@@ -169,6 +169,13 @@ class VpnServerAdapter(
          * The host should open the settings sheet so the user can restart the proxy.
          */
         fun onProxyStoppedItemTapped()
+
+        /**
+         * Called after the relay (hop) state of a single server was toggled from
+         * this list. The host should re-derive any aggregate UI that depends on
+         * the relay state of all servers (e.g. the Relay quick-settings tile).
+         */
+        fun onRelayToggled()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServerViewHolder {
@@ -488,11 +495,11 @@ class VpnServerAdapter(
                 val key = if (group.key == AUTO_SERVER_ID) {
                     VpnController.getWinProxyId() ?: "wgyrpn**"
                 } else {
-                    group.key
+                    Backend.RpnWin + group.key
                 }
                 val ct = connTrackerRepository.getLastRoutedConnectionForProxy(key)
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
-                val apps = ProxyManager.getAppCountForProxy(group.proxyId())
+                val apps = ProxyManager.getAppCountForProxy(key)
                 Logger.d(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyLastRoutedApp for id: ${group.proxyId()}, config: $config, apps: $apps, key: ${group.key}")
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
@@ -674,6 +681,8 @@ class VpnServerAdapter(
                             ),
                             Toast.LENGTH_SHORT
                         )
+                        // Let the host re-derive aggregate relay UI (quick-settings tile).
+                        listener.onRelayToggled()
                     }
                 } catch (t: Throwable) {
                     Logger.w(LOG_TAG_UI, "VpnServerAdapter toggleRelay[${group.key}]: ${t.message}")
@@ -722,7 +731,7 @@ class VpnServerAdapter(
             // between green (Connected) during the brief startup window (< 5 s) and red
             // (Failing) once that window expires – even though the backend reports TOK.
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> R.attr.accentGood
+                UIUtils.ProxyStatus.TOK -> R.attr.primaryLightColorText
                 UIUtils.ProxyStatus.TUP,
                 UIUtils.ProxyStatus.TZZ,
                 UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral

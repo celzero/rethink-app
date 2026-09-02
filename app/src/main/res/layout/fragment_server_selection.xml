@@ -13,29 +13,29 @@
         android:layout_height="match_parent"
         android:clipToPadding="false">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="12dp">
+
             <LinearLayout
+                android:id="@+id/header_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fitsSystemWindows="true"
                 android:orientation="vertical"
-                android:paddingBottom="12dp">
-
-                <LinearLayout
-                    android:id="@+id/header_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fitsSystemWindows="true"
-                    android:orientation="vertical"
-                    android:layout_marginTop="18dp"
-                    android:paddingStart="14dp"
-                    android:paddingTop="12dp"
-                    android:paddingEnd="14dp">
+                android:paddingStart="14dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="14dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/status_card"
+                    style="@style/RethinkPlus.HeroCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    style="@style/RethinkPlus.HeroCard">
+                    android:layout_marginTop="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -64,11 +64,11 @@
                                     android:id="@+id/status_chip"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginEnd="16dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/bg_plus_status_chip"
                                     android:gravity="center_vertical"
                                     android:orientation="horizontal"
-                                    android:layout_marginEnd="10dp"
                                     android:paddingStart="10dp"
                                     android:paddingTop="6dp"
                                     android:paddingEnd="12dp"
@@ -90,8 +90,7 @@
                                         android:maxLines="1"
                                         android:text="@string/dns_connected"
                                         android:textColor="?attr/primaryTextColor"
-                                        android:textSize="15sp"
-                                        android:textStyle="bold" />
+                                        android:textSize="@dimen/large_font_text_view" />
 
                                     <androidx.appcompat.widget.AppCompatTextView
                                         android:id="@+id/tv_active_duration"
@@ -110,23 +109,25 @@
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/support_btn"
                                     style="@style/Widget.Material3.Button.IconButton"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:contentDescription="@string/contact_support_title"
-                                    app:icon="@drawable/ic_user_crown"
+                                    app:icon="@drawable/ic_user_icon"
+                                    android:layout_marginEnd="12dp"
                                     app:iconGravity="textStart"
-                                    app:iconSize="32dp"
+                                    app:iconSize="26dp"
                                     app:iconTint="?attr/primaryLightColorText" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/settings_btn"
                                     style="@style/Widget.Material3.Button.IconButton"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:contentDescription="@string/server_settings_open"
+                                    android:layout_marginEnd="6dp"
                                     app:icon="@drawable/ic_settings"
                                     app:iconGravity="textStart"
-                                    app:iconSize="26dp"
+                                    app:iconSize="24dp"
                                     app:iconTint="?attr/primaryLightColorText" />
 
                             </LinearLayout>
@@ -289,8 +290,8 @@
                                         android:id="@+id/tv_hero_account_id"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:alpha="0.7"
                                         android:layout_marginTop="1dp"
+                                        android:alpha="0.7"
                                         android:ellipsize="end"
                                         android:gravity="end"
                                         android:maxLines="1"
@@ -437,519 +438,721 @@
                     app:trackColor="@android:color/transparent"
                     app:trackThickness="3dp" />
 
-            </LinearLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/selected_locations_header"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/quick_settings_card"
+                    style="@style/RethinkPlus.ContentCard"
+                    app:cardCornerRadius="8dp"
+                    app:strokeWidth="0.75dp"
+                    android:backgroundTint="?attr/colorSurface"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="10dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp">
 
                     <LinearLayout
-                        android:id="@+id/location_capacity_indicator"
+                        android:id="@+id/quick_settings_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
+                        android:paddingStart="6dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingBottom="16dp">
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/qs_relay_tile"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="@color/qs_tile_off_bg"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/qs_relay_icon"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:alpha="0.5"
+                                    android:src="@drawable/ic_hop_2"
+                                    android:tint="?attr/primaryLightColorText" />
+                            </FrameLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/tv_capacity_label"
-                            android:layout_width="0dp"
+                            android:id="@+id/qs_relay_label"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.04"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="@string/qs_relay_label"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp"
-                            tools:text="3 of 5 locations" />
+                            android:textSize="12sp" />
 
-                        <View
-                            android:id="@+id/capacity_dot_one"
-                            android:layout_width="22dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/bg_capacity_pill"
-                            android:backgroundTint="?attr/accentGood" />
-
-                        <View
-                            android:id="@+id/capacity_dot_two"
-                            android:layout_width="22dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/bg_capacity_pill"
-                            android:backgroundTint="?attr/accentGood" />
-
-                        <View
-                            android:id="@+id/capacity_dot_three"
-                            android:layout_width="22dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/bg_capacity_pill"
-                            android:backgroundTint="?attr/accentGood" />
-
-                        <View
-                            android:id="@+id/capacity_dot_four"
-                            android:layout_width="22dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/bg_capacity_pill"
-                            android:backgroundTint="?attr/primaryLightColorText"
-                            android:alpha="0.25" />
-
-                        <View
-                            android:id="@+id/capacity_dot_five"
-                            android:layout_width="22dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="5dp"
-                            android:background="@drawable/bg_capacity_pill"
-                            android:backgroundTint="?attr/primaryLightColorText"
-                            android:alpha="0.25" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/qs_relay_state"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:maxLines="1"
+                            android:text="@string/qs_relay_state_off"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="9.5sp" />
 
                     </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/manage_selected_btn"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="0dp"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="4dp"
-                        android:text="@string/server_selection_manage_locations"
-                        android:textColor="?attr/colorPrimary" />
-
-                </LinearLayout>
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_selected_servers"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="4dp"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    tools:listitem="@layout/list_item_vpn_server" />
-
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/add_location_btn"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:letterSpacing="0.02"
-                    android:text="@string/server_selection_add_location"
-                    android:textColor="?attr/colorPrimary"
-                    app:cornerRadius="24dp"
-                    app:icon="@drawable/ic_add"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    app:iconTint="?attr/colorPrimary"
-                    app:strokeWidth="1dp" />
-
-                <LinearLayout
-                    android:id="@+id/frequent_countries_section"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="2dp"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/server_selection_frequent_label"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="12sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.06"
-                        android:paddingStart="4dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="4dp"
-                        android:paddingBottom="6dp" />
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        android:clipToPadding="false"
-                        android:fadingEdgeLength="20dp"
-                        android:requiresFadingEdge="horizontal">
-
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/frequent_chip_group"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingStart="4dp"
-                            android:paddingTop="2dp"
-                            android:paddingEnd="20dp"
-                            android:paddingBottom="6dp"
-                            app:chipSpacingHorizontal="6dp"
-                            app:singleLine="true" />
-
-                    </HorizontalScrollView>
-
-                </LinearLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/empty_selection_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="4dp"
-                    style="@style/RethinkPlus.ContentCard">
-
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_marginEnd="12dp"
-                            android:alpha="0.6"
-                            android:src="@drawable/ic_vpn"
-                            android:tint="?attr/primaryLightColorText" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/qs_add_location_tile"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="@color/qs_tile_off_bg"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:alpha="0.5"
+                                    android:src="@drawable/ic_add"
+                                    android:tint="?attr/primaryLightColorText" />
+                            </FrameLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/server_selection_tap_to_select"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="@string/qs_add_location_label"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="16sp" />
+                            android:textSize="12sp" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.7"
-                            android:text="@string/server_selection_max_info"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="@string/qs_caption_location"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp" />
+                            android:textSize="9.5sp" />
 
                     </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <LinearLayout
-                    android:id="@+id/all_locations_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="10dp"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="All locations"
-                        style="@style/RethinkPlus.SectionLabel" />
-
-                </LinearLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/search_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="10dp"
-                    style="@style/RethinkPlus.ContentCard">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingStart="14dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="8dp">
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginEnd="10dp"
-                            android:src="@drawable/ic_search"
-                            android:tint="?attr/primaryLightColorText" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/qs_bypass_apps_tile"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="@color/qs_tile_off_bg"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
 
-                        <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/search_bar"
-                            android:layout_width="0dp"
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_bypass"
+                                    android:tint="?attr/primaryLightColorText" />
+                            </FrameLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@null"
-                            android:hint="@string/server_selection_search_hint"
-                            android:imeOptions="actionSearch"
-                            android:inputType="text"
+                            android:includeFontPadding="false"
                             android:maxLines="1"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textColorHint="?attr/primaryLightColorText"
-                            android:textSize="16sp" />
+                            android:text="@string/qs_bypass_apps_label"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="12sp" />
 
-                        <androidx.appcompat.widget.AppCompatImageButton
-                            android:id="@+id/search_clear_btn"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/server_selection_clear_search"
-                            android:src="@drawable/ic_cross"
-                            android:tint="?attr/primaryLightColorText"
-                            android:visibility="gone" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:maxLines="1"
+                            android:text="@string/qs_caption_apps"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="9.5sp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/search_filter_btn"
-                            style="@style/Widget.Material3.Button.IconButton"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:contentDescription="@string/server_selection_filter_locations"
-                            app:backgroundTint="?attr/colorSurfaceVariant"
-                            app:cornerRadius="18dp"
-                            app:icon="@drawable/ic_filter"
-                            app:iconGravity="textStart"
-                            app:iconPadding="0dp"
-                            app:iconSize="18dp"
-                            app:iconTint="?attr/primaryTextColor" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/qs_stats_tile"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="@color/qs_tile_off_bg"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center"
+                                    android:alpha="0.5"
+                                    android:src="@drawable/ic_statistics"
+                                    android:tint="?attr/primaryLightColorText" />
+                            </FrameLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:maxLines="1"
+                            android:text="@string/qs_stats_label"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="12sp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:maxLines="1"
+                            android:text="@string/qs_caption_live"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="9.5sp"
+                            android:visibility="visible" />
+
+                    </LinearLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/selected_locations_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
                 <LinearLayout
-                    android:id="@+id/server_count_layout"
-                    android:layout_width="match_parent"
+                    android:id="@+id/location_capacity_indicator"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingTop="12dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="4dp">
+                    android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_server_count"
+                        android:id="@+id/tv_capacity_label"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:letterSpacing="0.04"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="11sp"
+                        tools:text="3 of 5 locations" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_active_filter_summary"
+                    <View
+                        android:id="@+id/capacity_dot_one"
+                        android:layout_width="22dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_capacity_pill"
+                        android:backgroundTint="?attr/accentGood" />
+
+                    <View
+                        android:id="@+id/capacity_dot_two"
+                        android:layout_width="22dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_capacity_pill"
+                        android:backgroundTint="?attr/accentGood" />
+
+                    <View
+                        android:id="@+id/capacity_dot_three"
+                        android:layout_width="22dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_capacity_pill"
+                        android:backgroundTint="?attr/accentGood" />
+
+                    <View
+                        android:id="@+id/capacity_dot_four"
+                        android:layout_width="22dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="5dp"
+                        android:alpha="0.25"
+                        android:background="@drawable/bg_capacity_pill"
+                        android:backgroundTint="?attr/primaryLightColorText" />
+
+                    <View
+                        android:id="@+id/capacity_dot_five"
+                        android:layout_width="22dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="5dp"
+                        android:alpha="0.25"
+                        android:background="@drawable/bg_capacity_pill"
+                        android:backgroundTint="?attr/primaryLightColorText" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_selected_servers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                tools:listitem="@layout/list_item_vpn_server" />
+
+            <LinearLayout
+                android:id="@+id/frequent_countries_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="2dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.06"
+                    android:paddingStart="4dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="4dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/server_selection_frequent_label"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="12sp" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:fadingEdgeLength="20dp"
+                    android:requiresFadingEdge="horizontal"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/frequent_chip_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_vpn_status_chip"
-                        android:contentDescription="@string/server_selection_filter_clear_desc"
-                        android:drawableEnd="@drawable/ic_cross"
-                        android:drawablePadding="6dp"
-                        android:drawableTint="?attr/accentGood"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center_vertical"
-                        android:paddingStart="10dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="4dp"
-                        android:textColor="?attr/chipTextPositive"
-                        android:textSize="12sp"
-                        android:visibility="gone"
-                        tools:text="Low (≤ 40%) • Favourites only"
-                        tools:visibility="visible" />
+                        android:paddingStart="4dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="6dp"
+                        app:chipSpacingHorizontal="6dp"
+                        app:singleLine="true" />
+
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/empty_selection_card"
+                style="@style/RethinkPlus.ContentCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="12dp"
+                        android:alpha="0.6"
+                        android:src="@drawable/ic_vpn"
+                        android:tint="?attr/primaryLightColorText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/server_selection_tap_to_select"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="16sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:alpha="0.7"
                         android:text="@string/server_selection_max_info"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="11sp" />
 
                 </LinearLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_servers"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="false"
-                    android:paddingStart="12dp"
-                    android:paddingTop="0dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="12dp"
-                    android:visibility="gone"
-                    tools:listitem="@layout/list_item_country_card" />
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.facebook.shimmer.ShimmerFrameLayout
-                    android:id="@+id/shimmer_server_list"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/search_card"
+                style="@style/RethinkPlus.ContentCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:visibility="visible"
-                    app:shimmer_auto_start="true"
-                    app:shimmer_base_alpha="0.10"
-                    app:shimmer_duration="1200"
-                    app:shimmer_highlight_alpha="0.30">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="?attr/primaryLightColorText" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/search_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="@string/server_selection_search_hint"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textColorHint="?attr/primaryLightColorText"
+                        android:textSize="16sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/search_clear_btn"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/server_selection_clear_search"
+                        android:src="@drawable/ic_cross"
+                        android:tint="?attr/primaryLightColorText"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/search_filter_btn"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:contentDescription="@string/server_selection_filter_locations"
+                        app:backgroundTint="?attr/colorSurfaceVariant"
+                        app:cornerRadius="18dp"
+                        app:icon="@drawable/ic_filter"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="18dp"
+                        app:iconTint="?attr/primaryTextColor" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/server_count_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_server_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_active_filter_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_vpn_status_chip"
+                    android:contentDescription="@string/server_selection_filter_clear_desc"
+                    android:drawableEnd="@drawable/ic_cross"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="?attr/accentGood"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    tools:text="Low (≤ 40%) • Favourites only"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_servers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="12dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="12dp"
+                android:visibility="gone"
+                tools:listitem="@layout/list_item_country_card" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_server_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:visibility="visible"
+                app:shimmer_auto_start="true"
+                app:shimmer_base_alpha="0.10"
+                app:shimmer_duration="1200"
+                app:shimmer_highlight_alpha="0.30">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/list_item_shimmer_server_row" />
+
+                    <include layout="@layout/list_item_shimmer_server_row" />
+
+                    <include layout="@layout/list_item_shimmer_server_row" />
+
+                    <include layout="@layout/list_item_shimmer_server_row" />
+
+                    <include layout="@layout/list_item_shimmer_server_row" />
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <LinearLayout
+                android:id="@+id/error_state_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/RethinkPlus.ContentCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingStart="24dp"
+                        android:paddingTop="28dp"
+                        android:paddingEnd="24dp"
+                        android:paddingBottom="24dp">
 
-                        <include layout="@layout/list_item_shimmer_server_row" />
-                        <include layout="@layout/list_item_shimmer_server_row" />
-                        <include layout="@layout/list_item_shimmer_server_row" />
-                        <include layout="@layout/list_item_shimmer_server_row" />
-                        <include layout="@layout/list_item_shimmer_server_row" />
+                        <FrameLayout
+                            android:id="@+id/error_icon_container"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:background="@drawable/bg_error_icon_circle">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/error_illustration"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/illustrations_no_record"
+                                android:tint="?attr/accentBad" />
+
+                        </FrameLayout>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/error_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:text="@string/server_selection_error_title"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/error_hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:alpha="0.8"
+                            android:gravity="center"
+                            android:lineSpacingExtra="4dp"
+                            android:maxWidth="300dp"
+                            android:text="@string/server_selection_error_hint"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="14sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/error_retry_btn"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="24dp"
+                            android:paddingStart="28dp"
+                            android:paddingEnd="28dp"
+                            android:text="@string/server_selection_error_retry"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="?attr/accentBad"
+                            app:cornerRadius="24dp"
+                            app:elevation="0dp"
+                            app:icon="@drawable/ic_refresh"
+                            app:iconGravity="textStart"
+                            app:iconPadding="10dp"
+                            app:iconTint="@android:color/white" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/error_reset_btn"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="44dp"
+                            android:layout_marginTop="10dp"
+                            android:paddingStart="28dp"
+                            android:paddingEnd="28dp"
+                            android:text="@string/lbl_reset"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="22dp"
+                            app:elevation="0dp"
+                            app:icon="@drawable/ic_refresh"
+                            app:iconGravity="textStart"
+                            app:iconPadding="10dp"
+                            app:iconTint="?attr/accentBad"
+                            app:strokeColor="?attr/accentBad" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/error_report_btn"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/contact_support_title"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 
-                </com.facebook.shimmer.ShimmerFrameLayout>
-
-                <LinearLayout
-                    android:id="@+id/error_state_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="42dp"
-                    android:layout_marginBottom="42dp"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:paddingStart="32dp"
-                    android:paddingEnd="32dp"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <FrameLayout
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
-                        android:layout_marginBottom="32dp">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/error_illustration"
-                            android:layout_width="140dp"
-                            android:layout_height="140dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/illustrations_no_record"
-                            android:tint="?attr/colorOnSurface" />
-
-                    </FrameLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/error_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:text="@string/server_selection_error_title"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/error_message"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:gravity="center"
-                        android:lineSpacingExtra="5dp"
-                        android:maxWidth="320dp"
-                        android:text="@string/server_selection_error_message"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="15sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/error_hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="36dp"
-                        android:alpha="0.6"
-                        android:gravity="center"
-                        android:maxWidth="300dp"
-                        android:text="@string/server_selection_error_hint"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="13sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/error_retry_btn"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="52dp"
-                        android:paddingStart="32dp"
-                        android:paddingEnd="32dp"
-                        android:text="@string/server_selection_error_retry"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="?attr/accentBad"
-                        app:cornerRadius="26dp"
-                        app:elevation="4dp"
-                        app:icon="@drawable/ic_refresh"
-                        app:iconGravity="textStart"
-                        app:iconPadding="10dp"
-                        app:iconTint="@android:color/white"
-                        android:textColor="@android:color/white" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/error_reset_btn"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="12dp"
-                        android:paddingStart="32dp"
-                        android:paddingEnd="32dp"
-                        android:text="@string/lbl_reset"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="26dp"
-                        app:elevation="0dp"
-                        app:icon="@drawable/ic_refresh"
-                        app:iconGravity="textStart"
-                        app:iconPadding="10dp"
-                        app:strokeColor="?attr/accentBad"
-                        android:textColor="?attr/accentBad"
-                        app:iconTint="?attr/accentBad" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/error_report_btn"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/contact_support_title"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="15sp" />
-
-                </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
         android:id="@+id/collapsed_title_bar"
@@ -957,14 +1160,14 @@
         android:layout_height="48dp"
         android:layout_gravity="top"
         android:alpha="0"
+        android:background="?attr/background"
         android:clickable="false"
+        android:elevation="4dp"
         android:focusable="false"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="18dp"
-        android:paddingEnd="18dp"
-        android:elevation="4dp"
-        android:background="?attr/background">
+        android:paddingEnd="18dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_collapsed_flag"

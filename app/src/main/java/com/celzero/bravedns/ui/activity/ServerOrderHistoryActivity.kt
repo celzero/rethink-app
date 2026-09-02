@@ -38,6 +38,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.isActivityLightTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -126,6 +127,10 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
     }
 
     private fun setupClickListeners() {
+        b.chipEntitlement.setOnClickListener {
+            EntitlementDetailBottomSheet.newInstance()
+                .show(supportFragmentManager, "entitlementDetails")
+        }
         b.chipPaymentHistory.setOnClickListener {
             openBillingHistory()
         }
@@ -225,29 +230,29 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
     private fun loadHeroSubtitle() {
         io {
             val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
-            val subtitle = buildHeroSubtitle(deviceId)
-            val expiry = VpnController.getWinExpiryTs()
-            val hex = expiry?.toString(16)
+            val expiry = VpnController.getWinExpiryTs() ?: 0L
+            val hex = expiry.toString(16)
+            val subtitle = buildHeroSubtitle(deviceId, hex)
             uiCtx {
                 b.tvHeroSubtitle.text = subtitle
-                if (hex == null) {
-                    b.tvHeroExpiry.visibility = View.GONE
-                } else {
-                    b.tvHeroExpiry.visibility = View.VISIBLE
-                    b.tvHeroExpiry.text = hex
-                }
             }
         }
     }
 
-    private fun buildHeroSubtitle(deviceId: String): String {
-        val sub = RpnProxyManager.getSubscriptionData() ?: return ""
-        var token = sub.subscriptionStatus.purchaseToken ?: ""
-        token = if (token.length > 12) token.take(12) else token.ifBlank { "" }
-        val accountId = sub.subscriptionStatus.accountId.take(12).ifBlank { return token }
-        val did = deviceId.take(4).ifBlank { return token }
-        val id = "$accountId • $did"
-        return if (token.isNotEmpty()) "$token · $id" else id
+    /**
+     * purchase token (first 12 chars) · accountId (first 12 chars) • deviceId (first 4 chars).
+     */
+    private fun buildHeroSubtitle(deviceId: String, expiry: String): String {
+        val sub = RpnProxyManager.getSubscriptionData()?.subscriptionStatus ?: return ""
+        return heroIdentityLine(sub.purchaseToken, sub.accountId, deviceId, expiry)
+    }
+
+    private fun heroIdentityLine(token: String, accountId: String, deviceId: String, expiry: String): String {
+        val t = token.take(12)
+        val a = accountId.take(12)
+        val d = deviceId.take(4)
+        val idPart = listOf(a, d).filter { it.isNotBlank() }.joinToString(" • ")
+        return listOf(t, idPart, expiry).filter { it.isNotBlank() }.joinToString(" · ")
     }
 
     private fun startShimmer() {

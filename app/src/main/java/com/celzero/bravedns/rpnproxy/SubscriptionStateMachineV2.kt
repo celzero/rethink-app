@@ -1069,9 +1069,17 @@ open class SubscriptionStateMachineV2 : KoinComponent {
      */
     private suspend fun updateCancelledStatusInDb(detail: PurchaseDetail) {
         try {
-            val existing = subscriptionDb.getByPurchaseToken(detail.purchaseToken)
-                ?: subscriptionDb.getCurrentSubscription()
-                ?: return
+            // Token-strict lookup: this function unconditionally writes CANCELLED, so it
+            // must NEVER fall back to getCurrentSubscription() — a Play snapshot whose
+            // token is unknown to the DB would otherwise stamp "the most recent row"
+            // (possibly a different, ACTIVE purchase) as CANCELLED. When the token is
+            // unknown, handlePaymentSuccessful is the correct writer: it creates the row
+            // with targetStatus derived from Play (CANCELLED for isAutoRenewing=false).
+            val existing = subscriptionDb.getByPurchaseToken(detail.purchaseToken) ?: run {
+                Logger.w(LOG_IAB, "$TAG: updateCancelledStatusInDb: no DB row for token " +
+                    "${detail.purchaseToken.take(8)}, skipping (token-strict)")
+                return
+            }
 
             if (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) {
                 Logger.d(LOG_IAB, "$TAG: updateCancelledStatusInDb: already CANCELLED, no-op (DB)")

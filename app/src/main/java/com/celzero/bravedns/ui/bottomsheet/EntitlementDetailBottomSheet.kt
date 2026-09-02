@@ -229,13 +229,6 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         compareAndSet(b.rowTest, "Is Test", test1.capitalizeWords(), test2?.capitalizeWords(), valuesEqual(test1, test2), showDivider = false)
 
         b.restoreCv.visibility = if (canRestore) View.VISIBLE else View.GONE
-
-        if (everythingSame && activeEntitlement != null) {
-            b.tvComparisonInfo.text = getString(R.string.unicode_check_sign)
-            b.tvComparisonInfo.visibility = View.VISIBLE
-        } else {
-            b.tvComparisonInfo.visibility = View.GONE
-        }
     }
 
     /**

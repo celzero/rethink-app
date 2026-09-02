@@ -93,7 +93,7 @@ class WgIncludeAppsAdapter(
 
     override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
         // Guard against stale positions during layout pass after data change
-        if (position < 0 || position >= itemCount) {
+        if (position !in 0..<itemCount) {
             Logger.w(LOG_TAG_PROXY, "Invalid position $position for itemCount $itemCount")
             return
         }
@@ -120,7 +120,7 @@ class WgIncludeAppsAdapter(
                 val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
                 val hasInternetPerm = mapping.hasInternetPermission(packageManager)
                 val iconDrawable = getIcon(context, itemPackageName, itemAppName)
-                Logger.d(LOG_TAG_PROXY, "INCLUDE(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
+                Logger.d(LOG_TAG_PROXY, "include(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
                 uiCtx {
                     // Update UI synchronously on the main thread
                     // enable/disable UI based on exclusion

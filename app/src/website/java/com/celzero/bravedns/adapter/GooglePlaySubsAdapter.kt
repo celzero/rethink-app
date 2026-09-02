@@ -20,10 +20,12 @@ import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.billingclient.api.BillingClient.ProductType
@@ -32,7 +34,6 @@ import com.celzero.bravedns.databinding.ListItemPlaySubsBinding
 import com.celzero.bravedns.databinding.ListItemShimmerCardBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
-import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.facebook.shimmer.ShimmerFrameLayout
 
 class GooglePlaySubsAdapter(
@@ -98,6 +99,7 @@ class GooglePlaySubsAdapter(
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         if (holder is ShimmerViewHolder) holder.shimmerLayout.stopShimmer()
+        if (holder is SubscriptionPlansViewHolder) holder.stopBorderAnimation()
         super.onViewRecycled(holder)
     }
 
@@ -124,6 +126,8 @@ class GooglePlaySubsAdapter(
 
     inner class SubscriptionPlansViewHolder(private val binding: ListItemPlaySubsBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        private var rotationAnimator: ObjectAnimator? = null
 
         fun bind(prod: ProductDetail, pos: Int) {
             val pricing = prod.pricingDetails.firstOrNull() ?: return
@@ -241,14 +245,30 @@ class GooglePlaySubsAdapter(
 
         private fun applySelectionStyle(selected: Boolean) {
             if (selected) {
-                binding.planCard.strokeWidth = 3
-                binding.planCard.strokeColor = fetchColor(context, R.attr.accentGood)
+                binding.selectionBorderContainer.visibility = View.VISIBLE
                 binding.planCard.cardElevation = context.resources.displayMetrics.density * 4f
+                startBorderAnimation()
             } else {
-                binding.planCard.strokeWidth = 1
-                binding.planCard.strokeColor = fetchColor(context, R.attr.chipBgColorNeutral)
+                binding.selectionBorderContainer.visibility = View.GONE
                 binding.planCard.cardElevation = context.resources.displayMetrics.density * 1f
+                stopBorderAnimation()
             }
+        }
+
+        private fun startBorderAnimation() {
+            if (rotationAnimator?.isRunning == true) return
+
+            rotationAnimator = ObjectAnimator.ofFloat(binding.animatedBorderView, "rotation", 0f, 360f).apply {
+                duration = 3000
+                interpolator = LinearInterpolator()
+                repeatCount = ValueAnimator.INFINITE
+                start()
+            }
+        }
+
+        fun stopBorderAnimation() {
+            rotationAnimator?.cancel()
+            rotationAnimator = null
         }
 
         private fun animateSelection() {

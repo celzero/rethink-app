@@ -12,7 +12,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_glass"
+        android:background="@drawable/bg_plus_hero_gradient"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
@@ -41,29 +41,11 @@
                 android:layout_marginBottom="28dp"
                 android:maxLines="1"
                 android:textColor="?attr/homeScreenHeaderTextColor"
-                android:textSize="@dimen/small_font_text_view"
+                android:textSize="@dimen/mini_font_text_view"
                 android:ellipsize="end"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.6"
                 tools:text="RPN Standard · 74b4c00217"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_hero_expiry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:fontFamily="monospace"
-                android:alpha="0.75"
-                android:layout_marginBottom="10dp"
-                android:maxLines="1"
-                android:textColor="?attr/homeScreenHeaderTextColor"
-                android:textSize="@dimen/small_font_text_view"
-                android:ellipsize="end"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.6"
-                tools:text="RPN Standard · 74b4c00217" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -94,21 +76,42 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_payment_history"
-            style="@style/ThinnerChip.Action"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="end"
-            android:layout_gravity="end"
-            android:padding="5dp"
-            app:chipBackgroundColor="?attr/chipBgColorPositive"
-            android:text="@string/payment_history_title"
-            android:textSize="@dimen/large_font_text_view"
-            android:alpha="0.75"
-            android:textColor="?attr/chipTextPositive" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="10dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_entitlement"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:padding="5dp"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                android:text="@string/entitlement"
+                android:textSize="@dimen/large_font_text_view"
+                android:alpha="0.75"
+                android:textColor="?attr/chipTextPositive" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_payment_history"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:padding="5dp"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                android:text="@string/payment_history_title"
+                android:textSize="@dimen/large_font_text_view"
+                android:alpha="0.75"
+                android:textColor="?attr/chipTextPositive" />
+
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_orders"

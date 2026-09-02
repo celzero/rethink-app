@@ -62,7 +62,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="center"
-                        android:contentDescription="@string/ping_test_title"
+                        android:contentDescription="@string/settings_connectivity_checks"
                         android:src="@drawable/ic_shield_check"
                         app:tint="?attr/primaryTextColor" />
 
@@ -76,7 +76,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:maxLines="1"
-                    android:text="@string/ping_ready_title"
+                    android:text="@string/settings_connectivity_checks"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -159,6 +159,18 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/rpn_inactive_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/ping_vpn_inactive_note"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/ping_button"
                     style="@style/Widget.Material3.Button"
@@ -166,7 +178,7 @@
                     android:layout_height="52dp"
                     android:layout_marginTop="16dp"
                     android:letterSpacing="0.02"
-                    android:text="@string/ping_test_button"
+                    android:text="@string/rpn_perform_test"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:cornerRadius="26dp" />
@@ -178,7 +190,7 @@
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/results_scroll_view"
+        android:id="@+id/history_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -194,32 +206,22 @@
             android:paddingTop="6dp"
             android:paddingBottom="12dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/results_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="10dp"
-                android:text="@string/rpn_overhauled_plan_details_header"
-                style="@style/RethinkPlus.SectionLabel"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/results_card"
+                android:id="@+id/history_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 style="@style/RethinkPlus.ContentCard"
                 tools:visibility="visible">
 
-                <LinearLayout
-                    android:id="@+id/results_container"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/history_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp" />
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:paddingVertical="4dp" />
 
             </com.google.android.material.card.MaterialCardView>
 

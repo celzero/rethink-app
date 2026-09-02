@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/history_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/ic_circle"
+        android:backgroundTint="?attr/colorSurfaceVariant"
+        android:contentDescription="@string/lbl_status"
+        android:padding="8dp"
+        android:src="@drawable/ic_tick"
+        app:tint="?attr/accentGood" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="13dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/history_target"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="14.5sp"
+            tools:text="dl.rethinkdns.com, ifconfig.me" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/history_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:singleLine="true"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="11.5sp"
+            tools:text="3 min ago · 2/2 passed" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/history_latency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="320ms" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/history_outcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:textSize="11.5sp"
+            tools:text="Reachable"
+            tools:textColor="?attr/accentGood" />
+    </LinearLayout>
+
+</LinearLayout>

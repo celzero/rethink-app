@@ -123,7 +123,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="4dp"
-            android:text="@string/lbl_deselect_all"
+            android:text="@string/lbl_unselect_all"
             android:textColor="?attr/primaryTextColor"
             android:textSize="13sp"
             app:buttonIconTint="?attr/accentBad" />

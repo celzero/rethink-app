@@ -70,8 +70,9 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_country_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.01"
@@ -84,14 +85,18 @@
                 android:id="@+id/tv_server_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
+                android:gravity="center"
                 android:letterSpacing="0.04"
                 android:maxLines="1"
-                android:textColor="?attr/accentGood"
-                android:textSize="11sp"
+                android:paddingStart="9dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="9dp"
+                android:paddingBottom="3dp"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="10sp"
                 tools:text="Connected" />
 
         </LinearLayout>

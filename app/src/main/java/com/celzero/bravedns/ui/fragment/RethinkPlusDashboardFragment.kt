@@ -21,11 +21,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
-import com.celzero.bravedns.database.SubscriptionStatusDao
+import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.databinding.FragmentRethinkPlusDashboardBinding
 import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
@@ -36,6 +38,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver.PurchaseUiModel
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.PingTestActivity
@@ -48,10 +51,17 @@ import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import kotlin.time.Duration.Companion.milliseconds
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,11 +69,25 @@ import java.util.Locale
 class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_dashboard) {
     private val b by viewBinding(FragmentRethinkPlusDashboardBinding::bind)
 
-    private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
+    private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
+
+    /**
+     * Activity-scoped ViewModel that owns the RPN reset coroutine so the IO work
+     * survives dialog dismissal / fragment recreation. Mirrors the flow used by
+     * [ServerSelectionFragment] and [com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet].
+     */
+    private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
+
+    /** Job driving the RPN reset progress loop. */
+    private var rpnResetJob: Job? = null
+    /** Dialog shown while RPN reset is in progress. */
+    private var rpnResetDialog: android.app.Dialog? = null
 
     companion object {
         private const val TAG = "RPNDashFrag"
         private const val ARG_SHOW_MANAGE_PURCHASE = "arg_show_manage_purchase"
+        /** Interval between reset-status poll iterations (kept in sync with ServerSelectionFragment). */
+        private const val RESET_STATUS_POLL_INTERVAL_MS = 1_500L
 
         fun createBundle(showManagePurchase: Boolean): Bundle {
             return Bundle().apply {
@@ -79,6 +103,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         setupClickListeners()
         setupServerErrorObserver()
         observeSubscriptionState()
+        observeResetState()
         if (!Utilities.isFdroidFlavour()) {
             observeAckFailureState()
         }
@@ -101,17 +126,22 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
 
     private fun loadSubscriptionBanner() {
         io {
-            val sub = runCatching { subscriptionStatusDao.getCurrentSubscription() }.getOrNull()
+            // Repository prefers valid (Active-first) rows; the raw DAO query returns the
+            // most recently touched row of ANY status (including Expired).
+            val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
             val state = RpnProxyManager.getSubscriptionState()
             val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
-            uiCtx { populateBanner(sub, state, deviceId) }
+            val expiry = VpnController.getWinExpiryTs() ?: 0L
+            val hex = expiry.toString(16)
+            uiCtx { populateBanner(sub, state, deviceId, hex) }
         }
     }
 
     private fun populateBanner(
         sub: SubscriptionStatus?,
         state: SubscriptionStateMachineV2.SubscriptionState,
-        realDeviceId: String = ""
+        realDeviceId: String = "",
+        expiry: String = ""
     ) {
         if (!isAdded) return
 
@@ -121,11 +151,22 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
         val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
         val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
+
+        // Same guard as Manage Purchase: a CANCELLED DB row must not render as "Active"
+        // unless Play still reports an auto-renewing purchase for this token.
+        val dbRowCancelled = sub?.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+        val playConfirmsRenewal =
+            runCatching { RpnProxyManager.getSubscriptionData()?.purchaseDetail?.isAutoRenewing }
+                .getOrNull() == true
+        val effectivelyCancelled = dbRowCancelled && !playConfirmsRenewal
+
         val (statusText, statusColor) = when (model) {
             is PurchaseUiModel.Loading -> getString(R.string.rpn_status_syncing) to colorDim
             is PurchaseUiModel.NoPurchase -> getString(R.string.rpn_status_no_plan) to colorDim
             else -> when (state) {
-                is SubscriptionStateMachineV2.SubscriptionState.Active -> getString(R.string.lbl_active) to colorGood
+                is SubscriptionStateMachineV2.SubscriptionState.Active ->
+                    if (effectivelyCancelled) getString(R.string.lbl_cancelled) to colorBad
+                    else getString(R.string.lbl_active) to colorGood
                 is SubscriptionStateMachineV2.SubscriptionState.Grace -> getString(R.string.lbl_grace_period) to colorGood
                 is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> getString(R.string.lbl_cancelled) to colorBad
                 is SubscriptionStateMachineV2.SubscriptionState.Expired -> getString(R.string.lbl_expired) to colorBad
@@ -145,8 +186,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             }
 
             is PurchaseUiModel.NoPurchase -> renderNoPurchaseHero()
-            is PurchaseUiModel.Lapsed -> renderLapsedHero(model, fmt)
-            is PurchaseUiModel.Valid -> renderValidHero(model, realDeviceId, fmt)
+            is PurchaseUiModel.Lapsed -> renderLapsedHero(model, realDeviceId, fmt, expiry)
+            is PurchaseUiModel.Valid -> renderValidHero(model, realDeviceId, fmt, expiry)
         }
 
         // No-purchase guidance: CTA routes to the purchase screen; purchase surfaces are
@@ -162,15 +203,23 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     }
 
     private fun renderNoPurchaseHero() {
+        // Identical to RethinkPlusManagePurchaseFragment's NoPurchase hero: keep all
+        // three lines visible, showing N/A placeholders instead of hiding the rows.
         b.tvHeroPlanName.text = getString(R.string.rpn_no_active_plan_title)
-        b.tvHeroPurchasedDate.isVisible = false
-        b.tvHeroIds.isVisible = false
+        b.tvHeroPurchasedDate.isVisible = true
+        b.tvHeroPurchasedDate.text = getString(R.string.lbl_not_available_short)
+        b.tvHeroIds.isVisible = true
+        b.tvHeroIds.text = getString(R.string.lbl_not_available_short)
     }
 
-    private fun renderLapsedHero(model: PurchaseUiModel.Lapsed, fmt: SimpleDateFormat) {
+    private fun renderLapsedHero(model: PurchaseUiModel.Lapsed, realDeviceId: String, fmt: SimpleDateFormat, expiry: String) {
         val subscriptionData = RpnProxyManager.getSubscriptionData()
         val plan = resolvePlanName(subscriptionData).ifBlank {
-            resolvePlanName(model.sub?.productId.orEmpty(), model.sub?.planId.orEmpty())
+            resolvePlanName(
+                model.sub?.productId.orEmpty(),
+                model.sub?.planId.orEmpty(),
+                model.sub?.productTitle.orEmpty()
+            )
         }
         b.tvHeroPlanName.text = plan.ifBlank { getString(R.string.lbl_not_available_short) }
 
@@ -181,24 +230,22 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             getString(R.string.lbl_not_available_short)
         }
 
-        val accountId = model.sub?.accountId?.take(12).orEmpty()
-        b.tvHeroIds.isVisible = accountId.isNotEmpty()
-        b.tvHeroIds.text = accountId.ifEmpty { "" }
+        renderHeroIds(model.sub?.purchaseToken.orEmpty(), model.sub?.accountId.orEmpty(), realDeviceId, expiry)
     }
 
     private fun renderValidHero(
         model: PurchaseUiModel.Valid,
         realDeviceId: String,
-        fmt: SimpleDateFormat
+        fmt: SimpleDateFormat,
+        expiry: String
     ) {
-        val accountId = model.sub?.accountId?.take(12).orEmpty()
-        val deviceId = realDeviceId.take(4)
-        b.tvHeroIds.isVisible = accountId.isNotEmpty()
-        b.tvHeroIds.text = if (accountId.isNotEmpty()) "ID $accountId · $deviceId" else ""
-
         val subscriptionData = RpnProxyManager.getSubscriptionData()
         b.tvHeroPlanName.text = resolvePlanName(subscriptionData).ifBlank {
-            resolvePlanName(model.sub?.productId.orEmpty(), model.sub?.planId.orEmpty())
+            resolvePlanName(
+                model.sub?.productId.orEmpty(),
+                model.sub?.planId.orEmpty(),
+                model.sub?.productTitle.orEmpty()
+            )
         }.capitalizeWords()
 
         b.tvHeroPurchasedDate.isVisible = true
@@ -207,6 +254,26 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         } else {
             getString(R.string.placeholder_dash)
         }
+
+        renderHeroIds(model.sub?.purchaseToken.orEmpty(), model.sub?.accountId.orEmpty(), realDeviceId, expiry)
+    }
+
+    /**
+     * Renders the hero's last line: purchase token (first 12 chars) · accountId
+     * (first 12 chars) • deviceId (first 4 chars).
+     */
+    private fun renderHeroIds(token: String, accountId: String, deviceId: String, expiry: String) {
+        val line = heroIdentityLine(token, accountId, deviceId, expiry)
+        b.tvHeroIds.isVisible = line.isNotEmpty()
+        b.tvHeroIds.text = line
+    }
+
+    private fun heroIdentityLine(token: String, accountId: String, deviceId: String, expiry: String): String {
+        val t = token.take(12)
+        val a = accountId.take(12)
+        val d = deviceId.take(4)
+        val idPart = listOf(a, d).filter { it.isNotBlank() }.joinToString(" · ")
+        return listOf(t, idPart, expiry).filter { it.isNotBlank() }.joinToString(" · ")
     }
 
     private fun setupClickListeners() {
@@ -215,7 +282,148 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         }
         b.cardManagePurchaseDashboard.setOnClickListener { showManagePurchase() }
         b.cardGetPlus.setOnClickListener { showPurchaseScreen() }
-        b.cardReportIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
+        b.rowReportIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
+        b.rowRestoreDefaults.setOnClickListener { onRestoreDefaultsClicked() }
+    }
+
+    /**
+     * Restore Defaults entry point on the dashboard.
+     * The progress dialog and result handling are driven by [observeResetState].
+     */
+    private fun onRestoreDefaultsClicked() {
+        if (!isAdded) return
+        if (!VpnController.hasTunnel()) {
+            Logger.w(LOG_TAG_UI, "$TAG.onRestoreDefaultsClicked: no VPN tunnel, showing hint")
+            showToastUiCentered(requireContext(), getString(R.string.ssv_toast_start_rethink), Toast.LENGTH_SHORT)
+            return
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.rpn_restore_confirm_title))
+            .setMessage(getString(R.string.rpn_restore_confirm_message))
+            .setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { dialog, _ ->
+                dialog.dismiss()
+                serverSelectionViewModel.reset()
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
+            .show()
+    }
+
+    /**
+     * Observes [ServerSelectionViewModel.resetState] to drive the reset progress
+     * dialog and surface the outcome. Result data (servers/selected lists) is ignored here;
+     * the dashboard only needs to re-render the subscription banner.
+     */
+    private fun observeResetState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serverSelectionViewModel.resetState.collect { state ->
+                    when (state) {
+                        is ServerSelectionViewModel.ResetState.InProgress -> {
+                            if (rpnResetDialog?.isShowing != true) showRpnResetDialog()
+                        }
+                        is ServerSelectionViewModel.ResetState.Done -> {
+                            serverSelectionViewModel.onResetConsumed()
+                            dismissRpnResetDialog()
+                            when (state.result) {
+                                is RpnProxyManager.ResetResult.Success -> {
+                                    Logger.i(LOG_TAG_UI, "$TAG.observeResetState: reset success")
+                                    showToastUiCentered(
+                                        requireContext(),
+                                        getString(R.string.rpn_restore_success),
+                                        Toast.LENGTH_SHORT
+                                    )
+                                }
+                                is RpnProxyManager.ResetResult.Failure -> {
+                                    Logger.w(LOG_TAG_UI, "$TAG.observeResetState: reset failed: ${state.result.reason}")
+                                    showToastUiCentered(
+                                        requireContext(),
+                                        getString(R.string.rpn_restore_failure, state.result.reason),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
+                            }
+                            // Re-render the hero/chip; reset may have changed entitlement state.
+                            loadSubscriptionBanner()
+                        }
+                        is ServerSelectionViewModel.ResetState.NoTunnel -> {
+                            serverSelectionViewModel.onResetConsumed()
+                            dismissRpnResetDialog()
+                            showToastUiCentered(
+                                requireContext(),
+                                getString(R.string.ssv_toast_start_rethink),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                        is ServerSelectionViewModel.ResetState.Idle -> { /* no-op */ }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Progress dialog shown while the RPN reset is running. Reuses the
+     * dialog_server_loading layout (spinner + cycling status + timeout bar),
+     * matching ServerSelectionFragment.showRpnResetDialog.
+     */
+    private fun showRpnResetDialog() {
+        if (!isAdded) return
+        if (rpnResetDialog?.isShowing == true) return
+        dismissRpnResetDialog()
+
+        val timeoutMs = ServerSelectionViewModel.RESET_TIMEOUT_MS
+        val dialogView = layoutInflater.inflate(R.layout.dialog_server_loading, null)
+        val tvStatus = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_status)
+        val tvHint = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_hint)
+        val timeoutBar = dialogView.findViewById<LinearProgressIndicator>(R.id.server_loading_timeout_bar)
+
+        tvHint.text = getString(R.string.rpn_restore_dialog_hint)
+        timeoutBar.max = timeoutMs.toInt()
+        timeoutBar.setProgressCompat(0, false)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+        rpnResetDialog = dialog
+
+        val statusMessages = listOf(
+            getString(R.string.rpn_restore_dialog_status_unregistering),
+            getString(R.string.rpn_restore_dialog_status_fetching),
+            getString(R.string.rpn_restore_dialog_status_registering),
+            getString(R.string.rpn_restore_dialog_status_refreshing),
+        )
+
+        rpnResetJob = lifecycleScope.launch {
+            val startTime = System.currentTimeMillis()
+            var msgIdx = 0
+            while (serverSelectionViewModel.resetState.value is ServerSelectionViewModel.ResetState.InProgress) {
+                val elapsed = System.currentTimeMillis() - startTime
+                val statusMsg = when {
+                    elapsed > timeoutMs * 0.75 ->
+                        getString(R.string.server_loading_dialog_status_timeout)
+                    else -> statusMessages[msgIdx % statusMessages.size]
+                }
+                if (isAdded) {
+                    tvStatus.text = statusMsg
+                    timeoutBar.setProgressCompat(elapsed.coerceAtMost(timeoutMs).toInt(), true)
+                }
+                delay(RESET_STATUS_POLL_INTERVAL_MS.milliseconds)
+                msgIdx++
+            }
+        }
+    }
+
+    /** Cancels the reset status job and safely dismisses the reset progress dialog. */
+    private fun dismissRpnResetDialog() {
+        rpnResetJob?.cancel()
+        rpnResetJob = null
+        runCatching {
+            if (rpnResetDialog?.isShowing == true) rpnResetDialog?.dismiss()
+        }
+        rpnResetDialog = null
     }
 
     private fun showPurchaseScreen() {
@@ -257,7 +465,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun observeSubscriptionState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             RpnProxyManager.collectSubscriptionState().collect { state ->
-                val sub = runCatching { subscriptionStatusDao.getCurrentSubscription() }.getOrNull()
+                val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
                 uiCtx {
                     populateBanner(sub, state, deviceId)

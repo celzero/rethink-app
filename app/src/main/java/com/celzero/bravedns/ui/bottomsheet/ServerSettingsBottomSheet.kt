@@ -109,7 +109,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
          */
         fun onDnsModeChanged(tunTypes: String)
         /**
-         * Fired once when the sheet is dismissed (Done tap or swipe-away), but
+         * Fired once when the sheet is dismissed (back press or swipe-away), but
          * **only** if at least one of the four configuration values changed since
          * the sheet was opened. The caller reads the final values from
          * [PersistentState] directly.
@@ -196,7 +196,6 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         setupConfigHandlingSection()
         setupExcludeCountriesRow()
 
-        binding.btnDone.setOnClickListener { dismiss() }
         binding.btnResetRpn.setOnClickListener {
             if (!VpnController.hasTunnel()) {
                 Logger.w(LOG_TAG_UI, "$TAG: reset tapped but no VPN tunnel, showing hint")

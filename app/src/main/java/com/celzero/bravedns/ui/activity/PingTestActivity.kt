@@ -19,37 +19,37 @@ import com.celzero.bravedns.util.Logger
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.PingTestHistoryAdapter
 import com.celzero.bravedns.databinding.ActivityPingTestBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.PingTestOutcome
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.graphics.Canvas
+import android.graphics.Paint
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -64,6 +64,14 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
     private var isTesting = false
     private var testStartTime: Long = 0
+    private val historyAdapter by lazy { PingTestHistoryAdapter(this) }
+
+    /**
+     * False when the VPN or RPN proxy is inactive: custom target entry is then
+     * disabled and only the AUTO (default probes) test via [VpnController.testRpnProxy]
+     * is allowed, with a small note shown instead of the old blocking dialog.
+     */
+    private var allowCustomTargets = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
@@ -76,6 +84,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         }
         initView()
         setupClickListeners()
+        setupHistory()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -84,28 +93,14 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     }
 
     private fun initView() {
-        if (!VpnController.hasTunnel()) {
-            showStartVpnDialog()
-            return
-        }
-        // Pre-fill with default domains so user can immediately run the test.
-        if (b.reachInput.text.isNullOrEmpty()) {
-            b.reachInput.setText(getString(R.string.lbl_auto))
-        }
+        allowCustomTargets = VpnController.hasTunnel() && RpnProxyManager.isRpnActive()
+        // Input stays empty; an empty input runs the AUTO (default probes) test,
+        // conveyed via the field's hint so the user can type straight away.
         showReadyState()
-    }
-
-    private fun showStartVpnDialog() {
-        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(getString(R.string.vpn_not_active_dialog_title))
-            .setMessage(getString(R.string.vpn_not_active_dialog_desc))
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.dns_info_positive)) { dialog, _ ->
-                dialog.dismiss()
-                finish()
-            }
-            .create()
-            .show()
+        if (!allowCustomTargets) {
+            b.rpnInactiveNote.visibility = View.VISIBLE
+            setInputEnabled(false)
+        }
     }
 
     private fun setupClickListeners() {
@@ -123,19 +118,54 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         }
     }
 
+    private fun setupHistory() {
+        b.historyRecycler.layoutManager = LinearLayoutManager(this)
+        b.historyRecycler.adapter = historyAdapter
+        b.historyRecycler.addItemDecoration(historyDividerDecoration())
+
+        lifecycleScope.launch {
+            RpnProxyManager.pingTestHistory.collect { entries ->
+                historyAdapter.submitList(entries)
+                b.historyCard.visibility = if (entries.isNotEmpty()) View.VISIBLE else View.GONE
+            }
+        }
+    }
+
+    /**
+     * Hairline dividers between history rows, inset to align with the row text
+     * (16dp start padding + 32dp icon + 13dp gap), mirroring the results card.
+     */
+    private fun historyDividerDecoration(): RecyclerView.ItemDecoration {
+        val density = resources.displayMetrics.density
+        val paint = Paint().apply {
+            color = UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
+            alpha = 102 // ~40% for a subtle hairline
+            strokeWidth = density
+        }
+        return object : RecyclerView.ItemDecoration() {
+            override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                val start = (density * 61f).toInt()
+                for (i in 0 until parent.childCount - 1) {
+                    val child = parent.getChildAt(i)
+                    val params = child.layoutParams as RecyclerView.LayoutParams
+                    val top = (child.bottom + params.bottomMargin).toFloat()
+                    c.drawLine(start.toFloat(), top, parent.width.toFloat(), top, paint)
+                }
+            }
+        }
+    }
+
     private fun showReadyState() {
         b.statusIcon.setImageResource(R.drawable.ic_shield_check)
         b.statusIcon.colorFilter = null
         b.statusIcon.setColorFilter(UIUtils.fetchColor(this, R.attr.primaryTextColor))
-        b.statusTitle.text = getString(R.string.ping_ready_title)
+        b.statusTitle.text = getString(R.string.settings_connectivity_checks)
         b.statusDescription.text = getString(R.string.ping_ready_desc)
-        b.pingButton.text = getString(R.string.ping_test_button)
+        b.pingButton.text = getString(R.string.rpn_perform_test)
         b.pingButton.isEnabled = true
 
         b.progressIndicator.visibility = View.GONE
         b.latencyContainer.visibility = View.GONE
-        b.resultsCard.visibility = View.GONE
-        b.resultsHeader.visibility = View.GONE
     }
 
     private fun showTestingState() {
@@ -152,8 +182,6 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
         b.progressIndicator.visibility = View.VISIBLE
         b.latencyContainer.visibility = View.GONE
-        b.resultsCard.visibility = View.GONE
-        b.resultsHeader.visibility = View.GONE
 
         setInputEnabled(false)
     }
@@ -224,98 +252,22 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
 
         b.progressIndicator.visibility = View.GONE
         b.latencyContainer.visibility = View.GONE
-        b.resultsCard.visibility = View.GONE
-        b.resultsHeader.visibility = View.GONE
 
         setInputEnabled(true)
     }
 
     private fun setInputEnabled(enabled: Boolean) {
-        b.reachInputLayout.isEnabled = enabled
-        b.reachInput.isEnabled = enabled
-        b.reachInput.isFocusable = enabled
-        b.reachInput.isFocusableInTouchMode = enabled
+        // never re-enable custom entry when RPN/VPN is inactive (see allowCustomTargets)
+        val effective = enabled && allowCustomTargets
+        b.reachInputLayout.isEnabled = effective
+        b.reachInput.isEnabled = effective
+        b.reachInput.isFocusable = effective
+        b.reachInput.isFocusableInTouchMode = effective
     }
-
-    private fun showResultsCard(results: List<Pair<String, Boolean>>) {
-        b.resultsCard.visibility = View.GONE
-        b.resultsHeader.visibility = View.GONE
-        b.resultsContainer.removeAllViews()
-
-        results.forEachIndexed { index, (domain, reachable) ->
-            val row = LayoutInflater.from(this).inflate(
-                R.layout.item_ping_result_row, b.resultsContainer, false
-            )
-            row.findViewById<ImageView>(R.id.row_icon).apply {
-                if (reachable) {
-                    setImageResource(R.drawable.ic_tick)
-                    backgroundTintList = ColorStateList.valueOf(
-                        UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
-                    )
-                    imageTintList = ColorStateList.valueOf(
-                        UIUtils.fetchColor(this@PingTestActivity, R.attr.accentGood)
-                    )
-                } else {
-                    setImageResource(R.drawable.ic_cross_accent)
-                    backgroundTintList = ColorStateList.valueOf(
-                        UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
-                    )
-                    imageTintList = ColorStateList.valueOf(
-                        UIUtils.fetchColor(this@PingTestActivity, R.attr.accentBad)
-                    )
-                }
-            }
-            row.findViewById<TextView>(R.id.row_domain).apply {
-                text = domain
-                setTextColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.primaryTextColor))
-            }
-            row.findViewById<TextView>(R.id.row_status).apply {
-                if (reachable) {
-                    text = getString(R.string.ping_reach_reachable)
-                    setTextColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentGood))
-                } else {
-                    text = getString(R.string.ping_failure_title)
-                    setTextColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.accentBad))
-                }
-            }
-            b.resultsContainer.addView(row)
-
-            if (index < results.size - 1) {
-                val divider = View(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        (resources.displayMetrics.density * 1f).toInt()
-                    ).apply {
-                        setMargins((resources.displayMetrics.density * 16f).toInt(), 0, 0, 0)
-                    }
-                    setBackgroundColor(UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant))
-                }
-                b.resultsContainer.addView(divider)
-            }
-
-        }
-
-        // Animate results card in
-        b.resultsCard.alpha = 0f
-        b.resultsCard.translationY = 40f
-        b.resultsCard.visibility = View.VISIBLE
-        b.resultsHeader.visibility = View.VISIBLE
-        b.resultsCard.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(400)
-            .setInterpolator(AccelerateDecelerateInterpolator())
-            .start()
-    }
-
 
     private fun performTest() {
         val rawInput = b.reachInput.text?.toString()?.trim().orEmpty()
-        val csv = if (rawInput.isEmpty() || rawInput == getString(R.string.lbl_auto)) {
-            ""
-        } else {
-            rawInput
-        }
+        val csv = rawInput
         val domains = csv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
         // Guard: RPN must be enabled
@@ -343,8 +295,11 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                 val startTime = System.currentTimeMillis()
                 if (domains.isEmpty()) {
                     val result = VpnController.testRpnProxy()
+                    val latency = System.currentTimeMillis() - startTime
+                    recordHistory(csv, if (result) PingTestOutcome.SUCCESS else PingTestOutcome.FAILURE,
+                        latency, if (result) 1 else 0, 1)
                     uiCtx {
-                        if (result) showSuccessState(System.currentTimeMillis() - startTime)
+                        if (result) showSuccessState(latency)
                         else showFailureState()
                     }
                 } else {
@@ -357,6 +312,14 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                         Logger.LOG_IAB,
                         "$TAG reachability results: $results, latency: ${latency}ms"
                     )
+
+                    val passed = results.count { it.second }
+                    val outcome = when {
+                        results.all { it.second } -> PingTestOutcome.SUCCESS
+                        results.any { it.second } -> PingTestOutcome.PARTIAL
+                        else -> PingTestOutcome.FAILURE
+                    }
+                    recordHistory(csv, outcome, latency, passed, results.size)
 
                     // Honour minimum animation duration for UX
                     val elapsed = System.currentTimeMillis() - testStartTime
@@ -373,14 +336,19 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
                             anyOk -> showPartialState(latency)
                             else -> showFailureState()
                         }
-                        showResultsCard(results)
                     }
                 }
             } catch (e: Exception) {
                 Logger.e(Logger.LOG_IAB, "$TAG err during test: ${e.message}", e)
+                recordHistory(csv, PingTestOutcome.FAILURE, System.currentTimeMillis() - testStartTime,
+                    0, maxOf(1, domains.size))
                 uiCtx { showFailureState() }
             }
         }
+    }
+
+    private fun recordHistory(targets: String, outcome: PingTestOutcome, latencyMs: Long, passed: Int, total: Int) {
+        RpnProxyManager.recordPingTest(targets, outcome, latencyMs, passed, total)
     }
 
     private fun animateIconPulse() {

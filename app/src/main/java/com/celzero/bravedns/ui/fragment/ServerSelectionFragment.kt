@@ -21,6 +21,7 @@ import android.animation.ObjectAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
@@ -38,6 +39,7 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -60,8 +62,10 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.ui.activity.RpnBypassAppsActivity
 import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
+import com.celzero.bravedns.ui.bottomsheet.RpnStatsBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
 import com.celzero.bravedns.util.SnackbarHelper
@@ -134,6 +138,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private var isWinRegistered = false
     private var autoServer: CountryConfig? = null
+
+    /** Cached relay-tile state: true when every enabled non-AUTO location has relay (hop) on. */
+    private var isRelayAllOn = false
+
+    /** Guards against double-tapping the relay quick-setting while a bulk toggle is in flight. */
+    private var relayToggleInFlight = false
 
     /** True from the moment onViewCreated fires until initServers finishes. */
     private var isLoading = true
@@ -236,6 +246,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         updateFilterButtonState()
         setupHeaderUI()
         setupRpnState()
+        setupQuickSettings()
 
         // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
@@ -697,17 +708,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setSearchAndActionsEnabled(enabled: Boolean) {
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
-        b.searchCard.alpha              = alpha
-        b.searchCard.isEnabled          = enabled
-        b.searchBar.isEnabled           = enabled
-        b.searchBar.isFocusable         = enabled
+        b.searchCard.alpha = alpha
+        b.searchCard.isEnabled = enabled
+        b.searchBar.isEnabled = enabled
+        b.searchBar.isFocusable = enabled
         b.searchBar.isFocusableInTouchMode = enabled
-        b.settingsBtn.alpha             = alpha
-        b.settingsBtn.isEnabled         = enabled
-        b.searchFilterBtn.alpha         = alpha
-        b.searchFilterBtn.isEnabled     = enabled
-        b.addLocationBtn.alpha          = alpha
-        b.addLocationBtn.isEnabled      = enabled
+        b.settingsBtn.alpha = alpha
+        b.settingsBtn.isEnabled = enabled
+        b.searchFilterBtn.alpha = alpha
+        b.searchFilterBtn.isEnabled = enabled
+        setQuickSettingsEnabled(enabled)
     }
 
     private fun initServers(servers: List<CountryConfig>, selectedList: Set<CountryConfig> = emptySet()) {
@@ -805,6 +815,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 // isLoading must be false before the summary refresh so the
                 // location-capacity scale becomes visible with the loaded data.
                 updateVpnStatus()
+                refreshRelayTileState()
                 // Re-apply stopped UI on top of fully-loaded state
                 if (isProxyStopped) applyProxyStoppedUi()
                 // Notify adapter which server items are still waiting for tunnel setup,
@@ -1122,10 +1133,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setupNavigationButtons() {
         b.supportBtn.setOnClickListener { openAccount() }
         b.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
-        b.manageSelectedBtn.setOnClickListener {
-            b.serversScrollView.smoothScrollTo(0, b.selectedLocationsHeader.top)
-        }
-        b.addLocationBtn.setOnClickListener { focusLocationSearch() }
         b.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
         b.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
         // Status chip: open settings when running, show a hint when stopped
@@ -1170,8 +1177,147 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private fun focusLocationSearch() {
         if (!isAdded) return
-        b.serversScrollView.smoothScrollTo(0, b.allLocationsHeader.top)
+        b.serversScrollView.smoothScrollTo(0, b.searchCard.top)
         b.searchBar.requestFocus()
+    }
+
+    /**
+     * Quick settings row below the hero banner: Relay (toggle), Add location,
+     * Bypass apps and Stats. Mirrors the Android quick-settings tile look.
+     */
+    private fun setupQuickSettings() {
+        b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
+        b.qsAddLocationTile.setOnClickListener { focusLocationSearch() }
+        b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
+        b.qsStatsTile.setOnClickListener { showRpnStatsBottomSheet() }
+        refreshRelayTileState()
+    }
+
+    /**
+     * Re-derives the relay tile on/off state from the enabled locations:
+     * ON only when at least one non-AUTO location is enabled and **all** of
+     * them have hop (relay) enabled; OFF otherwise.
+     */
+    private fun refreshRelayTileState() {
+        io {
+            val enabledNonAuto = try {
+                RpnProxyManager.getEnabledConfigs()
+                    .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshRelayTileState: ${e.message}")
+                emptyList()
+            }
+            val allOn = enabledNonAuto.isNotEmpty() && enabledNonAuto.all { it.hopEnabled }
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                isRelayAllOn = allOn
+                applyRelayTileUi(allOn)
+            }
+        }
+    }
+
+    private fun applyRelayTileUi(allOn: Boolean) {
+        if (!isAdded) return
+        if (allOn) {
+            val onColor = resolveAttrColor(R.attr.chipTextPositive)
+            b.qsRelayTile.setCardBackgroundColor(resolveAttrColor(R.attr.chipBgColorPositive))
+            b.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
+            b.qsRelayLabel.setTextColor(onColor)
+            b.qsRelayState.setTextColor(onColor)
+            b.qsRelayState.text = getString(R.string.qs_relay_state_on)
+        } else {
+            val offColor = resolveAttrColor(R.attr.primaryLightColorText)
+            // Dim off-state fill: same muted foreground colour at ~12% alpha as the
+            // @color/qs_tile_off_bg used by the XML, so the circle stays visible as a
+            // subtle "off" tile (Android 12+ quick-settings behaviour) after toggling.
+            b.qsRelayTile.setCardBackgroundColor(
+                androidx.core.graphics.ColorUtils.setAlphaComponent(offColor, 31)
+            )
+            b.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
+            b.qsRelayLabel.setTextColor(offColor)
+            b.qsRelayState.setTextColor(offColor)
+            b.qsRelayState.text = getString(R.string.qs_relay_state_off)
+        }
+    }
+
+    /**
+     * Relay-all toggle: enables (or disables) hop for **all** enabled non-AUTO
+     * locations. Toggling ON only after every location reports hop-enabled, so a
+     * single disabled location flips the tile back to OFF (see [refreshRelayTileState]).
+     */
+    private fun onRelayQuickSettingClicked() {
+        if (isProxyStopped) {
+            showToast(getString(R.string.server_settings_proxy_stopped))
+            return
+        }
+        if (relayToggleInFlight) return
+
+        val enabledNonAuto = selectedServers.filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
+        if (enabledNonAuto.isEmpty()) {
+            showToast(getString(R.string.qs_relay_no_locations_toast))
+            return
+        }
+
+        relayToggleInFlight = true
+        val target = !isRelayAllOn
+
+        io {
+            val toUpdate = try {
+                RpnProxyManager.getEnabledConfigs()
+                    .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) && it.hopEnabled != target }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.onRelayQuickSettingClicked: ${e.message}")
+                emptyList()
+            }
+
+            var failures = 0
+            toUpdate.forEach { config ->
+                try {
+                    RpnProxyManager.setHopForWinServer(config.key, target)
+                } catch (e: Exception) {
+                    failures++
+                    Logger.e(LOG_TAG_UI, "$TAG.onRelayQuickSettingClicked: hop toggle failed for ${config.key}", e)
+                }
+            }
+
+            uiCtx {
+                relayToggleInFlight = false
+                if (!isAdded) return@uiCtx
+                if (failures > 0) {
+                    showToast(getString(R.string.qs_relay_failure_toast, failures))
+                } else {
+                    showToast(
+                        getString(
+                            if (target) R.string.qs_relay_enabled_toast else R.string.qs_relay_disabled_toast
+                        )
+                    )
+                }
+                refreshRelayTileState()
+            }
+        }
+    }
+
+    /** Opens the bypass-apps screen (apps excluded from RPN via FirewallManager). */
+    private fun openRpnBypassApps() {
+        if (!isAdded) return
+        startActivity(Intent(requireContext(), RpnBypassAppsActivity::class.java))
+    }
+
+    /** Opens the RPN live-stats bottom sheet (guarded against duplicate sheets). */
+    private fun showRpnStatsBottomSheet() {
+        if (!isAdded || isStateSaved) return
+        if (parentFragmentManager.findFragmentByTag(RpnStatsBottomSheet.TAG) != null) return
+        RpnStatsBottomSheet.newInstance().show(parentFragmentManager, RpnStatsBottomSheet.TAG)
+    }
+
+    /** Dims / enables the quick-settings tiles together with the search bar & actions. */
+    private fun setQuickSettingsEnabled(enabled: Boolean) {
+        if (!isAdded) return
+        val alpha = if (enabled) 1f else 0.5f
+        b.quickSettingsRow.alpha = alpha
+        listOf(b.qsRelayTile, b.qsAddLocationTile, b.qsBypassAppsTile, b.qsStatsTile).forEach { tile ->
+            tile.isEnabled = enabled
+        }
     }
 
     /** Opens the unified server-settings bottom sheet. */
@@ -1560,8 +1706,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         showUnifiedErrorState(
             illustration = R.drawable.illustrations_no_record,
             title = getString(R.string.server_selection_no_servers),
-            message = getString(R.string.server_selection_no_servers_desc),
-            hint = "",
+            hint = getString(R.string.server_selection_no_servers_hint),
             isError = false
         )
     }
@@ -1569,18 +1714,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun showErrorState(noTunnel: Boolean = false) {
         if (noTunnel) {
             showUnifiedErrorState(
-                illustration = R.drawable.ic_firewall_wifi_off,
+                illustration = R.drawable.illustrations_no_record,
                 title = getString(R.string.server_selection_error_title),
-                message = getString(R.string.server_selection_error_message),
                 hint = getString(R.string.ssv_toast_start_rethink),
                 isError = true,
                 noTunnel = true
             )
         } else {
             showUnifiedErrorState(
-                illustration = R.drawable.ic_firewall_wifi_off,
+                illustration = R.drawable.illustrations_no_record,
                 title = getString(R.string.server_selection_error_title),
-                message = getString(R.string.server_selection_error_message),
                 hint = getString(R.string.server_selection_error_hint),
                 isError = true
             )
@@ -1590,7 +1733,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun showUnifiedErrorState(
         illustration: Int,
         title: String,
-        message: String,
         hint: String,
         isError: Boolean,
         noTunnel: Boolean = false
@@ -1599,6 +1741,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.rvServers.isVisible = false
         b.searchCard.isVisible = true
         b.searchCard.isEnabled = false
+        b.searchCard.alpha = 0.5f
         b.searchBar.isEnabled = false
 
         b.supportBtn.isVisible = true
@@ -1617,13 +1760,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.frequentCountriesSection.isVisible = false
         b.locationCapacityIndicator.isVisible = false
 
-        // Update content
+        // Update content: illustration sits on a soft tinted circle whose color
+        // follows the state (red for errors, muted for the empty state).
+        val tintColor = resolveAttrColor(if (isError) R.attr.accentBad else R.attr.primaryLightColorText)
         b.errorIllustration.setImageResource(illustration)
-        b.errorIllustration.imageTintList = ColorStateList.valueOf(
-            resolveAttrColor(if (isError) R.attr.accentBad else R.attr.primaryLightColorText)
+        b.errorIllustration.imageTintList = ColorStateList.valueOf(tintColor)
+        b.errorIconContainer.backgroundTintList = ColorStateList.valueOf(
+            ColorUtils.setAlphaComponent(tintColor, (255 * 0.12f).toInt())
         )
         b.errorTitle.text = title
-        b.errorMessage.text = message
         b.errorHint.text = hint
         b.errorHint.isVisible = hint.isNotEmpty()
 
@@ -1706,6 +1851,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
         b.rvServers.isVisible = true
         b.searchCard.isVisible = true
+        b.searchCard.alpha = 1f
         b.supportBtn.isVisible = true
         b.settingsBtn.isVisible = true
         b.statusCard.isVisible = true
@@ -2229,6 +2375,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         updateAllServersCount()
         updateSelectedSectionVisibility()
         updateVpnStatus()
+        refreshRelayTileState()
         if (!isProxyStopped) loadAndShowFrequentChips()
     }
 
@@ -2249,6 +2396,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     override fun onProxyStoppedItemTapped() {
         showToast(getString(R.string.server_settings_proxy_stopped))
+    }
+
+    override fun onRelayToggled() {
+        // A per-server relay change in the adapter invalidates the aggregate
+        // "all locations relayed" state shown by the Relay quick-settings tile.
+        refreshRelayTileState()
     }
 
     override fun onFavouriteToggled(countryCode: String, countryName: String, isFavourite: Boolean) {
@@ -2581,6 +2734,41 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val purchaseDetail = RpnProxyManager.getSubscriptionData()?.purchaseDetail
         if (purchaseDetail == null) {
             Logger.w(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: purchaseDetail unavailable, skipping prompt")
+            return
+        }
+
+        // Gate 1: the machine must carry the cancellation in SOME form — either the
+        // machine STATE is Cancelled (server-side cancel via Manage Purchase) or the
+        // machine data status is CANCELLED (Play-side cancel: reconcile fires
+        // PaymentSuccessful which keeps the machine STATE Active but writes CANCELLED
+        // to the row). Both legitimate cancellation paths satisfy one of the two.
+        val machineState = RpnProxyManager.getSubscriptionState()
+        val machineDataCancelled = RpnProxyManager.getSubscriptionData()
+            ?.subscriptionStatus?.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+        if (!machineState.isCancelled && !machineDataCancelled) {
+            Logger.i(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: machine=${machineState.name} " +
+                    "does not confirm DB CANCELLED, skipping prompt")
+            return
+        }
+
+        // Gate 2: Play must confirm no auto-renewal for this purchase. If Play still
+        // reports isAutoRenewing=true, the CANCELLED row is stale or was written
+        // without Play confirmation; the next reconcile restores ACTIVE. Do not set
+        // resubscribePromptShown here so the prompt can fire later if Play confirms.
+        if (purchaseDetail.isAutoRenewing) {
+            Logger.w(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: DB CANCELLED but Play reports " +
+                    "isAutoRenewing=true for token=${purchaseDetail.purchaseToken.take(8)}, skipping prompt")
+            return
+        }
+
+        // Gate 3: the DB row must belong to the purchase the machine knows about,
+        // otherwise the prompt would describe a different purchase than the row read.
+        if (sub.purchaseToken.isNotEmpty() &&
+            purchaseDetail.purchaseToken.isNotEmpty() &&
+            sub.purchaseToken != purchaseDetail.purchaseToken
+        ) {
+            Logger.w(LOG_TAG_UI, "$TAG.maybeShowResubscribePrompt: DB row token != machine purchase " +
+                    "token, skipping prompt")
             return
         }
 

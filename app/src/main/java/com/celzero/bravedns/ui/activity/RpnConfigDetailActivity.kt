@@ -60,6 +60,7 @@ import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_
 import com.celzero.bravedns.ui.dialog.RpnSsidDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -73,7 +74,6 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -364,16 +364,16 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     val city = config.city.ifBlank { config.serverLocation }
                     b.tvHeroCity.text = city.ifBlank { config.cc }
                     // Show the city name in the collapsing toolbar title when collapsed.
-                    b.collapsingToolbar.title = b.tvHeroCity.text
+                    b.collapsingToolbar.title = city.ifBlank { config.cc }.capitalizeWords()
                 } else {
                     b.tvHeroFlag.visibility = View.GONE
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
-                    b.collapsingToolbar.title = b.configNameText.text
+                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
                 }
                 // Fallback: if no city-based title was set above, use the config name.
                 if (b.collapsingToolbar.title.isNullOrBlank()) {
-                    b.collapsingToolbar.title = b.configNameText.text
+                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
                 }
 
                 startStatsPolling(configKey)
@@ -435,7 +435,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
                         b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc
                         // Keep the collapsing toolbar title in sync with the hero city.
-                        b.collapsingToolbar.title = b.tvHeroCity.text
+                        b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
                     }
                 }
             }
@@ -899,15 +899,28 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun observeAppCount(configKey: String) {
         if (configKey.isBlank()) return
         // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
-        val pid = Backend.RpnWin + configKey
-        mappingViewModel.getAppCountById(pid).observe(this) { count ->
-            // Don't override the "All apps" state when catch-all is active
-            if (b.catchAllCheck.isChecked) return@observe
-            val c = count ?: 0
-            b.appsLabel.text = getString(R.string.two_argument_parenthesis, getString(R.string.apps_info_title), c)
-            b.appsLabel.setTextColor(
-                fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
-            )
+        io {
+            val pid = if (configKey == AUTO_SERVER_ID) {
+                VpnController.getWinProxyId() ?: configKey
+            } else {
+                Backend.RpnWin + configKey
+            }
+            Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
+            uiCtx {
+                mappingViewModel.getAppCountById(pid).observe(this) { count ->
+                    // Don't override the "All apps" state when catch-all is active
+                    if (b.catchAllCheck.isChecked) return@observe
+                    val c = count ?: 0
+                    b.appsLabel.text = getString(
+                        R.string.two_argument_parenthesis,
+                        getString(R.string.apps_info_title),
+                        c
+                    )
+                    b.appsLabel.setTextColor(
+                        fetchColor(this, if (c > 0) R.attr.primaryTextColor else R.attr.accentBad)
+                    )
+                }
+            }
         }
     }
 
@@ -1227,11 +1240,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     private fun setupHeaderUI() {
-        // Title will be set in populateHeroBanner() once the config name is loaded asynchronously.
+        // Title (city) is set asynchronously in populateHeroBanner(). Keep this identical to
+        // ServerOrderHistoryActivity / CustomerSupportActivity: no custom collapse mode and no
+        // programmatic collapsed title colors — theme defaults drive the pinned collapsed title.
         b.collapsingToolbar.title = ""
-        b.collapsingToolbar.titleCollapseMode = CollapsingToolbarLayout.TITLE_COLLAPSE_MODE_SCALE
+        // The hero already displays the city name while expanded, so keep the expanded CTL
+        // title transparent to avoid showing the city twice. Safe with the default FADE
+        // collapse mode: the collapsed title is drawn with the theme collapsed color (only
+        // TITLE_COLLAPSE_MODE_SCALE blends the expanded color into the collapsed title).
         b.collapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT)
-        b.collapsingToolbar.setCollapsedTitleTextColor(fetchColor(this, R.attr.primaryTextColor))
         setSupportActionBar(b.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 

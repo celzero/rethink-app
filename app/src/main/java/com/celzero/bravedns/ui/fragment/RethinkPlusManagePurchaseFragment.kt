@@ -29,7 +29,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
-import com.celzero.bravedns.database.SubscriptionStatusDao
+import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.databinding.FragmentRethinkPlusManagePurchaseBinding
 import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
@@ -40,11 +40,11 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver.PurchaseUiModel
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.ServerOrderHistoryActivity
 import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
-import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
@@ -67,7 +67,7 @@ import java.util.Locale
 class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plus_manage_purchase) {
     private val b by viewBinding(FragmentRethinkPlusManagePurchaseBinding::bind)
 
-    private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
+    private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
     private val viewModel: ManagePurchaseViewModel by viewModel()
 
     companion object {
@@ -104,11 +104,15 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun loadSubscriptionDetails() {
         io {
-            val sub = runCatching { subscriptionStatusDao.getCurrentSubscription() }.getOrNull()
+            // Repository prefers valid (Active-first) rows; the raw DAO query returns the
+            // most recently touched row of ANY status (including Expired).
+            val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
             val state = RpnProxyManager.getSubscriptionState()
             val subscriptionData = RpnProxyManager.getSubscriptionData()
             val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
-            uiCtx { populateView(sub, state, subscriptionData, deviceId) }
+            val expiry = VpnController.getWinExpiryTs() ?: 0L
+            val hex = expiry.toString(16)
+            uiCtx { populateView(sub, state, subscriptionData, deviceId, hex) }
         }
     }
 
@@ -116,7 +120,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         sub: SubscriptionStatus?,
         state: SubscriptionStateMachineV2.SubscriptionState,
         subscriptionData: SubscriptionStateMachineV2.SubscriptionData?,
-        realDeviceId: String
+        realDeviceId: String,
+        expiry: String
     ) {
         if (!isAdded) return
 
@@ -126,11 +131,23 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
         val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
         val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
+
+        // A CANCELLED DB row must not render as "Active" unless Play still reports an
+        // auto-renewing purchase for this token (a stale/wrong row that the next
+        // reconcile heals to ACTIVE). Cold-start restoration puts the machine in Active
+        // while the row says CANCELLED; without this guard the screen shows the machine
+        // state and the DB truth simultaneously (Active chip + cancelled entitlement).
+        val dbRowCancelled = sub?.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+        val playConfirmsRenewal = subscriptionData?.purchaseDetail?.isAutoRenewing == true
+        val effectivelyCancelled = dbRowCancelled && !playConfirmsRenewal
+
         val (statusText, statusColor) = when (model) {
             is PurchaseUiModel.Loading -> getString(R.string.rpn_status_syncing) to colorDim
             is PurchaseUiModel.NoPurchase -> getString(R.string.rpn_status_no_plan) to colorDim
             else -> when (state) {
-                is SubscriptionStateMachineV2.SubscriptionState.Active -> getString(R.string.lbl_active) to colorGood
+                is SubscriptionStateMachineV2.SubscriptionState.Active ->
+                    if (effectivelyCancelled) getString(R.string.lbl_cancelled) to colorBad
+                    else getString(R.string.lbl_active) to colorGood
                 is SubscriptionStateMachineV2.SubscriptionState.Grace -> getString(R.string.lbl_grace_period) to colorGood
                 is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> getString(R.string.lbl_cancelled) to colorBad
                 is SubscriptionStateMachineV2.SubscriptionState.Expired -> getString(R.string.lbl_expired) to colorBad
@@ -149,63 +166,67 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             is PurchaseUiModel.NoPurchase -> {
                 b.tvManagePlanName.text = getString(R.string.rpn_no_active_plan_title)
                 b.tvManagePurchasedDate.text = getString(R.string.lbl_not_available_short)
-                b.tvManageBilledVia.text = getString(R.string.lbl_not_available_short)
                 b.tvManageToken.text = getString(R.string.lbl_not_available_short)
             }
 
             is PurchaseUiModel.Lapsed -> {
                 b.tvManagePlanName.text = resolvePlanName(subscriptionData).ifBlank {
-                    resolvePlanName(model.sub?.productId.orEmpty(), model.sub?.planId.orEmpty())
+                    resolvePlanName(
+                        model.sub?.productId.orEmpty(),
+                        model.sub?.planId.orEmpty(),
+                        model.sub?.productTitle.orEmpty()
+                    )
                 }.ifBlank { getString(R.string.lbl_not_available_short) }
                 b.tvManagePurchasedDate.text = if (model.sub != null && model.sub.purchaseTime > 0) {
-                    fmt.format(Date(model.sub.purchaseTime))
+                    getString(R.string.rpn_overhauled_purchased_date_label, fmt.format(Date(model.sub.purchaseTime)))
                 } else {
                     getString(R.string.lbl_not_available_short)
                 }
-                b.tvManageBilledVia.text =
-                    if (model.sub != null) billedViaLabel(model.sub)
-                    else getString(R.string.lbl_not_available_short)
-                b.tvManageToken.text = formatToken(model.sub, realDeviceId)
+                b.tvManageToken.text = formatToken(model.sub, realDeviceId, expiry)
             }
 
             is PurchaseUiModel.Valid -> {
                 b.tvManagePlanName.text = resolvePlanName(subscriptionData).ifBlank {
-                    resolvePlanName(sub?.productId.orEmpty(), sub?.planId.orEmpty())
+                    resolvePlanName(
+                        sub?.productId.orEmpty(),
+                        sub?.planId.orEmpty(),
+                        sub?.productTitle.orEmpty()
+                    )
                 }.capitalizeWords()
                 b.tvManagePurchasedDate.text = if (sub != null && sub.purchaseTime > 0) {
-                    fmt.format(Date(sub.purchaseTime))
+                    getString(R.string.rpn_overhauled_purchased_date_label, fmt.format(Date(sub.purchaseTime)))
                 } else {
                     getString(R.string.placeholder_dash)
                 }
-                b.tvManageBilledVia.text =
-                    if (sub != null && isInAppProduct(sub.productId, sub.planId)) "One-time"
-                    else "Google Play"
-                b.tvManageToken.text = formatToken(sub, realDeviceId)
+                b.tvManageToken.text = formatToken(sub, realDeviceId, expiry)
             }
         }
 
-        showCancelOrRevokeButton(subscriptionData, state)
+        showCancelOrRevokeButton(subscriptionData, state, effectivelyCancelled)
         gateActionRows(model, sub)
+        gateManageOnPlayRow(sub, subscriptionData)
 
         if (!Utilities.isFdroidFlavour()) {
             updateAckFailureBanner(InAppBillingHandler.ackFailureFlow.value)
         }
     }
 
-    private fun billedViaLabel(sub: SubscriptionStatus): String {
-        return if (isInAppProduct(sub.productId, sub.planId)) "One-time" else "Google Play"
+    /**
+     * Same value that [RethinkPlusDashboardFragment], [CustomerSupportActivity] and
+     * [ServerOrderHistoryActivity] show as their hero's last line: purchase token
+     * (first 12 chars) · accountId (first 12 chars) • deviceId (first 4 chars).
+     */
+    private fun formatToken(sub: SubscriptionStatus?, realDeviceId: String, expiry: String): String {
+        val line = heroIdentityLine(sub?.purchaseToken.orEmpty(), sub?.accountId.orEmpty(), realDeviceId, expiry)
+        return line.ifBlank { getString(R.string.lbl_not_available_short) }
     }
 
-    private fun formatToken(sub: SubscriptionStatus?, realDeviceId: String): String {
-        val token = sub?.purchaseToken.orEmpty()
-        val accountId = sub?.accountId.orEmpty()
-        val deviceId = realDeviceId.take(4)
-        val parts = listOf(token, accountId, deviceId).filter { it.isNotBlank() }
-        return if (parts.isEmpty()) {
-            getString(R.string.lbl_not_available_short)
-        } else {
-            parts.joinToString(":")
-        }
+    private fun heroIdentityLine(token: String, accountId: String, deviceId: String, expiry: String): String {
+        val t = token.take(12)
+        val a = accountId.take(12)
+        val d = deviceId.take(4)
+        val idPart = listOf(a, d).filter { it.isNotBlank() }.joinToString(" • ")
+        return listOf(t, idPart, expiry).filter { it.isNotBlank() }.joinToString(" · ")
     }
 
     /**
@@ -214,11 +235,24 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
      * nothing was ever purchased since the Play deep-link requires a product id.
      */
     private fun gateActionRows(model: PurchaseUiModel, sub: SubscriptionStatus?) {
-        val noActivePlan = model is PurchaseUiModel.NoPurchase || model is PurchaseUiModel.Lapsed
-
-        setRowAvailability(b.rowEntitlement, enabled = !noActivePlan)
         setRowAvailability(b.rowOrderHistory, enabled = sub != null)
         setRowAvailability(b.rowManageOnPlay, enabled = model !is PurchaseUiModel.NoPurchase)
+    }
+
+    /**
+     * Manage-on-Play is only relevant to auto-renewing Play subscriptions: hide the
+     * row (and its divider) entirely for one-time (in-app) purchases.
+     */
+    private fun gateManageOnPlayRow(
+        sub: SubscriptionStatus?,
+        subscriptionData: SubscriptionStateMachineV2.SubscriptionData?
+    ) {
+        val productId = sub?.productId ?: subscriptionData?.purchaseDetail?.productId.orEmpty()
+        val planId = sub?.planId ?: subscriptionData?.purchaseDetail?.planId.orEmpty()
+        val isOneTimePurchase = productId.isNotEmpty() && isInAppProduct(productId, planId)
+
+        b.rowManageOnPlay.isVisible = !isOneTimePurchase
+        b.dividerManagePlay.isVisible = !isOneTimePurchase
     }
 
     private fun setRowAvailability(row: View, enabled: Boolean) {
@@ -228,9 +262,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     }
 
     private fun setupClickListeners() {
-        b.rowEntitlement.setOnClickListener {
-            EntitlementDetailBottomSheet.newInstance().show(childFragmentManager, "entitlementDetails")
-        }
         b.rowOrderHistory.setOnClickListener { openServerOrderHistory() }
         b.rowManageOnPlay.setOnClickListener { managePlayStoreSubs() }
         b.rowReportBillingIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
@@ -240,7 +271,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun showCancelOrRevokeButton(
         subscriptionData: SubscriptionStateMachineV2.SubscriptionData?,
-        state: SubscriptionStateMachineV2.SubscriptionState
+        state: SubscriptionStateMachineV2.SubscriptionState,
+        dbRowCancelled: Boolean
     ) {
         val planId  = subscriptionData?.purchaseDetail?.planId.orEmpty()
         val isInApp = isInAppProduct(subscriptionData?.purchaseDetail?.productId.orEmpty(), planId)
@@ -250,26 +282,32 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         b.dividerRefund.isVisible = false
         b.tvEndNote.isVisible = false
 
-        if (!state.isActive) {
+        // dbRowCancelled covers the cold-start restoration case where the machine is
+        // Active-in-memory but the persisted row is CANCELLED (and Play does not report
+        // a renewal): the plan is already ending — never offer "Cancel purchase" again.
+        if (!state.isActive || dbRowCancelled) {
             // Collapse the entire "Ending your plan" section: never render an empty card shell.
             b.tvEndingPlanHeader.isVisible = false
             b.cardEndingPlan.isVisible = false
             return
         }
 
-        b.tvEndingPlanHeader.isVisible = true
-        b.cardEndingPlan.isVisible = true
-
         val canRevoke = canRevoke(subscriptionData)
         if (canRevoke) {
             b.rowRequestRefund.isVisible = true
-            b.tvEndNote.isVisible = true
             b.tvEndNote.text = getString(R.string.revoke_subscription_note)
         } else if (!isInApp) {
             b.rowCancelPurchase.isVisible = true
-            b.tvEndNote.isVisible = true
             b.tvEndNote.text = getString(R.string.cancel_subscription_note_future)
         }
+
+        // Never render a dangling "Ending your plan" header or an empty card shell:
+        // the section is shown only when at least one action row is visible (e.g. a
+        // one-time purchase past its revoke window has neither cancel nor refund).
+        val hasEndingOption = b.rowRequestRefund.isVisible || b.rowCancelPurchase.isVisible
+        b.tvEndingPlanHeader.isVisible = hasEndingOption
+        b.cardEndingPlan.isVisible = hasEndingOption
+        b.tvEndNote.isVisible = hasEndingOption
 
         if (b.rowRequestRefund.isVisible && b.rowCancelPurchase.isVisible) {
             b.dividerRefund.isVisible = true
@@ -401,10 +439,12 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     private fun observeSubscriptionState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             RpnProxyManager.collectSubscriptionState().collect { state ->
-                val sub = runCatching { subscriptionStatusDao.getCurrentSubscription() }.getOrNull()
+                val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
                 val subscriptionData = RpnProxyManager.getSubscriptionData()
-                uiCtx { populateView(sub, state, subscriptionData, deviceId) }
+                val expiry = VpnController.getWinExpiryTs() ?: 0L
+                val hex = expiry.toString(16)
+                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex) }
             }
         }
     }
