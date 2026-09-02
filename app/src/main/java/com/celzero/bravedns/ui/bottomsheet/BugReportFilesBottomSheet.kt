@@ -34,6 +34,7 @@ import com.celzero.bravedns.databinding.ItemBugReportFileBinding
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -66,12 +67,16 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
     private val bugReportFiles = mutableListOf<BugReportFile>()
     private lateinit var adapter: BugReportFilesAdapter
 
+    // in-memory handle of the generated process_info.txt (in cacheDir), if any
+    private var procInfoFile: File? = null
+
     companion object {
         private const val ALPHA_ENABLED = 1.0f
         private const val ALPHA_DISABLED = 0.5f
         private const val BYTES_IN_KB = 1024L
         private const val BYTES_IN_MB = 1024L * 1024L
         private const val MB_DIVISOR = 1024.0 * 1024.0
+        private const val PROC_INFO_FILE_NAME = "process_info.txt"
     }
 
     override fun getTheme(): Int =
@@ -134,6 +139,10 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
             b.brbsSelectAllCheckbox.toggle()
         }
 
+        b.brbsProcInfoCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            toggleProcInfoEntry(isChecked)
+        }
+
         b.brbsSendButton.setOnClickListener {
             sendBugReport()
         }
@@ -143,7 +152,15 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
         lifecycleScope.launch {
             try {
                 val files = withContext(Dispatchers.IO) {
-                    collectAllBugReportFiles()
+                    val list = collectAllBugReportFiles().toMutableList()
+                    // generate a fresh process/memory/thread snapshot on every open so
+                    // the attached file reflects the current state of the process
+                    if (b.brbsProcInfoCheckbox.isChecked) {
+                        generateProcInfoFile()?.let { f ->
+                            list.add(BugReportFile(f, f.name, FileType.TEXT, isSelected = true))
+                        }
+                    }
+                    list.sortedByDescending { it.file.lastModified() }
                 }
 
                 bugReportFiles.clear()
@@ -160,6 +177,49 @@ class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
                     Toast.LENGTH_SHORT
                 )
             }
+        }
+    }
+
+    /**
+     * Adds or removes the process_info.txt entry in response to the checkbox.
+     * The file is (re)generated in cacheDir when included, deleted when excluded.
+     */
+    private fun toggleProcInfoEntry(include: Boolean) {
+        lifecycleScope.launch {
+            try {
+                val entry = withContext(Dispatchers.IO) {
+                    if (include) {
+                        generateProcInfoFile()?.let { f ->
+                            BugReportFile(f, f.name, FileType.TEXT, isSelected = true)
+                        }
+                    } else {
+                        procInfoFile?.delete()
+                        procInfoFile = null
+                        null
+                    }
+                }
+                bugReportFiles.removeAll { it.file.name == PROC_INFO_FILE_NAME }
+                entry?.let { bugReportFiles.add(it) }
+                bugReportFiles.sortByDescending { it.file.lastModified() }
+                adapter.notifyDataSetChanged()
+                updateTotalSize()
+                updateSendButtonState()
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "err toggling proc info: ${e.message}", e)
+            }
+        }
+    }
+
+    private suspend fun generateProcInfoFile(): File? {
+        return try {
+            val ctx = requireContext()
+            val f = File(ctx.cacheDir, PROC_INFO_FILE_NAME)
+            f.writeText(ProcessInfoCollector.collect(ctx), Charsets.UTF_8)
+            procInfoFile = f
+            f
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err generating proc info: ${e.message}", e)
+            null
         }
     }
 
