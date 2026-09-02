@@ -24,6 +24,7 @@ import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
+import com.celzero.bravedns.ui.stats.StatsViewMode
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
@@ -493,6 +494,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // include file trace in logs
     var includeFileTrace by booleanPref(INCLUDE_FILE_TRACE).withDefault<Boolean>(false)
+
+    // stats screen presentation mode, see enum StatsViewMode (0 - list, 1 - insights)
+    var statsViewMode by intPref("stats_view_mode").withDefault<Int>(StatsViewMode.LIST.id)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

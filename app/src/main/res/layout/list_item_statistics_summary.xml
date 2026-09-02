@@ -4,132 +4,98 @@
     android:id="@+id/ss_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:animateLayoutChanges="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:minHeight="50dp">
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/ss_icon_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:alpha="0.9">
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp">
 
             <ImageView
                 android:id="@+id/ss_icon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="start|center_vertical"
-                android:layout_margin="5dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
                 android:contentDescription="@string/fav_icon"
-                android:minWidth="32dp"
                 android:src="@android:color/transparent"
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ss_flag"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:ellipsize="none"
                 android:gravity="center"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="26sp" />
-        </LinearLayout>
+                android:textSize="18sp" />
+        </FrameLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/ss_count"
-            android:layout_toEndOf="@id/ss_icon_container"
-            android:baselineAligned="false"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ss_data_usage"
-                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:alpha="0.75"
-                android:ellipsize="start"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:padding="2dp"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:textSize="@dimen/large_font_text_view"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ss_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:ellipsize="start"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:padding="2dp"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/small_font_text_view" />
+                android:textSize="@dimen/small_font_subheading_text" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/ss_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:alpha="0.7"
-                android:padding="3dp"
-                app:trackColor="?attr/background" />
-
+                android:layout_marginTop="6dp"
+                android:alpha="0.9"
+                app:trackColor="?attr/background"
+                app:trackCornerRadius="2dp"
+                app:trackThickness="3dp" />
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ss_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_toStartOf="@id/ss_indicator"
+            android:layout_marginStart="10dp"
+            android:alpha="0.85"
             android:gravity="center_vertical"
-            android:padding="2dp"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/heading_font_text_view" />
+            android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ss_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:alpha="0.5"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="6dp"
+            android:alpha="0.35"
             android:src="@drawable/ic_right_arrow_white" />
 
-    </RelativeLayout>
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="match_parent"
-        android:layout_height="0.75dp"
-        android:background="?attr/divider"
-        android:paddingTop="3dp" />
+    </LinearLayout>
 </LinearLayout>
