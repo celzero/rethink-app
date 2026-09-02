@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.celzero.firestack.settings.Settings
 
 @Entity(tableName = "SmartDnsEndpoint")
 data class SmartDnsEndpoint(
@@ -59,6 +60,15 @@ enum class SmartDnsMode(val mode: Int) {
                 SECURITY.mode -> SECURITY
                 FAMILY.mode -> FAMILY
                 else -> NO_FILTER
+            }
+        }
+
+        fun getTunMode(id: Int): Long {
+            return when (id) {
+                NO_FILTER.mode -> Settings.PlusFilterNone
+                SECURITY.mode -> Settings.PlusFilterAdblock
+                FAMILY.mode -> Settings.PlusFilterAdblock
+                else -> Settings.PlusFilterNone
             }
         }
     }

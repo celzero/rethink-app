@@ -42,6 +42,7 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.database.SmartDnsMode
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
@@ -3705,12 +3706,18 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    fun setPlusStrategy(): Tunnel {
-        // Settings.PlusFilterSafest, Settings.PlusOrderFastest
-        // default value for PlusStrategy is Safest, which is the safest strategy
-        // fastest is another strategy, which is not used for now (v055n)
-        Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
-        return tunnel
+    suspend fun setPlusStrategy() {
+        if (appConfig.getDnsType().isSmartDns()) {
+            val chosenSmartDns = appConfig.getSelectedSmartDnsEndpoint()
+            if (chosenSmartDns == null) {
+                Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+            } else {
+                val mode = SmartDnsMode.getTunMode(chosenSmartDns.id)
+                Settings.setPlusStrategy(Settings.PlusOrderFastest, mode)
+            }
+        } else {
+            Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+        }
     }
 
     fun tunMtu(): Int {
