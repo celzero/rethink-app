@@ -17,6 +17,7 @@ package com.celzero.bravedns.customdownloader
 
 import android.content.Context
 import android.net.Uri
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_OKHTTP
@@ -64,6 +65,12 @@ class RetrofitManager {
         // Single-thread dispatcher dedicated to fire-and-forget log I/O so that
         // log writes never block OkHttp's network threads.
         private val logScope = CoroutineScope(Daemons.make("RayIdLogger"))
+
+        /**
+         * Compile-time constant User-Agent identifying app-originated requests.
+         * Usable directly inside Retrofit @Headers annotations
+         */
+        const val USER_AGENT: String = "rethink-app/${BuildConfig.VERSION_NAME}"
 
         /** Captures Cloudflare's cf-ray header for request tracing. */
         val rayIdInterceptor = Interceptor { chain ->

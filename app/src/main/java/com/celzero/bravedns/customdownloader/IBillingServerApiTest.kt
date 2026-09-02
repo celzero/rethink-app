@@ -85,7 +85,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
       */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/d/acc")
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
@@ -110,7 +113,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/d/reg")
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
@@ -135,7 +141,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/stop")
     suspend fun cancelSubscription(
         @Header("x-rethink-app-cid") accountId: String,
@@ -160,7 +169,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/refund")
     suspend fun revokeSubscription(
         @Header("x-rethink-app-cid") accountId: String,
@@ -184,7 +196,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/ack")
     suspend fun acknowledgePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -209,7 +224,10 @@ interface IBillingServerApiTest {
       * DB routing: read-only; first-unconstrained allows the server to use the nearest
       * replica (or primary) with no consistency constraint.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-unconstrained",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @GET("/g/ack")
     suspend fun queryEntitlement(
         @Header("x-rethink-app-cid") accountId: String,
@@ -235,7 +253,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/con")
     suspend fun consumePurchase(
         @Header("x-rethink-app-cid") accountId: String,
@@ -262,7 +283,10 @@ interface IBillingServerApiTest {
       * DB routing: read-only; first-unconstrained allows the server to use the nearest
       * replica (or primary) with no consistency constraint.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-unconstrained",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @GET("/g/tx")
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,
