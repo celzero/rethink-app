@@ -37,11 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
+import androidx.navigation.NavController
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.wireguard.Config
@@ -74,6 +76,11 @@ import kotlinx.coroutines.withContext
  *  * [WireguardManager.updateOneWireGuardConfig]
  *  * [WireguardManager.updateUseOnMobileNetworkConfig]
  *
+ * The "Included apps" row pushes `wg/{id}/apps`
+ * ([WgIncludeAppsScreen]) — the TV counterpart of the phone's
+ * `WgIncludeAppsActivity`, which `WgConfigDetailActivity` launches via
+ * `WgIncludeAppsActivity.newIntent(this, ID_WG_BASE + configId, name)`.
+ *
  * Add / delete / edit peers is upstream's `WgConfigEditorActivity`
  * territory and is intentionally deferred — TV remotes can't type a
  * 44-char base64 public key without a Bluetooth keyboard, so peer
@@ -81,7 +88,7 @@ import kotlinx.coroutines.withContext
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun WgDetailScreen(configId: Int) {
+fun WgDetailScreen(configId: Int, navController: NavController? = null) {
     val scope = rememberCoroutineScope()
     var reloadKey by remember { mutableStateOf(0) }
 
@@ -186,6 +193,13 @@ fun WgDetailScreen(configId: Int) {
             )
 
             Spacer(Modifier.height(16.dp))
+            if (navController != null) {
+                IncludedAppsRow(
+                    onClick = { navController.navigate("wg/$configId/apps") },
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
             val peers = config?.getPeers().orEmpty()
             SettingSectionHeader("Peers (${peers.size})")
             if (peers.isEmpty()) {
@@ -206,6 +220,51 @@ fun WgDetailScreen(configId: Int) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp),
+            )
+        }
+    }
+}
+
+/**
+ * Entry row for the per-tunnel app mapping ([WgIncludeAppsScreen]).
+ * Mirrors the phone's `WgConfigDetailActivity` "Applications" button.
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun IncludedAppsRow(onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Included apps",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Choose which apps route through this tunnel.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = "Open ›",
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
             )
         }
     }
