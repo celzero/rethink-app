@@ -917,7 +917,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         c
                     )
                     b.appsLabel.setTextColor(
-                        fetchColor(this, if (c > 0) R.attr.primaryTextColor else R.attr.accentBad)
+                        fetchColor(this, if (c > 0) R.attr.chipTextPositive else R.attr.accentBad)
                     )
                 }
             }
@@ -949,7 +949,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                     // Update apps section immediately based on catchAll state
                     if (config.catchAll) {
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.chipTextPositive))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
                     if (config.id.equals(AUTO_SERVER_ID, true)) {
@@ -1006,7 +1006,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.applicationsBtn.isEnabled = true
                     b.applicationsBtn.alpha = 1.0f
                     if (isChecked) {
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.chipTextPositive))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     } else {
                         observeAppCount(configKey)

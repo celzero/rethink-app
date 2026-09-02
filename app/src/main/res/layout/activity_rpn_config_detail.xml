@@ -540,8 +540,9 @@
                                     android:layout_weight="1"
                                     android:ellipsize="end"
                                     android:maxLines="1"
+                                    android:alpha="0.7"
                                     android:textAllCaps="false"
-                                    android:textColor="?attr/primaryTextColor"
+                                    android:textColor="?attr/chipTextPositive"
                                     android:textSize="@dimen/default_font_text_view" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
@@ -549,7 +550,7 @@
                                     android:layout_height="16dp"
                                     android:alpha="0.6"
                                     android:src="@drawable/ic_right_arrow_secondary"
-                                    app:tint="?attr/primaryLightColorText" />
+                                    app:tint="?attr/chipTextPositive" />
                             </LinearLayout>
 
                         </com.google.android.material.card.MaterialCardView>
@@ -652,8 +653,9 @@
                                     android:ellipsize="end"
                                     android:maxLines="1"
                                     android:text="@string/lbl_logs"
+                                    android:alpha="0.7"
                                     android:textAllCaps="false"
-                                    android:textColor="?attr/primaryTextColor"
+                                    android:textColor="?attr/chipTextPositive"
                                     android:textSize="@dimen/default_font_text_view" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
@@ -661,7 +663,7 @@
                                     android:layout_height="16dp"
                                     android:alpha="0.6"
                                     android:src="@drawable/ic_right_arrow_secondary"
-                                    app:tint="?attr/primaryLightColorText" />
+                                    app:tint="?attr/chipTextPositive" />
                             </LinearLayout>
 
                         </com.google.android.material.card.MaterialCardView>
