@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true"
-    android:background="?attr/colorSurface"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -301,56 +300,15 @@
                      android:paddingVertical="16dp"
                      android:orientation="vertical">
 
-                     <LinearLayout
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:orientation="horizontal"
-                         android:gravity="center_vertical">
-
-                         <androidx.appcompat.widget.AppCompatImageView
-                             android:id="@+id/fhs_proxy_icon"
-                             android:layout_width="20dp"
-                             android:layout_height="16dp"
-                             android:src="@drawable/ic_proxy"
-                             app:tint="?attr/accentGood" />
-
-                         <androidx.appcompat.widget.AppCompatTextView
-                             android:id="@+id/fhs_proxy_label"
-                             android:layout_width="0dp"
-                             android:layout_height="wrap_content"
-                             android:layout_weight="1"
-                             android:layout_marginStart="12dp"
-                             tools:text="PROXY"
-                             android:textSize="@dimen/mini_font_text_view"
-                             android:textAllCaps="true"
-                             android:letterSpacing="0.15"
-                             android:alpha="0.8"
-                             android:textColor="?attr/primaryLightColorText" />
-                     </LinearLayout>
-
-                     <androidx.appcompat.widget.AppCompatTextView
-                         android:id="@+id/fhs_card_proxy_count"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_marginTop="8dp"
-                         tools:text="3 active"
-                         android:textSize="@dimen/home_screen_stat_text"
-                         android:fontFamily="sans-serif-medium"
-                         android:textColor="?attr/primaryTextColor"
-                         android:maxLines="1"
-                         android:ellipsize="end" />
-
                      <androidx.appcompat.widget.AppCompatTextView
                          android:id="@+id/fhs_card_other_proxy_count"
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"
-                         android:layout_marginTop="2dp"
+                         android:layout_marginTop="8dp"
                          tools:text="WireGuard"
-                         android:textSize="@dimen/mini_font_text_view"
-                         android:textAllCaps="true"
-                         android:letterSpacing="0.02"
-                         android:alpha="0.6"
-                         android:textColor="?attr/primaryLightColorText"
+                         android:textSize="@dimen/home_screen_stat_text"
+                         android:fontFamily="sans-serif-medium"
+                         android:textColor="?attr/primaryTextColor"
                          android:maxLines="1"
                          android:ellipsize="end" />
 
@@ -399,17 +357,17 @@
                                      android:fontFamily="monospace"
                                      android:maxLines="1"
                                      android:textColor="?attr/accentGood" />
-                                 <androidx.appcompat.widget.AppCompatTextView
-                                     android:layout_width="wrap_content"
-                                     android:layout_height="wrap_content"
-                                     android:layout_marginStart="4dp"
-                                     android:layout_gravity="center_vertical"
-                                     android:text="LIVE"
-                                     android:textSize="@dimen/mini_font_text_view"
-                                     android:textAllCaps="true"
-                                     android:letterSpacing="0.05"
-                                     android:alpha="0.7"
-                                     android:textColor="?attr/primaryLightColorText" />
+                                  <androidx.appcompat.widget.AppCompatTextView
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:layout_marginStart="4dp"
+                                      android:layout_gravity="center_vertical"
+                                      android:text="@string/lbl_active"
+                                      android:textSize="@dimen/mini_font_text_view"
+                                      android:textAllCaps="true"
+                                      android:letterSpacing="0.05"
+                                      android:alpha="0.7"
+                                      android:textColor="?attr/primaryLightColorText" />
                              </LinearLayout>
 
                              <LinearLayout
@@ -436,7 +394,7 @@
                                      android:layout_height="wrap_content"
                                      android:layout_marginStart="4dp"
                                      android:layout_gravity="center_vertical"
-                                     android:text="IDLE"
+                                      android:text="@string/lbl_idle"
                                      android:textSize="@dimen/mini_font_text_view"
                                      android:textAllCaps="true"
                                      android:letterSpacing="0.05"
@@ -468,7 +426,7 @@
                                      android:layout_height="wrap_content"
                                      android:layout_marginStart="4dp"
                                      android:layout_gravity="center_vertical"
-                                     android:text="FAILING"
+                                      android:text="@string/status_failing"
                                      android:textSize="@dimen/mini_font_text_view"
                                      android:textAllCaps="true"
                                      android:letterSpacing="0.05"
@@ -487,7 +445,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/fhs_tp_apps_row"
             android:layout_width="match_parent"
-            android:layout_height="112dp"
+            android:layout_height="104dp"
             android:layout_marginTop="24dp"
             app:layout_constraintTop_toBottomOf="@id/fhs_fw_proxy_row">
 
@@ -818,7 +776,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    tools:text="last 6 days · hourly"
+                    tools:text="last 24 hours · 10-min cells"
                     android:textSize="11sp"
                     android:textAllCaps="true"
                     android:letterSpacing="0.08"

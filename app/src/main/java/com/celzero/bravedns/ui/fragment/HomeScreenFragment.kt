@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.content.res.ColorStateList
 import com.celzero.bravedns.util.Themes
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
@@ -42,6 +43,7 @@ import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -76,6 +78,7 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.LogActivityAggregator
+import com.celzero.bravedns.service.LogActivityInterval
 import com.celzero.bravedns.service.LogActivityState
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -160,7 +163,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // styling can be restored exactly on re-activation.
     private var dnsHeadlineSizePx: Float = 0f
     private var appsHeadlineSizePx: Float = 0f
-    private var proxyHeadlineSizePx: Float = 0f
 
     // presentation state for the blocked/allowed activity grid; toggling this
     // only re-renders from the cached aggregate, it never queries the database
@@ -168,6 +170,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // last state emitted by LogActivityAggregator; kept so the toggle can
     // re-render without waiting for a new emission
     private var lastActivityState: LogActivityState? = null
+
+    // last tap coordinates on the activity grid, used to resolve the exact
+    // cell (row == hour, column == day) the user tapped; zeroed on
+    // non-touch activation (keyboard), which falls back to the latest window
+    private var lastGridTouchX = 0f
+    private var lastGridTouchY = 0f
 
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
@@ -240,7 +248,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // activity grid intensity levels (empty + 4 logarithmic levels)
         private const val HEATMAP_INTENSITY_LEVELS = 5
 
-        // (fhs_logs_grid: 24 columns x 6 rows, 56dp tall)
         private const val HEATMAP_GRID_ROWS = 6
         private const val HEATMAP_GRID_HEIGHT_DP = 56
 
@@ -272,6 +279,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         registerForActivityResult()
     }
 
+    @SuppressLint("ClickableViewAccessibility") // requires for grid coordinates touch
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Logger.v(LOG_TAG_UI, "$TAG: init view in home screen fragment")
@@ -284,11 +292,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         updateLogsToggleUi(displayMode == ActivityDisplayMode.BLOCKED)
         observeLogActivity()
         // one listener on the grid container itself: every tap anywhere inside
-        // the heatmap opens the activity sheet, independent of per-cell
-        // measurement, gaps or margins
         b.fhsLogsGrid.isClickable = true
         b.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
-        b.fhsLogsGrid.setOnClickListener { openIntervalDetails() }
+        // record tap position; returning false lets the click event fire
+        b.fhsLogsGrid.setOnTouchListener { v, event ->
+            lastGridTouchX = event.x
+            lastGridTouchY = event.y
+            false
+        }
+        b.fhsLogsGrid.setOnClickListener { openIntervalDetails(it) }
         // the activity wall is reconciled with the databases when
         // BraveVPNService is created, not on every home-screen resume
         syncDnsStatus()
@@ -368,7 +380,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.v(LOG_TAG_UI, "$TAG: click event on ip rules card")
             val intent = Intent(requireContext(), CustomRulesActivity::class.java)
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
-            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.ALL_RULES.type)
+            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
+            intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
             startActivity(intent)
             logEvent(
                 EventType.UI_NAVIGATION,
@@ -381,7 +394,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.v(LOG_TAG_UI, "$TAG: click event on domain rules card")
             val intent = Intent(requireContext(), CustomRulesActivity::class.java)
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
-            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.ALL_RULES.type)
+            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
+            intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
             startActivity(intent)
             logEvent(
                 EventType.UI_NAVIGATION,
@@ -494,39 +508,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
         }
 
-        /*b.fhsSponsor.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (RpnProxyManager.isRpnEnabled()) {
-                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
-                // load rethink plus dashboard
-                openRpnDashboardScreen()
-                return@setOnClickListener
-            }
-            promptForAppSponsorship()
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Sponsor card clicked",
-                "Opening sponsorship dialog from HomeScreenFragment"
-            )
-        }
-
-        b.fhsTitleRethink.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on rethink card")
-            if (RpnProxyManager.isRpnEnabled()) {
-                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
-                // load rethink plus dashboard
-                openRpnDashboardScreen()
-                return@setOnClickListener
-            }
-
-            promptForAppSponsorship()
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Sponsor card clicked",
-                "Opening sponsorship dialog from HomeScreenFragment"
-            )
-        }*/
-
         b.fhsProtectionLevelTxt.setOnClickListener {
             openRethinkAppInfoIfNeeded()
         }
@@ -556,66 +537,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         )
     }
 
-    /*private fun observeSponsorState() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            // Seed immediately from a one-shot DB read so the sponsor button reflects
-            // the persisted sponsorship state before the reactive flow emits. Without
-            // this, the button (force-set VISIBLE in initializeValues) shows on the
-            // initial launch even for already-sponsored users.
-            applySponsorState(sponsorRepository.isCurrentlySponsored())
-            sponsorRepository.isSponsored.collect { sponsored ->
-                applySponsorState(sponsored)
-            }
-        }
-    }*/
-
-    /*private fun applySponsorState(sponsored: Boolean) {
-        b.fhsSponsorBadge.isVisible = sponsored
-        b.fhsSponsor.visibility = if (sponsored) View.GONE else View.VISIBLE
-        if (!sponsored) {
-            b.fhsSponsor.setOnClickListener(null)
-        }
-    }*/
-
     private fun logEvent(type: EventType, msg: String, details: String) {
         io {
             eventLogger.log(type, Severity.LOW, msg, EventSource.UI, true, details)
         }
-    }
-
-    private fun promptForAppSponsorship() {
-        val installTime = requireContext().packageManager.getPackageInfo(
-            requireContext().packageName,
-            0
-        ).firstInstallTime
-        val timeDiff = System.currentTimeMillis() - installTime
-        // convert it to month
-        val days = (timeDiff / (MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY)).toDouble()
-        val month = days / DAYS_PER_MONTH
-        // multiply the month with 0.60$ + 0.20$ for every month
-        val amount = month * (BASE_AMOUNT_PER_MONTH + ADDITIONAL_AMOUNT_PER_MONTH)
-        Logger.d(LOG_TAG_UI, "Sponsor: $installTime, days/month: $days/$month, amount: $amount")
-        val alertBuilder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-        val inflater = LayoutInflater.from(requireContext())
-        val dialogView = inflater.inflate(R.layout.dialog_sponsor_info, null)
-        alertBuilder.setView(dialogView)
-        alertBuilder.setCancelable(true)
-
-        val amountTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_amount)
-        val usageTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_usage)
-        val sponsorBtn = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_sponsor)
-
-        val dialog = alertBuilder.create()
-
-        val msg = getString(R.string.sponser_dialog_usage_msg, days.toInt().toString(), "%.2f".format(amount))
-        amountTxt.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_dollar), "%.2f".format(amount))
-        usageTxt.text = msg
-
-        sponsorBtn.setOnClickListener {
-            //openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
-            sponsorProvider.openSponsor(requireContext())
-        }
-        dialog.show()
     }
 
     private fun handlePause() {
@@ -674,7 +599,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun captureActiveEmphasis() {
         dnsHeadlineSizePx = b.fhsCardDnsLatency.textSize
         appsHeadlineSizePx = b.fhsCardAllowedApps.textSize
-        proxyHeadlineSizePx = b.fhsCardProxyCount.textSize
     }
 
     /**
@@ -1024,8 +948,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 if (proxies.isEmpty() && rpnProxies.isEmpty()) {
                     uiCtx {
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                        b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_checking))
-                        b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
+                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                     }
                     return@withContext
                 }
@@ -1051,44 +974,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 uiCtx {
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                    // single-line status summary; per-state counts are shown
-                    // in the colored Live/Idle/Failing row below
-                    var text = ""
-                    if (active > 0) {
-                        text = getString(
-                            R.string.two_argument_space,
-                            active.toString(),
-                            getString(R.string.lbl_active)
-                        )
-                    }
-                    if (idle > 0) {
-                        text += if (text.isNotEmpty()) " · " else ""
-                        text += getString(
-                            R.string.two_argument_space,
-                            idle.toString(),
-                            getString(R.string.lbl_idle).replaceFirstChar(Char::titlecase)
-                        )
-                    }
-                    if (failing > 0) {
-                        text += if (text.isNotEmpty()) " · " else ""
-                        text += getString(
-                            R.string.two_argument_space,
-                            failing.toString(),
-                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-                        )
-                    }
-                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text, proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
-
                     updateProxyHealthCounts(active, idle, failing)
+                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status; proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
 
-                    // If we have proxies but no status text, something went wrong - show a fallback
-                    if (text.isEmpty() && (proxies.isNotEmpty() || rpnProxies.isNotEmpty())) {
-                        b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_active))
-                        Logger.w(LOG_TAG_UI, "$TAG proxy status empty but proxies exist, showing fallback active status")
-                    } else if (text.isEmpty()) {
-                        b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_inactive))
-                    } else {
-                        b.fhsCardProxyCount.setTextAnimated(text)
+                    if (active == 0 && idle == 0 && failing == 0 && (proxies.isNotEmpty() || rpnProxies.isNotEmpty())) {
+                        Logger.w(LOG_TAG_UI, "$TAG proxy status empty but proxies exist, health row shows no state")
                     }
 
                     if (isBoth) {
@@ -1105,7 +995,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             if (appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()) {
                 showProxyActiveIndicator()
-                b.fhsCardProxyCount.setTextAnimated(getString(R.string.lbl_active))
             } else {
                 showProxyInactive()
                 return
@@ -1173,7 +1062,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 }
                 UIUtils.ProxyStatus.TUP -> {
-                    // Starting / connecting – optimistically count as active
+                    // Starting / connecting – count as active
                     active++
                 }
                 UIUtils.ProxyStatus.TZZ -> {
@@ -1246,11 +1135,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         Logger.w(LOG_TAG_UI, "$TAG proxy inactive, showing compact indicator")
-        b.fhsCardProxyCount.text = getString(R.string.hsf_proxy_off_indicator)
-        b.fhsCardProxyCount.applyLowEmphasis(proxyHeadlineSizePx)
-        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-        b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled).lowercase()
-        setProxyIconDimmed(true)
+        b.fhsCardOtherProxyCount.text = getString(R.string.hsf_proxy_off_indicator)
+        b.fhsCardOtherProxyCount.alpha = 0.65f
         b.fhsProxyHealthContainer.isVisible = false
     }
 
@@ -1258,9 +1144,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun showProxyActiveIndicator() {
         if (view == null || !isAdded) return
 
-        b.fhsCardProxyCount.restoreFullEmphasis(proxyHeadlineSizePx)
-        setProxyIconDimmed(false)
         b.fhsProxyHealthContainer.isVisible = true
+        b.fhsCardOtherProxyCount.alpha = 1f
     }
 
     /**
@@ -1273,12 +1158,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsProxyLiveCount.text = active.toString()
         b.fhsProxyIdleCount.text = idle.toString()
         b.fhsProxyFailingCount.text = failing.toString()
-    }
-
-    private fun setProxyIconDimmed(dimmed: Boolean) {
-        val ctx = context ?: return
-        val attr = if (dimmed) R.attr.colorOutline else R.attr.accentGood
-        b.fhsProxyIcon?.imageTintList = ColorStateList.valueOf(UIUtils.fetchColor(ctx, attr))
     }
 
     private fun toggleLogsView(mode: ActivityDisplayMode) {
@@ -1302,8 +1181,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     /**
      * Collects [LogActivityAggregator.activity] (a map of epoch-day to
      * [LogActivityState]); the fragment never queries the log databases for the
-     * grid nor maintains any counters itself. It renders only the current
-     * day's entry.
+     * grid nor maintains any counters itself. It renders the trailing
+     * 24-hour window split into 10-minute buckets.
      */
     private fun observeLogActivity() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -1317,11 +1196,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Renders the blocked/allowed activity wall: 6 rows (one per local day,
-     * oldest at top) x 24 columns (hour of day), ending today. Cell intensity
-     * is a deterministic logarithmic level of the real aggregated count; a
-     * count of zero always renders as an empty cell. Tapping anywhere on the
-     * wall opens the detail sheet, which defaults to the latest window.
+     * Renders the blocked/allowed activity wall: 24 columns (one per hour
+     * over the trailing 24 hours, oldest left, latest right) x 6 rows (one
+     * per 10-minute bucket within each hour, :00 at top, :50 at bottom). The
+     * newest bucket (now) is the bottom-right cell. Cell intensity is a
+     * deterministic logarithmic level of the real aggregated count; a count
+     * of zero always renders as an empty cell. Tapping a cell opens the
+     * detail sheet on that exact 10-minute interval.
      */
     private fun buildLogsHeatmap(
         state: LogActivityState,
@@ -1340,30 +1221,37 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
         val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
 
-        for (interval in state.intervals) {
-            val count = if (blockedMode) interval.blocked else interval.allowed
-            val lvl = intensityLevel(count)
-            val frac = HEATMAP_CELL_SIZE_FRACTION[lvl]
-            val cell = View(ctx)
-            cell.background =
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
-                }
-            cell.isClickable = false
-            cell.isFocusable = false
+        // iterate chronologically: the flat interval list is oldest-first, so
+        // column = hour index (idx / 6) and row = 10-min bucket within the
+        // hour (idx % 6); the grid fills row-major, matching this order
+        for (col in 0 until LogActivityAggregator.HOURS_IN_WINDOW) {
+            for (row in 0 until LogActivityAggregator.BUCKETS_PER_HOUR) {
+                val interval =
+                    state.intervals[col * LogActivityAggregator.BUCKETS_PER_HOUR + row]
+                val count = if (blockedMode) interval.blocked else interval.allowed
+                val lvl = intensityLevel(count)
+                val frac = HEATMAP_CELL_SIZE_FRACTION[lvl]
+                val cell = View(ctx)
+                cell.background =
+                    GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
+                    }
+                cell.isClickable = false
+                cell.isFocusable = false
 
-            val lp =
-                GridLayout.LayoutParams().apply {
-                    width = (cellBaseHeight * frac).toInt()
-                    height = (cellBaseHeight * frac).toInt()
-                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                    setMargins(gap, gap, gap, gap)
-                    setGravity(Gravity.CENTER)
-                }
-            cell.layoutParams = lp
-            grid.addView(cell)
+                val lp =
+                    GridLayout.LayoutParams().apply {
+                        width = (cellBaseHeight * frac).toInt()
+                        height = (cellBaseHeight * frac).toInt()
+                        columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                        rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                        setMargins(gap, gap, gap, gap)
+                        setGravity(Gravity.CENTER)
+                    }
+                cell.layoutParams = lp
+                grid.addView(cell)
+            }
         }
 
         val swatches =
@@ -1392,13 +1280,46 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Opens the activity detail sheet without waiting on any aggregation or
-     * loading state; the sheet builds its own default (latest) window and
-     * renders its data asynchronously.
+     * Resolves the [LogActivityInterval] under the last tap on the activity
+     * grid. Columns and rows are evenly weighted, so the hour is proportional
+     * to the tap's x-position and the 10-minute bucket within that hour to
+     * its y-position. Returns null when the grid has no data or was activated
+     * without a touch (keyboard/accessibility), which falls back to the
+     * latest window.
      */
-    private fun openIntervalDetails() {
-        LogActivityIntervalBottomSheet.newInstance()
-            .show(parentFragmentManager, LogActivityIntervalBottomSheet.TAG)
+    private fun tappedInterval(grid: View): LogActivityInterval? {
+        val state = lastActivityState ?: return null
+        if (state.intervals.size < LogActivityAggregator.TOTAL_SLOTS) return null
+        if (grid.width <= 0 || grid.height <= 0) return null
+        val col =
+            ((lastGridTouchX / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+                .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
+        val row =
+            ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
+                .coerceIn(0, LogActivityAggregator.BUCKETS_PER_HOUR - 1)
+        return state.intervals.getOrNull(
+            col * LogActivityAggregator.BUCKETS_PER_HOUR + row
+        )
+    }
+
+    /**
+     * Opens the activity detail sheet without waiting on any aggregation or
+     * loading state. When [grid] is set and the tap resolves to a cell, the
+     * sheet opens on that cell's exact 10-minute window; otherwise it builds
+     * its own default (latest) window and renders its data asynchronously.
+     */
+    private fun openIntervalDetails(grid: View?) {
+        val interval = grid?.let { tappedInterval(it) }
+        val sheet =
+            if (interval != null) {
+                LogActivityIntervalBottomSheet.newInstance(
+                    interval.startTimestamp,
+                    interval.startTimestamp + LogActivityAggregator.BUCKET_MS
+                )
+            } else {
+                LogActivityIntervalBottomSheet.newInstance()
+            }
+        sheet.show(parentFragmentManager, LogActivityIntervalBottomSheet.TAG)
     }
 
     // logarithmic scale so skewed traffic distributions stay visually
@@ -1441,6 +1362,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardAllowedApps.text = getString(R.string.hsf_firewall_mode_off_indicator)
         b.fhsCardAllowedApps.applyLowEmphasis(appsHeadlineSizePx)
         b.fhsCardAppsAllApps.text = ""
+        b.fhsAppsLabel.visibility = View.GONE
     }
 
     /**
@@ -1699,6 +1621,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardAllowedApps.restoreFullEmphasis(appsHeadlineSizePx)
                         b.fhsCardAllowedApps.text = allowedApps.toString()
                         b.fhsCardAllowedApps.isSelected = true
+                        b.fhsAppsLabel.visibility = View.VISIBLE
                         b.fhsCardAppsAllApps.text = getString(R.string.two_argument_space, getString(R.string.symbol_slash), allApps.toString())
                         b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
                         b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
@@ -1907,6 +1830,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var trafficStatsTicker: Job
 
     private fun startTrafficStats() {
+        // onResume() restarts this ticker; cancel the previous job first so
+        // multiple tickers never stack up
+        stopTrafficStats()
         trafficStatsTicker =
             ui("trafficStatsTicker") {
                 var counter = 0
@@ -2002,17 +1928,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun displayTrafficStatsRate() {
         val curr = TxRx()
-        if (txRx.time <= 0L) {
-            txRx = curr
-            b.fhsInternetSpeed.visibility = View.INVISIBLE
-            b.fhsInternetSpeedUnit.visibility = View.INVISIBLE
-            return
-        }
         val dur = (curr.time - txRx.time) / 1000L
-
-        if (dur <= 0) {
-            b.fhsInternetSpeed.visibility = View.INVISIBLE
-            b.fhsInternetSpeedUnit.visibility = View.INVISIBLE
+        if (txRx.time <= 0L || dur <= 0) {
+            // no measurable window yet (first tick after start, where the
+            // baseline was seeded moments ago): advance the baseline and show
+            // the cumulative counters immediately instead of hiding the row
+            // until the next cycle
+            txRx = curr
+            displayTrafficStatsBW()
             return
         }
         val tx = curr.tx - txRx.tx
