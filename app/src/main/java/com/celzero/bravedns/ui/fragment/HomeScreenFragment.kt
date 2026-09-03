@@ -15,12 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
-import android.content.res.Configuration
-import android.content.res.ColorStateList
-import com.celzero.bravedns.util.Themes
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -29,6 +23,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -39,24 +36,20 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
-import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import android.widget.GridLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
@@ -85,8 +78,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
-import com.celzero.bravedns.sponsor.provider.SponsorProvider
-import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -108,14 +99,16 @@ import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
-import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
@@ -141,7 +134,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.Locale
-import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
 import kotlin.time.Duration.Companion.milliseconds
@@ -153,7 +145,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val appConfig by inject<AppConfig>()
     private val workScheduler by inject<WorkScheduler>()
     private val eventLogger by inject<EventLogger>()
-    private val sponsorProvider by inject<SponsorProvider>()
     private val activityAggregator by inject<LogActivityAggregator>()
 
     private var isVpnActivated: Boolean = false
@@ -161,7 +152,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Active-state presentation captured once per view (in px / drawable)
     // before any state-dependent styling runs, so low-emphasis inactive
     // styling can be restored exactly on re-activation.
-    private var dnsHeadlineSizePx: Float = 0f
     private var appsHeadlineSizePx: Float = 0f
 
     // presentation state for the blocked/allowed activity grid; toggling this
@@ -205,17 +195,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val MAX_PROXY_POLL_DELAY_MS = 10_000L
         private const val TEXT_FADE_DURATION_MS = 150L
 
-        // Time calculation constants
-        private const val MILLISECONDS_PER_SECOND = 1000L
-        private const val SECONDS_PER_MINUTE = 60L
-        private const val MINUTES_PER_HOUR = 60L
-        private const val HOURS_PER_DAY = 24L
-        private const val DAYS_PER_MONTH = 30.0
-
-        // Sponsorship calculation constants
-        private const val BASE_AMOUNT_PER_MONTH = 0.60
-        private const val ADDITIONAL_AMOUNT_PER_MONTH = 0.20
-
         // Traffic display rotation
         private const val TRAFFIC_DISPLAY_CYCLE_MODULO = 3
         private const val TRAFFIC_DISPLAY_STATS_RATE = 0
@@ -245,8 +224,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val INACTIVE_TEXT_SCALE = 0.6f
         private const val INACTIVE_ELEMENT_ALPHA = 0.45f
 
+        // Monochrome proxy-health scheme (non-RPN proxies): one neutral hue
+        // with stepped alpha per state — active stays fully opaque, idle and
+        // failing fade out so visual weight tracks importance.
+        private const val MONO_IDLE_ALPHA = 153    // 0.6
+        private const val MONO_FAILING_ALPHA = 89  // 0.35
+
         // activity grid intensity levels (empty + 4 logarithmic levels)
         private const val HEATMAP_INTENSITY_LEVELS = 5
+
+        // empty-bucket placeholder dot: rendered far smaller and fainter than
+        // the lowest real level so "no activity" is barely perceptible
+        private const val HEATMAP_EMPTY_CELL_FRACTION = 0.12f
+        private const val HEATMAP_EMPTY_CELL_ALPHA = 0x1A
 
         private const val HEATMAP_GRID_ROWS = 6
         private const val HEATMAP_GRID_HEIGHT_DP = 56
@@ -254,7 +244,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val HEATMAP_CELL_OVAL_RATIO = 2f
 
         // fraction of the max cell size per intensity level
-        private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.55f, 0.78f, 0.78f, 1f, 1f)
+        private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.30f, 0.78f, 0.78f, 1f, 1f)
     }
 
     enum class ScreenType {
@@ -295,7 +285,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsLogsGrid.isClickable = true
         b.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
         // record tap position; returning false lets the click event fire
-        b.fhsLogsGrid.setOnTouchListener { v, event ->
+        b.fhsLogsGrid.setOnTouchListener { _, event ->
             lastGridTouchX = event.x
             lastGridTouchY = event.y
             false
@@ -319,23 +309,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
-
-        // Show "α" badge in the title when running an alpha build so testers can
-        // immediately identify they are on a pre-release version.
-        if (Utilities.isAlphaBuild()) {
-            //b.fhsTitleRethink.setText(R.string.app_name_alpha)
-            //b.fhsTitleRethink.isAllCaps = false
-        }
-
-        // do not show the sponsor card if the rethink plus is enabled
-        // sponsor state observer will take care of hiding the sponsor if already sponsored
-        if (RpnProxyManager.isRpnEnabled()) {
-            //b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
-            //b.fhsSponsor.visibility = View.VISIBLE
-        } else {
-            //b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
-            //b.fhsSponsor.visibility = View.VISIBLE
-        }
     }
 
     /**
@@ -597,7 +570,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * once per view, before any state-dependent styling is applied.
      */
     private fun captureActiveEmphasis() {
-        dnsHeadlineSizePx = b.fhsCardDnsLatency.textSize
         appsHeadlineSizePx = b.fhsCardAllowedApps.textSize
     }
 
@@ -679,7 +651,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableDnsCardIfNeeded() {
         if (appConfig.getBraveMode().isDnsActive()) {
-            b.fhsCardDnsLatency.restoreFullEmphasis(dnsHeadlineSizePx)
             observeDnsStates()
         } else {
             disabledDnsCard()
@@ -974,7 +945,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 uiCtx {
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                    updateProxyHealthCounts(active, idle, failing)
+                    // Colored scheme is reserved for RPN (also when RPN and
+                    // WireGuard are both active); WireGuard-only or any other
+                    // proxy renders monochrome.
+                    updateProxyHealthCounts(active, idle, failing, colored = rpnProxies.isNotEmpty())
                     Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status; proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
 
                     if (active == 0 && idle == 0 && failing == 0 && (proxies.isNotEmpty() || rpnProxies.isNotEmpty())) {
@@ -1120,9 +1094,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         b.fhsCardNetworkLogsCount.visibility = View.GONE
-        b.fhsCardNetworkLogsLabel?.text = getString(R.string.lbl_disabled)
+        b.fhsCardNetworkLogsLabel.text = getString(R.string.lbl_disabled)
         b.fhsCardDnsLogsCount.visibility = View.GONE
-        b.fhsCardDnsLogsLabel?.visibility = View.GONE
+        b.fhsCardDnsLogsLabel.visibility = View.GONE
         b.fhsCardLogsDuration.visibility = View.GONE
     }
 
@@ -1146,18 +1120,70 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsProxyHealthContainer.isVisible = true
         b.fhsCardOtherProxyCount.alpha = 1f
+        // Provisional scheme until the proxy poll computes the exact one:
+        // colored only when RPN is active, monochrome otherwise.
+        applyProxyHealthColorScheme(RpnProxyManager.isRpnActive())
     }
 
     /**
-     * Renders the per-state proxy counts (Live / Idle / Failing) in the colored
-     * health row at the bottom of the proxy card. Must be called on Main.
+     * Applies the proxy-health row color scheme. RPN users get the semantic
+     * accent colors (good/warning/bad); everyone else (WireGuard-only, plain
+     * SOCKS5/HTTP proxies) gets a monochrome scheme where a single neutral
+     * hue fades with importance: active is fully opaque, idle is dimmer, and
+     * failing is the dimmest. When RPN and WireGuard are both active, the
+     * colored scheme wins.
+     * Must be called on Main.
      */
-    private fun updateProxyHealthCounts(active: Int, idle: Int, failing: Int) {
+    private fun applyProxyHealthColorScheme(colored: Boolean) {
+        if (view == null || !isAdded) return
+
+        val ctx = requireContext()
+        if (colored) {
+            val good = UIUtils.fetchColor(ctx, R.attr.accentGood)
+            val warning = UIUtils.fetchColor(ctx, R.attr.accentWarning)
+            val bad = UIUtils.fetchColor(ctx, R.attr.accentBad)
+            b.fhsProxyBarActive.setBackgroundColor(good)
+            b.fhsProxyBarIdle.setBackgroundColor(warning)
+            b.fhsProxyBarFailing.setBackgroundColor(bad)
+            b.fhsProxyDotActive.backgroundTintList = ColorStateList.valueOf(good)
+            b.fhsProxyDotIdle.backgroundTintList = ColorStateList.valueOf(warning)
+            b.fhsProxyDotFailing.backgroundTintList = ColorStateList.valueOf(bad)
+            b.fhsProxyLiveCount.setTextColor(good)
+            b.fhsProxyIdleCount.setTextColor(warning)
+            b.fhsProxyFailingCount.setTextColor(bad)
+        } else {
+            // Monochrome: one neutral hue with stepped alpha so the row stays
+            // readable without carrying good/warning/bad semantics. Active is
+            // fully opaque; idle and failing fade out progressively.
+            val hue = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+            val active = hue
+            val idle = ColorUtils.setAlphaComponent(hue, MONO_IDLE_ALPHA)
+            val failing = ColorUtils.setAlphaComponent(hue, MONO_FAILING_ALPHA)
+            b.fhsProxyBarActive.setBackgroundColor(active)
+            b.fhsProxyBarIdle.setBackgroundColor(idle)
+            b.fhsProxyBarFailing.setBackgroundColor(failing)
+            b.fhsProxyDotActive.backgroundTintList = ColorStateList.valueOf(active)
+            b.fhsProxyDotIdle.backgroundTintList = ColorStateList.valueOf(idle)
+            b.fhsProxyDotFailing.backgroundTintList = ColorStateList.valueOf(failing)
+            b.fhsProxyLiveCount.setTextColor(active)
+            b.fhsProxyIdleCount.setTextColor(idle)
+            b.fhsProxyFailingCount.setTextColor(failing)
+        }
+    }
+
+    /**
+     * Renders the per-state proxy counts (Live / Idle / Failing) in the health
+     * row at the bottom of the proxy card. [colored] selects the accent-color
+     * scheme (RPN) versus the monochrome scheme (all other proxies).
+     * Must be called on Main.
+     */
+    private fun updateProxyHealthCounts(active: Int, idle: Int, failing: Int, colored: Boolean) {
         if (view == null || !isAdded) return
 
         b.fhsProxyLiveCount.text = active.toString()
         b.fhsProxyIdleCount.text = idle.toString()
         b.fhsProxyFailingCount.text = failing.toString()
+        applyProxyHealthColorScheme(colored)
     }
 
     private fun toggleLogsView(mode: ActivityDisplayMode) {
@@ -1199,10 +1225,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * Renders the blocked/allowed activity wall: 24 columns (one per hour
      * over the trailing 24 hours, oldest left, latest right) x 6 rows (one
      * per 10-minute bucket within each hour, :00 at top, :50 at bottom). The
-     * newest bucket (now) is the bottom-right cell. Cell intensity is a
-     * deterministic logarithmic level of the real aggregated count; a count
-     * of zero always renders as an empty cell. Tapping a cell opens the
-     * detail sheet on that exact 10-minute interval.
+        * newest bucket (now) is the bottom-right cell. Cell intensity is a
+        * deterministic logarithmic level of the real aggregated count; a count
+        * of zero renders a negligible placeholder dot (far smaller and fainter
+        * than the lowest real level) while the cell itself stays reserved so
+        * the grid geometry is unaffected. Tapping a cell opens the
+        * detail sheet on that exact 10-minute interval.
      */
     private fun buildLogsHeatmap(
         state: LogActivityState,
@@ -1221,24 +1249,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
         val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
 
-        // iterate chronologically: the flat interval list is oldest-first, so
-        // column = hour index (idx / 6) and row = 10-min bucket within the
-        // hour (idx % 6); the grid fills row-major, matching this order
-        for (col in 0 until LogActivityAggregator.HOURS_IN_WINDOW) {
-            for (row in 0 until LogActivityAggregator.BUCKETS_PER_HOUR) {
+        // iterate hour-major so each visual column holds one hour: cells are
+        // added bucket-by-bucket across the columns (GridLayout auto-places
+        // children row-major), giving column = hour index (oldest left,
+        // latest right) and row = 10-min bucket within the hour (:00 top,
+        // :50 bottom); the newest bucket (now) lands in the bottom-right cell
+        for (row in 0 until LogActivityAggregator.BUCKETS_PER_HOUR) {
+            for (col in 0 until LogActivityAggregator.HOURS_IN_WINDOW) {
                 val interval =
                     state.intervals[col * LogActivityAggregator.BUCKETS_PER_HOUR + row]
                 val count = if (blockedMode) interval.blocked else interval.allowed
                 val lvl = intensityLevel(count)
+                // empty buckets render a negligible placeholder dot instead of
+                // the lowest real level: far smaller and fainter, so "no
+                // activity" reads as near-nothing without leaving the wall
+                // looking gappy
+                /*val frac =
+                    if (lvl == 0) HEATMAP_EMPTY_CELL_FRACTION
+                    else HEATMAP_CELL_SIZE_FRACTION[lvl]
+                val cellAlpha = if (lvl == 0) HEATMAP_EMPTY_CELL_ALPHA else alphas[lvl]*/
                 val frac = HEATMAP_CELL_SIZE_FRACTION[lvl]
+                val cellAlpha = alphas[lvl]
                 val cell = View(ctx)
                 cell.background =
                     GradientDrawable().apply {
                         shape = GradientDrawable.OVAL
-                        setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
+                        setColor(ColorUtils.setAlphaComponent(base, cellAlpha))
                     }
                 cell.isClickable = false
                 cell.isFocusable = false
+                // alternative treatment: hide the circle entirely (keeps the
+                // cell slot reserved, but leaves visible gaps in the wall)
+                // if (lvl == 0) cell.visibility = View.GONE
 
                 val lp =
                     GridLayout.LayoutParams().apply {
@@ -1351,7 +1393,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // subtle, low-emphasis hint instead of the oversized legacy label
         b.fhsCardDnsConnectedDns.text = getString(R.string.hsf_dns_mode_off_indicator)
-        b.fhsCardDnsConnectedDns.applyLowEmphasis(dnsHeadlineSizePx)
+        b.fhsCardDnsConnectedDns.alpha = 0.75f
         b.fhsCardDnsLatency.text = getString(R.string.lbl_disabled).lowercase()
         b.fhsCardDnsLatency.isSelected = true
     }
@@ -1423,10 +1465,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Renders the DNS card's second line as "<status> · <region>(<p50> ms)"
-     * (e.g. "Connected · BLR(45 ms)"). Falls back to "45 ms" when the resolver
-     * region is unknown and shows the region alone until a latency sample is
-     * available. When no sample exists at all, shows the status (or "Inactive").
+     * Renders the DNS card's second line as "<status> · <region>(<p50>)"
+     * (e.g. "Connected · BLR(45 ms)"). Latency is formatted via
+     * UIUtils.formatLatency(): "45 ms" below one second, "1.5 s" / "15 s"
+     * above it. Falls back to the latency alone when the resolver region is
+     * unknown and shows the region alone until a latency sample is available.
+     * When no sample exists at all, shows the status (or "Inactive").
      */
     private fun renderDnsHeadline(dnsStatus: Int? = null) {
         if (view == null || !isAdded) return
@@ -1442,9 +1486,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val latency =
             when {
                 p50 != null && p50 >= 0L && !region.isNullOrEmpty() ->
-                    getString(R.string.hsf_dns_latency_region_ms, region, p50.toString())
+                    getString(R.string.hsf_dns_latency_region, region, UIUtils.formatLatency(p50))
                 p50 != null && p50 >= 0L ->
-                    getString(R.string.hsf_dns_latency_ms, p50.toString())
+                    UIUtils.formatLatency(p50)
                 !region.isNullOrEmpty() -> region
                 else -> null
             }
@@ -1462,6 +1506,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // show the resolver name alongside its connection status
         val dnsName = appConfig.getConnectedDnsObservable().value
+        b.fhsCardDnsConnectedDns.alpha = 1f
         b.fhsCardDnsConnectedDns.text = dnsName
         b.fhsCardDnsConnectedDns.isSelected = true
 
@@ -1469,11 +1514,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun observeLogsCount() {
-        b.fhsCardNetworkLogsLabel?.text = "CONNECTIONS"
-        b.fhsCardNetworkLogsLabel?.visibility = View.VISIBLE
+        b.fhsCardNetworkLogsLabel.text = "CONNECTIONS"
+        b.fhsCardNetworkLogsLabel.visibility = View.VISIBLE
         b.fhsCardNetworkLogsCount.visibility = View.VISIBLE
         b.fhsCardDnsLogsCount.visibility = View.VISIBLE
-        b.fhsCardDnsLogsLabel?.visibility = View.VISIBLE
+        b.fhsCardDnsLogsLabel.visibility = View.VISIBLE
         b.fhsCardLogsDuration.visibility = View.VISIBLE
         io {
             val time = appConfig.getLeastLoggedNetworkLogs()
