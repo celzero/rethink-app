@@ -1162,4 +1162,22 @@
     <string name="tour_btn_skip">Passer la visite guidée</string>
     <string name="stability_program_snackbar_msg" translatable="true">Le mode stabilité est activé. Les rapports d\'erreurs contribuent à l\'amélioration des fonctionnalités expérimentales.</string>
     <string name="stability_program_snackbar_disable" translatable="true">Désactiver</string>
+    <string name="lbl_notes" translatable="true">Notes</string>
+    <string name="hint_notes" translatable="true">Ajoutez des notes à propos de cette app</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Les notes peuvent faire jusqu\'à 500 caractères</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Échec d\'enregistrement des notes</string>
+    <string name="lbl_saving" translatable="true">Enregistrement…</string>
+    <string name="lbl_expires_on" translatable="true">Valide jusqu\'à</string>
+    <string name="lbl_cancelled" translatable="true">Annulé</string>
+    <string name="lbl_expired" translatable="true">Expiré</string>
+    <string name="lbl_grace_period" translatable="true">Délai de grâce</string>
+    <string name="lbl_paused" translatable="true">Mise en pause</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Le protocole IP sélectionné n\'est pas disponible sur le réseau actuel. Changez le mode \"IPv4 &amp; IPv6\" en \"Auto\" pour rester connecté.</string>
+    <string name="rethink_empty_state_title" translatable="true">Aucune liste de blocage</string>
+    <string name="rethink_empty_state_desc" translatable="true">Téléchargez ou configurez une liste de blocage pour commencer.</string>
+    <string name="settings_log_lifespan_heading" translatable="true">Durée de journalisation</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 jours (défaut)</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Rebouclage (expérimental)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">En mode Rebouclage, Rethink peut rediriger son propre trafic réseau. Cela signifie que Rethink peut appliquer des règles IP et de domaine, des règles de pare-feu universelles et des règles de proxy au trafic de Rethink, comme s’il s’agissait d’une application ordinaire. Même si le mode Rebouclage offre davantage de contrôle, le comportement qui en résulte n’est pas toujours souhaitable.\n\n\nIl est recommandé d\'exempter Rethink des règles de pare-feu, de DNS et de proxy. Cela n\'affecte pas la surveillance ni la journalisation du réseau, mais uniquement les règles.\n\n\nEn mode Rebouclage, le confinement proxy ne sera pas appliqué, pour l\'instant.</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Attention</string>
 </resources>

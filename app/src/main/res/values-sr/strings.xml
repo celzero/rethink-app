@@ -27,7 +27,7 @@
     <string name="lbl_wildcard" translatable="true">Специјални карактер</string>
     <string name="lbl_action_required" translatable="true">Захтева се радња</string>
     <string name="lbl_rules" translatable="true">правила</string>
-    <string name="lbl_network" translatable="true">мрежа</string>
+    <string name="lbl_network" translatable="true">Мрежа</string>
     <string name="lbl_create" translatable="true">Направи</string>
     <string name="lbl_qr_code" translatable="true">QR код</string>
     <string name="lbl_import" translatable="true">Увези</string>
@@ -53,14 +53,14 @@
     <string name="lbl_fast" translatable="true">брз</string>
     <string name="lbl_slow" translatable="true">спор</string>
     <string name="lbl_very" translatable="true">веома</string>
-    <string name="lbl_add" translatable="true">додај</string>
-    <string name="lbl_app_wise" translatable="true">по апликацији</string>
+    <string name="lbl_add" translatable="true">Додај</string>
+    <string name="lbl_app_wise" translatable="true">По Апликацији</string>
     <string name="lbl_sec" translatable="true">сек</string>
     <string name="lbl_hour" translatable="true">сати</string>
     <string name="lbl_preshared_key" translatable="true">Подељен кључ</string>
     <string name="lbl_optional" translatable="true">(опционо)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Стално одржавање</string>
-    <string name="lbl_save" translatable="true">сачувај</string>
+    <string name="lbl_save" translatable="true">Сачувај</string>
     <string name="lbl_cache" translatable="true">Кеш</string>
     <string name="lbl_status" translatable="true">Статус</string>
     <string name="lbl_remove" translatable="true">Уклони</string>
@@ -72,17 +72,17 @@
     <string name="lbl_split" translatable="true">Подели</string>
     <string name="lbl_on_device" translatable="true">на-уређају</string>
     <string name="lbl_unselected" translatable="true">Неизабрано</string>
-    <string name="lbl_notification" translatable="true">обавештење</string>
+    <string name="lbl_notification" translatable="true">Обавештење</string>
     <string name="memory_notification_text">Rethink-у недостаје меморије. Системске радње могу бити ограничене.</string>
     <string name="slide_2_title" translatable="true">Добродошли</string>
     <string name="slide_1_title" translatable="true">Бесплатан и отвореног кода</string>
-    <string name="slide_1_desc" translatable="true">Rethink је софтвер отвореног кода подржан од стране Mozilla Builders MVP програма.</string>
-    <string name="allow" translatable="true">дозволи</string>
-    <string name="block" translatable="true">блокирај</string>
-    <string name="bypass_universal" translatable="true">заобиђи универзално</string>
-    <string name="exclude" translatable="true">изузми</string>
+    <string name="slide_1_desc" translatable="true">Rethink је софтвер отвореног кода подржан од стране Mozilla Builders MVP програма, FOSS United Foundation.</string>
+    <string name="allow" translatable="true">Дозволи</string>
+    <string name="block" translatable="true">Блокирај</string>
+    <string name="bypass_universal" translatable="true">Заобиђи Универзално</string>
+    <string name="exclude" translatable="true">Изузми</string>
     <string name="lbl_peer" translatable="true">Равноправни члан</string>
-    <string name="bypass_dns_firewall" translatable="true">заобиђи днс и заштитни зид</string>
+    <string name="bypass_dns_firewall" translatable="true">Заобиђи DNS &amp; Заштитни зид</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Додирните да промените подешавања заштите</string>
     <string name="firewall_mode_notification_title" translatable="true">Заштићени! Повезани са заштитним зидом.</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">чекање</string>
@@ -735,7 +735,7 @@
     <string name="lbl_cancel" translatable="true">Поништи</string>
     <string name="lbl_domain" translatable="true">Домен</string>
     <string name="lbl_configure" translatable="true">Подеси</string>
-    <string name="lbl_logs" translatable="true">записи</string>
+    <string name="lbl_logs" translatable="true">Записи</string>
     <string name="lbl_proceed" translatable="true">Настави</string>
     <string name="lbl_private_key" translatable="true">Приватни кључ</string>
     <string name="lbl_random" translatable="true">(насумично)</string>
@@ -748,9 +748,9 @@
     <string name="lbl_idle" translatable="true">Мирује</string>
     <string name="lbl_anonymous" translatable="true">анонимно</string>
     <string name="slide_2_desc" translatable="true">Rethink је најлакши начин да надгледате активност мреже, заобиђете цензуру интернета, и блокирате апликације на вашем андроид уређају.</string>
-    <string name="untracked" translatable="true">непраћен</string>
+    <string name="untracked" translatable="true">Непраћен</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Упозорење: Rethink је деактивиран</string>
-    <string name="isolate" translatable="true">изолуј</string>
+    <string name="isolate" translatable="true">Изолуј</string>
     <string name="dns_mode_notification_title" translatable="true">Заштићени! Повезани са брзим и безбедним DNS-ом.</string>
     <string name="pause_mode_notification_title" translatable="true">Паузирано! Блокиране апликације ће наставити да буду надгледане.</string>
     <string name="status_no_internet" translatable="true">нема интернета</string>
@@ -959,4 +959,32 @@
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Филтер за одрасле блокира приступ свим сајтовима са садржајем за одрасле. Не блокира прокси или VPN-ове, нити сајтове са мешовитим садржајем. Сајтови попут Редита су дозвољени. Гугл и Бинг су подешени на безбедни мод.</string>
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">Блокира приступ свим сајтовима са садржајем за одрасле. Такође блокира прокси и VPN домене који се могу користити за заобилажење филтера. Сајтови мешовитог садржаја (попут Редита) су такође блокирани. Гугл, Бинг и Јутјуб су подешени на безбедни мод.</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Породични филтер блокира приступ свим сајтовима са садржајем за одрасле. Такође блокира све прокси и VPN домене који се могу користити за заобилажење наших филтера. Сајтови мешовитог садржаја (попут Редита) су такође блокирани. Гугл, Бинг и Јутјуб су подешени на безбедни мод.</string>
+    <string name="lbl_notes" translatable="true">Белешке</string>
+    <string name="hint_notes" translatable="true">Додајте белешку о овој апликацији</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Белешке имају максималну дужину од 500 знакова</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Чување бележака неуспешно</string>
+    <string name="lbl_saving" translatable="true">Чување у току…</string>
+    <string name="lbl_plan" translatable="true">План</string>
+    <string name="lbl_expires_on" translatable="true">Валидно до</string>
+    <string name="lbl_cancelled" translatable="true">Отказано</string>
+    <string name="lbl_expired" translatable="true">Истекло</string>
+    <string name="lbl_grace_period" translatable="true">Пробни период</string>
+    <string name="lbl_paused" translatable="true">Паузирано</string>
+    <string name="lbl_test" translatable="true">Тест</string>
+    <string name="lbl_experimental" translatable="true">(експериментално)</string>
+    <string name="lbl_service_providers" translatable="true">Пружаоци Услуга</string>
+    <string name="lbl_default" translatable="true">Подразумевано</string>
+    <string name="lbl_action" translatable="true">Акција</string>
+    <string name="lbl_connect" translatable="true">Повежите се</string>
+    <string name="lbl_criteria" translatable="true">Критеријуми</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Протоколи мреже се не подударају</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Ваш изабрани IP протокол није доступан на тренутној мрежи. Пређите на \"IPv4 &amp; IPv6\" или \"Аутоматски\" режим да останете повезани.</string>
+    <string name="wireguard_title" translatable="true">Безбедан интернет уз WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Шифрујте Ваш Интернет проток уз WireGuard. Одаберите различите путеве за различите апликације.</string>
+    <string name="firewall_title" translatable="true">Заштитите свој Android Firewall програмом</string>
+    <string name="firewall_desc" translatable="true">Контролише употребу интернета по апликацији; ограничите везе засновано на активности апликације или мреже.</string>
+    <string name="dns_title" translatable="true">Блокирајте рекламе и малвер уз DNS</string>
+    <string name="dns_desc" translatable="true">Одаберите са више од 190 листа да зауставите рекламе, праћења и малвер.</string>
+    <string name="status_no_network" translatable="true">без мреже</string>
 </resources>

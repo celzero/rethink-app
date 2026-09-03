@@ -1,1 +1,1 @@
-Firewall per app, usa VPN WireGuard, monitor di rete, blocco mandare, cambia DNS.
+Firewall per app, VPN WireGuard, monitor di rete, blocca malware, cambia DNS.

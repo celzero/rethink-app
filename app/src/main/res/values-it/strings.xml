@@ -9,7 +9,7 @@
     <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Partecipazione alla LAN!</b><br/><br/> 1. Nuovo: I log DNS e IP per ogni applicazione ora hanno una nuova vista meglio ordinata.<br/>2. Nuovo: Impostazione per <i>escludere</i> opzionalmente le app che fanno da proxy forwarder.<br/> 3. Sistemato crash con <i>DNS Booster</i> mentre si utilizza DNSCrypt.<br/> 4. Sistemata la traduzioneIPv6 to IPv4 in casi specifici.<br/> 5. Altre correzioni di bug e miglioramenti.<br/><br/> <a href=https://svc.rethinkdns.com/r/translate>Aiutare a tradurre questa applicazione</a>]]></string>
     <string name="orbot_explanation">Orbot è un\'applicazione proxy gratuita che consente ad altre applicazioni di utilizzare Internet in modo più &lt;u&gt;sicuro&lt;/u&gt;. \nOrbot utilizza &lt;u&gt;Tor&lt;/u&gt; per crittografare il traffico Internet, aiutandoti a &lt;u&gt;aggirare la censura&lt;/u&gt; e a difendersi dai vari tipi di &lt;u&gt;sorveglianza della rete&lt;/u&gt; che minacciano la libertà personale e la privacy. \n&lt;u&gt;Proxy TCP&lt;/u&gt;: Rethink inoltra a Orbot solo le connessioni TCP di tutte le applicazioni, tranne quelle escluse. \n&lt;u&gt;Proxy HTTP&lt;/u&gt;: Rethink &lt;i&gt;imposta&lt;/i&gt; la proxy HTTP, ma non impone alle app di utilizzarlo. Di solito, browser come Chrome e Firefox la utilizzano. Le applicazioni che utilizzano la proxy HTTP(S) aggirano sia le regole del Firewall che del DNS.</string>
     <string name="status_protected_with_socks5_private_dns">protetto con socks5 e dns privato</string>
-    <string name="block">blocca</string>
+    <string name="block">Blocca</string>
     <string name="status_app_error">errore dell\'app</string>
     <string name="status_dns_error">errore del dns</string>
     <string name="app_name" translatable="false">RethinkDNS</string>
@@ -25,13 +25,13 @@
     <string name="slide_2_title">Benvenuto/a</string>
     <string name="slide_2_desc">Rethink è il modo più semplice per monitorare l\'attività di rete, aggirare la censura di Internet e attivare un firewall per le app del tuo dispositivo Android.</string>
     <string name="slide_1_title">Gratuito e con sorgente pubblica</string>
-    <string name="slide_1_desc">Rethink è un software con sorgente pubblica sostenuto dal programma Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink è un software open source sostenuto dal programma Mozilla Builders MVP e da FOSS United Foundation.</string>
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
-    <string name="allow">consenti</string>
-    <string name="bypass_universal">aggira regole universali</string>
-    <string name="exclude">escludi</string>
-    <string name="isolate">isola</string>
-    <string name="untracked">non tracciato</string>
+    <string name="allow">Consenti</string>
+    <string name="bypass_universal">Aggira regole universali</string>
+    <string name="exclude">Escludi</string>
+    <string name="isolate">Isola</string>
+    <string name="untracked">Non tracciato</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Attenzione: Rethink è stato disattivato</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tocca per modificare l\'impostazione di protezione</string>
     <string name="dns_mode_notification_title">Protetto! Connesso ad un DNS veloce e sicuro.</string>
@@ -68,7 +68,7 @@
     <string name="always_on_dialog_stop_heading">VPN sempre attiva</string>
     <string name="always_on_dialog_positive">Arresta</string>
     <string name="always_on_dialog_neutral">Impostazioni</string>
-    <string name="firewall_act_universal_tab">universali</string>
+    <string name="firewall_act_universal_tab">Universali</string>
     <string name="firewall_act_network_monitor_tab">Rete</string>
     <string name="dns_act_configure_tab">Configura</string>
     <string name="univ_firewall_dialog_title">Eliminare regola IP?</string>
@@ -130,7 +130,7 @@
     <string name="settings_allow_bypass_heading">Attiva la visibilità rete</string>
     <string name="settings_allow_bypass_desc">Consentire alle app richiedenti di accedere a tutte le reti disponibili. Su richiesta queste app possono bypassare il tunnel VPN di Rethink. Alcune app per conferenze audio/video, come Zoom e Meet, potrebbero richiedere questa procedura per funzionare correttamente.</string>
     <string name="settings_lock_down_mode_desc">Alcune opzioni sono disabilitate quando la VPN è in modalità di blocco. <u>Vai alle Impostazioni VPN</u>.</string>
-    <string name="settings_proxy_header">proxy</string>
+    <string name="settings_proxy_header">Proxy</string>
     <string name="settings_socks5_heading">Imposta Proxy SOCKS5</string>
     <string name="settings_socks5_desc">Inoltra le connessioni a un endpoint SOCKS5.</string>
     <string name="settings_https_heading">Imposta Proxy HTTP(S) CONNECT</string>
@@ -176,8 +176,8 @@
     <string name="settings_https_disabled_error">Connesso a %1$s. Disabilitarlo per continuare.</string>
     <string name="settings_orbot_notification_content">Errore durante l\'avvio di Tor-come-Proxy. Apri l\'app Orbot e avvialo manualmente.</string>
     <string name="settings_orbot_notification_action">Apri Orbot</string>
-    <string name="settings_general_header">generali</string>
-    <string name="settings_network_all_networks">Usa tutte le reti disponibili (sperimentale)</string>
+    <string name="settings_general_header">Generali</string>
+    <string name="settings_network_all_networks">Usa tutte le reti disponibili</string>
     <string name="settings_network_all_networks_desc">Se abilitato, Rethink utilizza tutte le reti disponibili per connettersi a Internet. Altrimenti, Rethink utilizza la rete indicata come <i>attiva</i> da Android.</string>
     <string name="settings_autostart_bootup_heading">Avvio automatico all\'accensione (sperimentale)</string>
     <string name="settings_autostart_bootup_desc">Avvia automaticamente Rethink quando accendi il dispositivo, se questo era in esecuzione prima che venisse spento.</string>
@@ -236,7 +236,7 @@
     <string name="firewall_status_whitelisted">Aggira le regole universali del firewall</string>
     <string name="firewall_status_blocked">bloccata</string>
     <string name="lbl_proceed">Prosegui</string>
-    <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall. \n \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
+    <string name="hsf_vpn_dialog_message">Rethink ha bisogno dell\'autorizzazione di impostare una VPN locale per crittografare le richieste DNS del dispositivo, implementare un monitor di rete e applicare le regole del firewall.\n \nL\'automazione del proxy basato su Wi-Fi richiede l\'autorizzazione alla posizione per identificare la rete Wi-Fi connessa (SSID). Questa autorizzazione è richiesta solo quando attivi la fuzione.\n\nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
     <string name="contributors_list"><![CDATA[Il <i>Rethink Open Source Project</i> deve la sua esistenza a questi volontari, che dedicano innumerevoli ore al suo sviluppo.<br/> <br/>🛡️ App Android <br/> <a href=https://github.com/BayLee4>BayLee4</a><br/> <a href=https://github.com/Ch4t4r>Ch4t4r</a><br/> <a href=https://github.com/HrBDev>HrBDev</a><br/> <a href=https://github.com/hussainmohd-a>hussainmohd-a</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/markwmuller>markwmuller</a><br/><a href=https://github.com/Mygod>Mygod</a><br/> <a href=https://github.com/Uldiniad>Uldiniad</a><br/> <a href=https://github.com/Poussinou>Poussinou</a><br/> <a href=https://github.com/pjosingh>pjosingh</a><br/> <br/>🚂 Motore di rete <br/> <a href=https://github.com/alalamav>alalamav</a><br/> <a href=https://github.com/bemasc>bemasc</a><br/> <a href=https://github.com/dmcardle>dmcardle</a><br/> <a href=https://github.com/fortuna>fortuna</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/SeanBurford>SeanBurford</a><br/> <br/>📚 Resolver <br/> <a href=https://github.com/ahmed-tasaly>ahmed-tasaly</a><br/> <a href=https://github.com/amithm7>amithm7</a><br/> <a href=https://github.com/arfshl>arfshl</a><br/> <a href=https://github.com/badmojr>badmojr</a><br/> <a href=https://github.com/bongochong>bongochong</a><br/> <a href=https://github.com/elliotwutingfeng>elliotwutingfeng</a><br/> <a href=https://github.com/georgyo>georgyo</a><br/> <a href=https://github.com/GiddyGoatGaming>GiddyGoatGaming</a><br/> <a href=https://github.com/Harish-Narayan>Harish-Narayan</a><br/> <a href=https://github.com/ignoramous>ignoramous</a><br/> <a href=https://github.com/JakeChampion>JakeChampion</a><br/> <a href=https://github.com/MasterKia>MasterKia</a><br/> <a href=https://github.com/mtxadmin>mtxadmin</a><br/> <a href=https://github.com/neneeen>neneeen</a><br/> <a href=https://github.com/PeterDaveHello>PeterDaveHello</a><br/> <a href=https://github.com/santhosh-ponnusamy>santhosh-ponnusamy</a><br/> <a href=https://github.com/shruuub>shruuub</a><br/> <a href=https://github.com/shuvashish76>shuvashish76</a><br/> <br/>⚜ Moderatori della community <br/> <a href=https://t.me/amithm7>amithm7</a><br/> <a href=https://t.me/TronSlayer>Andersen</a><br/><a href=https://t.me/ppatra>ppatra</a><br/> <a href=https://t.me/InFamous23>InFamous23</a><br/> <a href=https://t.me/TheTr1ckst3r>TheTr1ckst3r</a><br/> <a href=https://t.me/Ch4t4r>Ch4t4r</a><br/> <a href=https://t.me/Billi_ance>Billi_ance</a><br/> <a href=https://t.me/kaliangel>kaliangel</a><br/> <a href=https://github.com/PoneyClairDeLune>PoneyClairDeLune</a><br/>📌 Geo-IP <br/> <a href=https://db-ip.com>db-ip.com</a><br/> <br/>❇ Traduzioni <br/> <a href=https://weblate.org/en/>Weblate</a><br/> <br/>🦆 Icons <br/> <a href=https://github.com/celzero/rethink-app/issues/346>Icons</a><br/> <br/>📦 Build server <br/> <a href=https://jitpack.io/>JitPack</a><br/> <a href=https://github.com/>GitHub</a><br/>]]></string>
     <string name="cd_custom_dns_proxy_default_app">Nessuno</string>
     <string name="cd_dns_proxy_error_text_3">Porta invalida</string>
@@ -296,7 +296,7 @@
     <string name="settings_dns_proxy_dialog_port_number">Numero porta</string>
     <string name="settings_dns_proxy_dialog_username">Nome utente</string>
     <string name="settings_dns_proxy_dialog_password">Password</string>
-    <string name="settings_dns_proxy_dialog_positive_btn">imposta</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">Imposta</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="false">L\'applicazione selezionata verrà esclusa dalla VPN per consentirle di effettuare connessioni proxy per conto dell\'utente.</string>
     <string name="settings_app_list_default_app">Nessuno</string>
     <string name="settings_socks_forwarding_desc">Inoltro a %1$s:%2$s, %3$s</string>
@@ -313,8 +313,8 @@
     <string name="settings_theme_dialog_themes_4">Nero</string>
     <string name="settings_ip_dialog_title">Scegli la versione IP</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (predefinito)</string>
-    <string name="settings_ip_dialog_ipv6">IPv6 (sperimentale)</string>
-    <string name="settings_ip_dialog_ipv46">Automatico (sperimentale)</string>
+    <string name="settings_ip_dialog_ipv6">IPv6</string>
+    <string name="settings_ip_dialog_ipv46">Automatico</string>
     <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="settings_notification_heading">Scegli azioni da notifica</string>
     <string name="settings_notification_desc">Pulsanti da mostrare nella notifica di Rethink: %1$s</string>
@@ -356,15 +356,15 @@
     <string name="hsf_blocklist_updating_text">Avvio…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Impossibile mettere in pausa: Rethink non è attivo</string>
-    <string name="dc_block_heading">regole</string>
-    <string name="dc_other_dns_heading">tipo</string>
+    <string name="dc_block_heading">Regole</string>
+    <string name="dc_other_dns_heading">Tipo</string>
     <string name="dc_custom_dns_radio">Altro DNS</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s elementi »</string>
     <string name="dc_local_block_heading">Liste dei filtri sul dispositivo</string>
     <string name="dc_local_block_desc_1">Scegli tra più di 195 liste di filtri. Clicca qui per scaricarle o configurarle.</string>
     <string name="dc_custom_block_heading">Regole domini</string>
-    <string name="dc_dns_website_heading">Mostra l\'icona dei siti web nel registro DNS (sperimentale)</string>
+    <string name="dc_dns_website_heading">Mostra l\'icona dei siti web nel registro DNS</string>
     <string name="dc_dns_website_desc">Recupera icone dei siti web da <i>nextdns.io</i> e <i>duckduckgo.com</i>. Utilizza fino a 350 MB di spazio su disco</string>
     <string name="dc_dns_leaks_heading">Previeni aggiramenti del DNS</string>
     <string name="dc_dns_leaks_desc">Se abilitata, Rethink cattura i pacchetti sulla porta 53 e li invia invece all\'endpoint DNS scelto dall\'utente</string>
@@ -438,7 +438,7 @@
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_desc">Descrizione (facoltativa)</string>
     <string name="cd_dns_crypt_dialog_name">Nome</string>
-    <string name="lbl_add">aggiungi</string>
+    <string name="lbl_add">Aggiungi</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_error_text_1">Lo stamp non può essere vuoto</string>
     <string name="cd_doh_dialog_heading">Aggiungi DNS su HTTPS</string>
@@ -690,7 +690,7 @@
     <string name="about_privacy_policy">Leggi l\'informativa sulla privacy</string>
     <string name="private_dns_error">Impossibile avviare schermata DNS privato.</string>
     <string name="private_dns_dialog_heading">Disattiva DNS privato</string>
-    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android. \n \nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva \"DNS privato\".</string>
+    <string name="private_dns_dialog_desc">Le impostazioni DNS di Rethink sono sovrascritte dal DNS privato di Android. \n \nPer utilizzare il DNS di Rethink vai nelle Impostazioni di Android e disattiva il DNS privato.</string>
     <string name="private_dns_dialog_positive">Vai alle Impostazioni</string>
     <string name="relative_time_today">Oggi</string>
     <string name="relative_time_yesterday">Ieri</string>
@@ -773,12 +773,12 @@
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
     <string name="lbl_rules" translatable="true">regole</string>
-    <string name="lbl_network" translatable="true">rete</string>
-    <string name="bypass_dns_firewall" translatable="true">bypassare dns e firewall</string>
-    <string name="settings_allow_lan_heading" translatable="true">Non instradare IP privati (sperimentale)</string>
+    <string name="lbl_network" translatable="true">Rete</string>
+    <string name="bypass_dns_firewall" translatable="true">Bypassa DNS e firewall</string>
+    <string name="settings_allow_lan_heading" translatable="true">Non instradare IP privati</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Non è possibile impostare le proxy quando la VPN funziona in modalità solo DNS.</string>
     <string name="settings_pcap_heading" translatable="true">Acquisizione pacchetti</string>
-    <string name="settings_default_dns_heading" translatable="true">Scegli DNS di riserva</string>
+    <string name="settings_default_dns_heading" translatable="true">Scegli DNS di bootstrap</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Output su Logcat</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Output nella cartella Download</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Acquisizione pacchetti disabilitata</string>
@@ -790,7 +790,7 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">aggirerà le regole universali DNS e firewall</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funziona solo con il DNS di Rethink</string>
     <string name="dc_refresh_toast" translatable="true">Aggiornamento completato</string>
-    <string name="settings_default_dns_desc" translatable="true">Nei rari casi in cui non sia possibile accertare il DNS preferito dall\'utente, viene utilizzato il DNS di riserva.</string>
+    <string name="settings_default_dns_desc" translatable="true">Usato solo durante l\'avvio per trovare l\'indirizzo IP del server DNS crittografato.</string>
     <string name="lbl_logs" translatable="true">Registri</string>
     <string name="logs_card_dns_count" translatable="true">%1$s interrogazioni</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloccato</string>
@@ -801,7 +801,7 @@
     <string name="pcap_failure_toast" translatable="true">Errore nella creazione del file pcap. Riprovare!</string>
     <string name="settings_allow_lan_desc" translatable="true">Escludere rotte LAN, loopback, multicast e link-local dal tunnel VPN di Rethink.</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s regole universali</string>
-    <string name="settings_general_customize" translatable="true">personalizza</string>
+    <string name="settings_general_customize" translatable="true">Personalizza</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">aggira regole DNS e firewall</string>
     <string name="rules_card_domain_count" translatable="true">%1$s regole domini(o)</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Acquisizione pacchetti attiva</string>
@@ -822,7 +822,7 @@
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_hour" translatable="true">hr</string>
     <string name="lbl_persistent_keepalive" translatable="true">Mantenimento persistente</string>
-    <string name="lbl_save" translatable="true">salva</string>
+    <string name="lbl_save" translatable="true">Salva</string>
     <string name="lbl_optional" translatable="true">(opzionale)</string>
     <string name="settings_go_log_desc" translatable="true">Per scopi di debug</string>
     <string name="public_key_copy_toast_msg" translatable="true">Chiave pubblica copiata.</string>
@@ -842,7 +842,7 @@
     <string name="lbl_active" translatable="true">Attivo</string>
     <string name="lbl_dns_servers" translatable="true">Server DNS</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Rendi la notifica permanente</string>
-    <string name="lbl_app_wise" translatable="true">per applicazione</string>
+    <string name="lbl_app_wise" translatable="true">Per applicazione</string>
     <string name="status_protected_with_wg" translatable="true">protetto con wireguard</string>
     <string name="lbl_public_key" translatable="true">Chiave Pubblica</string>
     <string name="lbl_insecure" translatable="true">(insicuro)</string>
@@ -895,7 +895,7 @@
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s è disabilitato perché i proxy sono attivi</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> potrebbe causare una perdita di connettività. Modificare l\'impostazione per consentire a Rethink di utilizzare dati e altre risorse quando è in background.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Non fare mai proxy di DNS su proxy come Always-on WireGuard, SOCKS5, HTTP.</string>
-    <string name="lbl_notification" translatable="true">notifiche</string>
+    <string name="lbl_notification" translatable="true">Notifiche</string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.]]></string>
     <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
     <string name="cd_toast_edit" translatable="true">Modificato</string>
@@ -903,9 +903,9 @@
     <string name="dc_filtering_heading" translatable="true">filtraggio</string>
     <string name="tcp_keep_alive_title" translatable="true">TCP keep alive più breve</string>
     <string name="most_contacted_asn" translatable="true">Provider più contattati</string>
-    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_test" translatable="true">Test</string>
     <string name="most_blocked_asn" translatable="true">Provider più bloccati</string>
-    <string name="lbl_expires_on" translatable="true">Scade il</string>
+    <string name="lbl_expires_on" translatable="true">Valido fino al</string>
     <string name="lbl_experimental" translatable="true">(sperimentale)</string>
     <string name="settings_mobile_metered_heading" translatable="true">Contatore reti mobili</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Immediatamente</string>
@@ -993,4 +993,49 @@
     <string name="wg_setting_use_on_mobile" translatable="true">Solo dati mobili</string>
     <string name="ac_split_tcp_desc" translatable="true">Altera i pacchetti TCP.</string>
     <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_notes" translatable="true">Note</string>
+    <string name="hint_notes" translatable="true">Aggiungi note su questa app</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Le note possono avere al massimo 500 caratteri</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Impossibile salvare le note</string>
+    <string name="lbl_sec" translatable="true">sec</string>
+    <string name="lbl_saving" translatable="true">Salvataggio…</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_hop" translatable="true">Relay</string>
+    <string name="lbl_bootstrap" translatable="true">Bootstrap</string>
+    <string name="ip_mismatch_notification_title" translatable="true">Discrepanza del protocollo di rete</string>
+    <string name="ip_mismatch_notification_content" translatable="true">Il protocollo IP selezionato non è disponibile sulla rete attuale. Passa alla modalità \"IPv4 &amp; IPv6\" o \"Auto\" per rimanere connesso.</string>
+    <string name="doh_empty_state_title" translatable="true">Nessun endpoint DoH</string>
+    <string name="doh_empty_state_desc" translatable="true">Aggiungi un endpoint DNS-over-HTTPS per iniziare.</string>
+    <string name="odoh_empty_state_title" translatable="true">Nessun endpoint ODoH</string>
+    <string name="odoh_empty_state_desc" translatable="true">Aggiungi un endpoint Oblivious DNS-over-HTTPS per iniziare.</string>
+    <string name="dot_empty_state_title" translatable="true">Nessun endpoint DoT</string>
+    <string name="dot_empty_state_desc" translatable="true">Aggiungi un endpoint DNS-over-TLS per iniziare.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">Nessun endpoint Proxy DNS</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">Aggiungi un endpoint Proxy DNS per iniziare.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">Nessun endpoint DNSCrypt</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">Aggiungi un endpoint DNSCrypt per iniziare.</string>
+    <string name="rethink_empty_state_title" translatable="true">Nessuna blocklist trovata</string>
+    <string name="rethink_empty_state_desc" translatable="true">Scarica o configura una blocklist per iniziare.</string>
+    <string name="settings_log_lifespan_heading" translatable="true">Ciclo di vita dei log</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 giorni (predefinito)</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">Loopback (sperimentale)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">In modalità Loopback, Rethink può reindirizzare il proprio traffico di rete. Ciò significa che Rethink può applicare le regole IP e di dominio, le regole firewall universali e le regole di proxy sul traffico di Rethink come se fosse qualsiasi altra app regolare. Anche se Loopback offre più controllo, il comportamento finale può non essere sempre quello desiderato.\n\n\nSi consiglia di escludere Rethink dalle regole firewall, DNS e proxy. In questo modo non influisce sul monitoraggio della rete o sulla registrazione, ma solo sulle regole.\n\n\nIn modalità Loopback, Proxy Lockdown non sarà applicato, per ora.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">Escludi Rethink</string>
+    <string name="app_info_rethink_warning_title" translatable="true">Attenzione</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">Stai per cambiare le regole del firewall per Rethink. Dal momento che Rethink gestisce il tunnel VPN, permettere, bloccare o isolare il proprio traffico può rompere l’accesso alla rete attraverso lo strumento.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">Ho capito</string>
+    <string name="rethink_home_screen_warning" translatable="true">può influire sulla connettività ⚠️</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1 ora</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3 ore</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6 ore</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12 ore</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1 giorno</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3 giorni</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7 giorni</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Chiaro Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Scuro Plus</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Autorizzazione di rete locale</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s richiede l\'autorizzazione di rete locale per fare funzionare alcune caratteristiche. La VPN è stata disattivata. Concedi l\'autorizzazione dalle impostazioni dell\'app e riprova.</string>
 </resources>

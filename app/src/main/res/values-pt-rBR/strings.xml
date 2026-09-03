@@ -1132,4 +1132,116 @@
     <string name="settings_rinr_btmsht_desc" translatable="true">No modo Loopback, o Rethink pode redirecionar seu próprio tráfego de rede. Isso significa que o Rethink pode aplicar regras de IP e domínio, regras universais de firewall e regras de proxy no tráfego do Rethink como se fosse qualquer outro aplicativo regular. Mesmo assim, o Loopback oferece mais controle, o comportamento disso pode nem sempre ser desejável.\n\n\nRecomenda-se isentar o Rethink de firewall, DNS e regras de proxy. Fazer isso não afeta o monitoramento ou o registro de rede, mas apenas as regras.\n\n\nNo modo Loopback, o Bloqueio do Proxy não será aplicado, por enquanto.</string>
     <string name="settings_rinr_exempt_btn" translatable="true">Isentar o Rethink</string>
     <string name="app_info_rethink_warning_title" translatable="true">Cuidado</string>
+    <string name="lbl_notes" translatable="true">Notas</string>
+    <string name="hint_notes" translatable="true">Adicione notas sobre este aplicativo</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">As observações podem ter no máximo 500 caracteres</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Falha ao salvar as notas</string>
+    <string name="settings_log_lifespan_heading" translatable="true">Vida útil do registro</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 dias (padrão)</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">Você está prestes a alterar as regras do firewall para o Rethink. Como o Rethink gerencia o túnel VPN, permitir, bloquear ou isolar seu próprio tráfego pode interromper o acesso à rede de forma geral.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">Eu entendo</string>
+    <string name="rethink_home_screen_warning" translatable="true">Pode afetar a conectividade ⚠️</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1 hora</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3 horas</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6 horas</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12 horas</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1 dia</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3 dias</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7 dias</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Permissão de rede local</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">O aplicativo %1$s requer permissão de Rede Local para que alguns recursos funcionem. A VPN foi desativada. Conceda a permissão nas configurações do aplicativo e tente novamente.</string>
+    <string name="dc_global_heading" translatable="true">Global</string>
+    <string name="dc_block_unknown_heading" translatable="true">Bloquear DNS de origem desconhecida</string>
+    <string name="dc_block_unknown_desc" translatable="true">Bloquear todas as solicitações de DNS originadas de aplicativos desconhecidos.</string>
+    <string name="fapps_filter_sort_heading" translatable="true">Ordenar por</string>
+    <string name="bsct_allow_reason" translatable="true">Motivo da permissão: %1$s</string>
+    <string name="fapps_filter_sort_name" translatable="true">Nome</string>
+    <string name="fapps_filter_sort_package" translatable="true">Nome do pacote</string>
+    <string name="fapps_filter_sort_uid" translatable="true">UID</string>
+    <string name="build_flavor_website_degoogled" translatable="true">site desvinculado do Google</string>
+    <string name="bsdl_app_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt; para este aplicativo</string>
+    <string name="config_delete_all_dialog_desc" translatable="true">Tem certeza de que deseja excluir TODAS as configurações de VPN do WireGuard? Esta ação é IRREVERSÍVEL.</string>
+    <string name="config_delete_all_dialog_title" translatable="true">Excluir tudo</string>
+    <string name="wireguard_dns_mode_conflict" translatable="true">O WireGuard não pode ser ativado no modo somente DNS. Alterne para o modo Firewall ou DNS+Firewall.</string>
+    <string name="wireguard_one_wg_active_conflict" translatable="true">Uma configuração ativa do One-WireGuard está em uso. Desative-a primeiro para usar configurações individuais do WireGuard.</string>
+    <string name="wireguard_invalid_config_title" translatable="true">Configuração WireGuard inválida</string>
+    <string name="wireguard_invalid_config_message" translatable="true">A configuração do WireGuard selecionada é inválida ou está ausente. Edite ou importe novamente a configuração e tente outra vez.</string>
+    <string name="wireguard_replaced_active_config" translatable="true">Substituiu a configuração do WireGuard que estava ativa anteriormente</string>
+    <string name="rpn_recovery_title" translatable="true">Não foi possível carregar o servidor</string>
+    <string name="rpn_recovery_desc" translatable="true">Não foi possível registrar ou recuperar este servidor. Certifique-se de que a VPN esteja conectada e tente novamente. Se a falha persistir, remova e adicione o servidor novamente.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Não altere aleatoriamente a porta de escuta do WireGuard</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">No modo Avançado, mantenha as portas de escuta do WireGuard fixas (sem aleatorização).</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Mapeamento independente de endpoint</string>
+    <string name="tcp_keep_alive_title" translatable="true">Intervalo menor de manutenção da conexão TCP</string>
+    <string name="exclude_no_package_err_toast" translatable="true">Excluir aplicativos requer o nome do pacote.</string>
+    <string name="hop_error_toast_msg_1" translatable="true">Não é possível encaminhar, já está %1$s</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Não há nenhum WireGuard disponível para encaminhamento; adicione mais.</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Desative somente o celular ou o SSID para usar retransmissores</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Desfazer</string>
+    <string name="settings_flood_wg_desc" translatable="true">Quando ativado, envia pacotes WireGuard adicionais para tornar o tráfego do túnel mais difícil de identificar e bloquear em redes restritivas.</string>
+    <plurals name="server_count">
+        <item quantity="one">%1$d localização</item>
+        <item quantity="many">%1$d localizações</item>
+        <item quantity="other">%1$d localizações</item>
+    </plurals>
+    <string name="rpn_desc_one" translatable="true">Largura de banda ilimitada • Mais de 100 cidades</string>
+    <string name="rpn_desc_two" translatable="true">Conecte até 5 cidades ao mesmo tempo</string>
+    <string name="rpn_desc_three" translatable="true">Navegação sem anúncios</string>
+    <string name="rpn_desc_four" translatable="true">Multi-hop • Criptografia dupla</string>
+    <string name="tour_step_counter">%1$d de %2$d</string>
+    <string name="tour_btn_finish">Entendi</string>
+    <string name="fs_configure_apps_desc" translatable="true">Regras de firewall e política de rede por aplicativo</string>
+    <string name="fs_configure_network_desc" translatable="true">Modo de túnel VPN e preferências de rede</string>
+    <string name="fs_configure_proxy_desc" translatable="true">Roteamento via WireGuard, SOCKS5 e proxy HTTP</string>
+    <string name="fs_configure_others_desc" translatable="true">Aparência, notificações e muito mais</string>
+    <string name="fs_configure_advanced_desc" translatable="true">Ferramentas de desenvolvedor e diagnósticos</string>
+    <string name="fs_configure_logs_desc" translatable="true">Analise as consultas de DNS e os logs de conexão.</string>
+    <string name="sponsor_continue" translatable="true">Continuar</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Não é possível alterar os modos quando proxies estão em uso. Toque para &lt;u&gt;editar as configurações de proxy&lt;/u&gt;.</string>
+    <string name="blocklist_not_available_toast" translatable="true">Para atualizar as listas de bloqueio, baixe a versão mais recente do aplicativo.</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">Somente para dispositivos móveis</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Use esta VPN WireGuard em redes móveis.</string>
+    <string name="hop_add_remove_title" translatable="true">Adicionar / Remover Relé</string>
+    <string name="bypasses_network_restrictions" translatable="true">As verificações de acessibilidade contornam todas as restrições de rede. No modo *Auto*, o Rethink utiliza aleatoriamente endereços IP e nomes de host conectados anteriormente.</string>
+    <string name="most_contacted_asn" translatable="true">Fornecedores mais contatados</string>
+    <string name="most_blocked_asn" translatable="true">Provedores mais bloqueados</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">‘Insira os nomes dos pacotes (separados por vírgula) com permissão para iniciar ou parar o Rethink.</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instruções: Parâmetros extras obrigatórios na transmissão (broadcast): • Chave: sender • Valor: O nome do pacote do aplicativo que realiza a chamada Exemplo: chave:sender valor:com.termux Ações suportadas: • Iniciar VPN – com.celzero.bravedns.intent.action.VPN_START • Parar VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="download_ip_info_desc" translatable="true">Busca detalhes do provedor de serviços para sites a partir de <i>rethinkdns.com</i>, com tecnologia de <i>%1$s</i></string>
+    <string name="vpn_policy_sensitive" translatable="true">Confidencial</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Reage a todas as alterações de rede e conectividade.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relaxado(a)</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reage a alterações interessantes na conectividade.</string>
+    <string name="vpn_policy_fixed" translatable="true">Conservador(a)</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reage minimamente a alterações na rede.</string>
+    <string name="vpn_policy_title" translatable="true">Política de alteração de conexão</string>
+    <string name="use_bootstrap_dns_to_bypass" translatable="true">Use o DNS de bootstrap para contornar restrições.</string>
+    <string name="use_bootstrap_dns_to_bypass_desc" translatable="true">Quando ativado, sempre utiliza DNS de bootstrap para domínios e IPs ignorados.</string>
+    <string name="title_database_dump" translatable="true">Banco de dados</string>
+    <string name="copied_clipboard" translatable="true">Copiado(a)</string>
+    <string name="wg_setting_ssid_title" translatable="true">Apenas Wi-Fi</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Ative esta VPN WireGuard apenas quando estiver conectado ao Wi-Fi ou a um dos identificadores de Wi-Fi especificados (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">O Rethink precisa de permissão de localização para acessar identificadores de Wi-Fi (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">Para acessar identificadores de Wi-Fi (%1$s), ative os Serviços de Localização.</string>
+    <string name="ssid_location_error" translatable="true">Ativar serviços de localização</string>
+    <string name="ssid_permission_error_action" translatable="true">Conceder permissão</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Não é possível usar %1$s e %2$s simultaneamente.</string>
+    <string name="location_disclosure_title" translatable="true">Permissão de localização para recursos de Wi-Fi</string>
+    <string name="location_disclosure_message" translatable="true">O Rethink trata as informações da rede Wi-Fi (SSID/BSSID) como dados de localização. A localização em segundo plano permite que o aplicativo aplique automaticamente a automação de Proxy quando a rede Wi-Fi muda, mesmo que o aplicativo não esteja aberto. O Rethink NÃO coleta, armazena nem compartilha sua localização física via GPS.</string>
+    <string name="location_disclosure_positive" translatable="true">Continuar</string>
+    <string name="location_disclosure_negative" translatable="true">Agora não</string>
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s esta VPN WireGuard quando o identificador de Wi-Fi <i>ativo</i> (%2$s) %3$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Insira o identificador do Wi-Fi (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Corresponde exatamente</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Corresponde parcialmente</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Os identificadores de Wi-Fi (%1$s) devem ter 32 caracteres ou menos.</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Programa de estabilidade</string>
+    <string name="tombstone_app_title" translatable="true">Lembrar de aplicativos desinstalados</string>
+    <string name="settings_locale_dialog_default" translatable="true">Padrão do sistema</string>
+    <string name="lockdown_download_message" translatable="true">O *Gerenciador de Downloads* nativo do Android pode falhar quando a VPN está no modo *Lockdown*. Deseja ativar o downloader do Rethink em vez dele?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Ativar downloader</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Utiliza *jumbo packets* dentro do túnel VPN do Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Sempre medido</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Marque o túnel VPN do Rethink como conexão limitada para incentivar os aplicativos a usar menos dados. Atenção: isso pode fazer com que os aplicativos pausem uploads e downloads grandes, como backups.</string>
 </resources>

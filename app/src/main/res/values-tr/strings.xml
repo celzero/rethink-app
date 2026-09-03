@@ -215,7 +215,7 @@
     <string name="settings_theme_dialog_themes_4">Gerçek Siyah</string>
     <string name="firewall_status_block_unmetered">ölçülmemiş (wifi) ağlarda engellendi</string>
     <string name="dns_card_latency_active">%1$sms</string>
-    <string name="dc_dns_website_heading">DNS günlüklerinde web sitesi simgesini göster (deneysel)</string>
+    <string name="dc_dns_website_heading">DNS loglarında websitesinin simgesini göster</string>
     <string name="log_file_not_available">Kaza raporu bulunamadı</string>
     <string name="cd_dns_proxy_error_text_3">Kapı Geçersiz</string>
     <string name="cd_dns_crypt_dialog_stamp">Pul</string>
@@ -449,7 +449,7 @@
     <string name="orbot_stop_dialog_message">Rethink, bağlantıları Orbot\'a yönlendirmeyi durdurdu, ancak Orbot arka planda çalışıyor olabilir.</string>
     <string name="settings_dns_proxy_dialog_port_number">Liman Numarası</string>
     <string name="settings_dns_proxy_dialog_positive_btn">Set</string>
-    <string name="settings_ip_dialog_ipv6">IPv6 (deneysel)</string>
+    <string name="settings_ip_dialog_ipv6">IPv6</string>
     <string name="hsf_proxy_chip_text">Proxy etkin</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_local_block_heading">Cihaz üzerinde blok listeleri</string>
@@ -474,11 +474,11 @@
     <string name="orbot_bs_status_1">%1$s bağlantılarının Orbot\'a yönlendirilmesi.</string>
     <string name="orbot_install_dialog_positive">Kur</string>
     <string name="orbot_install_activity_error" translatable="false">Bir şeyler ters gitti, bir süre sonra deneyin</string>
-    <string name="settings_network_all_networks">Mevcut tüm ağları kullanın (deneysel)</string>
+    <string name="settings_network_all_networks">Mevcut tüm ağları kullan</string>
     <string name="settings_check_update_desc">Uygulama güncellemelerini haftada bir otomatik olarak kontrol edin.</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 Vekili Ayarla</string>
     <string name="settings_theme_dialog_title">Görünüm</string>
-    <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
+    <string name="settings_ip_dialog_ipv46">Otomatik</string>
     <string name="firewall_status_isolate">izole edilmiş</string>
     <string name="lbl_proceed">Devam Et</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
@@ -594,7 +594,7 @@
     <string name="apps_card_ips_count">%1$s IP ve Port kuralı</string>
     <string name="hsf_start_btn_state">başlat</string>
     <string name="dns_btm_resolved_doh">%1$s tarafından çözüldü %2$s</string>
-    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar. \n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="hsf_vpn_dialog_message">Rethink, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar.\n\nWi-Fi tabanlı proxy otomasyonu, bağlı Wi-Fi ağını (SSID) tanımlamak için Konum izni gerektirir. Bu izin, yalnızca bu özelliği etkinleştirdiğinizde istenir.\n \nRethink herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
     <string name="dc_dns_website_desc">Web sitesi simgelerini <i>nextdns.io</i> ve <i>duckduckgo.com</i> adresinden alır. 350 mb\'a kadar disk alanı tüketir</string>
     <string name="about_bravedns_explantion">Rethink, Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü aşmanın ve uygulamaları güvenlik duvarına almanın en kolay yoludur.</string>
     <string name="about_bravedns_whoarewe">Rethink, Amazon, IBM ve Scientific Games\'in eski mühendisleri tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
@@ -801,9 +801,9 @@
     <string name="new_warp_invalid_config_toast" translatable="true">Geçersiz WARP yapılandırması</string>
     <string name="dc_refresh_toast" translatable="true">Yenileme tamamlandı</string>
     <string name="bad_config_reason_unknown_attribute" translatable="true">Bilinmeyen özellik</string>
-    <string name="settings_allow_lan_heading" translatable="true">Özel IP\'leri yönlendirmeyin (deneysel)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Private IP\'leri yönlendirme</string>
     <string name="lbl_delete" translatable="true">Sil</string>
-    <string name="settings_default_dns_heading" translatable="true">Yedek DNS\'yi seçin</string>
+    <string name="settings_default_dns_heading" translatable="true">Yedek DNS\'i seç</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Uygulamaları atlayın</string>
     <string name="fapps_bypass_block_dialog_message" translatable="true"><i>Listelenen</i> uygulamalar için Evrensel güvenlik duvarı kurallarını atlayın?</string>
     <string name="ci_trust_rule" translatable="true">Güvenilirlik</string>
@@ -871,7 +871,7 @@
     <string name="lbl_public_key" translatable="true">Ortak Anahtar</string>
     <string name="config_add_success_toast">Yapılandırma eklendi</string>
     <string name="key_contents_error" translatable="true">Anahtardaki kötü karakterler</string>
-    <string name="settings_default_dns_desc" translatable="true">Kullanıcı tarafından tercih edilen DNS\'nin tespit edilemediği nadir durumlarda, yedek DNS kullanılır.</string>
+    <string name="settings_default_dns_desc" translatable="true">Yalnızca başlangıçta şifreli DNS sunucusunun IP\'sini bulmak için kullanılır.</string>
     <string name="lbl_insecure" translatable="true">(güvensiz)</string>
     <string name="lbl_min" translatable="true">dk</string>
     <string name="crypt_relay_us" translatable="true">https://cryptostrom.is/ tarafından sağlanan ABD - Los Angeles, CA\'da barındırılan anonimleştirilmiş DNS aktarıcısı.</string>
@@ -1198,4 +1198,26 @@
     <string name="settings_rinr_btmsht_desc" translatable="true">Geri döngü modunda Rethink kendi ağ trafiğini kendisine yönlendirir. Demek oluyor ki, Rethink kendi trafiğine (IP ve Domain kuralları, güvenlik duvarı kurallar vb.) aynı diğer uygulamalar gibi kuralları uygular. Geri döngü modu fazlaca kontrol sağlasada sonuçları pek beklendiği gibi olmayabilir.\n\n\nRethink\'i güvenlik duvarı, DNS ve proxy kurallarından muaf tutmanız önerilir. Bu işlem, ağ izleme veya günlük kaydı işlemlerini etkilemez; yalnızca kuralları etkiler.\n\n\nGeri döngü modunda, Proxy Lockdown özelliği şimdilik uygulanmayacaktır.</string>
     <string name="settings_rinr_exempt_btn" translatable="true">Rethink\'i muaf tut</string>
     <string name="app_info_rethink_warning_title" translatable="true">Uyarı</string>
+    <string name="lbl_notes" translatable="true">Notlar</string>
+    <string name="hint_notes" translatable="true">Bu uygulama için not ekle</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Notlar maksimum 500 karakter olabilir</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Notlar kaydedilemedi</string>
+    <string name="settings_log_lifespan_heading" translatable="true">Log Ömrü</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 gün (varsayılan)</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">Rethink\'in firewall ayarlarını değiştirmeye çalışıyorsun. Rethink tüm VPN yönetimini üstlendiği için kendisinin internet trafiğine izin/yasak vermek internete erişiminizi bozabilir.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">Anladım</string>
+    <string name="rethink_home_screen_warning" translatable="true">bağlantıyı etkileyebilir ⚠️</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1 saat</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3 saat</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6 saat</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12 saat</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1 gün</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3 gün</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7 gün</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Lokal Ağ İzni</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s ait bazı özelliklerinin çalışabilmesi için \"Yerel Ağ\" izni gereklidir. VPN şuanda devre dışı. Uygulama ayarlarından bu izni verin ve tekrar deneyin.</string>
+    <string name="dc_global_heading" translatable="true">Global</string>
+    <string name="dc_block_unknown_heading" translatable="true">Bilinmeyen kaynaklardan gelen DNS isteklerini blokla</string>
+    <string name="dc_block_unknown_desc" translatable="true">Bilinmedik uygulamalardan gelen tüm DNS isteklerini bloklar.</string>
 </resources>

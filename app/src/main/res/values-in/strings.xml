@@ -123,7 +123,7 @@
     <string name="notif_channel_vpn_notification">VPN aktif</string>
     <string name="category_name_sys_apps">Aplikasi Sistem</string>
     <string name="cd_dns_crypt_dialog_desc">Deskripsi (opsional)</string>
-    <string name="dc_dns_website_heading">Tampilkan ikon situs web di riwayat DNS (eksperimental)</string>
+    <string name="dc_dns_website_heading">Tampilkan ikon situs web di log DNS</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="dns_mode_info_title">DNS</string>
     <string name="copy_clipboard_label">URL</string>
@@ -291,7 +291,7 @@
     <string name="ctbs_block_other_apps">Aturan yang diterapkan ke %1$s juga akan diterapkan ke %2$s aplikasi lainnya</string>
     <string name="settings_notification_desc">Tombol tindakan untuk ditampilkan dengan pemberitahuan Rethink: %1$s</string>
     <string name="cd_toast_added">Domain berhasil ditambahkan</string>
-    <string name="settings_network_all_networks">Gunakan semua jaringan yang tersedia (eksperimental)</string>
+    <string name="settings_network_all_networks">Gunakan semua jaringan yang tersedia</string>
     <string name="settings_socks_forwarding_default_desc">Meneruskan koneksi ke titik akhir SOCKS5.</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (bawaan)</string>
     <string name="fapps_filter_categories_heading">Kategori</string>
@@ -333,7 +333,7 @@
     <string name="rt_chip_check_update">Periksa pembaruan</string>
     <string name="firewall_mode_info_explanation_new">Pantau aktivitas jaringan dan blokir aplikasi atau alamat IP apa pun.</string>
     <string name="settings_check_update_desc">Secara otomatis memeriksa pembaruan setiap minggu.</string>
-    <string name="settings_ip_dialog_ipv46">Otomatis (eksperimental)</string>
+    <string name="settings_ip_dialog_ipv46">Otomatis</string>
     <string name="bsct_conn_desc_allowed">diizinkan pada %1$s %2$s</string>
     <string name="univ_firewall_rule_5">Blokir lalu lintas yang melewati DNS</string>
     <string name="fapps_firewall_filter_excluded">Dikecualikan</string>
@@ -430,7 +430,7 @@
     <string name="custom_url_error_invalid_url">URL tidak valid</string>
     <string name="dc_custom_block_heading">Aturan Domain</string>
     <string name="cd_remove_dialog_title">Hapus domain?</string>
-    <string name="settings_ip_dialog_ipv6">IPv6 (eksperimental)</string>
+    <string name="settings_ip_dialog_ipv6">IPv6</string>
     <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="dns_card_latency_inactive">Aktifkan mode DNS.</string>
     <string name="ctbs_dialog_negative_btn">Kembali</string>
@@ -808,7 +808,7 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Koneksi ini diblokir karena <i>domain</i> diblokir oleh DNS yang dipilih pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.]]></string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">Jaringan</string>
-    <string name="settings_allow_lan_heading" translatable="true">Jangan merutekan IP Pribadi (eksperimental)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Jangan rutekan IP Privat</string>
     <string name="settings_allow_lan_desc" translatable="true">Kecualikan rute LAN, loopback, multicast, dan link-lokal dari terowongan VPN Rethink.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Abaikan DNS &amp; aturan firewall untuk aplikasi <i>tercantum</i>\?</string>
     <string name="bypass_dns_firewall_tooltip">%1$s bekerja dengan DNS Rethink saja</string>
@@ -1161,7 +1161,7 @@
     <string name="cd_allowed_dns_record_types_desc" translatable="false">Pilih jenis catatan sumber daya DNS yang diizinkan.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Otomatis (Semua jenis)</string>
     <plurals name="server_count">
-        <item quantity="other">%1$d server</item>
+        <item quantity="other">%1$d lokasi</item>
     </plurals>
     <string name="tour_step_counter">%1$d dari %2$d</string>
     <plurals name="peer_count">
@@ -1220,4 +1220,37 @@
     <string name="location_disclosure_positive" translatable="true">Lanjutkan</string>
     <string name="location_disclosure_negative" translatable="true">Jangan Sekarang</string>
     <string name="sponsor_continue" translatable="true">Lanjutkan</string>
+    <string name="lbl_notes" translatable="true">Catatan</string>
+    <string name="hint_notes" translatable="true">Tambahkan catatan tentang aplikasi ini</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Catatan maksimal 500 karakter</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Gagal menyimpan catatan</string>
+    <string name="settings_log_lifespan_heading" translatable="true">Masa Aktif Log</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">7 hari (bawaan)</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">1 jam</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">3 jam</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">6 jam</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">12 jam</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">1 hari</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">3 hari</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">7 hari</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">Izin Jaringan Lokal</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s memerlukan izin Jaringan Lokal agar beberapa fitur berfungsi. VPN telah dinonaktifkan. Berikan izin tersebut dari pengaturan aplikasi, lalu coba lagi.</string>
+    <string name="fapps_filter_sort_heading" translatable="true">Urutkan berdasarkan</string>
+    <string name="bsct_allow_reason" translatable="true">Alasan mengizinkan: %1$s</string>
+    <string name="fapps_filter_sort_name" translatable="true">Nama</string>
+    <string name="fapps_filter_sort_package" translatable="true">Nama paket</string>
+    <string name="fapps_filter_sort_uid" translatable="true">UID</string>
+    <string name="bsdl_app_block_desc" translatable="true">Blokir, percayai &lt;u&gt;domain ini&lt;/u&gt; untuk aplikasi ini</string>
+    <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard tidak dapat diaktifkan dalam mode hanya-DNS. Beralih ke mode Firewall atau DNS+Firewall.</string>
+    <string name="wireguard_one_wg_active_conflict" translatable="true">Konfigurasi One-WireGuard yang aktif sedang digunakan. Nonaktifkan terlebih dahulu untuk menggunakan konfigurasi WireGuard individual.</string>
+    <string name="wireguard_invalid_config_title" translatable="true">Konfigurasi WireGuard tidak valid</string>
+    <string name="wireguard_invalid_config_message" translatable="true">Konfigurasi WireGuard yang dipilih tidak valid atau tidak ditemukan. Edit atau impor ulang konfigurasi tersebut, lalu coba lagi.</string>
+    <string name="wireguard_replaced_active_config" translatable="true">Mengganti konfigurasi WireGuard yang sebelumnya aktif</string>
+    <string name="rpn_recovery_title" translatable="true">Tidak dapat memuat server</string>
+    <string name="rpn_recovery_desc" translatable="true">Kami tidak dapat mendaftarkan atau mengambil server ini. Pastikan VPN terhubung, lalu coba lagi. Jika masih gagal, hapus dan tambahkan ulang server tersebut.</string>
+    <string name="rpn_desc_one" translatable="true">"Bandwidth tanpa batas -  100+ kota"</string>
+    <string name="rpn_desc_two" translatable="true">Hubungkan hingga 5 kota sekaligus</string>
+    <string name="rpn_desc_three" translatable="true">Penjelajahan bebas iklan</string>
+    <string name="rpn_desc_four" translatable="true">"Multi-hop -  Enkripsi ganda"</string>
 </resources>
