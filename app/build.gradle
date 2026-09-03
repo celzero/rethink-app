@@ -15,10 +15,11 @@ plugins {
 }
 
 // apply Google Services and Firebase Crashlytics plugins conditionally
-// strategy: For command-line builds, check task names. For IDE, always apply plugins
-// but they'll only process play/website variants (Firebase deps are scoped to those variants)
+// firebase (google-services + crashlytics) is scoped to the play flavour only.
+// website and fdroid builds are de-googled w.r.t. Firebase (the Google Play Developer
+// API model classes remain available to website as plain dependencies).
 def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
-def apkBuild = taskNames.contains("full")
+def playBuild = taskNames.contains("play")
 def fdroidBuild = taskNames.contains("fdroid")
 // for alpha builds generate universal apk only
 def alphaBuild = taskNames.contains("alpha")
@@ -26,7 +27,8 @@ def alphaBuild = taskNames.contains("alpha")
 // check for fdroidserver value is set in system env
 def fdroidBuildServer = System.getenv("fdroidserver")
 def isFdroidBuildServer = fdroidBuildServer != null && !fdroidBuildServer.isEmpty() && fdroidBuildServer != "null"
-def deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
+// firebase tooling applies only to play builds; everything else is de-googled
+def deGoogled = !playBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 def shouldSplit = !alphaBuild
 
 // Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
@@ -34,7 +36,7 @@ def shouldSplit = !alphaBuild
 def isWebsiteDegoogled = project.hasProperty("websiteDegoogled") &&
         project.property("websiteDegoogled").toString().toBoolean()
 
-// add google-services.json only for play/website builds.
+// add google-services.json only for play builds.
 // local dev : copy from the sibling ../firebase/{debug,release} dir (gitignored, outside repo).
 // CI        : secret is written to app/src/google-services.json
 //             by the GitHub Actions; so no local copy is needed there.
@@ -75,20 +77,20 @@ if (!deGoogled) {
         }
     }
 } else {
-    logger.info("skipping google-services.json for de-googled/F-Droid build")
+    logger.info("skipping google-services.json for de-googled build (website/fdroid have no Firebase)")
 }
 
 println("app-task names: '$taskNames'")
-println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+println("gradle deGoogled? $deGoogled (playBuild: $playBuild, fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer)")
 println("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 
-// don't apply firebase plugins for fdroid CLI builds
+// don't apply firebase plugins for non-play builds (website/fdroid are de-googled)
 if (!deGoogled) {
     apply plugin: 'com.google.gms.google-services'
     apply plugin: 'com.google.firebase.crashlytics'
-    println("app firebase plugins applied")
+    println("app firebase plugins applied (play build)")
 } else {
-    println("app firebase plugins SKIPPED")
+    println("app firebase plugins SKIPPED (non-play build)")
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -291,7 +293,7 @@ android {
     }
 
     // fix: injectCrashlyticsBuildIds task has a buffer overflow bug
-    // apply crashlytics configuration to firebase builds only
+    // apply crashlytics configuration to play (firebase) builds only
     if (!deGoogled) {
         // workaround for crashlytics gradle plugin bug with large native symbols
         afterEvaluate {
@@ -740,6 +742,8 @@ dependencies {
     // The version v3-rev20240301-2.0.0 cited in the API docs does not exist on Maven Central;
     // v3-rev20260318-2.0.0 is the closest available release with the same model classes.
     // ref: github.com/googleapis/google-api-java-client-services/tree/main/clients/google-api-services-androidpublisher/v3
+    // scoped to play + website only (server order-history / billing backend).
+    // Not included in fdroid (and hence Izzy) builds;
     playImplementation('com.google.apis:google-api-services-androidpublisher:v3-rev20260318-2.0.0') {
         // Exclude Apache HTTP transport, conflicts with Android's built-in HTTP stack
         exclude group: 'com.google.http-client', module: 'google-http-client-apache-v2'
@@ -753,18 +757,13 @@ dependencies {
         exclude group: 'com.google.oauth-client'
     }
 
-
     lintChecks 'com.android.security.lint:lint:1.0.4'
 
     // battery optimization permission helper
     implementation 'com.waseemsabir:betterypermissionhelper:1.0.3'
 
-    // Firebase dependencies for error reporting (website and play variants only)
-    websiteImplementation platform('com.google.firebase:firebase-bom:34.17.0')
-    websiteImplementation 'com.google.firebase:firebase-crashlytics'
-    websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
-
-    playImplementation platform('com.google.firebase:firebase-bom:34.17.0')
+    // Firebase dependencies for error reporting (play flavour only)
+    playImplementation platform('com.google.firebase:firebase-bom:34.18.0')
     playImplementation 'com.google.firebase:firebase-crashlytics'
     playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 }

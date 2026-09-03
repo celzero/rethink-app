@@ -12,7 +12,7 @@ dependencyResolutionManagement {
         // firestack AAR is not on google()/mavenCentral(); it must be fetched
         // from the repository selected via `firestackRepo` in gradle.properties.
         // NOTE: with RepositoriesMode.PREFER_SETTINGS, repositories declared in
-        // project build.gradle files are ignored — so this MUST live here.
+        // project build.gradle files are ignored
         def firestackRepo = providers.gradleProperty("firestackRepo").orElse("github").get()
 
         if (firestackRepo == "jitpack") {
