@@ -26,14 +26,13 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class ProxyCountriesBtmSheet :
-    BottomSheetDialogFragment() {
+    BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
     private val b

@@ -63,11 +63,11 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,7 +75,7 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.util.Locale
 
-class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
+class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
 
     private var _binding: BottomSheetConnTrackBinding? = null
 
@@ -740,13 +740,20 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         connStatus: FirewallManager.ConnectionStatus
     ) {
         val uid = info?.uid ?: return
-        uiCtx {
-            io {
-                FirewallManager.updateFirewallStatus(uid, firewallStatus, connStatus)
-                logEvent("Firewall rule changed", "UID: $uid, FirewallStatus: ${firewallStatus.name}, ConnectionStatus: ${connStatus.name}")
-            }
-            updateFirewallRulesUi(firewallStatus, connStatus)
-        }
+        // persistence + audit log run on IO unconditionally; only the spinner
+        // update is gated on the view lifecycle. Gating the persistence behind
+        // the view check silently dropped the user's firewall change when the
+        // view was destroyed while the fragment remained attached.
+        applyFirewallRuleWithLifecycle(
+            isViewAlive = { isAdded && view != null },
+            persistAndLog = {
+                io {
+                    FirewallManager.updateFirewallStatus(uid, firewallStatus, connStatus)
+                    logEvent("Firewall rule changed", "UID: $uid, FirewallStatus: ${firewallStatus.name}, ConnectionStatus: ${connStatus.name}")
+                }
+            },
+            renderUi = { updateFirewallRulesUi(firewallStatus, connStatus) }
+        )
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
@@ -808,4 +815,26 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         withContext(Dispatchers.Main) {
             if (isAdded && view != null) f()
         }
+}
+
+/**
+ * Applies a firewall rule with UI-lifecycle awareness.
+ *
+ * Regression guard for the "view destroyed while the fragment remains
+ * attached" sequence: [persistAndLog] (persistence + audit log) must always
+ * run, on an IO dispatcher — it must never be gated behind the view check,
+ * which silently dropped the user's rule change. Only [renderUi] is skipped
+ * when [isViewAlive] reports the view is gone.
+ */
+internal suspend fun applyFirewallRuleWithLifecycle(
+    isViewAlive: () -> Boolean,
+    mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    persistAndLog: suspend () -> Unit,
+    renderUi: () -> Unit
+) {
+    persistAndLog()
+    withContext(mainDispatcher) {
+        if (!isViewAlive()) return@withContext
+        renderUi()
+    }
 }

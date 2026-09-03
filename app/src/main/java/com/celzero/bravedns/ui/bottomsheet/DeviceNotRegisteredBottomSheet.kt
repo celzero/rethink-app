@@ -31,7 +31,6 @@ import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 /**
@@ -42,7 +41,7 @@ import org.koin.android.ext.android.inject
  * This means the device is not registered under the subscription account.
  * The user is guided to contact support with their account details.
  */
-class DeviceNotRegisteredBottomSheet : BottomSheetDialogFragment() {
+class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetDeviceNotRegisteredBinding? = null
     private val binding

@@ -39,7 +39,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,7 +52,7 @@ import org.koin.android.ext.android.inject
  * per-app summaries are grouped via SQL, connection rows load lazily when an
  * app group is expanded.
  */
-class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
+class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomSheetLogActivityIntervalBinding? = null
 
@@ -75,6 +74,11 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
         LogActivityWindow.fromPreset(0, System.currentTimeMillis())
     private var selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
     private var blockedOnly = false
+
+    // bumped on every preset change; results of a superseded query must never
+    // render, otherwise an old load can overwrite the new window's summaries
+    // or populate the adapter with the previous window's expansion rows
+    private var requestGeneration = 0L
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -156,7 +160,6 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
         }
 
         setupRangeChips()
-        setupFilterChips()
 
         adapter = AppActivityAdapter { summary ->
             viewLifecycleOwner.lifecycleScope.launch { onAppExpandRequested(summary) }
@@ -206,22 +209,6 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
         )
     }
 
-    /**
-     * Filters the app list to surface exactly what was blocked within the
-     * selected window; "All" restores the full list.
-     */
-    private fun setupFilterChips() {
-        b.bsLaiFilterGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
-            val blocked = checkedIds.first() == R.id.bs_lai_filter_blocked
-            if (blocked != blockedOnly) {
-                blockedOnly = blocked
-                adapter.setBlockedOnly(blocked)
-            }
-        }
-        b.bsLaiFilterGroup.check(R.id.bs_lai_filter_all)
-    }
-
     private fun applyPreset(presetIndex: Int) {
         selectedPresetIndex = presetIndex
         currentWindow = LogActivityWindow.fromPreset(presetIndex, System.currentTimeMillis())
@@ -230,6 +217,7 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
 
     private fun load(window: LogActivityWindow) {
         showTimeRange(window)
+        val gen = ++requestGeneration
         viewLifecycleOwner.lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 try {
@@ -253,11 +241,16 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
                     SheetData(WindowCountRow(0L, 0L), emptyList())
                 }
             }
+            // a preset change while this query was pending superseded it
+            if (gen != requestGeneration) return@launch
             render(window, result)
         }
     }
 
     private suspend fun onAppExpandRequested(summary: AppActivitySummary) {
+        // expand results belong to the window that was current when the
+        // request was made; discard them when the preset changed meanwhile
+        val gen = requestGeneration
         val w = currentWindow
         val entries = withContext(Dispatchers.IO) {
             try {
@@ -304,6 +297,7 @@ class LogActivityIntervalBottomSheet : BottomSheetDialogFragment() {
                 emptyList()
             }
         }
+        if (gen != requestGeneration) return
         if (_binding != null && isAdded) {
             adapter.setChildren(summary.uid, entries)
         }

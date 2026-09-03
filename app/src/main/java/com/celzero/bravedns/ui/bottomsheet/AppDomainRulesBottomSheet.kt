@@ -46,13 +46,12 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener  {
+class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener  {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     private val b

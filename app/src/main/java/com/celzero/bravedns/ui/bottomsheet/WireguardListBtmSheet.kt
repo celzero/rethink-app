@@ -28,14 +28,13 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class WireguardListBtmSheet :
-    BottomSheetDialogFragment() {
+    BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
     private val b

@@ -31,13 +31,12 @@ import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 /**
  * Bottom sheet shown when a `/g/acc` or `/reg` API call returns HTTP 401.
  */
-class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
+class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetDeviceAuthErrorBinding? = null
     private val binding

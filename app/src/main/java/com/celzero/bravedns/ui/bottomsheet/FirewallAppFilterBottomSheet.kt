@@ -32,14 +32,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
+class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetFirewallSortFilterBinding? = null
 
     private val b

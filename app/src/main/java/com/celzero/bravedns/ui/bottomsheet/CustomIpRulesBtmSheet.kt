@@ -39,7 +39,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +47,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class CustomIpRulesBtmSheet :
-    BottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
+    BaseBottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetCustomIpsBinding? = null
 
     private val b

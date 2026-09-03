@@ -44,7 +44,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.humanReadableByteCount
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -58,12 +57,9 @@ import org.koin.android.ext.android.inject
  * - Last-24h data usage (rx/tx) from [RpnConnStatsSummary], plus active-since +
  *   last handshake from the WIN proxy [com.celzero.firestack.backend.RouterStats].
  * - Last-24h aggregates (connections, blocked, distinct apps) and the top apps
- *   by usage, queried from [ConnectionTracker] by proxy id — the same query
- *   shape [NetworkLogsActivity] receives via `RULES_SEARCH_ID_RPN + proxyId`
- *   (see RpnConfigDetailActivity.invokeNetworkLogs()).
- * - A jump-off point to the full connection logs.
+ *   by usage.
  */
-class RpnStatsBottomSheet : BottomSheetDialogFragment() {
+class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetRpnStatsBinding? = null
     private val b

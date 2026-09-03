@@ -52,7 +52,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * One touch Orbot Integration. Bottom sheet dialog fragment shows UI that enables One touch
  * Integration from the settings page.
  */
-class OrbotBottomSheet : BottomSheetDialogFragment() {
+class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetOrbotBinding? = null
 
     private val b

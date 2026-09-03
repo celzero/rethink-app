@@ -40,7 +40,6 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,7 +55,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-class BugReportFilesBottomSheet : BottomSheetDialogFragment() {
+class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetBugReportFilesBinding? = null
     private val b
         get() = checkNotNull(_binding)

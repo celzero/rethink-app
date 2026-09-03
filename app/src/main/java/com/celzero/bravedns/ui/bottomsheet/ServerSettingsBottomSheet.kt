@@ -44,7 +44,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,7 +55,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * bottom sheet combining DNS filter settings and new Configuration Handling section.
  */
-class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
+class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetServerSettingsBinding? = null
     private val binding

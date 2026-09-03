@@ -58,7 +58,6 @@ import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +65,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.io.File
 
-class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
+class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetLocalBlocklistsBinding? = null
 
     private val b
@@ -141,24 +140,30 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         initializeClickListeners()
     }
 
-    private fun isLocalDownloadActive(): Boolean {
-        val ctx = requireContext()
-        return WorkScheduler.isWorkScheduled(ctx, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) ||
-            WorkScheduler.isWorkScheduled(ctx, DownloadConstants.DOWNLOAD_TAG) ||
-            WorkScheduler.isWorkScheduled(ctx, DownloadConstants.FILE_TAG)
-    }
+    // WorkManager's getWorkInfosByTag() blocks on ListenableFuture.get(), so
+    // all three lookups must run off the main thread (regression: up to three
+    // blocking queries ran on Main, stalling rendering and input).
+    private suspend fun isLocalDownloadActive(): Boolean =
+        withContext(Dispatchers.IO) {
+            val ctx = requireContext()
+            WorkScheduler.isWorkScheduled(ctx, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) ||
+                WorkScheduler.isWorkScheduled(ctx, DownloadConstants.DOWNLOAD_TAG) ||
+                WorkScheduler.isWorkScheduled(ctx, DownloadConstants.FILE_TAG)
+        }
 
     // If a download is already running (started from another screen or a previous
     // session), show progress and disable the action buttons instead of offering
     // stale download/redownload buttons that would fail with a misleading toast.
     private fun reflectOngoingDownloadUi() {
-        if (!isLocalDownloadActive()) return
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!isLocalDownloadActive()) return@launch
 
-        b.lbbsDownload.isEnabled = false
-        b.lbbsRedownload.isEnabled = false
-        b.lbbsCheckDownload.isEnabled = false
-        onDownloadProgress()
-        registerWorkObserversOnce()
+            b.lbbsDownload.isEnabled = false
+            b.lbbsRedownload.isEnabled = false
+            b.lbbsCheckDownload.isEnabled = false
+            onDownloadProgress()
+            registerWorkObserversOnce()
+        }
     }
 
     private fun registerWorkObserversOnce() {
@@ -389,7 +394,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             }
 
-            if (!isAdded) return@ui
+            // defense in depth: the job runs in the view lifecycle scope, so it
+            // is cancelled at the ioCtx suspension point once the view is
+            // destroyed; this guard keeps the binding access safe even if the
+            // scope outlives the view
+            if (_binding == null) return@ui
 
             updateLocalBlocklistUi()
             showCheckUpdateUi()
@@ -728,9 +737,10 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            if (isAdded && view != null) f()
-        }
+        // bound to the view lifecycle: the job is cancelled in onDestroyView,
+        // so a coroutine suspended in ioCtx can never resume against a cleared
+        // binding (regression: deleteLocalBlocklist() crashed after teardown)
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

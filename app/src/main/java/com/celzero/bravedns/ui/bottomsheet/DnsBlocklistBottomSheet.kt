@@ -65,7 +65,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
@@ -78,7 +77,7 @@ import org.koin.android.ext.android.inject
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
-class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
+class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
 
     private val b
@@ -757,7 +756,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             request.into(
                     object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
-                            if (!isAdded) return
+                            // the application-scoped Glide request can deliver
+                            // after onDestroyView() cleared the binding while
+                            // the fragment is still added; `b` would throw
+                            if (_binding == null) return
 
                             b.dnsBlockFavIcon.visibility = View.GONE
                         }
@@ -770,14 +772,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                                 LOG_TAG_DNS,
                                 "Glide - CustomViewTarget onResourceReady() nextdns: $url"
                             )
-                            if (!isAdded) return
+                            if (_binding == null) return
 
                             b.dnsBlockFavIcon.visibility = View.VISIBLE
                             b.dnsBlockFavIcon.setImageDrawable(resource)
                         }
 
                         override fun onResourceCleared(placeholder: Drawable?) {
-                            if (!isAdded) return
+                            if (_binding == null) return
 
                             b.dnsBlockFavIcon.visibility = View.GONE
                         }
@@ -788,7 +790,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL)?.into(
                 object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
                     override fun onLoadFailed(errorDrawable: Drawable?) {
-                        if (!isAdded) return
+                        if (_binding == null) return
 
                         b.dnsBlockFavIcon.visibility = View.GONE
                     }
@@ -801,14 +803,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                             LOG_TAG_DNS,
                             "Glide - CustomViewTarget onResourceReady() duckduckgo: $url"
                         )
-                        if (!isAdded) return
+                        if (_binding == null) return
 
                         b.dnsBlockFavIcon.visibility = View.VISIBLE
                         b.dnsBlockFavIcon.setImageDrawable(resource)
                     }
 
                     override fun onResourceCleared(placeholder: Drawable?) {
-                        if (!isAdded) return
+                        if (_binding == null) return
 
                         b.dnsBlockFavIcon.visibility = View.GONE
                     }

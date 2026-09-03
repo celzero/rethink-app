@@ -59,7 +59,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
@@ -67,7 +66,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
+class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: ActivityBackupRestoreBinding? = null
 
     private val b
