@@ -187,7 +187,7 @@ class RpnProxyManagerTest : KoinTest {
         val purchase = makePurchaseDetail("prd-1")
         val payload = "{\"ws\":{\"sessiontoken\":\"t1\"}}"
 
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         every { mockStateMachine.hasValidSubscription() } returns true
         // real state needed to observe the write
         val realPs = useRealPersistentState()
@@ -204,7 +204,7 @@ class RpnProxyManagerTest : KoinTest {
         val purchase = makePurchaseDetail("prd-1")
         val payload = "{\"ws\":{\"sessiontoken\":\"t1\"}}"
 
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.ENABLED.id
 
         RpnProxyManager.activateRpn(purchase, payload)
@@ -366,7 +366,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns updatedPurchase
         coEvery { mockSubscriptionStatusDb.updateDeveloperPayload(any(), any(), any()) } returns 1
         every { mockStateMachine.getSubscriptionData() } returns null
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         // isPayloadUsable resolves the session token through the tunnel entitlement
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { token() } returns "server-token"
@@ -416,7 +416,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { token() } returns "db-token"
         }
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
 
         val result = RpnProxyManager.processRpnPurchase(purchase, existingSub)
 
@@ -451,7 +451,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { token() } returns "server-token"
         }
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
 
         val result = RpnProxyManager.processRpnPurchase(purchase, existingSub)
 
@@ -492,7 +492,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { mockStateMachine.paymentSuccessful(any()) } returns Unit
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
 
         val result = RpnProxyManager.tryReactivateLinkedPurchase("acc-1", "did-1", "tok-1")
 
@@ -1318,7 +1318,7 @@ class RpnProxyManagerTest : KoinTest {
     @Test
     fun `updateWinConfigState success writes file and updates DB`() = runTest {
         val bytes = "test-config".toByteArray()
-        every { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         coEvery { mockRpnProxyDb.getProxyById(4) } returns null
         coEvery { mockRpnProxyDb.insert(any()) } returns 1L
 

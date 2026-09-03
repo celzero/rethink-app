@@ -264,6 +264,61 @@ class LogActivityAggregatorTest {
     }
 
     @Test
+    fun `restore does not wipe arrivals that are not yet written to the database`() = runTest {
+        // regression: an arrival updates the wall immediately, but database
+        // writes are batched — a restore in between replaced the wall with a
+        // db snapshot that did not contain the event, silently dropping it
+        val agg = aggregator()
+        agg.record(listOf(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true)))
+        // db snapshot comes back empty: the batched write has not landed yet
+        agg.restoreFromDatabase()
+
+        assertEquals(1L, at(agg.activity.value, 5).blocked)
+        assertEquals(1L, agg.activity.value.intervals.sumOf { it.blocked })
+    }
+
+    @Test
+    fun `restore re-anchors the wall for recorded events without a rebuild`() = runTest {
+        val agg = aggregator()
+        agg.record(listOf(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true)))
+
+        // restore must keep the recorded event and re-anchor (isStale false)
+        // instead of wiping the wall with an empty db snapshot
+        agg.restoreFromDatabase()
+
+        val s = agg.activity.value
+        assertEquals(1L, at(s, 5).blocked)
+        assertEquals(
+            LogActivityAggregator.bucketFloor(nowMs) + BUCKET_MS,
+            s.windowEndMs
+        )
+        org.junit.Assert.assertFalse(agg.isStale())
+
+        // subsequent arrivals still land after the live restore; both events
+        // floor into the same 11:50 bucket
+        agg.record(listOf(LogActivityEvent(minutesAgoMs(3), LogActivitySource.NETWORK, blocked = true, key = "post")))
+        assertEquals(1L, at(agg.activity.value, 3).networkBlocked)
+        assertEquals(1L, at(agg.activity.value, 5).dnsBlocked)
+    }
+
+    @Test
+    fun `restore rebuilds from the database when no arrivals happened since the last snapshot`() = runTest {
+        // with a clean (idle) wall a rebuild is safe: nothing applied since
+        // the last restore can be missing from the db
+        val (rangeStart, rangeEnd) = restoreRange()
+        coEvery {
+            dnsRepo.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS)
+        } returns listOf(ActivityBucketRow(72L, 1, 5))
+
+        val agg = aggregator()
+        agg.restoreFromDatabase() // first snapshot, nothing recorded
+        // simulate wall loss without recording (fresh aggregator restores the
+        // same way); here verify a second idle restore still rebuilds
+        agg.restoreFromDatabase()
+        assertEquals(5L, agg.activity.value.intervals[72].dnsBlocked)
+    }
+
+    @Test
     fun `blocked to allowed reclassification moves the count`() = runTest {
         val agg = aggregator()
         val e = LogActivityEvent(minutesAgoMs(35), LogActivitySource.DNS, blocked = true)
