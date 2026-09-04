@@ -550,6 +550,8 @@ dependencies {
     // for confetti animation
     "fullImplementation"("nl.dionsegijn:konfetti-xml:2.0.5")
 
+    // Android TV flavor dependencies. Firestack is inherited through the
+    // orthogonal releaseChannel flavor and must not be duplicated here.
     "tvImplementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
     "tvImplementation"("androidx.appcompat:appcompat:1.8.0")
     "tvImplementation"("androidx.core:core-ktx:1.19.0")
