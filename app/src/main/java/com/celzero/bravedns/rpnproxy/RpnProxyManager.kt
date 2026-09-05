@@ -2801,7 +2801,7 @@ object RpnProxyManager : KoinComponent {
             isActive = true,
             isEnabled = false, // Not enabled by default
             catchAll = true,
-            lockdown = false,
+            lockdown = true,
             mobileOnly = false,
             ssidBased = false,
             priority = 999, // Highest priority so it appears first
