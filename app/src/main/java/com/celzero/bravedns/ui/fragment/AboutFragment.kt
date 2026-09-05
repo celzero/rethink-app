@@ -106,6 +106,7 @@ import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -1092,80 +1093,81 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             val clipText = if (timedOut) "TIMED OUT\n$stats" else stats.ifEmpty { notAvailable }
 
-            uiCtx {
-                progressDialog.dismiss()
-                if (!isAdded) return@uiCtx
+            dismissProgressAndShowResults(
+                isViewAlive = { isAdded && view != null },
+                dismissProgress = { progressDialog.dismiss() },
+                showResults = {
+                    val selectedPositions = mutableSetOf<Int>()
+                    val highlightColor = UIUtils.fetchColor(ctx, android.R.attr.colorControlHighlight)
 
-                val selectedPositions = mutableSetOf<Int>()
-                val highlightColor = UIUtils.fetchColor(ctx, android.R.attr.colorControlHighlight)
-
-                // use recycler as using textview with large stats causes OOM and ANR issues
-                val recyclerView = androidx.recyclerview.widget.RecyclerView(ctx).apply {
-                    layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
-                    setHasFixedSize(true)
-                    adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<
-                            androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
-                        override fun getItemCount() = lines.size
-                        override fun onCreateViewHolder(
-                            parent: android.view.ViewGroup,
-                            viewType: Int
-                        ): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-                            val tv = android.widget.TextView(ctx).apply {
-                                setPadding(pad, 1, pad, 1)
-                                typeface = android.graphics.Typeface.MONOSPACE
-                                textSize = 11.5f
-                            }
-                            return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
-                        }
-                        override fun onBindViewHolder(
-                            holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
-                            position: Int
-                        ) {
-                            val tv = holder.itemView as android.widget.TextView
-                            tv.text = lines[position]
-                            if (selectedPositions.contains(position)) {
-                                tv.setBackgroundColor(highlightColor)
-                            } else {
-                                tv.background = null
-                            }
-
-                            tv.setOnClickListener {
-                                if (selectedPositions.contains(position)) {
-                                    selectedPositions.remove(position)
-                                } else {
-                                    selectedPositions.add(position)
+                    // use recycler as using textview with large stats causes OOM and ANR issues
+                    val recyclerView = androidx.recyclerview.widget.RecyclerView(ctx).apply {
+                        layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
+                        setHasFixedSize(true)
+                        adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<
+                                androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+                            override fun getItemCount() = lines.size
+                            override fun onCreateViewHolder(
+                                parent: android.view.ViewGroup,
+                                viewType: Int
+                            ): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+                                val tv = android.widget.TextView(ctx).apply {
+                                    setPadding(pad, 1, pad, 1)
+                                    typeface = android.graphics.Typeface.MONOSPACE
+                                    textSize = 11.5f
                                 }
-                                notifyItemChanged(position)
+                                return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
+                            }
+                            override fun onBindViewHolder(
+                                holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                                position: Int
+                            ) {
+                                val tv = holder.itemView as android.widget.TextView
+                                tv.text = lines[position]
+                                if (selectedPositions.contains(position)) {
+                                    tv.setBackgroundColor(highlightColor)
+                                } else {
+                                    tv.background = null
+                                }
+
+                                tv.setOnClickListener {
+                                    if (selectedPositions.contains(position)) {
+                                        selectedPositions.remove(position)
+                                    } else {
+                                        selectedPositions.add(position)
+                                    }
+                                    notifyItemChanged(position)
+                                }
                             }
                         }
                     }
-                }
 
-                val container = android.widget.LinearLayout(ctx).apply {
-                    orientation = android.widget.LinearLayout.VERTICAL
-                    addView(recyclerView, android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-                }
+                    val container = android.widget.LinearLayout(ctx).apply {
+                        orientation = android.widget.LinearLayout.VERTICAL
+                        addView(recyclerView, android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+                    }
 
-                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
-                    .setTitle(getString(R.string.title_statistics))
-                    .setView(container)
-                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
-                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        val textToCopy = if (selectedPositions.isEmpty()) {
-                            clipText
-                        } else {
-                            selectedPositions.sorted().joinToString("\n") { lines[it] }
-                        }
-                        copyToClipboard("stats_dump", textToCopy)
-                        showToastUiCentered(
-                            ctx,
-                            getString(R.string.copied_clipboard),
-                            Toast.LENGTH_SHORT
-                        )
-                    }.create()
-                    .show()
-            }
+                    MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.title_statistics))
+                        .setView(container)
+                        .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                        .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                            val textToCopy = if (selectedPositions.isEmpty()) {
+                                clipText
+                            } else {
+                                selectedPositions.sorted().joinToString("\n") { lines[it] }
+                            }
+                            copyToClipboard("stats_dump", textToCopy)
+                            showToastUiCentered(
+                                ctx,
+                                getString(R.string.copied_clipboard),
+                                Toast.LENGTH_SHORT
+                            )
+                        }.create()
+                        .show()
+                }
+            )
         }
     }
 
@@ -1479,7 +1481,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun getDatabaseTables(): List<String> {
         val db = appDatabase.openHelper.readableDatabase
         val cursor =
-            db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+            db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' and name NOT LIKE '%Subscription%' ORDER BY name")
         val tablesToSkip = setOf(
             "android_metadata",
             "sqlite_sequence",
@@ -1870,5 +1872,21 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 f()
             }
         }
+    }
+}
+
+/**
+ * Dismisses the stats progress dialog and conditionally shows the results.
+ */
+internal suspend fun dismissProgressAndShowResults(
+    isViewAlive: () -> Boolean,
+    mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    dismissProgress: () -> Unit,
+    showResults: () -> Unit
+) {
+    withContext(mainDispatcher) {
+        dismissProgress()
+        if (!isViewAlive()) return@withContext
+        showResults()
     }
 }
