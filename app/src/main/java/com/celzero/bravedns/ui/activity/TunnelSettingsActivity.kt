@@ -1207,14 +1207,16 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomHttpProxyEnabled()) {
             val appName = appConfig.getConnectedHttpProxy()?.proxyAppName ?: ""
-            checks.add(
-                LockdownCheckItem(
-                    label = getString(R.string.lockdown_check_http_proxy),
-                    description = getString(R.string.lockdown_check_http_proxy_desc, appName),
-                    hasConflict = true,
-                    type = CheckType.HTTP_PROXY
+            if (!appName.isBlank()) {
+                checks.add(
+                    LockdownCheckItem(
+                        label = getString(R.string.lockdown_check_http_proxy),
+                        description = getString(R.string.lockdown_check_http_proxy_desc, appName),
+                        hasConflict = true,
+                        type = CheckType.HTTP_PROXY
+                    )
                 )
-            )
+            }
         }
 
         // 6. SOCKS5 Proxy check
@@ -1222,14 +1224,16 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // just app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomSocks5Enabled()) {
             val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName ?: ""
-            checks.add(
-                LockdownCheckItem(
-                    label = getString(R.string.lockdown_check_socks5),
-                    description = getString(R.string.lockdown_check_socks5_desc, appName),
-                    hasConflict = true,
-                    type = CheckType.SOCKS5
+            if (!appName.isBlank()) {
+                checks.add(
+                    LockdownCheckItem(
+                        label = getString(R.string.lockdown_check_socks5),
+                        description = getString(R.string.lockdown_check_socks5_desc, appName),
+                        hasConflict = true,
+                        type = CheckType.SOCKS5
+                    )
                 )
-            )
+            }
         }
 
         // 7. Anti-Censorship check
@@ -1307,13 +1311,17 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                     }
                     CheckType.HTTP_PROXY -> {
                         if (!proxiesRemoved) {
-                            appConfig.removeAllProxies()
+                            val pt = AppConfig.ProxyType.valueOf(appConfig.getProxyType())
+                            val pp = AppConfig.ProxyProvider.valueOf(appConfig.getProxyProvider())
+                            appConfig.removeProxy(pt, pp)
                             proxiesRemoved = true
                         }
                     }
                     CheckType.SOCKS5 -> {
                         if (!proxiesRemoved) {
-                            appConfig.removeAllProxies()
+                            val pt = AppConfig.ProxyType.valueOf(appConfig.getProxyType())
+                            val pp = AppConfig.ProxyProvider.valueOf(appConfig.getProxyProvider())
+                            appConfig.removeProxy(pt, pp)
                             proxiesRemoved = true
                         }
                     }

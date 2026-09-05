@@ -175,16 +175,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
-            // Proxy lockdown: SOCKS5 cannot be toggled at all (enforcement; the row click
-            // listener and handleProxyUi() already prevent user interaction).
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnCheckedChangeListener
-            }
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text =
@@ -225,6 +215,18 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 }
                 val packageName = endpoint.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)?.appName.orEmpty()
+                // Proxy lockdown: SOCKS5 cannot be toggled at all (enforcement; the row click
+                // listener and handleProxyUi() already prevent user interaction).
+                if (persistentState.wgGlobalLockdown && app.isNotBlank()) {
+                    uiCtx {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.lockdown_check_setting_disabled),
+                            Toast.LENGTH_SHORT,
+                        )
+                    }
+                    return@io
+                }
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
@@ -264,15 +266,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
-            // Proxy lockdown: HTTP proxy cannot be toggled. Inform instead of silently ignoring.
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnCheckedChangeListener
-            }
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
@@ -316,6 +309,17 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 }
                 val packageName = endpoint.proxyAppName
                 val app = FirewallManager.getAppInfoByPackage(packageName)
+                // Proxy lockdown: HTTP proxy cannot be toggled. Inform instead of silently ignoring.
+                if (persistentState.wgGlobalLockdown && app?.appName?.isNotBlank() == true) {
+                    uiCtx {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.lockdown_check_setting_disabled),
+                            Toast.LENGTH_SHORT,
+                        )
+                    }
+                    return@io
+                }
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
