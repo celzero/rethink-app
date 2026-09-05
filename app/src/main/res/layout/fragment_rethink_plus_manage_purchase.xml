@@ -120,6 +120,7 @@
                                 android:ellipsize="end"
                                 android:fontFamily="monospace"
                                 android:maxLines="1"
+                                android:alpha="0.7"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/mini_font_text_view"
                                 tools:text="49c0737336de · 7adf8821c00 • 1a0c" />

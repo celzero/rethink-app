@@ -114,9 +114,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
 
-    /** When true, the Apps screen opens automatically once the proxy is initialized. */
-    private var openAppsOnLaunch: Boolean = false
-
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
@@ -167,13 +164,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         const val INTENT_EXTRA_FROM_SERVER_SELECTION = "FROM_SERVER_SELECTION"
         const val INTENT_EXTRA_CONFIG_KEY = "CONFIG_KEY"
 
-        /**
-         * When set (boolean extra), the Apps screen ([WgIncludeAppsActivity]) is opened
-         * automatically once the proxy is initialized. Used by the server-selection
-         * list's "Apps" chip to land directly on the per-app mapping screen.
-         */
-        const val INTENT_EXTRA_OPEN_APPS = "OPEN_APPS"
-
         /** Polling interval for live stats. */
         private const val STATS_POLL_MS = 2_000L
 
@@ -199,7 +189,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         configKey = intent.getStringExtra(INTENT_EXTRA_CONFIG_KEY) ?: ""
-        openAppsOnLaunch = intent.getBooleanExtra(INTENT_EXTRA_OPEN_APPS, false)
         applyScrollPadding()
     }
 
@@ -273,11 +262,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 observeAppCount(configKey)
                 loadConfigSettings(configKey)
                 setupHeaderUI()
-                // Server-selection "Apps" chip lands here; forward to the Apps screen.
-                if (openAppsOnLaunch) {
-                    openAppsOnLaunch = false
-                    openAppsDialog()
-                }
             }
         }
 
@@ -363,8 +347,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
                     b.tvHeroCity.text = city.ifBlank { config.cc }
-                    // Show the city name in the collapsing toolbar title when collapsed.
-                    b.collapsingToolbar.title = city.ifBlank { config.cc }.capitalizeWords()
+                    // Show the flag + city name in the collapsing toolbar title when collapsed.
+                    b.collapsingToolbar.title =
+                        collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
                 } else {
                     b.tvHeroFlag.visibility = View.GONE
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
@@ -474,11 +459,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             // Relayed connection: show Entry (AUTO) ↓ Exit with a relay marker.
             // The AUTO entry IP is resolved on IO; the span is composed on the main thread.
             io {
-                val entryIp = runCatching {
-                    VpnController.getRpnAddlInfo(AUTO_SERVER_ID)?.addr
-                        ?.split(",")?.getOrNull(1)?.trim().orEmpty()
-                }.getOrDefault("")
-                uiCtx { b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4) }
+                val addlInfo = runCatching { VpnController.getRpnAddlInfo(AUTO_SERVER_ID) }
+                    .getOrNull()
+                val entryIp = addlInfo?.addr
+                    ?.split(",")?.getOrNull(1)?.trim().orEmpty()
+                val entryCity = addlInfo?.city.orEmpty()
+                uiCtx { b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity) }
             }
         } else {
             b.valueIpv4.text = ip4
@@ -516,8 +502,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
      *
      * [entryIp] is AUTO's public IP (the relay entry); the exit is [meta] which
      * carries the client's public IP and its ASN metadata as seen through the relay.
+     * [entryCity] is AUTO's city, shown alongside the AUTO marker when available.
      */
-    private fun buildHopIpSpan(entryIp: String, meta: IPMetadata): SpannableStringBuilder {
+    private fun buildHopIpSpan(
+        entryIp: String,
+        meta: IPMetadata,
+        entryCity: String
+    ): SpannableStringBuilder {
         val sb = SpannableStringBuilder()
         val labelColor = fetchColor(this, R.attr.primaryLightColorText)
         val accentColor = fetchColor(this, R.attr.accentGood)
@@ -542,7 +533,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         mono(entryIpStart, sb.length)
         sb.append(" ")
         val entrySuffixStart = sb.length
-        sb.append("(AUTO)")
+        sb.append("(AUTO")
+        if (entryCity.isNotBlank()) {
+            sb.append(" · ").append(entryCity)
+        }
+        sb.append(")")
         styleLabel(entrySuffixStart, sb.length)
 
         // Arrow row (relay marker)
@@ -809,7 +804,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         return when {
             status == null -> R.attr.primaryLightColorText
             isFailing(status) -> R.attr.chipTextNegative
-            status == UIUtils.ProxyStatus.TOK -> R.attr.accentGood
+            status == UIUtils.ProxyStatus.TOK -> R.attr.primaryTextColor
             status == UIUtils.ProxyStatus.TUP ||
             status == UIUtils.ProxyStatus.TZZ ||
             status == UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
@@ -917,7 +912,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         c
                     )
                     b.appsLabel.setTextColor(
-                        fetchColor(this, if (c > 0) R.attr.chipTextPositive else R.attr.accentBad)
+                        fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
                     )
                 }
             }
@@ -949,7 +944,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                     // Update apps section immediately based on catchAll state
                     if (config.catchAll) {
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.chipTextPositive))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.accentGood))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
                     if (config.id.equals(AUTO_SERVER_ID, true)) {
@@ -1006,7 +1001,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.applicationsBtn.isEnabled = true
                     b.applicationsBtn.alpha = 1.0f
                     if (isChecked) {
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.chipTextPositive))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.accentGood))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     } else {
                         observeAppCount(configKey)
@@ -1237,6 +1232,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         if (!b.catchAllCheck.isChecked) return
         // unchecking via the listener persists state and refreshes the apps section
         b.catchAllCheck.isChecked = false
+    }
+
+    /**
+     * Builds the collapsing-toolbar (collapsed header) title as "<flag> <city>"
+     * (e.g. "🇩🇪 Frankfurt") so the country flag travels with the city name
+     * while the app bar is collapsed. Falls back to the plain title when
+     * [flag] is blank.
+     */
+    private fun collapsedHeaderTitle(flag: String, title: String): String {
+        val t = title.capitalizeWords()
+        if (flag.isBlank()) return t
+        return "$flag $t"
     }
 
     private fun setupHeaderUI() {

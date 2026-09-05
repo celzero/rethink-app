@@ -35,14 +35,17 @@ import kotlin.random.Random
  * vector [Path] shapes — no bitmap/sprite-sheet asset is bundled or decoded.
  *
  * The scene: a calm underwater world below a subtly moving water surface.
- * The leader dolphin enters from the left underwater, swims calmly, gradually
- * approaches the surface, breaches in an elegant jump (splash), hangs briefly
- * at the apex, dives back in (second splash), and continues underwater
- * off-screen before the cycle repeats. The rest of the pod follows the same
- * trajectory, each offset by its own time lag and size, reading as a small
- * pod swimming and leaping together. The underwater cruise alternates
- * between a short and a longer variant per cycle so the loop feels organic
- * rather than metronomic.
+ * The pod is arranged as a small swim-along group of three dolphins moving
+ * together (staggered horizontally and vertically so they read as natural
+ * pod mates, not a conga line) followed by two solo swimmers trailing with
+ * plenty of water between them. Exactly one member breaches: the smallest
+ * dolphin of the pod — the playful calf — rises to the surface in an
+ * elegant arc (splash), hangs briefly at the apex, dives back in (second
+ * splash), and continues off-screen toward the far end of the view. Every
+ * other member just swims, rising to cruise just below the surface while
+ * the calf leaps and settling back down afterwards. The whole pod crosses
+ * slowly (an 18-second cycle) with a slow, sweeping tail stroke, so the
+ * movement reads as a relaxed glide rather than a scurry.
  *
  * Architecture: a single time-driven custom view (no Animators). All phase
  * motion is analytic (piecewise waypoints plus easing), producing natural
@@ -70,28 +73,34 @@ class DolphinOceanView @JvmOverloads constructor(
     // Trajectory phases
     // ---------------------------------------------------------------------
 
-    /** Ordered phases of one dolphin cycle. Durations in milliseconds. */
+    /** Ordered phases of one dolphin cycle. Durations in milliseconds.
+     * Sum to an 18s cycle: a slow, unhurried crossing. ENTER+SWIM+APPROACH
+     * total exactly half the cycle (9000ms), which anchors the diver's
+     * surface exit at f = 0.5 + lag/cycle (see the pod constants). */
     private enum class DolphinPhase(val durationMs: Long) {
         /** Calm underwater entry from off-screen left. */
-        ENTER(1_700L),
+        ENTER(2_550L),
 
-        /** Calm underwater cruise. Duration alternates per cycle variant. */
-        SWIM(3_400L),
+        /** Calm underwater cruise. The horizontal crossing spans one full
+         * cycle, so this duration directly sets the pod's swim speed across
+         * the view — the longest phase, since the scene is mostly cruising. */
+        SWIM(4_800L),
 
-        /** Rises toward the surface, accelerating, nose pitching up. */
-        APPROACH_SURFACE(1_000L),
+        /** Gathers speed underwater, nose pitching up toward the surface. */
+        APPROACH_SURFACE(1_650L),
 
-        /** Exits the water and climbs, decelerating. Splash on exit. */
-        BREACH(1_200L),
+        /** Exits the water and climbs, shedding speed. Splash on exit. */
+        BREACH(900L),
 
         /** Brief suspension at the top of the jump. */
-        APEX(350L),
+        APEX(300L),
 
-        /** Energetic dive back through the surface. Splash on re-entry. */
-        DIVE(1_300L),
+        /** Gravity-powered dive back to the surface. Splash on re-entry. */
+        DIVE(1_050L),
 
-        /** Calm underwater exit toward off-screen right. */
-        UNDERWATER_EXIT(1_400L)
+        /** Re-entry deceleration down to depth, then calm exit off-screen
+         * right. Sized so ENTER+SWIM+APPROACH is exactly half the cycle. */
+        UNDERWATER_EXIT(6_750L)
     }
 
     /** Reusable pose result; filled by [calculateDolphinPose] each frame. */
@@ -108,25 +117,39 @@ class DolphinOceanView @JvmOverloads constructor(
     // ---------------------------------------------------------------------
 
     /**
-     * One dolphin in the pod. Every member follows the same phase trajectory
-     * offset by [lagMs] in time; a positive lag places the member behind the
-     * leader along the path, which reads naturally as dolphins following.
-     * [unitToPx] is this member's uniform scale from the shared unit-space
-     * vector paths to on-screen pixels; recomputed only on size changes.
+     * One dolphin in the pod. Every member runs its own clock that starts at
+     * -[lagMs], so a positive lag places the member behind the leader along
+     * the path, which reads naturally as dolphins following. Because the
+     * clock is per-member, trailing members always complete their full
+     * trajectory instead of being cut off when a shared clock wraps.
+     * [dives] controls whether this member breaches the surface or just
+     * swims. [unitToPx] is this member's uniform scale from the shared
+     * unit-space vector paths to on-screen pixels; recomputed only on size
+     * changes.
      */
     private class PodMember(
         val sizeFraction: Float,
         val lagMs: Long,
-        val alphaFraction: Float
+        val alphaFraction: Float,
+        val dives: Boolean,
+        val depthOffsetFraction: Float
     ) {
         val pose = DolphinPose()
         var previousCenterY = 0f
         var unitToPx = 1f
+        var elapsedMs = -lagMs.toFloat()
+        var cycleCount = 0
     }
 
     private val pod =
         POD_SIZE_FRACTIONS.indices.map { i ->
-            PodMember(POD_SIZE_FRACTIONS[i], POD_LAG_MS[i], POD_ALPHA_FRACTIONS[i])
+            PodMember(
+                POD_SIZE_FRACTIONS[i],
+                POD_LAG_MS[i],
+                POD_ALPHA_FRACTIONS[i],
+                POD_DIVER_FLAGS[i],
+                POD_DEPTH_OFFSET_FRACTIONS[i]
+            )
         }
 
     // ---------------------------------------------------------------------
@@ -191,8 +214,6 @@ class DolphinOceanView @JvmOverloads constructor(
     private var started = false
     private var running = false
     private var lastFrameNanos = 0L
-    private var elapsedInCycleMs = 0f
-    private var cycleCount = 0
     private var wavePhase1 = 0f
     private var wavePhase2 = 0f
 
@@ -266,17 +287,17 @@ class DolphinOceanView @JvmOverloads constructor(
         color = EYE_HIGHLIGHT_COLOR
     }
 
-    /** Main body: rounded beak -> back -> tapered peduncle -> belly. */
+    /** Main body: rounded beak -> back -> tapered peduncle -> lean belly. */
     private val dolphinBodyPath = Path().apply {
         moveTo(108f, -1f)
         cubicTo(105f, -12f, 95f, -20f, 78f, -25f)
         cubicTo(55f, -31f, 25f, -33f, -5f, -30f)
         cubicTo(-30f, -27f, -50f, -20f, -64f, -9f)
         cubicTo(-70f, -5f, -72f, -2f, -73f, 0f)
-        cubicTo(-72f, 2f, -70f, 5f, -64f, 9f)
-        cubicTo(-50f, 20f, -30f, 27f, -5f, 30f)
-        cubicTo(25f, 33f, 52f, 30f, 72f, 22f)
-        cubicTo(84f, 17f, 92f, 12f, 98f, 5f)
+        cubicTo(-72f, 2f, -70f, 4f, -64f, 8f)
+        cubicTo(-50f, 16f, -30f, 22f, -5f, 24f)
+        cubicTo(25f, 26f, 52f, 24f, 72f, 17f)
+        cubicTo(84f, 13f, 92f, 9f, 98f, 4f)
         cubicTo(102f, 2f, 105f, 1f, 108f, -1f)
         close()
     }
@@ -308,13 +329,13 @@ class DolphinOceanView @JvmOverloads constructor(
         close()
     }
 
-    /** Lighter belly patch for the two-tone look. */
+    /** Lighter belly patch for the two-tone look; hugs the lean underside. */
     private val dolphinBellyPath = Path().apply {
-        moveTo(80f, 10f)
-        cubicTo(50f, 25f, 5f, 29f, -32f, 24f)
-        cubicTo(-48f, 22f, -58f, 15f, -63f, 7f)
-        cubicTo(-42f, 14f, -2f, 17f, 32f, 10f)
-        cubicTo(52f, 6f, 68f, 2f, 80f, -4f)
+        moveTo(80f, 6f)
+        cubicTo(50f, 19f, 5f, 23f, -32f, 19f)
+        cubicTo(-48f, 17f, -58f, 12f, -63f, 5f)
+        cubicTo(-42f, 11f, -2f, 14f, 32f, 8f)
+        cubicTo(52f, 5f, 68f, 1f, 80f, -4f)
         close()
     }
 
@@ -327,9 +348,9 @@ class DolphinOceanView @JvmOverloads constructor(
     /** Starts (or restarts) the animation loop from the beginning of a cycle. */
     fun start() {
         started = true
-        elapsedInCycleMs = 0f
-        cycleCount = 0
         pod.forEach {
+            it.elapsedMs = -it.lagMs.toFloat()
+            it.cycleCount = 0
             it.previousCenterY = 0f
         }
         clearParticles()
@@ -399,7 +420,7 @@ class DolphinOceanView @JvmOverloads constructor(
         val maxLengthByHeight = (h * MAX_DOLPHIN_HEIGHT_FRACTION) / UNIT_HEIGHT_ASPECT
         dolphinSize = (DOLPHIN_LENGTH_DP * density).coerceAtMost(maxLengthByHeight)
         jumpHeight =
-            (h * JUMP_HEIGHT_FRACTION).coerceAtLeast(dolphinSize * UNIT_HEIGHT_ASPECT * 0.9f)
+            (h * JUMP_HEIGHT_FRACTION).coerceAtLeast(dolphinSize * UNIT_HEIGHT_ASPECT * MIN_JUMP_HEIGHT_ASPECT)
         apexY = surfaceY - jumpHeight
 
         // uniform unit-space -> pixel scale per member; the same vector
@@ -417,17 +438,17 @@ class DolphinOceanView @JvmOverloads constructor(
         )
     }
 
-    /** Swim phase duration; alternates per cycle for an organic loop. */
-    private fun swimDurationMs(): Long {
-        val variantExtra = if (cycleCount % 2 == 0) 0L else SWIM_VARIANT_EXTRA_MS
+    /** Swim phase duration; alternates per member cycle for an organic loop. */
+    private fun swimDurationMs(cycle: Int): Long {
+        val variantExtra = if (cycle % 2 == 0) 0L else SWIM_VARIANT_EXTRA_MS
         return DolphinPhase.SWIM.durationMs + variantExtra
     }
 
-    private fun cycleDurationMs(): Long {
+    private fun cycleDurationMs(cycle: Int): Long {
         var total = 0L
         for (phase in DolphinPhase.entries) {
             total +=
-                if (phase == DolphinPhase.SWIM) swimDurationMs() else phase.durationMs
+                if (phase == DolphinPhase.SWIM) swimDurationMs(cycle) else phase.durationMs
         }
         return total
     }
@@ -459,11 +480,19 @@ class DolphinOceanView @JvmOverloads constructor(
     }
 
     private fun advanceTime(dtMs: Float) {
-        elapsedInCycleMs += dtMs
-        val cycleLen = cycleDurationMs().toFloat()
-        if (elapsedInCycleMs >= cycleLen) {
-            elapsedInCycleMs -= cycleLen
-            cycleCount++
+        // Per-member clocks: each dolphin advances its own cycle, offset by
+        // its lag, so trailing members always play out their full trajectory
+        // (breach included) instead of being cut off when a shared clock
+        // wraps. A member whose clock is still negative has not entered the
+        // scene yet.
+        for (member in pod) {
+            member.elapsedMs += dtMs
+            if (member.elapsedMs < 0f) continue
+            val cycleLen = cycleDurationMs(member.cycleCount).toFloat()
+            if (member.elapsedMs >= cycleLen) {
+                member.elapsedMs -= cycleLen
+                member.cycleCount++
+            }
         }
         wavePhase1 += WAVE_SPEED_1 * dtMs / 1000f
         wavePhase2 -= WAVE_SPEED_2 * dtMs / 1000f
@@ -482,21 +511,19 @@ class DolphinOceanView @JvmOverloads constructor(
 
     /** Computes one member's pose for the current frame and renders it. */
     private fun drawMember(canvas: Canvas, member: PodMember, w: Float, h: Float, dtSec: Float) {
-        val cycleLen = cycleDurationMs().toFloat()
-        var memberElapsed = elapsedInCycleMs - member.lagMs
-        if (memberElapsed < 0f) {
+        if (member.elapsedMs < 0f) {
             member.previousCenterY = 0f
             return // the member has not entered the scene yet
         }
-        if (memberElapsed >= cycleLen) memberElapsed -= cycleLen
 
-        calculateDolphinPose(memberElapsed, cycleLen, w, h, member.pose)
+        val cycleLen = cycleDurationMs(member.cycleCount).toFloat()
+        calculateDolphinPose(member, member.elapsedMs, cycleLen, w, h, member.pose)
 
         // detect surface crossings (breach exit / dive entry) for splashes
         maybeSpawnSplashOnCrossing(member, w)
 
         drawShadowIfAirborne(canvas, member)
-        drawDolphinGlyph(canvas, member, memberElapsed)
+        drawDolphinGlyph(canvas, member, member.elapsedMs)
         // sparse bubbles trail the leader only, keeping the scene quiet
         if (member === pod[0]) maybeEmitBubble(member, dtSec)
     }
@@ -506,21 +533,31 @@ class DolphinOceanView @JvmOverloads constructor(
     // ---------------------------------------------------------------------
 
     /**
-     * Fills [pose] for [elapsedMs] within the cycle.
+     * Fills [pose] for [member] at [elapsedMs] within its cycle.
      *
      * Horizontal motion is a single constant-speed glide across the entire
      * cycle: x has no per-phase easing, so velocity is continuous by
-     * construction and the motion never stops, stalls, or jumps. All the
-     * life is in the vertical curve, rotation, and scale, which are smooth
-     * S-curves that start and end at zero velocity: steady swim ->
-     * continuous rise through the surface -> brief suspension at the apex
-     * (rotation passes through) -> more energetic but still smooth fall ->
-     * calm underwater exit. Because the dolphin is a single freely-rotated
-     * vector silhouette (not pre-rendered pose frames), rotationDeg alone is
-     * enough to sell every part of the arc — there is no artwork to keep in
-     * sync.
+     * construction and the motion never stops, stalls, or jumps.
+     *
+     * The diver's vertical motion follows a ballistic profile: ease-in
+     * (accelerating) underwater so top speed lands exactly at the surface
+     * line, ease-out through the air so vertical velocity reaches zero only
+     * at the apex, ease-in on the fall so the dolphin is fastest exactly at
+     * re-entry, and ease-out underwater to bleed off the entry speed. The
+     * pitch keys track the trajectory tangent (steep up at exit, level at
+     * the apex, steep down at entry), which is what makes the breach read
+     * as a real jump. Approach ends at [surfaceY] and BREACH/DIVE start and
+     * end on [surfaceY], so the splash crossings trigger precisely at the
+     * exit and entry points.
+     *
+     * Only members with [PodMember.dives] follow that full breach arc; the
+     * rest of the pod stays underwater for the whole cycle, rising to cruise
+     * just below the surface while the lone jumper (the pod's smallest)
+     * leaps and settling back down afterwards, so the scene reads as
+     * swimmers + one playful calf jumping at the far end.
      */
     private fun calculateDolphinPose(
+        member: PodMember,
         elapsedMs: Float,
         cycleLen: Float,
         w: Float,
@@ -529,6 +566,9 @@ class DolphinOceanView @JvmOverloads constructor(
     ) {
         val half = dolphinSize / 2f
         val uwAlpha = 1f - UNDERWATER_ALPHA_DIP
+        // depth the non-diving members rise to: comfortably below the wave
+        // crests so they never clip the surface (and never spawn splashes)
+        val swimmerY = surfaceY + dolphinSize * SWIMMER_SURFACE_GAP_FRACTION
 
         // steady glide: x is linear in cycle time
         pose.centerX =
@@ -536,15 +576,16 @@ class DolphinOceanView @JvmOverloads constructor(
 
         // phase windows (keep in sync with the DolphinPhase durations)
         val enterLen = DolphinPhase.ENTER.durationMs.toFloat()
-        val swimLen = swimDurationMs().toFloat()
-        val riseLen =
-            DolphinPhase.APPROACH_SURFACE.durationMs + DolphinPhase.BREACH.durationMs
-        val apexLen = DolphinPhase.APEX.durationMs
-        val fallLen = DolphinPhase.DIVE.durationMs
+        val swimLen = swimDurationMs(member.cycleCount).toFloat()
+        val approachLen = DolphinPhase.APPROACH_SURFACE.durationMs.toFloat()
+        val breachLen = DolphinPhase.BREACH.durationMs.toFloat()
+        val apexLen = DolphinPhase.APEX.durationMs.toFloat()
+        val diveLen = DolphinPhase.DIVE.durationMs.toFloat()
         val preRiseLen = enterLen + swimLen
-        val preApexLen = preRiseLen + riseLen
+        val preBreachLen = preRiseLen + approachLen
+        val preApexLen = preBreachLen + breachLen
         val preFallLen = preApexLen + apexLen
-        val preExitLen = preFallLen + fallLen
+        val preExitLen = preFallLen + diveLen
 
         var t = elapsedMs
         when {
@@ -558,58 +599,155 @@ class DolphinOceanView @JvmOverloads constructor(
             }
 
             t < preRiseLen -> {
-                // SWIM: calm cruise with a gentle porpoising bob that starts
-                // and ends at zero offset so it never pops
+                // SWIM: one long, gentle swell — a single slow rise and
+                // fall that starts and ends at zero offset so it never
+                // pops. The pitch term tracks the swell's slope (nose down
+                // while sinking, nose up while rising) and is windowed to
+                // zero at both ends, so the body eases level into the
+                // ENTER and APPROACH phases instead of see-sawing at the
+                // crests.
                 val u = (t - enterLen) / swimLen
                 pose.centerY =
                     deepY + sin(u * 2f * PI.toFloat() * SWIM_BOB_CYCLES) * h * SWIM_BOB_FRACTION
-                pose.rotationDeg = sin(u * 2f * PI.toFloat() * SWIM_BOB_CYCLES) * SWIM_ROTATION
+                pose.rotationDeg =
+                    SWIM_ROTATION * cos(u * 2f * PI.toFloat() * SWIM_BOB_CYCLES) *
+                        sin(u * PI.toFloat())
                 pose.scale = UNDERWATER_SCALE
                 pose.alpha = uwAlpha
+            }
+
+            t < preBreachLen -> {
+                if (member.dives) {
+                    // APPROACH: accelerate underwater (ease-in), reaching top
+                    // speed exactly at the surface line — like a real launch
+                    val u = (t - preRiseLen) / approachLen
+                    val e = easeInSine(u)
+                    pose.centerY = lerp(deepY, surfaceY, e)
+                    pose.rotationDeg = lerp(0f, EXIT_PITCH_ROTATION, e)
+                    pose.scale = lerp(UNDERWATER_SCALE, BREACH_SCALE_MID, e)
+                    pose.alpha = lerp(uwAlpha, 0.95f, e)
+                } else {
+                    // swim up to just below the surface, but never out of it
+                    val u = (t - preRiseLen) / (approachLen + breachLen)
+                    val e = easeInOutSine(u)
+                    pose.centerY = lerp(deepY, swimmerY, e)
+                    pose.rotationDeg = lerp(0f, SWIMMER_NOSE_UP_ROTATION, e)
+                    pose.scale = UNDERWATER_SCALE
+                    pose.alpha = uwAlpha
+                }
             }
 
             t < preApexLen -> {
-                // RISE: one continuous ease up through the surface
-                val u = (t - preRiseLen) / riseLen
-                val e = easeInOutSine(u)
-                pose.centerY = lerp(deepY, apexY, e)
-                pose.rotationDeg = lerp(0f, NOSE_UP_ROTATION, e)
-                pose.scale = lerp(UNDERWATER_SCALE, 1f, e)
-                pose.alpha = lerp(uwAlpha, 1f, e)
+                val u = (t - preBreachLen) / breachLen
+                if (member.dives) {
+                    // BREACH: shed speed through the air (ease-out); vertical
+                    // velocity reaches exactly zero at the apex. Starts at the
+                    // surface line, so the exit splash fires precisely here.
+                    val e = easeOutSine(u)
+                    pose.centerY = lerp(surfaceY, apexY, e)
+                    pose.rotationDeg = lerp(EXIT_PITCH_ROTATION, APEX_ENTER_ROTATION, e)
+                    pose.scale = lerp(BREACH_SCALE_MID, APEX_SCALE, e)
+                    pose.alpha = lerp(0.95f, 1f, e)
+                } else {
+                    // single gentle bob while the jumpers are airborne
+                    pose.centerY =
+                        swimmerY + sin(u * PI.toFloat()) * dolphinSize * SWIMMER_CRUISE_BOB_FRACTION
+                    pose.rotationDeg = lerp(SWIMMER_NOSE_UP_ROTATION, 0f, easeInOutSine(u))
+                    pose.scale = UNDERWATER_SCALE
+                    pose.alpha = uwAlpha
+                }
             }
 
             t < preFallLen -> {
-                // APEX: brief suspension; vertical velocity is naturally zero
-                // at the top while the dolphin rotates through
                 val u = (t - preApexLen) / apexLen
-                val e = easeInOutSine(u)
-                pose.centerY = apexY
-                pose.rotationDeg = lerp(NOSE_UP_ROTATION, APEX_ROTATION, e)
-                pose.scale = lerp(1f, APEX_SCALE, e)
-                pose.alpha = 1f
+                if (member.dives) {
+                    // APEX: instantaneous ballistic top; the body keeps arcing
+                    // over the top (pitch passes through level) while vertical
+                    // velocity stays zero
+                    pose.centerY = apexY
+                    pose.rotationDeg =
+                        lerp(APEX_ENTER_ROTATION, APEX_EXIT_ROTATION, easeInOutSine(u))
+                    pose.scale = APEX_SCALE
+                    pose.alpha = 1f
+                } else {
+                    // cruise just under the surface with a tiny bob
+                    pose.centerY =
+                        swimmerY + sin(u * PI.toFloat()) * dolphinSize * SWIMMER_CRUISE_BOB_FRACTION
+                    pose.rotationDeg = lerp(0f, SWIMMER_NOSE_UP_ROTATION * 0.5f, easeInOutSine(u))
+                    pose.scale = UNDERWATER_SCALE
+                    pose.alpha = uwAlpha
+                }
             }
 
             t < preExitLen -> {
-                // FALL: the dive — the same smooth curve over a shorter
-                // window, so it feels more energetic without any jerk
-                val u = (t - preFallLen) / fallLen
-                val e = easeInOutSine(u)
-                pose.centerY = lerp(apexY, exitDeepY, e)
-                pose.rotationDeg = lerp(APEX_ROTATION, DIVE_ROTATION, e)
-                pose.scale = lerp(APEX_SCALE, UNDERWATER_SCALE, e)
-                pose.alpha = lerp(1f, uwAlpha, e)
+                val u = (t - preFallLen) / diveLen
+                if (member.dives) {
+                    // DIVE: gravity takes over — ease-in means the dolphin is
+                    // slow off the apex and fastest exactly at re-entry (the
+                    // entry splash fires precisely at the surface line)
+                    val e = easeInSine(u)
+                    pose.centerY = lerp(apexY, surfaceY, e)
+                    pose.rotationDeg = lerp(APEX_EXIT_ROTATION, ENTRY_PITCH_ROTATION, e)
+                    pose.scale = lerp(APEX_SCALE, BREACH_SCALE_MID, e)
+                    pose.alpha = 1f
+                } else {
+                    // settle back down to cruise depth
+                    val e = easeInOutSine(u)
+                    pose.centerY = lerp(swimmerY, exitDeepY, e)
+                    pose.rotationDeg = lerp(0f, SWIMMER_NOSE_DOWN_ROTATION, e)
+                    pose.scale = UNDERWATER_SCALE
+                    pose.alpha = uwAlpha
+                }
             }
 
             else -> {
-                // EXIT: calm level swim off-screen
+                // EXIT
                 val exitLen = (cycleLen - preExitLen).coerceAtLeast(1f)
-                val e = easeInOutSine(((t - preExitLen) / exitLen).coerceIn(0f, 1f))
-                pose.centerY = exitDeepY
-                pose.rotationDeg = lerp(DIVE_ROTATION, EXIT_ROTATION, e)
-                pose.scale = UNDERWATER_SCALE
-                pose.alpha = uwAlpha
+                val u = ((t - preExitLen) / exitLen).coerceIn(0f, 1f)
+                if (member.dives) {
+                    // re-entry deceleration down to depth (ease-out continues
+                    // the dive's speed smoothly), then level off for the exit
+                    if (u < EXIT_SUBMERGE_FRACTION) {
+                        val e = easeOutSine(u / EXIT_SUBMERGE_FRACTION)
+                        pose.centerY = lerp(surfaceY, exitDeepY, e)
+                        pose.rotationDeg = lerp(ENTRY_PITCH_ROTATION, SUBMERGED_ROTATION, e)
+                        pose.scale = lerp(BREACH_SCALE_MID, UNDERWATER_SCALE, e)
+                        pose.alpha = lerp(1f, uwAlpha, e)
+                    } else {
+                        val e = easeInOutSine(
+                            ((u - EXIT_SUBMERGE_FRACTION) / (1f - EXIT_SUBMERGE_FRACTION))
+                                .coerceIn(0f, 1f)
+                        )
+                        pose.centerY = exitDeepY
+                        pose.rotationDeg = lerp(SUBMERGED_ROTATION, EXIT_ROTATION, e)
+                        pose.scale = UNDERWATER_SCALE
+                        pose.alpha = uwAlpha
+                    }
+                } else {
+                    val e = easeInOutSine(u)
+                    pose.centerY = exitDeepY
+                    pose.rotationDeg = lerp(SWIMMER_NOSE_DOWN_ROTATION, EXIT_ROTATION, e)
+                    pose.scale = UNDERWATER_SCALE
+                    pose.alpha = uwAlpha
+                }
             }
         }
+
+        // small per-member depth bias so pod mates don't ride the exact
+        // same line. The diver's offset is 0, so breach/splash geometry
+        // (surface-crossing detection keys off this same centerY) is
+        // unaffected; swim-only members keep SWIMMER_SURFACE_GAP_FRACTION
+        // of clearance, which absorbs the largest bias here.
+        pose.centerY += dolphinSize * member.depthOffsetFraction
+
+        // a barely-there continuous pitch swell layered over every phase:
+        // ±1.5° of slow rocking keeps the long underwater stretches from
+        // looking freeze-dried while being imperceptible during the
+        // breach. GLIDE_PITCH_SWELLS_PER_CYCLE is a whole number of
+        // cycles, so the swell is exactly zero at the cycle wrap.
+        pose.rotationDeg +=
+            GLIDE_PITCH_AMPLITUDE_DEG *
+                sin(2f * PI.toFloat() * (elapsedMs / cycleLen) * GLIDE_PITCH_SWELLS_PER_CYCLE)
     }
 
     // ---------------------------------------------------------------------
@@ -692,8 +830,15 @@ class DolphinOceanView @JvmOverloads constructor(
         dolphinEyePaint.alpha = alpha
         dolphinEyeHighlightPaint.alpha = alpha
 
-        val tailFlapDeg =
-            sin(memberElapsedMs / 1000f * 2f * PI.toFloat() * TAIL_FLAP_HZ) * TAIL_FLAP_AMPLITUDE_DEG
+        // Asymmetric stroke: the sine is phase-warped so the fluke dwells
+        // briefly at the end of each sweep (quicker flick, slower recovery
+        // hold). Pure sines read as a mechanical metronome; real cetacean
+        // strokes spend more time in the glide between power strokes.
+        val rawPhase = memberElapsedMs / 1000f * TAIL_FLAP_HZ
+        val warpedPhase =
+            rawPhase +
+                TAIL_STROKE_WARP * sin(2f * PI.toFloat() * rawPhase) / (2f * PI.toFloat())
+        val tailFlapDeg = sin(2f * PI.toFloat() * warpedPhase) * TAIL_FLAP_AMPLITUDE_DEG
 
         canvas.save()
         canvas.translate(pose.centerX, pose.centerY)
@@ -850,6 +995,12 @@ class DolphinOceanView @JvmOverloads constructor(
 
     private fun easeInOutSine(t: Float): Float = 0.5f * (1f - cos(PI.toFloat() * t))
 
+    /** Slow start, fast end: acceleration. Matches [easeOutSine] at the seam. */
+    private fun easeInSine(t: Float): Float = 1f - cos(PI.toFloat() * t * 0.5f)
+
+    /** Fast start, slow end: deceleration. Matches [easeInSine] at the seam. */
+    private fun easeOutSine(t: Float): Float = sin(PI.toFloat() * t * 0.5f)
+
     private fun randDp(from: Float, to: Float): Float {
         val v = from + (to - from) * random.nextFloat()
         return v * density
@@ -857,14 +1008,35 @@ class DolphinOceanView @JvmOverloads constructor(
 
     companion object {
         // --- the pod ---
-        // Five members by default. Sizes are intentionally mixed rather
-        // than strictly largest-to-smallest — real pods don't line up by
-        // size — while lag/alpha still stagger entrance and depth so the
-        // trail reads cleanly. All three arrays must be the same length;
-        // index 0 enters first, but is not necessarily the biggest.
-        private val POD_SIZE_FRACTIONS = floatArrayOf(0.47f, 0.60f, 0.35f, 0.54f, 0.41f)
-        private val POD_LAG_MS = longArrayOf(0L, 670L, 1_400L, 2_170L, 3_010L)
-        private val POD_ALPHA_FRACTIONS = floatArrayOf(0.90f, 1.00f, 0.78f, 0.96f, 0.84f)
+        // Five members arranged as: one tight swim-along group of three
+        // (indices 0-2) plus two solo swimmers trailing with plenty of
+        // water between them. Lags are scaled for the 18s cycle so the
+        // on-screen gaps stay generous at the slower crossing speed.
+        // Exactly one member breaches: the smallest dolphin of the whole
+        // pod (index 2, the playful calf). Its jump position is cycle
+        // arithmetic: x is linear in cycle time, and preBreach=9000 +
+        // lag=3750 puts its surface exit at f = 12750/18000 ≈ 0.71 — so
+        // the whole arc (apex ≈ 0.94w, re-entry at the edge) plays out at
+        // the far END of the view. All arrays must be the same length.
+        private val POD_SIZE_FRACTIONS =
+            floatArrayOf(0.50f, 0.40f, 0.30f, 0.56f, 0.44f)
+        private val POD_LAG_MS =
+            longArrayOf(0L, 1_950L, 3_750L, 7_800L, 11_700L)
+        private val POD_ALPHA_FRACTIONS =
+            floatArrayOf(0.95f, 0.88f, 0.86f, 1.00f, 0.84f)
+
+        /** true = this member breaches and dives; false = swims only. */
+        private val POD_DIVER_FLAGS =
+            booleanArrayOf(false, false, true, false, false)
+
+        // per-member vertical bias (fraction of the leader's nose-to-tail
+        // length); small ±values break up the "train on a single line"
+        // look. Every diver's entry MUST stay 0 so their breach arcs and
+        // the surface-crossing splash detection key off exact surfaceY;
+        // swim-only members keep SWIMMER_SURFACE_GAP_FRACTION of clearance,
+        // which absorbs the largest bias here.
+        private val POD_DEPTH_OFFSET_FRACTIONS =
+            floatArrayOf(0.06f, -0.05f, 0f, 0.08f, -0.06f)
 
         // --- vector dolphin geometry ---
         // Unit space the Path artwork is authored in: nose at +x, tail tip
@@ -883,8 +1055,22 @@ class DolphinOceanView @JvmOverloads constructor(
         private const val EYE_HIGHLIGHT_X = 81f
         private const val EYE_HIGHLIGHT_Y = -10.2f
         private const val EYE_HIGHLIGHT_RADIUS = 1.0f
-        private const val TAIL_FLAP_HZ = 1.7f
-        private const val TAIL_FLAP_AMPLITUDE_DEG = 12f
+        // Slow, sweeping tail stroke: a low cadence and a modest arc read
+        // as a relaxed glide; anything faster looks like a frantic buzz
+        // against the unhurried crossing speed. Flap phase is naturally
+        // desynchronized between members because each member's clock
+        // includes its own lag offset.
+        private const val TAIL_FLAP_HZ = 0.9f
+        private const val TAIL_FLAP_AMPLITUDE_DEG = 8f
+
+        // phase-warp strength for the tail stroke; higher = longer dwell
+        // at the end of each sweep (keep < ~0.7 or the stroke stalls)
+        private const val TAIL_STROKE_WARP = 0.45f
+
+        // continuous, barely-there pitch swell layered over the whole
+        // glide; must be a whole number so it lands on zero at the wrap
+        private const val GLIDE_PITCH_AMPLITUDE_DEG = 1.5f
+        private const val GLIDE_PITCH_SWELLS_PER_CYCLE = 4f
 
         // --- vector dolphin colors ---
         private const val BODY_COLOR_TOP = 0xFF2F6FB4.toInt()
@@ -898,33 +1084,59 @@ class DolphinOceanView @JvmOverloads constructor(
         private const val SURFACE_Y_FRACTION = 0.42f
         private const val DEEP_Y_FRACTION = 0.70f
         private const val EXIT_DEEP_Y_FRACTION = 0.72f
-        private const val JUMP_HEIGHT_FRACTION = 0.30f
+        // how far above the surface the apex sits, as a fraction of the view
+        // height; kept small so the breach reads as a light hop, not a launch
+        private const val JUMP_HEIGHT_FRACTION = 0.16f
+        // floor so the jump still clears the dolphin's own silhouette on short
+        // views, as a fraction of its on-screen height
+        private const val MIN_JUMP_HEIGHT_ASPECT = 0.55f
         private const val DOLPHIN_LENGTH_DP = 108f
         private const val MAX_DOLPHIN_HEIGHT_FRACTION = 0.42f
 
         // --- depth / pose ---
         private const val UNDERWATER_SCALE = 0.92f
+        // body is fully stretched (max speed) at surface exit/re-entry
+        private const val BREACH_SCALE_MID = 0.97f
         private const val APEX_SCALE = 1.08f
+        // fraction of the exit window spent decelerating from re-entry
+        // speed down to cruise depth before leveling off
+        private const val EXIT_SUBMERGE_FRACTION = 0.5f
         private const val UNDERWATER_ALPHA_DIP = 0.12f
-        private const val SWIM_BOB_FRACTION = 0.02f
-        // whole number so the bob always returns to zero at the phase end
-        private const val SWIM_BOB_CYCLES = 2f
-        private const val SWIM_ROTATION = 5f
+        private const val SWIM_BOB_FRACTION = 0.025f
+        // whole number so the swell always returns to zero at the phase end
+        private const val SWIM_BOB_CYCLES = 1f
+        // peak tangent-tracking pitch mid-swell (windowed at the ends)
+        private const val SWIM_ROTATION = 4f
 
-        // --- rotation (degrees; negative = nose up). Each jump segment is a
-        // smooth S-curve between these keys, so rotation velocity is zero at
-        // every phase boundary — no snapping. A single vector silhouette can
-        // be freely rotated without ever looking "wrong" (unlike a sprite
-        // frame, which already depicts a fixed pose), so these can be as
-        // dramatic as the motion calls for.
+        // --- non-diving pod members (swim-only trajectory) ---
+        // how far below the surface the swimmers cruise, as a fraction of
+        // the leader's nose-to-tail length; sized to stay clear of the wave
+        // crests so they never clip the surface or spawn splashes
+        private const val SWIMMER_SURFACE_GAP_FRACTION = 0.30f
+        private const val SWIMMER_CRUISE_BOB_FRACTION = 0.02f
+        private const val SWIMMER_NOSE_UP_ROTATION = -10f
+        private const val SWIMMER_NOSE_DOWN_ROTATION = 10f
+
+        // --- rotation (degrees; negative = nose up). The diver's pitch keys
+        // track the trajectory tangent — steep nose-up at surface exit, level
+        // at the apex, steep nose-down at re-entry — which is what makes the
+        // breach read as a ballistic arc instead of a canned flip. Each
+        // segment is a smooth S-curve between keys, so angular velocity is
+        // continuous at phase boundaries.
         private const val ENTER_ROTATION = 4f
-        private const val NOSE_UP_ROTATION = -50f
-        private const val APEX_ROTATION = -15f
-        private const val DIVE_ROTATION = 65f
+        private const val EXIT_PITCH_ROTATION = -55f
+        private const val APEX_ENTER_ROTATION = -8f
+        private const val APEX_EXIT_ROTATION = 6f
+        private const val ENTRY_PITCH_ROTATION = 70f
+        private const val SUBMERGED_ROTATION = 18f
         private const val EXIT_ROTATION = 6f
 
         // --- cycle variants ---
-        private const val SWIM_VARIANT_EXTRA_MS = 1_400L
+        // Kept at 0: the two jump positions are anchored to specific spots
+        // in the view (middle for the leader, far end for the calf) via the
+        // SWIM/UNDERWATER_EXIT durations, and a per-cycle length variation
+        // would drift those positions every other cycle.
+        private const val SWIM_VARIANT_EXTRA_MS = 0L
 
         // --- water surface ---
         private const val WAVE_AMPLITUDE_1_DP = 1.6f

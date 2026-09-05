@@ -109,28 +109,6 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_country_code"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                tools:text="SG" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_cc_sep"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:alpha="0.55"
-                android:text="@string/lbl_separator_dot"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_server_ip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -144,78 +122,19 @@
                 tools:text="82.102.25.218"
                 tools:visibility="visible" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_uptime_sep"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:alpha="0.55"
-                android:text="@string/lbl_separator_dot"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_uptime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.02"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="gone"
-                tools:text="2 min"
-                tools:visibility="visible" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/stats_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="9dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_last_routed_app"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:letterSpacing="0.02"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="gone"
-                tools:text="Recently routed app • 3 sec ago"
-                tools:visibility="visible" />
-
         </LinearLayout>
 
     </LinearLayout>
-
-    <View
-        android:id="@+id/action_divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="14dp"
-        android:alpha="0.45"
-        android:background="?attr/divider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/country_info_layout" />
 
     <LinearLayout
         android:id="@+id/apps_action_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/bg_plus_status_chip"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginStart="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="11dp"
@@ -223,7 +142,7 @@
         android:paddingEnd="8dp"
         android:paddingBottom="6dp"
         app:layout_constraintStart_toEndOf="@id/tv_flag"
-        app:layout_constraintTop_toBottomOf="@id/action_divider">
+        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/apps_action"
@@ -254,11 +173,12 @@
         android:id="@+id/relay_action_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/bg_plus_status_chip"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="11dp"
@@ -266,7 +186,7 @@
         android:paddingEnd="8dp"
         android:paddingBottom="6dp"
         app:layout_constraintStart_toEndOf="@id/apps_action_container"
-        app:layout_constraintTop_toBottomOf="@id/action_divider">
+        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/relay_action"
@@ -290,6 +210,106 @@
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
             android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/last_routed_app_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_plus_status_chip"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="7dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="7dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintStart_toEndOf="@id/relay_action_container"
+        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
+
+        <FrameLayout
+            android:id="@+id/last_routed_app_icon_stack"
+            android:layout_width="40dp"
+            android:layout_height="18dp"
+            android:duplicateParentState="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/routed_app_icon_2"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="start|center_vertical"
+                android:background="@drawable/bg_server_avatar_circle"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                tools:src="@mipmap/ic_launcher"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/routed_app_icon_1"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="11dp"
+                android:background="@drawable/bg_server_avatar_circle"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                tools:src="@mipmap/ic_launcher"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/routed_app_icon_0"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="22dp"
+                android:background="@drawable/bg_server_avatar_circle"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                tools:src="@mipmap/ic_launcher" />
+
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/last_routed_app_fallback_icon"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:duplicateParentState="true"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_timer"
+            android:tint="?attr/colorPrimary"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/last_routed_app_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:duplicateParentState="true"
+            android:ellipsize="marquee"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxWidth="80dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:text="Chrome"
             tools:visibility="visible" />
 
     </LinearLayout>

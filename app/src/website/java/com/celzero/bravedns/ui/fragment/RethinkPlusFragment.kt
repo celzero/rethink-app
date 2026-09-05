@@ -150,15 +150,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             b.extendModeBanner.isVisible = true
             // hide the connection info card since it's not relevant in extend mode
             b.connectionInfoCard.visibility = View.GONE
-            }
         }
+    }
 
     private fun applyButtonTheme() {
         val ctx = requireContext()
 
         // subscribe button
         val accentGood = UIUtils.fetchColor(ctx, R.attr.accentGood)
-        val lightText  = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        val lightText = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
         val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenBtnBackground)
 
         b.subscribeButton.apply {
@@ -536,6 +536,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             b.ispContainer.isVisible = false
             b.vDivider.isVisible = false
         }
+        b.ispContainer.isVisible = false
+        b.vDivider.isVisible = false
     }
 
     private fun showProcessing(message: String) {

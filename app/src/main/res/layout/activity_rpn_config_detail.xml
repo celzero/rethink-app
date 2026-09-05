@@ -521,7 +521,7 @@
                                 <FrameLayout
                                     android:layout_width="32dp"
                                     android:layout_height="32dp"
-                                    android:background="@drawable/bg_qs_tile_badge">
+                                    android:background="@drawable/bg_vpn_status_chip">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="20dp"
@@ -529,7 +529,7 @@
                                         android:layout_gravity="center"
                                         android:alpha="0.5"
                                         android:src="@drawable/ic_app_info_accent"
-                                        app:tint="?attr/chipTextPositive" />
+                                        app:tint="?attr/accentGood" />
                                 </FrameLayout>
 
                                 <com.google.android.material.textview.MaterialTextView
@@ -540,17 +540,15 @@
                                     android:layout_weight="1"
                                     android:ellipsize="end"
                                     android:maxLines="1"
-                                    android:alpha="0.7"
                                     android:textAllCaps="false"
-                                    android:textColor="?attr/chipTextPositive"
+                                    android:textColor="?attr/accentGood"
                                     android:textSize="@dimen/default_font_text_view" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
-                                    android:alpha="0.6"
                                     android:src="@drawable/ic_right_arrow_secondary"
-                                    app:tint="?attr/chipTextPositive" />
+                                    app:tint="?attr/accentGood" />
                             </LinearLayout>
 
                         </com.google.android.material.card.MaterialCardView>
@@ -635,14 +633,14 @@
                                 <FrameLayout
                                     android:layout_width="32dp"
                                     android:layout_height="32dp"
-                                    android:background="@drawable/bg_qs_tile_badge">
+                                    android:background="@drawable/bg_vpn_status_chip">
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_logs"
-                                        app:tint="?attr/chipTextPositive" />
+                                        app:tint="?attr/accentGood" />
                                 </FrameLayout>
 
                                 <com.google.android.material.textview.MaterialTextView
@@ -653,17 +651,15 @@
                                     android:ellipsize="end"
                                     android:maxLines="1"
                                     android:text="@string/lbl_logs"
-                                    android:alpha="0.7"
                                     android:textAllCaps="false"
-                                    android:textColor="?attr/chipTextPositive"
+                                    android:textColor="?attr/accentGood"
                                     android:textSize="@dimen/default_font_text_view" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
-                                    android:alpha="0.6"
                                     android:src="@drawable/ic_right_arrow_secondary"
-                                    app:tint="?attr/chipTextPositive" />
+                                    app:tint="?attr/accentGood" />
                             </LinearLayout>
 
                         </com.google.android.material.card.MaterialCardView>
@@ -725,7 +721,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Route this client through a Auto server. This may help if the client is in a restrictive network environment, but it will increase latency and reduce speed."
+                                android:text="@string/relay_rpn_desc"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="13sp" />
 

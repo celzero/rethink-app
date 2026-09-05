@@ -23,8 +23,10 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -34,6 +36,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -51,6 +54,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
 import com.celzero.bravedns.database.SubscriptionStatus
@@ -60,11 +65,13 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.LogActivityAggregator
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.RpnBypassAppsActivity
 import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
+import com.celzero.bravedns.ui.bottomsheet.RpnLogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.RpnStatsBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
@@ -90,6 +97,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.log10
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.toString
 
@@ -102,6 +111,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
     private val countryConfigRepository by inject<CountryConfigRepository>()
+    private val appInfoRepository by inject<AppInfoRepository>()
+    private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
     private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
 
@@ -114,6 +125,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private var statusUpdateJob: Job? = null
     private var headerScrollListener: NestedScrollView.OnScrollChangeListener? = null
+
+    /** Last touch position on the RPN heat map, used to resolve the tapped cell. */
+    private var lastHeatmapTouchX = 0f
+    private var lastHeatmapTouchY = 0f
+
+    /**
+     * Exclusive end (epoch-millis) of the most recently rendered heat-map
+     * window; tapped cell timestamps are derived from it. Zero until the
+     * first successful load.
+     */
+    private var heatmapWindowEndMs = 0L
 
     /** Looping alpha blink on the header status dot while connected. */
     private var blinkAnimator: ObjectAnimator? = null
@@ -133,6 +155,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     /** Guards against double-tapping the FAB stop/start. */
     private var toggleProxyInFlight = false
+    /** Guards against re-entrant pull-to-refresh while a swipe refresh is in flight. */
+    private var swipeRefreshInFlight = false
     /** Looping spin animator running on the FAB icon while stop/start is in progress. */
     private var fabLoadingAnimator: ObjectAnimator? = null
 
@@ -196,6 +220,21 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
          */
         private const val MAX_SELECTIONS = 5
 
+        /**
+         * Pull-to-refresh must be dragged this far (dp) before it fires. The
+         * framework default (~64dp) triggers on small accidental swipes at
+         * scroll-top; requiring a deep, deliberate pull avoids spurious
+         * refreshes. Roughly 3x the default.
+         */
+        private const val SWIPE_REFRESH_TRIGGER_DP = 180
+
+        /**
+         * Caps how far the spinner itself travels during the pull so the
+         * indicator stays visible near the top while the user keeps dragging
+         * past the trigger distance.
+         */
+        private const val SWIPE_REFRESH_SLINGSHOT_DP = 220
+
         /** UI connection states surfaced by [updateConnectionStatus]. */
         private enum class ConnectionUiState { DISCONNECTED, CONNECTING, CONNECTED, REGISTERING, FAILED }
 
@@ -203,6 +242,25 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         private const val LOADING_DIALOG_TIMEOUT_MS = 20_000L
         /** Interval between registration / server-list poll iterations. */
         private const val LOADING_DIALOG_POLL_INTERVAL_MS = 1_500L
+
+        // RPN activity heat map: one dot == one 10-minute interval, 12 dots
+        // per row (one row == 2 hours), trailing 6-hour window (36 dots ==
+        // 3 rows). Oldest dot at the top-left, newest (current interval) at
+        // the bottom-right. Only connection logs routed through RPN proxies
+        // are counted.
+        private const val RPN_HEATMAP_DOTS_PER_ROW = 12
+        private const val RPN_HEATMAP_BUCKET_MS = 10L * 60L * 1000L
+        private const val RPN_HEATMAP_WINDOW_MS = 6L * 60L * 60L * 1000L
+        private const val RPN_HEATMAP_SLOTS = 36
+        private const val RPN_HEATMAP_INTENSITY_LEVELS = 5
+
+        // dot fill fraction per intensity level (mirrors HomeScreenFragment's
+        // HEATMAP_CELL_SIZE_FRACTION: level 0 is a small placeholder dot)
+        private val RPN_HEATMAP_CELL_SIZE_FRACTION =
+            floatArrayOf(0.30f, 0.78f, 0.78f, 1f, 1f)
+
+        // base dot diameter in dp before the per-level fill fraction
+        private const val RPN_HEATMAP_DOT_SIZE_DP = 7f
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -247,6 +305,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupHeaderUI()
         setupRpnState()
         setupQuickSettings()
+        setupRpnHeatmapClicks()
+        setupSwipeToRefresh()
+        loadRpnHeatmap()
 
         // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
@@ -293,6 +354,77 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.serversScrollView.paddingRight,
                 b.serversScrollView.paddingBottom
             )
+        }
+    }
+
+    /**
+     * Classical pull-to-refresh on the whole screen. Unlike the settings-sheet
+     * refresh (which goes through [ServerSelectionViewModel.refresh] and
+     * re-fetches the entire server catalog), this refreshes the WIN proxy in
+     * place via [VpnController.refreshRpnProxy] and then reloads the server
+     * list from cache/DB — the same path ProxySettingsActivity's refresh uses.
+     * The gesture is disabled while the initial load shimmer, an RPN reset,
+     * or a stopped proxy is active.
+     */
+    private fun setupSwipeToRefresh() {
+        // Require a deliberate, hard pull before the refresh fires (the
+        // framework default of ~64dp triggers on small accidental swipes),
+        // and cap the slingshot so the spinner stays put during deep drags.
+        val density = resources.displayMetrics.density
+        b.swipeRefresh.setDistanceToTriggerSync((SWIPE_REFRESH_TRIGGER_DP * density).toInt())
+        b.swipeRefresh.setSlingshotDistance((SWIPE_REFRESH_SLINGSHOT_DP * density).toInt())
+        b.swipeRefresh.setOnRefreshListener {
+            Logger.i(LOG_TAG_UI, "$TAG.setupSwipeToRefresh: pull-to-refresh triggered")
+            handleSwipeRefresh()
+        }
+        // Pull is meaningless until the initial list has loaded.
+        b.swipeRefresh.isEnabled = !isLoading
+    }
+
+    /**
+     * Pull-to-refresh handler: refreshes the WIN proxy inside the tunnel
+     * ([VpnController.refreshRpnProxy]), then reloads the server list and
+     * re-renders it. Runs as a one-shot suspend (no state flow), so the
+     * spinner is shown/hidden here and re-entrant pulls are coalesced via
+     * [swipeRefreshInFlight].
+     */
+    private fun handleSwipeRefresh() {
+        // Coalesce: ignore a second pull while one refresh is already running.
+        if (swipeRefreshInFlight) return
+        swipeRefreshInFlight = true
+        b.swipeRefresh.isRefreshing = true
+
+        io {
+            val refreshed = if (RpnProxyManager.isRpnActive()) {
+                try {
+                    VpnController.refreshRpnProxy(Backend.RpnWin)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "$TAG.handleSwipeRefresh: refreshRpnProxy failed: ${e.message}", e)
+                    false
+                }
+            } else {
+                Logger.w(LOG_TAG_UI, "$TAG.handleSwipeRefresh: RPN not active, skipping proxy refresh")
+                false
+            }
+
+            // Reload the server list from cache/DB regardless of the refresh
+            // result so the UI reflects the current server status/load.
+            val servers = try { RpnProxyManager.getWinServers() } catch (_: Exception) { emptyList() }
+            val selected = try { RpnProxyManager.getEnabledConfigs() } catch (_: Exception) { emptySet() }
+
+            uiCtx {
+                swipeRefreshInFlight = false
+                if (!isAdded) return@uiCtx
+                b.swipeRefresh.isRefreshing = false
+                if (refreshed) {
+                    showToast(getString(R.string.dc_refresh_toast))
+                } else {
+                    Logger.w(LOG_TAG_UI, "$TAG.handleSwipeRefresh: proxy refresh failed or RPN inactive")
+                }
+                if (servers.any { it.id != AUTO_SERVER_ID }) {
+                    initServers(servers, selected)
+                }
+            }
         }
     }
 
@@ -366,6 +498,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         Logger.vv(LOG_TAG_UI, "$TAG.onResume")
         super.onResume()
         redriveProxyStartStopState()
+        // Bypass apps / live-connection counts change outside this screen
+        // (e.g. after returning from RpnBypassAppsActivity), so re-read them.
+        refreshBypassAppsTileState()
+        refreshStatsTileState()
+        refreshRelayTileState()
+        // Refresh the RPN heat map so newly logged connections show up when
+        // the user returns to this screen.
+        loadRpnHeatmap()
     }
 
     /**
@@ -397,6 +537,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         is ServerSelectionViewModel.RefreshState.InProgress,
                         is ServerSelectionViewModel.RefreshState.Idle -> {
                             // no ui action needed here; the bottom sheet owns the animation.
+                            // The pull-to-refresh spinner is managed independently by
+                            // handleSwipeRefresh().
                         }
                     }
                 }
@@ -432,6 +574,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             if (isAdded && view != null) {
                                 b.fabStopProxy.isClickable  = false
                                 b.fabStartProxy.isClickable = false
+                                // Block pull-to-refresh while a reset is in flight.
+                                b.swipeRefresh.isEnabled = false
                             }
                             if (resetDialogDismissedByUser) {
                                 // User explicitly dismissed the dialog; show inline bar
@@ -458,6 +602,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                                 b.registrationProgressBar.hide()
                                 b.fabStopProxy.isClickable  = true
                                 b.fabStartProxy.isClickable = true
+                                b.swipeRefresh.isEnabled = true
                                 // Restore search and action icons now that reset is done
                                 setSearchAndActionsEnabled(true)
                             }
@@ -472,6 +617,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                                 b.registrationProgressBar.hide()
                                 b.fabStopProxy.isClickable  = true
                                 b.fabStartProxy.isClickable = true
+                                b.swipeRefresh.isEnabled = true
                                 // Restore search and action icons
                                 setSearchAndActionsEnabled(true)
                             }
@@ -482,6 +628,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             if (isAdded && view != null) {
                                 b.fabStopProxy.isClickable  = true
                                 b.fabStartProxy.isClickable = true
+                                b.swipeRefresh.isEnabled = !isLoading
                             }
                         }
                     }
@@ -683,6 +830,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
             // Disable search bar and action icons while data is loading
             setSearchAndActionsEnabled(false)
+            // Pull-to-refresh is meaningless during the initial load.
+            b.swipeRefresh.isEnabled = false
+            b.swipeRefresh.isRefreshing = false
         } else {
             // Stop and hide header shimmer, reveal real content
             b.shimmerHeader.stopShimmer()
@@ -696,6 +846,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
             // Re-enable search bar and action icons once data is ready
             setSearchAndActionsEnabled(true)
+            b.swipeRefresh.isEnabled = true
         }
     }
 
@@ -1073,6 +1224,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
                 gravity = Gravity.CENTER
                 textSize = 22f
+                alpha = 0.75f
                 text = config.flagEmoji
             }
             val iso = AppCompatTextView(requireContext()).apply {
@@ -1081,7 +1233,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
                 gravity = Gravity.CENTER
                 textSize = 10f
-                setTextColor(Color.WHITE)
+                setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
                 setTypeface(typeface, Typeface.BOLD)
                 setShadowLayer(2f * density, 0f, 1f * density, Color.argb(128, 0, 0, 0))
                 text = config.cc.uppercase(Locale.US)
@@ -1092,13 +1244,162 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    /** Updates the minimalist "N of M" capacity pills below the connection list. */
+    /**
+     * Loads the RPN-only activity heat map: aggregates connection logs routed
+     * through RPN proxies (proxyDetails prefixed with [Backend.RpnWin]) into
+     * 10-minute buckets over the trailing 6 hours, then renders the wall
+     * inside the header status chip. Mirrors the RPN-scoped filtering used by
+     * RpnStatsBottomSheet (whose summary covers 24 hours) but visualizes only
+     * the most recent 6 hours, one dot per 10 minutes, 12 dots per row.
+     */
+    private fun loadRpnHeatmap() {
+        io {
+            try {
+                // epoch-aligned exclusive end: buckets match the wall-clock
+                // 10-minute boundaries used by LogActivityAggregator, so a
+                // tapped cell opens the sheet on the exact interval
+                val rangeEnd =
+                    LogActivityAggregator.bucketFloor(System.currentTimeMillis()) +
+                        RPN_HEATMAP_BUCKET_MS
+                val rangeStart = rangeEnd - RPN_HEATMAP_WINDOW_MS
+                val rows = connectionTrackerDAO.getRpnActivityBuckets(
+                    Backend.RpnWin + "%",
+                    rangeStart,
+                    rangeEnd,
+                    RPN_HEATMAP_BUCKET_MS
+                )
+                // fold grouped rows into per-bucket counts, chronological
+                // (oldest bucket first) so the grid can be filled row-major
+                val counts = LongArray(RPN_HEATMAP_SLOTS)
+                rows.forEach { row ->
+                    val idx = row.bucketIndex.toInt()
+                    if (idx in counts.indices) counts[idx] += row.total
+                }
+                uiCtx {
+                    heatmapWindowEndMs = rangeEnd
+                    renderRpnHeatmap(counts)
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.loadRpnHeatmap failed: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Renders the RPN activity wall: [RPN_HEATMAP_SLOTS] dots laid out
+     * [RPN_HEATMAP_DOTS_PER_ROW] per row (GridLayout places children
+     * row-major), chronological order so the newest interval lands in the
+     * bottom-right cell. Columns are weighted so the wall spans the full
+     * chip width. Intensity follows the same logarithmic scale as
+     * HomeScreenFragment's activity wall; empty intervals render a small,
+     * faint placeholder dot so the grid geometry stays stable.
+     */
+    private fun renderRpnHeatmap(counts: LongArray) {
+        if (!isAdded || view == null) return
+        val grid = b.rpnHeatmapGrid
+        grid.removeAllViews()
+
+        val ctx = requireContext()
+        val base = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        // higher alpha in light mode for readability (mirrors HomeScreenFragment)
+        val alphas =
+            if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
+            else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
+        val gap = (2f * resources.displayMetrics.density).toInt()
+        val cellBase = RPN_HEATMAP_DOT_SIZE_DP * resources.displayMetrics.density
+
+        for (i in 0 until RPN_HEATMAP_SLOTS) {
+            val lvl = rpnHeatmapIntensityLevel(counts[i])
+            val frac = RPN_HEATMAP_CELL_SIZE_FRACTION[lvl]
+            val cell = View(ctx)
+            cell.background =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
+                }
+            cell.isClickable = false
+            cell.isFocusable = false
+            cell.layoutParams =
+                GridLayout.LayoutParams().apply {
+                    width = (cellBase * frac).toInt()
+                    height = (cellBase * frac).toInt()
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED)
+                    setMargins(gap, gap, gap, gap)
+                    setGravity(Gravity.CENTER)
+                }
+            grid.addView(cell)
+        }
+    }
+
+    // logarithmic scale so skewed traffic distributions stay visually
+    // distinguishable (1-9 -> 1, 10-99 -> 2, 100-999 -> 3, >=1000 -> 4);
+    // zero always maps to the empty/placeholder dot (mirrors HomeScreenFragment)
+    private fun rpnHeatmapIntensityLevel(count: Long): Int {
+        if (count <= 0L) return 0
+        return min(RPN_HEATMAP_INTENSITY_LEVELS - 1, log10(count.toDouble()).toInt() + 1)
+    }
+
+    /**
+     * Tapping a heat-map cell opens [RpnLogActivityIntervalBottomSheet] on
+     * that exact 10-minute interval. The touch position is captured by the
+     * touch listener (returning false so the click still fires); columns and
+     * rows are evenly weighted, so the column is proportional to the tap's
+     * x-position and the row to its y-position (same approach as
+     * HomeScreenFragment's activity wall).
+     */
+    private fun setupRpnHeatmapClicks() {
+        b.rpnHeatmapGrid.setOnTouchListener { _, event ->
+            lastHeatmapTouchX = event.x
+            lastHeatmapTouchY = event.y
+            false
+        }
+        b.rpnHeatmapGrid.setOnClickListener { openRpnHeatmapDetails() }
+    }
+
+    private fun openRpnHeatmapDetails() {
+        if (!isAdded) return
+        if (heatmapWindowEndMs <= 0L) return
+        val grid = b.rpnHeatmapGrid
+        if (grid.width <= 0 || grid.height <= 0) return
+
+        // GridLayout mirrors column order in RTL (oldest column renders on the
+        // right), so mirror the tap's x-position before resolving the column
+        val x = if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+            grid.width - lastHeatmapTouchX
+        } else {
+            lastHeatmapTouchX
+        }
+
+        val rows = RPN_HEATMAP_SLOTS / RPN_HEATMAP_DOTS_PER_ROW
+        val col = ((x / grid.width) * RPN_HEATMAP_DOTS_PER_ROW)
+            .toInt().coerceIn(0, RPN_HEATMAP_DOTS_PER_ROW - 1)
+        val row = ((lastHeatmapTouchY / grid.height) * rows).toInt().coerceIn(0, rows - 1)
+        val startMs = heatmapWindowEndMs - RPN_HEATMAP_WINDOW_MS +
+            ((row * RPN_HEATMAP_DOTS_PER_ROW) + col) * RPN_HEATMAP_BUCKET_MS
+
+        val sheet = RpnLogActivityIntervalBottomSheet.newInstance(
+            startMs,
+            startMs + RPN_HEATMAP_BUCKET_MS
+        )
+        sheet.show(parentFragmentManager, RpnLogActivityIntervalBottomSheet.TAG)
+    }
+
+    private fun isLightTheme(): Boolean =
+        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) !=
+            Configuration.UI_MODE_NIGHT_YES
+
+    /**
+     * Updates the minimalist "N of M" capacity indicator: the Add-location
+     * quick-settings tile caption shows the count as "N/M" and the capacity
+     * pills below the connection list mirror the same state visually.
+     */
     private fun updateCapacityIndicator() {
         if (!isAdded) return
         val filled = selectedServers.count { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
             .coerceIn(0, MAX_SELECTIONS)
         b.locationCapacityIndicator.isVisible = !isLoading && !isProxyStopped
-        b.tvCapacityLabel.text = String.format(Locale.US, "%d of %d locations", filled, MAX_SELECTIONS)
+        b.qsAddLocationState.text = String.format(Locale.US, "%d/%d", filled, MAX_SELECTIONS)
         val dots = listOf(
             b.capacityDotOne, b.capacityDotTwo, b.capacityDotThree,
             b.capacityDotFour, b.capacityDotFive
@@ -1190,13 +1491,76 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.qsAddLocationTile.setOnClickListener { focusLocationSearch() }
         b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
         b.qsStatsTile.setOnClickListener { showRpnStatsBottomSheet() }
-        refreshRelayTileState()
+        refreshQuickSettingCaptions()
     }
 
     /**
-     * Re-derives the relay tile on/off state from the enabled locations:
-     * ON only when at least one non-AUTO location is enabled and **all** of
-     * them have hop (relay) enabled; OFF otherwise.
+     * Refreshes all data-driven quick-settings captions: relay count
+     * (n/m locations), location capacity (n/m), bypass apps
+     * (not-bypassed/total) and live RPN connection count.
+     */
+    private fun refreshQuickSettingCaptions() {
+        refreshRelayTileState()
+        updateCapacityIndicator()
+        refreshBypassAppsTileState()
+        refreshStatsTileState()
+    }
+
+    /**
+     * Refreshes the bypass-apps tile caption with "<not-bypassed>/<total>"
+     * (e.g. "345/462") computed from the installed-apps DB snapshot.
+     */
+    private fun refreshBypassAppsTileState() {
+        io {
+            val apps = try {
+                appInfoRepository.getAppInfo()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshBypassAppsTileState: ${e.message}")
+                emptyList()
+            }
+            val total = apps.size
+            val notBypassed = apps.count { !it.isProxyExcluded }
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                b.qsBypassAppsState.text =
+                    String.format(Locale.US, "%d/%d", notBypassed, total)
+            }
+        }
+    }
+
+    /**
+     * Refreshes the stats tile caption with the number of connections routed
+     * through the live WIN proxy in the last 24 hours (same window and query
+     * as [RpnStatsBottomSheet]); shows "0" when the tunnel or proxy is down.
+     */
+    private fun refreshStatsTileState() {
+        io {
+            val count = try {
+                val proxyId = VpnController.getWinProxyId()
+                if (proxyId.isNullOrBlank()) {
+                    0
+                } else {
+                    connectionTrackerDAO.getRpnConnStats(
+                        proxyId,
+                        System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24)
+                    ).connectionsCount
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshStatsTileState: ${e.message}")
+                0
+            }
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                b.qsStatsState.text = String.format(Locale.US, "%,d", count)
+            }
+        }
+    }
+
+    /**
+     * Re-derives the relay tile state from the enabled locations: the caption
+     * shows "<relay-on>/<total>" (e.g. "0/3", "2/3", "5/5") and the tile is
+     * highlighted only when **all** enabled non-AUTO locations have hop
+     * (relay) enabled.
      */
     private fun refreshRelayTileState() {
         io {
@@ -1207,36 +1571,46 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 Logger.w(LOG_TAG_UI, "$TAG.refreshRelayTileState: ${e.message}")
                 emptyList()
             }
-            val allOn = enabledNonAuto.isNotEmpty() && enabledNonAuto.all { it.hopEnabled }
+            val relayOnCount = enabledNonAuto.count { it.hopEnabled }
+            val totalCount = enabledNonAuto.size
+            val allOn = totalCount > 0 && relayOnCount == totalCount
             uiCtx {
                 if (!isAdded) return@uiCtx
                 isRelayAllOn = allOn
-                applyRelayTileUi(allOn)
+                applyRelayTileUi(relayOnCount, totalCount)
             }
         }
     }
 
-    private fun applyRelayTileUi(allOn: Boolean) {
+    /**
+     * Applies the relay tile caption ("n/m") and colours. The tile is
+     * highlighted (positive colours) only when every enabled non-AUTO
+     * location has relay on; otherwise it stays dim.
+     */
+    private fun applyRelayTileUi(relayOnCount: Int, totalCount: Int) {
         if (!isAdded) return
+        b.qsRelayState.text = String.format(Locale.US, "%d/%d", relayOnCount, totalCount)
+        val allOn = totalCount > 0 && relayOnCount == totalCount
         if (allOn) {
             val onColor = resolveAttrColor(R.attr.chipTextPositive)
-            b.qsRelayTile.setCardBackgroundColor(resolveAttrColor(R.attr.chipBgColorPositive))
+            // mutate() first: all tiles share the bg_qs_tile ConstantState, so
+            // tinting without mutation would recolour the other tiles as well.
+            b.qsRelayTile.background = b.qsRelayTile.background.mutate()
+            b.qsRelayTile.backgroundTintList =
+                ColorStateList.valueOf(resolveAttrColor(R.attr.chipBgColorPositive))
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
             b.qsRelayLabel.setTextColor(onColor)
             b.qsRelayState.setTextColor(onColor)
-            b.qsRelayState.text = getString(R.string.qs_relay_state_on)
         } else {
             val offColor = resolveAttrColor(R.attr.primaryLightColorText)
-            // Dim off-state fill: same muted foreground colour at ~12% alpha as the
-            // @color/qs_tile_off_bg used by the XML, so the circle stays visible as a
-            // subtle "off" tile (Android 12+ quick-settings behaviour) after toggling.
-            b.qsRelayTile.setCardBackgroundColor(
-                androidx.core.graphics.ColorUtils.setAlphaComponent(offColor, 31)
-            )
+            // Off state: clear the tint so the drawable's own @color/qs_tile_off_bg
+            // fill shows through. Stacking another translucent tint here erases the
+            // circle: background tint defaults to SRC_IN, so a ~12%-alpha tint over
+            // the drawable's ~12%-alpha fill multiplies down to near-invisible (~1%).
+            b.qsRelayTile.backgroundTintList = null
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
             b.qsRelayLabel.setTextColor(offColor)
             b.qsRelayState.setTextColor(offColor)
-            b.qsRelayState.text = getString(R.string.qs_relay_state_off)
         }
     }
 
@@ -1554,6 +1928,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.rvSelectedServers.alpha = stoppedAlpha
         // Disable search bar and action icons while proxy is stopped
         setSearchAndActionsEnabled(false)
+        // Also disable pull-to-refresh: re-fetching server status is not
+        // meaningful while the proxy is stopped.
+        b.swipeRefresh.isEnabled = false
 
         // Adapters replace click handlers so tapping any server item opens the
         // settings sheet instead of selecting/deselecting or opening detail.
@@ -1585,6 +1962,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.rvSelectedServers.alpha      = 1f
         // Re-enable search bar and action icons when proxy resumes
         setSearchAndActionsEnabled(true)
+        // Re-enable pull-to-refresh (unless the initial load is still running;
+        // setLoadingState() owns the enabled state in that case).
+        b.swipeRefresh.isEnabled = !isLoading
 
         selectedAdapter.setProxyStopped(false)
         serverAdapter.setProxyStopped(false)
@@ -1962,7 +2342,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 }.sortedBy { it.city.lowercase()     }
 
                 CountryServerAdapter.CountryItem(cc, sample.countryName, sample.flagEmoji, groups, list.any { it.isFavourite })
-            }.sortedBy { it.countryName.lowercase()  }.sortedBy { !it.isFavourite }
+                // Sorted purely A→Z (no favourites-first reordering) so the
+                // alphabet section headers in CountryServerAdapter stay contiguous.
+            }.sortedBy { it.countryName.lowercase() }
             .toList()
     }
 

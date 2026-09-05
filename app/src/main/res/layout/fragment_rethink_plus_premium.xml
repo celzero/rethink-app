@@ -123,32 +123,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:layout_marginBottom="10dp">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/symbol_tv"
-                                    android:textSize="@dimen/default_font_text_view"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:alpha="0.85"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="10dp"
-                                    android:text="@string/rpn_desc_three"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="12sp"
-                                    android:alpha="0.85" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
                                 android:gravity="center_vertical">
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -178,6 +152,7 @@
                             android:layout_marginTop="10dp"
                             android:background="?attr/border"
                             android:alpha="0.15"
+                            android:visibility="gone"
                             app:layout_constraintTop_toBottomOf="@id/ll_benefits" />
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -186,6 +161,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:layout_marginStart="4dp"
+                            android:visibility="gone"
                             app:layout_constraintTop_toBottomOf="@id/v_divider">
 
                             <View

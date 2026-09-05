@@ -530,12 +530,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
         b.connectionLocation.text = locationText
 
-        if (state.asorg.isNotEmpty()) {
-            b.ispContainer.isVisible = true
-            b.connectionIsp.text = state.asorg
-        } else {
-            b.ispContainer.isVisible = false
-        }
+        b.ispContainer.isVisible = false
+        b.vDivider.isVisible = false
     }
 
     private fun showProcessing(message: String) {

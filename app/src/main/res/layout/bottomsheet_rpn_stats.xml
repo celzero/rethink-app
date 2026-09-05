@@ -27,13 +27,12 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/TextAppearance.AppCompat.Headline"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
-            android:text="@string/qs_stats_label"
-            android:textColor="?attr/primaryTextColor"
-            android:textStyle="bold" />
+            android:text="@string/rpn_stats_top_apps"
+            android:textColor="?attr/primaryTextColor" />
 
     </LinearLayout>
 
@@ -281,25 +280,12 @@
 
         </LinearLayout>
 
-        <!-- Top apps -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="4dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/rpn_stats_top_apps"
-            android:textAllCaps="true"
-            android:letterSpacing="0.1"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="10.5sp" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rpn_stats_top_apps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:overScrollMode="never"
+            android:layout_marginTop="16dp"
             tools:listitem="@layout/list_item_rpn_stat_app"
             tools:itemCount="3" />
 
@@ -322,7 +308,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="26dp"
             android:layout_marginEnd="16dp"
             android:alpha="0.75"
             android:letterSpacing="0.02"

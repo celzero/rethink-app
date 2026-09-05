@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/servers_scroll_view"
         android:layout_width="match_parent"
@@ -23,11 +28,10 @@
                 android:id="@+id/header_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
                 android:fitsSystemWindows="true"
                 android:orientation="vertical"
+                android:layout_marginTop="4dp"
                 android:paddingStart="14dp"
-                android:paddingTop="12dp"
                 android:paddingEnd="14dp">
 
                 <com.google.android.material.card.MaterialCardView
@@ -61,48 +65,74 @@
                                 android:orientation="horizontal">
 
                                 <LinearLayout
-                                    android:id="@+id/status_chip"
+                                    android:id="@+id/avatar_row"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginEnd="16dp"
                                     android:layout_weight="1"
-                                    android:background="@drawable/bg_plus_status_chip"
                                     android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    android:paddingStart="10dp"
-                                    android:paddingTop="6dp"
-                                    android:paddingEnd="12dp"
-                                    android:paddingBottom="6dp">
+                                    android:orientation="horizontal">
 
-                                    <View
-                                        android:id="@+id/status_indicator"
-                                        android:layout_width="8dp"
-                                        android:layout_height="8dp"
-                                        android:layout_marginEnd="8dp"
-                                        android:background="@drawable/ic_circle"
-                                        android:backgroundTint="?attr/accentGood" />
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tv_connection_status"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="sans-serif-medium"
-                                        android:maxLines="1"
-                                        android:text="@string/dns_connected"
-                                        android:textColor="?attr/primaryTextColor"
-                                        android:textSize="@dimen/large_font_text_view" />
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            android:alpha="0.65"
+                                            tools:text="🇮🇳" />
 
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tv_active_duration"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginStart="6dp"
-                                        android:alpha="0.75"
-                                        android:fontFamily="sans-serif"
-                                        android:maxLines="1"
-                                        android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/large_font_text_view"
-                                        tools:text="• 02:45:12" />
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#FF000000"
+                                            android:shadowDy="1"
+                                            android:shadowDx="1"
+                                            android:shadowRadius="10"
+                                            android:textAllCaps="true"
+                                            android:textColor="?attr/svgStrokeColor"
+                                            android:textSize="@dimen/small_font_text_view"
+                                            android:textStyle="bold"
+                                            tools:text="IN" />
+                                    </FrameLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="38dp"
+                                        android:layout_height="38dp"
+                                        android:layout_marginStart="-10dp"
+                                        android:background="@drawable/bg_avatar_circle"
+                                        android:visibility="gone"
+                                        tools:visibility="visible">
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:textSize="22sp"
+                                            android:alpha="0.65"
+                                            tools:text="🇸🇬" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:gravity="center"
+                                            android:shadowColor="#FF000000"
+                                            android:shadowDy="1"
+                                            android:shadowDx="1"
+                                            android:shadowRadius="10"
+                                            android:textAllCaps="true"
+                                            android:textColor="?attr/svgStrokeColor"
+                                            android:textSize="@dimen/small_font_text_view"
+                                            android:textStyle="bold"
+                                            tools:text="SG" />
+                                    </FrameLayout>
 
                                 </LinearLayout>
 
@@ -140,135 +170,31 @@
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
+                                <!-- Container for the RPN activity heat map.
+                                     minWidth guarantees the fixed-size dots
+                                     never clip when the status column grows
+                                     (long translations, large font scale). -->
                                 <LinearLayout
-                                    android:id="@+id/avatar_row"
+                                    android:id="@+id/status_chip"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal"
-                                    tools:ignore="UselessParent">
+                                    android:minWidth="140dp"
+                                    android:orientation="vertical">
 
-                                    <FrameLayout
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:background="@drawable/bg_avatar_circle"
-                                        android:visibility="gone"
-                                        tools:visibility="visible">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:textSize="22sp"
-                                            tools:text="🇮🇳" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:shadowColor="#80000000"
-                                            android:shadowDy="1"
-                                            android:shadowRadius="2"
-                                            android:textAllCaps="true"
-                                            android:textColor="@android:color/white"
-                                            android:textSize="10sp"
-                                            android:textStyle="bold"
-                                            tools:text="IN" />
-                                    </FrameLayout>
-
-                                    <FrameLayout
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_marginStart="-10dp"
-                                        android:background="@drawable/bg_avatar_circle"
-                                        android:visibility="gone"
-                                        tools:visibility="visible">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:textSize="22sp"
-                                            tools:text="🇸🇬" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:shadowColor="#80000000"
-                                            android:shadowDy="1"
-                                            android:shadowRadius="2"
-                                            android:textAllCaps="true"
-                                            android:textColor="@android:color/white"
-                                            android:textSize="10sp"
-                                            android:textStyle="bold"
-                                            tools:text="SG" />
-                                    </FrameLayout>
-
-                                    <FrameLayout
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_marginStart="-10dp"
-                                        android:background="@drawable/bg_avatar_circle"
-                                        android:visibility="gone"
-                                        tools:visibility="visible">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:textSize="22sp"
-                                            tools:text="🇩🇪" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:shadowColor="#80000000"
-                                            android:shadowDy="1"
-                                            android:shadowRadius="2"
-                                            android:textAllCaps="true"
-                                            android:textColor="@android:color/white"
-                                            android:textSize="10sp"
-                                            android:textStyle="bold"
-                                            tools:text="DE" />
-                                    </FrameLayout>
-
-                                    <FrameLayout
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_marginStart="-10dp"
-                                        android:background="@drawable/bg_avatar_circle"
-                                        android:visibility="gone"
-                                        tools:visibility="visible">
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:textSize="22sp"
-                                            tools:text="🇺🇸" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:gravity="center"
-                                            android:shadowColor="#80000000"
-                                            android:shadowDy="1"
-                                            android:shadowRadius="2"
-                                            android:textAllCaps="true"
-                                            android:textColor="@android:color/white"
-                                            android:textSize="10sp"
-                                            android:textStyle="bold"
-                                            tools:text="US" />
-                                    </FrameLayout>
+                                    <GridLayout
+                                        android:id="@+id/rpn_heatmap_grid"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:columnCount="12"
+                                        tools:background="?attr/background" />
 
                                 </LinearLayout>
 
                                 <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
                                     android:gravity="end"
                                     android:orientation="vertical">
 
@@ -280,6 +206,7 @@
                                         android:fontFamily="sans-serif-medium"
                                         android:gravity="end"
                                         android:maxLines="1"
+                                        android:maxWidth="140dp"
                                         android:textColor="?attr/primaryLightColorText"
                                         android:textSize="@dimen/small_font_text_view"
                                         android:visibility="gone"
@@ -295,6 +222,7 @@
                                         android:ellipsize="end"
                                         android:gravity="end"
                                         android:maxLines="1"
+                                        android:maxWidth="140dp"
                                         android:textColor="?attr/primaryLightColorText"
                                         android:textSize="@dimen/mini_font_text_view"
                                         tools:text="49c0737336de · 7adf" />
@@ -307,11 +235,57 @@
                                         android:ellipsize="end"
                                         android:gravity="end"
                                         android:maxLines="1"
+                                        android:maxWidth="140dp"
                                         android:textColor="?attr/primaryLightColorText"
                                         android:textSize="@dimen/mini_font_text_view"
                                         android:visibility="gone"
                                         tools:text="device-id"
                                         tools:visibility="visible" />
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:gravity="end|center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <View
+                                            android:id="@+id/status_indicator"
+                                            android:layout_width="6dp"
+                                            android:layout_height="6dp"
+                                            android:layout_marginEnd="5dp"
+                                            android:background="@drawable/ic_circle"
+                                            android:backgroundTint="?attr/accentGood" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tv_connection_status"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:ellipsize="end"
+                                            android:maxLines="1"
+                                            android:maxWidth="110dp"
+                                            android:gravity="end"
+                                            android:layout_gravity="center_vertical"
+                                            android:text="@string/dns_connected"
+                                            android:textColor="?attr/primaryTextColor"
+                                            android:textSize="@dimen/small_font_text_view" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/tv_active_duration"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:alpha="0.65"
+                                            android:ellipsize="end"
+                                            android:layout_marginStart="4dp"
+                                            android:gravity="end"
+                                            android:maxLines="1"
+                                            android:maxWidth="120dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:textColor="?attr/primaryLightColorText"
+                                            android:textSize="@dimen/small_font_text_view"
+                                            tools:text="· active 2 min ago" />
+
+                                    </LinearLayout>
 
                                 </LinearLayout>
 
@@ -438,330 +412,273 @@
                     app:trackColor="@android:color/transparent"
                     app:trackThickness="3dp" />
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/quick_settings_card"
-                    style="@style/RethinkPlus.ContentCard"
-                    app:cardCornerRadius="8dp"
-                    app:strokeWidth="0.75dp"
-                    android:backgroundTint="?attr/colorSurface"
+                <LinearLayout
+                    android:id="@+id/quick_settings_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp">
-
-                    <LinearLayout
-                        android:id="@+id/quick_settings_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal"
-                        android:paddingStart="6dp"
-                        android:paddingTop="6dp"
-                        android:paddingEnd="6dp"
-                        android:paddingBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/qs_relay_tile"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardBackgroundColor="@color/qs_tile_off_bg"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:id="@+id/qs_relay_icon"
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:alpha="0.5"
-                                    android:src="@drawable/ic_hop_2"
-                                    android:tint="?attr/primaryLightColorText" />
-                            </FrameLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/qs_relay_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="@string/qs_relay_label"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/qs_relay_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.7"
-                            android:maxLines="1"
-                            android:text="@string/qs_relay_state_off"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="9.5sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/qs_add_location_tile"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardBackgroundColor="@color/qs_tile_off_bg"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:alpha="0.5"
-                                    android:src="@drawable/ic_add"
-                                    android:tint="?attr/primaryLightColorText" />
-                            </FrameLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="@string/qs_add_location_label"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.7"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:text="@string/qs_caption_location"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="9.5sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/qs_bypass_apps_tile"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardBackgroundColor="@color/qs_tile_off_bg"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_bypass"
-                                    android:tint="?attr/primaryLightColorText" />
-                            </FrameLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="@string/qs_bypass_apps_label"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.7"
-                            android:maxLines="1"
-                            android:text="@string/qs_caption_apps"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="9.5sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/qs_stats_tile"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardBackgroundColor="@color/qs_tile_off_bg"
-                            app:cardCornerRadius="32dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:alpha="0.5"
-                                    android:src="@drawable/ic_statistics"
-                                    android:tint="?attr/primaryLightColorText" />
-                            </FrameLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:maxLines="1"
-                            android:text="@string/qs_stats_label"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="12sp" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.7"
-                            android:maxLines="1"
-                            android:text="@string/qs_caption_live"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="9.5sp"
-                            android:visibility="visible" />
-
-                    </LinearLayout>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/selected_locations_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="10dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/location_capacity_indicator"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="10dp"
+                    android:baselineAligned="false"
                     android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_capacity_label"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/qs_card_actions"
+                        style="@style/RethinkPlus.ContentCard"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="5dp"
                         android:layout_weight="1"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.04"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="11sp"
-                        tools:text="3 of 5 locations" />
+                        android:backgroundTint="?attr/colorSurface"
+                        app:strokeWidth="0.75dp">
 
-                    <View
-                        android:id="@+id/capacity_dot_one"
-                        android:layout_width="22dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:baselineAligned="false"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="2dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="2dp"
+                            android:paddingBottom="8dp">
 
-                    <View
-                        android:id="@+id/capacity_dot_two"
-                        android:layout_width="22dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
 
-                    <View
-                        android:id="@+id/capacity_dot_three"
-                        android:layout_width="22dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
+                                <FrameLayout
+                                    android:id="@+id/qs_add_location_tile"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_qs_tile"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:foreground="?attr/selectableItemBackground">
 
-                    <View
-                        android:id="@+id/capacity_dot_four"
-                        android:layout_width="22dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:alpha="0.25"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/primaryLightColorText" />
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="17dp"
+                                        android:layout_height="17dp"
+                                        android:layout_gravity="center"
+                                        android:alpha="0.5"
+                                        android:src="@drawable/ic_add"
+                                        android:tint="?attr/primaryLightColorText" />
 
-                    <View
-                        android:id="@+id/capacity_dot_five"
-                        android:layout_width="22dp"
-                        android:layout_height="6dp"
+                                </FrameLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/qs_add_location_label"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="10.5sp" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/qs_add_location_state"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:alpha="0.7"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="8.5sp"
+                                    tools:text="2/5" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/qs_bypass_apps_tile"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_qs_tile"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:foreground="?attr/selectableItemBackground">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="17dp"
+                                        android:layout_height="17dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_bypass"
+                                        android:tint="?attr/primaryLightColorText" />
+
+                                </FrameLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/qs_bypass_apps_label"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="10.5sp" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/qs_bypass_apps_state"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:alpha="0.7"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="8.5sp"
+                                    tools:text="345/462" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/qs_card_status"
+                        style="@style/RethinkPlus.ContentCard"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
                         android:layout_marginStart="5dp"
-                        android:alpha="0.25"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/primaryLightColorText" />
+                        android:layout_weight="1"
+                        android:backgroundTint="?attr/colorSurface"
+                        app:strokeWidth="0.75dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:baselineAligned="false"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="2dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="2dp"
+                            android:paddingBottom="8dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/qs_relay_tile"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_qs_tile"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:foreground="?attr/selectableItemBackground">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:id="@+id/qs_relay_icon"
+                                        android:layout_width="17dp"
+                                        android:layout_height="17dp"
+                                        android:layout_gravity="center"
+                                        android:alpha="0.5"
+                                        android:src="@drawable/ic_hop_2"
+                                        android:tint="?attr/primaryLightColorText" />
+
+                                </FrameLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/qs_relay_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/qs_relay_label"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="10.5sp" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/qs_relay_state"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:alpha="0.7"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="8.5sp"
+                                    tools:text="2/3" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/qs_stats_tile"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@drawable/bg_qs_tile"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:foreground="?attr/selectableItemBackground">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="17dp"
+                                        android:layout_height="17dp"
+                                        android:layout_gravity="center"
+                                        android:alpha="0.5"
+                                        android:src="@drawable/ic_statistics"
+                                        android:tint="?attr/primaryLightColorText" />
+
+                                </FrameLayout>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:includeFontPadding="false"
+                                    android:maxLines="1"
+                                    android:text="@string/qs_stats_label"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="10.5sp" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/qs_stats_state"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:alpha="0.7"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="8.5sp"
+                                    tools:text="1,234" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
-            </LinearLayout>
 
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_selected_servers"
@@ -775,6 +692,7 @@
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
                 android:paddingTop="4dp"
+                android:visibility="visible"
                 android:paddingBottom="4dp"
                 tools:listitem="@layout/list_item_vpn_server" />
 
@@ -835,37 +753,106 @@
                 android:layout_marginBottom="4dp">
 
                 <LinearLayout
+                    android:id="@+id/selected_locations_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_marginEnd="12dp"
-                        android:alpha="0.6"
-                        android:src="@drawable/ic_vpn"
-                        android:tint="?attr/primaryLightColorText" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_marginEnd="12dp"
+                            android:alpha="0.6"
+                            android:src="@drawable/ic_vpn"
+                            android:tint="?attr/primaryLightColorText" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/server_selection_tap_to_select"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="16sp" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:text="@string/server_selection_max_info"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/location_capacity_indicator"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_weight="1"
-                        android:text="@string/server_selection_tap_to_select"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="16sp" />
+                        android:layout_gravity="end"
+                        android:gravity="end"
+                        android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.7"
-                        android:text="@string/server_selection_max_info"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="11sp" />
+                        <View
+                            android:id="@+id/capacity_dot_one"
+                            android:layout_width="22dp"
+                            android:layout_height="6dp"
+                            android:layout_marginStart="5dp"
+                            android:background="@drawable/bg_capacity_pill"
+                            android:backgroundTint="?attr/accentGood" />
+
+                        <View
+                            android:id="@+id/capacity_dot_two"
+                            android:layout_width="22dp"
+                            android:layout_height="6dp"
+                            android:layout_marginStart="5dp"
+                            android:background="@drawable/bg_capacity_pill"
+                            android:backgroundTint="?attr/accentGood" />
+
+                        <View
+                            android:id="@+id/capacity_dot_three"
+                            android:layout_width="22dp"
+                            android:layout_height="6dp"
+                            android:layout_marginStart="5dp"
+                            android:background="@drawable/bg_capacity_pill"
+                            android:backgroundTint="?attr/accentGood" />
+
+                        <View
+                            android:id="@+id/capacity_dot_four"
+                            android:layout_width="22dp"
+                            android:layout_height="6dp"
+                            android:layout_marginStart="5dp"
+                            android:alpha="0.25"
+                            android:background="@drawable/bg_capacity_pill"
+                            android:backgroundTint="?attr/primaryLightColorText" />
+
+                        <View
+                            android:id="@+id/capacity_dot_five"
+                            android:layout_width="22dp"
+                            android:layout_height="6dp"
+                            android:layout_marginStart="5dp"
+                            android:alpha="0.25"
+                            android:background="@drawable/bg_capacity_pill"
+                            android:backgroundTint="?attr/primaryLightColorText" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
+
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -1153,6 +1140,8 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/collapsed_title_bar"

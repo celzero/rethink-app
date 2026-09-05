@@ -889,11 +889,11 @@ class BillingBackendClient(
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: server business error, ${result.payload}")
-                    if (result.payload.isSubscriptionExpired) {
-                        // Server definitively confirmed subscription is expired —
+                    if (result.payload.isSubscriptionExpired || result.payload.isPurchaseCancelled) {
+                        // Server definitively confirmed the purchase is no longer valid —
                         // callers must NOT preserve the old purchase or entitlement.
-                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: subscription definitively expired on server " +
-                            "(state=${result.payload.state}); returning Expired to caller")
+                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: purchase definitively expired/cancelled on server " +
+                            "(error=${result.payload.error}, state=${result.payload.state}); returning Expired to caller")
                         QueryEntitlementResult.Expired(purchase)
                     } else {
                         // Other business errors (revoked, linked purchase, etc.) — preserve the local
