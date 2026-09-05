@@ -750,7 +750,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        val owner = context as? LifecycleOwner ?: return
+        val owner = lifecycleOwner ?: (context as? LifecycleOwner) ?: return
 
         withContext(Dispatchers.Main.immediate) {
             if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {

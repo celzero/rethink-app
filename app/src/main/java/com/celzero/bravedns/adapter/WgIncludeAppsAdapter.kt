@@ -53,7 +53,6 @@ class WgIncludeAppsAdapter(
     private val context: Context,
     private val proxyId: String,
     private val proxyName: String,
-    // invoked on the main thread after any individual app inclusion/exclusion is persisted
     private val onAppModified: (() -> Unit)? = null
 ) :
     PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
@@ -246,12 +245,16 @@ class WgIncludeAppsAdapter(
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
                     Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
                 }
+                notifyAppModified()
                 uiCtx {
-                    // individual app state diverges from any active catch-all; let the
-                    // host decide what to do with it (e.g. switch catch-all off)
-                    onAppModified?.invoke()
                     refresh()
                 }
+            }
+        }
+
+        private suspend fun notifyAppModified() {
+            withContext(Dispatchers.Main.immediate) {
+                onAppModified?.invoke()
             }
         }
 
@@ -306,8 +309,8 @@ class WgIncludeAppsAdapter(
                                 }
                             }
                         }
+                        notifyAppModified()
                         uiCtx {
-                            onAppModified?.invoke()
                             refresh()
                         }
                     }
