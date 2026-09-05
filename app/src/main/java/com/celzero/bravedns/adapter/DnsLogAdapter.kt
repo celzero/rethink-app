@@ -408,8 +408,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
         private fun displayDnsType(log: DnsLog) {
             if (ProxyManager.isRpnProxy(log.proxyId)) {
-                // for now show wg for RPN as well, later can change
-                b.dnsTypeName.text = context.getString(R.string.lbl_wg)
+                b.dnsTypeName.text = context.getString(R.string.rpn_title)
                 return
             } else if (isConnectionProxied(log.proxyId) && log.proxyId.startsWith(ID_WG_BASE)) {
                 b.dnsTypeName.text = context.getString(R.string.lbl_wg)
