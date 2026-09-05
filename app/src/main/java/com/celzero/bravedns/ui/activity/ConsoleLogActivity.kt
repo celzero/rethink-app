@@ -26,7 +26,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -96,6 +98,10 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
         // DB query is ORDER BY id DESC (newest first), so take(N) keeps the most
         // recent N entries;
         private const val MAX_PAUSED_SNAPSHOT_SIZE = 5000
+        // Cap the filter dialog's single-choice list at this fraction of the
+        // screen height so the checkbox and the positive/neutral buttons always
+        // remain visible on small-height screens (folded foldables, small phones).
+        private const val MAX_LIST_HEIGHT_FRACTION = 0.4f
     }
 
     // Guard against rapid double-taps on share buttons while a job is in-progress
@@ -188,7 +194,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
                 b.consoleLogInfoText.text = descWithTime
             }
         }
-        b.fabShareLog.text = getString(R.string.about_bug_report_desc).capitalizeWords()
+        b.fabShareLog.text = getString(R.string.about_email).capitalizeWords()
         b.searchView.setOnQueryTextListener(this)
         val logLevel = Logger.uiLogLevel.toInt()
         if (logLevel >= Logger.LoggerLevel.ERROR.id) {
@@ -379,10 +385,32 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             getString(R.string.settings_gologger_dialog_option_7),
         )
         val checkedItem = Logger.uiLogLevel.toInt()
-        builder.setSingleChoiceItems(
-            items.map { it }.toTypedArray(),
-            checkedItem
-        ) { _, which ->
+
+        // Combining setSingleChoiceItems() with setView() stacks the list panel,
+        // the custom panel and the button bar vertically without any scrollable
+        // wrapper. On short screens (foldables in the folded state, small phones)
+        // the dialog overflows and the positive/neutral buttons end up off-screen.
+        // Instead, render the choices in a single height-capped ListView (which
+        // scrolls internally) plus the checkbox inside the custom view, so the
+        // dialog never grows past the window and the buttons always stay visible.
+        val density = resources.displayMetrics.density
+        val margin = (20 * density).toInt()
+        val spacing = (8 * density).toInt()
+
+        val maxListHeightPx = (resources.displayMetrics.heightPixels * MAX_LIST_HEIGHT_FRACTION).toInt()
+        val listView = object : ListView(this) {
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                val capped =
+                    MeasureSpec.makeMeasureSpec(maxListHeightPx, MeasureSpec.AT_MOST)
+                super.onMeasure(widthMeasureSpec, capped)
+            }
+        }
+        listView.choiceMode = ListView.CHOICE_MODE_SINGLE
+        listView.divider = null
+        listView.adapter =
+            ArrayAdapter(this, android.R.layout.simple_list_item_single_choice, items)
+        listView.setItemChecked(checkedItem, true)
+        listView.setOnItemClickListener { _, _, which, _ ->
             Logger.uiLogLevel = which.toLong()
             GoVpnAdapter.setLogLevel(
                 persistentState.goLoggerLevel.toInt(),
@@ -421,16 +449,22 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             }
             Logger.i(LOG_TAG_BUG_REPORT, "File trace set to $isChecked")
         }
-        val density = resources.displayMetrics.density
-        val margin = (20 * density).toInt()
+
         val container = LinearLayout(this)
-        val params =
+        container.orientation = LinearLayout.VERTICAL
+        val listParams =
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-        params.setMargins(margin, 0, margin, 0)
-        container.addView(cb, params)
+        container.addView(listView, listParams)
+        val cbParams =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        cbParams.setMargins(margin, spacing, margin, spacing)
+        container.addView(cb, cbParams)
         builder.setView(container)
 
         builder.setCancelable(true)
