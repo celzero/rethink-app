@@ -139,12 +139,16 @@ class AppDownloadManager(
 
     private fun shouldUpdateState(current: DownloadState?, next: DownloadState): Boolean {
         if (current == null) return true
-        // Only transition *into* Error/Success once. This avoids re-triggering the error
-        // dialog (or success toast) when multiple WorkManager tag-observers each report the
-        // same terminal state.
-        if (next is DownloadState.Error) return current !is DownloadState.Error
-        if (next is DownloadState.Success) return current !is DownloadState.Success
+        // Terminal states are final: a later WorkManager tag callback (e.g. a finished
+        // WorkInfo observed before pruneWork() takes effect) must not flip Success ->
+        // Error or Error -> Success, which would trigger the wrong dialog or toast.
+        // Reject any transition out of a terminal state before evaluating next.
         if (current is DownloadState.Error || current is DownloadState.Success) return false
+        // Only transition *into* Error/Success once. This avoids re-triggering the error
+        // dialog (or success toast) when multiple WorkManager tag-observers each report
+        // the same terminal state.
+        if (next is DownloadState.Error) return true
+        if (next is DownloadState.Success) return true
 
         return when (current) {
             is DownloadState.Idle -> next !is DownloadState.Idle
