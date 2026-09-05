@@ -788,7 +788,6 @@
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Dominio (Univ)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Dominio affidabile (Univ)</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">aggirerà le regole universali DNS e firewall</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s funziona solo con il DNS di Rethink</string>
     <string name="dc_refresh_toast" translatable="true">Aggiornamento completato</string>
     <string name="settings_default_dns_desc" translatable="true">Usato solo durante l\'avvio per trovare l\'indirizzo IP del server DNS crittografato.</string>
     <string name="lbl_logs" translatable="true">Registri</string>

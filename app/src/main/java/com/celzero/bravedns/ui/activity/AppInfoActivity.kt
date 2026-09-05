@@ -446,14 +446,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
         }
 
-        TooltipCompat.setTooltipText(
-            b.aadAppSettingsBypassDnsFirewall,
-            getString(
-                R.string.bypass_dns_firewall_tooltip,
-                getString(R.string.ada_app_bypass_dns_firewall)
-            )
-        )
-
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {

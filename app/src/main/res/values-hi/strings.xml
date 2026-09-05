@@ -794,7 +794,6 @@
     <string name="settings_allow_lan_heading" translatable="true">निजी आइपी रूट ना करे (प्रयोग)</string>
     <string name="settings_allow_lan_desc" translatable="true">रीथिंक के VPN टनल से LAN, लूपबैक, मल्टीकास्ट, लिंक-लोकल रूट को बाहर रखें।</string>
     <string name="lbl_network" translatable="true">नेटवर्क</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s सिर्फ रीथिंक के डीएनएस के साथ काम करता है</string>
     <string name="lbl_import" translatable="true">आयात (इंपोर्ट) करें</string>
     <string name="lbl_allowed_ips" translatable="true">अलाउड आईपी</string>
     <string name="lbl_socks5" translatable="true">सॉक्स5</string>

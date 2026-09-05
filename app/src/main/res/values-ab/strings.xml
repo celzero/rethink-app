@@ -679,7 +679,6 @@
     <string name="ada_app_dns_settings" translatable="true">DNS Амҳәахәҭырақәқәа</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Ажәақəеи ҟаҵатәуп</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Ашәашәқәа зегьы ашәымызцәырцала ашәашәқәа рхаангьы.</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s Апсуа dnsskt ransit Rеthinksnt.</string>
     <string name="bsac_title_desc" translatable="true">Ақәылақәа ари апрограм аҟны акәымкәа.</string>
     <string name="bsdl_block_desc" translatable="true">Абаба, адгьылбӏы &lt;u&gt;ацырҩыла&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">ҧлокупт %1$с %2$с рылаҧшәрала</string>

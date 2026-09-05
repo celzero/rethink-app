@@ -772,7 +772,6 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="build__flavor_play_store" translatable="true">پلی استور</string>
     <string name="bsdl_blocked_desc" translatable="true">%1$s توسط %2$s مسدود شد</string>
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s فقط با DNS شرکت Rethink کار می‌کند</string>
     <string name="bypasses_network_restrictions" translatable="true">بررسی‌های دسترسی‌پذیری از تمام محدودیت‌های شبکه عبور می‌کنند. در حالت <i>خودکار</i>، رسینک به طور تصادفی از IPها و نام‌های میزبان قبلاً متصل شده استفاده می‌کند.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">تمام اتصالات و برنامه‌هایی که توسط سایر VPN های WireGuard مسیریابی نمی‌شوند، توسط این یکی مسیریابی خواهند شد.</string>
     <string name="category_name_sys_components" translatable="true">اجزای سیستم</string>

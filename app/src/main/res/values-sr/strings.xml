@@ -613,7 +613,6 @@
     <string name="ada_app_isolate" translatable="true">Изолуј</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Очисти записе</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Очисти све записе повезане са овом апликацијом.</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s ради једино са Rethink-овим DNS-om</string>
     <string name="exclude_apps_from_proxy">Заобиђи апликацију од свих проксија</string>
     <string name="bsac_title_desc" translatable="true">Правила се примањују само на ову апликацију.</string>
     <string name="bsdl_block_desc" translatable="true">Блокирај, веруј &lt;u&gt;овом домену&lt;/u&gt;</string>

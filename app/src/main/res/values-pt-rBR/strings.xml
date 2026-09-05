@@ -848,7 +848,6 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Bloquear malware, ransomware, cryptoware, phishers e outras ameaças.</string>
     <string name="cd_deleted_toast" translatable="true">Excluiu todas as regras de domínio</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Limpar registros</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s funciona apenas com DNS do Rethink</string>
     <string name="dc_refresh_toast" translatable="true">Atualização concluída</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Impulsionar DNS</string>
     <string name="brbs_backup_restore_desc" translatable="true">Não funciona em todas as versões do aplicativo</string>

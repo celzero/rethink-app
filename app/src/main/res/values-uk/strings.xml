@@ -604,7 +604,6 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Застосунки які обходять</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">ігнорують універсальні правила DNS та брандмауера</string>
     <string name="univ_firewall_rule_9" translatable="true">Блокувати у мобільній (тарифікованій) мережі</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s працює лише з DNS Rethink</string>
     <string name="wireguard_connection_error" translatable="true">WireGuard VPN не вдається підключити</string>
     <string name="cd_custom_dns_proxy_title" translatable="true">Користувкий DNS-проксі</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Ім\'я хосту порожнє</string>

@@ -663,7 +663,6 @@
     <string name="ada_app_isolate" translatable="true">Izolovat</string>
     <string name="ada_app_dns_settings" translatable="true">Nastavení DNS</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Smazat všechny záznamy související s touto aplikací.</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s funguje pouze s DNS Rethink</string>
     <string name="bsdl_blocked_desc" translatable="true">blokováno %1$s přes %2$s</string>
     <string name="network_dns" translatable="true">Systémové DNS</string>
     <string name="notif_download_content_text" translatable="true">Probíhá stahování…</string>

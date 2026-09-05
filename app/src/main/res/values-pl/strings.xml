@@ -838,7 +838,6 @@
     <string name="settings_allow_lan_heading" translatable="true">Nie kieruj prywatnych adresów IP (eksperymentalnie)</string>
     <string name="lbl_delete" translatable="true">Usuń</string>
     <string name="lbl_qr_code" translatable="true">Kod QR</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s działa tylko z DNS Rethink</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modyfikowanie reguł adresu IP/domeny aplikacji.</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Brakujący atrybut</string>

@@ -811,7 +811,6 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">合并请求，缓存响应，弹性应对错误</string>
     <string name="ada_app_firewall" translatable="true">防火墙</string>
     <string name="brbs_backup_restore_desc" translatable="true">无法跨版本使用</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
     <string name="lbl_maybe_blocked" translatable="true">或被拦截</string>
     <string name="lbl_network" translatable="true">网络</string>
     <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
