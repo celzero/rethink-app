@@ -1510,6 +1510,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardDnsConnectedDns.text = dnsName
         b.fhsCardDnsConnectedDns.isSelected = true
 
+        // for RethinkDNS Plus, append the number of blocklists in-use,
+        // mirroring RethinkEndpointAdapter.updateDnsStatus()
+        if (appConfig.isRethinkDnsConnected()) {
+            io {
+                val count = appConfig.getRemoteRethinkEndpoint()?.blocklistCount ?: 0
+                if (count > 0) {
+                    uiCtx {
+                        val countLabel =
+                            getString(R.string.rsv_blocklist_count_text, count.toString())
+                        b.fhsCardDnsConnectedDns.text =
+                            listOfNotNull(dnsName, countLabel).joinToString(" · ")
+                    }
+                }
+            }
+        }
+
         renderDnsHeadline(dnsStatus)
     }
 

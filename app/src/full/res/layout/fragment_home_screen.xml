@@ -97,12 +97,11 @@
                             android:id="@+id/fhs_card_dns_connected_dns"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="sans-serif-medium"
+                            android:ellipsize="marquee"
                             android:maxLines="1"
                             tools:text="DNS · Connected"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/extra_large_font_text_view" />
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_latency"
@@ -110,10 +109,10 @@
                             android:layout_height="wrap_content"
                             android:alpha="0.5"
                             android:maxLines="1"
-                            android:ellipsize="end"
+                            android:ellipsize="marquee"
                             tools:text="BLR(– ms)"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="11sp" />
+                            android:textSize="@dimen/small_font_text_view" />
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
