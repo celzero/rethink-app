@@ -119,10 +119,6 @@ class RethinkBlocklistViewModel(
         if (_selectedFileTags.value == tags) return
 
         _selectedFileTags.postValue(tags)
-        // serialize stamp recomputation: cancel any in-flight computation so a
-        // slower, older result can never overwrite a newer selection. Every
-        // cancel-then-launch pair runs sequentially on the confined dispatcher,
-        // keeping the pair atomic without thread-blocking locks.
         viewModelScope.launch(stampJobSerializer) {
             stampJob?.cancel()
             stampJob = launch(Dispatchers.IO) {
@@ -236,6 +232,12 @@ class RethinkBlocklistViewModel(
             setStamp(stamp)
             Logger.i(LOG_TAG_UI, "revert to old stamp for blocklist type: ${type.name}, $stamp, $tags")
         }
+    }
+
+    override fun onCleared() {
+        // viewModelScope cancellation already propagates to stampJob (it is a
+        // child); this is defensive and idempotent.
+        stampJob?.cancel()
     }
 
     fun extractStamp(t: String): String? {
