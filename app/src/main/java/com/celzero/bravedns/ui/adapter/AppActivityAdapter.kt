@@ -15,7 +15,9 @@
  */
 package com.celzero.bravedns.ui.adapter
 
+import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +28,7 @@ import com.celzero.bravedns.database.AppActivityRow
 import com.celzero.bravedns.databinding.ItemLogActivityAppBinding
 import com.celzero.bravedns.databinding.ItemLogActivityConnBinding
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 
 /**
  * Summary for one app within the selected activity window; children are loaded
@@ -200,15 +203,27 @@ class AppActivityAdapter(
 
         fun bind(summary: AppActivitySummary) {
             val ctx = b.root.context
-            val name = summary.appName.ifBlank { ctx.getString(R.string.log_activity_unknown_app) }
+            val name = summary.appName.ifBlank { ctx.getString(R.string.lbl_unknown) }
 
-            // avatar pill follows the active theme's accent at low alpha so
-            // it stays legible on light and dark surfaces alike
-            val accent = UIUtils.fetchColor(ctx, R.attr.accentGood)
-            val avatarBg = b.laaAvatar.background?.mutate()
-            avatarBg?.setTint(ColorUtils.setAlphaComponent(accent, 0x1A))
-            b.laaAvatar.background = avatarBg
-            b.laaAvatar.text = name.take(1).uppercase()
+            // prefer the real app icon: preventively resolve the package (and
+            // its cached icon) from the uid and show it; the initials avatar
+            // is only a fallback for uids with no resolvable package/icon
+            val icon = resolveIconForUid(ctx, summary.uid)
+            if (icon != null) {
+                b.laaAppIcon.setImageDrawable(icon)
+                b.laaAppIcon.visibility = View.VISIBLE
+                b.laaAvatar.visibility = View.GONE
+            } else {
+                b.laaAppIcon.visibility = View.GONE
+                b.laaAvatar.visibility = View.VISIBLE
+                // avatar pill follows the active theme's accent at low alpha
+                // so it stays legible on light and dark surfaces alike
+                val accent = UIUtils.fetchColor(ctx, R.attr.accentGood)
+                val avatarBg = b.laaAvatar.background?.mutate()
+                avatarBg?.setTint(ColorUtils.setAlphaComponent(accent, 0x1A))
+                b.laaAvatar.background = avatarBg
+                b.laaAvatar.text = name.take(1).uppercase()
+            }
             b.laaName.text = name
             b.laaConnCount.text =
                 ctx.getString(R.string.log_activity_conn_count, summary.total)
@@ -256,6 +271,22 @@ class AppActivityAdapter(
 
         private fun formatCount(n: Long): String {
             return if (n > 999) "999+" else n.toString()
+        }
+
+        /**
+         * Resolves the app icon for a uid: first package of the uid, then its
+         * cached icon via [Utilities.getIcon]; falls back to the system
+         * default icon, and returns null (initials avatar) when even that
+         * fails. Mirrors RpnStatsBottomSheet's TopAppsAdapter behavior.
+         */
+        private fun resolveIconForUid(context: Context, uid: Int): Drawable? {
+            return try {
+                context.packageManager.getPackagesForUid(uid)?.firstOrNull()?.let {
+                    Utilities.getIcon(context, it)
+                } ?: Utilities.getDefaultIcon(context)
+            } catch (_: Exception) {
+                null
+            }
         }
     }
 
