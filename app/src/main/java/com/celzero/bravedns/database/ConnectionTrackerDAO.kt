@@ -386,6 +386,9 @@ interface ConnectionTrackerDAO {
     @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 1")
     suspend fun getLastRoutedConnectionForProxy(proxyId: String): ConnectionTracker?
 
+    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 24")
+    suspend fun getRecentRoutedConnectionsForProxy(proxyId: String): List<ConnectionTracker>
+
     @Query(
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails = :wgId"
     )
@@ -403,6 +406,43 @@ interface ConnectionTrackerDAO {
         "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, '' as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(downloadBytes + uploadBytes) as totalBytes from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and timeStamp > :to group by uid, appName order by totalBytes desc limit :limit"
     )
     suspend fun getRpnTopAppsForProxy(proxyId: String, to: Long, limit: Int): List<AppConnection>
+
+    // bucketed activity counts for connections routed through RPN proxies only.
+    @Query(
+        "select cast((timeStamp - :rangeStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from ConnectionTracker where timeStamp >= :rangeStart and timeStamp < :rangeEnd and proxyDetails like :proxyIdFilter group by bucketIndex, blocked"
+    )
+    suspend fun getRpnActivityBuckets(
+        proxyIdFilter: String,
+        rangeStart: Long,
+        rangeEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow>
+
+    @Query(
+        "select coalesce(sum(case when isBlocked then 1 else 0 end), 0) as blocked, count(*) as total from ConnectionTracker where timeStamp >= :start and timeStamp < :end and proxyDetails like :proxyIdFilter"
+    )
+    suspend fun getRpnWindowCounts(proxyIdFilter: String, start: Long, end: Long): WindowCountRow
+
+    @Query(
+        "select uid as uid, appName as appName, count(id) as total, sum(case when isBlocked then 1 else 0 end) as blocked from ConnectionTracker where timeStamp >= :start and timeStamp < :end and proxyDetails like :proxyIdFilter group by uid, appName order by total desc limit :limit"
+    )
+    suspend fun getRpnAppActivity(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long,
+        limit: Int
+    ): List<AppActivityRow>
+
+    @Query(
+        "select * from ConnectionTracker where timeStamp >= :start and timeStamp < :end and uid = :uid and proxyDetails like :proxyIdFilter order by id desc limit :limit"
+    )
+    suspend fun getRpnConnectionsInWindowForUid(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<ConnectionTracker>
 
     @Query("update ConnectionTracker set message = :reason, duration = 0 where connId in (:connIds) and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
     fun closeConnections(connIds: List<String>, reason: String)
