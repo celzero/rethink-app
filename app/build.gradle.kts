@@ -508,8 +508,10 @@ dependencies {
     implementation("com.github.seancfoley:ipaddress:5.6.2")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.work:work-testing:2.11.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation("androidx.test.espresso:espresso-accessibility:3.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
     testImplementation("org.robolectric:robolectric:4.16.1")
     testImplementation("androidx.test:core:1.7.0")
