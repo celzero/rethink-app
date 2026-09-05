@@ -72,9 +72,9 @@ if (!deGoogled) {
     logger.info("skipping google-services.json for de-googled/F-Droid build")
 }
 
-println("app-task names: '$taskNames'")
-println("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
-println("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
+logger.info("app-task names: '$taskNames'")
+logger.info("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 
 // don't apply firebase plugins for fdroid CLI builds
 if (!deGoogled) {
@@ -139,6 +139,14 @@ java {
     }
 }
 
+val tvKsAlias: String? = System.getenv("TV_RELEASE_KS_ALIAS")
+val tvKsPassphrase: String? = System.getenv("TV_RELEASE_KS_PASSPHRASE")
+val tvKsFile: String? = System.getenv("TV_RELEASE_KS_FILE")
+val tvKsStorePassphrase: String? = System.getenv("TV_RELEASE_KS_STORE_PASSPHRASE")
+val hasTvReleaseSigningConfig =
+    listOf(tvKsAlias, tvKsPassphrase, tvKsFile, tvKsStorePassphrase)
+        .all { value -> !value.isNullOrEmpty() }
+
 android {
     compileSdk = 37
     // https://developer.android.com/studio/build/configure-app-module
@@ -149,6 +157,7 @@ android {
         minSdk = 23
         targetSdk = 37
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Defaults to false; the fdroid flavor overrides it via -PwebsiteDegoogled=true.
         buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false")
     }
 
@@ -220,10 +229,10 @@ android {
                 }
             }
             signingConfig = if (isWebsiteDegoogled) {
-                println("IzzyOnDroid build: using izzyondroid signing config")
+                logger.info("IzzyOnDroid build: using izzyondroid signing config")
                 signingConfigs.getByName("izzyondroid")
             } else {
-                println("Normal build: using config signing config")
+                logger.info("Normal build: using config signing config")
                 signingConfigs.getByName("config")
             }
         }
@@ -337,11 +346,7 @@ android {
         abortOnError = true
     }
 
-    val tvKsAlias = System.getenv("TV_RELEASE_KS_ALIAS")
-    val tvKsPassphrase = System.getenv("TV_RELEASE_KS_PASSPHRASE")
-    val tvKsFile = System.getenv("TV_RELEASE_KS_FILE")
-    val tvKsStorePassphrase = System.getenv("TV_RELEASE_KS_STORE_PASSPHRASE")
-    if (listOf(tvKsAlias, tvKsPassphrase, tvKsFile, tvKsStorePassphrase).all { !it.isNullOrEmpty() }) {
+    if (hasTvReleaseSigningConfig) {
         val tvRelease = signingConfigs.create("tvRelease") {
             keyAlias = tvKsAlias
             keyPassword = tvKsPassphrase
@@ -543,8 +548,6 @@ dependencies {
     // for confetti animation
     "fullImplementation"("nl.dionsegijn:konfetti-xml:2.0.5")
 
-    // Android TV flavor dependencies. Firestack is inherited through the
-    // orthogonal releaseChannel flavor and must not be duplicated here.
     "tvImplementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
     "tvImplementation"("androidx.appcompat:appcompat:1.8.0")
     "tvImplementation"("androidx.core:core-ktx:1.19.0")
