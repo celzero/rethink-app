@@ -22,6 +22,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isAnyUserSetProxy
 import com.celzero.bravedns.service.TunFirewallManager
+import com.celzero.bravedns.service.TunFlowManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
@@ -248,6 +249,18 @@ object TunDnsManager: KoinComponent {
         if (forceBypassLocalBlocklists) {
             val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
             logd("onQuery: makeNsOpts(force-bypass) for $fqdn")
+            return opts
+        }
+
+        // skip applying rules for system components (DNS and ANDROID) on Android 11 and below,
+        // as we cannot determine the actual app from which the request originated when split dns
+        // is disabled. However, when split dns is enabled, advanced dns filtering will also be
+        // enabled on Android 11 and below, allowing Rethink to determine the actual requesting app.
+        // In that case, we can apply the app-specific rules.
+        val isProtectedUid = uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid || uid == rethinkUid
+        if (isAtleastR() && isProtectedUid && !persistentState.splitDns) {
+            val opts = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
+            logd("onQuery: makeNsOpts(protected-uid) for $fqdn")
             return opts
         }
 
@@ -828,7 +841,7 @@ object TunDnsManager: KoinComponent {
             "onUpstreamAnswer: init, ${params.id}, sum: ${params.smm}, ipcsv: ${params.ipcsv}, opts: ${params.rcvdDnsOpts}"
         )
         if (params.ipcsv.isEmpty()) {
-            Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
+            Logger.w(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
             return dnsOptsFactory()
         }
         if (appConfig.getBraveMode().isDnsMode()) {
