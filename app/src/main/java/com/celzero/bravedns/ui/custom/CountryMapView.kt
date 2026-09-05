@@ -85,6 +85,44 @@ class CountryMapView @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * The map has an intrinsic aspect ratio ([WorldMapPaths.MAP_WIDTH] x
+     * [WorldMapPaths.MAP_HEIGHT]); derive the unconstrained dimension from the
+     * constrained one so the view never letterboxes (which previously left the
+     * map looking squashed into a thin, off-center strip).
+     */
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        val wMode = MeasureSpec.getMode(widthSpec)
+        val hMode = MeasureSpec.getMode(heightSpec)
+        val aspect = WorldMapPaths.MAP_WIDTH.toFloat() / WorldMapPaths.MAP_HEIGHT
+        val w = getDefaultSize(suggestedMinimumWidth, widthSpec)
+        val h = getDefaultSize(suggestedMinimumHeight, heightSpec)
+        val vPadding = paddingTop + paddingBottom
+        val hPadding = paddingLeft + paddingRight
+        val measured: Pair<Int, Int> = when {
+            hMode != MeasureSpec.EXACTLY && wMode == MeasureSpec.EXACTLY -> {
+                // width drives: height = contentWidth / aspect
+                val content = (w - hPadding).coerceAtLeast(0)
+                var derived = (content / aspect).toInt() + vPadding
+                if (hMode == MeasureSpec.AT_MOST) {
+                    derived = derived.coerceAtMost(h)
+                }
+                Pair(w, derived)
+            }
+            wMode != MeasureSpec.EXACTLY && hMode == MeasureSpec.EXACTLY -> {
+                // height drives: width = contentHeight * aspect
+                val content = (h - vPadding).coerceAtLeast(0)
+                var derived = (content * aspect).toInt() + hPadding
+                if (wMode == MeasureSpec.AT_MOST) {
+                    derived = derived.coerceAtMost(w)
+                }
+                Pair(derived, h)
+            }
+            else -> Pair(w, h)
+        }
+        setMeasuredDimension(measured.first, measured.second)
+    }
+
     private fun rebuild() {
         if (width == 0 || height == 0) {
             paths = emptyList()
@@ -134,11 +172,15 @@ class CountryMapView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (paths.isEmpty()) return
-        // vertically center the (aspect-fitted) map
+        // center the (aspect-fitted) map in both axes; with an aspect-aware
+        // onMeasure there is no leftover space, but a fixed-size parent can
+        // still leave gutters, so center explicitly rather than pin to (0, 0)
+        val mapW = WorldMapPaths.MAP_WIDTH * drawMatrixScale
         val mapH = WorldMapPaths.MAP_HEIGHT * drawMatrixScale
+        val dx = (width - mapW) / 2f
         val dy = (height - mapH) / 2f
         canvas.save()
-        canvas.translate(0f, dy)
+        canvas.translate(dx, dy)
         for ((path, intensity) in paths) {
             if (intensity < 0f) {
                 canvas.drawPath(path, basePaint)

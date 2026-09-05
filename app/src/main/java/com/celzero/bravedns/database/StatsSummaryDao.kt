@@ -769,7 +769,7 @@ interface StatsSummaryDao {
               flag 
             FROM DnsLogs
             WHERE isBlocked = 0
-              AND status = 'COMPLETE' 
+              AND status = 'COMPLETE'
               AND queryStr != '' 
               AND time > :to
               AND flag != ''
@@ -786,8 +786,12 @@ interface StatsSummaryDao {
               AND flag != ''
             GROUP BY flag
           ) AS combined
+        -- keep only valid flag emojis (U+1F1E6..U+1F1FF pairs, e.g. 'AA'..'ZZ'
+        -- in regional indicators). Excludes placeholders written by log trackers:
+        -- '?', warning sign and the invalid pair derived from CountryMap's "--" unknown marker.
+        WHERE flag BETWEEN char(127462, 127462) AND char(127487, 127487)
         GROUP BY flag
-        ORDER BY count DESC 
+        ORDER BY count DESC
         LIMIT 7
         """
     )

@@ -141,7 +141,7 @@ class SummaryStatisticsAdapter(
 
     override fun onBindViewHolder(holder: AppNetworkActivityViewHolder, position: Int) {
         // Fix: Validate position to prevent IndexOutOfBoundsException
-        if (position < 0 || position >= itemCount) {
+        if (position !in 0..<itemCount) {
             Logger.w(LOG_TAG_DNS, "Invalid position $position, itemCount: $itemCount")
             return
         }

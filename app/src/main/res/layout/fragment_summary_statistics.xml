@@ -863,7 +863,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:paddingVertical="4dp"
-                            android:text="@string/ssv_insights_active_conns"
+                            android:text="@string/top_active_conns"
                             android:textColor="?attr/colorOnBackground" />
 
                         <com.google.android.material.chip.Chip
@@ -901,7 +901,7 @@
                             android:id="@+id/fss_ia_active_conns_donut"
                             android:layout_width="96dp"
                             android:layout_height="96dp"
-                            android:contentDescription="@string/ssv_insights_active_conns" />
+                            android:contentDescription="@string/top_active_conns" />
 
                         <LinearLayout
                             android:id="@+id/fss_ia_active_conns_rows"
@@ -1258,7 +1258,7 @@
                     <com.celzero.bravedns.ui.custom.CountryMapView
                         android:id="@+id/fss_ia_countries_map"
                         android:layout_width="match_parent"
-                        android:layout_height="140dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:contentDescription="@string/cd_stats_country_map" />
 

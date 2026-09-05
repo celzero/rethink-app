@@ -21,6 +21,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import androidx.core.graphics.ColorUtils
 
@@ -51,6 +52,13 @@ class DonutChartView @JvmOverloads constructor(
     }
     private val centerPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
+        // sp-based default (scales with density + user font size); without this
+        // the paint falls back to a raw 12px, which renders tiny on modern screens
+        textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            DEFAULT_CENTER_TEXT_SIZE_SP,
+            resources.displayMetrics
+        )
     }
     private val rect = RectF()
 
@@ -133,5 +141,9 @@ class DonutChartView @JvmOverloads constructor(
         // small visual gap between adjacent slices
         private const val SLICE_GAP_DEGREES = 1.5f
         private const val MIN_SWEEP = SLICE_GAP_DEGREES + 0.5f
+
+        // default center-label size in sp; fits comfortably inside the inner
+        // hole of the 96dp donuts (hole ≈ 69dp, longest label ≈ "1.2 GB")
+        private const val DEFAULT_CENTER_TEXT_SIZE_SP = 12f
     }
 }
