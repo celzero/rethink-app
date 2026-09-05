@@ -252,7 +252,7 @@ class CustomDomainFragment :
         val dialog = builder.create()
         dialog.show()
         lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
@@ -315,6 +315,7 @@ class CustomDomainFragment :
         }
 
         dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+        Utilities.adjustButtonLayoutOrientation(dBind.dacdButtonsContainer)
         dialog.show()
     }
 
