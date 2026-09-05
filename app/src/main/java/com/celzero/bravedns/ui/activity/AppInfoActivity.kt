@@ -952,14 +952,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     ) {
         io {
             val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
-            uiCtx {
-                if (appNames.count() > 1) {
-                    showDialog(appNames, appInfo, aStat, cStat, prevConnStat)
-                    return@uiCtx
-                }
-
-                completeFirewallChanges(aStat, cStat)
+            if (appNames.count() > 1) {
+                // guard only the dialog: showing it is pointless once the
+                // activity is finishing
+                uiCtx { showDialog(appNames, appInfo, aStat, cStat, prevConnStat) }
+                return@io
             }
+            completeFirewallChanges(aStat, cStat)
         }
     }
 
@@ -970,11 +969,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         appStatus = aStat
         connStatus = cStat
         io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
-        updateFirewallStatusUi(aStat, cStat)
         logEvent(
             "firewall rule change",
             "Firewall status changed for ${appInfo.appName} (${appInfo.uid}), new status: $aStat, conn status: $cStat"
         )
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) updateFirewallStatusUi(aStat, cStat)
+        }
     }
 
     private fun enableAppBypassedUi() {
