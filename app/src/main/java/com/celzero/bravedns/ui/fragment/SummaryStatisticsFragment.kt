@@ -686,10 +686,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         ).setTimeCategory(viewModel.getTimeCategory())
     }
 
-    // ------------------------------------------------------------------
-    // Insights view
-    // ------------------------------------------------------------------
-
     /** Re-renders every Insights section from the cached snapshots. */
     private fun renderInsights() {
         applyInsightsTheme()
@@ -904,7 +900,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             SummaryStatisticsType.MOST_CONNECTED_APPS,
             SummaryStatisticsType.MOST_BLOCKED_APPS ->
                 item.appOrDnsName?.takeIf { it.isNotEmpty() }
-                    ?: getString(R.string.network_log_app_name_unnamed, "(${item.uid})")
+                    ?: getString(R.string.network_log_app_name_unnamed, item.uid.toString())
             SummaryStatisticsType.MOST_CONNECTED_ASN,
             SummaryStatisticsType.MOST_BLOCKED_ASN ->
                 getString(R.string.two_argument_space, item.flag, item.appOrDnsName.orEmpty())

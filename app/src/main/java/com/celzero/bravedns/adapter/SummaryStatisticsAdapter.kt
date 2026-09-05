@@ -379,17 +379,15 @@ class SummaryStatisticsAdapter(
         }
 
         private fun applyAppName(appConnection: AppConnection, cachedAppName: String?) {
-            val name = if (appConnection.appOrDnsName.isNullOrEmpty()) {
-                if (cachedAppName.isNullOrEmpty()) {
-                    context.getString(
-                        R.string.network_log_app_name_unnamed,
-                        "(${appConnection.uid})"
-                    )
-                } else {
-                    cachedAppName
-                }
-            } else {
+            val name = if (!cachedAppName.isNullOrEmpty()) {
+                cachedAppName
+            } else if (!appConnection.appOrDnsName.isNullOrEmpty()) {
                 appConnection.appOrDnsName
+            } else {
+                context.getString(
+                    R.string.network_log_app_name_unnamed,
+                    appConnection.uid.toString()
+                )
             }
             if (type == SummaryStatisticsType.MOST_CONNECTED_APPS) {
                 itemBinding.ssName.visibility = View.VISIBLE
