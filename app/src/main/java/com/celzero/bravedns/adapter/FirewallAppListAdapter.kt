@@ -33,7 +33,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
@@ -292,12 +291,9 @@ class FirewallAppListAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-            ui {
-                Glide.with(context)
-                    .load(drawable)
-                    .error(Utilities.getDefaultIcon(context))
-                    .into(mIconImageView)
-            }
+            val target = drawable ?: Utilities.getDefaultIcon(context) ?: return
+            if (mIconImageView.drawable?.constantState == target.constantState) return
+            mIconImageView.setImageDrawable(target)
         }
 
         private fun setupClickListeners(appInfo: AppInfo) {
@@ -492,10 +488,6 @@ class FirewallAppListAdapter(
 
             f()
         }
-    }
-
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -30,6 +30,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.LinkProperties
@@ -89,7 +92,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("TooManyFunctions", "LargeClass")
@@ -506,18 +512,31 @@ object Utilities {
     }
 
     object AppIconCache {
-        private const val CACHE_SIZE = 500
+        // Icons are stored as pre-scaled bitmaps, not raw drawables.
+        // Launcher icons (AdaptiveIconDrawable layers) are commonly >=432px,
+        // while list views draw them at ~40dp. Downscaling at draw time is a
+        // large bilinear resample on the (software-rasterized) UI thread and
+        // has caused main-thread ANRs while scrolling FastScrollRecyclerViews.
+        // Scaling once here makes every subsequent bind/draw a ~1:1 blit.
+        private const val CACHE_SIZE_BYTES = 16 shl 20 // 16 MiB
+        private const val ICON_SIZE_DP = 48
 
-        private val cache =
-            LruCache<String, Drawable.ConstantState>(CACHE_SIZE)
+        private val bitmapCache =
+            object : LruCache<String, Bitmap>(CACHE_SIZE_BYTES) {
+                override fun sizeOf(key: String, value: Bitmap): Int {
+                    return value.allocationByteCount
+                }
+            }
 
         fun get(
             context: Context,
             packageName: String,
             appName: String? = null
         ): Drawable? {
-            cache.get(packageName)?.let {
-                return it.newDrawable(context.resources)
+            val sizePx = iconSizePx(context)
+            val key = "${packageName}#${sizePx}"
+            bitmapCache.get(key)?.let {
+                return BitmapDrawable(context.resources, it)
             }
 
             if (!isValidAppName(appName, packageName)) {
@@ -531,11 +550,55 @@ object Utilities {
                 return getDefaultIcon(context)
             }
 
-            drawable.constantState?.let {
-                cache.put(packageName, it)
-            }
+            val bitmap = downscale(context, drawable, sizePx)
+            // fall back to the original drawable if rasterization failed
+            if (bitmap == null) return drawable
 
-            return drawable
+            bitmapCache.put(key, bitmap)
+            return BitmapDrawable(context.resources, bitmap)
+        }
+
+        /**
+         * Rasterizes [drawable] to fit inside a [sizePx] box (never upscales,
+         * never distorts: matches ImageView's fitCenter behaviour so visuals
+         * are identical to drawing the original drawable).
+         */
+        @Suppress("TooGenericExceptionCaught", "ReturnCount")
+        private fun downscale(context: Context, drawable: Drawable, sizePx: Int): Bitmap? {
+            return try {
+                val w = drawable.intrinsicWidth
+                val h = drawable.intrinsicHeight
+                if (w <= 0 || h <= 0) return null
+
+                val scale =
+                    if (w <= sizePx && h <= sizePx) 1f
+                    else min(sizePx.toFloat() / w, sizePx.toFloat() / h)
+                val dw = max(1, (w * scale).roundToInt())
+                val dh = max(1, (h * scale).roundToInt())
+
+                // createBitmap(metrics, ...) stamps the display density so the
+                // resulting BitmapDrawable reports dp-sized intrinsic bounds.
+                val bitmap =
+                    Bitmap.createBitmap(
+                        context.resources.displayMetrics,
+                        dw,
+                        dh,
+                        Bitmap.Config.ARGB_8888
+                    )
+                val canvas = Canvas(bitmap)
+                // mutate() so bounds changes never leak into a shared ConstantState
+                drawable.mutate().setBounds(0, 0, dw, dh)
+                drawable.draw(canvas)
+                bitmap
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "err downscaling icon: ${e.message}")
+                null
+            }
+        }
+
+        private fun iconSizePx(context: Context): Int {
+            val density = context.resources.displayMetrics.density
+            return max(1, (ICON_SIZE_DP * density).toInt())
         }
     }
 
