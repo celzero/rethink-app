@@ -189,6 +189,16 @@ class LogActivityAggregator(
     @Volatile
     private var restoredForBucketStart: Long = Long.MIN_VALUE
 
+    // Set synchronously by [recordOnArrival] (before the event is dispatched)
+    // and under [mutex] by [record]/[reclassify] when they mutate the wall.
+    // While set, [restoreFromDatabase] must not rebuild from the database:
+    // events applied since the last snapshot may not be persisted yet (db
+    // writes are batched), so a rebuild would silently wipe them — and events
+    // queued behind the mutex would be double counted once the snapshot
+    // already contains them. See [restoreFromDatabase].
+    @Volatile
+    private var hasRecordedSinceRestore: Boolean = false
+
     // flat wall counters, chronological: index 0 = oldest bucket,
     // TOTAL_SLOTS-1 = current bucket
     private val dnsBlocked = LongArray(TOTAL_SLOTS)
@@ -221,6 +231,9 @@ class LogActivityAggregator(
      * slide/dedupe semantics.
      */
     fun recordOnArrival(event: LogActivityEvent) {
+        // flag synchronously: a queued-but-not-yet-applied arrival must make
+        // the next restore treat the wall as live (see restoreFromDatabase)
+        hasRecordedSinceRestore = true
         arrivalScope.launch { record(listOf(event)) }
     }
 
@@ -233,7 +246,10 @@ class LogActivityAggregator(
                 applyEvent(event, +1)
                 mutated = true
             }
-            if (mutated) publishSnapshot()
+            if (mutated) {
+                hasRecordedSinceRestore = true
+                publishSnapshot()
+            }
         }
     }
 
@@ -250,6 +266,7 @@ class LogActivityAggregator(
                 slideWindowIfNeeded(new.timestampMs)
                 applyEvent(new, +1)
             }
+            hasRecordedSinceRestore = true
             publishSnapshot()
         }
     }
@@ -259,12 +276,31 @@ class LogActivityAggregator(
      * per table over the full trailing-24h range; never by loading individual
      * rows). Called from BraveVPNService.onCreate; also re-anchors the window
      * for long-lived processes. Idempotent.
+     *
+     * Restoration is atomic with respect to arrival recording: when events
+     * have been recorded (or are queued) since the last snapshot, the wall is
+     * considered live and the rebuild is skipped — a database snapshot cannot
+     * tell whether an already-applied event has been flushed to disk yet
+     * (batched writes), so rebuilding would either drop it, or double count a
+     * queued arrival the snapshot already contains. Instead the window is
+     * re-anchored by sliding; the next restore that runs while no arrivals
+     * happened performs the full rebuild.
      */
     suspend fun restoreFromDatabase() {
         try {
             mutex.withLock {
-                currentBucketStart = bucketFloor(clock.millis())
                 if (restoredForBucketStart == currentBucketStart && loaded) return
+                val previousBucketStart = currentBucketStart
+                currentBucketStart = bucketFloor(clock.millis())
+
+                if (hasRecordedSinceRestore) {
+                    slide(((currentBucketStart - previousBucketStart) / BUCKET_MS).coerceAtLeast(0).toInt())
+                    loaded = true
+                    restoredForBucketStart = currentBucketStart
+                    publishSnapshot()
+                    return
+                }
+
                 val rangeStart = currentBucketStart - (TOTAL_SLOTS - 1) * BUCKET_MS
                 val rangeEnd = currentBucketStart + BUCKET_MS
 
@@ -285,6 +321,7 @@ class LogActivityAggregator(
 
                 loaded = true
                 restoredForBucketStart = currentBucketStart
+                hasRecordedSinceRestore = false
                 publishSnapshot()
             }
         } catch (e: Exception) {

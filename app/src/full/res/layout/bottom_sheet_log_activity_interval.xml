@@ -25,23 +25,15 @@
             android:background="?attr/border" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/bs_lai_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lbl_activity"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_lai_range"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="13sp" />
+            android:textSize="@dimen/large_font_text_view" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bs_lai_range_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
@@ -54,7 +46,6 @@
                 android:id="@+id/bs_lai_range_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
                 app:selectionRequired="true"
                 app:singleSelection="true">
 
@@ -87,9 +78,10 @@
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
+            android:id="@+id/bs_lai_counts_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
@@ -116,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textColor="?attr/accentBad"
-                        android:textSize="26sp"
+                        android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -126,7 +118,7 @@
                         android:text="@string/lbl_blocked"
                         android:textAllCaps="true"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="11sp" />
+                        android:textSize="@dimen/small_font_subheading_text" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -153,7 +145,7 @@
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textColor="?attr/colorPrimary"
-                        android:textSize="26sp"
+                        android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -163,42 +155,9 @@
                         android:text="@string/lbl_allowed"
                         android:textAllCaps="true"
                         android:textColor="?attr/primaryLightColorText"
-                        android:textSize="11sp" />
+                        android:textSize="@dimen/small_font_subheading_text" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="end"
-            android:orientation="horizontal">
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/bs_lai_filter_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:chipSpacingHorizontal="4dp"
-                app:selectionRequired="true"
-                app:singleSelection="true">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/bs_lai_filter_all"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="@string/lbl_all" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/bs_lai_filter_blocked"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="@string/lbl_blocked" />
-            </com.google.android.material.chip.ChipGroup>
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -209,14 +168,14 @@
             android:alpha="0.6"
             android:text="@string/log_activity_interval_empty"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="13sp"
+            android:textSize="@dimen/small_font_subheading_text"
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bs_lai_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never" />
     </LinearLayout>

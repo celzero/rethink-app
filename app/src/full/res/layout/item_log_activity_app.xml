@@ -9,15 +9,29 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/laa_avatar"
+    <!-- Avatar pill: shows the resolved app icon when one is available
+         (laa_app_icon), falling back to the initials (laa_avatar). -->
+    <FrameLayout
         android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/bg_activity_avatar"
-        android:gravity="center"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+        android:layout_height="36dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/laa_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_activity_avatar"
+            android:gravity="center"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/laa_app_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/settings_dns_proxy_dialog_app"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
