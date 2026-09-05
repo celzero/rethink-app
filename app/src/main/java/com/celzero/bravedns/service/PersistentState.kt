@@ -684,12 +684,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
      * @return true if the state was changed (i.e., it was newly enabled), false otherwise.
      */
     fun enableStabilityDependentSettings(): Boolean {
-        // Skip for fdroid flavor
-        if (Utilities.isFdroidFlavour()) {
+        // Stability program is backed by Firebase error reporting, which is
+        // available in the play flavour only; skip for website and fdroid.
+        if (!Utilities.isPlayStoreFlavour()) {
             return false
         }
 
-        // Enable Firebase error reporting for play and website variants
+        // Enable Firebase error reporting for the play variant
         if (!firebaseErrorReportingEnabled) {
             firebaseErrorReportingEnabled = true
             FirebaseErrorReporting.setEnabled(firebaseErrorReportingEnabled)
