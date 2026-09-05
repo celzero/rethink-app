@@ -64,17 +64,6 @@ object EnhancedBugReport : KoinComponent {
     // Crashlytics log() is a 64 KB ring buffer; keep each log entry comfortably small so
     // no chunk of the raw captured trace is truncated or evicted mid-write.
     private const val LOG_CHUNK_CHARS = 4 * 1024
-    private const val MAX_BYTES = 64 * 1024
-    private const val MAX_EXCEPTION_PREVIEW_CHARS = 2 * 1024
-    private const val MAX_FAILURE_MESSAGE_CHARS = 1024
-
-    private val JVM_EXCEPTION_HEADER =
-        Regex(
-            """^(?:Exception in thread "[^"]+"\s+)?(?:Caused by:\s*)?[\w.$]+(?:Exception|Error|Throwable)(?::.*)?$"""
-        )
-    private val JVM_FRAME = Regex("""^\s*at\s+([^\s(]+)\(([^)]*)\)\s*$""")
-    private val GO_LOCATION = Regex("""^\s*(.+\.go):(\d+)(?:\s+.*)?$""")
-
     private val persistentState by inject<PersistentState>()
 
     /**
@@ -344,10 +333,6 @@ object EnhancedBugReport : KoinComponent {
                 else -> "CrashLog"
             }
             Logger.d(LOG_TAG_BUG_REPORT, "err-rpting: sending $type ${file.name} (${content.length} chars)")
-            val content = readTruncatedContent(file)
-            val type = reportType(file.name)
-            Logger.d(LOG_TAG_BUG_REPORT, "err-rpting: sending $type ${file.name} (${content.length} chars)")
-            val ex = buildReportException(file.name, content)
 
             val parsed = ExceptionParser.parse(content)
             if (parsed.frames.isEmpty()) {
@@ -378,143 +363,6 @@ object EnhancedBugReport : KoinComponent {
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err-rpting: failed to send ${file.name}: ${e.message}")
             false
-        }
-    }
-
-    /** Builds the same exception sent to Crashlytics, restoring frames when the format permits. */
-    internal fun buildReportException(fileName: String, content: String): RuntimeException {
-        val type = reportType(fileName)
-        val frames = when {
-            fileName.startsWith(PREFIX_KOTLIN) -> parseJvmFrames(content)
-            fileName.startsWith(PREFIX_GO_CRASH) -> parseGoFrames(content)
-            else -> emptyList()
-        }
-        val failure = when {
-            fileName.startsWith(PREFIX_KOTLIN) -> findJvmExceptionHeader(content)
-            fileName.startsWith(PREFIX_GO_CRASH) -> findGoFailureHeader(content)
-            else -> null
-        }
-        val message = if (failure != null) {
-            "[$type] $fileName: ${failure.take(MAX_FAILURE_MESSAGE_CHARS)}"
-        } else {
-            // Keep the existing bounded preview for malformed tombstones and non-crash logs.
-            "[$type] $fileName\n${content.take(MAX_EXCEPTION_PREVIEW_CHARS)}"
-        }
-        return RuntimeException(message).also { exception ->
-            if (frames.isNotEmpty()) {
-                exception.stackTrace = frames.toTypedArray()
-            }
-        }
-    }
-
-    private fun reportType(fileName: String): String {
-        return when {
-            fileName.startsWith(PREFIX_GO_CRASH) -> "GoCrash"
-            fileName.startsWith(PREFIX_GO_LOG) -> "GoLog"
-            fileName.startsWith(PREFIX_KOTLIN) -> "KotlinCrash"
-            else -> "CrashLog"
-        }
-    }
-
-    private fun findJvmExceptionHeader(content: String): String? {
-        return content.lineSequence()
-            .map { it.trim() }
-            .firstOrNull { JVM_EXCEPTION_HEADER.matches(it) }
-    }
-
-    private fun findGoFailureHeader(content: String): String? {
-        return content.lineSequence()
-            .map { it.trim() }
-            .firstOrNull { it.startsWith("panic:") || it.startsWith("fatal error:") }
-    }
-
-    private fun parseJvmFrames(content: String): List<StackTraceElement> {
-        return content.lineSequence().mapNotNull { line ->
-            val match = JVM_FRAME.matchEntire(line) ?: return@mapNotNull null
-            val classAndMethod = match.groupValues[1]
-            val separator = classAndMethod.lastIndexOf('.')
-            if (separator <= 0 || separator == classAndMethod.lastIndex) {
-                return@mapNotNull null
-            }
-
-            val className = classAndMethod.substring(0, separator)
-            val methodName = classAndMethod.substring(separator + 1)
-            val location = match.groupValues[2]
-            when (location) {
-                "Native Method" -> StackTraceElement(className, methodName, null, -2)
-                "Unknown Source" -> StackTraceElement(className, methodName, null, -1)
-                else -> {
-                    val lineSeparator = location.lastIndexOf(':')
-                    val lineNumber = if (lineSeparator >= 0) {
-                        location.substring(lineSeparator + 1).toIntOrNull()
-                    } else {
-                        null
-                    }
-                    val sourceFile = if (lineNumber != null) {
-                        location.substring(0, lineSeparator)
-                    } else {
-                        location
-                    }
-                    if (sourceFile.isBlank()) {
-                        null
-                    } else {
-                        StackTraceElement(className, methodName, sourceFile, lineNumber ?: -1)
-                    }
-                }
-            }
-        }.toList()
-    }
-
-    private fun parseGoFrames(content: String): List<StackTraceElement> {
-        val lines = content.lines()
-        return lines.mapIndexedNotNull { index, line ->
-            if (index == lines.lastIndex) return@mapIndexedNotNull null
-            val functionName = parseGoFunctionName(line) ?: return@mapIndexedNotNull null
-            val location = GO_LOCATION.matchEntire(lines[index + 1]) ?: return@mapIndexedNotNull null
-            val separator = functionName.lastIndexOf('.')
-            if (separator <= 0 || separator == functionName.lastIndex) {
-                return@mapIndexedNotNull null
-            }
-
-            val filePath = location.groupValues[1]
-            val lineNumber = location.groupValues[2].toIntOrNull() ?: -1
-            StackTraceElement(
-                functionName.substring(0, separator),
-                functionName.substring(separator + 1),
-                filePath.substringAfterLast('/'),
-                lineNumber
-            )
-        }
-    }
-
-    private fun parseGoFunctionName(line: String): String? {
-        val trimmed = line.trim()
-        if (trimmed.isEmpty()) return null
-        if (trimmed.startsWith("created by ")) {
-            return trimmed.removePrefix("created by ").substringBefore(" in goroutine").trim()
-                .takeIf { it.isNotEmpty() }
-        }
-        if (line.firstOrNull()?.isWhitespace() == true || !trimmed.contains('.')) return null
-
-        val receiverEnd = trimmed.lastIndexOf(").")
-        val argumentsStart = if (receiverEnd >= 0) {
-            trimmed.indexOf('(', receiverEnd + 2)
-        } else {
-            trimmed.indexOf('(')
-        }
-        if (argumentsStart < 0) return null
-        return trimmed.substring(0, argumentsStart)
-            .takeIf { it.isNotEmpty() }
-    }
-
-    private fun readTruncatedContent(file: File): String {
-        file.inputStream().buffered().use { input ->
-            val buffer = ByteArray(MAX_BYTES)
-            val bytesRead = input.read(buffer)
-            if (bytesRead <= 0) return ""
-
-            return buffer.copyOf(bytesRead)
-                .toString(Charsets.UTF_8)
         }
     }
 
