@@ -42,7 +42,7 @@ object IpRulesManager : KoinComponent {
 
     // separate tries are used internally for ip4 and ip6, if the implementation changes in the
     // future, ensure both cases continue to be handled correctly.
-    private val iptree = Backend.newIpTree()
+    private val iptree by lazy { Backend.newIpTree() }
 
     // key-value object for ip look-up
     data class CacheKey(val ipNetPort: String, val uid: Int)

@@ -42,12 +42,12 @@ object DomainRulesManager : KoinComponent {
 
     private val db by inject<CustomDomainRepository>()
 
-    private val trie: RadixTree = Backend.newRadixTree()
+    private val trie: RadixTree by lazy { Backend.newRadixTree() }
     // fixme: find a better way to handle trusted domains without using two data structures
     // map to store the trusted domains with set of uids
     private val trustedMap = ConcurrentHashMap<String, Set<Int>>()
     // even though we have trustedMap, we need to keep the trie for wildcard matching
-    private val trustedTrie: RadixTree = Backend.newRadixTree()
+    private val trustedTrie: RadixTree by lazy { Backend.newRadixTree() }
 
     // regex to check if url is valid wildcard domain
     // valid wildcard domain: *.eu, *.com, *.example.com, *.example.co.in, *.do-main.com

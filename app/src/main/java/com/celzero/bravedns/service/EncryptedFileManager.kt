@@ -196,7 +196,7 @@ object EncryptedFileManager : KoinComponent {
      * @throws EncryptionException for any encryption/decryption failures
      */
     @Throws(EncryptionException::class)
-    fun read(ctx: Context, file: File): String {
+    suspend fun read(ctx: Context, file: File): String {
         val bytes = readByteArray(ctx, file)
         return bytes.toString(StandardCharsets.UTF_8)
     }
@@ -216,7 +216,7 @@ object EncryptedFileManager : KoinComponent {
      * @throws EncryptionException.IOError for file I/O failures
      */
     @Throws(EncryptionException::class)
-    fun readByteArray(ctx: Context, file: File): ByteArray {
+    suspend fun readByteArray(ctx: Context, file: File): ByteArray {
         try {
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
@@ -250,7 +250,7 @@ object EncryptedFileManager : KoinComponent {
      * @throws EncryptionException for any encryption failures
      */
     @Throws(EncryptionException::class)
-    fun writeTcpConfig(ctx: Context, cfg: String, fileName: String) {
+    suspend fun writeTcpConfig(ctx: Context, cfg: String, fileName: String) {
         val dir =
             File(
                 ctx.filesDir.canonicalPath +
@@ -269,10 +269,12 @@ object EncryptedFileManager : KoinComponent {
     /**
      * Writes String data to encrypted file.
      *
+     * suspend: keystore + disk I/O must never run on the caller's (possibly main) thread.
+     *
      * @throws EncryptionException for any encryption failures
      */
     @Throws(EncryptionException::class)
-    fun write(ctx: Context, data: String, file: File): Boolean {
+    suspend fun write(ctx: Context, data: String, file: File): Boolean {
         val d = data.toByteArray(StandardCharsets.UTF_8)
         return write(ctx, d, file)
     }
@@ -293,7 +295,7 @@ object EncryptedFileManager : KoinComponent {
      * @throws EncryptionException.IOError for file I/O failures
      */
     @Throws(EncryptionException::class)
-    fun write(ctx: Context, data: ByteArray, file: File): Boolean {
+    suspend fun write(ctx: Context, data: ByteArray, file: File): Boolean {
         Logger.d(LOG_TAG, "write into ${file.absolutePath}")
         return try {
             // Delete any existing file first; EncryptedFile refuses to overwrite it.

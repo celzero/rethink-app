@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets
  *
  * This helper intentionally does **not** perform any encryption so that the Go backend and
  * backup/restore flows can read/write the files directly.
+ *
  */
 object WireguardConfigFileManager {
     private const val LOG_TAG = "WgConfigFileMgr"
@@ -38,7 +39,7 @@ object WireguardConfigFileManager {
      * Returns the directory used for WireGuard config files.
      * Creates the directory if it does not exist.
      */
-    fun getConfigDirectory(ctx: Context): File {
+    suspend fun getConfigDirectory(ctx: Context): File {
         val dir = File(ctx.filesDir, WIREGUARD_FOLDER_NAME)
         if (!dir.exists()) {
             dir.mkdirs()
@@ -53,7 +54,7 @@ object WireguardConfigFileManager {
      * @throws IOException if the file cannot be written
      */
     @Throws(IOException::class)
-    fun write(ctx: Context, cfg: String, fileName: String): File {
+    suspend fun write(ctx: Context, cfg: String, fileName: String): File {
         val dir = getConfigDirectory(ctx)
         val file = File(dir, fileName)
         write(file, cfg)
@@ -66,7 +67,7 @@ object WireguardConfigFileManager {
      * @throws IOException if the file cannot be written
      */
     @Throws(IOException::class)
-    fun write(file: File, cfg: String) {
+    suspend fun write(file: File, cfg: String) {
         Logger.d(LOG_TAG, "writing wg config to plain file: ${file.absolutePath}")
         file.parentFile?.mkdirs()
         file.writeText(cfg, StandardCharsets.UTF_8)
@@ -78,7 +79,7 @@ object WireguardConfigFileManager {
      * @throws IOException if the file cannot be read
      */
     @Throws(IOException::class)
-    fun read(file: File): ByteArray {
+    suspend fun read(file: File): ByteArray {
         return file.readBytes()
     }
 
@@ -87,7 +88,7 @@ object WireguardConfigFileManager {
      *
      * @return true if the file was deleted or did not exist
      */
-    fun delete(file: File): Boolean {
+    suspend fun delete(file: File): Boolean {
         return if (file.exists()) {
             file.delete()
         } else {
@@ -99,7 +100,7 @@ object WireguardConfigFileManager {
      * Returns true if the file looks like a plain WireGuard config (contains an [Interface]
      * section). This is used by the migration to skip files that are already plaintext.
      */
-    fun isPlaintextConfig(file: File): Boolean {
+    suspend fun isPlaintextConfig(file: File): Boolean {
         if (!file.exists() || file.length() == 0L) return false
         return try {
             file.readText(StandardCharsets.UTF_8).contains("[Interface]", ignoreCase = true)

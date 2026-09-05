@@ -95,14 +95,15 @@ object ProxyManager : KoinComponent {
 
     private val pamSet = CopyOnWriteArraySet<ProxyAppMapTuple>()
 
-    // Serializes every mutation of the proxy↔app mapping (bulk include/remove and per-app
-    // add/remove). Without it, a slow "include all" loop can interleave with a concurrent
-    // "remove all" or an individual toggle and re-insert stale rows into
-    // ProxyApplicationMapping after the removal has already deleted them.
-    // Note: readers (getProxyIdsForApp etc.) stay lock-free on purpose.
+    // mutex protecting all proxy-app mapping mutations and refresh maintenance from
+    // concurrent updates
     private val pamMutex = Mutex()
 
     suspend fun load(): Int {
+        pamMutex.withLock { return loadLocked() }
+    }
+
+    private suspend fun loadLocked(): Int {
         val a = db.getApps()
         val entries = a.map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
         pamSet.clear()
@@ -127,6 +128,7 @@ object ProxyManager : KoinComponent {
     // ensure the proxyId="" base row exists for (uid, packageName). base row is what makes an
     // app visible in the "All Apps" pager query (proxyId = :proxyId OR proxyId = '') even when the
     // app is not assigned to any specific proxy.
+    // Caller must hold pamMutex (all call sites are within withLock blocks).
     private suspend fun ensureBaseRow(uid: Int, packageName: String, appName: String) {
         val baseTuple = ProxyAppMapTuple(uid, packageName, "")
         if (pamSet.contains(baseTuple)) return
@@ -231,23 +233,33 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteApps(m: Collection<FirewallManager.AppInfoTuple>) {
-        m.forEach { deleteApp(it.uid, it.packageName) }
+        pamMutex.withLock {
+            m.forEach { deleteAppLocked(it.uid, it.packageName) }
+        }
     }
 
     suspend fun addApps(m: Collection<AppInfo?>) {
-        m.forEach { addNewApp(it) }
+        pamMutex.withLock {
+            m.forEach { addNewAppLocked(it) }
+        }
     }
 
     suspend fun updateApps(m: Collection<FirewallManager.AppInfoTuple>) {
-        m.forEach {
-            val newInfo = FirewallManager.getAppInfoByPackage(it.packageName) ?: return@forEach
-            if (newInfo.uid == it.uid) return@forEach // no change in uid
+        pamMutex.withLock {
+            m.forEach {
+                val newInfo = FirewallManager.getAppInfoByPackage(it.packageName) ?: return@forEach
+                if (newInfo.uid == it.uid) return@forEach // no change in uid
 
-            updateApp(newInfo.uid, it.packageName)
+                updateAppLocked(newInfo.uid, it.packageName)
+            }
         }
     }
 
     suspend fun updateApp(uid: Int, packageName: String) {
+        pamMutex.withLock { updateAppLocked(uid, packageName) }
+    }
+
+    private suspend fun updateAppLocked(uid: Int, packageName: String) {
         // filter only entries with a different uid; these are the stale ones
         val m = pamSet.filter { it.packageName == packageName && it.uid != uid }.toSet()
         if (m.isEmpty()) {
@@ -284,6 +296,10 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun addNewApp(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {
+        pamMutex.withLock { addNewAppLocked(appInfo, proxyId, proxyName) }
+    }
+
+    private suspend fun addNewAppLocked(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {
         if (appInfo == null) {
             Logger.e(LOG_TAG_PROXY, "AppInfo is null, cannot add to proxy")
             return
@@ -315,60 +331,73 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteApp(uid: Int, packageName: String) {
+        pamMutex.withLock { deleteAppLocked(uid, packageName) }
+    }
+
+    // Caller must hold pamMutex.
+    private suspend fun deleteAppLocked(uid: Int, packageName: String) {
         deleteFromCache(uid, packageName)
         db.deleteApp(uid, packageName)
         Logger.i(LOG_TAG_PROXY, "deleting app for mapping: $uid, $packageName")
     }
 
     suspend fun deleteAppIfNeeded(uid: Int, packageName: String) {
-        val fm = FirewallManager.getAppInfoByPackage(packageName)
-        // if there is no app info for the package, then delete the app from the mapping
-        if (fm == null) {
-            deleteApp(uid, packageName)
-            return
-        } else {
-            // the app can be tombstoned, so do not delete the app from the mapping
-            Logger.i(LOG_TAG_PROXY, "deleteAppIfNeeded: app($uid, $packageName) is available in firewall manager, not deleting, tombstone: ${fm.tombstoneTs}")
+        pamMutex.withLock {
+            val fm = FirewallManager.getAppInfoByPackage(packageName)
+            // if there is no app info for the package, then delete the app from the mapping
+            if (fm == null) {
+                deleteAppLocked(uid, packageName)
+                return@withLock
+            } else {
+                // the app can be tombstoned, so do not delete the app from the mapping
+                Logger.i(LOG_TAG_PROXY, "deleteAppIfNeeded: app($uid, $packageName) is available in firewall manager, not deleting, tombstone: ${fm.tombstoneTs}")
+            }
         }
     }
 
     suspend fun deleteAppByPkgName(packageName: String) {
-        val toRemove = pamSet.filter { it.packageName == packageName }
-        if (toRemove.isEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "deleteAppByPkgName: app not found in proxy mapping: $packageName")
-            return
+        pamMutex.withLock {
+            val toRemove = pamSet.filter { it.packageName == packageName }
+            if (toRemove.isEmpty()) {
+                Logger.i(LOG_TAG_PROXY, "deleteAppByPkgName: app not found in proxy mapping: $packageName")
+                return@withLock
+            }
+            pamSet.removeAll(toRemove.toSet())
+            // delete the app from the database
+            db.deleteAppByPkgName(packageName)
+            Logger.i(LOG_TAG_PROXY, "deleting app for mapping by package name: $packageName")
         }
-        pamSet.removeAll(toRemove.toSet())
-        // delete the app from the database
-        db.deleteAppByPkgName(packageName)
-        Logger.i(LOG_TAG_PROXY, "deleting app for mapping by package name: $packageName")
     }
 
     suspend fun clear() {
-        pamSet.clear()
-        db.deleteAll()
-        Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
+        pamMutex.withLock {
+            pamSet.clear()
+            db.deleteAll()
+            Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
+        }
     }
 
     suspend fun tombstoneApp(oldUid: Int) {
-        val newUid = if (oldUid > 0) -1 * oldUid else oldUid
-        if (newUid == oldUid) {
-            Logger.w(LOG_TAG_PROXY, "no change in uid, not tombstoning: $oldUid")
-            return
-        }
-        val entries = pamSet.filter { it.uid == oldUid }
-        try {
-            entries.forEach { tuple ->
-                db.deleteMapping(newUid, tuple.packageName, tuple.proxyId)
+        pamMutex.withLock {
+            val newUid = if (oldUid > 0) -1 * oldUid else oldUid
+            if (newUid == oldUid) {
+                Logger.w(LOG_TAG_PROXY, "no change in uid, not tombstoning: $oldUid")
+                return@withLock
             }
-            db.tombstoneApp(oldUid, newUid)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_PROXY, "tombstoneApp failed for oldUid=$oldUid; reloading cache", e)
-            load()
-            return
+            val entries = pamSet.filter { it.uid == oldUid }
+            try {
+                entries.forEach { tuple ->
+                    db.deleteMapping(newUid, tuple.packageName, tuple.proxyId)
+                }
+                db.tombstoneApp(oldUid, newUid)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "tombstoneApp failed for oldUid=$oldUid; reloading cache", e)
+                loadLocked()
+                return@withLock
+            }
+            loadLocked()
+            Logger.i(LOG_TAG_PROXY, "tombstoning app for mapping: $oldUid, $newUid, entries: ${entries.size}")
         }
-        load()
-        Logger.i(LOG_TAG_PROXY, "tombstoning app for mapping: $oldUid, $newUid, entries: ${entries.size}")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {
