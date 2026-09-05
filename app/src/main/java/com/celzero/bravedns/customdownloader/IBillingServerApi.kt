@@ -100,11 +100,12 @@ interface IBillingServerApi {
 
     /*
       * Cancel the subscription for the given account ID.
-      * URL shape: /g/stop?sku=xxx&purchaseToken=xxx
+      * URL shape: /g/stop?sku=xxx
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * response: {"message":"canceled subscription","purchaseId":"..."}
       *
@@ -119,17 +120,18 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
       * Refund / revoke the subscription for the given account ID.
-      * URL shape: /g/refund?sku=xxx&purchaseToken=xxx
+      * URL shape: /g/refund?sku=xxx
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * response: {"message":"canceled subscription","purchaseId":"..."}
       *
@@ -144,17 +146,18 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
       * Acknowledge a purchase. POST
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx
+      * URL shape: /g/ack?sku=xxx
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
@@ -167,17 +170,18 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
       * Query the entitlement status of a purchase. GET
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx
+      * URL shape: /g/ack?sku=xxx
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * DB routing: read-only; first-unconstrained allows the server to use the nearest
       * replica (or primary) with no consistency constraint.
@@ -191,18 +195,19 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
 
     /*
       * Consume an expired one-time (INAPP) purchase server-side.
-      * URL shape: /g/con?sku=xxx&purchaseToken=xxx
+      * URL shape: /g/con?sku=xxx
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * response: {"message":"consumed","purchaseId":"..."}
       *           {"error":"already consumed",...}
@@ -218,18 +223,23 @@ interface IBillingServerApi {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String
     ): Response<JsonObject?>?
 
     /*
       * Fetch purchase/order history from the server.
-      * URL shape: /g/tx?cid=xxx&purchaseToken=xxx[&tot=n][&test][&active]
+      * URL shape: /g/tx[?tot=n][&test][&active]
       *
       * - tot=n (1–20): also return up to n most recent purchases for the same cid,
       *   ordered by mtime desc. The entry for purchaseToken is always included.
       * - active: only return active purchases (if purchaseToken itself is active).
       * - test: operate on test-entitlement records.
+      *
+      * Headers:
+      *   x-rethink-app-cid: <account id>
+      *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * Response: single PlayOrder JSON object (with optional `orders` array when tot=n).
       *
@@ -244,7 +254,7 @@ interface IBillingServerApi {
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("tot") total: Int? = null,
         @Query("active") active: String? = null,
         @Query("vcode") vcode: String

@@ -43,9 +43,10 @@ import retrofit2.http.Query
  *                           primary; safe for all read (GET) endpoints.
  *
  * ### Identity headers
- * CID and DID are no longer passed as URL query parameters. All endpoints send:
+ * CID, DID, and purchaseToken are no longer passed as URL query parameters. All endpoints send:
  *   `x-rethink-app-cid: <account id>`
  *   `x-rethink-app-did: <device id>`
+ *   `x-rethink-app-purchase-token: <purchase token>`
  * Bootstrap endpoints (`registerCustomer`, `registerDevice`) accept nullable headers
  * so Retrofit omits them for first-time registrations.
  *
@@ -129,11 +130,12 @@ interface IBillingServerApiTest {
 
     /*
       * Cancel the subscription for the given account ID (test path).
-      * URL shape: /g/stop?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/stop?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement] (typically "test").
@@ -150,18 +152,19 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Refund / revoke the subscription for the given account ID (test path).
-      * URL shape: /g/refund?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/refund?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -178,18 +181,19 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Acknowledge a purchase (test path). POST
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/ack?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -205,18 +209,19 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Query entitlement for a purchase (test path). GET
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/ack?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -233,18 +238,19 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Consume an expired one-time (INAPP) purchase server-side (test path).
-      * URL shape: /g/con?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/con?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -262,18 +268,19 @@ interface IBillingServerApiTest {
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Fetch purchase/order history from the server (test path).
-      * URL shape: /g/tx?purchaseToken=xxx&test=<value>[&tot=n][&active]
+      * URL shape: /g/tx?test=<value>[&tot=n][&active]
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -291,7 +298,7 @@ interface IBillingServerApiTest {
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("tot") total: Int? = null,
         @Query("active") active: String? = null,
         @Query("test") test: String,

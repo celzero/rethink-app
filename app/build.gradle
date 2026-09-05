@@ -230,11 +230,15 @@ android {
 
     buildTypes {
         release {
-            // modified as part of #352, now webview is removed from app, flipping back
-            // the setting to true
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // AGP 9.3 DSL: enables both code and resource optimization and
+            // includes the default Android keep rules (equivalent to
+            // proguard-android-optimize.txt, which the webview removal in #352
+            // allowed flipping back on). Project keep rules live in
+            // src/main/keepRules/*.keep (see developer.android.com/topic/
+            // performance/app-optimization/enable-app-optimization).
+            optimization {
+                enable = true // Enables code and resource optimizations.
+            }
             ndk {
                 // Use SYMBOL_TABLE to reduce symbol file size significantly
                 debugSymbolLevel 'SYMBOL_TABLE'
@@ -263,19 +267,20 @@ android {
         alpha {
             // archive.is/y8uCB
             applicationIdSuffix ".alpha"
-            minifyEnabled true
-            shrinkResources true
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig signingConfigs.alpha
             resValue "string", "app_name", "Rethink(α)"
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         releaseDebug {
              // for testing release build with debug signing config
             initWith buildTypes.release
-            minifyEnabled true
-            shrinkResources true
+            // set explicitly; initWith may not copy the optimization block
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig signingConfigs.debug
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ndk {
                 // Use SYMBOL_TABLE to reduce symbol file size significantly
                 debugSymbolLevel 'SYMBOL_TABLE'
@@ -339,12 +344,6 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    packagingOptions {
-        jniLibs {
-            keepDebugSymbols += ['**/*.so']
-        }
     }
 
     // required for google play developer api model classes
