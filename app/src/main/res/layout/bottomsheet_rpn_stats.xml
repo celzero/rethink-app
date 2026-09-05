@@ -230,7 +230,7 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/rpn_stats_blocked"
+                        android:text="@string/lbl_blocked"
                         android:textSize="10.5sp"
                         android:alpha="0.7"
                         android:textColor="?attr/primaryLightColorText" />
@@ -269,7 +269,7 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/rpn_stats_apps"
+                        android:text="@string/apps_info_title"
                         android:textSize="10.5sp"
                         android:alpha="0.7"
                         android:textColor="?attr/primaryLightColorText" />
@@ -312,7 +312,7 @@
             android:layout_marginEnd="16dp"
             android:alpha="0.75"
             android:letterSpacing="0.02"
-            android:text="@string/tour_step_logs_title"
+            android:text="@string/rpn_stats_view_logs"
             android:textColor="?attr/accentGood"
             app:cornerRadius="24dp"
             app:icon="@drawable/ic_logs"

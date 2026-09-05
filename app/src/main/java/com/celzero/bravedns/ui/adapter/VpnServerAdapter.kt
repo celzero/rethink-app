@@ -685,18 +685,20 @@ class VpnServerAdapter(
                 return
             }
             b.relayActionContainer.visibility = View.VISIBLE
+            val relayLabel = ctx.getString(R.string.cd_dns_crypt_relay_heading) + " · " +
+                ctx.getString(if (config.hopEnabled) R.string.lbl_on else R.string.lbl_off)
             if (config.hopEnabled) {
                 b.relayAction.text = ctx.getString(
                     R.string.two_argument_space,
                     ctx.getString(R.string.symbol_bunny),
-                    ctx.getString(R.string.server_item_relay_on)
+                    relayLabel
                 )
                 b.relayAction.setTextColor(fetchColor(ctx, R.attr.accentGood))
                 b.relayActionContainer.backgroundTintList =
                     ColorStateList.valueOf(fetchColor(ctx, R.attr.chipBgColorPositive))
                 b.relayIcon.visibility = View.VISIBLE
             } else {
-                b.relayAction.text = ctx.getString(R.string.server_item_relay_off)
+                b.relayAction.text = relayLabel
                 b.relayAction.setTextColor(fetchColor(ctx, android.R.attr.colorPrimary))
                 b.relayActionContainer.backgroundTintList = null
                 b.relayIcon.visibility = View.GONE
@@ -721,10 +723,8 @@ class VpnServerAdapter(
                         applyRelayAction(updated)
                         Utilities.showToastUiCentered(
                             ctx,
-                            ctx.getString(
-                                if (newState) R.string.server_item_relay_enabled_toast
-                                else R.string.server_item_relay_disabled_toast
-                            ),
+                            ctx.getString(R.string.cd_dns_crypt_relay_heading) + " " +
+                                ctx.getString(if (newState) R.string.lbl_on else R.string.lbl_off),
                             Toast.LENGTH_SHORT
                         )
                         // Let the host re-derive aggregate relay UI (quick-settings tile).

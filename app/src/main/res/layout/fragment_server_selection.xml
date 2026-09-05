@@ -476,7 +476,7 @@
                                     android:layout_marginTop="4dp"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/qs_add_location_label"
+                                    android:text="@string/lbl_add"
                                     android:textColor="?attr/primaryLightColorText"
                                     android:textSize="10.5sp" />
 
@@ -525,7 +525,7 @@
                                     android:layout_marginTop="4dp"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/qs_bypass_apps_label"
+                                    android:text="@string/rpn_bypass_positive"
                                     android:textColor="?attr/primaryLightColorText"
                                     android:textSize="10.5sp" />
 
@@ -603,7 +603,7 @@
                                     android:layout_marginTop="4dp"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/qs_relay_label"
+                                    android:text="@string/cd_dns_crypt_relay_heading"
                                     android:textColor="?attr/primaryLightColorText"
                                     android:textSize="10.5sp" />
 

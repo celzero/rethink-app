@@ -1486,7 +1486,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val latency =
             when {
                 p50 != null && p50 >= 0L && !region.isNullOrEmpty() ->
-                    getString(R.string.hsf_dns_latency_region, region, UIUtils.formatLatency(p50))
+                    getString(R.string.two_argument_parenthesis, region, UIUtils.formatLatency(p50))
                 p50 != null && p50 >= 0L ->
                     UIUtils.formatLatency(p50)
                 !region.isNullOrEmpty() -> region
