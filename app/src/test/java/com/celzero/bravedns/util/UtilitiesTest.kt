@@ -47,7 +47,19 @@ class UtilitiesTest {
     fun testGetFlag() {
         assertEquals("🇮🇳", Utilities.getFlag("IN"))
         assertEquals("🇺🇸", Utilities.getFlag("US"))
-        assertEquals("", Utilities.getFlag(null))
+        // invalid inputs fall back to the "---" placeholder instead of
+        // producing tofu glyphs (or crashing on strings shorter than 2 chars)
+        assertEquals("---", Utilities.getFlag(null))
+        assertEquals("---", Utilities.getFlag(""))
+        assertEquals("---", Utilities.getFlag("-"))
+        // CountryMap's marker for unassigned IP ranges
+        assertEquals("---", Utilities.getFlag("--"))
+        // lowercase letters are not valid regional indicators
+        assertEquals("---", Utilities.getFlag("us"))
+        // non-alphabetic codes
+        assertEquals("---", Utilities.getFlag("01"))
+        // longer than 2 chars
+        assertEquals("---", Utilities.getFlag("USA"))
     }
 
     @Test

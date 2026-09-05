@@ -40,7 +40,11 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.LruCache
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
@@ -93,6 +97,12 @@ object Utilities {
 
     private const val FLAG_BASE_OFFSET = 0x1F1E6
     private const val ALPHA_BASE_CODE = 'A'.code
+
+    // stored in DB flag columns when the country code is unknown/invalid;
+    // excluded from country-stat queries by the flag-emoji range filter.
+    // Three dashes so it can't be confused with CountryMap's "--" unknown
+    // marker or UIUtils' "--" country-name fallback.
+    const val UNKNOWN_COUNTRY_FLAG = "---"
     private const val BUFFER_SIZE = 256
     private const val HEX_FORMAT = "%02x"
     private const val BYTE_UNIT_THRESHOLD = 1000
@@ -220,8 +230,17 @@ object Utilities {
     }
 
     fun getFlag(countryCode: String?): String {
-        if (countryCode == null) {
-            return ""
+        // guard against invalid inputs (e.g. CountryMap's "--" marker for unassigned
+        // IP ranges, or null/short strings). Shifting such characters into the
+        // regional-indicator range produces invalid code points (tofu glyphs), and
+        // inputs shorter than 2 chars would throw StringIndexOutOfBoundsException.
+        if (
+            countryCode == null ||
+            countryCode.length != 2 ||
+            countryCode[0] !in 'A'..'Z' ||
+            countryCode[1] !in 'A'..'Z'
+        ) {
+            return UNKNOWN_COUNTRY_FLAG
         }
         // Flag emoji consist of two "regional indicator symbol letters", which are
         // Unicode characters that correspond to the English alphabet and are arranged in the
@@ -232,8 +251,8 @@ object Utilities {
         // indicator
         // symbol letter range.
         val offset = FLAG_BASE_OFFSET - ALPHA_BASE_CODE
-        val firstHalf = Character.codePointAt(countryCode, 0) + offset
-        val secondHalf = Character.codePointAt(countryCode, 1) + offset
+        val firstHalf = countryCode[0].code + offset
+        val secondHalf = countryCode[1].code + offset
         return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
     }
 
@@ -1023,6 +1042,39 @@ object Utilities {
             return ips[index].split(",").firstOrNull()?.trim()
         }
         return null
+    }
+
+    /**
+     * Keeps the buttons of [buttonContainer] on a single horizontal row while they
+     * fit, and stacks them vertically once they no longer do (small screens, long
+     * localized labels, foldables in the folded state). This prevents buttons from
+     * overlapping or clipping in wrap_content-width dialogs.
+     *
+     * Must be called after the container's content (text, visibility) is set; the
+     * check runs on the next layout pass via [View.post].
+     */
+    fun adjustButtonLayoutOrientation(buttonContainer: LinearLayout) {
+        buttonContainer.post {
+            var totalButtonsWidth = 0
+            for (index in 0 until buttonContainer.childCount) {
+                val child = buttonContainer.getChildAt(index)
+                if (child.visibility == View.GONE) continue
+                val margins =
+                    (child.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                        it.marginStart + it.marginEnd
+                    } ?: 0
+                totalButtonsWidth += child.measuredWidth + margins
+            }
+            // container.width includes its own horizontal padding
+            if (totalButtonsWidth > buttonContainer.width) {
+                // No space for a single row: order the buttons vertically.
+                buttonContainer.orientation = LinearLayout.VERTICAL
+                buttonContainer.gravity = Gravity.CENTER_HORIZONTAL
+            } else {
+                buttonContainer.orientation = LinearLayout.HORIZONTAL
+                buttonContainer.gravity = Gravity.END
+            }
+        }
     }
 
 }

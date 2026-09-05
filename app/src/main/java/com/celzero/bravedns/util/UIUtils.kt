@@ -101,6 +101,18 @@ object UIUtils {
         }
     }
 
+    /**
+     * Formats a latency value in milliseconds for display. Values below one
+     * second are shown as "ms"; values at or above one second are shown in
+     * seconds with at most one decimal (e.g. "45 ms", "1.5 s", "15 s").
+     */
+    fun formatLatency(latencyMs: Long): String {
+        if (latencyMs < 1000L) return "$latencyMs ms"
+        val wholeSec = latencyMs / 1000L
+        val tenths = (latencyMs % 1000L) / 100L
+        return if (tenths == 0L) "$wholeSec s" else "$wholeSec.$tenths s"
+    }
+
     fun getProxyStatusStringRes(statusId: Int?): Int {
         return when (statusId) {
             Backend.TUP -> {
@@ -660,7 +672,7 @@ object UIUtils {
                 "🇿🇲" to "Zambia",
                 "🇿🇼" to "Zimbabwe"
             )
-        return flagCodePoints[flag] ?: "--"
+        return flagCodePoints[flag] ?: Utilities.UNKNOWN_COUNTRY_FLAG
     }
 
     fun getAccentColor(appTheme: Int): Int {
