@@ -1004,7 +1004,7 @@ object IpRulesManager : KoinComponent {
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_FIREWALL, "err iptree.valuesLike($normalized) for uid: $uid", e)
                 return@any false
-            }
+            } ?: return@any false
             val reversed = res.split(Backend.Vsep).reversed()
             if (reversed.isEmpty()) return@any false
 
