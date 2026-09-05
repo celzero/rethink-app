@@ -653,7 +653,7 @@
                                     android:layout_marginTop="4dp"
                                     android:includeFontPadding="false"
                                     android:maxLines="1"
-                                    android:text="@string/qs_stats_label"
+                                    android:text="@string/title_statistics"
                                     android:textColor="?attr/primaryLightColorText"
                                     android:textSize="10.5sp" />
 
