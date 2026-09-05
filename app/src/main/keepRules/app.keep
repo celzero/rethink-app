@@ -1,26 +1,19 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
+# Project-specific R8 keep rules.
 #
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Migrated from app/proguard-rules.pro as part of the AGP 9.3 migration to the
+# `optimization { enable = true }` DSL: with the new DSL, keep rules must live
+# in src/<variant>/keepRules/*.keep (this source set is also honored by the
+# legacy DSL). The two stale `-printmapping` lines from the old file were
+# dropped — AGP already writes mapping.txt under
+# build/outputs/mapping/<variant>/mapping.txt.
+#
+# ref: developer.android.com/topic/performance/app-optimization/enable-app-optimization
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-# commenting below, webview removed from version v053i
-#-keepclassmembers class com.celzero.bravedns.ui.DnsConfigureWebViewActivity$JSInterface {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-#Dont obfuscate
+# Dont obfuscate (deliberate: reflection-heavy code paths — Gson models, Koin,
+# the firestack JNI Bridge — have not been audited for renamed identifiers).
+# ref: github.com/celzero/rethink-app/issues/875-era decision. Revisit only
+# after auditing all reflective access paths.
 -dontobfuscate
--printmapping obfuscation/mapping.txt
--printmapping build/outputs/mapping/release/mapping.txt
 
 # https://github.com/celzero/rethink-app/issues/875
 # Keep generic signature of Call, Response (R8 full mode strips signatures from non-kept items).
@@ -70,7 +63,3 @@
 -keepattributes *Annotation*
 -keep class com.google.gson.** { *; }
 -keep class com.celzero.bravedns.data.FileTag { *; }
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
