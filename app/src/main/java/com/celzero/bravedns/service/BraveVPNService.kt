@@ -4651,23 +4651,30 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     @RequiresApi(VERSION_CODES.Q)
     private fun initializeBubble() {
         try {
-            // Request bubble. Bubbles are always backed by a notification, but we suppress the
-            // shade entry via BubbleMetadata#setSuppressNotification(true).
-            val eligible = BubbleHelper.showBubble(this, persistentState)
-            Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
+            // ShortcutManagerCompat / NotificationManager calls inside showBubble() are
+            // synchronous binder IPC to system_server and can stall for seconds when it
+            // is busy; run them off the main thread to avoid ANRs during onCreate().
+            io("bubbleInit") {
+                // Request bubble. Bubbles are always backed by a notification, but we suppress the
+                // shade entry via BubbleMetadata#setSuppressNotification(true).
+                val eligible = BubbleHelper.showBubble(this@BraveVPNService, persistentState)
+                Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
 
-            // If not eligible, do not install observers / update loops.
-            // Do not post any fallback notification (bubble-only UX).
-            if (!eligible) {
-                unobserveBubbleBlockedConns()
-                return
+                ui {
+                    // If not eligible, do not install observers / update loops.
+                    // Do not post any fallback notification (bubble-only UX).
+                    if (!eligible) {
+                        unobserveBubbleBlockedConns()
+                        return@ui
+                    }
+
+                    blockedConnsObserver = makeFirewallBlockedConnsObserver()
+                    connTrackRepository.getBlockedConnectionsCountLiveData()
+                        .observeForever(blockedConnsObserver)
+                }
             }
-
-            blockedConnsObserver = makeFirewallBlockedConnsObserver()
-            connTrackRepository.getBlockedConnectionsCountLiveData().observeForever(blockedConnsObserver)
         } catch (e: Exception) {
             Logger.e(TAG, "Bubble init failed: ${e.message}", e)
-            stopSelf()
         }
     }
     private var lastBlockedCount = -1
