@@ -640,7 +640,8 @@ internal constructor(
         newAppInfo.appCategory = ctx.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
         newAppInfo.uid = uid
 
-        if (persistentState.getBlockNewlyInstalledApp()) {
+        val isSystemComponent = newAppInfo.isSystemApp && !AndroidUidConfig.isUidAppRange(uid)
+        if (persistentState.getBlockNewlyInstalledApp() && !isSystemComponent) {
             newAppInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             newAppInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
