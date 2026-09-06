@@ -1427,7 +1427,7 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +
                                     "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
-                                    "VALUES (4, 'Family', 2, 'Prefers resolvers blocking adult and pirated content.', 0, 0, 0)"
+                                    "VALUES (4, 'Family', 3, 'Prefers resolvers blocking adult and pirated content.', 0, 0, 0)"
                         )
                     }
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: seeded SmartDnsEndpoint rows")
@@ -1453,7 +1453,7 @@ abstract class AppDatabase : RoomDatabase() {
                 private fun replaceMullvadWithControlD(db: SupportSQLiteDatabase) {
                     with(db) {
                         execSQL(
-                            "UPDATE DoTEndpoint SET name = 'ControlD Security', " +
+                            "UPDATE DoTEndpoint SET name = 'ControlD Privacy', " +
                                     "url = 'tls://p2.freedns.controld.com', " +
                                     "desc = 'Blocks spyware and tracking domains.', isCustom = 0 " +
                                     "WHERE id = 3 AND url = 'tls://adblock.dns.mullvad.net'"
