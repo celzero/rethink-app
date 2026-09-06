@@ -292,7 +292,8 @@ class FirewallAppListAdapter(
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
             val target = drawable ?: Utilities.getDefaultIcon(context) ?: return
-            if (mIconImageView.drawable?.constantState == target.constantState) return
+            val current = mIconImageView.drawable?.constantState
+            if (current != null && current == target.constantState) return
             mIconImageView.setImageDrawable(target)
         }
 
