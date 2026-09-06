@@ -1175,7 +1175,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         if (appConfig.isDnsProxyActive()) {
             val dnsDetails = appConfig.getSelectedDnsProxyDetails()
             val appName = dnsDetails?.proxyAppName
-            val hasConflict = !appName.isNullOrBlank()
+            val hasConflict =
+                !appName.isNullOrBlank() &&
+                    appName != getString(R.string.cd_custom_dns_proxy_default_app)
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_dns_proxy),
@@ -1206,34 +1208,33 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // HTTP proxy cannot be used in lockdown (any HTTP proxy conflicts, not just
         // app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName ?: ""
-            if (!appName.isBlank()) {
-                checks.add(
-                    LockdownCheckItem(
-                        label = getString(R.string.lockdown_check_http_proxy),
-                        description = getString(R.string.lockdown_check_http_proxy_desc, appName),
-                        hasConflict = true,
-                        type = CheckType.HTTP_PROXY
-                    )
+            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName
+            val hasConflict = !appName.isNullOrBlank() &&
+                    appName != getString(R.string.cd_custom_dns_proxy_default_app)
+            checks.add(
+                LockdownCheckItem(
+                    label = getString(R.string.lockdown_check_http_proxy),
+                    description = getString(R.string.lockdown_check_http_proxy_desc, appName),
+                    hasConflict = hasConflict,
+                    type = CheckType.HTTP_PROXY
                 )
-            }
+            )
         }
 
         // 6. SOCKS5 Proxy check
         // SOCKS5 proxy cannot be used in lockdown (any SOCKS5 proxy conflicts, not
         // just app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomSocks5Enabled()) {
-            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName ?: ""
-            if (!appName.isBlank()) {
-                checks.add(
-                    LockdownCheckItem(
-                        label = getString(R.string.lockdown_check_socks5),
-                        description = getString(R.string.lockdown_check_socks5_desc, appName),
-                        hasConflict = true,
-                        type = CheckType.SOCKS5
-                    )
+            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName
+            val hasConflict = !appName.isNullOrBlank() && appName != getString(R.string.cd_custom_dns_proxy_default_app)
+            checks.add(
+                LockdownCheckItem(
+                    label = getString(R.string.lockdown_check_socks5),
+                    description = getString(R.string.lockdown_check_socks5_desc, appName),
+                    hasConflict = hasConflict,
+                    type = CheckType.SOCKS5
                 )
-            }
+            )
         }
 
         // 7. Anti-Censorship check

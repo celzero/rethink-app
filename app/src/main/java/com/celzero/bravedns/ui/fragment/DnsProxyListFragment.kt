@@ -89,7 +89,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         )
 
         dnsProxyRecyclerAdapter =
-            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get(), persistentState)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
             dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
