@@ -59,6 +59,8 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.SmartDnsEndpoint
+import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
@@ -109,6 +111,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val inAppMessageProvider by inject<InAppMessageProvider>()
     private val rdb by inject<RefreshDatabase>()
     private val appConfig by inject<AppConfig>()
+    private val smartDnsEndpointRepository by inject<SmartDnsEndpointRepository>()
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -380,6 +383,9 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         // reset the local blocklist download from android download manager to custom in v055o
         persistentState.useCustomDownloadManager = true
 
+        // migrate smart dns users to the "No Filter" option, remove this post v057.
+        io { migrateSmartDnsSelectionIfNeeded() }
+
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }
         // reset the plus url to empty if it is set as /rec
@@ -394,6 +400,26 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                 }
                 appConfig.updateRethinkEndpoint(Constants.RETHINK_DNS_PLUS, newUrl, 0)
             }
+        }
+    }
+
+    // v057: previously smart dns was a single selection stored only in persistent state
+    // with no per-option record. now the options live in the SmartDnsEndpoint table
+    private suspend fun migrateSmartDnsSelectionIfNeeded() {
+        try {
+            // user did not use smart dns previously, nothing to migrate
+            if (!appConfig.isSmartDnsEnabled()) return
+
+            // an option is already selected (or migration ran before), do not overwrite
+            if (appConfig.getSelectedSmartDnsEndpoint() != null) return
+
+            val noFilter = smartDnsEndpointRepository.getSmartDnsEndpoints()
+                .firstOrNull { SmartDnsEndpoint.isNoFilterMode(it.dnsMode) } ?: return
+
+            Logger.i(LOG_TAG_UI, "migrating prev smart dns to no filter (id: ${noFilter.id})")
+            appConfig.enableSmartDns(noFilter.id)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err migrating smart dns selection: ${e.message}", e)
         }
     }
 
