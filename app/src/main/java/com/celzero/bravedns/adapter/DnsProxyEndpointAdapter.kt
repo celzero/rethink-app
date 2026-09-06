@@ -35,6 +35,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -48,7 +49,8 @@ import kotlinx.coroutines.withContext
 class DnsProxyEndpointAdapter(
     private val context: Context,
     val lifecycleOwner: LifecycleOwner,
-    private val appConfig: AppConfig
+    private val appConfig: AppConfig,
+    private val persistentState: PersistentState
 ) :
     PagingDataAdapter<DnsProxyEndpoint, DnsProxyEndpointAdapter.DnsProxyEndpointViewHolder>(
         DIFF_CALLBACK
@@ -95,17 +97,20 @@ class DnsProxyEndpointAdapter(
         }
 
         private fun setupClickListeners(endpoint: DnsProxyEndpoint) {
-            b.root.setOnClickListener { updateDnsProxyDetails(endpoint) }
+            b.root.setOnClickListener { selectDnsProxy(endpoint) }
 
             b.dnsProxyListActionImage.setOnClickListener { promptUser(endpoint) }
 
-            b.dnsProxyListCheckImage.setOnClickListener { updateDnsProxyDetails(endpoint) }
+            b.dnsProxyListCheckImage.setOnClickListener { selectDnsProxy(endpoint) }
+        }
 
-            b.root.setOnClickListener { updateDnsProxyDetails(endpoint) }
-
-            b.dnsProxyListActionImage.setOnClickListener { promptUser(endpoint) }
-
-            b.dnsProxyListCheckImage.setOnClickListener { updateDnsProxyDetails(endpoint) }
+        private fun selectDnsProxy(endpoint: DnsProxyEndpoint) {
+            if (isProxyLockdownConflict(endpoint)) {
+                b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
+                showLockdownConflictDialog(endpoint)
+                return
+            }
+            updateDnsProxyDetails(endpoint)
         }
 
         private fun displayDetails(endpoint: DnsProxyEndpoint) {
@@ -248,6 +253,33 @@ class DnsProxyEndpointAdapter(
         io {
             endpoint.isSelected = true
             appConfig.handleDnsProxyChanges(endpoint)
+        }
+    }
+
+    private fun isProxyLockdownConflict(endpoint: DnsProxyEndpoint): Boolean {
+        if (!persistentState.wgGlobalLockdown) return false
+        val app = endpoint.proxyAppName
+        return !app.isNullOrBlank() &&
+            app != context.getString(R.string.cd_custom_dns_proxy_default_app)
+    }
+
+    private fun showLockdownConflictDialog(endpoint: DnsProxyEndpoint) {
+        io {
+            val appName =
+                FirewallManager.getAppInfoByPackage(endpoint.proxyAppName)?.appName
+                    ?: endpoint.proxyAppName
+                    ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
+            uiCtx {
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.lockdown_check_dialog_title)
+                    .setMessage(
+                        context.getString(R.string.dns_proxy_lockdown_conflict_message, appName)
+                    )
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.dns_info_positive) { d, _ -> d.dismiss() }
+                    .create()
+                    .show()
+            }
         }
     }
 

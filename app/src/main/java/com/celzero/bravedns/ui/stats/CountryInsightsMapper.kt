@@ -33,10 +33,9 @@ object CountryInsightsMapper {
      */
     fun toCountryCode(flag: String?): String? {
         if (flag.isNullOrEmpty()) return null
-        val cps = flag.codePoints().toArray()
-        if (cps.size != 2) return null
-        val a = cps[0] - REGIONAL_INDICATOR_A
-        val b = cps[1] - REGIONAL_INDICATOR_A
+        if (flag.codePointCount(0, flag.length) != 2) return null
+        val a = flag.codePointAt(0) - REGIONAL_INDICATOR_A
+        val b = flag.codePointAt(flag.offsetByCodePoints(0, 1)) - REGIONAL_INDICATOR_A
         if (a !in 0..25 || b !in 0..25) return null
         return "${LETTER_A + a}${LETTER_A + b}"
     }

@@ -2153,6 +2153,7 @@
     <string name="lockdown_check_dns_bootstrap_desc" translatable="false">Bootstrap DNS is set to System which can bypass the lockdown proxy.</string>
     <string name="lockdown_check_dns_proxy" translatable="false">DNS Proxy</string>
     <string name="lockdown_check_dns_proxy_desc" translatable="false">DNS proxy with app (%1$s) conflicts with lockdown.</string>
+    <string name="dns_proxy_lockdown_conflict_message" translatable="false">The selected DNS proxy is using proxy forwarder app (%1$s) and cannot be enabled while Proxy Lockdown is enabled.</string>
     <string name="lockdown_check_orbot" translatable="false">Orbot Proxy</string>
     <string name="lockdown_check_orbot_desc" translatable="false">Orbot proxy conflicts with lockdown mode.</string>
     <string name="lockdown_check_http_proxy" translatable="false">HTTP Proxy</string>
