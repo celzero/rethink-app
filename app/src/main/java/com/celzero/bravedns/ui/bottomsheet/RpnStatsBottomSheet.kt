@@ -68,8 +68,6 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
     private val persistentState by inject<PersistentState>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
 
-    /** Live WIN proxy id; null when the tunnel is down or the sheet is detached. */
-    private var winProxyId: String? = null
 
     private var loadJob: Job? = null
 
@@ -139,21 +137,9 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         showLoadingState()
 
         loadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val proxyId = withContext(Dispatchers.IO) {
-                try {
-                    VpnController.getWinProxyId()
-                } catch (e: Exception) {
-                    Logger.w(LOG_TAG_UI, "$TAG: getWinProxyId failed: ${e.message}")
-                    null
-                }
-            }
-            winProxyId = proxyId
+            val proxyId = Backend.RpnWin
 
             if (!isAdded) return@launch
-            if (proxyId.isNullOrBlank()) {
-                showErrorState()
-                return@launch
-            }
 
             val since = System.currentTimeMillis() - TIME_WINDOW_MS
             val summary = withContext(Dispatchers.IO) {
@@ -221,8 +207,8 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
      */
     private fun openConnectionLogs() {
         if (!isAdded) return
-        val proxyId = winProxyId
-        if (proxyId.isNullOrBlank()) {
+        val proxyId = Backend.RpnWin
+        if (proxyId.isBlank()) {
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.rpn_stats_no_active_proxy),
