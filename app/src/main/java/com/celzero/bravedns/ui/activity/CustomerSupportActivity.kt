@@ -189,6 +189,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             b.chipActivation.isChecked -> getString(R.string.support_category_activation)
             b.chipConnectivity.isChecked -> getString(R.string.support_category_connectivity)
             b.chipRefund.isChecked -> getString(R.string.support_category_refund)
+            b.chipMoneyback.isChecked -> getString(R.string.support_category_moneyback)
             b.chipOther.isChecked -> getString(R.string.category_name_others)
             else -> null
         }

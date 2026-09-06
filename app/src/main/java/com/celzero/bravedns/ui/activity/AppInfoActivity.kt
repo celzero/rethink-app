@@ -103,8 +103,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
-
-    private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
@@ -450,13 +448,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
-                // show the tooltip only once when app is not bypassed (dns + firewall) earlier
-                if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
-                    b.aadAppSettingsBypassDnsFirewall.performLongClick()
-                    showBypassToolTip = false
-                    return@guardAppInfoInitialized
-                }
-
                 if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.NONE,

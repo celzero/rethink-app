@@ -588,8 +588,9 @@ internal constructor(
                 postConnectedDnsName(context.getString(R.string.network_dns))
             }
             DnsType.SMART_DNS -> {
-                val name = getSelectedSmartDnsEndpoint()?.dnsName
-                    ?: context.getString(R.string.smart_dns)
+                val endpointName = getSelectedSmartDnsEndpoint()?.dnsName
+                    ?: ""
+                val name = context.getString(R.string.two_argument_space, context.getString(R.string.smart_dns), endpointName)
                 postConnectedDnsName(name)
             }
         }

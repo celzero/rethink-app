@@ -35,7 +35,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.format.DateUtils
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -229,6 +233,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // failing fade out so visual weight tracks importance.
         private const val MONO_IDLE_ALPHA = 153    // 0.6
         private const val MONO_FAILING_ALPHA = 89  // 0.35
+
+        // Blocklist-count suffix on the DNS card: rendered smaller and lighter
+        // than the resolver name so it never competes with it
+        private const val BLOCKLIST_COUNT_SUFFIX_SCALE = 0.8f
+        private const val BLOCKLIST_COUNT_SUFFIX_ALPHA = 153  // 0.6
 
         // activity grid intensity levels (empty + 4 logarithmic levels)
         private const val HEATMAP_INTENSITY_LEVELS = 5
@@ -1511,22 +1520,50 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardDnsConnectedDns.isSelected = true
 
         // for RethinkDNS Plus, append the number of blocklists in-use,
-        // mirroring RethinkEndpointAdapter.updateDnsStatus()
+        // rendered smaller and lighter than the resolver name, mirroring
+        // RethinkEndpointAdapter.updateDnsStatus()
         if (appConfig.isRethinkDnsConnected()) {
             io {
                 val count = appConfig.getRemoteRethinkEndpoint()?.blocklistCount ?: 0
                 if (count > 0) {
                     uiCtx {
                         val countLabel =
-                            getString(R.string.rsv_blocklist_count_text, count.toString())
+                            getString(R.string.blocklist_count_home_screen, count.toString())
                         b.fhsCardDnsConnectedDns.text =
-                            listOfNotNull(dnsName, countLabel).joinToString(" · ")
+                            withBlocklistCountSuffix(dnsName, countLabel)
                     }
                 }
             }
         }
 
         renderDnsHeadline(dnsStatus)
+    }
+
+    /**
+     * Appends [suffix] to [text] with a " · " separator, styling the suffix smaller and
+     * lighter than the main text so the resolver name stays prominent.
+     */
+    private fun withBlocklistCountSuffix(text: String?, suffix: String): CharSequence {
+        if (text.isNullOrEmpty()) return suffix
+        val separator = " · "
+        val sb = SpannableStringBuilder(text).append(separator).append(suffix)
+        val start = text.length + separator.length
+        val base =
+            UIUtils.fetchColor(b.fhsCardDnsConnectedDns.context, R.attr.primaryLightColorText)
+        val fadedColor = ColorUtils.setAlphaComponent(base, BLOCKLIST_COUNT_SUFFIX_ALPHA)
+        sb.setSpan(
+            RelativeSizeSpan(BLOCKLIST_COUNT_SUFFIX_SCALE),
+            start,
+            sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        sb.setSpan(
+            ForegroundColorSpan(fadedColor),
+            start,
+            sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return sb
     }
 
     private fun observeLogsCount() {

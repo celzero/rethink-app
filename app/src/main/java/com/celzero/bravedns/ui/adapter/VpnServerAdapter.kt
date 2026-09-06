@@ -693,13 +693,13 @@ class VpnServerAdapter(
                     ctx.getString(R.string.symbol_bunny),
                     relayLabel
                 )
-                b.relayAction.setTextColor(fetchColor(ctx, R.attr.accentGood))
+                b.relayAction.setTextColor(fetchColor(ctx, R.attr.primaryTextColor))
                 b.relayActionContainer.backgroundTintList =
                     ColorStateList.valueOf(fetchColor(ctx, R.attr.chipBgColorPositive))
                 b.relayIcon.visibility = View.VISIBLE
             } else {
                 b.relayAction.text = relayLabel
-                b.relayAction.setTextColor(fetchColor(ctx, android.R.attr.colorPrimary))
+                b.relayAction.setTextColor(fetchColor(ctx, R.attr.primaryTextColor))
                 b.relayActionContainer.backgroundTintList = null
                 b.relayIcon.visibility = View.GONE
             }

@@ -27,6 +27,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.icu.text.CompactDecimalFormat
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -79,6 +80,7 @@ import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.chip.Chip
@@ -1551,8 +1553,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
             uiCtx {
                 if (!isAdded) return@uiCtx
-                b.qsStatsState.text = String.format(Locale.US, "%,d", count)
+                b.qsStatsState.text = formatCompactDecimal(count)
             }
+        }
+    }
+
+    private fun formatCompactDecimal(i: Int): String {
+        return if (isAtleastN()) {
+            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
+                .format(i.toLong())
+        } else {
+            i.toString()
         }
     }
 

@@ -496,7 +496,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var includeFileTrace by booleanPref(INCLUDE_FILE_TRACE).withDefault<Boolean>(false)
 
     // stats screen presentation mode, see enum StatsViewMode (0 - list, 1 - insights)
-    var statsViewMode by intPref("stats_view_mode").withDefault<Int>(StatsViewMode.LIST.id)
+    var statsViewMode by intPref("stats_view_mode").withDefault<Int>(StatsViewMode.INSIGHTS.id)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

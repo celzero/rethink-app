@@ -42,6 +42,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
@@ -312,14 +313,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun openHelpAndSupport() {
-        val args = Bundle().apply { putString("ARG_KEY", "Launch_Rethink_Support_Dashboard") }
-        startActivity(
-            FragmentHostActivity.createIntent(
-                context = requireContext(),
-                fragmentClass = RethinkPlusDashboardFragment::class.java,
-                args = args
-            )
-        )
+        CustomerSupportActivity.start(requireContext())
     }
 
     private fun setupObservers() {

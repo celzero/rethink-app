@@ -87,9 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:letterSpacing="0.04"
                 android:maxLines="1"
                 android:paddingStart="9dp"
                 android:paddingTop="3dp"
@@ -154,7 +152,7 @@
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"
             android:maxLines="1"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="11sp"
             tools:text="Apps · 12" />
 
@@ -165,7 +163,7 @@
             android:duplicateParentState="true"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_right_arrow_small"
-            android:tint="?attr/colorPrimary" />
+            android:tint="?attr/primaryTextColor" />
 
     </LinearLayout>
 
@@ -198,7 +196,7 @@
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"
             android:maxLines="1"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="?attr/primaryTextColor"
             android:textSize="11sp"
             tools:text="Relay · On" />
 
@@ -209,6 +207,7 @@
             android:layout_marginStart="4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
+            android:tint="?attr/primaryTextColor"
             android:visibility="gone"
             tools:visibility="visible" />
 
