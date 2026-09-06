@@ -77,7 +77,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private var loadMoreInitialized: Boolean = false
 
     // current Stats presentation mode; persisted across sessions via PersistentState
-    private var statsViewMode: StatsViewMode = StatsViewMode.LIST
+    private var statsViewMode: StatsViewMode = StatsViewMode.INSIGHTS
 
     // latest snapshot per section, kept in sync with the (shared) adapters so
     // switching to Insights renders instantly without refetching anything
