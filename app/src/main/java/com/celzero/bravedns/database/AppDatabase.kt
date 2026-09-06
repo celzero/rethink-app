@@ -58,7 +58,7 @@ import com.celzero.bravedns.util.Constants
         SponsorEntity::class,
         SmartDnsEndpoint::class
     ],
-    version = 34,
+    version = 35,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -175,6 +175,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_31_32)
                 .addMigrations(MIGRATION_32_33)
                 .addMigrations(MIGRATION_33_34)
+                .addMigrations(MIGRATION_34_35)
                 .build()
 
         private val roomCallback: Callback =
@@ -1387,7 +1388,7 @@ abstract class AppDatabase : RoomDatabase() {
             object : Migration(33, 34) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     createSmartDnsTable(db)
-                    seedSmartDnsEndpoints(db)
+                    addSmartDnsEndpoints(db)
                 }
 
                 private fun createSmartDnsTable(db: SupportSQLiteDatabase) {
@@ -1404,27 +1405,119 @@ abstract class AppDatabase : RoomDatabase() {
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: created SmartDnsEndpoint table")
                 }
 
-                // seed the three smart dns options; none is selected until the user
+                // add the three smart dns options; none is selected until the user
                 // explicitly picks one from the smart dns list screen
-                private fun seedSmartDnsEndpoints(db: SupportSQLiteDatabase) {
+                private fun addSmartDnsEndpoints(db: SupportSQLiteDatabase) {
                     with(db) {
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +
                                     "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
-                                    "VALUES (1, 'Smart DNS No Filter', 0, 'Uses any of the configured DNS resolvers without applying any filtering.', 0, 0, 0)"
+                                    "VALUES (1, 'No Filter', 0, 'Prefers any of the default DNS resolvers without applying any filtering.', 0, 0, 0)"
                         )
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +
                                     "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
-                                    "VALUES (2, 'Smart DNS Security', 1, 'Prefers resolvers blocking malicious domains.', 0, 0, 0)"
+                                    "VALUES (2, 'Security', 1, 'Prefers resolvers blocking malware, ransomware, phishers, and other threats.', 0, 0, 0)"
                         )
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +
                                     "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
-                                    "VALUES (3, 'Smart DNS Family', 2, 'Prefers resolvers blocking malicious and adult content.', 0, 0, 0)"
+                                    "VALUES (3, 'Privacy', 2, 'Prefers resolvers blocking attentionware, spyware, scareware.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (4, 'Family', 2, 'Prefers resolvers blocking adult and pirated content.', 0, 0, 0)"
                         )
                     }
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: seeded SmartDnsEndpoint rows")
+                }
+            }
+
+        // migration part of v057:
+        // 1. replace Mullvad DoT endpoints with Control-D in-place, preserving the
+        //    user's selection (an in-place update that does not touch isSelected
+        //    carries it over automatically)
+        // 2. add ControlD Security (DoH, p1) as a default (non-deletable) endpoint
+        // 3. add DNS4U Extended (DoT) and DNS4U Privacy (DoH) as default endpoints
+        // 4. refresh Quad9 DNSCrypt stamps as per upstream dnscrypt-resolvers list
+        // ref: github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/public-resolvers.md
+        private val MIGRATION_34_35: Migration =
+            object : Migration(34, 35) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    replaceMullvadWithControlD(db)
+                    addControlDDefaultDoHEndpoint(db)
+                    updateQuad9DnsCryptStamps(db)
+                }
+
+                private fun replaceMullvadWithControlD(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "UPDATE DoTEndpoint SET name = 'ControlD Security', " +
+                                    "url = 'tls://p2.freedns.controld.com', " +
+                                    "desc = 'Blocks spyware and tracking domains.', isCustom = 0 " +
+                                    "WHERE id = 3 AND url = 'tls://adblock.dns.mullvad.net'"
+                        )
+                        execSQL(
+                            "UPDATE DoTEndpoint SET name = 'ControlD Extended', " +
+                                    "url = 'tls://p3.freedns.controld.com', " +
+                                    "desc = 'Blocks malware, spyware, social media and tracking " +
+                                    "domains.', isCustom = 0 " +
+                                    "WHERE id = 4 AND url = 'tls://extended.dns.mullvad.net'"
+                        )
+                        // remove any stray mullvad rows not covered by the in-place update
+                        execSQL(
+                            "DELETE FROM DoTEndpoint WHERE url IN " +
+                                    "('tls://adblock.dns.mullvad.net', 'tls://extended.dns.mullvad.net')"
+                        )
+                        // seed the defaults if the mullvad rows were already absent;
+                        // isCustom = 0 makes them non-deletable from the ui
+                        execSQL(
+                            "INSERT OR IGNORE INTO DoTEndpoint(id, name, url, desc, isSelected, " +
+                                    "isCustom, isSecure, latency, modifiedDataTime) " +
+                                    "VALUES(3, 'ControlD Privacy', 'tls://p2.freedns.controld.com', " +
+                                    "'Blocks spyware and tracking domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR IGNORE INTO DoTEndpoint(id, name, url, desc, isSelected, " +
+                                    "isCustom, isSecure, latency, modifiedDataTime) " +
+                                    "VALUES(4, 'ControlD Extended', 'tls://p3.freedns.controld.com', " +
+                                    "'Blocks malware, spyware, social media, and tracking domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                    }
+                }
+
+                // control-d security (doh, p1) as a default endpoint; no explicit id,
+                // mirroring how default doh entries are seeded in MIGRATION_11_12
+                private fun addControlDDefaultDoHEndpoint(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "INSERT INTO DoHEndpoint(dohName, dohURL, dohExplanation, isSelected, " +
+                                    "isCustom, isSecure, modifiedDataTime, latency) " +
+                                    "VALUES('ControlD Security', 'https://freedns.controld.com/p1', " +
+                                    "'Blocks malware and malicious domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                    }
+                }
+
+
+                // update quad9 dns crypt stamps as per the upstream public-resolvers list
+                private fun updateQuad9DnsCryptStamps(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint SET dnsCryptURL = " +
+                                    "'sdns://AQMAAAAAAAAADDkuOS45Ljk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0' " +
+                                    "WHERE id = 4 AND dnsCryptName = 'Quad9 Security'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint SET dnsCryptURL = " +
+                                    "'sdns://AQcAAAAAAAAADTkuOS45LjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA' " +
+                                    "WHERE id = 5 AND dnsCryptName = 'Quad9'"
+                        )
+                    }
                 }
             }
 
