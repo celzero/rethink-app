@@ -153,7 +153,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -4650,31 +4652,44 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     @RequiresApi(VERSION_CODES.Q)
     private fun initializeBubble() {
-        try {
-            // ShortcutManagerCompat / NotificationManager calls inside showBubble() are
-            // synchronous binder IPC to system_server and can stall for seconds when it
-            // is busy; run them off the main thread to avoid ANRs during onCreate().
-            io("bubbleInit") {
+        io("bubbleInit") {
+            try {
+                // ShortcutManagerCompat / NotificationManager calls inside showBubble() are
+                // synchronous binder IPC to system_server and can stall for seconds when it
+                // is busy; run them off the main thread to avoid ANRs during onCreate().
                 // Request bubble. Bubbles are always backed by a notification, but we suppress the
                 // shade entry via BubbleMetadata#setSuppressNotification(true).
                 val eligible = BubbleHelper.showBubble(this@BraveVPNService, persistentState)
                 Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
 
-                ui {
+                // If the coroutine was cancelled while showBubble() was executing (e.g. VPN
+                // stopped), dismiss the just-posted bubble and rethrow; do not install
+                // observers on a torn-down service.
+                currentCoroutineContext().ensureActive()
+
+                withContext(Dispatchers.Main) {
                     // If not eligible, do not install observers / update loops.
                     // Do not post any fallback notification (bubble-only UX).
                     if (!eligible) {
                         unobserveBubbleBlockedConns()
-                        return@ui
+                        return@withContext
                     }
 
                     blockedConnsObserver = makeFirewallBlockedConnsObserver()
                     connTrackRepository.getBlockedConnectionsCountLiveData()
                         .observeForever(blockedConnsObserver)
                 }
+            } catch (e: CancellationException) {
+                Logger.w(TAG, "Bubble init cancelled; dismissing bubble: ${e.message}")
+                try {
+                    BubbleHelper.dismissBubble(this@BraveVPNService)
+                } catch (ex: Exception) {
+                    Logger.w(TAG, "err dismissing bubble: ${ex.message}")
+                }
+                throw e
+            } catch (e: Exception) {
+                Logger.e(TAG, "Bubble init failed: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            Logger.e(TAG, "Bubble init failed: ${e.message}", e)
         }
     }
     private var lastBlockedCount = -1
