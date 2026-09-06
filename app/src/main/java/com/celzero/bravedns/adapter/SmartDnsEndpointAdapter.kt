@@ -77,15 +77,13 @@ class SmartDnsEndpointAdapter(private val context: Context) :
         }
 
         private fun displayDetails(endpoint: SmartDnsEndpoint) {
-            b.endpointName.text = getDisplayName(endpoint)
+            b.endpointName.text = endpoint.dnsName
             b.endpointCheck.isChecked = endpoint.isSelected
             if (endpoint.isSelected) {
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)
                 b.endpointDesc.visibility = View.VISIBLE
             } else {
-                b.endpointDesc.text = getDisplayDesc(endpoint)
-                b.endpointDesc.visibility =
-                    if (endpoint.dnsExplanation.isBlank()) View.GONE else View.VISIBLE
+                b.endpointDesc.visibility = View.GONE
             }
             // the info icon shows the explanation; there is no delete action as all
             // smart dns entries are default (non-custom)
@@ -96,29 +94,13 @@ class SmartDnsEndpointAdapter(private val context: Context) :
 
         private fun showExplanationDialog(endpoint: SmartDnsEndpoint) {
             val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
-            builder.setTitle(getDisplayName(endpoint))
+            builder.setTitle(endpoint.dnsName)
             builder.setMessage(endpoint.dnsExplanation)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialog, _ ->
                 dialog.dismiss()
             }
             builder.create().show()
-        }
-
-        private fun getDisplayName(endpoint: SmartDnsEndpoint): String {
-            return when (SmartDnsMode.getMode(endpoint.dnsMode)) {
-                SmartDnsMode.NO_FILTER -> context.getString(R.string.smart_dns_no_filter)
-                SmartDnsMode.SECURITY -> context.getString(R.string.smart_dns_security)
-                SmartDnsMode.FAMILY -> context.getString(R.string.smart_dns_family)
-            }
-        }
-
-        private fun getDisplayDesc(endpoint: SmartDnsEndpoint): String {
-            return when (SmartDnsMode.getMode(endpoint.dnsMode)) {
-                SmartDnsMode.NO_FILTER -> context.getString(R.string.smart_dns_no_filter_desc)
-                SmartDnsMode.SECURITY -> context.getString(R.string.smart_dns_security_desc)
-                SmartDnsMode.FAMILY -> context.getString(R.string.smart_dns_family_desc)
-            }
         }
     }
 }

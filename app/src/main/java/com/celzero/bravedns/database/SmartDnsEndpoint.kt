@@ -51,13 +51,15 @@ data class SmartDnsEndpoint(
 enum class SmartDnsMode(val mode: Int) {
     NO_FILTER(0),
     SECURITY(1),
-    FAMILY(2);
+    PRIVACY(2),
+    FAMILY(3);
 
     companion object {
         fun getMode(id: Int): SmartDnsMode {
             return when (id) {
                 NO_FILTER.mode -> NO_FILTER
                 SECURITY.mode -> SECURITY
+                PRIVACY.mode -> PRIVACY
                 FAMILY.mode -> FAMILY
                 else -> NO_FILTER
             }
@@ -68,6 +70,7 @@ enum class SmartDnsMode(val mode: Int) {
                 NO_FILTER.mode -> Settings.PlusFilterNone
                 SECURITY.mode -> Settings.PlusFilterAdblock
                 FAMILY.mode -> Settings.PlusFilterAdblock
+                PRIVACY.mode -> Settings.PlusFilterAdblock
                 else -> Settings.PlusFilterNone
             }
         }
