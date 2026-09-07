@@ -1,6 +1,6 @@
-rootProject.name='rethink'
-include ':app'
-include ':benchmark'
+rootProject.name = "rethink"
+include(":app")
+include(":benchmark")
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
