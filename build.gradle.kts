@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    val kotlinVersion = "2.3.21"
     repositories {
         google()
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
@@ -9,10 +8,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:9.4.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath(libs.androidToolsBuildGradle)
+        classpath(libs.jetbrainsKotlinKotlinGradlePlugin)
         // Required by the TV flavor's Compose UI.
-        classpath("org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlinVersion")
+        classpath(libs.jetbrainsKotlinComposeCompilerGradlePlugin)
         
         // add firebase plugins - will be conditionally applied in app/build.gradle
         val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
@@ -28,14 +27,14 @@ buildscript {
         println("app; deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
 
         if (!deGoogled) {
-            classpath("com.google.gms:google-services:4.4.4")
-            classpath("com.google.firebase:firebase-crashlytics-gradle:3.0.7")
+            classpath(libs.googleGmsGoogleServices)
+            classpath(libs.googleFirebaseFirebaseCrashlyticsGradle)
         }
     }
 }
 
 plugins {
-    id("com.google.devtools.ksp") version "2.3.9" apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 allprojects {

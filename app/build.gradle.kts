@@ -415,77 +415,75 @@ fun firestackDependency(): String {
 }
 
 dependencies {
-    val roomVersion = "2.8.4"
-    val pagingVersion = "3.5.1"
 
-    implementation("com.google.guava:guava:33.7.1-android")
+    implementation(libs.googleGuavaGuava)
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    coreLibraryDesugaring(libs.androidToolsDesugarJdkLibs)
 
-    "fullImplementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
-    "fullImplementation"("androidx.appcompat:appcompat:1.8.0")
-    "fullImplementation"("androidx.core:core-ktx:1.19.0")
-    implementation("androidx.preference:preference-ktx:1.2.1")
-    "fullImplementation"("androidx.constraintlayout:constraintlayout:2.2.2")
-    "fullImplementation"("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
+    "fullImplementation"(libs.jetbrainsKotlinKotlinStdlibJdk8)
+    "fullImplementation"(libs.androidxAppcompatAppcompat)
+    "fullImplementation"(libs.androidxCoreCoreKtx)
+    implementation(libs.androidxPreferencePreferenceKtx)
+    "fullImplementation"(libs.androidxConstraintlayoutConstraintlayout)
+    "fullImplementation"(libs.androidxSwiperefreshlayoutSwiperefreshlayout)
 
-    "fullImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-    "fullImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    "fullImplementation"(libs.jetbrainsKotlinxKotlinxCoroutinesCore)
+    "fullImplementation"(libs.jetbrainsKotlinxKotlinxCoroutinesAndroid)
 
     // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.11.0")
-    implementation("com.google.code.gson:gson:2.14.0")
+    implementation(libs.androidxLifecycleLifecycleLivedataKtx)
+    implementation(libs.googleCodeGsonGson)
 
-    implementation("androidx.room:room-runtime:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    implementation("androidx.room:room-paging:$roomVersion")
+    implementation(libs.androidxRoomRoomRuntime)
+    ksp(libs.androidxRoomRoomCompiler)
+    implementation(libs.androidxRoomRoomKtx)
+    implementation(libs.androidxRoomRoomPaging)
 
-    "fullImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
-    "fullImplementation"("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
+    "fullImplementation"(libs.androidxLifecycleLifecycleViewmodelKtx)
+    "fullImplementation"(libs.androidxLifecycleLifecycleRuntimeKtx)
 
     // Pagers Views
-    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
-    "fullImplementation"("androidx.fragment:fragment-ktx:1.9.0")
-    implementation("com.google.android.material:material:1.14.0")
-    "fullImplementation"("androidx.viewpager2:viewpager2:1.1.0")
+    implementation(libs.androidxPagingPagingRuntimeKtx)
+    "fullImplementation"(libs.androidxFragmentFragmentKtx)
+    implementation(libs.googleAndroidMaterialMaterial)
+    "fullImplementation"(libs.androidxViewpager2Viewpager2)
 
-    "fullImplementation"("com.squareup.okhttp3:okhttp:5.5.0")
-    "fullImplementation"("com.squareup.okhttp3:okhttp-dnsoverhttps:5.5.0")
-    "fullImplementation"("com.squareup.okhttp3:logging-interceptor:5.5.0")
+    "fullImplementation"(libs.squareupOkhttp3Okhttp)
+    "fullImplementation"(libs.squareupOkhttp3OkhttpDnsoverhttps)
+    "fullImplementation"(libs.squareupOkhttp3LoggingInterceptor)
 
-    "fullImplementation"("com.squareup.retrofit2:retrofit:3.0.0")
-    "fullImplementation"("com.squareup.retrofit2:converter-gson:3.0.0")
+    "fullImplementation"(libs.squareupRetrofit2Retrofit)
+    "fullImplementation"(libs.squareupRetrofit2ConverterGson)
 
-    implementation("com.squareup.okio:okio-jvm:3.18.1")
+    implementation(libs.squareupOkioOkioJvm)
     // Glide
-    "fullImplementation"("com.github.bumptech.glide:glide:5.0.9") {
+    "fullImplementation"(libs.githubBumptechGlideGlide) {
         exclude(group = "glide-parent")
     }
-    "fullImplementation"("com.github.bumptech.glide:okhttp3-integration:5.0.9") {
+    "fullImplementation"(libs.githubBumptechGlideOkhttp3Integration) {
         exclude(group = "glide-parent")
     }
 
     // Ref: https://stackoverflow.com/a/46638213
-    "kspFull"("com.github.bumptech.glide:compiler:5.0.7")
+    "kspFull"(libs.githubBumptechGlideCompiler)
     // Swipe button animation
-    "fullImplementation"("com.facebook.shimmer:shimmer:0.5.0")
+    "fullImplementation"(libs.facebookShimmerShimmer)
 
     // Koin core
-    download("io.insert-koin:koin-core:4.2.2")
-    implementation("io.insert-koin:koin-core:4.2.2")
+    download(libs.insertKoinKoinCore)
+    implementation(libs.insertKoinKoinCore)
     // Koin main (Scope, ViewModel ...)
-    download("io.insert-koin:koin-android:4.2.2")
-    implementation("io.insert-koin:koin-android:4.2.2")
+    download(libs.insertKoinKoinAndroid)
+    implementation(libs.insertKoinKoinAndroid)
 
-    download("hu.autsoft:krate:2.0.0")
-    implementation("hu.autsoft:krate:2.0.0")
+    download(libs.huAutsoftKrate)
+    implementation(libs.huAutsoftKrate)
 
     // viewBinding without reflection
-    "fullImplementation"("com.github.kirich1409:viewbindingpropertydelegate:1.5.9")
-    "fullImplementation"("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
+    "fullImplementation"(libs.githubKirich1409Viewbindingpropertydelegate)
+    "fullImplementation"(libs.githubKirich1409ViewbindingpropertydelegateNoreflection)
 
     // add ":debug" suffix to the dependency to include debug symbols
     download(firestackDependency())
@@ -494,7 +492,7 @@ dependencies {
     "playImplementation"(firestackDependency())
 
     // Work manager
-    implementation("androidx.work:work-runtime-ktx:2.11.2") {
+    implementation(libs.androidxWorkWorkRuntimeKtx) {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -504,105 +502,105 @@ dependencies {
 
     // for handling IP addresses and subnets, both IPv4 and IPv6
     // seancfoley.github.io/IPAddress/ipaddress.html
-    download("com.github.seancfoley:ipaddress:5.6.2")
-    implementation("com.github.seancfoley:ipaddress:5.6.2")
+    download(libs.githubSeancfoleyIpaddress)
+    implementation(libs.githubSeancfoleyIpaddress)
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.work:work-testing:2.11.2")
-    androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation("androidx.test.espresso:espresso-accessibility:3.7.0")
-    androidTestImplementation("androidx.test:rules:1.7.0")
-    testImplementation("org.robolectric:robolectric:4.16.1")
-    testImplementation("androidx.test:core:1.7.0")
-    testImplementation("androidx.test.ext:junit:1.3.0")
-    testImplementation("org.mockito:mockito-core:5.23.0")
+    testImplementation(libs.junitJunit)
+    testImplementation(libs.androidxWorkWorkTesting)
+    androidTestImplementation(libs.androidxTestExtJunit)
+    androidTestImplementation(libs.androidxTestEspressoEspressoCore)
+    androidTestImplementation(libs.androidxTestEspressoEspressoAccessibility)
+    androidTestImplementation(libs.androidxTestRules)
+    testImplementation(libs.robolectricRobolectric)
+    testImplementation(libs.androidxTestCore)
+    testImplementation(libs.androidxTestExtJunit)
+    testImplementation(libs.mockitoMockitoCore)
     // Added test dependencies for comprehensive testing
-    testImplementation("io.mockk:mockk:1.14.11")
-    testImplementation("io.mockk:mockk-android:1.14.11")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
-    testImplementation("io.insert-koin:koin-test:4.2.2")
-    testImplementation("io.insert-koin:koin-test-junit4:4.2.2")
-    androidTestImplementation("io.insert-koin:koin-test:4.2.2")
-    androidTestImplementation("io.insert-koin:koin-test-junit4:4.2.2")
-    androidTestImplementation("io.mockk:mockk-android:1.14.11")
+    testImplementation(libs.mockkMockk)
+    testImplementation(libs.mockkMockkAndroid)
+    testImplementation(libs.androidxArchCoreCoreTesting)
+    testImplementation(libs.jetbrainsKotlinxKotlinxCoroutinesTest)
+    testImplementation(libs.insertKoinKoinTest)
+    testImplementation(libs.insertKoinKoinTestJunit4)
+    androidTestImplementation(libs.insertKoinKoinTest)
+    androidTestImplementation(libs.insertKoinKoinTestJunit4)
+    androidTestImplementation(libs.mockkMockkAndroid)
 
-    "leakCanaryImplementation"("com.squareup.leakcanary:leakcanary-android:2.14")
+    "leakCanaryImplementation"(libs.squareupLeakcanaryLeakcanaryAndroid)
 
-    "fullImplementation"("androidx.navigation:navigation-fragment-ktx:2.9.8")
-    "fullImplementation"("androidx.navigation:navigation-ui-ktx:2.9.8")
+    "fullImplementation"(libs.androidxNavigationNavigationFragmentKtx)
+    "fullImplementation"(libs.androidxNavigationNavigationUiKtx)
 
-    "fullImplementation"("androidx.biometric:biometric:1.1.0")
+    "fullImplementation"(libs.androidxBiometricBiometric)
 
-    "playImplementation"("com.google.android.play:app-update:2.1.0")
-    "playImplementation"("com.google.android.play:app-update-ktx:2.1.0")
+    "playImplementation"(libs.googleAndroidPlayAppUpdate)
+    "playImplementation"(libs.googleAndroidPlayAppUpdateKtx)
 
     // for encrypting wireguard configuration files
-    implementation("androidx.security:security-crypto:1.1.0")
-    implementation("androidx.security:security-app-authenticator:1.0.0")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0")
+    implementation(libs.androidxSecuritySecurityCrypto)
+    implementation(libs.androidxSecuritySecurityAppAuthenticator)
+    androidTestImplementation(libs.androidxSecuritySecurityAppAuthenticator)
 
     // barcode scanner for wireguard
-    "fullImplementation"("com.journeyapps:zxing-android-embedded:4.3.0")
-    "fullImplementation"("com.simplecityapps:recyclerview-fastscroll:2.0.1")
+    "fullImplementation"(libs.journeyappsZxingAndroidEmbedded)
+    "fullImplementation"(libs.simplecityappsRecyclerviewFastscroll)
 
     // for confetti animation
-    "fullImplementation"("nl.dionsegijn:konfetti-xml:2.0.5")
+    "fullImplementation"(libs.nlDionsegijnKonfettiXml)
 
-    "tvImplementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
-    "tvImplementation"("androidx.appcompat:appcompat:1.8.0")
-    "tvImplementation"("androidx.core:core-ktx:1.19.0")
-    "tvImplementation"("androidx.constraintlayout:constraintlayout:2.2.2")
-    "tvImplementation"("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
-    "tvImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-    "tvImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
-    "tvImplementation"("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
-    "tvImplementation"("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
-    "tvImplementation"("androidx.fragment:fragment-ktx:1.9.0")
-    "tvImplementation"("androidx.viewpager2:viewpager2:1.1.0")
-    "tvImplementation"("com.squareup.okhttp3:okhttp:5.5.0")
-    "tvImplementation"("com.squareup.okhttp3:okhttp-dnsoverhttps:5.5.0")
-    "tvImplementation"("com.squareup.okhttp3:logging-interceptor:5.5.0")
-    "tvImplementation"("com.squareup.retrofit2:retrofit:3.0.0")
-    "tvImplementation"("com.squareup.retrofit2:converter-gson:3.0.0")
-    "tvImplementation"("com.github.bumptech.glide:glide:5.0.9") { exclude(group = "glide-parent") }
-    "tvImplementation"("com.github.bumptech.glide:okhttp3-integration:5.0.9") { exclude(group = "glide-parent") }
-    "kspTv"("com.github.bumptech.glide:compiler:5.0.9")
-    "tvImplementation"("com.facebook.shimmer:shimmer:0.5.0")
-    "tvImplementation"("com.github.kirich1409:viewbindingpropertydelegate:1.5.9")
-    "tvImplementation"("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
-    "tvImplementation"("androidx.navigation:navigation-fragment-ktx:2.9.8")
-    "tvImplementation"("androidx.navigation:navigation-ui-ktx:2.9.8")
-    "tvImplementation"("androidx.biometric:biometric:1.1.0")
-    "tvImplementation"("com.journeyapps:zxing-android-embedded:4.3.0")
-    "tvImplementation"("com.simplecityapps:recyclerview-fastscroll:2.0.1")
-    "tvImplementation"("nl.dionsegijn:konfetti-xml:2.0.5")
+    "tvImplementation"(libs.jetbrainsKotlinKotlinStdlibJdk8)
+    "tvImplementation"(libs.androidxAppcompatAppcompat)
+    "tvImplementation"(libs.androidxCoreCoreKtx)
+    "tvImplementation"(libs.androidxConstraintlayoutConstraintlayout)
+    "tvImplementation"(libs.androidxSwiperefreshlayoutSwiperefreshlayout)
+    "tvImplementation"(libs.jetbrainsKotlinxKotlinxCoroutinesCore)
+    "tvImplementation"(libs.jetbrainsKotlinxKotlinxCoroutinesAndroid)
+    "tvImplementation"(libs.androidxLifecycleLifecycleViewmodelKtx)
+    "tvImplementation"(libs.androidxLifecycleLifecycleRuntimeKtx)
+    "tvImplementation"(libs.androidxFragmentFragmentKtx)
+    "tvImplementation"(libs.androidxViewpager2Viewpager2)
+    "tvImplementation"(libs.squareupOkhttp3Okhttp)
+    "tvImplementation"(libs.squareupOkhttp3OkhttpDnsoverhttps)
+    "tvImplementation"(libs.squareupOkhttp3LoggingInterceptor)
+    "tvImplementation"(libs.squareupRetrofit2Retrofit)
+    "tvImplementation"(libs.squareupRetrofit2ConverterGson)
+    "tvImplementation"(libs.githubBumptechGlideGlide) { exclude(group = "glide-parent") }
+    "tvImplementation"(libs.githubBumptechGlideOkhttp3Integration) { exclude(group = "glide-parent") }
+    "kspTv"(libs.githubBumptechGlideCompilerTv)
+    "tvImplementation"(libs.facebookShimmerShimmer)
+    "tvImplementation"(libs.githubKirich1409Viewbindingpropertydelegate)
+    "tvImplementation"(libs.githubKirich1409ViewbindingpropertydelegateNoreflection)
+    "tvImplementation"(libs.androidxNavigationNavigationFragmentKtx)
+    "tvImplementation"(libs.androidxNavigationNavigationUiKtx)
+    "tvImplementation"(libs.androidxBiometricBiometric)
+    "tvImplementation"(libs.journeyappsZxingAndroidEmbedded)
+    "tvImplementation"(libs.simplecityappsRecyclerviewFastscroll)
+    "tvImplementation"(libs.nlDionsegijnKonfettiXml)
 
-    implementation(platform("androidx.compose:compose-bom:2026.08.00"))
-    implementation("androidx.compose.runtime:runtime")
-    "tvImplementation"(platform("androidx.compose:compose-bom:2024.12.01"))
-    "tvImplementation"("androidx.compose.ui:ui")
-    "tvImplementation"("androidx.compose.ui:ui-tooling-preview")
-    "tvImplementation"("androidx.compose.foundation:foundation")
-    "tvImplementation"("androidx.compose.runtime:runtime-livedata")
-    "tvImplementation"("androidx.compose.material3:material3")
-    "tvImplementation"("androidx.tv:tv-material:1.1.0")
-    "tvImplementation"("androidx.activity:activity-compose:1.13.0")
-    "tvImplementation"("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
-    "tvImplementation"("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
-    "tvImplementation"("io.insert-koin:koin-androidx-compose:4.2.2")
-    "tvImplementation"("androidx.navigation:navigation-compose:2.9.8")
-    "tvImplementation"("androidx.compose.material:material-icons-extended")
-    "tvImplementation"("androidx.paging:paging-compose:3.5.1")
+    implementation(platform(libs.androidxComposeComposeBom))
+    implementation(libs.androidxComposeRuntimeRuntime)
+    "tvImplementation"(platform(libs.androidxComposeComposeBomTv))
+    "tvImplementation"(libs.androidxComposeUiUi)
+    "tvImplementation"(libs.androidxComposeUiUiToolingPreview)
+    "tvImplementation"(libs.androidxComposeFoundationFoundation)
+    "tvImplementation"(libs.androidxComposeRuntimeRuntimeLivedata)
+    "tvImplementation"(libs.androidxComposeMaterial3Material3)
+    "tvImplementation"(libs.androidxTvTvMaterial)
+    "tvImplementation"(libs.androidxActivityActivityCompose)
+    "tvImplementation"(libs.androidxLifecycleLifecycleRuntimeCompose)
+    "tvImplementation"(libs.androidxLifecycleLifecycleViewmodelCompose)
+    "tvImplementation"(libs.insertKoinKoinAndroidxCompose)
+    "tvImplementation"(libs.androidxNavigationNavigationCompose)
+    "tvImplementation"(libs.androidxComposeMaterialMaterialIconsExtended)
+    "tvImplementation"(libs.androidxPagingPagingCompose)
 
     constraints {
-        implementation("androidx.annotation:annotation-experimental:1.6.0")
+        implementation(libs.androidxAnnotationAnnotationExperimental)
     }
 
     // for in-app purchases
-    "playImplementation"("com.android.billingclient:billing:9.1.0")
-    "websiteImplementation"("com.android.billingclient:billing:9.1.0")
+    "playImplementation"(libs.androidBillingclientBilling)
+    "websiteImplementation"(libs.androidBillingclientBilling)
     // for stripe payment gateway
     //"websiteImplementation"("com.stripe:stripe-android:21.21.0)"
     //"fdroidImplementation"("com.stripe:stripe-android:21.21.0)"
@@ -612,30 +610,30 @@ dependencies {
     // The version v3-rev20240301-2.0.0 cited in the API docs does not exist on Maven Central;
     // v3-rev20260318-2.0.0 is the closest available release with the same model classes.
     // ref: github.com/googleapis/google-api-java-client-services/tree/main/clients/google-api-services-androidpublisher/v3
-    "playImplementation"("com.google.apis:google-api-services-androidpublisher:v3-rev20260318-2.0.0") {
+    "playImplementation"(libs.googleApisGoogleApiServicesAndroidpublisher) {
         // Exclude Apache HTTP transport, conflicts with Android's built-in HTTP stack
         exclude(group = "com.google.http-client", module = "google-http-client-apache-v2")
         exclude(group = "org.apache.httpcomponents")
         // Exclude OAuth, not needed for model-only parsing
         exclude(group = "com.google.oauth-client")
     }
-    "websiteImplementation"("com.google.apis:google-api-services-androidpublisher:v3-rev20260318-2.0.0") {
+    "websiteImplementation"(libs.googleApisGoogleApiServicesAndroidpublisher) {
         exclude(group = "com.google.http-client", module = "google-http-client-apache-v2")
         exclude(group = "org.apache.httpcomponents")
         exclude(group = "com.google.oauth-client")
     }
 
-    lintChecks("com.android.security.lint:lint:1.0.4")
+    lintChecks(libs.androidSecurityLintLint)
 
     // battery optimization permission helper
-    implementation("com.waseemsabir:betterypermissionhelper:1.0.3")
+    implementation(libs.waseemsabirBetterypermissionhelper)
 
     // Firebase dependencies for error reporting (website and play variants only)
-    "websiteImplementation"(platform("com.google.firebase:firebase-bom:34.17.0"))
-    "websiteImplementation"("com.google.firebase:firebase-crashlytics")
-    "websiteImplementation"("com.google.firebase:firebase-crashlytics-ndk")
+    "websiteImplementation"(platform(libs.googleFirebaseFirebaseBom))
+    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlytics)
+    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)
 
-    "playImplementation"(platform("com.google.firebase:firebase-bom:34.17.0"))
-    "playImplementation"("com.google.firebase:firebase-crashlytics")
-    "playImplementation"("com.google.firebase:firebase-crashlytics-ndk")
+    "playImplementation"(platform(libs.googleFirebaseFirebaseBom))
+    "playImplementation"(libs.googleFirebaseFirebaseCrashlytics)
+    "playImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)
 }
