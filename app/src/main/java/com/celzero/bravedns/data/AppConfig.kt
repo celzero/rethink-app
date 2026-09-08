@@ -966,7 +966,7 @@ internal constructor(
                 // no-op, no need to remove connection status
             }
             DnsType.SMART_DNS -> {
-                // no-op, no need to remove connection status
+                smartDnsEndpointRepository.removeConnectionStatus()
             }
         }
     }

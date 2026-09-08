@@ -33,6 +33,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ODoHEndpoint
@@ -93,6 +94,9 @@ class ODoHEndpointAdapter(private val context: Context, private val appConfig: A
     inner class ODoHEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
         private var statusCheckJob: Job? = null
+        private val selectionIndicator =
+            SelectionIndicator(b.endpointSelectionOrbital, b.endpointSelectionPill)
+
 
         fun update(endpoint: ODoHEndpoint) {
             displayDetails(endpoint)
@@ -102,12 +106,17 @@ class ODoHEndpointAdapter(private val context: Context, private val appConfig: A
         private fun setupClickListeners(endpoint: ODoHEndpoint) {
             b.root.setOnClickListener { updateConnection(endpoint) }
             b.endpointInfoImg.setOnClickListener { showExplanationOnImageClick(endpoint) }
-            b.endpointCheck.setOnClickListener { updateConnection(endpoint) }
         }
 
         private fun displayDetails(endpoint: ODoHEndpoint) {
             b.endpointName.text = endpoint.name
-            b.endpointCheck.isChecked = endpoint.isSelected
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.name
+                )
+            selectionIndicator.update(endpoint.isSelected)
 
             if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()

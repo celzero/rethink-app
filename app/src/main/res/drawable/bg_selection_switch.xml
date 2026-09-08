@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/accentGood" />
+            <corners android:radius="@dimen/selection_pill_radius" />
+            <size
+                android:width="@dimen/selection_pill_width"
+                android:height="@dimen/selection_pill_height" />
+        </shape>
+    </item>
+    <item
+        android:bottom="@dimen/selection_switch_knob_inset"
+        android:end="@dimen/selection_switch_knob_inset"
+        android:gravity="end|center_vertical"
+        android:top="@dimen/selection_switch_knob_inset">
+        <shape android:shape="oval">
+            <size
+                android:width="@dimen/selection_switch_knob_size"
+                android:height="@dimen/selection_switch_knob_size" />
+            <solid android:color="?attr/invertedPrimaryTextColor" />
+        </shape>
+    </item>
+</layer-list>

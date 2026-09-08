@@ -31,7 +31,6 @@ data class SmartDnsEndpoint(
     val latency: Int = 0
 ) {
     companion object {
-        const val SMART_DNS_TABLE_NAME = "SmartDnsEndpoint"
 
         fun isNoFilterMode(mode: Int): Boolean {
             return mode == SmartDnsMode.NO_FILTER.mode
@@ -68,8 +67,8 @@ enum class SmartDnsMode(val mode: Int) {
         fun getTunMode(id: Int): Long {
             return when (id) {
                 NO_FILTER.mode -> Settings.PlusFilterNone
-                SECURITY.mode -> Settings.PlusFilterAdblock
-                FAMILY.mode -> Settings.PlusFilterAdblock
+                SECURITY.mode -> Settings.PlusFilterSecurity
+                FAMILY.mode -> Settings.PlusFilterFamily
                 PRIVACY.mode -> Settings.PlusFilterAdblock
                 else -> Settings.PlusFilterNone
             }

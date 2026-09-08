@@ -68,28 +68,45 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/endpoint_info_img"
+            android:alpha="0.55"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@id/endpoint_check"
+            android:layout_toStartOf="@id/endpoint_selection_indicator"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@null"
+            android:tint="?attr/primaryTextColor"
             android:padding="12dp"
             android:src="@drawable/ic_info" />
 
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/endpoint_check"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <FrameLayout
+            android:id="@+id/endpoint_selection_indicator"
+            android:layout_width="32dp"
+            android:layout_height="18dp"
             android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:buttonTint="?attr/accentGood"
-            android:checked="false"
-            android:foregroundTint="?attr/accentGood"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="@null" />
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="12dp">
+
+            <View
+                android:id="@+id/endpoint_selection_orbital"
+                android:layout_width="@dimen/selection_orbital_size"
+                android:layout_height="@dimen/selection_orbital_size"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_selection_orbital"
+                android:contentDescription="@null"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/endpoint_selection_pill"
+                android:layout_width="@dimen/selection_pill_width"
+                android:layout_height="@dimen/selection_pill_height"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_selection_switch"
+                android:contentDescription="@null"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
     </RelativeLayout>
 

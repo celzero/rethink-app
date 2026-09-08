@@ -30,6 +30,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
@@ -90,6 +91,8 @@ class DnsProxyEndpointAdapter(
 
     inner class DnsProxyEndpointViewHolder(private val b: DnsProxyListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private val selectionIndicator =
+            SelectionIndicator(b.dnsProxyListSelectionOrbital, b.dnsProxyListSelectionPill)
 
         fun update(endpoint: DnsProxyEndpoint) {
             displayDetails(endpoint)
@@ -100,13 +103,10 @@ class DnsProxyEndpointAdapter(
             b.root.setOnClickListener { selectDnsProxy(endpoint) }
 
             b.dnsProxyListActionImage.setOnClickListener { promptUser(endpoint) }
-
-            b.dnsProxyListCheckImage.setOnClickListener { selectDnsProxy(endpoint) }
         }
 
         private fun selectDnsProxy(endpoint: DnsProxyEndpoint) {
             if (isProxyLockdownConflict(endpoint)) {
-                b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
                 showLockdownConflictDialog(endpoint)
                 return
             }
@@ -115,7 +115,14 @@ class DnsProxyEndpointAdapter(
 
         private fun displayDetails(endpoint: DnsProxyEndpoint) {
             b.dnsProxyListUrlName.text = endpoint.proxyName
-            b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.proxyName
+                )
+            selectionIndicator.update(endpoint.isSelected)
+
 
             io {
                 val appInfo = FirewallManager.getAppInfoByPackage(endpoint.proxyAppName)

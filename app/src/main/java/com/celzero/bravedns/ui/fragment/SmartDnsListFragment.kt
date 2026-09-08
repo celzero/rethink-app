@@ -69,7 +69,8 @@ class SmartDnsListFragment : Fragment(R.layout.fragment_smart_dns_list) {
             RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
         )
 
-        smartDnsAdapter = SmartDnsEndpointAdapter(requireContext())
+        smartDnsAdapter =
+            SmartDnsEndpointAdapter(requireContext()) { appConfig.isSmartDnsEnabled() }
         smartDnsAdapter?.onEndpointSelected = { endpoint ->
             io { appConfig.enableSmartDns(endpoint.id) }
         }

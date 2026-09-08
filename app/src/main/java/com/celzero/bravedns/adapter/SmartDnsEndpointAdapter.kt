@@ -23,12 +23,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.database.SmartDnsEndpoint
 import com.celzero.bravedns.database.SmartDnsMode
 import com.celzero.bravedns.databinding.ListItemEndpointBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class SmartDnsEndpointAdapter(private val context: Context) :
+class SmartDnsEndpointAdapter(
+    private val context: Context,
+    private val isSmartDnsActive: () -> Boolean
+) :
     ListAdapter<SmartDnsEndpoint, SmartDnsEndpointAdapter.SmartDnsEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -64,6 +68,9 @@ class SmartDnsEndpointAdapter(private val context: Context) :
 
     inner class SmartDnsEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private val selectionIndicator =
+            SelectionIndicator(b.endpointSelectionOrbital, b.endpointSelectionPill)
+
 
         fun update(endpoint: SmartDnsEndpoint) {
             displayDetails(endpoint)
@@ -72,14 +79,20 @@ class SmartDnsEndpointAdapter(private val context: Context) :
 
         private fun setupClickListeners(endpoint: SmartDnsEndpoint) {
             b.root.setOnClickListener { onEndpointSelected?.invoke(endpoint) }
-            b.endpointCheck.setOnClickListener { onEndpointSelected?.invoke(endpoint) }
             b.endpointInfoImg.setOnClickListener { showExplanationDialog(endpoint) }
         }
 
         private fun displayDetails(endpoint: SmartDnsEndpoint) {
             b.endpointName.text = endpoint.dnsName
-            b.endpointCheck.isChecked = endpoint.isSelected
-            if (endpoint.isSelected) {
+            val isSelected = endpoint.isSelected && isSmartDnsActive()
+            b.root.contentDescription =
+                context.getString(
+                    if (isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.dnsName
+                )
+            selectionIndicator.update(isSelected)
+            if (isSelected) {
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)
                 b.endpointDesc.visibility = View.VISIBLE
             } else {
