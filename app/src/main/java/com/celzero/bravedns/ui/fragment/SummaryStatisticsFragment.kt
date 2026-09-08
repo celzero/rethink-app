@@ -332,6 +332,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         // insights-view chips (same detailed screens as the list view)
+        b.fssIaCloseConnsChip.setOnClickListener {
+            showCloseConnectionDialog()
+        }
         b.fssIaActiveConnsChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.TOP_ACTIVE_CONNS)
         }
