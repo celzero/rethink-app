@@ -86,6 +86,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/bs_lai_blocked_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
@@ -160,16 +161,33 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <LinearLayout
             android:id="@+id/bs_lai_empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:alpha="0.6"
-            android:text="@string/log_activity_interval_empty"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_subheading_text"
-            android:visibility="gone" />
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:contentDescription="@string/log_activity_interval_empty"
+                android:src="@drawable/illustrations_no_record" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:alpha="0.6"
+                android:gravity="center"
+                android:text="@string/log_activity_interval_empty"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_subheading_text" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bs_lai_recycler"
