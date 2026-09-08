@@ -45,6 +45,7 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
 
 /**
  * Generic class responsible for downloading the block list for both remote and local. As of now,
@@ -78,6 +79,45 @@ class AppDownloadManager(
     fun resetDownloadState() {
         downloadState.postValue(DownloadState.Idle)
         persistentState.lastDownloadFailureReason = ""
+    }
+
+
+    fun isDownloadWorkActive(type: DownloadType): Boolean {
+        return if (type.isLocal()) {
+            WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) ||
+                WorkScheduler.isWorkScheduled(context, FILE_TAG) ||
+                WorkScheduler.isWorkScheduled(context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) ||
+                WorkScheduler.isWorkRunning(context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+        } else {
+            WorkScheduler.isWorkScheduled(context, RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER) ||
+                WorkScheduler.isWorkRunning(context, RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
+        }
+    }
+
+    /**
+     * The sticky [downloadState] can be left in an in progress state (Starting/Downloading/
+     * Processing) when the download finished while no screen observing [observeWorkManager]
+     * was alive eg, the download was started from LocalBlocklistsBottomSheet, whose own
+     * observers prune the finished WorkInfos. The terminal (Success/Error) transition is
+     * then lost forever and every later screen misreads the stale value as "download in
+     * progress". Reconcile: if the sticky state claims a download is in flight but no
+     * download work actually is, reset to Idle.
+     *
+     * Blocking WorkManager queries: must not be called on the main thread.
+     */
+    fun reconcileStaleInFlightDownloadState(type: DownloadType) {
+        val state = downloadState.value ?: return
+        val inFlight = state is DownloadState.Starting ||
+            state is DownloadState.Downloading ||
+            state is DownloadState.Processing
+        if (!inFlight) return
+        if (isDownloadWorkActive(type)) return
+
+        Logger.i(
+            LOG_TAG_DOWNLOAD,
+            "reconciling stale in-flight download state: $state, no download work active for ${type.name}"
+        )
+        resetDownloadState()
     }
 
     private fun mapWorkInfoToDownloadState(tag: String, workInfo: androidx.work.WorkInfo): DownloadState {
@@ -318,7 +358,8 @@ class AppDownloadManager(
      */
     suspend fun downloadLocalBlocklist(
         currentTs: Long,
-        isRedownload: Boolean
+        isRedownload: Boolean,
+        forceInApp: Boolean = false
     ): DownloadManagerStatus {
         // local blocklist available only in fdroid and website version
         if (!Utilities.isWebsiteFlavour() && !Utilities.isFdroidFlavour()) {
@@ -358,7 +399,13 @@ class AppDownloadManager(
         // earlier would make the Idle transitions above get rejected by shouldUpdateState,
         // leaving the UI stuck on "Starting").
         downloadState.postValue(DownloadState.Starting)
-        if (persistentState.useCustomDownloadManager) {
+        if (forceInApp || persistentState.useCustomDownloadManager) {
+            if (forceInApp) {
+                Logger.i(
+                    LOG_TAG_DNS,
+                    "vpn active; forcing local blocklist download with custom download mgr"
+                )
+            }
             Logger.i(LOG_TAG_DNS, "initiating local blocklist download with custom download mgr")
             return initiateCustomDownloadManager(updatableTs)
         }
@@ -577,7 +624,7 @@ class AppDownloadManager(
     private fun enqueueDownload(url: String, fileName: String, timestamp: String): Long {
         try {
             downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            val downloadUri = Uri.parse(url)
+            val downloadUri = url.toUri()
             val request = DownloadManager.Request(downloadUri)
             request.apply {
                 setTitle(fileName)

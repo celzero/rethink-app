@@ -43,6 +43,10 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         // The time out value is set as 40 minutes.
         val ONDEVICE_BLOCKLIST_DOWNLOAD_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(40)
 
+        // How long the downloads may stay at 0 bytes / total -1 (never started) before
+        // the watcher gives up and fails, instead of retrying until the 40-minute timeout.
+        val ONDEVICE_BLOCKLIST_DOWNLOAD_NOT_STARTED_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5)
+
         // various download status used as part of Work manager. see
         // DownloadWatcher#checkForDownload()
         const val DOWNLOAD_FAILURE = -1
@@ -109,7 +113,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
             return Result.failure()
         }
 
-        when (checkForDownload(context, downloadIds)) {
+        when (checkForDownload(context, downloadIds, startTime)) {
             DOWNLOAD_RETRY -> {
                 return Result.retry()
             }
@@ -137,7 +141,11 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         }
     }
 
-    private fun checkForDownload(context: Context, downloadIds: MutableList<Long>?): Int {
+    private fun checkForDownload(
+        context: Context,
+        downloadIds: MutableList<Long>?,
+        startTimeMs: Long
+    ): Int {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         var totalBytes = 0L
         var downloadedBytes = 0L
@@ -232,6 +240,27 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
         if (totalBytes > 0) {
             val progress = (downloadedBytes * 100 / totalBytes).toInt()
             setProgressAsync(workDataOf("progress" to progress))
+        }
+
+        // Fail fast when the platform download provider never starts the transfer:
+        // every download still reports total-size -1 (no response headers received)
+        // and zero bytes downloaded, ie, the downloads are stuck in STATUS_PENDING.
+        // Left alone, this loops until the full 40-minute timeout with no user-visible
+        // error, and (because the DOWNLOAD_WORKER chain stays ENQUEUED) blocks every
+        // new download attempt with a bare FAILURE until then. Seen when the provider
+        // defers the job (data saver on metered network, battery saver) or when it is
+        // disabled/force-stopped on some OEM ROMs.
+        if (downloadedBytes == 0L && totalBytes == 0L) {
+            val elapsedMs = SystemClock.elapsedRealtime() - startTimeMs
+            if (elapsedMs > ONDEVICE_BLOCKLIST_DOWNLOAD_NOT_STARTED_TIMEOUT_MS) {
+                Logger.w(
+                    LOG_TAG_DOWNLOAD,
+                    "downloads($downloadIds) never started after $elapsedMs ms; failing"
+                )
+                persistentState.lastDownloadFailureReason =
+                    context.getString(R.string.download_err_system_manager)
+                return DOWNLOAD_FAILURE
+            }
         }
 
         // occasionally, the download-manager observer fires without a download having

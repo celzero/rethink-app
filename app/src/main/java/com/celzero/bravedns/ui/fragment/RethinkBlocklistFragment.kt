@@ -158,6 +158,14 @@ class RethinkBlocklistFragment :
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // a download-error dialog shown against this activity must not outlive the view,
+        // else the activity's window is torn down with the dialog attached (WindowLeaked)
+        downloadErrorDialog?.dismiss()
+        downloadErrorDialog = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Logger.v(LOG_TAG_UI, "init Rethink blocklist fragment")
@@ -266,12 +274,20 @@ class RethinkBlocklistFragment :
 
     private fun hasBlocklist() {
         go {
+            // downloadState is a sticky, process-wide LiveData; it can be left in an
+            // in-flight state when a download (started from, say, LocalBlocklistsBottomSheet)
+            // finished while no screen observing observeWorkManager() was alive. Reconcile
+            // it against actual WorkManager state (both calls do blocking queries: keep
+            // them off the main thread) before deciding which UI to show.
+            withContext(Dispatchers.IO) {
+                appDownloadManager.reconcileStaleInFlightDownloadState(downloadType())
+            }
+            val isDownloadWorkActive =
+                withContext(Dispatchers.IO) { appDownloadManager.isDownloadWorkActive(downloadType()) }
             uiCtx {
                 val blocklistsExist = withContext(Dispatchers.IO) { hasBlocklists() }
-                val state = appDownloadManager.downloadState.value
-                val isDownloadRunning = state is AppDownloadManager.DownloadState.Starting ||
-                                       state is AppDownloadManager.DownloadState.Downloading ||
-                                       state is AppDownloadManager.DownloadState.Processing
+                // trust actual WorkManager state over the possibly-stale sticky LiveData
+                val isDownloadRunning = isDownloadWorkActive
 
                 if (blocklistsExist && !isDownloadRunning) {
                     setListAdapter()
@@ -428,7 +444,23 @@ class RethinkBlocklistFragment :
             return
         }
 
-        proceedWithBlocklistDownload()
+        // Downloads are only allowed while the VPN is on, and while the VPN is the
+        // default network the system download manager's JobScheduler jobs never dispatch
+        // (downloads sit in STATUS_PENDING forever; see
+        // PersistentState.useCustomDownloadManager). Fall back to the in-app downloader
+        // for this attempt instead of starting a download that cannot proceed. Local
+        // downloads only: remote blocklists always use the in-app worker.
+        var forceInApp = false
+        if (type.isLocal() && !persistentState.useCustomDownloadManager && VpnController.hasTunnel()) {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.download_inapp_vpn_toast),
+                Toast.LENGTH_SHORT
+            )
+            forceInApp = true
+        }
+
+        proceedWithBlocklistDownload(forceInApp)
     }
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
@@ -449,7 +481,7 @@ class RethinkBlocklistFragment :
         builder.create().show()
     }
 
-    private fun proceedWithBlocklistDownload() {
+    private fun proceedWithBlocklistDownload(forceInApp: Boolean = false) {
         ui {
             if (viewModel.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
@@ -457,7 +489,8 @@ class RethinkBlocklistFragment :
                     status =
                         appDownloadManager.downloadLocalBlocklist(
                             persistentState.localBlocklistTimestamp,
-                            isRedownload = false
+                            isRedownload = false,
+                            forceInApp
                         )
                 }
                 handleDownloadStatus(status)
@@ -501,6 +534,14 @@ class RethinkBlocklistFragment :
                 // observer (AppDownloadManager posts DownloadState.Error on early failures,
                 // and the WorkManager observers post it for worker failures). Handling it
                 // here too would show a duplicate error dialog.
+                // But a FAILURE can also arrive with no Error posted at all (eg, the
+                // "download already in progress" guard in AppDownloadManager); the click
+                // listener disabled the download button before this call, so re-enable it
+                // or the UI goes dead with no message until the process restarts.
+                ui {
+                    b.lbDownloadBtn.isEnabled = true
+                    b.lbDownloadBtn.isClickable = true
+                }
             }
             AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
                 // no-op, no need to update any ui in this screen
@@ -803,8 +844,19 @@ class RethinkBlocklistFragment :
         }
     }
 
+    // tracked so the dialog can be dismissed when this view tears down; otherwise an
+    // Error delivered while the activity is finishing leaks the dialog's window
+    // (android.view.WindowLeaked)
+    private var downloadErrorDialog: androidx.appcompat.app.AlertDialog? = null
+
     private fun showDownloadErrorDialog(reason: String) {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        // the Error may have been posted while this screen was going away; showing a
+        // dialog against a finishing activity leaks its window. The sticky Error state
+        // is reset on the next entry to this screen (see maybeResetStaleTerminalDownloadState).
+        val a = activity
+        if (a == null || !isAdded || a.isFinishing || a.isDestroyed) return
+
+        val builder = MaterialAlertDialogBuilder(a, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.download_update_dialog_failure_title)
         builder.setMessage(getString(R.string.download_update_dialog_failure_message) + "\n\n" + reason)
         builder.setPositiveButton(R.string.retry) { _, _ ->
@@ -833,7 +885,8 @@ class RethinkBlocklistFragment :
             appDownloadManager.resetDownloadState()
             dialog.dismiss()
         }
-        builder.create().show()
+        downloadErrorDialog = builder.create()
+        downloadErrorDialog?.show()
     }
 
     private fun onDownloadSuccess() {

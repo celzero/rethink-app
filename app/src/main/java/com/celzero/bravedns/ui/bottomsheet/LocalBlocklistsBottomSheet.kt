@@ -59,6 +59,7 @@ import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,6 +75,7 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
+    private val appScope by inject<CoroutineScope>()
 
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
 
@@ -209,7 +211,30 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
             Logger.i(LOG_TAG_DNS, "$TAG; Check for blocklist update, status: $it")
             if (it == null) return@observe
 
-            handleDownloadStatus(it)
+            // downloadRequired is sticky: an update-check result can be delivered late
+            // (eg, the check completed while this sheet was closed) right after reopen,
+            // when reflectOngoingDownloadUi() has already shown the progress UI of a
+            // download that is actually running. The SUCCESS/NOT_REQUIRED/FAILURE
+            // handlers hide the progress indicators and re-enable buttons, which would
+            // wipe that progress UI. While a download is active, swallow the stale
+            // result and just clear the sticky value instead.
+            viewLifecycleOwner.lifecycleScope.launch {
+                val resetsProgressUi =
+                    it == AppDownloadManager.DownloadManagerStatus.SUCCESS ||
+                        it == AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED ||
+                        it == AppDownloadManager.DownloadManagerStatus.FAILURE
+
+                if (isLocalDownloadActive()) {
+                    if (resetsProgressUi) {
+                        appDownloadManager.downloadRequired.postValue(
+                            AppDownloadManager.DownloadManagerStatus.NOT_STARTED
+                        )
+                    }
+                    return@launch
+                }
+
+                handleDownloadStatus(it)
+            }
         }
     }
 
@@ -335,6 +360,21 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
             return
         }
 
+        // Downloads are only allowed while the VPN is on, and while the VPN is the
+        // default network the system download manager's JobScheduler jobs never dispatch
+        // (downloads sit in STATUS_PENDING forever; see
+        // PersistentState.useCustomDownloadManager). Fall back to the in-app downloader
+        // for this attempt instead of starting a download that cannot proceed.
+        if (!persistentState.useCustomDownloadManager && VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.download_inapp_vpn_toast),
+                Toast.LENGTH_SHORT
+            )
+            proceedWithDownload(isRedownload, forceInApp = true)
+            return
+        }
+
         proceedWithDownload(isRedownload)
     }
 
@@ -357,7 +397,7 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
         alertDialog.show()
     }
 
-    private fun proceedWithDownload(isRedownload: Boolean) {
+    private fun proceedWithDownload(isRedownload: Boolean, forceInApp: Boolean = false) {
         ui {
             // a download is already in flight; do not enqueue a duplicate, just track it
             if (isLocalDownloadActive()) {
@@ -366,13 +406,34 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
                 return@ui
             }
 
-            var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
             b.lbbsDownload.isEnabled = false
             b.lbbsRedownload.isEnabled = false
-            val currentTs = persistentState.localBlocklistTimestamp
-            ioCtx { status = appDownloadManager.downloadLocalBlocklist(currentTs, isRedownload) }
+            // optimistic progress: the update-check inside downloadLocalBlocklist is
+            // network-bound and can take several seconds before the work is enqueued
+            onDownloadProgress()
 
-            handleDownloadStatus(status)
+            val currentTs = persistentState.localBlocklistTimestamp
+            // The download start (update check + work enqueue) must survive the sheet
+            // being dismissed: run it in the app scope, not the view lifecycle scope,
+            // otherwise a quick dismiss cancels the coroutine before any WorkManager
+            // work is enqueued and the confirmed download silently never starts. A new
+            // sheet instance picks the download up via reflectOngoingDownloadUi().
+            appScope.launch {
+                val status =
+                    withContext(Dispatchers.IO) {
+                        appDownloadManager.downloadLocalBlocklist(
+                            currentTs,
+                            isRedownload,
+                            forceInApp
+                        )
+                    }
+                withContext(Dispatchers.Main) {
+                    // the sheet may have been torn down while the download was starting;
+                    // its UI is then driven by the new instance's observers instead
+                    if (_binding == null) return@withContext
+                    handleDownloadStatus(status)
+                }
+            }
         }
     }
 
@@ -419,7 +480,10 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
                 // the job of download status stops after initiating the work manager observer
                 ui {
                     registerWorkObserversOnce()
-                    showCheckDownloadProgressUi()
+                    // show progress on the visible download/redownload buttons right away;
+                    // showCheckDownloadProgressUi() toggles only the check-update button's
+                    // spinner, which is hidden in the download/redownload UI states
+                    onDownloadProgress()
                 }
             }
             AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
@@ -651,7 +715,14 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
         workManager.getWorkInfosByTagLiveData(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD).observe(
             viewLifecycleOwner
         ) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+            // Finished WorkInfos linger in WorkManager until pruned and can sit at index 0,
+            // shadowing a just-enqueued attempt (which would leave the download with no
+            // progress cue). Prefer an in-flight info, fall back to the newest entry.
+            val workInfo = workInfoList?.firstOrNull {
+                it.state == WorkInfo.State.ENQUEUED ||
+                        it.state == WorkInfo.State.RUNNING ||
+                        it.state == WorkInfo.State.BLOCKED
+            } ?: workInfoList?.lastOrNull() ?: return@observe
             Logger.i(
                 Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for ${LocalBlocklistCoordinator.CUSTOM_DOWNLOAD}"
@@ -680,7 +751,12 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
         workManager.getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(
             viewLifecycleOwner
         ) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+            // prefer an in-flight info over lingering finished entries; see above
+            val workInfo = workInfoList?.firstOrNull {
+                it.state == WorkInfo.State.ENQUEUED ||
+                        it.state == WorkInfo.State.RUNNING ||
+                        it.state == WorkInfo.State.BLOCKED
+            } ?: workInfoList?.lastOrNull() ?: return@observe
             Logger.i(
                 Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for ${DownloadConstants.DOWNLOAD_TAG}"
@@ -707,7 +783,12 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
             viewLifecycleOwner
         ) { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
-                val workInfo = workInfoList[0]
+                // prefer an in-flight info over lingering finished entries; see above
+                val workInfo = workInfoList.firstOrNull {
+                    it.state == WorkInfo.State.ENQUEUED ||
+                            it.state == WorkInfo.State.RUNNING ||
+                            it.state == WorkInfo.State.BLOCKED
+                } ?: workInfoList.last()
                 if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
