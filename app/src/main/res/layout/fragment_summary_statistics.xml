@@ -867,6 +867,18 @@
                             android:textColor="?attr/colorOnBackground" />
 
                         <com.google.android.material.chip.Chip
+                            android:id="@+id/fss_ia_close_conns_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:text="@string/close_all"
+                            android:textColor="?attr/chipTextNegative"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorNegative"
+                            app:chipSurfaceColor="@null" />
+
+                        <com.google.android.material.chip.Chip
                             android:id="@+id/fss_ia_active_conns_chip"
                             style="@style/ThinnerChip.Action"
                             android:layout_width="wrap_content"

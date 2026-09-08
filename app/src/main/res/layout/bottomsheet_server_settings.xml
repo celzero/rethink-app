@@ -367,27 +367,27 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_config_auto"
-                                style="@style/toggleButtonNoStyle"
+                                style="@style/ActivityTimeSegment"
                                 android:layout_width="wrap_content"
                                 android:layout_height="36dp"
                                 android:minWidth="60dp"
                                 android:paddingStart="12dp"
                                 android:paddingEnd="12dp"
                                 android:text="@string/server_settings_config_mode_auto"
-                                android:textColor="?attr/primaryTextColor"
+                                android:textColor="?attr/invertedPrimaryTextColor"
                                 android:textSize="12sp"
                                 app:cornerRadius="8dp" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_config_manual"
-                                style="@style/toggleButtonNoStyle"
+                                style="@style/ActivityTimeSegment"
                                 android:layout_width="wrap_content"
                                 android:layout_height="36dp"
                                 android:minWidth="70dp"
                                 android:paddingStart="12dp"
                                 android:paddingEnd="12dp"
                                 android:text="@string/server_settings_config_mode_manual"
-                                android:textColor="?attr/primaryTextColor"
+                                android:textColor="?attr/invertedPrimaryTextColor"
                                 android:textSize="12sp"
                                 app:cornerRadius="8dp" />
 
@@ -509,7 +509,7 @@
                                 android:textColor="?attr/accentGood"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
-                                tools:text="RANDOM" />
+                                tools:text="@string/lbl_random" />
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:layout_width="16dp"

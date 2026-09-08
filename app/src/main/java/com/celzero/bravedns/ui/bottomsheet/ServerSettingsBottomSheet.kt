@@ -38,6 +38,7 @@ import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
@@ -606,7 +607,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      * uses [R.attr.primaryTextColor].
      */
     private fun updateToggleTextColors(isManual: Boolean) {
-        val selectedColor = UIUtils.fetchColor(requireContext(), R.attr.secondaryTextColor)
+        val selectedColor = UIUtils.fetchColor(requireContext(), R.attr.invertedPrimaryTextColor)
         val unselectedColor = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
         binding.btnConfigManual.setTextColor(if (isManual) selectedColor else unselectedColor)
         binding.btnConfigAuto.setTextColor(if (isManual) unselectedColor else selectedColor)
@@ -741,7 +742,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
         // lbl_random string resource as updatePortValueLabel()
         // replace 0 to "RANDOM" in the dialog list
-        val randomLabel = getString(R.string.lbl_random).trim('(', ')').uppercase()
+        val randomLabel = getString(R.string.lbl_random).trim('(', ')').capitalizeWords()
         val portLabels  = arrayOf(randomLabel, "80", "443", "53", "123", "1194", "65142")
 
         val currentPort = persistentState.rpnPort
@@ -766,7 +767,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
     private fun updatePortValueLabel(port: Int) {
         binding.tvPortValue.text = if (port == 0) {
             // Use lbl_random ("(random)"), strip the parentheses, and display in caps → "RANDOM"
-            getString(R.string.lbl_random).trim('(', ')').uppercase()
+            getString(R.string.lbl_random).trim('(', ')').capitalizeWords()
         } else {
             port.toString()
         }

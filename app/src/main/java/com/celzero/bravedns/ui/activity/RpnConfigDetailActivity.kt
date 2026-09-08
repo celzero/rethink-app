@@ -346,7 +346,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     }
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
-                    b.tvHeroCity.text = city.ifBlank { config.cc }
+
+                    b.tvHeroCity.text =
+                        if (configKey.equals(AUTO_SERVER_ID, true)) city.capitalizeWords()
+                        else city.ifBlank { config.cc }
                     // Show the flag + city name in the collapsing toolbar title when collapsed.
                     b.collapsingToolbar.title =
                         collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
@@ -418,7 +421,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // update load if available
                     buildLoadSpeedText(addlInfo.load, addlInfo.link)
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc
+                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc.capitalizeWords()
                         // Keep the collapsing toolbar title in sync with the hero city.
                         b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
                     }
@@ -533,7 +536,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         mono(entryIpStart, sb.length)
         sb.append(" ")
         val entrySuffixStart = sb.length
-        sb.append("(AUTO")
+        sb.append("(Auto")
         if (entryCity.isNotBlank()) {
             sb.append(" · ").append(entryCity)
         }
@@ -1200,6 +1203,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
         val cc = countryConfig
         val proxyName = when {
+            configKey.contains(AUTO_SERVER_ID, ignoreCase = true) ->
+                AUTO_SERVER_ID.capitalizeWords()
             cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey

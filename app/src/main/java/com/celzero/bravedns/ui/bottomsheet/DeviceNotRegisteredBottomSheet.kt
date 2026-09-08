@@ -152,13 +152,11 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
         try {
             val subject = getString(R.string.device_not_registered_email_subject)
             val body = buildString {
-                appendLine(getString(R.string.device_auth_error_email_body_greeting))
                 appendLine()
                 appendLine(getString(R.string.device_not_registered_email_body_details))
                 appendLine("  • ${getString(R.string.device_not_registered_entitlement_cid_label)}: $entitlementCid")
                 appendLine("  • ${getString(R.string.device_auth_error_device_id_label)}: $deviceIdPrefix")
                 appendLine()
-                appendLine(getString(R.string.device_auth_error_email_body_closing))
             }
 
             val intent = Intent(Intent.ACTION_SENDTO).apply {

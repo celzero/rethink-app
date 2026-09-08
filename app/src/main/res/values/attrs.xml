@@ -73,6 +73,11 @@
     <attr name="serverHeaderGradientCenter" format="color|reference" />
     <attr name="serverHeaderGradientEnd" format="color|reference" />
     <attr name="serverHeaderStrokeColor" format="color|reference" />
+    <!-- VPN server list item chips (Apps / Relay / last-routed-app):
+         background + stroke adapt per theme (white/accent in light themes). -->
+    <attr name="serverChipBgColor" format="color|reference" />
+    <attr name="serverChipStrokeColor" format="color|reference" />
+    <attr name="serverChipTextColor" format="color|reference" />
     <attr name="colorGolden" format="reference" />
 
     <!-- Guided Tour overlay / tooltip theming -->

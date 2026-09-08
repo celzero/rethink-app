@@ -115,7 +115,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
             ) ?: return@setOnShowListener
             BottomSheetBehavior.from(sheet).state = BottomSheetBehavior.STATE_EXPANDED
         }
-
+        b.rpnStatsBlockedCard.isVisible = false
         b.rpnStatsViewLogs.setOnClickListener { openConnectionLogs() }
         loadStats()
     }

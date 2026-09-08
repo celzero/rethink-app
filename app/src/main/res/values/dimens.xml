@@ -24,6 +24,15 @@
 
     <dimen name="badge_dot_padding">10dp</dimen>
 
+    <!-- Trailing selection indicator on DNS endpoint list rows -->
+    <dimen name="selection_pill_width">32dp</dimen>
+    <dimen name="selection_pill_height">16dp</dimen>
+    <dimen name="selection_pill_radius">8dp</dimen>
+    <dimen name="selection_orbital_size">18dp</dimen>
+    <dimen name="selection_orbital_stroke">2dp</dimen>
+    <dimen name="selection_switch_knob_size">12dp</dimen>
+    <dimen name="selection_switch_knob_inset">2dp</dimen>
+
     <!-- Snackbar styling -->
     <dimen name="snackbar_elevation">8dp</dimen>
     <dimen name="snackbar_horizontal_margin">16dp</dimen>

@@ -82,8 +82,24 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         // hard cap on uncompressed bytes kept from a trimmed bugreport zip
         private const val BUG_ZIP_TRIM_BUDGET_BYTES = 6L * 1024L * 1024L // 6 MB
 
+        private const val EXTRA_ACCOUNT_ID = "extra_account_id"
+        private const val EXTRA_DEVICE_ID_PREFIX = "extra_device_id_prefix"
+
         fun start(context: Context) {
             context.startActivity(Intent(context, CustomerSupportActivity::class.java))
+        }
+
+        /**
+         * Entry point used by error flows (e.g. [DeviceAuthErrorBottomSheet]):
+         * opens the support screen with the description pre-filled
+         */
+        fun start(context: Context, accountId: String, deviceIdPrefix: String) {
+            context.startActivity(
+                Intent(context, CustomerSupportActivity::class.java).apply {
+                    putExtra(EXTRA_ACCOUNT_ID, accountId)
+                    putExtra(EXTRA_DEVICE_ID_PREFIX, deviceIdPrefix)
+                }
+            )
         }
     }
 
@@ -105,8 +121,21 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
         setupToolbar()
         loadSubscriptionSummary()
+        prefillDescriptionFromExtras()
         setupSendButton()
         applyScrollPadding()
+    }
+
+    private fun prefillDescriptionFromExtras() {
+        val accountId = intent.getStringExtra(EXTRA_ACCOUNT_ID) ?: return
+        val deviceIdPrefix = intent.getStringExtra(EXTRA_DEVICE_ID_PREFIX).orEmpty()
+        if (accountId.isBlank() && deviceIdPrefix.isBlank()) return
+
+        val sb = StringBuilder()
+        sb.append("Device authorization issue (HTTP 401).\n")
+        if (accountId.isNotBlank()) sb.append("Account ID: $accountId\n")
+        if (deviceIdPrefix.isNotBlank()) sb.append("Device ID: $deviceIdPrefix\n")
+        b.etDescription.setText(sb.toString().trimEnd())
     }
 
     private fun applyScrollPadding() {
@@ -148,7 +177,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
     /**
      * Loads the current subscription from the DB and populates the summary card.
-     * Runs on IO, posts result to Main.
+     * Also toggles the refund/moneyback category chips based on how long ago the
+     * purchase was made
      */
     private fun loadSubscriptionSummary() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -161,9 +191,21 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
             val expiry = VpnController.getWinExpiryTs() ?: 0L
             val hex = expiry.toString(16)
+
+            // Refund is available within the purchase revoke window; moneyback
+            // within the global moneyback window
+            val purchaseTs = sub?.purchaseTime ?: 0L
+            val elapsedMs = if (purchaseTs > 0L) System.currentTimeMillis() - purchaseTs else Long.MAX_VALUE
+            val dayMs = 24 * 60 * 60 * 1000L
+            val windowDays = sub?.windowDays?.takeIf { it > 0 } ?: InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+            val refundVisible = elapsedMs < windowDays * dayMs
+            val moneybackVisible = elapsedMs < InAppBillingHandler.MONEYBACK_WINDOW_DAYS * dayMs
+
             withContext(Dispatchers.Main) {
                 if (isFinishing || isDestroyed) return@withContext
                 updateHeroSubtitle(sub, deviceId, hex)
+                b.chipRefund.isVisible = refundVisible
+                b.chipMoneyback.isVisible = moneybackVisible
             }
         }
     }
@@ -634,7 +676,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         b.btnSendEmail.text = if (loading)
             getString(R.string.support_btn_sending)
         else
-            getString(R.string.support_btn_send)
+            getString(R.string.about_bug_report_dialog_positive_btn)
         b.layoutLoading.isVisible = loading
     }
 

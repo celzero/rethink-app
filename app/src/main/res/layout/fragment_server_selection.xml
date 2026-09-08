@@ -64,14 +64,12 @@
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
-                                <LinearLayout
-                                    android:id="@+id/avatar_row"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_weight="1"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
+                            <LinearLayout
+                                android:id="@+id/avatar_row"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
                                     <FrameLayout
                                         android:layout_width="38dp"
@@ -128,11 +126,55 @@
                                             android:shadowDx="1"
                                             android:shadowRadius="10"
                                             android:textAllCaps="true"
-                                            android:textColor="?attr/svgStrokeColor"
+                                            android:textColor="@android:color/white"
                                             android:textSize="@dimen/small_font_text_view"
                                             android:textStyle="bold"
                                             tools:text="SG" />
                                     </FrameLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <View
+                                        android:id="@+id/status_indicator"
+                                        android:layout_width="6dp"
+                                        android:layout_height="6dp"
+                                        android:layout_marginEnd="5dp"
+                                        android:background="@drawable/ic_circle"
+                                        android:backgroundTint="?attr/accentGood" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_connection_status"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:maxWidth="110dp"
+                                        android:text="@string/dns_connected"
+                                        android:textColor="?attr/primaryTextColor"
+                                        android:textSize="@dimen/small_font_text_view" />
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:id="@+id/tv_active_duration"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center_vertical"
+                                        android:layout_marginStart="4dp"
+                                        android:alpha="0.65"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:maxWidth="120dp"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        android:textSize="@dimen/small_font_text_view"
+                                        tools:text="· active 2 min ago" />
 
                                 </LinearLayout>
 
@@ -163,131 +205,19 @@
                             </LinearLayout>
 
                             <LinearLayout
+                                android:id="@+id/status_chip"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="14dp"
-                                android:baselineAligned="false"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
+                                android:layout_marginTop="12dp"
+                                android:orientation="vertical">
 
-                                <!-- Container for the RPN activity heat map.
-                                     minWidth guarantees the fixed-size dots
-                                     never clip when the status column grows
-                                     (long translations, large font scale). -->
-                                <LinearLayout
-                                    android:id="@+id/status_chip"
-                                    android:layout_width="0dp"
+                                <GridLayout
+                                    android:id="@+id/rpn_heatmap_grid"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:minWidth="140dp"
-                                    android:orientation="vertical">
-
-                                    <GridLayout
-                                        android:id="@+id/rpn_heatmap_grid"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="12"
-                                        tools:background="?attr/background" />
-
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="12dp"
-                                    android:gravity="end"
-                                    android:orientation="vertical">
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tv_hero_plan_name"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:ellipsize="end"
-                                        android:fontFamily="sans-serif-medium"
-                                        android:gravity="end"
-                                        android:maxLines="1"
-                                        android:maxWidth="140dp"
-                                        android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/small_font_text_view"
-                                        android:visibility="gone"
-                                        tools:text="Standard.tier"
-                                        tools:visibility="visible" />
-
-                                    <androidx.appcompat.widget.AppCompatTextView
-                                        android:id="@+id/tv_hero_account_id"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="1dp"
-                                        android:alpha="0.7"
-                                        android:ellipsize="end"
-                                        android:gravity="end"
-                                        android:maxLines="1"
-                                        android:maxWidth="140dp"
-                                        android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/mini_font_text_view"
-                                        tools:text="49c0737336de · 7adf" />
-
-                                    <com.google.android.material.textview.MaterialTextView
-                                        android:id="@+id/tv_hero_who"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:alpha="0.7"
-                                        android:ellipsize="end"
-                                        android:gravity="end"
-                                        android:maxLines="1"
-                                        android:maxWidth="140dp"
-                                        android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/mini_font_text_view"
-                                        android:visibility="gone"
-                                        tools:text="device-id"
-                                        tools:visibility="visible" />
-
-                                    <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="4dp"
-                                        android:gravity="end|center_vertical"
-                                        android:orientation="horizontal">
-
-                                        <View
-                                            android:id="@+id/status_indicator"
-                                            android:layout_width="6dp"
-                                            android:layout_height="6dp"
-                                            android:layout_marginEnd="5dp"
-                                            android:background="@drawable/ic_circle"
-                                            android:backgroundTint="?attr/accentGood" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tv_connection_status"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:ellipsize="end"
-                                            android:maxLines="1"
-                                            android:maxWidth="110dp"
-                                            android:gravity="end"
-                                            android:layout_gravity="center_vertical"
-                                            android:text="@string/dns_connected"
-                                            android:textColor="?attr/primaryTextColor"
-                                            android:textSize="@dimen/small_font_text_view" />
-
-                                        <androidx.appcompat.widget.AppCompatTextView
-                                            android:id="@+id/tv_active_duration"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:alpha="0.65"
-                                            android:ellipsize="end"
-                                            android:layout_marginStart="4dp"
-                                            android:gravity="end"
-                                            android:maxLines="1"
-                                            android:maxWidth="120dp"
-                                            android:layout_gravity="center_vertical"
-                                            android:textColor="?attr/primaryLightColorText"
-                                            android:textSize="@dimen/small_font_text_view"
-                                            tools:text="· active 2 min ago" />
-
-                                    </LinearLayout>
-
-                                </LinearLayout>
+                                    android:columnCount="24"
+                                    android:rowCount="6"
+                                    tools:background="?attr/background" />
 
                             </LinearLayout>
 
@@ -461,8 +391,8 @@
                                     android:foreground="?attr/selectableItemBackground">
 
                                     <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="17dp"
-                                        android:layout_height="17dp"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
                                         android:layout_gravity="center"
                                         android:alpha="0.5"
                                         android:src="@drawable/ic_add"
@@ -511,8 +441,8 @@
                                     android:foreground="?attr/selectableItemBackground">
 
                                     <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="17dp"
-                                        android:layout_height="17dp"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
                                         android:layout_gravity="center"
                                         android:src="@drawable/ic_bypass"
                                         android:tint="?attr/primaryLightColorText" />
@@ -587,8 +517,8 @@
 
                                     <androidx.appcompat.widget.AppCompatImageView
                                         android:id="@+id/qs_relay_icon"
-                                        android:layout_width="17dp"
-                                        android:layout_height="17dp"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
                                         android:layout_gravity="center"
                                         android:alpha="0.5"
                                         android:src="@drawable/ic_hop"

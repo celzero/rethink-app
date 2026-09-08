@@ -133,7 +133,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
             val expiry = VpnController.getWinExpiryTs() ?: 0L
             val hex = expiry.toString(16)
-            uiCtx { populateBanner(sub, state, deviceId, hex) }
+            val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+            uiCtx { populateBanner(sub, state, deviceId, hex, who) }
         }
     }
 
@@ -141,7 +142,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         sub: SubscriptionStatus?,
         state: SubscriptionStateMachineV2.SubscriptionState,
         realDeviceId: String = "",
-        expiry: String = ""
+        expiry: String = "",
+        who: String = ""
     ) {
         if (!isAdded) return
 
@@ -178,6 +180,10 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         }
         b.tvStatusText.text = statusText
         b.tvStatusText.setTextColor(statusColor)
+
+        // who
+        b.tvHeroWho.isVisible = who.isNotEmpty()
+        b.tvHeroWho.text = who
 
         when (model) {
             is PurchaseUiModel.Loading -> {
@@ -280,10 +286,21 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         b.cardRunTest.setOnClickListener {
             startActivity(Intent(requireContext(), PingTestActivity::class.java))
         }
-        b.cardManagePurchaseDashboard.setOnClickListener { showManagePurchase() }
+        b.rowManagePurchase.setOnClickListener { showManagePurchase() }
         b.cardGetPlus.setOnClickListener { showPurchaseScreen() }
         b.rowReportIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
         b.rowRestoreDefaults.setOnClickListener { onRestoreDefaultsClicked() }
+        b.tvHeroWho.setOnClickListener { copyWhoToClipboard() }
+    }
+
+    /** Copies the hero "who" line to the clipboard. */
+    private fun copyWhoToClipboard() {
+        val text = b.tvHeroWho.text?.toString().orEmpty()
+        if (text.isBlank()) return
+        val clipboard =
+            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
+        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
     }
 
     /**
@@ -467,8 +484,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             RpnProxyManager.collectSubscriptionState().collect { state ->
                 val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
                 val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
+                val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
                 uiCtx {
-                    populateBanner(sub, state, deviceId)
+                    populateBanner(sub, state, deviceId, who = who)
                 }
             }
         }

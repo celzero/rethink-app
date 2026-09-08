@@ -510,11 +510,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             isEnabled && isActive -> {
                 io {
                     val selectedConfigs = RpnProxyManager.getSelectedCCs()
-                    val ccs = selectedConfigs.map { if (it.city.equals(AUTO_SERVER_ID, true)) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
+                    val ccs = selectedConfigs.map { it.city.capitalizeWords() }
                     val desc =
                         if (selectedConfigs.isNotEmpty()) {
                             val countryList =
-                                ccs.take(3).joinToString(", ")
+                                ccs.take(6).joinToString(", ")
                             getString(
                                 R.string.two_argument_dot,
                                 getString(R.string.lbl_active),

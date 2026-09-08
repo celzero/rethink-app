@@ -112,7 +112,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
             val expiry = VpnController.getWinExpiryTs() ?: 0L
             val hex = expiry.toString(16)
-            uiCtx { populateView(sub, state, subscriptionData, deviceId, hex) }
+            val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+            uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
         }
     }
 
@@ -121,7 +122,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         state: SubscriptionStateMachineV2.SubscriptionState,
         subscriptionData: SubscriptionStateMachineV2.SubscriptionData?,
         realDeviceId: String,
-        expiry: String
+        expiry: String,
+        who: String = ""
     ) {
         if (!isAdded) return
 
@@ -159,6 +161,9 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         }
         b.tvManageStatusText.text = statusText
         b.tvManageStatusText.setTextColor(statusColor)
+
+        b.tvHeroWho.isVisible = who.isNotEmpty()
+        b.tvHeroWho.text = who
 
         when (model) {
             is PurchaseUiModel.Loading -> return // suppress paint until state resolves
@@ -267,6 +272,17 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         b.rowReportBillingIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
         b.rowRequestRefund.setOnClickListener { showDialogConfirmCancelOrRevoke(isCancel = false) }
         b.rowCancelPurchase.setOnClickListener { showDialogConfirmCancelOrRevoke(isCancel = true) }
+        b.tvHeroWho.setOnClickListener { copyWhoToClipboard() }
+    }
+
+    /** Copies the hero "who" line to the clipboard. */
+    private fun copyWhoToClipboard() {
+        val text = b.tvHeroWho.text?.toString().orEmpty()
+        if (text.isBlank()) return
+        val clipboard =
+            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
+        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
     }
 
     private fun showCancelOrRevokeButton(
@@ -444,7 +460,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
                 val subscriptionData = RpnProxyManager.getSubscriptionData()
                 val expiry = VpnController.getWinExpiryTs() ?: 0L
                 val hex = expiry.toString(16)
-                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex) }
+                val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
             }
         }
     }

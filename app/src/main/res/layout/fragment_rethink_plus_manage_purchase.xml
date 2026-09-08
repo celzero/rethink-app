@@ -112,20 +112,41 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tv_manage_token"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:ellipsize="end"
-                                android:fontFamily="monospace"
-                                android:maxLines="1"
-                                android:alpha="0.7"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/mini_font_text_view"
-                                tools:text="49c0737336de · 7adf8821c00 • 1a0c" />
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tv_manage_token"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:fontFamily="monospace"
+                                    android:maxLines="1"
+                                    android:alpha="0.7"
+                                    android:textColor="?attr/primaryLightColorText"
+                                    android:textSize="@dimen/mini_font_text_view"
+                                    tools:text="49c0737336de · 7adf8821c00 • 1a0c" />
                         </LinearLayout>
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_hero_who"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:paddingStart="2dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="2dp"
+                            android:paddingBottom="2dp"
+                            android:alpha="0.7"
+                            android:ellipsize="end"
+                            android:fontFamily="monospace"
+                            android:maxLines="1"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/mini_font_text_view"
+                            android:visibility="gone"
+                            tools:text="device-id"
+                            tools:visibility="visible" />
                     </LinearLayout>
+
                 </com.google.android.material.card.MaterialCardView>
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -153,6 +174,7 @@
                             android:id="@+id/row_order_history"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="16dp">
@@ -208,6 +230,7 @@
                             android:id="@+id/row_manage_on_play"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="16dp">
@@ -285,6 +308,7 @@
                             android:id="@+id/row_request_refund"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="16dp"
@@ -344,6 +368,7 @@
                             android:id="@+id/row_cancel_purchase"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:padding="16dp"
@@ -427,6 +452,7 @@
                         android:id="@+id/row_report_billing_issue"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">

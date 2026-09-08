@@ -123,6 +123,27 @@
                             android:textSize="@dimen/mini_font_text_view"
                             tools:text="49c0737336de · 7adf8821c00 • 1a0c" />
                     </LinearLayout>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_hero_who"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="4dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="4dp"
+                        android:paddingBottom="2dp"
+                        android:layout_marginStart="-4dp"
+                        android:alpha="0.7"
+                        android:ellipsize="end"
+                        android:fontFamily="monospace"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view"
+                        android:visibility="gone"
+                        tools:text="device-id"
+                        tools:visibility="visible" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -258,8 +279,10 @@
                     android:orientation="vertical">
 
                     <LinearLayout
+                        android:id="@+id/row_manage_purchase"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
@@ -310,6 +333,7 @@
                         android:id="@+id/row_restore_defaults"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">
@@ -379,6 +403,7 @@
                         android:id="@+id/row_report_issue"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="16dp">

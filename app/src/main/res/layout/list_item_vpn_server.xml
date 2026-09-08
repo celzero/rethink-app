@@ -81,22 +81,6 @@
                 android:textSize="16sp"
                 tools:text="Singapore" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_server_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingStart="9dp"
-                android:paddingTop="3dp"
-                android:paddingEnd="9dp"
-                android:paddingBottom="3dp"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="10sp"
-                tools:text="Connected" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -120,6 +104,32 @@
                 tools:text="82.102.25.218"
                 tools:visibility="visible" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_status_check"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="6dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_check_circle"
+                android:tint="?attr/accentGood"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_server_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="0dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="3dp"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="10sp"
+                tools:text="Connected" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -130,7 +140,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_plus_status_chip"
+        android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
@@ -152,7 +162,7 @@
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"
             android:maxLines="1"
-            android:textColor="?attr/primaryTextColor"
+            android:textColor="?attr/serverChipTextColor"
             android:textSize="11sp"
             tools:text="Apps · 12" />
 
@@ -163,7 +173,7 @@
             android:duplicateParentState="true"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_right_arrow_small"
-            android:tint="?attr/primaryTextColor" />
+            android:tint="?attr/serverChipTextColor" />
 
     </LinearLayout>
 
@@ -174,7 +184,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_plus_status_chip"
+        android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
@@ -196,7 +206,7 @@
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"
             android:maxLines="1"
-            android:textColor="?attr/primaryTextColor"
+            android:textColor="?attr/serverChipTextColor"
             android:textSize="11sp"
             tools:text="Relay · On" />
 
@@ -207,7 +217,7 @@
             android:layout_marginStart="4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
-            android:tint="?attr/primaryTextColor"
+            android:tint="?attr/serverChipTextColor"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -220,7 +230,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_plus_status_chip"
+        android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
