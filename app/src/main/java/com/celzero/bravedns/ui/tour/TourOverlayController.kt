@@ -186,13 +186,20 @@ class TourOverlayController(
     }
 
     private fun positionOnView(target: View, step: TourStep) {
+        // Targets inside scrolling containers (e.g. the RPN dashboard's
+        // NestedScrollView) can sit partially below the fold. getGlobalVisibleRect
+        // then returns only the clipped portion and the spotlight lands on the
+        // wrong area, so bring the target fully on-screen before measuring it.
+        bringTargetIntoView(target)
+
         val targetRect = target.globalVisibleRect() ?: run {
             Logger.w("TourOverlay", "$TAG: target not visible on screen, skipping")
             showStep(currentStepIndex + 1)
             return
         }
 
-        // Animate spotlight
+        // Animate spotlight; premium steps additionally get the golden glow ring
+        overlayView.setPremiumGlow(step.isPremium)
         overlayView.animateTo(targetRect, step.spotlightShape)
 
         // Tap inside spotlight → advance; tap outside → same as next
@@ -203,6 +210,22 @@ class TourOverlayController(
             placeTooltip(targetRect, step.tooltipSide)
         }
         tooltipView.requestLayout()
+    }
+
+    /**
+     * Scrolls the target fully into view (instantly, no smooth animation) by
+     * asking ancestor scroll containers to reveal its full bounds. No-op for
+     * already-visible targets. Uses the synchronous variant so the very next
+     * [View.getGlobalVisibleRect] call reflects the new scroll position.
+     */
+    private fun bringTargetIntoView(target: View) {
+        if (target.width == 0 || target.height == 0) return
+        val visible = Rect()
+        val fullyVisible = target.getGlobalVisibleRect(visible) &&
+                visible.height() >= target.height &&
+                visible.width() >= target.width
+        if (fullyVisible) return
+        target.requestRectangleOnScreen(Rect(0, 0, target.width, target.height), true)
     }
 
     private fun advanceOrComplete() {
