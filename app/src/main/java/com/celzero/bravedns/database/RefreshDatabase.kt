@@ -105,7 +105,13 @@ internal constructor(
     init {
         io("RefreshDatabase") {
             for (action in actions) {
-                process(action)
+                try {
+                    process(action)
+                } catch (e: Exception) {
+                    // an uncaught exception here crashes the app and all subsequent refresh
+                    // actions would be dropped.
+                    Logger.crash(LOG_TAG_APP_DB, "refresh action failed, action: $action", e)
+                }
             }
         }
     }
