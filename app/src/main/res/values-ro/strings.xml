@@ -348,7 +348,7 @@
     <string name="settings_orbot_disabled_error" translatable="true">Inchide proxy-ul HTTP(S) și/sau SOCKS5 pentru a continua instalarea Tor-ca-proxy.</string>
     <string name="settings_orbot_notification_action" translatable="true">Deschide Orbot</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start la pornirea dispozitivului (experimental)</string>
-    <string name="settings_autostart_bootup_desc" translatable="true">La pornirea dispozitivului, startează Rethink dacă rula înainte de închidere.</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">La pornirea dispozitivului, pornește și Rethink dacă rula înainte de închidere.</string>
     <string name="orbot_explanation" translatable="true">Orbot este o aplicație proxy gratuită care permite altor aplicații să folosească internetul mult mai &lt;u&gt;sigur&lt;/u&gt;.\nOrbot folosește &lt;u&gt;Tor&lt;/u&gt; pentru a cripta traficul tău de internet și astfel te ajută să &lt;u&gt;ocolești cenzura&lt;/u&gt; și să eviți diferitele forme de &lt;u&gt;supraveghere în rețea&lt;/u&gt; care pun în pericol libertatea și intimitatea personală\n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink direcționează numai conexiunile TCP ale aplicațiilor &lt;i&gt;adăugate&lt;/i&gt; la Orbot.\n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;instalează&lt;/i&gt; tunelul HTTP CONNECT la Orbot și direcționează numai conexiunile TCP ale aplicațiilor &lt;i&gt;adăugate&lt;/i&gt;.</string>
     <string name="settings_network_all_networks" translatable="true">Folosește toate rețelele disponibile</string>
     <string name="settings_network_all_networks_desc" translatable="true">Când este activat, Rethink folosește toate rețelele disponibile pentru conectarea la internet. Dacă nu, folosește orice rețea indicată ca <i>activă</i> de Android.</string>
@@ -979,11 +979,11 @@
     <string name="settings_theme_dialog_themes_5" translatable="true">Luminos Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Întunecat Plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Autentificare biometrică</string>
-    <string name="settings_biometric_dialog_option_0" translatable="true">Nici una</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nu</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Imediat</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">După 5 minute</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">După 15 minute</string>
-    <string name="sponser_dialog_usage_msg" translatable="true">Ai utilizat Rethink de <b>%1$s days</b>, care înseamnă un cost de utilizare de <b>$%2$s</b>. Consideri oportună o sponsorizare pentru susținerea dezvoltării sale?</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Ai utilizat Rethink de <b>%1$s zile</b>, care înseamnă un cost de utilizare de <b>$%2$s</b>. Consideri oportună o sponsorizare pentru susținerea dezvoltării sale?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate precum <i>.lan</i>, <i>.internal</i>, etc.</string>
     <string name="dc_filtering_heading" translatable="true">Filtrare</string>
@@ -1014,7 +1014,7 @@
     <string name="tcp_keep_alive_desc" translatable="true">Închide rapid socket-urile TCP fără activitate recentă.</string>
     <string name="ac_title" translatable="true">anti-cenzură</string>
     <string name="ac_desc" translatable="true">Uneltele anti-cenzură pot garanta libertatea internetului, dar s-ar putea să nu funcționeze peste tot. Încercare efectuată doar pe conexiuni non-proxy.</string>
-    <string name="ac_never_split_desc" translatable="true">Nu modifica pachetele.</string>
+    <string name="ac_never_split_desc" translatable="true">Nu modifică pachetele.</string>
     <string name="ac_split_auto_desc" translatable="true">Modifică pachetele la nevoie.</string>
     <string name="ac_split_tcp" translatable="true">TCP</string>
     <string name="ac_split_tcp_desc" translatable="true">Modifică pachetele TCP.</string>
@@ -1059,7 +1059,7 @@
     <string name="close_conns_dialog_title" translatable="true">Închide conexiunile</string>
     <string name="close_conns_dialog_desc" translatable="true">Închizi toate conexiunile pentru %1$s?</string>
     <string name="local_blocklist_delete_desc" translatable="true">Ștergi listele de blocat de pe dispozitiv?</string>
-    <string name="fail_open_network_title" translatable="true">Blocaj la pierderea rețelei</string>
+    <string name="fail_open_network_title" translatable="true">Blocare la pierderea rețelei</string>
     <string name="fail_open_network_desc" translatable="true">Când este activat, Rethink blochează toate datele când conectivitatea este întreruptă, ca în <i>Modul Avion</i>.</string>
     <string name="about_license" translatable="true">Licențiat sub Apache-2.0</string>
     <string name="close_all" translatable="true">Închide tot</string>
@@ -1111,7 +1111,7 @@
     <string name="settings_jumbo_packets" translatable="true">Extindere lățime de bandă</string>
     <string name="settings_jumbo_packets_desc" translatable="true">Folosește <i>pachete jumbo</i> în tunelul VPN al Rethink.</string>
     <string name="settings_tunnel_metered" translatable="true">Contorizat întotdeauna</string>
-    <string name="settings_tunnel_metered_desc" translatable="true">Marchează tunelul VPN al Rethink ca și contorizat pentru a face ca aplicațiile să folosească mai puține date mobile. Atenție: Asta poate determina aplicațiile să oprească descărcările și încărcările masive, cum ar fi copiile de rezervă.</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Marchează tunelul VPN al Rethink ca și contorizat pentru a face ca aplicațiile să folosească mai puține date mobile. Atenție: asta poate determina aplicațiile să oprească descărcările și încărcările masive, cum ar fi copiile de rezervă.</string>
     <string name="stability_program_toast" translatable="true">Înscris în <i>programul de stabilitate</i> pentru <i>caracteristici experimentale</i>.</string>
     <string name="dns_record_types_auto_mode_status" translatable="true">Auto (toate tipurile)</string>
     <plurals name="server_count">
