@@ -835,6 +835,18 @@
 
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:text="@string/about_mozilla"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -868,19 +880,6 @@
                 app:srcCompat="@drawable/ic_floss_fund_badge" />
 
         </LinearLayout>
-
-
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="center"
-            android:text="@string/about_mozilla"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_app_version"
