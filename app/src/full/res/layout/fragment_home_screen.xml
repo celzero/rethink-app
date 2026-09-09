@@ -43,7 +43,7 @@
                     tools:text="Lockdown with RPN"
                     android:textAllCaps="true"
                     android:textColor="?attr/accentGood"
-                    android:textSize="12sp"
+                    android:textSize="@dimen/default_font_text_view"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fhs_active_since_txt"
                     app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,7 @@
                     android:maxLines="1"
                     android:text=""
                     android:textColor="?attr/primaryLightColorText"
-                    android:textSize="11sp"
+                    android:textSize="@dimen/small_font_text_view"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -98,6 +98,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
+                            android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
                             tools:text="DNS · Connected"
                             android:textColor="?attr/primaryLightColorText"
@@ -177,7 +178,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/fhs_card_proxy_ll"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.55">
+                    app:layout_constraintWidth_percent="0.50">
 
                     <LinearLayout
                         android:id="@+id/fhs_firewall_badges_row"
@@ -206,7 +207,7 @@
                                     android:maxLines="1"
                                     tools:text="0"
                                     android:textColor="?attr/primaryTextColor"
-                                    android:textSize="16sp"
+                                    android:textSize="@dimen/extra_large_font_text_view"
                                     android:textStyle="bold" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
@@ -335,8 +336,7 @@
 
                         <Space
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
+                            android:layout_height="18dp" />
 
                         <LinearLayout
                             android:id="@+id/fhs_proxy_health_container"
@@ -369,8 +369,16 @@
                                     android:id="@+id/fhs_proxy_bar_failing"
                                     android:layout_width="0dp"
                                     android:layout_height="match_parent"
+                                    android:layout_marginEnd="2dp"
                                     android:layout_weight="1"
                                     android:background="?attr/accentBad" />
+                                <View
+                                    android:id="@+id/fhs_proxy_bar_stopped"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:background="?attr/primaryLightColorText"
+                                    android:visibility="gone" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -408,18 +416,24 @@
                                             android:maxLines="1"
                                             tools:text="0"
                                             android:textColor="?attr/accentGood"
-                                            android:textSize="@dimen/small_font_text_view" />
+                                            android:textSize="@dimen/default_font_text_view" />
                                     </LinearLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:alpha="0.85"
+                                        android:ellipsize="end"
+                                        android:gravity="center_horizontal"
                                         android:letterSpacing="0.05"
+                                        android:maxLines="1"
                                         android:text="@string/lbl_active"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/small_font_text_view" />
+                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMinTextSize="6sp"
+                                        app:autoSizeStepGranularity="1sp"
+                                        app:autoSizeTextType="uniform" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -451,18 +465,24 @@
                                             android:maxLines="1"
                                             tools:text="0"
                                             android:textColor="?attr/accentWarning"
-                                            android:textSize="@dimen/small_font_text_view" />
+                                            android:textSize="@dimen/default_font_text_view" />
                                     </LinearLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:alpha="0.85"
+                                        android:ellipsize="end"
+                                        android:gravity="center_horizontal"
                                         android:letterSpacing="0.05"
+                                        android:maxLines="1"
                                         android:text="@string/lbl_idle"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/small_font_text_view" />
+                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMinTextSize="6sp"
+                                        app:autoSizeStepGranularity="1sp"
+                                        app:autoSizeTextType="uniform" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -494,18 +514,75 @@
                                             android:maxLines="1"
                                             tools:text="0"
                                             android:textColor="?attr/accentBad"
-                                            android:textSize="@dimen/small_font_text_view" />
+                                            android:textSize="@dimen/default_font_text_view" />
                                     </LinearLayout>
 
                                     <androidx.appcompat.widget.AppCompatTextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:alpha="0.85"
+                                        android:ellipsize="end"
+                                        android:gravity="center_horizontal"
                                         android:letterSpacing="0.05"
+                                        android:maxLines="1"
                                         android:text="@string/status_failing"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        android:textSize="@dimen/small_font_text_view" />
+                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMinTextSize="6sp"
+                                        app:autoSizeStepGranularity="1sp"
+                                        app:autoSizeTextType="uniform" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/fhs_proxy_stopped_column"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="vertical"
+                                    android:visibility="gone">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <View
+                                            android:id="@+id/fhs_proxy_dot_stopped"
+                                            android:layout_width="5dp"
+                                            android:layout_height="5dp"
+                                            android:background="@drawable/ic_circle"
+                                            android:backgroundTint="?attr/primaryLightColorText" />
+
+                                        <androidx.appcompat.widget.AppCompatTextView
+                                            android:id="@+id/fhs_proxy_stopped_count"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="2dp"
+                                            android:fontFamily="monospace"
+                                            android:maxLines="1"
+                                            tools:text="0"
+                                            android:textColor="?attr/primaryLightColorText"
+                                            android:textSize="@dimen/default_font_text_view" />
+                                    </LinearLayout>
+
+                                    <androidx.appcompat.widget.AppCompatTextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:alpha="0.85"
+                                        android:ellipsize="end"
+                                        android:gravity="center_horizontal"
+                                        android:letterSpacing="0.05"
+                                        android:maxLines="1"
+                                        android:text="@string/lbl_stopped"
+                                        android:textAllCaps="true"
+                                        android:textColor="?attr/primaryLightColorText"
+                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMinTextSize="6sp"
+                                        app:autoSizeStepGranularity="1sp"
+                                        app:autoSizeTextType="uniform" />
                                 </LinearLayout>
 
                             </LinearLayout>
@@ -552,7 +629,7 @@
                                 android:fontFamily="monospace"
                                 tools:text="62K"
                                 android:textColor="?attr/primaryTextColor"
-                                android:textSize="@dimen/rethink_sub_header_text" />
+                                android:textSize="@dimen/rethink_header_text" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/fhs_card_network_logs_label"
@@ -762,6 +839,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.8"
+                            android:fontFamily="monospace"
                             tools:text="/461"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/large_font_text_view" />
@@ -874,55 +952,85 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/home_fragment_pause_icon"
-            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="50dp"
             android:layout_height="56dp"
-            android:padding="0dp"
-            app:icon="@drawable/ic_pause"
-            app:iconGravity="textStart"
-            app:iconSize="20dp"
-            app:iconTint="?attr/primaryTextColor"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
-            app:strokeColor="?attr/colorOutline" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/fhs_dns_on_off_btn"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_pause"
+                app:tint="?attr/primaryTextColor" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <FrameLayout
+            android:id="@+id/fhs_start_btn_border_container"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginHorizontal="12dp"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.15"
-            tools:text="START"
-            android:textAllCaps="true"
-            android:textColor="?attr/invertedPrimaryTextColor"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="28dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/home_fragment_bottom_sheet_icon"
             app:layout_constraintStart_toEndOf="@id/home_fragment_pause_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.button.MaterialButton
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fhs_dns_on_off_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="monospace"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:letterSpacing="0.15"
+                tools:text="START"
+                android:textAllCaps="true"
+                android:textColor="?attr/invertedPrimaryTextColor"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold"
+                app:cornerRadius="28dp" />
+
+            <View
+                android:id="@+id/fhs_animated_border_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="false"
+                android:elevation="1dp"
+                android:focusable="false"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/home_fragment_bottom_sheet_icon"
-            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="50dp"
             android:layout_height="56dp"
-            android:padding="0dp"
-            app:icon="@drawable/ic_arrow_down"
-            app:iconGravity="textStart"
-            app:iconSize="20dp"
-            app:iconTint="?attr/primaryTextColor"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
-            app:strokeColor="?attr/colorOutline" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="?attr/primaryTextColor" />
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

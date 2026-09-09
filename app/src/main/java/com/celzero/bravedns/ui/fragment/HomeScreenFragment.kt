@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.fragment
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
@@ -43,6 +44,7 @@ import android.text.style.RelativeSizeSpan
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -107,6 +109,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
+import com.celzero.bravedns.util.RotatingBorderDrawable
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -153,6 +156,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private var isVpnActivated: Boolean = false
 
+    // Rotating gradient border on the start button; runs only while the VPN
+    // is stopped to draw attention to the call-to-action. Cleared in
+    // onDestroyView().
+    private var rotationAnimator: ValueAnimator? = null
+
     // Active-state presentation captured once per view (in px / drawable)
     // before any state-dependent styling runs, so low-emphasis inactive
     // styling can be restored exactly on re-activation.
@@ -186,6 +194,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     companion object {
         private const val TAG = "HSFragment"
         private const val MAX_RULE_BADGE_CHARS = 3
+
+        // animated border ring around the start button (VPN-off call-to-action)
+        private const val BORDER_STROKE_WIDTH_DP = 2.5f
+        private const val BORDER_ROTATION_DURATION_MS = 2000L
 
         // UI interaction delays (milliseconds)
         private const val UI_DELAY_MS = 500L
@@ -234,6 +246,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val MONO_IDLE_ALPHA = 153    // 0.6
         private const val MONO_FAILING_ALPHA = 89  // 0.35
 
+        // The "Stopped" slot always renders as a dimmed neutral (it is not a
+        // health signal — it only flags that the RPN itself is not routing)
+        private const val STOPPED_ALPHA = 89       // 0.35
+
         // Blocklist-count suffix on the DNS card: rendered smaller and lighter
         // than the resolver name so it never competes with it
         private const val BLOCKLIST_COUNT_SUFFIX_SCALE = 0.8f
@@ -241,11 +257,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // activity grid intensity levels (empty + 4 logarithmic levels)
         private const val HEATMAP_INTENSITY_LEVELS = 5
-
-        // empty-bucket placeholder dot: rendered far smaller and fainter than
-        // the lowest real level so "no activity" is barely perceptible
-        private const val HEATMAP_EMPTY_CELL_FRACTION = 0.12f
-        private const val HEATMAP_EMPTY_CELL_ALPHA = 0x1A
 
         private const val HEATMAP_GRID_ROWS = 6
         private const val HEATMAP_GRID_HEIGHT_DP = 56
@@ -478,15 +489,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsCardProxyLl.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on proxy card")
-            if (appConfig.isWireGuardEnabled()) {
-                startActivity(ScreenType.PROXY_WIREGUARD)
-            } else {
-                startActivity(ScreenType.PROXY)
+            // RPN-owned cards (active or stopped-but-purchased) land on RPN
+            // server selection; only when RPN AND WireGuard are both active
+            // does the tap open the combined proxy settings screen.
+            val isRpnOwned = RpnProxyManager.isRpnActive() || RpnProxyManager.hasValidSubscription()
+            when {
+                isRpnOwned && appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY)
+                isRpnOwned -> openRpnServerSelection()
+                appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY_WIREGUARD)
+                else -> startActivity(ScreenType.PROXY)
             }
             logEvent(
                 EventType.UI_NAVIGATION,
                 "HomeScreen: Proxy card clicked",
-                "Navigating to wg: ${appConfig.isWireGuardEnabled()}  from HomeScreenFragment"
+                "Navigating to rpn: ${RpnProxyManager.isRpnActive()}, wg: ${appConfig.isWireGuardEnabled()}  from HomeScreenFragment"
             )
         }
 
@@ -515,6 +531,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 context = requireContext(),
                 fragmentClass = RethinkPlusDashboardFragment::class.java,
                 args = args
+            )
+        )
+    }
+
+    /**
+     * Opens the RPN server-selection screen directly, bypassing
+     * [ProxySettingsActivity]. Used when the proxy card is tapped while RPN
+     * is active.
+     */
+    private fun openRpnServerSelection() {
+        startActivity(
+            FragmentHostActivity.createIntent(
+                context = requireContext(),
+                fragmentClass = ServerSelectionFragment::class.java
             )
         )
     }
@@ -606,6 +636,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             btn.backgroundTintList =
                 ColorStateList.valueOf(UIUtils.fetchColor(ctx, R.attr.background))
             btn.setTextColor(UIUtils.fetchColor(ctx, R.attr.primaryTextColor))
+            stopBorderAnimation()
         } else {
             // Stopped: accent-filled, high-visibility call-to-action
             btn.text = getString(R.string.hsf_start_btn_state).uppercase()
@@ -615,7 +646,54 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             btn.backgroundTintList =
                 ColorStateList.valueOf(UIUtils.fetchColor(ctx, R.attr.accentGood))
             btn.setTextColor(UIUtils.fetchColor(ctx, R.attr.invertedPrimaryTextColor))
+            startBorderAnimation()
         }
+    }
+
+    /**
+     * Animates a thin gradient ring around the start button. Runs only while
+     * the VPN is stopped to draw attention to the call-to-action. The ring is
+     * a stroke-only pill drawable whose sweep-gradient highlight rotates via
+     * its shader matrix, so only the border moves — never the shape.
+     *
+     * The highlight uses [R.attr.invertedPrimaryTextColor] — the same contrast
+     * color as the button's own text — because the ring sits directly on the
+     * button edge and the button fill is accentGood while stopped; an
+     * accent-colored ring would be invisible against it.
+     */
+    private fun startBorderAnimation() {
+        val ctx = context ?: return
+        val borderView = b.fhsAnimatedBorderView
+        borderView.isVisible = true
+
+        val drawable =
+            borderView.background as? RotatingBorderDrawable
+                ?: RotatingBorderDrawable().also {
+                    it.configure(
+                        UIUtils.fetchColor(ctx, R.attr.invertedPrimaryTextColor),
+                        BORDER_STROKE_WIDTH_DP * resources.displayMetrics.density
+                    )
+                    borderView.background = it
+                }
+
+        if (rotationAnimator?.isRunning == true) return
+        rotationAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = BORDER_ROTATION_DURATION_MS
+            interpolator = LinearInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { anim ->
+                drawable.rotation = anim.animatedValue as Float
+                borderView.invalidate()
+            }
+            start()
+        }
+        Logger.v(LOG_TAG_UI, "$TAG: start button border animation started")
+    }
+
+    private fun stopBorderAnimation() {
+        rotationAnimator?.cancel()
+        rotationAnimator = null
+        b.fhsAnimatedBorderView.isVisible = false
     }
 
     private fun showDisabledCards() {
@@ -671,7 +749,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         Logger.vv(LOG_TAG_UI, "$TAG enableProxyCardIfNeeded")
         if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
             Logger.vv(LOG_TAG_UI, "$TAG enableProxyCardIfNeeded: isVpnActivated")
-            val isAnyProxyEnabled = appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()
+            // A purchased (but currently stopped) RPN keeps the card alive so
+            // the health row can render the "Stopped" state instead of
+            // collapsing the card to "proxy inactive".
+            val isAnyProxyEnabled =
+                appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive() || RpnProxyManager.hasValidSubscription()
             Logger.vv(LOG_TAG_UI, "$TAG enableProxyCardIfNeeded: isAnyProxyEnabled=$isAnyProxyEnabled")
             if (isAnyProxyEnabled) {
                 showProxyActiveIndicator()
@@ -740,6 +822,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private var lastDnsP50: Long? = null
     // last known DNS status
     private var lastDnsStatus: Int? = null
+    // bumped on every updateUiWithDnsStates() invocation; on going blocklist
+    // lookups compare against it so only the latest DNS selection result is
+    // applied to fhsCardDnsConnectedDns
+    @Volatile
+    private var dnsBlocklistGeneration: Int = 0
     // Cache the distinctUntilChanged() LiveData so the same observer instance is reused and
     // unobserveProxyStates() can actually remove it. Without this, every call to
     // observeProxyStates() creates a NEW MediatorLiveData wrapper and registers a brand-new
@@ -758,9 +845,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (proxyStateListenerJob?.isActive != true) {
                 val lastStatus = proxyStatusLiveData!!.value
                 Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $lastStatus")
-                if (lastStatus != null && lastStatus != -1) {
-                    Logger.vv(LOG_TAG_UI, "$TAG restarting proxy poll after resume, lastStatus=$lastStatus")
-                    startProxyStatePolling(lastStatus)
+                if (lastStatus != null) {
+                    startProxyPollingForStatus(lastStatus)
                 }
             }
             return
@@ -771,13 +857,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to ${proxyStatusLiveData?.value}")
         proxyStatusLiveData?.distinctUntilChanged()?.observe(viewLifecycleOwner) { resId ->
             Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $resId")
-            if (resId != -1) {
-                startProxyStatePolling(resId)
+            startProxyPollingForStatus(resId)
+        }
+    }
+
+    /**
+     * Starts the health-row poll for the given persisted proxy status.
+     * A status of `-1` means no proxy provider is configured; that still
+     * shows a poll when RPN is purchased (but stopped) so the card can
+     * render the RPN "Stopped" state, and only collapses to the compact
+     * "proxy inactive" indicator when there is no RPN purchase.
+     */
+    private fun startProxyPollingForStatus(resId: Int) {
+        if (resId != -1) {
+            startProxyStatePolling(resId)
+        } else if (view != null && isAdded) {
+            if (RpnProxyManager.hasValidSubscription()) {
+                startProxyStatePolling(R.string.rpn_title)
             } else {
-                // Check if view is available before accessing binding
-                if (view != null && isAdded) {
-                    showProxyInactive()
-                }
+                showProxyInactive()
             }
         }
     }
@@ -926,9 +1024,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 // If no proxies are configured but WireGuard/rpn is enabled, show appropriate message
                 if (proxies.isEmpty() && rpnProxies.isEmpty()) {
+                    // counts are pending, but the RPN stopped flag is
+                    // independent of them
+                    val stoppedCount =
+                        if (isRpnStoppedEarly()) RpnProxyManager.getEnabledConfigs().size else 0
                     uiCtx {
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_checking))
+                        updateStoppedSlot(isStoppedSlotVisible())
+                        b.fhsProxyStoppedCount.text = stoppedCount.toString()
                     }
                     return@withContext
                 }
@@ -952,12 +1056,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 val isBoth = proxies.isNotEmpty() && rpnProxies.isNotEmpty()
 
+                // The "Stopped" slot tracks the RPN alone: while the RPN is
+                // not routing (soft-stopped), every selected RPN server counts
+                // as stopped — even while WireGuard is up.
+                val isRpnStopped = RpnProxyManager.hasValidSubscription() && !RpnProxyManager.isRpnActive()
+                val stoppedCount = if (isRpnStopped) RpnProxyManager.getEnabledConfigs().size else 0
+
                 uiCtx {
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                     // Colored scheme is reserved for RPN (also when RPN and
                     // WireGuard are both active); WireGuard-only or any other
                     // proxy renders monochrome.
-                    updateProxyHealthCounts(active, idle, failing, colored = rpnProxies.isNotEmpty())
+                    updateProxyHealthCounts(
+                        active,
+                        idle,
+                        failing,
+                        colored = rpnProxies.isNotEmpty(),
+                        stopped = stoppedCount,
+                        showStopped = isStoppedSlotVisible()
+                    )
                     Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status; proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
 
                     if (active == 0 && idle == 0 && failing == 0 && (proxies.isNotEmpty() || rpnProxies.isNotEmpty())) {
@@ -978,12 +1095,47 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             if (appConfig.isProxyEnabled() || RpnProxyManager.isRpnActive()) {
                 showProxyActiveIndicator()
+            } else if (RpnProxyManager.hasValidSubscription()) {
+                // RPN purchased but not routing: render the RPN "Stopped"
+                // state instead of collapsing the card to "proxy inactive"
+                showRpnStopped()
+                return
             } else {
                 showProxyInactive()
                 return
             }
             b.fhsCardOtherProxyCount.visibility = View.VISIBLE
             b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
+        }
+    }
+
+    /**
+     * Renders the RPN "Stopped" state on the proxy card: the headline reads
+     * "RPN" and every selected RPN server is counted in the "Stopped" slot
+     * while the live/idle/failing counts stay zero. Only reachable when a
+     * valid RPN subscription exists but RPN is not routing.
+     * Must be called off the Main thread (it fetches the selected servers).
+     */
+    private suspend fun showRpnStopped() {
+        val stopped = withContext(Dispatchers.IO) {
+            if (view == null || !isAdded) return@withContext 0
+            RpnProxyManager.getEnabledConfigs().size
+        }
+        uiCtx {
+            if (view == null || !isAdded) return@uiCtx
+
+            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            b.fhsCardOtherProxyCount.alpha = 1f
+            b.fhsCardOtherProxyCount.isSelected = true
+            b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.rpn_title))
+            updateProxyHealthCounts(
+                active = 0,
+                idle = 0,
+                failing = 0,
+                colored = true,
+                stopped = stopped,
+                showStopped = true
+            )
         }
     }
 
@@ -1130,8 +1282,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsProxyHealthContainer.isVisible = true
         b.fhsCardOtherProxyCount.alpha = 1f
         // Provisional scheme until the proxy poll computes the exact one:
-        // colored only when RPN is active, monochrome otherwise.
-        applyProxyHealthColorScheme(RpnProxyManager.isRpnActive())
+        // colored only when RPN is active, monochrome otherwise. The stopped
+        // slot (RPN-only) shows with a provisional 0; the poll corrects both.
+        val isRpnActive = RpnProxyManager.isRpnActive()
+        applyProxyHealthColorScheme(isRpnActive)
+        updateStoppedSlot(isStoppedSlotVisible())
+        b.fhsProxyStoppedCount.text = "0"
     }
 
     /**
@@ -1147,6 +1303,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         val ctx = requireContext()
+        // The stopped slot tracks the RPN alone and carries no health
+        // semantics, so it stays a dimmed neutral in both schemes.
+        val stopped = ColorUtils.setAlphaComponent(
+            UIUtils.fetchColor(ctx, R.attr.primaryLightColorText),
+            STOPPED_ALPHA
+        )
+        b.fhsProxyBarStopped.setBackgroundColor(stopped)
+        b.fhsProxyDotStopped.backgroundTintList = ColorStateList.valueOf(stopped)
+        b.fhsProxyStoppedCount.setTextColor(stopped)
         if (colored) {
             val good = UIUtils.fetchColor(ctx, R.attr.accentGood)
             val warning = UIUtils.fetchColor(ctx, R.attr.accentWarning)
@@ -1184,15 +1349,52 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * Renders the per-state proxy counts (Live / Idle / Failing) in the health
      * row at the bottom of the proxy card. [colored] selects the accent-color
      * scheme (RPN) versus the monochrome scheme (all other proxies).
+     * [stopped] is the count shown in the RPN-only "Stopped" slot (1 when the
+     * RPN is not routing), and [showStopped] controls that slot's visibility.
      * Must be called on Main.
      */
-    private fun updateProxyHealthCounts(active: Int, idle: Int, failing: Int, colored: Boolean) {
+    private fun updateProxyHealthCounts(
+        active: Int,
+        idle: Int,
+        failing: Int,
+        colored: Boolean,
+        stopped: Int = 0,
+        showStopped: Boolean = false
+    ) {
         if (view == null || !isAdded) return
 
         b.fhsProxyLiveCount.text = active.toString()
         b.fhsProxyIdleCount.text = idle.toString()
         b.fhsProxyFailingCount.text = failing.toString()
+        b.fhsProxyStoppedCount.text = stopped.toString()
+        updateStoppedSlot(showStopped)
         applyProxyHealthColorScheme(colored)
+    }
+
+    /**
+     * Shows/hides the RPN-only "Stopped" slot (legend column + bar segment).
+     * Both views toggle together so the remaining bars keep equal widths.
+     */
+    private fun updateStoppedSlot(show: Boolean) {
+        if (view == null || !isAdded) return
+
+        b.fhsProxyBarStopped.isVisible = show
+        b.fhsProxyStoppedColumn.isVisible = show
+    }
+
+    /**
+     * The "Stopped" slot appears only when RPN is part of the proxy card:
+     * while RPN is routing, or when RPN is stopped but the subscription is
+     * still valid (so the slot can flag "stopped"). It never shows for
+     * WireGuard-only or plain SOCKS5/HTTP proxies.
+     */
+    private fun isStoppedSlotVisible(): Boolean {
+        return RpnProxyManager.isRpnActive() || RpnProxyManager.hasValidSubscription()
+    }
+
+    /** True when a valid RPN subscription exists but RPN is not routing. */
+    private fun isRpnStoppedEarly(): Boolean {
+        return !RpnProxyManager.isRpnActive() && RpnProxyManager.hasValidSubscription()
     }
 
     private fun toggleLogsView(mode: ActivityDisplayMode) {
@@ -1519,6 +1721,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardDnsConnectedDns.text = dnsName
         b.fhsCardDnsConnectedDns.isSelected = true
 
+        val generation = ++dnsBlocklistGeneration
+
         // for RethinkDNS Plus, append the number of blocklists in-use,
         // rendered smaller and lighter than the resolver name, mirroring
         // RethinkEndpointAdapter.updateDnsStatus()
@@ -1527,6 +1731,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val count = appConfig.getRemoteRethinkEndpoint()?.blocklistCount ?: 0
                 if (count > 0) {
                     uiCtx {
+                        if (generation != dnsBlocklistGeneration) return@uiCtx
                         val countLabel =
                             getString(R.string.blocklist_count_home_screen, count.toString())
                         b.fhsCardDnsConnectedDns.text =
@@ -1925,7 +2130,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private lateinit var trafficStatsTicker: Job
+    @Volatile
+    private var trafficStatsTicker: Job? = null
 
     private fun startTrafficStats() {
         // onResume() restarts this ticker; cancel the previous job first so
@@ -2009,11 +2215,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopTrafficStats() {
-        try {
-            trafficStatsTicker.cancel()
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error stopping traffic stats ticker", e)
-        }
+        // null before the first startTrafficStats(); ?. avoids
+        // UninitializedPropertyAccessException on the initial onResume()
+        trafficStatsTicker?.cancel()
+        trafficStatsTicker = null
     }
 
     data class TxRx(
@@ -2165,6 +2370,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         proxyStateListenerJob = null
         proxyStatusLiveData = null
         dnsObserverActive = false
+        stopBorderAnimation()
         super.onDestroyView()
     }
 
@@ -2381,6 +2587,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // users and also by other developers, e.g.
                 // https://stackoverflow.com/questions/45470113.
                 Logger.e(LOG_TAG_VPN, "Device does not support system-wide VPN mode.", e)
+                return false
+            } catch (e: IllegalStateException) {
+                // VpnService.prepare() throws IllegalStateException("Unavailable in lockdown
+                // mode") when another VPN app is set as Always-on VPN with "Block connections
+                // without VPN" enabled. See ConnectivityService.throwIfLockdownEnabled().
+                Logger.e(LOG_TAG_VPN, "VPN is in lockdown mode, cannot prepare VPN service.", e)
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.hsf_vpn_lockdown_prepare_failure),
+                    Toast.LENGTH_LONG
+                )
                 return false
             }
         // If the VPN.prepare() is not null, then the first time VPN dialog is shown, Show info
