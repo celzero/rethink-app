@@ -38,6 +38,7 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
@@ -657,6 +658,9 @@ object Utilities {
         return null
     }
 
+    // annotated so lint's NewApi check treats calls guarded by this helper
+    // as safe (minSdk 23 < TileService's API 24 requirement)
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
     fun isAtleastN(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
     }

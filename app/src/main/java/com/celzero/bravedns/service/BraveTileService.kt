@@ -19,8 +19,6 @@ package com.celzero.bravedns.service
 import com.celzero.bravedns.util.Logger
 import android.app.PendingIntent
 import android.app.UiModeManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.VpnService
@@ -46,22 +44,6 @@ class BraveTileService : TileService(), KoinComponent {
     // removeObserver(this::updateTile) does NOT find the observer previously
     // registered with observeForever(this::updateTile), and the observer leaks.
     private val tileObserver = Observer<Boolean> { updateTile() }
-
-    companion object {
-        // rebind this tile so onStartListening() can get its current
-        // state. updateTile() calls made while the tile is not listening are
-        // silently dropped; without this, the tile keeps showing its last state
-        fun requestTileUpdate(context: Context) {
-            try {
-                TileService.requestListeningState(
-                    context,
-                    ComponentName(context, BraveTileService::class.java)
-                )
-            } catch (e: Exception) {
-                Logger.w(Logger.LOG_TAG_VPN, "Tile: err in requesting listening state", e)
-            }
-        }
-    }
 
     override fun onCreate() {
         super.onCreate()

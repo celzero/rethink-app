@@ -528,7 +528,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // updates are dropped by SystemUI while the tile is not listening, so
         // without this push the tile would keep showing its last-rendered
         // state until the user next pulls down the shade.
-        BraveTileService.requestTileUpdate(appContext)
+        QuickSettingsTileHelper.requestTileUpdate(appContext)
     }
 
     fun getVpnEnabled(): Boolean {
