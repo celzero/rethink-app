@@ -497,7 +497,7 @@ dependencies {
     // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10'
     fullImplementation 'androidx.appcompat:appcompat:1.8.0'
     fullImplementation 'androidx.core:core-ktx:1.19.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -626,7 +626,7 @@ dependencies {
     // each combined variant (e.g. `fdroidTv`) already picks up firestack
     // via `fdroidImplementation`. Mirroring here would double-add it.
     // ------------------------------------------------------------------
-    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21'
+    tvImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10'
     tvImplementation 'androidx.appcompat:appcompat:1.8.0'
     tvImplementation 'androidx.core:core-ktx:1.19.0'
     tvImplementation 'androidx.constraintlayout:constraintlayout:2.2.2'
