@@ -44,6 +44,11 @@ import hu.autsoft.krate.stringPref
 import org.koin.core.component.KoinComponent
 
 class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
+
+    // constructor param promoted to a property so it is accessible from
+    // methods (SimpleKrate in krate 2.0.0 does not expose the context)
+    private val appContext: Context = context
+
     companion object {
         const val BRAVE_MODE = "brave_mode"
         const val BACKGROUND_MODE = "background_mode"
@@ -106,6 +111,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // Any stored version lower than this will cause the tour to re-trigger.
         // v2: added Rethink+ premium nav-item step (step 6) + fixed tour button text contrast.
         const val GUIDED_TOUR_CURRENT_VERSION = 2
+
+        // RPN (ServerSelection) onboarding tour version. Bump to re-show the premium
+        // RPN onboarding to existing subscribers after a major dashboard UI change.
+        // v1: initial post-purchase onboarding (quick tiles, relay, bypass, per-app
+        // routing, stats, DNS-filter settings).
+        const val RPN_ONBOARDING_CURRENT_VERSION = 1
 
         const val FLOOD_WIREGUARD = "flood_wireguard"
 
@@ -513,6 +524,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     fun setVpnEnabled(isOn: Boolean) {
         vpnEnabledLiveData.postValue(isOn)
         _vpnEnabled = isOn
+        // Push the quick-settings tile to re-bind and re-seed its state. Tile
+        // updates are dropped by SystemUI while the tile is not listening, so
+        // without this push the tile would keep showing its last-rendered
+        // state until the user next pulls down the shade.
+        BraveTileService.requestTileUpdate(appContext)
     }
 
     fun getVpnEnabled(): Boolean {
@@ -791,6 +807,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // the version of the guided tour that was last shown; used to re-trigger on UI changes
     var guidedTourVersion by intPref("guided_tour_version").withDefault<Int>(0)
+
+    // whether the RPN (ServerSelection) onboarding tour has been completed;
+    // false = show the premium onboarding on the next dashboard visit
+    var rpnOnboardingCompleted by booleanPref("rpn_onboarding_completed").withDefault<Boolean>(false)
+
+    // the version of the RPN onboarding tour that was last shown
+    var rpnOnboardingVersion by intPref("rpn_onboarding_version").withDefault<Int>(0)
 
     // maximum memory the go engine can consume in bytes (ideally value*1024*1024)
     var goMaxMemory by longPref(GO_MAX_MEMORY).withDefault<Long>(-1L)

@@ -60,6 +60,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -88,6 +89,14 @@ class VpnServerAdapter(
      * When set, every server item shows a "Stopped" status row and all taps
      */
     private var proxyStopped = false
+
+    /**
+     * relay (hop) locations enter via AUTO, so when
+     * AUTO is paused they are effectively paused too, their status row and
+     * must show "Paused" regardless of their own state.
+     */
+    @Volatile
+    private var autoPaused = false
 
     /**
      * Keys of selected servers whose WIN tunnel is not yet available
@@ -524,11 +533,22 @@ class VpnServerAdapter(
                 val id = group.proxyId()
                 val statusPair = VpnController.getProxyStatusById(id)
 
+                val isAuto = group.key.equals(AUTO_SERVER_ID, ignoreCase = true)
+                var isAutoPaused = false
+                if (isAuto) {
+                    autoPaused = statusPair.first == Backend.TPU
+                } else if (config?.hopEnabled == true) {
+                    isAutoPaused = runCatching {
+                        VpnController.getProxyStatusById(Backend.RpnWin).first == Backend.TPU
+                    }.getOrDefault(autoPaused)
+                    autoPaused = isAutoPaused
+                }
+
                 Logger.v(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats for id: $id, config: $config, status: $statusPair")
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
 
-                    applyStats(config, statusPair)
+                    applyStats(config, statusPair, isAutoPaused)
                 }
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats[${group.key}]: ${t.message}")
@@ -777,7 +797,7 @@ class VpnServerAdapter(
         /**
          * Renders the Relay chip state: "🐇 Relay · On" with a positive background and
          * a check icon when the hop is active; "Relay · Off" with the default chip
-         * background when inactive. Tapping toggles the hop for this server.
+         * background when inactive.
          */
         private fun applyRelayAction(config: CountryConfig?) {
             if (config == null || config.id.equals(AUTO_SERVER_ID, true)) {
@@ -785,6 +805,19 @@ class VpnServerAdapter(
                 return
             }
             b.relayActionContainer.visibility = View.VISIBLE
+            if (config.hopEnabled && autoPaused) {
+                val pausedLabel = ctx.getString(R.string.cd_dns_crypt_relay_heading) + " · " +
+                    ctx.getString(R.string.pause_text).replaceFirstChar(Char::titlecase)
+                b.relayAction.text = ctx.getString(
+                    R.string.two_argument_space,
+                    ctx.getString(R.string.symbol_bunny),
+                    pausedLabel
+                )
+                b.relayAction.setTextColor(fetchColor(ctx, R.attr.chipTextNeutral))
+                b.relayActionContainer.backgroundTintList = null
+                b.relayIcon.visibility = View.VISIBLE
+                return
+            }
             val relayLabel = ctx.getString(R.string.cd_dns_crypt_relay_heading) + " · " +
                 ctx.getString(if (config.hopEnabled) R.string.lbl_on else R.string.lbl_off)
             if (config.hopEnabled) {
@@ -805,30 +838,33 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Enables/disables the relay (hop) for [group] via
-         * [RpnProxyManager.setHopForWinServer] and re-renders the chip from the
-         * freshly persisted config. The periodic poll re-applies the state as well,
-         * so even a failed toggle is corrected on the next tick.
-         */
+
         private fun toggleRelay(group: ServerGroup) {
             io {
                 try {
                     val config = RpnProxyManager.getCountryConfigByKey(group.key) ?: return@io
                     val newState = !config.hopEnabled
-                    RpnProxyManager.setHopForWinServer(group.key, newState)
-                    val updated = RpnProxyManager.getCountryConfigByKey(group.key)
+                    if (!newState) {
+                        setRelay(group, false)
+                        return@io
+                    }
+                    val automationEnabled = runCatching { RpnProxyManager.isAutoAutomationEnabled() }
+                        .onFailure { Logger.w(LOG_TAG_UI, "VpnServerAdapter toggleRelay[${group.key}]: automation check failed: ${it.message}") }
+                        .getOrDefault(false)
                     uiCtx {
                         if (!b.root.isAttachedToWindow) return@uiCtx
-                        applyRelayAction(updated)
-                        Utilities.showToastUiCentered(
-                            ctx,
-                            ctx.getString(R.string.cd_dns_crypt_relay_heading) + " " +
-                                ctx.getString(if (newState) R.string.lbl_on else R.string.lbl_off),
-                            Toast.LENGTH_SHORT
-                        )
-                        // Let the host re-derive aggregate relay UI (quick-settings tile).
-                        listener.onRelayToggled()
+                        if (!automationEnabled) {
+                            io { setRelay(group, true) }
+                            return@uiCtx
+                        }
+                        MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                            .setTitle(ctx.getString(R.string.qs_relay_automation_dialog_title))
+                            .setMessage(ctx.getString(R.string.qs_relay_automation_dialog_message))
+                            .setPositiveButton(ctx.getString(R.string.lbl_proceed)) { _, _ ->
+                                io { setRelay(group, true) }
+                            }
+                            .setNegativeButton(ctx.getString(R.string.lbl_cancel), null)
+                            .show()
                     }
                 } catch (t: Throwable) {
                     Logger.w(LOG_TAG_UI, "VpnServerAdapter toggleRelay[${group.key}]: ${t.message}")
@@ -836,9 +872,37 @@ class VpnServerAdapter(
             }
         }
 
+        /**
+         * Enables/disables the relay (hop) for [group] via
+         * [RpnProxyManager.setHopForWinServer] and re-renders the chip from the
+         * freshly persisted config. The periodic poll re-applies the state as well,
+         * so even a failed toggle is corrected on the next tick.
+         */
+        private suspend fun setRelay(group: ServerGroup, newState: Boolean) {
+            try {
+                RpnProxyManager.setHopForWinServer(group.key, newState)
+                val updated = RpnProxyManager.getCountryConfigByKey(group.key)
+                uiCtx {
+                    if (!b.root.isAttachedToWindow) return@uiCtx
+                    applyRelayAction(updated)
+                    Utilities.showToastUiCentered(
+                        ctx,
+                        ctx.getString(R.string.cd_dns_crypt_relay_heading) + " " +
+                            ctx.getString(if (newState) R.string.lbl_on else R.string.lbl_off),
+                        Toast.LENGTH_SHORT
+                    )
+                    // Let the host re-derive aggregate relay UI (quick-settings tile).
+                    listener.onRelayToggled()
+                }
+            } catch (t: Throwable) {
+                Logger.w(LOG_TAG_UI, "VpnServerAdapter setRelay[${group.key}]: ${t.message}")
+            }
+        }
+
         private fun applyStats(
             config: CountryConfig?,
-            statusPair: Pair<Int?, String>
+            statusPair: Pair<Int?, String>,
+            isAutoPaused: Boolean = false
         ) {
             if (config == null) {
                 hideStats()
@@ -850,6 +914,15 @@ class VpnServerAdapter(
 
             // Status chip
             val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
+
+            if (isAutoPaused && status != UIUtils.ProxyStatus.TPU) {
+                currentProxyStatus = UIUtils.ProxyStatus.TPU
+                b.tvServerStatus.text = ctx.getString(UIUtils.getProxyStatusStringRes(UIUtils.ProxyStatus.TPU.id))
+                    .replaceFirstChar(Char::titlecase)
+                b.tvServerStatus.setTextColor(fetchColor(ctx, getStatusColor(UIUtils.ProxyStatus.TPU)))
+                renderStatusRow()
+                return
+            }
             currentProxyStatus = status
             b.tvServerStatus.text = getStatusText(status, statusPair.second)
             b.tvServerStatus.setTextColor(fetchColor(ctx, getStatusColor(status)))

@@ -2491,6 +2491,7 @@ object RpnProxyManager : KoinComponent {
                 winServersCache.filter { it.key == key }.forEach { it.isEnabled = true }
             }
             config.catchAll = true
+            config.lockdown = true
             config.isEnabled = true
             try {
                 countryConfigRepo.update(config)
@@ -2845,6 +2846,20 @@ object RpnProxyManager : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
+        }
+    }
+
+    /**
+     * True when the AUTO sentinel has automation (mobile-only or
+     * SSID-based) enabled
+     */
+    suspend fun isAutoAutomationEnabled(): Boolean {
+        return try {
+            val auto = getAutoServer() ?: return false
+            auto.mobileOnly || auto.ssidBased
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; isAutoAutomationEnabled: err: ${e.message}")
+            false
         }
     }
 

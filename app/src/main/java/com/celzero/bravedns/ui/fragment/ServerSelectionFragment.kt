@@ -1698,7 +1698,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Confirmation dialog shown when AUTO automation (mobileOnly/ssidBased) is active. */
     private fun showRelayAutomationDialog(onProceed: () -> Unit) {
         if (!isAdded || isStateSaved) return
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.qs_relay_automation_dialog_title))
             .setMessage(getString(R.string.qs_relay_automation_dialog_message))
             .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> onProceed() }
