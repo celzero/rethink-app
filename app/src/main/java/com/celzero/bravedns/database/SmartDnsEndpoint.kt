@@ -54,15 +54,6 @@ enum class SmartDnsMode(val mode: Int) {
     FAMILY(3);
 
     companion object {
-        fun getMode(id: Int): SmartDnsMode {
-            return when (id) {
-                NO_FILTER.mode -> NO_FILTER
-                SECURITY.mode -> SECURITY
-                PRIVACY.mode -> PRIVACY
-                FAMILY.mode -> FAMILY
-                else -> NO_FILTER
-            }
-        }
 
         fun getTunMode(id: Int): Long {
             return when (id) {
