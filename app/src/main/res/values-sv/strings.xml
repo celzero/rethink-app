@@ -23,4 +23,1074 @@
     <string name="lbl_public_key" translatable="true">Publik Nyckel</string>
     <string name="lbl_private_key" translatable="true">Privat nyckel</string>
     <string name="lbl_disabled" translatable="true">Inaktiverad</string>
+    <string name="title_about" translatable="true">Om</string>
+    <string name="title_settings" translatable="true">Inställningar</string>
+    <string name="title_statistics" translatable="true">Statistik</string>
+    <string name="pause_title_desc" translatable="true">sover …</string>
+    <string name="settings_title_desc" translatable="true">En mycket anpassningsbar DNS- och brandvägg</string>
+    <string name="about_title_desc" translatable="true">Upptäck och blockera nätverkssäkerhetshot</string>
+    <string name="txt_home" translatable="true">Hem</string>
+    <string name="accessibility_service_description" translatable="true">Rethink använder tillgänglighetstjänsten för att upptäcka appar i bakgrunden och tillämpa brandväggsregler på dem. Rethink samlar inte in eller säljer någon information.</string>
+    <string name="next" translatable="true">Nästa</string>
+    <string name="skip" translatable="true">Hoppa över</string>
+    <string name="finish" translatable="true">Slutför</string>
+    <string name="lbl_cancel" translatable="true">Avbryt</string>
+    <string name="lbl_apply" translatable="true">Tillämpa</string>
+    <string name="lbl_dismiss" translatable="true">Stäng</string>
+    <string name="lbl_all" translatable="true">Alla</string>
+    <string name="lbl_applications" translatable="true">Appar</string>
+    <string name="lbl_generated" translatable="true">(genererad)</string>
+    <string name="lbl_random" translatable="true">(slumpmässig)</string>
+    <string name="lbl_listen_port" translatable="true">Lyssningsport</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(automatiskt)</string>
+    <string name="lbl_include" translatable="true">Inkludera</string>
+    <string name="lbl_select_all" translatable="true">markera alla</string>
+    <string name="lbl_active" translatable="true">Aktiv</string>
+    <string name="lbl_inactive" translatable="true">Inaktiv</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTP och SOCKS5</string>
+    <string name="lbl_fast" translatable="true">snabb</string>
+    <string name="lbl_slow" translatable="true">långsam</string>
+    <string name="lbl_very" translatable="true">mycket</string>
+    <string name="lbl_add" translatable="true">Lägg till</string>
+    <string name="lbl_app_wise" translatable="true">Per app</string>
+    <string name="lbl_sec" translatable="true">sek</string>
+    <string name="lbl_min" translatable="true">min</string>
+    <string name="lbl_hour" translatable="true">tim</string>
+    <string name="lbl_day" translatable="true">dag</string>
+    <string name="lbl_preshared_key" translatable="true">Delad nyckel</string>
+    <string name="lbl_insecure" translatable="true">(osäkert)</string>
+    <string name="lbl_optional" translatable="true">(valfritt)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Beständig keepalive</string>
+    <string name="lbl_allowed_ips" translatable="true">Tillåtna IP-adresser</string>
+    <string name="lbl_save" translatable="true">Spara</string>
+    <string name="slide_2_desc" translatable="true">Rethink är det enklaste sättet att övervaka nätverksaktivitet, kringgå internetcensur och tillämpa brandväggsregler på appar på din Android-enhet.</string>
+    <string name="slide_1_title" translatable="true">Fri och öppen källkod</string>
+    <string name="slide_1_desc" translatable="true">Rethink är programvara med öppen källkod som stöds av Mozilla Builders MVP-programmet och FOSS United Foundation.</string>
+    <string name="allow" translatable="true">Tillåt</string>
+    <string name="block" translatable="true">Blockera</string>
+    <string name="bypass_universal" translatable="true">Kringgå universella regler</string>
+    <string name="exclude" translatable="true">Undanta</string>
+    <string name="isolate" translatable="true">Isolera</string>
+    <string name="untracked" translatable="true">Ospårad</string>
+    <string name="bypass_dns_firewall" translatable="true">Kringgå DNS och brandvägg</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Varning: Rethink har avaktiverats</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Tryck för att ändra skyddsinställning</string>
+    <string name="dns_mode_notification_title" translatable="true">Skyddad! Ansluten till snabb och säker DNS.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Skyddad! Ansluten till brandväggen.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Skyddad! Ansluten till DNS och brandvägg.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pausad! Blockerade appar omfattas fortfarande av brandväggen.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">väntar</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">misslyckas</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">skyddad</string>
+    <string name="status_app_error" translatable="true">appfel</string>
+    <string name="status_dns_error" translatable="true">DNS-fel</string>
+    <string name="status_dns_server_down" translatable="true">DNS-servern är nere</string>
+    <string name="status_no_internet" translatable="true">ingen internetanslutning</string>
+    <string name="status_protected_with_tor" translatable="true">skyddad med Tor</string>
+    <string name="status_protected_with_private_dns" translatable="true">skyddad med privat DNS</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">skyddad med Tor och privat DNS</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">skyddad med proxy och privat DNS</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">skyddad med SOCKS5 och privat DNS</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">skyddad med HTTP-proxy och privat DNS</string>
+    <string name="status_protected_with_socks5" translatable="true">skyddad med SOCKS-proxy</string>
+    <string name="status_protected_with_http" translatable="true">skyddad med HTTP-proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">skyddad med proxy</string>
+    <string name="status_protected_with_wg" translatable="true">skyddad med WireGuard</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">skyddad med WireGuard och privat DNS</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">privat DNS är aktiverad</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">inte skyddad</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Ansluten till RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Ansluten till brandväggen</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Ansluten till RethinkDNS och brandväggen</string>
+    <string name="universal_firewall_explanation" translatable="true">Tillämpa brandväggsregler på alla appar utifrån enhetshändelser, till exempel när enheten är låst eller när en viss app inte används.</string>
+    <string name="notification_action_resume_vpn" translatable="true">ÅTERUPPTA</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUSA</string>
+    <string name="notification_action_stop_vpn" translatable="true">STOPPA</string>
+    <string name="firewall_rules" translatable="true">Nätverksregler</string>
+    <string name="firewall_mode_info_title" translatable="true">Brandvägg</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Övervaka nätverksaktivitet och tillämpa brandväggsregler på valfri app eller IP-adress.</string>
+    <string name="apps_info_title" translatable="true">Appar</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Övervaka, blockera och kryptera DNS-förfrågningar.</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Allt ovanstående samt kringgå internetcensur.</string>
+    <string name="alert_permission_accessibility" translatable="true">Behörighet – Tillgänglighet</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink använder tillgänglighetstjänsten för att se vilka appar som används (i förgrunden) och vilka som inte används (i bakgrunden).\n\nRethink samlar inte in information och övervakar dig inte på något sätt.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethinks tillgänglighetstjänst har stoppats eller kraschat. <i><b>Gå till Inställningar och tvinga stopp</b></i> för Rethink, och starta sedan appen igen för att använda funktionen <i>Blockera alla appar som inte används</i>.\n\nRethink använder tillgänglighetstjänsten för att se vilka appar som används (i förgrunden) och vilka som inte används (i bakgrunden).</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Det gick inte att öppna inställningarna för Tillgänglighet. Försök igen senare!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Välj läge.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Välj läge.</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Ogiltig URL</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Ta bort alla nätverksloggar?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Detta tar bara bort nätverksloggar, inte brandväggsregler. Åtgärden kan inte ångras. Vill du fortsätta?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Ta bort alla DNS-loggar?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Detta tar bort DNS-loggar på enheten. Åtgärden kan inte ångras. Vill du fortsätta?</string>
+    <string name="bsct_app_info" translatable="true">Appinformation</string>
+    <string name="bsct_block_ip" translatable="true">Blockera eller lita på &lt;u&gt;den här IP-adressen&lt;/u&gt; för &lt;u&gt;den här appen&lt;/u&gt;</string>
+    <string name="bsct_block_domain" translatable="true">Blockera eller lita på &lt;u&gt;domäner&lt;/u&gt; för &lt;u&gt;den här appen&lt;/u&gt;</string>
+    <string name="bsct_block" translatable="true">Blockera, kringgå, undanta eller isolera &lt;u&gt;den här appen&lt;/u&gt;</string>
+    <string name="bsct_conn_block_desc" translatable="true">blockerade %1$s enligt %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">blockerade %1$s på enheten</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">tillåten på %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">blockerad på %1$s %2$s</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: Blockerar en app från att ansluta till internet. \n &lt;u&gt;#2&lt;/u&gt;: Blockerar alla appar från att ansluta till en viss IP-adress. \n &lt;u&gt;#3&lt;/u&gt;: Blockerar alla anslutningar när enheten är låst (universell brandvägg). \n &lt;u&gt;#4&lt;/u&gt;: Blockerar alla appar som inte används (universell brandvägg). \n &lt;u&gt;#5&lt;/u&gt;: Blockerar anslutningar när källappen är okänd (universell brandvägg). \n &lt;u&gt;#6&lt;/u&gt;: Blockerar all UDP-trafik utom DNS (universell brandvägg). \n &lt;u&gt;#7&lt;/u&gt;: Blockerar anslutningar när DNS kringgås (universell brandvägg).</string>
+    <string name="always_on_dialog_heading" translatable="true">Inaktivera alltid-på-VPN</string>
+    <string name="always_on_dialog" translatable="true">”Alltid-på-VPN” är aktiverat på den här enheten. För att starta Rethink, öppna Inställningar och inaktivera ”Alltid-på-VPN”.</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Gå till Inställningar</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Alltid-på-VPN</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Alltid-på-VPN är aktiverat för Rethink. Är du säker på att du vill stoppa Rethink ändå?</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink kör VPN i <i>låst</i> läge. Om du stoppar det förlorar användarprofilen internetanslutning. Vill du fortsätta ändå?</string>
+    <string name="always_on_dialog_positive" translatable="true">Stoppa</string>
+    <string name="always_on_dialog_neutral" translatable="true">Inställningar</string>
+    <string name="private_dns_dialog_heading" translatable="true">Stäng av privat DNS</string>
+    <string name="private_dns_dialog_desc" translatable="true">Rethinks DNS-inställningar åsidosätts av Androids privata DNS.\n\nFör att använda Rethinks DNS, öppna Android-inställningarna och stäng av privat DNS.</string>
+    <string name="private_dns_dialog_positive" translatable="true">Gå till Inställningar</string>
+    <string name="firewall_act_universal_tab" translatable="true">Universell</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Nätverk</string>
+    <string name="dns_act_configure_tab" translatable="true">Konfigurera</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Ta bort IP-regel?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Om du tar bort regeln kan alla appar ansluta till denna IP-adress. Vill du fortsätta?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Ta bort DoH-slutpunkt?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Ta bort DNS-over-HTTPS-slutpunkten från den sparade konfigurationen.</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Slutpunkten har tagits bort.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Ta bort DNSCrypt-resolver?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Ta bort DNSCrypt-resolvern från den sparade konfigurationen.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt-resolvern har tagits bort.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Ta bort DNSCrypt-relä?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Ta bort DNSCrypt-reläet från den sparade konfigurationen.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt-reläet har tagits bort.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Ta bort DNS-proxy?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Ta bort DNS-proxyn från den sparade konfigurationen.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS-proxyn har tagits bort.</string>
+    <string name="local_blocklist_download" translatable="true">Hämta blocklistor</string>
+    <string name="local_blocklist_download_desc" translatable="true">Hämta blocklistor (cirka 60 MB) för att använda funktionen?</string>
+    <string name="local_blocklist_redownload" translatable="true">Uppdaterad!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Blocklistorna på enheten har redan den senaste versionen, v%1$s.</string>
+    <string name="blocklist_update_check_failure" translatable="true">Något gick fel. Försök igen senare!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Blocklistorna har redan den senaste versionen.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Synkroniseringen av applistan är klar.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Loggning av anslutningar har inaktiverats. För att aktivera den igen, gå till <i>Inställningar</i> och slå på <i>Aktivera loggning på enheten</i>.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Loggning av DNS-förfrågningar har inaktiverats. För att aktivera den igen, gå till <i>Inställningar</i> och slå på <i>Aktivera loggning på enheten</i>.</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS över HTTPS</string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS-proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">Ansluten till %1$s</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolvrar</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Ställ in HTTP(S)-CONNECT-proxy</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Ange en URL i formen &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exempel: http://proxy.example.com:8080/</string>
+    <string name="download_update_dialog_title" translatable="true">Ny uppdatering!</string>
+    <string name="download_update_dialog_message" translatable="true">En ny version av appen kan hämtas från webbplatsen. Vill du fortsätta?</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Uppdaterad!</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Du använder redan den senaste versionen.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Blocklistan har hämtats.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Något gick fel!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Antingen är våra servrar nere eller så kunde anslutningen inte upprättas. Försök igen senare.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Kan inte uppdatera just nu</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Uppdateringen kan inte genomföras just nu. Försök igen senare.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Sök appar, IP-adresser, domäner</font></string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Sök appar efter UID eller namn</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Sök domännamn eller IP-adresser</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">Sök IP-adresser</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Sök domännamn</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Sök blocklistor</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Sök appar efter namn</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (batterisparläge)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="app_mode_firewall" translatable="true">Brandvägg</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS och brandvägg (standard)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_vpn_heading" translatable="true">VPN</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP-adressen har kopierats.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL:en har kopierats</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Den offentliga nyckeln har kopierats.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Kopierades som RDNS+-URL för DNS över HTTPS</string>
+    <string name="settings_enable_logs_desc" translatable="true">Spara DNS- och brandväggsloggar lokalt på enheten.</string>
+    <string name="settings_enable_logs" translatable="true">Aktivera loggning på enheten</string>
+    <string name="app_mode_choose" translatable="true">Välj läge</string>
+    <string name="connection_http3" translatable="true">HTTP/3</string>
+    <string name="relative_time_today" translatable="true">I dag</string>
+    <string name="relative_time_yesterday" translatable="true">I går</string>
+    <string name="settings_ip_network_heading" translatable="true">Välj IP-version</string>
+    <string name="settings_ip_network_desc" translatable="true">Välj mellan versioner av Internet Protocol.</string>
+    <string name="settings_ptrans_heading" translatable="true">Tvinga utgående IPv4</string>
+    <string name="settings_ptrans_desc" translatable="true">Översätt utgående IPv6-trafik till IPv4 på enheten. Aktivera detta om du är ansluten till ett nätverk med enbart IPv4.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Routa inte privata IP-adresser</string>
+    <string name="settings_allow_lan_desc" translatable="true">Undanta LAN, loopback, multicast och länk-lokala rutter från Rethinks VPN-tunnel.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Aktivera nätverkssynlighet</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Tillåt appar som begär det att komma åt alla tillgängliga nätverk. Dessa appar kan vid behov kringgå Rethinks VPN-tunnel. Vissa ljud- och videokonferensappar, som Zoom och Meet, kan behöva detta för att fungera korrekt.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Vissa alternativ är inaktiverade när VPN körs i låst läge. <u>Se VPN-inställningar</u>.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Det går inte att konfigurera proxyservrar när VPN körs i läget enbart DNS.</string>
+    <string name="settings_proxy_header" translatable="true">Proxy</string>
+    <string name="settings_socks5_heading" translatable="true">Ställ in SOCKS5-proxy</string>
+    <string name="settings_socks5_desc" translatable="true">Vidarebefordra anslutningar till en SOCKS5-slutpunkt.</string>
+    <string name="settings_https_heading" translatable="true">Ställ in HTTP(S)-CONNECT-proxy</string>
+    <string name="settings_https_desc" translatable="true">Vidarebefordra anslutningar till en HTTP(S)-CONNECT-slutpunkt.</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_socks5" translatable="true">Endast TCP-proxy</string>
+    <string name="orbot_socks5_desc" translatable="true">Vidarebefordrar alla TCP-anslutningar till Orbot.</string>
+    <string name="orbot_http" translatable="true">HTTP-proxy</string>
+    <string name="orbot_http_desc" translatable="true">Upprättar en HTTP CONNECT-tunnel till Orbot.</string>
+    <string name="orbot_both" translatable="true">TCP- och HTTP-proxy</string>
+    <string name="orbot_both_desc" translatable="true">Allt ovanstående.</string>
+    <string name="orbot_none" translatable="true">Ingen (standard)</string>
+    <string name="orbot_none_desc" translatable="true">Inget av ovanstående.</string>
+    <string name="orbot_bs_status_1" translatable="true">Vidarebefordrar %1$s-anslutningar till Orbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP-proxy är inställd.</string>
+    <string name="orbot_bs_status_3" translatable="true">Vidarebefordrar %1$s till Orbot; HTTP-proxy är också inställd.</string>
+    <string name="orbot_bs_status_4" translatable="true">Konfiguration av Tor som proxy (Orbot) med ett klick.</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS och TCP</string>
+    <string name="orbot_app_issue" translatable="true">Det gick inte att starta Orbot. Är appen installerad?</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Konfigurerar Orbot …</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Manuell åtgärd krävs</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink har slutat vidarebefordra anslutningar till Orbot, men Orbot kan fortfarande köras i bakgrunden.</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink är inställt på att vidarebefordra DNS-förfrågningar till Orbot. Ändra vid behov.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Stoppa Orbot</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Ändra DNS</string>
+    <string name="orbot_title" translatable="true">Orbot och proxyservrar</string>
+    <string name="orbot_explanation" translatable="true">Orbot är en fri proxyapp som låter andra appar använda internet på ett mer &lt;u&gt;säkert&lt;/u&gt; sätt. \\nOrbot använder &lt;u&gt;Tor&lt;/u&gt; för att kryptera din internettrafik, vilket hjälper dig att &lt;u&gt;kringgå censur&lt;/u&gt; och skydda dig mot former av &lt;u&gt;nätverksövervakning&lt;/u&gt; som hotar personlig frihet och integritet. \\n&lt;u&gt;TCP-proxy&lt;/u&gt;: Rethink vidarebefordrar endast TCP-anslutningar från &lt;i&gt;inkluderade&lt;/i&gt; appar till Orbot. \\n&lt;u&gt;HTTP-proxy&lt;/u&gt;: Rethink &lt;i&gt;upprättar&lt;/i&gt; en HTTP CONNECT-tunnel till Orbot och vidarebefordrar endast TCP-anslutningar från &lt;i&gt;inkluderade&lt;/i&gt; appar.</string>
+    <string name="orbot_install_dialog_title" translatable="true">Installera Orbot?</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot ger Android funktionerna i Tor.</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Installera</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">webbplats</string>
+    <string name="settings_orbot_heading" translatable="true">Ställ in Orbot</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot i icke-VPN-läge med HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_install_desc" translatable="true">Tryck här för att installera Orbot</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Ansluten till %1$s. Stäng av den för att fortsätta.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Starta Rethink för att fortsätta.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Stäng av HTTP(S)- och/eller SOCKS5-proxy för att fortsätta konfigurera Tor som proxy.</string>
+    <string name="settings_https_disabled_error" translatable="true">Ansluten till %1$s. Stäng av den för att fortsätta.</string>
+    <string name="settings_orbot_notification_content" translatable="true">Det gick inte att starta Tor som proxy. Öppna Orbot-appen för att starta den manuellt.</string>
+    <string name="settings_orbot_notification_action" translatable="true">Öppna Orbot</string>
+    <string name="settings_general_header" translatable="true">Allmänt</string>
+    <string name="settings_general_customize" translatable="true">Anpassa</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">Starta automatiskt vid uppstart (experimentellt)</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">Starta Rethink vid enhetsstart om det kördes före avstängningen.</string>
+    <string name="settings_network_all_networks" translatable="true">Använd alla tillgängliga nätverk</string>
+    <string name="settings_network_all_networks_desc" translatable="true">När det är aktiverat använder Rethink alla tillgängliga nätverk för att ansluta till internet. Annars används nätverket som Android bedömer som <i>aktivt</i>.</string>
+    <string name="settings_check_update_heading" translatable="true">Sök efter appuppdateringar</string>
+    <string name="settings_check_update_desc" translatable="true">Sök automatiskt efter appuppdateringar en gång i veckan.</string>
+    <string name="settings_custom_downloader_heading" translatable="true">Använd hämtning i appen</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Om detta är inaktiverat används Androids inbyggda <i>Hämtningshanterare</i>.</string>
+    <string name="settings_import_export_heading" translatable="true">Säkerhetskopiering och återställning</string>
+    <string name="settings_import_export_desc" translatable="true">Säkerhetskopiera eller återställ appdata och inställningar manuellt.</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">Appavisering</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Aktivera aviseringsbehörighet för appen</string>
+    <string name="settings_theme_heading" translatable="true">Utseende</string>
+    <string name="settings_theme_desc" translatable="true">Mörkt/ljust tema</string>
+    <string name="settings_go_log_heading" translatable="true">Loggnivå</string>
+    <string name="settings_go_log_desc" translatable="true">För felsökning</string>
+    <string name="settings_http_proxy_desc" translatable="true">Vidarebefordrar till %1$s</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">Anpassad server-URL</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">Portintervallet ska vara 1024–65535</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">Ogiltig port</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">Värdnamnet är tomt</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">Det gick inte att ansluta till värden. Försök igen.</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">HTTP-proxy är inställd</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">Ställ in SOCKS5-proxy</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">App</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Värdnamn</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Portnummer</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">Användarnamn</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">Lösenord</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">Ställ in</string>
+    <string name="settings_app_list_default_app" translatable="true">Ingen</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">Vidarebefordrar till %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">Vidarebefordrar till %1$s:%2$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">Vidarebefordra anslutningar till SOCKS5-slutpunkten.</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">IP-adress</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Användarnamn (valfritt)</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Lösenord (valfritt)</string>
+    <string name="settings_theme_dialog_title" translatable="true">Utseende</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">Styrs av systemet</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Ljust</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Mörkt</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Helsvart</string>
+    <string name="settings_ip_dialog_title" translatable="true">Välj IP-version</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (standard)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Automatiskt</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Automatiskt</string>
+    <string name="settings_notification_heading" translatable="true">Välj aviseringsåtgärd</string>
+    <string name="settings_notification_desc" translatable="true">Åtgärdsknappar som ska visas med Rethink-aviseringen: %1$s</string>
+    <string name="settings_notification_desc1" translatable="true">Pausa/stoppa (standard)</string>
+    <string name="settings_notification_desc2" translatable="true">DNS/DNS och brandvägg</string>
+    <string name="settings_notification_desc3" translatable="true">Ingen</string>
+    <string name="settings_notification_dialog_title" translatable="true">Välj aviseringsåtgärd</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\nPausa/stoppa (standard):\nVisar två knappar för att snabbt pausa och stoppa Rethink.</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\nDNS/DNS och brandvägg:\nVisar två knappar för att snabbt växla mellan batterisparande DNS-läge och normalt läge för DNS och brandvägg.</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\nIngen:\nVisar inga knappar.\n</string>
+    <string name="settings_locale_heading" translatable="true">Byt språk</string>
+    <string name="settings_locale_desc" translatable="true">Välj önskat språk</string>
+    <string name="settings_locale_dialog_title" translatable="true">Välj önskat språk</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Hjälp till att översätta appen</string>
+    <string name="settings_biometeric_heading" translatable="true">Aktivera applås</string>
+    <string name="settings_biometric_desc" translatable="true">Skydda appen med skärmlåset</string>
+    <string name="settings_selected_theme" translatable="true">Aktuellt tema: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">Växla till läget DNS/DNS och brandvägg för att aktivera inställningen</string>
+    <string name="settings_default_dns_heading" translatable="true">Välj bootstrap-DNS</string>
+    <string name="settings_default_dns_desc" translatable="true">Används endast vid uppstart för att hitta IP-adressen till den krypterade DNS-servern.</string>
+    <string name="settings_pcap_heading" translatable="true">Paketinsamling</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Av (standard)</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Skriv till Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Skriv till mappen Hämtade filer</string>
+    <string name="pcap_failure_toast" translatable="true">Det gick inte att skapa PCAP-filen. Försök igen!</string>
+    <string name="apps_icon_content_desc" translatable="true">Appikon</string>
+    <string name="firewall_status_allow" translatable="true">tillåten</string>
+    <string name="firewall_status_excluded" translatable="true">undantagen från DNS och brandvägg</string>
+    <string name="firewall_status_isolate" translatable="true">isolerad</string>
+    <string name="firewall_status_whitelisted" translatable="true">kringgår universella brandväggsregler</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">kringgår DNS- och brandväggsregler</string>
+    <string name="firewall_status_block_unmetered" translatable="true">blockerad på nätverk utan datatak (Wi-Fi)</string>
+    <string name="firewall_status_block_metered" translatable="true">blockerad på nätverk med datatak (mobilt)</string>
+    <string name="firewall_status_blocked" translatable="true">blockerad</string>
+    <string name="firewall_status_unknown" translatable="true">okänd</string>
+    <string name="ct_bs_app_info_error" translatable="true">Appinformation hittades inte</string>
+    <string name="hs_biometeric_title" translatable="true">Lås upp Rethink</string>
+    <string name="hs_biometeric_desc" translatable="true">Använd biometrisk autentisering för att låsa upp Rethink</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">Biometrisk autentisering stöds inte eller är inaktiverad på den här enheten</string>
+    <string name="hs_biometeric_failed" translatable="true">Biometrisk autentisering misslyckades</string>
+    <string name="hs_biometeric_error" translatable="true">Fel vid biometrisk autentisering</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s app(ar)</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s blockerade\n%2$s kringgår\n%3$s undantagna\n%4$s isolerade</string>
+    <string name="firewall_card_text_inactive" translatable="true">Aktivera brandväggsläget.</string>
+    <string name="dns_card_latency_active" translatable="true">%1$s ms</string>
+    <string name="dns_card_latency_inactive" translatable="true">Aktivera DNS-läget.</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s universell(a) regel/regler</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s domänregel/regler</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP- och portregel/regler</string>
+    <string name="logs_card_network_count" translatable="true">%1$s anslutning(ar)</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s förfrågan/förfrågningar</string>
+    <string name="hsf_start_btn_state" translatable="true">starta</string>
+    <string name="hsf_stop_btn_state" translatable="true">stoppa</string>
+    <string name="hsf_downtime" translatable="true">(inaktiv sedan %1$s)</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">Observera!</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Antingen saknas VPN-behörighet eller så kör en annan app i läget alltid-på-VPN.</string>
+    <string name="hsf_notification_permission_failure" translatable="true">Aktivera aviseringsbehörigheten på inställningsskärmen</string>
+    <string name="hsf_start_dialog_header" translatable="true">Starta %1$s</string>
+    <string name="hsf_start_dialog_message" translatable="true">Du är ett steg från en säker Android-enhet: se genast nätverksaktivitet, blockera webbplatser, IP-adresser och appar som beter sig illa.</string>
+    <string name="hsf_start_dialog_positive" translatable="true">Starta</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">Nyheter</string>
+    <string name="hsf_proxy_chip_text" translatable="true">Proxy aktiv</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Paketinsamling aktiv</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">Aktivera RDNS+</string>
+    <string name="hsf_exclude_error" translatable="true">Det går inte att undanta appar i VPN-låsningsläge</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxyn har tagits bort</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Paketinsamling inaktiverad</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">Stänger …</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">Aktiverar …</string>
+    <string name="hsf_chip_appearance" translatable="true">Tema: %1$s</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Det går inte att pausa: Rethink är inte aktivt</string>
+    <string name="dc_block_heading" translatable="true">Regler</string>
+    <string name="dc_other_dns_heading" translatable="true">Typ</string>
+    <string name="dc_custom_dns_radio" translatable="true">Annan DNS</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="dc_entries" translatable="true">%1$s poster »</string>
+    <string name="dc_local_block_heading" translatable="true">Blocklistor på enheten</string>
+    <string name="dc_local_block_desc_1" translatable="true">Välj bland fler än 195 blocklistor. Klicka här för att hämta eller konfigurera blocklistor.</string>
+    <string name="dc_custom_block_heading" translatable="true">Domänregler</string>
+    <string name="dc_dns_website_heading" translatable="true">Visa webbplatsikon i DNS-loggar</string>
+    <string name="dc_dns_website_desc" translatable="true">Hämtar webbplatsikoner från <i>nextdns.io</i> och <i>duckduckgo.com</i>. Använder upp till 350 MB diskutrymme.</string>
+    <string name="dc_dns_leaks_heading" translatable="true">Förhindra DNS-läckor</string>
+    <string name="dc_dns_leaks_desc" translatable="true">När det är aktiverat fångar Rethink alla paket på port 53 och vidarebefordrar dem till en DNS-slutpunkt som användaren har angett.</string>
+    <string name="dc_check_update_heading" translatable="true">Fråga vid uppdateringar av blocklistor</string>
+    <string name="dc_check_update_desc" translatable="true">Sök efter uppdateringar av blocklistor var <i>tredje</i> dag</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink är det enklaste sättet att övervaka appaktivitet, kringgå internetcensur och tillämpa brandväggsregler på appar på din Android-enhet.</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink är ett fritt projekt med öppen källkod, lett av tidigare ingenjörer från Amazon, IBM och Scientific Games.</string>
+    <string name="about_bravedns_toreport_text" translatable="true">hjälp och återkoppling</string>
+    <string name="about_bug_report_desc" translatable="true">e-posta kraschloggar</string>
+    <string name="about_join_telegram" translatable="true">Telegram</string>
+    <string name="about_bug_report" translatable="true">Felrapport</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">Skicka e-post</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Felrapport</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">Det gick inte att hämta kraschloggar. Vill du rapportera felet manuellt?</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Skicka e-post</string>
+    <string name="about_web" translatable="true">Länkar</string>
+    <string name="about_website" translatable="true">Besök rethinkdns.com</string>
+    <string name="about_github" translatable="true">Bidra på GitHub</string>
+    <string name="about_faq" translatable="true">Visa vanliga frågor</string>
+    <string name="about_docs" translatable="true">Läs dokumentationen</string>
+    <string name="about_privacy_policy" translatable="true">Läs integritetspolicyn</string>
+    <string name="about_connect" translatable="true">Kontakt</string>
+    <string name="about_sponsor_link_text" translatable="true">Sponsra</string>
+    <string name="about_app" translatable="true">App</string>
+    <string name="about_email" translatable="true">E-posta oss</string>
+    <string name="about_settings" translatable="true">System</string>
+    <string name="about_settings_app_info" translatable="true">Appinformation</string>
+    <string name="about_settings_vpn_profile" translatable="true">VPN-profil</string>
+    <string name="about_settings_notification" translatable="true">Aviseringsinställningar</string>
+    <string name="about_whats_new" translatable="true">Nyheter i %1$s</string>
+    <string name="about_twitter" translatable="true">Följ oss på Twitter</string>
+    <string name="about_mozilla" translatable="true">Rethink stöds av Mozilla Builders, FOSS United Foundation och FLOSS/fund.</string>
+    <string name="about_app_update_check" translatable="true">Sök efter appuppdateringar</string>
+    <string name="about_app_contributors" translatable="true">Upphovspersoner</string>
+    <string name="about_app_translate" translatable="true">Översätt</string>
+    <string name="about_dialog_positive_button" translatable="true">Kör i gång</string>
+    <string name="about_mail_bugreport_text" translatable="true">Skicka detta e-postmeddelande till: hello@celzero.com</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">Välj e-postleverantör</string>
+    <string name="about_dialog_neutral_button" translatable="true">Föreslå funktioner</string>
+    <string name="app_info_error" translatable="true">Det gick inte att öppna appinformationen.</string>
+    <string name="vpn_profile_error" translatable="true">Det gick inte att öppna VPN-profilen.</string>
+    <string name="private_dns_error" translatable="true">Det gick inte att öppna skärmen för privat DNS.</string>
+    <string name="notification_screen_error" translatable="true">Det gick inte att öppna appens aviseringsskärm.</string>
+    <string name="intent_launch_error" translatable="true">Det gick inte att öppna %1$s</string>
+    <string name="no_browser_error" translatable="true">Det går inte att öppna webbsidan i webbläsaren.</string>
+    <string name="log_file_not_available" translatable="true">Ingen kraschrapport hittades</string>
+    <string name="error_loading_log_file" translatable="true">Fel vid inläsning av loggfilen</string>
+    <string name="collecting_logs_progress_text" translatable="true">Samlar in …</string>
+    <string name="logs_disclaimer" translatable="true">Visar de första 20 000 tecknen</string>
+    <string name="contributors_dialog_title" translatable="true">Upphovspersoner</string>
+    <string name="cd_dns_crypt_title" translatable="true">Resolvrar</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">Anpassad server-URL</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">Anpassad DNS-proxy</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">Proxy</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">Proxy %1$s</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Ingen</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">Intern</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">Extern</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">Ogiltig IP-adress</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">Portintervallet ska vara 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">Ogiltig port</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">Lägg till DNSCrypt-resolver eller relä</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNS-relä %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">Lägg till DNSCrypt-resolver eller relä</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">Resolver</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">Relä</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">Namn</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">Stämpel</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">Beskrivning (valfritt)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">Stämpeln får inte vara tom</string>
+    <string name="cd_doh_dialog_heading" translatable="true">Lägg till DNS över HTTPS</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">Resolvernamn</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">Resolver-URL</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Validera inte serverns TLS-certifikat (aktivera bara om du vet vad du gör)</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">Reläer</string>
+    <string name="cd_dns_alg_heading" translatable="true">Avancerad DNS-filtrering (experimentell)</string>
+    <string name="cd_dns_alg_desc" translatable="true">Tilldela en unik IP-adress per DNS-förfrågan.</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">Sidan för appinställningar hittades inte</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s annan/andra app(ar)</string>
+    <string name="ctbs_block_other_apps" translatable="true">Regler som tillämpas för %1$s kommer också att gälla för %2$s andra appar</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">Gå tillbaka</string>
+    <string name="dns_log_dialog_positive" translatable="true">Ta bort loggar</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s andra IP-adresser</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">Inget svar</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">löstes &lt;u&gt;anonymt&lt;/u&gt; %1$s av %2$s via %3$s</string>
+    <string name="dns_btm_resolved_doh" translatable="true">löstes %1$s av %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">löstes %1$s</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$s s</string>
+    <string name="dns_btm_record_type" translatable="true">Förfrågetyp: %1$s</string>
+    <string name="hs_download_positive_default" translatable="true">OK</string>
+    <string name="hs_download_positive_play_store" translatable="true">Slutför uppdatering</string>
+    <string name="hs_download_positive_website" translatable="true">Besök webbplatsen</string>
+    <string name="hs_download_negative_default" translatable="true">Påminn mig senare</string>
+    <string name="univ_firewall_rule_1" translatable="true">Blockera alla appar när enheten är låst</string>
+    <string name="univ_firewall_rule_2" translatable="true">Blockera alla appar som inte används</string>
+    <string name="univ_firewall_rule_3" translatable="true">Blockera när källappen är okänd</string>
+    <string name="univ_firewall_rule_4" translatable="true">Blockera UDP utom DNS och NTP</string>
+    <string name="univ_firewall_rule_5" translatable="true">Blockera när DNS kringgås</string>
+    <string name="univ_firewall_rule_6" translatable="true">Blockera nyinstallerade appar som standard</string>
+    <string name="univ_firewall_rule_7" translatable="true">Blockera IPv4 i IPv6 (experimentellt)</string>
+    <string name="univ_firewall_rule_8" translatable="true">Blockera trafik på port 80 (osäker HTTP)</string>
+    <string name="univ_firewall_rule_9" translatable="true">Blockera på nätverk med datatak (mobilt)</string>
+    <string name="univ_firewall_rule_10" translatable="true">Blockera alla utom kringgångna appar och IP-adresser</string>
+    <string name="univ_view_blocked_ip" translatable="true">IP- och portregler</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Ändra blockerade eller betrodda domän-, IP- och portregler.</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s har tagits bort.</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">Ta bort alla</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">Alla IP-regler har tagits bort.</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">Ta bort alla IP-regler?</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">Om du tar bort dessa regler kan alla appar ansluta till de IP-adresser som nu blockeras.</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">Gå till Inställningar</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">Bevilja</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">Neka</string>
+    <string name="univ_firewall_heading" translatable="true">Universella brandväggsregler</string>
+    <string name="app_ip_domain_rules" translatable="true">IP- och domänregler per app</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Ändra IP- och domänregler per app.</string>
+    <string name="dns_connected_rethink_plus" translatable="true">Ansluten. %1$s blocklistor används</string>
+    <string name="dns_connected_no_count" translatable="true">Ansluten</string>
+    <string name="dns_connected" translatable="true">Ansluten</string>
+    <string name="dns_info_positive" translatable="true">OK</string>
+    <string name="dns_info_neutral" translatable="true">Kopiera</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">Ingen resolver har valts</string>
+    <string name="dns_query_latency" translatable="true">%1$s ms</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">Lägg till DNS-proxy</string>
+    <string name="dns_proxy_name" translatable="true">Proxynamn</string>
+    <string name="dns_proxy_app" translatable="true">App</string>
+    <string name="dns_proxy_ip_address" translatable="true">IP-adress</string>
+    <string name="dns_proxy_port" translatable="true">Portnummer</string>
+    <string name="fapps_filter_filter_heading" translatable="true">Typ</string>
+    <string name="fapps_filter_categories_heading" translatable="true">Kategorier</string>
+    <string name="fapps_filter_clear_btn" translatable="true">Rensa</string>
+    <string name="fapps_filter_parent_installed" translatable="true">Installerade</string>
+    <string name="fapps_filter_parent_system" translatable="true">System</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Kringgångna</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">Undantagna</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">Isolerade</string>
+    <string name="fapps_info_dialog_message" translatable="true">Blockera appar från att ansluta till internet. Begränsad internetåtkomst hjälper till att förhindra obefogad dataanvändning och sparar batteri.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Tillåt/blockera på nätverk utan datatak (Wi-Fi).</string>
+    <string name="fapps_info_metered_msg" translatable="true">Tillåt/blockera på nätverk med datatak (mobilt).</string>
+    <string name="fapps_info_bypass_msg" translatable="true">Kringgå universella brandväggsregler.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Kringgå DNS- och brandväggsregler.</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Undanta från både DNS och brandvägg.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">Blockera alla utom betrodda IP-adresser.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">OK</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Tillåt på nätverk utan datatak</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockera på nätverk utan datatak</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Blockera anslutningar på nätverk utan datatak (Wi-Fi) för <i>listade</i> appar?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Tillåt anslutningar på nätverk utan datatak (Wi-Fi) för <i>listade</i> appar?</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">Blockera på nätverk med datatak</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Blockera anslutningar på nätverk med datatak (mobilt) för <i>listade</i> appar?</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">Tillåt på nätverk med datatak</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Tillåt anslutningar på nätverk med datatak (mobilt) för <i>listade</i> appar?</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Kringgå appar</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Kringgå universella brandväggsregler för <i>listade</i> appar?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Kringgå appar</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Kringgå universella DNS- och brandväggsregler för <i>listade</i> appar?</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Tillåt appar</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Tillåt anslutningar för <i>listade</i> appar?</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Undanta appar</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Undanta <i>listade</i> appar från DNS och brandvägg?</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Isolera appar</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Isolera <i>listade</i> appar?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">Visar alla appar</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Visar <u>%1$s</u> %2$s appar]]></string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[Visar <u>%1$s</u> %2$s appar i kategorierna: %3$s]]></string>
+    <string name="rules_load_failure_heading" translatable="true">Obs</string>
+    <string name="rules_load_failure_desc" translatable="true">Inga brandväggsregler hittades</string>
+    <string name="rules_load_failure_reload" translatable="true">läs om</string>
+    <string name="network_log_app_name_unknown" translatable="true">Okänd</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Namnlös (%1$s)</string>
+    <string name="dns_crypt_connection_failure" translatable="true">Fel vid anslutning till DNSCrypt-servern.</string>
+    <string name="dns_proxy_connection_failure" translatable="true">Fel vid anslutning till DNS-proxyservern.</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">Om %1$s undantas för %2$s i låsningsläge kan internetanslutningen påverkas.</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">DNS-proxy</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5-proxy</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor som proxy</string>
+    <string name="system_dns_connection_failure" translatable="true">Det går inte att fastställa den aktuella DNS-servern</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="update_complete_snack_message" translatable="true">Ny version hämtad.</string>
+    <string name="update_complete_action_snack" translatable="true">STARTA OM</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s blocklistor används</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Hämta</string>
+    <string name="settings_local_blocklist_version" translatable="true">Version: v%1$s</string>
+    <string name="accessibility_notification_content" translatable="true">Rethinks tillgänglighetstjänst har stoppats eller kraschat. Appar i bakgrunden blockeras inte längre. Tryck för att aktivera igen.</string>
+    <string name="accessibility_failure_toast" translatable="true">Rethinks tillgänglighetstjänst har stoppats eller kraschat. Appar i bakgrunden blockeras inte längre.</string>
+    <string name="coming_soon_toast" translatable="true">kommer snart</string>
+    <string name="pause_text" translatable="true">pausad</string>
+    <string name="pause_desc" translatable="true">Observera: %1$s blockerade appar omfattas fortfarande av brandväggen.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="other_dns_list_tab2" translatable="true">DNSCrypt</string>
+    <string name="other_dns_list_tab3" translatable="true">DNS-proxy</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Det går inte att ändra läge när VPN är <i>låst</i>. Tryck för att &lt;u&gt;ändra VPN-inställningar&lt;/u&gt;.</string>
+    <string name="firewall_rule_no_rule" translatable="true">Ingen regel</string>
+    <string name="firewall_rule_block_app" translatable="true">App blockerad</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">Nätverk utan datatak (Wi-Fi)</string>
+    <string name="firewall_rule_block_metered" translatable="true">Nätverk med datatak (mobilt)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Datatak (universellt)</string>
+    <string name="firewall_rule_isolate" translatable="true">Isolera</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Kringgången app</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Ny app</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Fel</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP/port (app)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP/port (universellt)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">Betrodd IP-adress</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">Kringgången IP-adress</string>
+    <string name="firewall_rule_device_lock" translatable="true">Enheten låst</string>
+    <string name="firewall_rule_foreground" translatable="true">App används inte</string>
+    <string name="firewall_rule_unknown" translatable="true">Källa okänd</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP blockerad</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS kringgås</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Kringgången app</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS proxyskyddad</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot-konfiguration</string>
+    <string name="firewall_rule_block_http" translatable="true">Osäker HTTP</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">Låst läge</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Betrodd domän (app)</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domän (app)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS blockerad</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domän (universellt)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Betrodd domän (universellt)</string>
+    <string name="firewall_rule_proxied" translatable="true">Via proxy</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">Inga brandväggsregler matchade anslutningen.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade denna <i>app</i>.<br><br> Ändra detta på fliken <i>Alla appar</i>.]]></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Den här appen anslöt för <i>första</i> gången.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade denna <i>app</i> när den försökte ansluta på ett <i>nätverk utan datatak</i>.<br><br> Ändra detta på fliken <i>Alla appar</i>.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade denna <i>app</i> när den försökte ansluta på ett <i>nätverk med datatak</i>.<br><br> Ändra detta på fliken <i>Alla appar</i>.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[En användarinställd universell brandväggsregel blockerade denna <i>app</i> när den försökte ansluta på ett <i>nätverk med datatak</i> (mobilt).<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade denna <i>app</i> från anslutningar till annat än <i>kringgångna IP-adresser</i>.<br><br> Ändra detta på fliken <i>Alla appar</i>.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>källappen</i> är inställd på att <i>kringgå DNS- och brandväggsregler</i>.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade <i>mål-IP-adressen/-porten</i>.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade <i>mål-IP-adressen</i>.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>mål-IP-adressen</i> är inställd som en betrodd IP-adress.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>mål-IP-adressen</i> är inställd på att kringgå alla universella brandväggsregler.<br/><br/> Ändra detta under <i>IP-regler<i> på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[Anslutningen omfattades av brandväggen eftersom <i>enheten var låst</i> då.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[Anslutningen omfattades av brandväggen eftersom källappen <i>inte var i förgrunden</i>.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[Anslutningen omfattades av brandväggen eftersom <i>källappen</i> inte kunde fastställas.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade denna <i>UDP</i>-anslutning.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom <i>källappen</i> kringgick användarens valda DNS.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>källappen</i> är inställd på att <i>kringgå universella</i> brandväggsregler.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[DNS-anslutningen proxades och vidarebefordrades till användarens valda DNS-slutpunkt.<br><br> För att ändra detta, inaktivera <i>Förhindra DNS-läckor</i> på DNS-skärmen <i>Konfigurera</i>.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom konfigurationen <i>Tor som proxy med ett klick</i> via Orbot pågick.]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom den sannolikt använde <i>osäker HTTP</i>.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom universellt låsningsläge är inställt.<br><br> Ändra detta på fliken <i>Universell</i>.]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[En användarinställd brandväggsregel blockerade <i>domänen</i>.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>domänen</i> är inställd som en betrodd domän.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom <i>domänen</i> blockeras av användarens valda DNS.<br><br> Ändra detta på fliken <i>Konfigurera DNS</i>.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom <i>domänen</i> är inställd som blockerad i universella domänregler.<br><br> Ändra detta på fliken <i>Konfigurera DNS</i>.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>domänen</i> är inställd som betrodd i universella domänregler.<br><br> Ändra detta på fliken <i>Konfigurera DNS</i>.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Anslutningen vidarebefordrades till användarens valda proxy.<br><br> Ändra detta under <i>Proxy</i> på skärmen <i>Konfigurera</i>.]]></string>
+    <string name="new_app_bulk_notification_title" translatable="true">Observera</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink blockerade %1$s nya appar. Tryck för att visa eller ändra.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink blockerade den nyligen installerade appen %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">Fortsätt blockera</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Nätverksanslutning tillåten för appen</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Nätverksanslutning nekad för appen</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Appen är pausad!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Appen är pausad; återuppta för att fortsätta</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">Återuppta</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Ignorera</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Visa</string>
+    <string name="notif_channel_vpn_notification" translatable="true">Aktivt VPN</string>
+    <string name="notif_channel_vpn_failure" translatable="true">Inaktivt VPN</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Brandväggsvarningar</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Proxyvarningar</string>
+    <string name="notif_channel_download" translatable="true">Hämtningsvarningar</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Informera när Rethink är aktivt och körs i bakgrunden</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Informera när Rethink stoppas av Android eller av en annan VPN-app</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Varna vid brandväggsfel och avvikelser</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Varna vid proxyfel och avvikelser</string>
+    <string name="notif_channed_desc_download" translatable="true">Varna vid hämtningsförlopp för blocklistor på enheten</string>
+    <string name="category_name_sys_components" translatable="true">Systemkomponenter</string>
+    <string name="category_name_sys_apps" translatable="true">Systemappar</string>
+    <string name="category_name_others" translatable="true">Övrigt</string>
+    <string name="category_name_non_app_sys" translatable="true">Systemtjänster</string>
+    <string name="category_name_installed" translatable="true">Installerade appar</string>
+    <string name="build__flavor_website" translatable="true">webbplats</string>
+    <string name="build__flavor_play_store" translatable="true">Play</string>
+    <string name="build__flavor_fdroid" translatable="true">F-Droid</string>
+    <string name="cd_toast_deleted" translatable="true">Domänen har tagits bort från den anpassade listan</string>
+    <string name="cd_toast_added" translatable="true">Domänen har lagts till</string>
+    <string name="cd_remove_dialog_title" translatable="true">Ta bort domän?</string>
+    <string name="cd_remove_dialog_message" translatable="true">Ta bort domänen från den sparade konfigurationen.</string>
+    <string name="cd_deleted_toast" translatable="true">Alla domänregler har tagits bort</string>
+    <string name="cd_no_rules_text" translatable="true">Inga domänregler.</string>
+    <string name="cd_dialog_title" translatable="true">Lägg till domänregel</string>
+    <string name="cd_dialog_desc" translatable="true">En URL eller ett domännamn med valfritt jokertecken: *.test.com, test.com/test</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">Ange %1$s</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Ogiltig URL eller domännamn</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Ogiltig URL eller domän med jokertecken</string>
+    <string name="cd_no_rule_txt" translatable="true">Ingen regel</string>
+    <string name="ci_dialog_title" translatable="true">Lägg till IP-/portregel</string>
+    <string name="ci_dialog_desc" translatable="true">Tillåt (kringgå) eller blockera IP-adress, IP-undernät (intervall) eller port. Exempel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">IP-adress, undernät eller port</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Ogiltig IP-adress, undernät eller port.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP-adressen har lagts till i listan</string>
+    <string name="ci_no_rules_text" translatable="true">Inga IP- eller portregler.</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Kringgå universella regler</string>
+    <string name="ci_trust_txt" translatable="true">Betrodd</string>
+    <string name="ci_no_rule_txt" translatable="true">Ingen regel</string>
+    <string name="ci_no_rule" translatable="true">Ingen regel</string>
+    <string name="ci_block" translatable="true">Blockera</string>
+    <string name="ci_bypass_universal" translatable="true">Kringgå universella regler</string>
+    <string name="ci_trust_rule" translatable="true">Lita på</string>
+    <string name="ci_delete" translatable="true">ta bort</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Ingen sådan app</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Appinformation saknas. Har appen avinstallerats?</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">OK</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[Den här appen <b><i>%1$s</i></b>.]]></string>
+    <string name="ada_ip_connection_count" translatable="true">Ansluten till %1$s IP-adress(er)</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 IP-adresser</string>
+    <string name="ada_ip_no_connection" translatable="true">Inga nätverksloggar för denna kategori.</string>
+    <string name="ada_app_status_allow" translatable="true">är tillåten</string>
+    <string name="ada_app_status_block" translatable="true">är blockerad</string>
+    <string name="ada_app_status_block_wifi" translatable="true">är blockerad på nätverk utan datatak (Wi-Fi)</string>
+    <string name="ada_app_status_block_md" translatable="true">är blockerad på nätverk med datatak (mobilt)</string>
+    <string name="ada_app_status_whitelist" translatable="true">kommer att kringgå universella brandväggsregler</string>
+    <string name="ada_app_status_exclude" translatable="true">är undantagen från DNS och brandvägg</string>
+    <string name="ada_app_status_isolate" translatable="true">är isolerad; endast betrodda IP-adresser och domäner tillåts</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">kommer att kringgå universella DNS- och brandväggsregler</string>
+    <string name="ada_app_status_unknown" translatable="true">är okänd</string>
+    <string name="ada_firewall_title" translatable="true">Brandväggsregler för appen</string>
+    <string name="ada_network_log_title" translatable="true">Nätverkslogg för appen</string>
+    <string name="ada_app_firewall" translatable="true">Brandvägg</string>
+    <string name="ada_app_metered" translatable="true">Med datatak</string>
+    <string name="ada_app_unmetered" translatable="true">Utan datatak</string>
+    <string name="ada_app_bypass_univ" translatable="true">Kringgå universella regler</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Kringgå DNS och brandvägg</string>
+    <string name="ada_app_exclude" translatable="true">Undanta</string>
+    <string name="ada_app_isolate" translatable="true">Isolera</string>
+    <string name="ada_app_dns_settings" translatable="true">DNS-inställningar</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Rensa loggar</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Rensa alla loggar som hör till appen.</string>
+    <string name="bsac_title_desc" translatable="true">Reglerna gäller endast den här appen.</string>
+    <string name="bsdl_block_desc" translatable="true">Blockera eller lita på &lt;u&gt;den här domänen&lt;/u&gt;</string>
+    <string name="bsdl_blocked_desc" translatable="true">blockerade %1$s enligt %2$s</string>
+    <string name="network_dns" translatable="true">System-DNS</string>
+    <string name="notif_download_content_title" translatable="true">Hämtning av blocklistor på enheten</string>
+    <string name="notif_download_content_text" translatable="true">Hämtning pågår …</string>
+    <string name="notif_download_failure_content" translatable="true">Hämtningen misslyckades. Försök igen.</string>
+    <string name="notif_download_cancel_content" translatable="true">Hämtningen avbröts.</string>
+    <string name="notif_download_success_content" translatable="true">Hämtningen lyckades.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Föräldrakontroll</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blockera vuxen- och piratkopierat innehåll, nätspel och dejting samt sociala medier.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Integritet</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blockera uppmärksamhetsprogram, spionprogram och skrämselprogram.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Säkerhet</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blockera skadlig programvara, utpressningsprogram, kryptoskadlig kod, nätfiske och andra hot.</string>
+    <string name="rt_dialog_title" translatable="true">Spara ändringar</string>
+    <string name="rt_dialog_message" translatable="true">Vill du tillämpa de nykonfigurerade blocklistorna?</string>
+    <string name="rt_dialog_neutral" translatable="true">Fortsätt</string>
+    <string name="rt_edit_dialog_positive" translatable="true">Redigera</string>
+    <string name="rt_download_start" translatable="true">Hämtar blocklistor …</string>
+    <string name="rt_download" translatable="true">Hämta blocklistor</string>
+    <string name="rt_chip_update_available" translatable="true">Uppdatering tillgänglig</string>
+    <string name="rt_chip_check_update" translatable="true">Sök efter uppdatering</string>
+    <string name="rt_re_download" translatable="true">Hämta blocklistor igen</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">Enkelt</string>
+    <string name="lbl_advanced" translatable="true">Avancerat</string>
+    <string name="rt_filter_parent_selected" translatable="true">Valda</string>
+    <string name="rt_download_desc" translatable="true">Hämta blocklistor (cirka 60 MB) för att använda funktionen.</string>
+    <string name="rt_filter_hint" translatable="true">Visar <u>alla</u> blocklistor</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[Visar <u>%1$s</u> blocklistor]]></string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[Visar <u>%1$s</u> blocklistor i gruppen %2$s och undergruppen %3$s]]></string>
+    <string name="rethink_sky_desc" translatable="true">Fler än 280 platser; högre tillgänglighet; stubresolver körs på cloudflare.com</string>
+    <string name="rethink_max_desc" translatable="true">Fler än 50 platser; mer privat; rekursiv resolver körs på fly.io</string>
+    <string name="bsrf_sub_group_heading" translatable="true">Undergrupp</string>
+    <string name="bsrf_clear_filter" translatable="true">Rensa</string>
+    <string name="dc_local_block_enabled" translatable="true">Aktiverad</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS-accelerator</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Samordna förfrågningar, cachelagra svar, motståndskraftig felhantering</string>
+    <string name="dc_refresh_toast" translatable="true">Uppdateringen är klar</string>
+    <string name="lbbs_enabled" translatable="true">Aktiverad</string>
+    <string name="lbbs_configure" translatable="true">Konfigurera</string>
+    <string name="lbbs_copy" translatable="true">Kopiera som RDNS+-URL</string>
+    <string name="lbbs_search" translatable="true">Sök domäner i blocklistor</string>
+    <string name="lbbs_update_check" translatable="true">Sök efter uppdatering</string>
+    <string name="lbbs_redownload" translatable="true">Hämta blocklistor igen</string>
+    <string name="lbbs_download" translatable="true">Uppdatera blocklistor</string>
+    <string name="lbbs_heading" translatable="true">Konfigurera fler än 195 blocklistor</string>
+    <string name="brbs_title" translatable="true">Säkerhetskopiering och återställning</string>
+    <string name="brbs_backup_title" translatable="true">Säkerhetskopiering</string>
+    <string name="brbs_backup_desc" translatable="true">Säkerhetskopiera appinställningar, nätverks- och DNS-loggar</string>
+    <string name="brbs_restore_title" translatable="true">Återställ</string>
+    <string name="brbs_restore_desc" translatable="true">Återställ från en säkerhetskopia</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Fungerar inte mellan appversioner</string>
+    <string name="brbs_backup_dialog_title" translatable="true">Säkerhetskopiera</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Säkerhetskopierar appinställningar samt nätverks- och DNS-loggar till en fil. VPN startas om.</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Säkerhetskopiera</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Återställ säkerhetskopia</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Återställ appinställningar samt nätverks- och DNS-loggar från en säkerhetskopia. Appen startas om.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Återställ</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Säkerhetskopieringen misslyckades</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">Det gick inte att säkerhetskopiera. Försök igen?</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Försök säkerhetskopiera igen</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">Återställningen misslyckades</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">Det gick inte att återställa. Försök igen?</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Försök återställa igen</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Återställningen slutförd, startar om appen …</string>
+    <string name="brbs_backup_complete_toast" translatable="true">Säkerhetskopieringen är klar</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">Återställningen misslyckades; försök igen</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklistor</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Mest tillåtna appar</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Mest blockerade appar</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Mest kontaktade domäner</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Mest kontaktade länder</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Mest blockerade domäner</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Mest kontaktade IP-adresser</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Mest blockerade IP-adresser</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Mest blockerade länder</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starta Rethink för att fortsätta</string>
+    <string name="ssv_see_more" translatable="true">Visa alla</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Ogiltig nyckel</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Ogiltigt tal</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Ogiltigt värde</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Attribut saknas</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Avsnitt saknas</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Syntaxfel</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Okänt attribut</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Okänt avsnitt</string>
+    <string name="key_length_explanation_base64" translatable="true">: WireGuards base64-nycklar måste vara 44 tecken (32 byte)</string>
+    <string name="key_length_explanation_binary" translatable="true">: WireGuard-nycklar måste vara 32 byte</string>
+    <string name="key_length_explanation_hex" translatable="true">: WireGuards hexadecimala nycklar måste vara 64 tecken (32 byte)</string>
+    <string name="key_contents_error" translatable="true">Otillåtna tecken i nyckeln</string>
+    <string name="key_length_error" translatable="true">Felaktig nyckellängd</string>
+    <string name="parse_error_inet_address" translatable="true">IP-adress</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Slutpunkt</string>
+    <string name="parse_error_inet_network" translatable="true">IP-nätverk</string>
+    <string name="parse_error_integer" translatable="true">tal</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Måste vara positivt och högst 65535</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Måste vara positivt</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Måste vara ett giltigt UDP-portnummer</string>
+    <string name="bad_config_context" translatable="true">%1$s:s %2$s</string>
+    <string name="bad_config_error" translatable="true">%1$s i %2$s</string>
+    <string name="generic_error" translatable="true">Okänt fel ”%s”</string>
+    <string name="parse_error_generic" translatable="true">sträng</string>
+    <string name="parse_error_reason" translatable="true">Det går inte att tolka %1$s ”%2$s”</string>
+    <string name="unknown_error" translatable="true">Okänt fel</string>
+    <string name="invalid_file_error" translatable="true">ogiltig fil</string>
+    <string name="import_error" translatable="true">Det går inte att importera tunnel: %s</string>
+    <string name="illegal_filename_error" translatable="true">Otillåtet filnamn ”%s”</string>
+    <string name="no_configs_error" translatable="true">Inga konfigurationer hittades</string>
+    <string name="bad_extension_error" translatable="true">Filen måste vara .conf eller .zip</string>
+    <string name="setup_wireguard" translatable="true">Konfigurera WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard som proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Hämta WARP-konfiguration från servern</string>
+    <string name="new_warp_error_toast" translatable="true">Det gick inte att hämta WARP-konfiguration</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Ogiltig WARP-konfiguration</string>
+    <string name="add_remove_apps" translatable="true">Lägg till/ta bort (%1$s appar)</string>
+    <string name="add_peer" translatable="true">Lägg till peer</string>
+    <string name="config_delete_dialog_desc" translatable="true">Är du säker på att du vill ta bort denna WireGuard-VPN-konfiguration?</string>
+    <string name="config_delete_dialog_title" translatable="true">Ta bort</string>
+    <string name="config_add_success_toast" translatable="true">Klar</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Inkludera alla appar</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Använd detta WireGuard-VPN för alla appar?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Undanta alla appar</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Undanta alla appar från detta WireGuard-VPN?</string>
+    <string name="wireguard_enabled_failure" translatable="true">Stoppa andra aktiva proxyservrar för att aktivera WireGuard</string>
+    <string name="wireguard_no_config_msg" translatable="true">Inga WireGuard-VPN:er. Lägg till en för att komma igång.</string>
+    <string name="wireguard_connection_error" translatable="true">WireGuard-VPN kan inte ansluta</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS vidarebefordras till %1$s.</string>
+    <string name="cloudflare_dns_desc" translatable="true">Blockerar inga DNS-förfrågningar. Använder Cloudflares DNS-slutpunkt 1.1.1.1.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blockerar skadlig programvara och vuxeninnehåll. Använder Cloudflares DNS-slutpunkt 1.1.1.3.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blockerar skadligt innehåll. Använder Cloudflares DNS-slutpunkt 1.1.1.2.</string>
+    <string name="google_dns_desc" translatable="true">Blockerar inga DNS-förfrågningar. Använder Googles DNS-slutpunkt.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Familjefiltret blockerar åtkomst till vuxen-, pornografiska och explicita webbplatser. Det blockerar även proxy- och VPN-domäner som kan användas för att kringgå filtren. Webbplatser med blandat innehåll (som Reddit) blockeras också. Google, Bing och YouTube är inställda på säkert läge.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Vuxenfiltret blockerar åtkomst till vuxen-, pornografiska och explicita webbplatser. Det blockerar inte proxyer, VPN:er eller webbplatser med blandat innehåll. Webbplatser som Reddit tillåts. Google och Bing är inställda på säkert läge.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 routar dina DNS-förfrågningar genom ett säkert nätverk av servrar över hela världen.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blockerar åtkomst till vuxen-, pornografiska och explicita webbplatser. Det blockerar även proxy- och VPN-domäner som används för att kringgå filtren. Webbplatser med blandat innehåll (som Reddit) blockeras också. Google, Bing och YouTube är inställda på säkert läge.</string>
+    <string name="crypt_adguard_desc" translatable="true">Skyddar enheten mot skadlig programvara och annat.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">AdGuard DNS med Safe Search och blockering av vuxeninnehåll.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) DNSSEC/ingen loggning/inget filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) DNSSEC/ingen loggning/inget filter 9.9.9.10 – 149.112.112.10</string>
+    <string name="crypt_relay_netherlands" translatable="true">Anonymiserat DNS-relä i Nederländerna</string>
+    <string name="crypt_relay_france" translatable="true">Anonymiserat DNS-relä i Paris, Frankrike, tillhandahållet av https://cryptostrom.is/.</string>
+    <string name="crypt_relay_sweden" translatable="true">Anonymiserat DNS-relä i Sverige, tillhandahållet av https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Anonymiserat DNS-relä i USA – Los Angeles, Kalifornien, tillhandahållet av https://cryptostrom.is/.</string>
+    <string name="crypt_relay_singapore" translatable="true">Anonymiserat DNS-relä i Singapore.</string>
+    <string name="logs_card_duration" translatable="true">sedan %1$s</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Beständig avisering</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Gör aviseringen beständig</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Ta bort</string>
+    <string name="lbl_last" translatable="true">Senaste</string>
+    <string name="lbl_starting" translatable="true">Startar</string>
+    <string name="lbl_overall" translatable="true">Övergripande</string>
+    <string name="lbl_stopped" translatable="true">Stoppad</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Ta bort DoT-slutpunkt?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Ta bort DNS över TLS-slutpunkten från den sparade konfigurationen.</string>
+    <string name="orbot_no_app_toast" translatable="true">Lägg till minst en app för att aktivera Orbot</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimentellt)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Routar Rethinks egen trafik genom tunneln. Stäng av detta om du inte vet vad du gör.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Routa Rethinks egen trafik, såsom hämtning av blocklistor, anslutningskontroller och DNS-anslutningar, tillbaka in i tunneln.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Redigera domänregel</string>
+    <string name="cd_toast_edit" translatable="true">Redigerad</string>
+    <string name="one_wg_apps_added" translatable="true">Routar alla appar</string>
+    <string name="one_wg_dialog_desc" translatable="true">Alla anslutningar från alla appar, inklusive DNS, routas genom ett enda aktivt WireGuard-VPN. Andra aktiva WireGuard-VPN:er stoppas.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Alltid på</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Alla anslutningar och appar som inte routas av andra WireGuard-VPN:er routas av detta.</string>
+    <string name="one_wg_error_toast" translatable="true">Stoppa WireGuard i enkelt läge för att växla till avancerat</string>
+    <string name="wireguard_disable_failure" translatable="true">”Alltid på-WireGuard” kan inte stängas av</string>
+    <string name="lbl_private" translatable="true">privat</string>
+    <string name="lbl_secure" translatable="true">säker</string>
+    <string name="lbl_anonymous" translatable="true">anonym</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="routing_remaining_apps" translatable="true">Routar återstående appar</string>
+    <string name="lbl_remaining_apps" translatable="true">Återstående appar</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Inkludera återstående appar</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Inkludera alla återstående appar som inte routas av någon annan proxy</string>
+    <string name="lbl_idle" translatable="true">Inaktiv</string>
+    <string name="lbl_split" translatable="true">Delad</string>
+    <string name="lbl_on_device" translatable="true">på enheten</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Skyddad! Ansluten till DNS, brandvägg och proxy.</string>
+    <string name="settings_connectivity_checks" translatable="true">Utför anslutningskontroller</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Anslutningskontroller skickas för att fastställa nåbarhet.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Proxyanvänd aldrig DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Proxya inte DNS via alltid på-WireGuard, SOCKS5- eller HTTP-proxyer.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s är inaktiverat eftersom proxyservrar är aktiva</string>
+    <string name="lbl_unselected" translatable="true">Inte vald</string>
+    <string name="lbl_battery_optimization" translatable="true">Batterioptimering</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Inaktivera %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> kan orsaka förlorad anslutning. Ändra inställningen så att Rethink kan använda data och andra resurser i bakgrunden.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Appar för loopback-proxyvidarebefordran</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">När den är inaktiverad undantas appar som vidarebefordrar proxy (SOCKS5, HTTP, DNS) från Rethinks VPN-tunnel.</string>
+    <string name="exclude_apps_from_proxy">Kringgå app från alla proxyservrar</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Den här appen kringgår proxyservrar</string>
+    <string name="lbl_notification" translatable="true">Avisering</string>
+    <string name="memory_notification_text">Rethink har lite minne. Systemåtgärder kan vara begränsade.</string>
+    <string name="lbl_test" translatable="true">Test</string>
+    <string name="lbl_protos" translatable="true">protokoll</string>
+    <string name="lbl_experimental" translatable="true">(experimentellt)</string>
+    <string name="lbl_service_providers" translatable="true">Tjänsteleverantörer</string>
+    <string name="lbl_hop" translatable="true">Reläer</string>
+    <string name="lbl_manual" translatable="true">Manuell</string>
+    <string name="wireguard_title" translatable="true">Säkert internet med WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Kryptera internettrafiken med WireGuard. Välj olika rutter för olika appar.</string>
+    <string name="firewall_title" translatable="true">Skydda Android med brandvägg</string>
+    <string name="firewall_desc" translatable="true">Styr appars internetanvändning; begränsa anslutningar utifrån app- eller nätverksaktivitet.</string>
+    <string name="dns_title" translatable="true">Blockera annonser och skadlig programvara med DNS</string>
+    <string name="dns_desc" translatable="true">Välj bland fler än 190 listor för att stoppa annonser, spårare och skadlig programvara.</string>
+    <string name="status_no_network" translatable="true">inget nätverk</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Mät mobila nätverk</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Behandla endast mobila nätverk som nätverk med datatak, övriga som utan datatak.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Ljust plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Mörkt plus</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometrisk autentisering</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Ingen</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Omedelbart</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Efter 5 minuter</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Efter 15 minuter</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Du har använt Rethink i <b>%1$s dagar</b>, vilket motsvarar en användningskostnad på <b>$%2$s</b>. Vill du sponsra projektet för att stödja fortsatt utveckling?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Använd system-DNS för odelegerade domäner</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Använd system-DNS för odelegerade domäner som <i>.lan</i>, <i>.internal</i> och så vidare.</string>
+    <string name="dc_filtering_heading" translatable="true">Filtrering</string>
+    <string name="cd_split_dns_heading" translatable="true">Delad DNS (experimentellt)</string>
+    <string name="cd_split_dns_desc" translatable="true">Vidarebefordra DNS-förfrågningar från appar via proxy till proxyns DNS-servrar.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Blockera alla anslutningar till lokala värdar</string>
+    <string name="firewall_rule_private_dns" translatable="true">Privat DNS</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Kringgå proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">App pausad</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Proxy i låst läge</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Anslutningen söker efter en <i>privat DNS</i>-server som inte finns.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>källappen</i> är inställd på att <i>kringgå proxyregler</i>.<br><br> Ändra detta på skärmen <i>Appspecifik brandvägg</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Anslutningen tilläts eftersom <i>appen</i> är <i>pausad</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom WireGuard är i <i>låst</i> läge.<br><br> Ändra detta på skärmen <i>WireGuard</i>.]]></string>
+    <string name="wireguard_disable_failure_relay" translatable="true">”Relay WireGuard” kan inte stängas av</string>
+    <string name="config_invalid_desc" translatable="true">Ogiltig WireGuard-konfiguration</string>
+    <string name="console_log_title" translatable="true">Apploggar</string>
+    <string name="console_log_desc" translatable="true">Loggar kan innehålla känslig information.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Slumpa inte WireGuards lyssningsport</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Behåll WireGuards lyssningsportar fasta (utan slumpning) i avancerat läge.</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Mappning oberoende av slutpunkt</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">När detta är aktiverat behåller UDP-socklar en fast adress och port för alla mål.</string>
+    <string name="anti_censorship_title" translatable="true">Kringgå censur</string>
+    <string name="anti_censorship_desc" translatable="true">Välj bland olika tekniker för att kringgå censur.</string>
+    <string name="tcp_keep_alive_title" translatable="true">Kortare TCP-keepalive</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Stäng snabbt TCP-socklar utan ny aktivitet.</string>
+    <string name="ac_title" translatable="true">kringgå censur</string>
+    <string name="ac_desc" translatable="true">Verktyg för att kringgå censur kan ge internetfrihet, men fungerar kanske inte överallt. Används endast för anslutningar utan proxy.</string>
+    <string name="ac_never_split_desc" translatable="true">Ändra inte paket.</string>
+    <string name="ac_split_auto_desc" translatable="true">Ändra paket vid behov.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Ändra TCP-paket.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Ändra TCP- eller TLS-paket.</string>
+    <string name="ac_desync" translatable="true">Desynkronisering</string>
+    <string name="ac_desync_desc" translatable="true">Skicka lockbetespaket vid behov.</string>
+    <string name="ac_retry_options_title" translatable="true">strategi</string>
+    <string name="ac_retry_options_desc" translatable="true">Ställ in hur återförsök fungerar för censurerade anslutningar.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Försök aldrig igen med tekniker för att kringgå censur efter fel.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Använd tekniker för att kringgå censur vid behov.</string>
+    <string name="lbl_always" translatable="true">Alltid</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Använd alltid tekniker för att kringgå censur.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Välj ett alternativ för att kringgå censur för att välja strategi.</string>
+    <string name="exclude_no_package_err_toast" translatable="true">För att undanta appar krävs ett paketnamn.</string>
+    <string name="hop_error_toast_msg_1" translatable="true">Det går inte att reläa, redan %1$s</string>
+    <string name="hop_error_toast_msg_2" translatable="true">Ingen WireGuard tillgänglig för relä; lägg till fler.</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Det går inte att ändra läge när proxyservrar används. Tryck för att &lt;u&gt;redigera proxyinställningar&lt;/u&gt;.</string>
+    <string name="blocklist_not_available_toast" translatable="true">Hämta den senaste appversionen för att uppdatera blocklistor.</string>
+    <string name="lbl_ultra_secure" translatable="true">extra säkert</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Tidsgräns för inaktivitet</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Stäng inaktiva TCP- och UDP-socklar efter denna tid.</string>
+    <string name="no_stats_available" translatable="true">Ingen statistik</string>
+    <string name="hop_failure_toast" translatable="true">Reläfel: %1$s → %2$s</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">Endast mobilt</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Använd detta WireGuard-VPN via mobildata.</string>
+    <string name="hop_add_remove_title" translatable="true">Lägg till/ta bort relä</string>
+    <string name="about_terms_of_service" translatable="true">Användarvillkor</string>
+    <string name="bypasses_network_restrictions" translatable="true">Nåbarhetskontroller kringgår alla nätverksbegränsningar. I läget <i>Automatiskt</i> använder Rethink slumpmässigt tidigare anslutna IP-adresser och värdnamn.</string>
+    <string name="most_contacted_asn" translatable="true">Mest kontaktade leverantörer</string>
+    <string name="most_blocked_asn" translatable="true">Mest blockerade leverantörer</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">Ange paketnamn (kommaseparerade) som får starta eller stoppa Rethink.</string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Ange paketnamn (exempel: net.dinglisch.android.taskerm)</string>
+    <string name="download_ip_info_title" translatable="true">Visa leverantörsinformation</string>
+    <string name="download_ip_info_desc" translatable="true">Hämtar tjänsteleverantörsuppgifter för webbplatser från <i>rethinkdns.com</i>, med data från <i>%1$s</i></string>
+    <string name="adv_taster_title" translatable="true">Automatisering</string>
+    <string name="adv_taster_desc" translatable="true">Konfigurera appar som kan starta eller stoppa Rethink.</string>
+    <string name="top_active_conns" translatable="true">Mest aktiva anslutningar</string>
+    <string name="load_more" translatable="true">Läs in alla</string>
+    <string name="close_conns_dialog_title" translatable="true">Stäng anslutningar</string>
+    <string name="close_conns_dialog_desc" translatable="true">Stäng alla anslutningar för %1$s?</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Ta bort blocklistor på enheten?</string>
+    <string name="fail_open_network_title" translatable="true">Stoppa vid nätverksbortfall</string>
+    <string name="fail_open_network_desc" translatable="true">När detta är aktiverat stoppar Rethink all data när ingen anslutning finns, till exempel i <i>flygplansläge</i>.</string>
+    <string name="about_license" translatable="true">Licensierad under Apache-2.0</string>
+    <string name="close_all" translatable="true">Stäng alla</string>
+    <string name="smart_dns" translatable="true">Smart DNS</string>
+    <string name="processing_dialog_title" translatable="true">Bearbetar</string>
+    <string name="processing_dialog_desc" translatable="true">Vänta medan begäran bearbetas.</string>
+    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> använder slumpmässigt någon av dessa DNS-resolvrar:</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Inaktivera Endast mobilt eller SSID för att använda reläer</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Läget endast mobilt stöds inte för reläer</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Ta bort alla domänregler?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Om du tar bort dessa regler kan alla appar ansluta till de domäner som nu blockeras.</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Reagerar på viktiga ändringar av nätverk och anslutning.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Känslig</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Reagerar på alla ändringar av nätverk och anslutning.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Avslappnad</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reagerar på intressanta ändringar av anslutningen.</string>
+    <string name="vpn_policy_title" translatable="true">Princip för anslutningsändringar</string>
+    <string name="title_database_dump" translatable="true">Databas</string>
+    <string name="copied_clipboard" translatable="true">Kopierad</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Ta bort loggar för denna regel?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Detta tar bara bort nätverksloggar för brandväggsregeln som visas. Åtgärden kan inte ångras. Vill du fortsätta?</string>
+    <string name="lbl_default" translatable="true">Standard</string>
+    <string name="lbl_action" translatable="true">Åtgärd</string>
+    <string name="lbl_connect" translatable="true">Anslut</string>
+    <string name="lbl_criteria" translatable="true">Kriterier</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Proxyfel</string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Anslutningen blockerades eftersom den <i>proxy</i> som valts för appen inte är inställd.<br><br> Ändra detta under <i>Proxy</i> på skärmen <i>Konfigurera</i>.]]></string>
+    <string name="vpn_policy_fixed" translatable="true">Försiktig</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reagerar minimalt på nätverksändringar.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Endast Wi-Fi</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Aktivera detta WireGuard-VPN endast när det är anslutet till Wi-Fi eller till en av de angivna Wi-Fi-identifierarna (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink behöver platsbehörighet för att komma åt Wi-Fi-identifierare (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">Slå på platstjänster för att komma åt Wi-Fi-identifierare (%1$s).</string>
+    <string name="ssid_location_error" translatable="true">Aktivera platstjänster</string>
+    <string name="ssid_permission_error_action" translatable="true">Bevilja behörighet</string>
+    <string name="ssid_location_error_action" translatable="true">Aktivera plats</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Det går inte att använda både %1$s och %2$s</string>
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s detta WireGuard-VPN när Wi-Fi-identifieraren (%2$s) är <i>aktiv</i> %3$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Ange Wi-Fi-identifierare (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Matchar exakt</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Matchar delvis</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi-identifierare (%1$s) får högst vara 32 tecken.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Ta bort %1$s?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Stabilitetsprogram</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Samla felrapporter för att bidra till bättre stabilitet.</string>
+    <string name="tombstone_app_title" translatable="true">Kom ihåg avinstallerade appar</string>
+    <string name="tombstone_app_desc" translatable="true">När detta är aktiverat behålls appregler i sju dagar.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Systemstandard</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">När detta är aktiverat tillåts inkommande anslutningar som initieras av WireGuard-peers.</string>
+    <string name="lockdown_download_message" translatable="true">Androids inbyggda <i>Hämtningshanterare</i> kan misslyckas eftersom VPN är i <i>låst</i> läge. Aktivera Rethinks hämtare i stället?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Aktivera hämtare</string>
+    <string name="settings_jumbo_packets" translatable="true">Bandbreddsaccelerator</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Använder <i>jumbopaket</i> i Rethinks VPN-tunnel.</string>
+    <string name="settings_tunnel_metered" translatable="true">Alltid med datatak</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Markera Rethinks VPN-tunnel som ett nätverk med datatak för att uppmuntra appar att använda mindre data. Observera: Detta kan få appar att pausa stora uppladdningar och hämtningar, till exempel säkerhetskopior.</string>
+    <string name="stability_program_toast" translatable="true">Ansluten till <i>stabilitetsprogrammet</i> för <i>experimentella funktioner</i>.</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">Automatiskt (alla typer)</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink behöver behörighet för att konfigurera ett lokalt VPN och därmed kryptera enhetens DNS-förfrågningar, övervaka nätverk och tillämpa brandväggsregler.\n\nWi-Fi-baserad proxyautomatisering kräver platsbehörighet för att identifiera det anslutna Wi-Fi-nätverket (SSID). Behörigheten begärs bara när du aktiverar funktionen.\n\nRethink samlar inte in information och övervakar dig inte på något sätt.</string>
+    <string name="stability_program_snackbar_msg" translatable="true">Stabilitetsprogram aktiverat</string>
+    <string name="stability_program_snackbar_disable" translatable="true">Ångra</string>
+    <plurals name="server_count">
+        <item quantity="one">%1$d plats</item>
+        <item quantity="other">%1$d platser</item>
+    </plurals>
+    <plurals name="peer_count">
+        <item quantity="one">%d peer</item>
+        <item quantity="other">%d peers</item>
+    </plurals>
 </resources>
