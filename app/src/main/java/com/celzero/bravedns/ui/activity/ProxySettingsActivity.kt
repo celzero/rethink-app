@@ -356,6 +356,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
         val dialog = builder.create()
         dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun launchOrbotWebsite() {
@@ -977,6 +978,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             dialog.dismiss()
         }
         dialog.show()
+        // Cap to 600dp on expanded windows; the MATCH_PARENT width set above would
+        // otherwise stretch the dialog edge-to-edge on foldables/tablets.
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun handleProxyUi() {
@@ -1032,6 +1036,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
+        // Cap to 600dp on expanded windows; the MATCH_PARENT width set above would
+        // otherwise stretch the dialog edge-to-edge on foldables/tablets.
+        UIUtils.capDialogWidth(dialog)
 
         val headerTxt: TextView = dialogBinding.dialogProxyHeader
         val headerDesc: TextView = dialogBinding.dialogProxyHeaderDesc

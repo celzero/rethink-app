@@ -1086,7 +1086,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                     if (isBoth) {
                         b.fhsCardOtherProxyCount.isSelected = true
-                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.two_argument, getString(R.string.lbl_wireguard), getString(R.string.rpn_title)))
+                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.two_argument, getString(R.string.rpn_title), getString(R.string.lbl_wireguard)))
                     } else {
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
@@ -2021,7 +2021,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun isRestrictBackgroundActive(context: Context): Boolean {
@@ -2064,7 +2066,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             openVpnProfile(requireContext())
         }
 
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun openBottomSheet() {
@@ -2100,7 +2104,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             // no-op
         }
 
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     override fun onResume() {
@@ -2422,7 +2428,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun startAppsActivity() {
@@ -2647,7 +2655,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->
             // no-op
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun registerForActivityResult() {
@@ -2756,7 +2766,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op; the VPN remains disabled until the user grants the permission and starts it.
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     // Sets the UI DNS status on/off.
