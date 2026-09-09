@@ -112,6 +112,11 @@ object VpnController : KoinComponent {
         // if the tunnel has the go-adapter then there's nothing to do
         if (b?.hasTunnel() == true) {
             Logger.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
+            // actually resend the vpn enabled state: the persisted flag can be
+            // false after a crash (which skips onDestroy). Without this the
+            // tile and the home screen keep showing the VPN as off even though
+            // the tunnel is up.
+            persistentState.setVpnEnabled(true)
             return
         }
         // below check is to avoid multiple calls to start the vpn when always-on is enabled
@@ -145,7 +150,12 @@ object VpnController : KoinComponent {
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         vpnState = null
         onConnectionStateChanged(null)
-        rvpn?.signalStopService(reason, userInitiated)
+        val b = rvpn
+        if (b == null) {
+            persistentState.setVpnEnabled(false)
+            return
+        }
+        b.signalStopService(reason, userInitiated)
     }
 
     @Suppress("DEPRECATION")
@@ -320,11 +330,11 @@ object VpnController : KoinComponent {
 
         t =
             if (b.underlyingNetworks?.isActiveNetworkMetered == true) {
-                b.getString(R.string.ada_app_metered).toString()
+                b.getString(R.string.ada_app_metered)
             } else {
                 // the network type is shown as unmetered even when rethink cannot determine
                 // the underlying network / no underlying network
-                b.getString(R.string.ada_app_unmetered).toString()
+                b.getString(R.string.ada_app_unmetered)
             }
         return t
     }

@@ -24,12 +24,10 @@ import com.celzero.bravedns.wireguard.BadConfigException.Reason
 import com.celzero.bravedns.wireguard.BadConfigException.Section
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.WgKey
-import inet.ipaddr.IPAddressString
 import java.util.Collections
 import java.util.Locale
 import java.util.Objects
 import java.util.Optional
-import java.util.function.Consumer
 
 /**
  * Represents the configuration for a WireGuard peer (a [Peer] block). Peers must have a public key,
@@ -40,8 +38,11 @@ import java.util.function.Consumer
 class Peer private constructor(builder: Builder) {
     val id: Int = 0
     private val allowedIps: Set<InetNetwork>
-    private val endpoint: Optional<InetEndpoint>
-    private val unresolvedEndpoint: Optional<String>
+
+    /**
+     * The peer endpoint as the raw `host:port` text. this is not resolved on the JVM side.
+     */
+    private val endpoint: Optional<String>
 
     /**
      * Returns the peer's persistent keepalive.
@@ -58,7 +59,6 @@ class Peer private constructor(builder: Builder) {
         allowedIps =
             Collections.unmodifiableSet(LinkedHashSet<Any?>(builder.allowedIps)) as Set<InetNetwork>
         endpoint = builder.endpoint
-        unresolvedEndpoint = builder.unresolvedEndpoint
         persistentKeepalive = builder.persistentKeepalive
         preSharedKey = builder.preSharedKey
         publicKey = Objects.requireNonNull(builder.publicKey, "Peers must have a public key")!!
@@ -69,7 +69,6 @@ class Peer private constructor(builder: Builder) {
         if (obj !is Peer) return false
         return allowedIps == obj.allowedIps &&
                 endpoint == obj.endpoint &&
-                unresolvedEndpoint == obj.unresolvedEndpoint &&
                 persistentKeepalive == obj.persistentKeepalive &&
                 preSharedKey == obj.preSharedKey &&
                 publicKey == obj.publicKey
@@ -86,16 +85,12 @@ class Peer private constructor(builder: Builder) {
     }
 
     /**
-     * Returns the peer's endpoint.
+     * Returns the peer's endpoint as `host:port` text.
      *
      * @return the endpoint, or `Optional.empty()` if none is configured
      */
-    fun getEndpoint(): Optional<InetEndpoint> {
+    fun getEndpoint(): Optional<String> {
         return endpoint
-    }
-
-    fun getEndpointText(): Optional<String> {
-        return unresolvedEndpoint
     }
 
     /**
@@ -120,7 +115,6 @@ class Peer private constructor(builder: Builder) {
         var hash = 1
         hash = 31 * hash + allowedIps.hashCode()
         hash = 31 * hash + endpoint.hashCode()
-        hash = 31 * hash + unresolvedEndpoint.hashCode()
         hash = 31 * hash + persistentKeepalive.hashCode()
         hash = 31 * hash + preSharedKey.hashCode()
         hash = 31 * hash + publicKey.hashCode()
@@ -136,9 +130,7 @@ class Peer private constructor(builder: Builder) {
     override fun toString(): String {
         val sb = StringBuilder("(Peer ")
         sb.append(publicKey.base64())
-        endpoint.ifPresent(
-            Consumer<InetEndpoint> { ep: InetEndpoint? -> sb.append(" @").append(ep) }
-        )
+        endpoint.ifPresent { ep: String? -> sb.append(" @").append(ep) }
         sb.append(')')
         return sb.toString()
     }
@@ -152,20 +144,13 @@ class Peer private constructor(builder: Builder) {
         val sb = StringBuilder()
         if (allowedIps.isNotEmpty())
             sb.append("AllowedIPs = ").append(Attribute.join(allowedIps)).append('\n')
-        endpoint.ifPresent(
-            Consumer<InetEndpoint> { ep: InetEndpoint? ->
-                sb.append("Endpoint = ").append(ep).append('\n')
-            }
-        )
-        unresolvedEndpoint.ifPresent { sb.append("Endpoint = ").append(it).append('\n') }
+        endpoint.ifPresent { ep: String? -> sb.append("Endpoint = ").append(ep).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("PersistentKeepalive = ").append(pk).append('\n')
         }
-        preSharedKey.ifPresent(
-            Consumer<WgKey> { psk: WgKey ->
-                sb.append("PreSharedKey = ").append(psk.base64()).append('\n')
-            }
-        )
+        preSharedKey.ifPresent { psk: WgKey ->
+            sb.append("PreSharedKey = ").append(psk.base64()).append('\n')
+        }
         sb.append("PublicKey = ").append(publicKey.base64()).append('\n')
         return sb.toString()
     }
@@ -187,20 +172,14 @@ class Peer private constructor(builder: Builder) {
         } else {
             for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
         }
-        if (endpoint.isPresent) {
-            endpoint.get().getResolved().ifPresent { ep ->
-                sb.append("endpoint=").append(ep).append('\n')
-            }
-        }
-        unresolvedEndpoint.ifPresent { sb.append("endpoint=").append(it).append('\n') }
+        // the endpoint is passed as-is; the go layer resolves the host, if needed.
+        endpoint.ifPresent { ep: String? -> sb.append("endpoint=").append(ep).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }
-        preSharedKey.ifPresent(
-            Consumer<WgKey> { psk: WgKey ->
-                sb.append("preshared_key=").append(psk.hex()).append('\n')
-            }
-        )
+        preSharedKey.ifPresent { psk: WgKey ->
+            sb.append("preshared_key=").append(psk.hex()).append('\n')
+        }
         return sb.toString()
     }
 
@@ -213,11 +192,8 @@ class Peer private constructor(builder: Builder) {
         // Defaults to an empty set.
         val allowedIps: MutableSet<InetNetwork> = LinkedHashSet<InetNetwork>()
 
-        // Defaults to not present.
-        var endpoint: Optional<InetEndpoint> = Optional.empty<InetEndpoint>()
-
-        // Defaults to not present.
-        var unresolvedEndpoint: Optional<String> = Optional.empty<String>()
+        // Defaults to not present. Maintained as `host:port` text; never resolved on the JVM side.
+        var endpoint: Optional<String> = Optional.empty<String>()
 
         // Defaults to not present.
         var persistentKeepalive = Optional.empty<Int>()
@@ -265,27 +241,10 @@ class Peer private constructor(builder: Builder) {
         @Throws(BadConfigException::class)
         fun parseEndpoint(endpoint: String): Builder {
             return try {
-                setEndpoint(InetEndpoint.parse(endpoint))
-                // add the domain name to the unresolved endpoint
-                parseUnresolvedEndpoint(endpoint)
+                // validate the endpoint text, no resolution is done here.
+                setEndpoint(InetEndpoint.parse(endpoint).toString())
             } catch (e: ParseException) {
                 throw BadConfigException(Section.PEER, Location.ENDPOINT, e)
-            }
-        }
-
-        @Throws(BadConfigException::class)
-        fun parseUnresolvedEndpoint(d: String): Builder {
-            return try {
-                if (d.isEmpty()) return this
-
-                val ip = IPAddressString(d)
-                if (ip.isIPv4 || ip.isIPv6) return this
-
-                setUnresolvedEndpoint(d)
-                this
-            } catch (e: Exception) {
-                setUnresolvedEndpoint(d)
-                this
             }
         }
 
@@ -323,13 +282,8 @@ class Peer private constructor(builder: Builder) {
             }
         }
 
-        fun setEndpoint(endpoint: InetEndpoint): Builder {
-            this.endpoint = Optional.of<InetEndpoint>(endpoint)
-            return this
-        }
-
-        fun setUnresolvedEndpoint(endpointText: String): Builder {
-            this.unresolvedEndpoint = Optional.of<String>(endpointText)
+        fun setEndpoint(endpointText: String): Builder {
+            this.endpoint = Optional.of<String>(endpointText)
             return this
         }
 
@@ -369,7 +323,7 @@ class Peer private constructor(builder: Builder) {
          * input is not well-formed or contains unknown attributes.
          *
          * @param lines an iterable sequence of lines, containing at least a public key attribute
-         * @return a `Peer` with all of its attributes set from `lines`
+         * @return a `Peer` with all its attributes set from `lines`
          */
         @Throws(BadConfigException::class)
         fun parse(lines: Iterable<CharSequence?>): Peer {

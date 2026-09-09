@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
@@ -103,12 +104,16 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val timestamp = inputData.getLong("blocklistTimestamp", 0)
 
             if (runAttemptCount > MAX_RETRY_COUNT) {
-                Logger.w(LOG_TAG_DOWNLOAD, "Local blocklist download failed after $MAX_RETRY_COUNT attempts")
+                val msg = context.getString(R.string.download_err_internal)
+                Logger.w(LOG_TAG_DOWNLOAD, "Max retries reached: $runAttemptCount")
+                persistentState.lastDownloadFailureReason = msg
                 return Result.failure()
             }
 
             if (SystemClock.elapsedRealtime() - startTime > BLOCKLIST_DOWNLOAD_TIMEOUT_MS) {
-                Logger.w(LOG_TAG_DOWNLOAD, "Local blocklist download timeout")
+                val msg = context.getString(R.string.download_err_network)
+                Logger.w(LOG_TAG_DOWNLOAD, "Timeout reached")
+                persistentState.lastDownloadFailureReason = msg
                 return Result.failure()
             }
 
@@ -117,8 +122,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                     if (isDownloadCancelled()) {
                         Logger.i(LOG_TAG_DOWNLOAD, "Local blocklist download cancelled")
                         notifyDownloadCancelled(context)
+                    } else {
+                        Logger.i(LOG_TAG_DOWNLOAD, "Local blocklist download failed")
                     }
-                    Logger.i(LOG_TAG_DOWNLOAD, "Local blocklist download failed")
                     Result.failure()
                 }
                 true -> {
@@ -136,14 +142,12 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             )
             notifyDownloadCancelled(context)
         } catch (ex: Exception) {
-            Logger.e(
-                LOG_TAG_DOWNLOAD,
-                "Local blocklist download, received cancellation exception: ${ex.message}",
-                ex
-            )
+            val msg = context.getString(R.string.download_err_internal)
+            Logger.e(LOG_TAG_DOWNLOAD, msg, ex)
+            persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
         } finally {
-            clear()
+            clear(inputData.getLong("blocklistTimestamp", 0))
         }
         return Result.failure()
     }
@@ -153,11 +157,14 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val file = makeTempDownloadDir(timestamp)
 
         if (file == null) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Error creating temp folder for download")
+            val msg = context.getString(R.string.download_err_storage)
+            Logger.e(LOG_TAG_DOWNLOAD, "Error creating temp folder")
+            persistentState.lastDownloadFailureReason = msg
             return false
         }
 
-        Constants.ONDEVICE_BLOCKLISTS_IN_APP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
+        val totalFiles = Constants.ONDEVICE_BLOCKLISTS_IN_APP.size
+        Constants.ONDEVICE_BLOCKLISTS_IN_APP.forEachIndexed { index, onDeviceBlocklistsMetadata ->
             val id = generateCustomDownloadId()
 
             downloadStatuses[id] = DownloadStatus.RUNNING
@@ -173,25 +180,43 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 return false
             }
 
-            when (startFileDownload(context, onDeviceBlocklistsMetadata.url, filePath)) {
+            // Overall progress = (completed files) / total
+            val initialProgress = (index * 100 / totalFiles)
+            setProgress(workDataOf("progress" to initialProgress))
+            // keep the notification's progress bar in sync at file boundaries too, so it
+            // doesn't sit frozen at the previous file's percentage while the next file's
+            // download connection is still being established
+            updateProgress(context, initialProgress)
+
+            when (startFileDownload(context, onDeviceBlocklistsMetadata.url, filePath, index, totalFiles)) {
                 true -> {
                     Logger.i(LOG_TAG_DOWNLOAD, "Download successful for id: $id")
                     downloadStatuses[id] = DownloadStatus.SUCCESSFUL
                 }
                 false -> {
-                    Logger.e(LOG_TAG_DOWNLOAD, "Download failed for id: $id")
+                    val msg = context.getString(R.string.download_err_network)
+                    Logger.e(LOG_TAG_DOWNLOAD, "Download failed for ${onDeviceBlocklistsMetadata.filename}")
+                    persistentState.lastDownloadFailureReason = msg
                     downloadStatuses[id] = DownloadStatus.FAILED
                     return false
                 }
             }
         }
+
+        // final progress before processing
+        setProgress(workDataOf("progress" to 100))
+        updateProgress(context, 100)
+
+        // transition to processing
+        setProgress(workDataOf("processing" to true))
+        notifyProcessing(context)
+
         // check if all the files are downloaded, as of now the check if for only number of files
         // downloaded. TODO: Later add checksum matching as well
         if (!isDownloadComplete(file)) {
-            Logger.e(
-                LOG_TAG_DOWNLOAD,
-                "Local blocklist validation failed for timestamp: $timestamp"
-            )
+            val msg = context.getString(R.string.download_err_validation)
+            Logger.e(LOG_TAG_DOWNLOAD, "Verification failed (files missing)")
+            persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
             return false
         }
@@ -199,7 +224,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         if (isDownloadCancelled()) return false
 
         if (!moveLocalBlocklistFiles(context, timestamp)) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Issue while moving the downloaded files: $timestamp")
+            val msg = context.getString(R.string.download_err_storage)
+            Logger.e(LOG_TAG_DOWNLOAD, "Error moving downloaded files")
+            persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
             return false
         }
@@ -207,7 +234,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         if (isDownloadCancelled()) return false
 
         if (!isLocalBlocklistDownloadValid(context, timestamp)) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Invalid download for local blocklist files: $timestamp")
+            val msg = context.getString(R.string.download_err_validation)
+            Logger.e(LOG_TAG_DOWNLOAD, "Verification failed (checksum mismatch)")
+            persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
             return false
         }
@@ -216,7 +245,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
         val result = updateTagsToDb(timestamp)
         if (!result) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Invalid download for local blocklist files: $timestamp")
+            val msg = context.getString(R.string.download_err_internal)
+            Logger.e(LOG_TAG_DOWNLOAD, "Database update failed")
+            persistentState.lastDownloadFailureReason = msg
             notifyDownloadFailure(context)
             return false
         }
@@ -256,6 +287,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         context: Context,
         urlPath: String,
         filePath: String,
+        fileIndex: Int,
+        totalFiles: Int,
         retryCount: Int = 0
     ): Boolean {
         // enable the OkHttp's logging only in debug mode for testing
@@ -269,19 +302,23 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             Logger.i(LOG_TAG_DOWNLOAD, "Downloading file: $filePath, urlPath: $urlPath")
             val response = retrofit.downloadLocalBlocklistFile(urlPath, persistentState.appVersion, "")
             if (response?.isSuccessful == true) {
-                return downloadFile(context, response.body(), filePath)
+                return downloadFile(context, response.body(), filePath, fileIndex, totalFiles)
             } else {
                 Logger.e(
                     LOG_TAG_DOWNLOAD,
                     "Error in startFileDownload: ${response?.message()}, code: ${response?.code()}"
                 )
             }
+        } catch (e: CancellationException) {
+            // never swallow cooperative cancellation; rethrow so WorkManager marks the
+            // worker CANCELLED instead of mislabelling it as a network failure
+            throw e
         } catch (e: Exception) {
             Logger.e(LOG_TAG_DOWNLOAD, "Error in startFileDownload: ${e.message}", e)
         }
         return if (isRetryRequired(retryCount)) {
             Logger.i(LOG_TAG_DOWNLOAD, "retrying download($urlPath) $filePath, count: $retryCount")
-            startFileDownload(context, urlPath, filePath, retryCount + 1)
+            startFileDownload(context, urlPath, filePath, fileIndex, totalFiles, retryCount + 1)
         } else {
             Logger.i(LOG_TAG_DOWNLOAD, "download failed for $filePath, retry: $retryCount")
             false
@@ -293,7 +330,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         return retryCount < MAX_RETRY_COUNT
     }
 
-    private fun downloadFile(context: Context, body: ResponseBody?, fileName: String): Boolean {
+    private suspend fun downloadFile(context: Context, body: ResponseBody?, fileName: String, fileIndex: Int, totalFiles: Int): Boolean {
         if (body == null) {
             return false
         }
@@ -308,7 +345,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             // file size and download percentage
             var bytesRead: Int
             val contentLength = body.contentLength()
-            val expectedMB: Double = contentLength / BYTES_PER_MB
+            val expectedMB: Double = if (contentLength > 0) contentLength / BYTES_PER_MB else 0.0
             var downloadedMB = 0.0
             input = BufferedInputStream(body.byteStream(), BUFFERED_INPUT_STREAM_SIZE)
             val startMs = SystemClock.elapsedRealtime()
@@ -317,11 +354,20 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             while (input.read(buf).also { bytesRead = it } != -1) {
                 val elapsedMs = SystemClock.elapsedRealtime() - startMs
                 downloadedMB += bytesToMB(bytesRead)
-                val progress =
-                    if (contentLength == Long.MAX_VALUE || expectedMB == 0.0) 0
-                    else (downloadedMB * NOTIFICATION_PROGRESS_MAX / expectedMB).toInt()
+
+                val fileProgress =
+                    if (expectedMB <= 0.0) 0
+                    else (downloadedMB * 100 / expectedMB).toInt().coerceIn(0, 100)
+
+                // Overall progress = (completed files + fraction of current file) / total
+                val overallProgress = (((fileIndex.toDouble() * 100) + fileProgress) / totalFiles).toInt()
+
                 if (elapsedMs >= progressJumpsMs) {
-                    updateProgress(context, progress)
+                    // notification must reflect the overall (all-files) progress, not just
+                    // the current file's, otherwise the progress bar/percentage resets back
+                    // towards 0% every time a new file starts downloading
+                    updateProgress(context, overallProgress)
+                    setProgress(workDataOf("progress" to overallProgress))
                     // increase the next update duration linearly by another sec; ie,
                     // update in the intervals of once every [1, 2, 3, 4, ...] secs
                     progressJumpsMs += PROGRESS_UPDATE_INTERVAL_MS
@@ -331,6 +377,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             output.flush()
             Logger.i(LOG_TAG_DOWNLOAD, "$fileName > ${downloadedMB}MB downloaded")
             return true
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.e(LOG_TAG_DOWNLOAD, "$fileName download err: ${e.message}", e)
         } finally {
@@ -508,10 +556,30 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun updateProgress(context: Context, progress: Int) {
         val builder = getBuilder(context)
-        val cur = if (progress <= 0) 0 else progress
-        val max = if (cur <= 0) 0 else NOTIFICATION_PROGRESS_MAX
+        // clamp defensively: rounding in the overall-progress computation could otherwise
+        // push this a hair past 100 on the last tick of the last file
+        val cur = progress.coerceIn(0, NOTIFICATION_PROGRESS_MAX)
         val forever = cur <= 0
+        val max = if (forever) 0 else NOTIFICATION_PROGRESS_MAX
+        // surface the percentage as text as well, since the progress bar alone isn't a
+        // reliable indicator of percent-complete across all devices/launchers
+        val contentText = context.getString(R.string.notif_download_progress_content, cur)
+        builder
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.setProgress(max, cur, forever)
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+    }
+
+    private fun notifyProcessing(context: Context) {
+        val builder = getBuilder(context)
+        val contentText = context.getString(R.string.notif_download_processing_content)
+        builder
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        // indeterminate spinner while files are being verified/validated
+        builder.setProgress(0, 0, true)
         getNotificationManager(context)
             .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
@@ -564,8 +632,17 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
-    private fun clear() {
+    private fun clear(timestamp: Long) {
         downloadStatuses.clear()
+        // deleteBlocklistResidue() is a no-op when localBlocklistTimestamp is still
+        // INIT_TIME_MS (ie, no download has ever succeeded). That guard would otherwise
+        // leave this attempt's own temp dir (tempDownloadBasePath, "-timestamp") behind
+        // forever on a first-ever failed download, so always delete it explicitly here.
+        if (timestamp > INIT_TIME_MS) {
+            Utilities.deleteRecursive(
+                File(tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
+            )
+        }
         BlocklistDownloadHelper.deleteBlocklistResidue(
             context,
             LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,

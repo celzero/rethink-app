@@ -1043,7 +1043,6 @@
     <string name="radio_max_btn" translatable="true">🪂 Max</string>
     <string name="wireguard_disclaimer" translatable="true">DNS를 %1$s에 포워딩했습니다.</string>
     <string name="brbs_backup_restore_desc" translatable="true">앱 버전이 다르면 호환되지 않습니다</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s 기능은 Rethink의 DNS에서만 동작합니다</string>
     <string name="wireguard_enabled_failure" translatable="true">WireGuard를 켜려면 다른 모든 프록시를 중단하세요</string>
     <string name="crypt_adguard_desc" translatable="true">악성코드 등으로부터 기기를 보호합니다.</string>
     <string name="crypt_adguard_family_desc" translatable="true">세이프서치 및 성인 콘텐츠 차단 기능을 탑재한 Adguard DNS입니다.</string>

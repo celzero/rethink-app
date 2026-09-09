@@ -73,7 +73,7 @@ class WgAddPeerDialog(
             }
             b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
             if (wgPeer.getEndpoint().isPresent) {
-                b.peerEndpoint.setText(wgPeer.getEndpoint().get().toString())
+                b.peerEndpoint.setText(wgPeer.getEndpoint().get())
             }
             if (wgPeer.persistentKeepalive.isPresent) {
                 val kas = wgPeer.persistentKeepalive.get()
@@ -191,6 +191,8 @@ class WgAddPeerDialog(
     }
 
     private fun ui(f: suspend () -> Unit) {
+        if (activity.isFinishing || activity.isDestroyed) return
+
         (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 

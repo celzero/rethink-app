@@ -33,12 +33,11 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.EntitlementDetailViewModel
 import com.celzero.firestack.backend.RpnEntitlement
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
-class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
+class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
     private var _b: BottomsheetEntitlementDetailBinding? = null
     private val b get() = checkNotNull(_b) { "Binding accessed outside of view lifecycle" }
 
@@ -229,13 +228,6 @@ class EntitlementDetailBottomSheet : BottomSheetDialogFragment() {
         compareAndSet(b.rowTest, "Is Test", test1.capitalizeWords(), test2?.capitalizeWords(), valuesEqual(test1, test2), showDivider = false)
 
         b.restoreCv.visibility = if (canRestore) View.VISIBLE else View.GONE
-
-        if (everythingSame && activeEntitlement != null) {
-            b.tvComparisonInfo.text = getString(R.string.unicode_check_sign)
-            b.tvComparisonInfo.visibility = View.VISIBLE
-        } else {
-            b.tvComparisonInfo.visibility = View.GONE
-        }
     }
 
     /**

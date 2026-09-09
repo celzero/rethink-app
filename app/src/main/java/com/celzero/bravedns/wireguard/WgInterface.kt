@@ -792,13 +792,9 @@ class WgInterface private constructor(builder: Builder) {
                     "h2" -> builder.parseH2(attribute.value)
                     "h3" -> builder.parseH3(attribute.value)
                     "h4" -> builder.parseH4(attribute.value)
-                    else ->
-                        throw BadConfigException(
-                            Section.INTERFACE,
-                            Location.TOP_LEVEL,
-                            Reason.UNKNOWN_ATTRIBUTE,
-                            attribute.key
-                        )
+                    // no-op, some wg config has extra params which is ignored, instead of
+                    // throwing unknown param error
+                    else -> {}
                 }
             }
             return builder.build()

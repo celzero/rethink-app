@@ -86,6 +86,11 @@ class SubscriptionCheckWorker(
      */
     private suspend fun checkAndRegisterDeviceIfNeeded() {
         val name = "checkAndRegisterDeviceIfNeeded"
+        // Single-flight: RpnProxyUpdateWorker runs its own copy of this check and also
+        // enqueues this worker in the same doWork() pass. Coalesce overlapping runs so
+        // concurrent reconciles cannot race into minting duplicate DIDs
+        // (two POST /d/reg at the same second).
+        if (!DeviceRegistrationGuard.tryBegin(name)) return
         try {
             val storedAccountId = billingBackendClient.getAccountId()
             val storedDeviceId = billingBackendClient.getDeviceId()
@@ -155,6 +160,8 @@ class SubscriptionCheckWorker(
 
         } catch (e: Exception) {
             Logger.w(LOG_IAB, "$TAG; $name: error reg dev: ${e.message}")
+        } finally {
+            DeviceRegistrationGuard.end(name)
         }
     }
 

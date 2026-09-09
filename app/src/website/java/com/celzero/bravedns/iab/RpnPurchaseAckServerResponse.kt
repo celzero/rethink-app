@@ -242,6 +242,17 @@ data class ResponseErr(
     val isSubscriptionExpired: Boolean
         get() = state == "SUBSCRIPTION_STATE_EXPIRED"
 
+    /**
+     * True when the server authoritatively refused entitlement for this purchase token
+     * (one-time purchases report cancellation via error/state, not status). A present
+     * [linkedPurchaseId] means the purchase was superseded, not dead — callers must
+     * attempt reactivation instead of expiring.
+     */
+    val isPurchaseCancelled: Boolean
+        get() = linkedPurchaseId.isNullOrBlank() &&
+            (error.equals("purchase cancelled", ignoreCase = true) ||
+                state?.startsWith("CANCELLED", ignoreCase = true) == true)
+
     override fun toString(): String =
         "PlayErr(http=$httpCode, error='$error', state=$state, status=$status, sku=$sku, ray=$ray)"
 }

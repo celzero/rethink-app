@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inactive quick-settings tile fill: the theme's muted foreground colour at
+     ~12% alpha, exactly how Android 12+ renders off-state QS tiles (a subtle
+     dim circle that stays visible on both light and dark backgrounds without
+     needing per-theme colours). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.12" android:color="?attr/primaryLightColorText" />
+</selector>

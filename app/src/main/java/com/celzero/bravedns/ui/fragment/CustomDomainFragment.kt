@@ -189,7 +189,6 @@ class CustomDomainFragment :
 
         // Import FAB is only shown and wired up in DEBUG builds.
         // The FAB itself is GONE in XML; this block also stays dead-code in release builds
-        // so ProGuard/R8 can strip it entirely.
         if (DEBUG) {
             b.cdaImportFab.visibility = View.VISIBLE
             b.cdaImportFab.setOnClickListener {
@@ -253,7 +252,7 @@ class CustomDomainFragment :
         val dialog = builder.create()
         dialog.show()
         lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
@@ -316,6 +315,7 @@ class CustomDomainFragment :
         }
 
         dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+        Utilities.adjustButtonLayoutOrientation(dBind.dacdButtonsContainer)
         dialog.show()
     }
 
@@ -535,7 +535,11 @@ class CustomDomainFragment :
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }
 

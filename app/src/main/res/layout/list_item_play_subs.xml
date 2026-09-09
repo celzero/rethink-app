@@ -1,30 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/plan_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="1dp"
-    app:strokeWidth="0dp"
-    app:strokeColor="@android:color/transparent"
-    app:cardBackgroundColor="?attr/background">
+    android:padding="4dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/selection_border_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
+
+        <View
+            android:id="@+id/animated_border_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/premium_border_gradient"
+            android:scaleX="2.0"
+            android:scaleY="2.0" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/plan_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1.5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="?attr/background"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="?attr/accentGood"
-            tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,9 +66,8 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/plan_duration"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -54,7 +79,9 @@
                     android:id="@+id/savings_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chip_bg_positive"
+                    android:background="@drawable/rectangle_border_sharp_background"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp"
                     android:paddingTop="1dp"
@@ -82,17 +109,6 @@
                 tools:text="₹1,700" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/original_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/secondaryTextColor"
-                android:alpha="0.6"
-                android:textSize="12sp"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="₹2,100" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/billing_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,18 +118,6 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 tools:text="Cancel anytime" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/price_per_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="?attr/accentGood"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="₹141 / mo" />
 
         </LinearLayout>
     </LinearLayout>
@@ -150,4 +154,6 @@
             android:visibility="gone" />
     </LinearLayout>
 
-</com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,7 +32,6 @@ import com.celzero.bravedns.databinding.ItemRemovedServerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 /**
@@ -43,7 +42,7 @@ import org.koin.android.ext.android.inject
  * - List of removed servers with details
  * - Professional notification experience
  */
-class ServerRemovalNotificationBottomSheet : BottomSheetDialogFragment() {
+class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetServerRemovalNotificationBinding? = null
     private val binding

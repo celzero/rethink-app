@@ -91,65 +91,51 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/wg_include_app_select_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/wg_include_app_dialog_search_layout"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/wg_include_app_select_all_text"
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/wg_include_app_bulk_check"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/wg_include_app_select_all_checkbox"
-            android:fontFamily="sans-serif-smallcaps"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="4dp"
             android:text="@string/lbl_select_all"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textSize="13sp"
+            app:buttonIconTint="?attr/accentGood" />
 
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/wg_include_app_select_all_checkbox"
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/wg_include_app_deselect_all_check"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:buttonTint="?attr/accentGood"
-            android:foregroundTint="?attr/accentGood" />
-    </RelativeLayout>
+            android:layout_marginStart="16dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="4dp"
+            android:text="@string/lbl_unselect_all"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="13sp"
+            app:buttonIconTint="?attr/accentBad" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/wg_include_app_recycler_view_dialog"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/wg_include_app_dialog_ok_button"
         android:layout_below="@id/wg_include_app_select_all"
         android:clickable="true"
         android:focusable="true" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/wg_include_app_dialog_ok_button"
-        style="@style/Widget.Material3.Button.TextButton.Dialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:text="@string/ada_noapp_dialog_positive"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/wg_remaining_apps_btn"
-        style="@style/Widget.Material3.Button.TextButton.Dialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:text="@string/lbl_remaining_apps"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view" />
 
 </RelativeLayout>

@@ -27,7 +27,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastT
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import java.io.Serializable
 
@@ -35,7 +34,7 @@ import java.io.Serializable
  * Bottom sheet for displaying purchase processing states
  * Provides visual feedback during subscription purchase, activation, and completion
  */
-class PurchaseProcessingBottomSheet : BottomSheetDialogFragment() {
+class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetPurchaseProcessingBinding? = null
     private val binding

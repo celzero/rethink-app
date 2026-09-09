@@ -9,23 +9,19 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="@drawable/bg_glass"
-        android:elevation="0dp"
-        android:fitsSystemWindows="true"
-        app:elevation="0dp">
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_plus_hero_gradient"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_vpn_header_gradient"
+            android:layout_height="150dp"
+            android:fitsSystemWindows="true"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-            app:contentScrim="@drawable/bg_vpn_header_gradient"
-            app:expandedTitleMarginBottom="0dp"
-            app:expandedTitleMarginEnd="16dp"
-            app:expandedTitleMarginStart="10dp"
-            app:expandedTitleMarginTop="10dp"
+            app:contentScrim="@drawable/bg_plus_hero_gradient"
+            app:expandedTitleMarginBottom="48dp"
+            app:expandedTitleMarginStart="24dp"
             app:expandedTitleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:titleEnabled="true">
@@ -41,7 +37,7 @@
                     android:id="@+id/header_gradient_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_vpn_header_gradient" />
+                    android:background="@drawable/bg_plus_hero_gradient" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/hero_content"
@@ -199,8 +195,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent"
-                android:elevation="0dp"
                 app:layout_collapseMode="pin"
                 app:title="" />
 
@@ -228,18 +222,17 @@
                 android:id="@+id/stats_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeColor="?attr/divider"
-                app:strokeWidth="1dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.facebook.shimmer.ShimmerFrameLayout
                         android:id="@+id/shimmer_stats"
@@ -314,13 +307,6 @@
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="11sp"
                                 tools:text="↓ 4.5 MB" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" · "
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="11sp" />
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/value_tx"
@@ -481,16 +467,16 @@
                 android:id="@+id/actions_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
@@ -506,44 +492,66 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <com.google.android.material.card.MaterialCardView
                             android:id="@+id/applications_btn"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:background="@drawable/rectangle_border_background"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:gravity="center"
-                            android:minHeight="64dp"
-                            android:orientation="vertical"
-                            android:paddingStart="12dp"
-                            android:paddingTop="10dp"
-                            android:paddingEnd="12dp"
-                            android:paddingBottom="10dp">
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="1dp"
+                            app:strokeColor="?attr/border">
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginBottom="4dp"
-                                android:alpha="0.5"
-                                android:src="@drawable/ic_app_info_accent"
-                                app:tint="?attr/primaryTextColor" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/apps_label"
+                            <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:ellipsize="end"
-                                android:gravity="center"
-                                android:maxLines="1"
-                                android:textAllCaps="false"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="12sp" />
-                        </LinearLayout>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="12dp"
+                                android:paddingTop="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingBottom="10dp">
+
+                                <FrameLayout
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="@drawable/bg_vpn_status_chip">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_gravity="center"
+                                        android:alpha="0.5"
+                                        android:src="@drawable/ic_app_info_accent"
+                                        app:tint="?attr/accentGood" />
+                                </FrameLayout>
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:id="@+id/apps_label"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textAllCaps="false"
+                                    android:textColor="?attr/accentGood"
+                                    android:textSize="@dimen/default_font_text_view" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_right_arrow_secondary"
+                                    app:tint="?attr/accentGood" />
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
 
                         <LinearLayout
                             android:id="@+id/hop_btn"
@@ -598,37 +606,63 @@
 
                         </LinearLayout>
 
-                        <LinearLayout
+                        <com.google.android.material.card.MaterialCardView
                             android:id="@+id/logs_btn"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:background="@drawable/rectangle_border_background"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:gravity="center"
-                            android:minHeight="64dp"
-                            android:orientation="vertical"
-                            android:paddingStart="12dp"
-                            android:paddingTop="10dp"
-                            android:paddingEnd="12dp"
-                            android:paddingBottom="10dp">
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="1dp"
+                            app:strokeColor="?attr/border">
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginBottom="4dp"
-                                android:src="@drawable/ic_logs"
-                                app:tint="?attr/primaryTextColor" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lbl_logs"
-                                android:textAllCaps="false"
-                                android:textColor="?attr/secondaryTextColor"
-                                android:textSize="12sp" />
-                        </LinearLayout>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="12dp"
+                                android:paddingTop="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingBottom="10dp">
+
+                                <FrameLayout
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="@drawable/bg_vpn_status_chip">
+
+                                    <androidx.appcompat.widget.AppCompatImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/ic_logs"
+                                        app:tint="?attr/accentGood" />
+                                </FrameLayout>
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="@string/lbl_logs"
+                                    android:textAllCaps="false"
+                                    android:textColor="?attr/accentGood"
+                                    android:textSize="@dimen/default_font_text_view" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/ic_right_arrow_secondary"
+                                    app:tint="?attr/accentGood" />
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -638,16 +672,16 @@
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="18dp">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
@@ -678,7 +712,7 @@
                                 android:id="@+id/hop_title_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Relay"
+                                android:text="@string/cd_dns_crypt_relay_heading"
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
@@ -687,7 +721,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Route this client through a Auto server. This may help if the client is in a restrictive network environment, but it will increase latency and reduce speed."
+                                android:text="@string/relay_rpn_desc"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="13sp" />
 
@@ -772,7 +806,7 @@
                                 android:id="@+id/catch_all_title_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/catch_all_wg_dialog_title"
+                                android:text="Route remaining apps"
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
@@ -805,10 +839,10 @@
                 android:id="@+id/mobile_ssid_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                style="@style/RethinkPlus.ContentCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"

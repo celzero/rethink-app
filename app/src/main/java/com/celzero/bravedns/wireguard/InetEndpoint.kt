@@ -18,69 +18,23 @@
  */
 package com.celzero.bravedns.wireguard
 
-import java.net.Inet4Address
-import java.net.InetAddress
 import java.net.URI
 import java.net.URISyntaxException
-import java.net.UnknownHostException
-import java.time.Duration
-import java.time.Instant
-import java.util.Optional
 import java.util.regex.Pattern
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 /**
  * An external endpoint (host and port) used to connect to a WireGuard [Peer].
  *
- * Instances of this class are externally immutable.
+ * Instances of this class are externally immutable. The host is never resolved here; DNS
+ * resolution of the endpoint is delegated to the Go layer.
  */
 class InetEndpoint
 private constructor(val host: String, private val isResolved: Boolean, val port: Int) {
-    private val mutex = Mutex()
-    private var lastResolution = Instant.EPOCH
-    private var resolved: InetEndpoint? = null
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun equals(obj: Any?): Boolean {
         if (obj !is InetEndpoint) return false
         return host == obj.host && port == obj.port
-    }
-
-    /**
-     * Generate an `InetEndpoint` instance with the same port and the host resolved using DNS to a
-     * numeric address. If the host is already numeric, the existing instance may be returned.
-     * Because this function may perform network I/O, it must not be called from the main thread.
-     *
-     * @return the resolved endpoint, or [Optional.empty]
-     */
-    suspend fun getResolved(): Optional<InetEndpoint> {
-        if (isResolved) return Optional.of(this)
-        return mutex.withLock {
-            // TODO: Implement a real timeout mechanism using DNS TTL
-            if (Duration.between(lastResolution, Instant.now()).toSeconds() > 5) {
-                withContext(Dispatchers.IO) {
-                    try {
-                        // Prefer v4 endpoints over v6 to work around DNS64 and IPv6 NAT issues.
-                        val candidates = InetAddress.getAllByName(host)
-                        var address = candidates[0]
-                        for (candidate in candidates) {
-                            if (candidate is Inet4Address) {
-                                address = candidate
-                                break
-                            }
-                        }
-                        resolved = InetEndpoint(address.hostAddress ?: "", true, port)
-                        lastResolution = Instant.now()
-                    } catch (_: UnknownHostException) {
-                        resolved = null
-                    }
-                }
-            }
-            Optional.ofNullable(resolved)
-        }
     }
 
     override fun hashCode(): Int {
@@ -106,7 +60,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
                 } catch (e: URISyntaxException) {
                     throw ParseException(InetEndpoint::class.java, endpoint, e)
                 }
-            if (uri.port < 0 || uri.port > 65535)
+            if (uri.port !in 0..65535)
                 throw ParseException(
                     InetEndpoint::class.java,
                     endpoint,

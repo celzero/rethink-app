@@ -31,7 +31,6 @@ import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 /**
@@ -42,7 +41,7 @@ import org.koin.android.ext.android.inject
  * This means the device is not registered under the subscription account.
  * The user is guided to contact support with their account details.
  */
-class DeviceNotRegisteredBottomSheet : BottomSheetDialogFragment() {
+class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetDeviceNotRegisteredBinding? = null
     private val binding
@@ -153,13 +152,11 @@ class DeviceNotRegisteredBottomSheet : BottomSheetDialogFragment() {
         try {
             val subject = getString(R.string.device_not_registered_email_subject)
             val body = buildString {
-                appendLine(getString(R.string.device_auth_error_email_body_greeting))
                 appendLine()
                 appendLine(getString(R.string.device_not_registered_email_body_details))
                 appendLine("  • ${getString(R.string.device_not_registered_entitlement_cid_label)}: $entitlementCid")
                 appendLine("  • ${getString(R.string.device_auth_error_device_id_label)}: $deviceIdPrefix")
                 appendLine()
-                appendLine(getString(R.string.device_auth_error_email_body_closing))
             }
 
             val intent = Intent(Intent.ACTION_SENDTO).apply {

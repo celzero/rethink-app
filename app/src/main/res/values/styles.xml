@@ -1,25 +1,205 @@
 <resources>
 
+    <!--
+        ====================================================================
+        Rethink Type Scale (M3-compatible, OEM-font safe)
+        Identical to the Material 3 reference type scale (size, family,
+        letter-spacing), but WITHOUT the hard android:lineHeight entries
+        that ship in TextAppearance.Material3.* since material 1.13.
+
+        Why: M3's fixed lineHeight (e.g. 16sp for 12sp BodySmall) clamps
+        the line box and overrides natural font ascent/descent. On OEM
+        ROMs whose default fonts have taller vertical metrics (notably
+        Samsung One UI 6/7/8 with One UI Sans family), glyphs render
+        taller than the forced box and get vertically CLIPPED app-wide,
+        in every widget that resolves ?attr/textAppearance* from the
+        theme (buttons, chips, sheets, menus, lists).
+
+        Dropping lineHeight makes TextView use the font's own metrics,
+        which always fit the rendered glyphs on any device/font combo.
+        Visual side effect: multi-line paragraphs may space lines
+        slightly differently vs the M3 spec (~ +2dp on body sizes).
+        ====================================================================
+    -->
+    <style name="TextAppearance.Rethink.DisplayLarge" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:letterSpacing">-0.00438596</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.DisplayMedium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.DisplaySmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.HeadlineLarge" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.HeadlineMedium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.HeadlineSmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.TitleLarge" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.TitleMedium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.009375</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.TitleSmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.00714286</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.BodyLarge" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.03125</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.BodyMedium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.01785714</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.BodySmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.03333333</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.LabelLarge" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.00714286</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.LabelMedium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.04166667</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Rethink.LabelSmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.04545455</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
     <!-- Base application theme. -->
     <style name="AppThemeInitial" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowDisablePreview">true</item>
+        <item name="android:textColorLink">@color/accentGood</item>
 
-        <!-- Use Material 3 Standard Typography -->
-        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
-        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
-        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
-        <item name="textAppearanceLabelLarge">@style/TextAppearance.Material3.LabelLarge</item>
-        <item name="textAppearanceLabelMedium">@style/TextAppearance.Material3.LabelMedium</item>
-        <item name="textAppearanceLabelSmall">@style/TextAppearance.Material3.LabelSmall</item>
-        <item name="textAppearanceTitleLarge">@style/TextAppearance.Material3.TitleLarge</item>
-        <item name="textAppearanceTitleMedium">@style/TextAppearance.Material3.TitleMedium</item>
-        <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
-        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
-        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
-        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
+        <item name="android:textColorHint">@color/primaryLightColorText</item>
+        <item name="android:textColorHighlight">@color/accentGood</item>
+
+        <!-- Use Material 3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
     </style>
 
     <style name="AppThemeDialog" parent="Theme.Material3.DayNight.Dialog">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -29,6 +209,27 @@
     </style>
 
     <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
+        <item name="android:textColorLink">@color/accentGood</item>
+
+        <item name="android:textColorHint">@color/primaryLightColorText</item>
+        <item name="android:textColorHighlight">@color/accentGood</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGood</item>
         <item name="colorOnPrimary">@android:color/black</item>
@@ -112,6 +313,7 @@
         <item name="chipTextNegative">@color/chipTextNegative</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormal</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlight</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackground</item>
 
@@ -131,6 +333,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStart</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenter</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEnd</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartDark</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterDark</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
+        <item name="serverHeaderStrokeColor">#33FFFFFF</item>
+        <item name="serverChipBgColor">@color/vpnHeaderGradientStart</item>
+        <item name="serverChipStrokeColor">#33FFFFFF</item>
+        <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGolden</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
         <!-- Guided Tour -->
@@ -142,6 +351,27 @@
     </style>
 
     <style name="AppThemeWhite" parent="Theme.Material3.Light.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
+        <item name="android:textColorLink">@color/accentGoodLight</item>
+
+        <item name="android:textColorHint">@color/primaryLightColorTextLight</item>
+        <item name="android:textColorHighlight">@color/accentGoodLight</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodLight</item>
         <item name="colorOnPrimary">@android:color/white</item>
@@ -223,6 +453,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralLight</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLight</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
+        <item name="accentInfo">@color/accentInfoLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLight</item>
         <item name="selectedCardBg">@color/selectedCardBgLight</item>
@@ -243,6 +474,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLight</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLight</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLight</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartLight</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterLight</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndLight</item>
+        <item name="serverHeaderStrokeColor">#334A90D9</item>
+        <item name="serverChipBgColor">@android:color/white</item>
+        <item name="serverChipStrokeColor">@color/accentGoodLight</item>
+        <item name="serverChipTextColor">@color/accentGoodLight</item>
         <item name="colorGolden">@color/colorGoldenLight</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
 
@@ -255,6 +493,27 @@
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
+        <item name="android:textColorLink">@color/accentGoodBlack</item>
+
+        <item name="android:textColorHint">@color/primaryLightColorTextBlack</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlack</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodBlack</item>
         <item name="colorOnPrimary">@android:color/black</item>
@@ -337,6 +596,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
         <item name="selectedCardBg">@color/selectedCardBgBlack</item>
@@ -357,6 +617,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartDark</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterDark</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
+        <item name="serverHeaderStrokeColor">#26FFFFFF</item>
+        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlack</item>
+        <item name="serverChipStrokeColor">#26FFFFFF</item>
+        <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
 
@@ -369,6 +636,23 @@
     </style>
 
     <style name="AppThemeWhitePlus" parent="Theme.Material3.Light.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodLightPlus</item>
         <item name="colorOnPrimary">@android:color/white</item>
@@ -450,6 +734,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralLightPlus</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLightPlus</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLightPlus</item>
+        <item name="accentInfo">@color/accentInfoLight</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundLightPlus</item>
         <item name="selectedCardBg">@color/selectedCardBgLightPlus</item>
@@ -470,6 +755,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartLightPlus</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterLightPlus</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndLightPlus</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartLight</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterLight</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndLight</item>
+        <item name="serverHeaderStrokeColor">#334A90D9</item>
+        <item name="serverChipBgColor">@android:color/white</item>
+        <item name="serverChipStrokeColor">@color/accentGoodLightPlus</item>
+        <item name="serverChipTextColor">@color/accentGoodLightPlus</item>
         <item name="colorGolden">@color/colorGoldenLightPlus</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
         <!-- Guided Tour -->
@@ -481,6 +773,27 @@
     </style>
 
     <style name="AppThemeTrueBlackPlus" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
+        <item name="android:textColorLink">@color/accentGoodBlackPlus</item>
+
+        <item name="android:textColorHint">@color/primaryLightColorTextBlackPlus</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlackPlus</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodBlackPlus</item>
         <item name="colorOnPrimary">@android:color/black</item>
@@ -563,6 +876,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlackPlus</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlackPlus</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlackPlus</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlackPlus</item>
         <item name="selectedCardBg">@color/selectedCardBgBlackPlus</item>
@@ -583,6 +897,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlackPlus</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlackPlus</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlackPlus</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartDark</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterDark</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
+        <item name="serverHeaderStrokeColor">#26FFFFFF</item>
+        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlackPlus</item>
+        <item name="serverChipStrokeColor">#26FFFFFF</item>
+        <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlackPlus</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView</item>
         <!-- Guided Tour -->
@@ -594,6 +915,27 @@
     </style>
 
     <style name="AppThemeTrueBlackFrost" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
+        <item name="android:textColorLink">@color/accentGoodBlack</item>
+
+        <item name="android:textColorHint">@color/primaryLightColorTextBlack</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlack</item>
         <item name="android:windowIsTranslucent">true</item>
         <!-- M3 Standard Palette -->
         <item name="colorPrimary">@color/accentGoodBlack</item>
@@ -673,6 +1015,7 @@
         <item name="chipTextNeutral">@color/chipTextNeutralBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
+        <item name="accentInfo">@color/accentInfo</item>
 
         <item name="fabBackgroundColor">@color/fabBackgroundBlack</item>
         <item name="selectedCardBg">@color/selectedCardBgBlack</item>
@@ -693,6 +1036,13 @@
         <item name="vpnHeaderGradientStart">@color/vpnHeaderGradientStartBlack</item>
         <item name="vpnHeaderGradientCenter">@color/vpnHeaderGradientCenterBlack</item>
         <item name="vpnHeaderGradientEnd">@color/vpnHeaderGradientEndBlack</item>
+        <item name="serverHeaderGradientStart">@color/serverHeaderGradientStartDark</item>
+        <item name="serverHeaderGradientCenter">@color/serverHeaderGradientCenterDark</item>
+        <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
+        <item name="serverHeaderStrokeColor">#26FFFFFF</item>
+        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlack</item>
+        <item name="serverChipStrokeColor">#26FFFFFF</item>
+        <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
 
@@ -708,12 +1058,15 @@
         <item name="materialThemeOverlay">@style/CustomCompoundButtonSwitch</item>
     </style>
 
-    <style name="CustomCompoundButtonSwitch">
+    <style name="CustomCompoundButtonSwitch" parent="ThemeOverlay.Material3">
         <item name="colorSurface">?attr/colorSwitchThumbNormal</item>
         <item name="colorOnSurface">?attr/switchNormal</item>
         <item name="colorControlActivated">?attr/controlActivated</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorSecondary</item>
+        <item name="android:textColorLink">@color/accentGood</item>
+        <item name="android:textColorHint">@color/primaryLightColorText</item>
+        <item name="android:textColorHighlight">@color/accentGood</item>
     </style>
 
     <style name="CustomMaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
@@ -721,11 +1074,14 @@
     </style>
 
     <!-- Theme overlay to force switch colors -->
-    <style name="CustomSwitchThemeOverlay">
+    <style name="CustomSwitchThemeOverlay" parent="ThemeOverlay.Material3">
         <item name="colorPrimary">?attr/accentGood</item>
         <item name="colorSurfaceVariant">?attr/colorSurfaceVariant</item>
         <item name="colorSurface">?attr/colorSurface</item>
         <item name="colorOutline">?attr/switchNormal</item>
+        <item name="android:textColorLink">@color/accentGood</item>
+        <item name="android:textColorHint">@color/primaryLightColorText</item>
+        <item name="android:textColorHighlight">@color/accentGood</item>
     </style>
 
     <!-- Light theme switch style -->
@@ -769,12 +1125,32 @@
     </style>
 
     <style name="BaseBottomSheetDialog" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <!-- M3 Typography (OEM-font safe: no forced lineHeight) -->
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Rethink.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Rethink.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Rethink.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Rethink.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Rethink.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Rethink.LabelSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Rethink.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Rethink.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Rethink.TitleSmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Rethink.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Rethink.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Rethink.HeadlineSmall</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Rethink.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Rethink.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Rethink.DisplaySmall</item>
+
         <item name="bottomSheetStyle">@style/BottomSheet</item>
         <item name="android:navigationBarColor">?attr/navBarColor</item>
         <item name="android:windowIsFloating">false</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGood</item>
+        <item name="android:textColorHint">@color/primaryLightColorText</item>
+        <item name="android:textColorHighlight">@color/accentGood</item>
         <!-- Surface / background -->
         <item name="colorSurface">@color/btmSheetBgColor</item>
         <item name="colorOnSurface">@color/primaryText</item>
@@ -812,6 +1188,9 @@
     </style>
 
     <style name="BottomSheetDialogThemeWhite" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGoodLight</item>
+        <item name="android:textColorHint">@color/primaryLightColorTextLight</item>
+        <item name="android:textColorHighlight">@color/accentGoodLight</item>
         <!-- Surface / background -->
         <item name="colorSurface">@color/btmSheetBgColorLight</item>
         <item name="colorOnSurface">@color/primaryTextLight</item>
@@ -849,6 +1228,9 @@
     </style>
 
     <style name="BottomSheetDialogThemeTrueBlack" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGoodBlack</item>
+        <item name="android:textColorHint">@color/primaryLightColorTextBlack</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlack</item>
         <!-- Surface / background -->
         <item name="colorSurface">@color/btmSheetBgColorBlack</item>
         <item name="colorOnSurface">@color/primaryTextBlack</item>
@@ -887,6 +1269,9 @@
     </style>
 
     <style name="BottomSheetDialogThemeWhitePlus" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGoodLightPlus</item>
+        <item name="android:textColorHint">@color/primaryLightColorTextLightPlus</item>
+        <item name="android:textColorHighlight">@color/accentGoodLightPlus</item>
         <!-- Surface / background -->
         <item name="colorSurface">@color/btmSheetBgColorLightPlus</item>
         <item name="colorOnSurface">@color/primaryTextLightPlus</item>
@@ -928,6 +1313,9 @@
 
     <!-- Restore missing bottom sheet theme for BlackPlus -->
     <style name="BottomSheetDialogThemeTrueBlackPlus" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGoodBlackPlus</item>
+        <item name="android:textColorHint">@color/primaryLightColorTextBlackPlus</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlackPlus</item>
         <item name="colorSurface">@color/btmSheetBgColorBlackPlus</item>
         <item name="colorOnSurface">@color/primaryTextBlackPlus</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlackPlus</item>
@@ -964,6 +1352,9 @@
     </style>
 
     <style name="BottomSheetDialogThemeTrueBlackFrost" parent="BaseBottomSheetDialog">
+        <item name="android:textColorLink">@color/accentGoodBlack</item>
+        <item name="android:textColorHint">@color/primaryLightColorTextBlack</item>
+        <item name="android:textColorHighlight">@color/accentGoodBlack</item>
         <item name="colorSurface">@color/btmSheetBgColorBG</item>
         <item name="colorOnSurface">@color/primaryTextBG</item>
         <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
@@ -1013,6 +1404,28 @@
         <item name="android:textColor">@drawable/chip_text_color</item>
     </style>
 
+    <!-- segmented time-range control used by the activity detail sheet;
+         styled only via supported MaterialButton attributes (backgroundTint /
+         strokeColor selectors) - never overwrite android:background on
+         children of MaterialButtonToggleGroup -->
+    <style name="ActivityTimeSegment" parent="Widget.Material3.Button">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="backgroundTint">@color/time_segment_fill</item>
+        <item name="strokeColor">@color/time_segment_stroke</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/time_segment_text_color</item>
+        <item name="rippleColor">#22000000</item>
+    </style>
+
     <style name="ThinnerChip.Action" parent="Widget.Material3.Chip.Assist">
         <item name="chipCornerRadius">12dp</item>
         <item name="chipMinHeight">24dp</item>
@@ -1037,6 +1450,7 @@
         <item name="android:fontFamily">sans-serif-smallcaps</item>
         <item name="android:letterSpacing">0.25</item>
         <item name="android:textAllCaps">true</item>
+        <item name="textAllCaps">true</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">@dimen/rethink_header_text</item>
     </style>
@@ -1152,6 +1566,74 @@
         <item name="secondaryTextColor">@color/alpha_accent_light</item>
         <item name="homeScreenBtnGradientEnd">@color/alpha_accent_light</item>
         <item name="homeScreenBtnGradientStart">@color/alpha_accent_light</item>
+    </style>
+
+    <!--
+        ====================================================================
+        Rethink Plus — shared design language
+        Applied across: RethinkPlus dashboard, ping test, manage purchase,
+        RPN config detail and server selection screens.
+
+        Structure:
+          • HeroCard     — translucent card carrying bg_plus_hero_gradient;
+                           owns rounding (24dp) + hairline stroke.
+          • ContentCard  — solid surface card for list/settings groups;
+                           16dp corners, 1dp border, no elevation.
+          • SectionLabel — tiny uppercase section header.
+          • HeroTitle    — large light-weight plan/feature title.
+          • RowTitle / RowSubtitle — title+description inside rows.
+          • StatusChip   — dot + label pill over hero gradients.
+        ====================================================================
+    -->
+    <style name="RethinkPlus" />
+
+    <style name="RethinkPlus.HeroCard">
+        <item name="cardBackgroundColor">@android:color/transparent</item>
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="strokeColor">?attr/serverHeaderStrokeColor</item>
+    </style>
+
+    <style name="RethinkPlus.ContentCard">
+        <item name="cardBackgroundColor">?attr/cardBackgroundColor</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">?attr/border</item>
+    </style>
+
+    <style name="RethinkPlus.SectionLabel" parent="android:Widget.Material.TextView">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">10.5sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.13</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+
+    <style name="RethinkPlus.HeroTitle" parent="android:Widget.Material.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="RethinkPlus.RowTitle" parent="android:Widget.Material.TextView">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14.5sp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="RethinkPlus.RowSubtitle" parent="android:Widget.Material.TextView">
+        <item name="android:textSize">11.5sp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+
+    <style name="RethinkPlus.StatusChipText">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/accentGood</item>
     </style>
 
     <style name="Widget.Sponsor.Slider" parent="Widget.Material3.Slider">

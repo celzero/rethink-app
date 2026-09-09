@@ -44,6 +44,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.BackoffPolicy
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -51,13 +52,17 @@ import androidx.work.WorkRequest
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.SmartDnsEndpoint
+import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
@@ -69,6 +74,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
+import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ALPHA_UPDATE_CHECK_URL
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -107,6 +113,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val inAppMessageProvider by inject<InAppMessageProvider>()
     private val rdb by inject<RefreshDatabase>()
     private val appConfig by inject<AppConfig>()
+    private val smartDnsEndpointRepository by inject<SmartDnsEndpointRepository>()
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -208,7 +215,14 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             )
         } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
             Logger.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
-            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE) }
+            io {
+                // post-restore DB work must run here (fresh Room connections, post
+                // process restart): the restore worker's close()/reopen() cycle
+                // permanently poisons the previous process' RoomDatabase instances
+                RemoteFileTagUtil.moveFileToLocalDir(applicationContext, persistentState)
+                RestoreAgent.clearSubscriptionEntries(get<AppDatabase>())
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE)
+            }
         }
     }
 
@@ -250,8 +264,8 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
-            startRestore(uri)
-            observeRestoreWorker()
+            val workId = startRestore(uri)
+            observeRestoreWorker(workId)
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
@@ -263,7 +277,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         dialog.show()
     }
 
-    private fun startRestore(fileUri: Uri) {
+    private fun startRestore(fileUri: Uri): java.util.UUID? {
         Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
         data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
@@ -278,15 +292,26 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                 )
                 .addTag(RestoreAgent.TAG)
                 .build()
-        WorkManager.getInstance(this).beginWith(importWorker).enqueue()
+        // unique work: a concurrent restore (double-tap or the other entry point)
+        // would close/copy the same database files simultaneously and corrupt them
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            RestoreAgent.TAG,
+            ExistingWorkPolicy.KEEP,
+            importWorker
+        )
+        return importWorker.id
     }
 
-    private fun observeRestoreWorker() {
+    private fun observeRestoreWorker(workId: java.util.UUID?) {
+        if (workId == null) return
         val workManager = WorkManager.getInstance(this.applicationContext)
 
-        // observer for custom download manager worker
-        workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(this) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+        // observe by id, not by tag: the tag query also returns terminal WorkInfos of
+        // previous restore attempts and emits them immediately upon registration
+        // (pruneWork is async). Reacting to a stale FAILED/CANCELLED info here cancelled
+        // the just-started, running restore (JobCancellationException inside the worker).
+        workManager.getWorkInfoByIdLiveData(workId).observe(this) { workInfo ->
+            if (workInfo == null) return@observe
             Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
@@ -312,9 +337,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                     getString(R.string.brbs_restore_no_uri_toast),
                     Toast.LENGTH_SHORT
                 )
+                // no cancelAllWorkByTag here: the observed work is already terminal and
+                // a tag-scoped cancel would only kill a different, running restore
                 workManager.pruneWork()
-                workManager.cancelAllWorkByTag(RestoreAgent.TAG)
-            } else { // state == blocked
+            } else { // state == enqueued, running, blocked
                 // no-op
             }
         }
@@ -350,17 +376,36 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
-        if (persistentState.biometricAuth) {
-            persistentState.biometricAuthType =
-                MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
-            // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
-            // to SystemClock.elapsedRealtime
-            persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
+
+        try {
+            // /data/data/com.celzero.bravedns/shared_prefs/com.celzero.bravedns_preferences.xml
+            val prefs = getSharedPreferences("com.celzero.bravedns_preferences", MODE_PRIVATE)
+            val allowBypass = prefs.getBoolean("allow_bypass", false)
+            persistentState.privateIps = allowBypass
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err reading shared prefs: ${e.message}", e)
+            persistentState.privateIps = isPlayStoreFlavour()
+        }
+
+        try {
+            io {
+                rdb.addNewApp(AndroidUidConfig.ANDROID.uid)
+                rdb.addNewApp(AndroidUidConfig.SYSTEM.uid)
+                rdb.addNewApp(AndroidUidConfig.RADIO.uid)
+                rdb.addNewApp(AndroidUidConfig.MEDIA.uid)
+                rdb.addNewApp(AndroidUidConfig.MDNSR.uid)
+                rdb.addNewApp(AndroidUidConfig.GPS.uid)
+                rdb.addNewApp(AndroidUidConfig.DNS.uid)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err adding new app: ${e.message}", e)
         }
 
         // reset the local blocklist download from android download manager to custom in v055o
         persistentState.useCustomDownloadManager = true
+
+        // migrate smart dns users to the "No Filter" option, remove this post v057.
+        io { migrateSmartDnsSelectionIfNeeded() }
 
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }
@@ -376,6 +421,26 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                 }
                 appConfig.updateRethinkEndpoint(Constants.RETHINK_DNS_PLUS, newUrl, 0)
             }
+        }
+    }
+
+    // v057: previously smart dns was a single selection stored only in persistent state
+    // with no per-option record. now the options live in the SmartDnsEndpoint table
+    private suspend fun migrateSmartDnsSelectionIfNeeded() {
+        try {
+            // user did not use smart dns previously, nothing to migrate
+            if (!appConfig.isSmartDnsEnabled()) return
+
+            // an option is already selected (or migration ran before), do not overwrite
+            if (appConfig.getSelectedSmartDnsEndpoint() != null) return
+
+            val noFilter = smartDnsEndpointRepository.getSmartDnsEndpoints()
+                .firstOrNull { SmartDnsEndpoint.isNoFilterMode(it.dnsMode) } ?: return
+
+            Logger.i(LOG_TAG_UI, "migrating prev smart dns to no filter (id: ${noFilter.id})")
+            appConfig.enableSmartDns(noFilter.id)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err migrating smart dns selection: ${e.message}", e)
         }
     }
 
@@ -539,15 +604,34 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val installStateUpdatedListener =
         object : AppUpdater.InstallStateListener {
             override fun onStateUpdate(state: AppUpdater.InstallState) {
-                Logger.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
+                Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: state: " + state.status)
                 when (state.status) {
                     AppUpdater.InstallStatus.DOWNLOADED -> {
-                        // CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
                         showUpdateCompleteSnackbar()
                     }
-
-                    else -> {
+                    AppUpdater.InstallStatus.INSTALLED -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update installed")
                         appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.FAILED -> {
+                        Logger.e(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update failed")
+                        appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.CANCELED -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Update canceled")
+                        appUpdateManager.unregisterListener(this)
+                    }
+                    AppUpdater.InstallStatus.DOWNLOADING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Downloading...")
+                    }
+                    AppUpdater.InstallStatus.INSTALLING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Installing...")
+                    }
+                    AppUpdater.InstallStatus.PENDING -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Pending...")
+                    }
+                    else -> {
+                        Logger.i(LOG_TAG_APP_UPDATE, "InstallStateUpdatedListener: Unknown state: ${state.status}")
                     }
                 }
             }

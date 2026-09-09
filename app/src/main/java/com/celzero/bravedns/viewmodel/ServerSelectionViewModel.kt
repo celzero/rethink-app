@@ -20,6 +20,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.celzero.bravedns.database.CountryConfig
+import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.VpnController
 import kotlinx.coroutines.Dispatchers
@@ -175,6 +176,20 @@ class ServerSelectionViewModel : ViewModel() {
         viewModelScope.launch {
             _resetState.value = ResetState.InProgress
             Logger.i(LOG_TAG_UI, "$TAG.reset: starting RPN reset")
+
+            // Fire-and-forget refetch of purchases from Google Play (SUBS + INAPP),
+            // independent of whether RPN is on or off: resetAndRefetchRpn reads the
+            // subscription from the local DB only, so without this refresh a stale or
+            // missing DB row would abort the reset with "No active subscription
+            // found" even though Play still has a valid purchase. fdroid flavour
+            // stubs this call as a no-op.
+            try {
+                InAppBillingHandler.fetchPurchases(
+                    listOf(InAppBillingHandler.PRODUCT_TYPE_SUBS, InAppBillingHandler.PRODUCT_TYPE_INAPP)
+                )
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.reset: fetchPurchases failed (non-fatal): ${e.message}")
+            }
 
             // Guard: reset requires an active VPN tunnel; fail fast instead of timing out.
             val hasTunnel = withContext(Dispatchers.IO) { VpnController.hasTunnel() }

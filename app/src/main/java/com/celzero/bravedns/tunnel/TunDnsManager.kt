@@ -12,12 +12,17 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.LogActivityAggregator
+import com.celzero.bravedns.service.LogActivityEvent
+import com.celzero.bravedns.service.LogActivitySource
+import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.service.NetLogTracker
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isAnyUserSetProxy
 import com.celzero.bravedns.service.TunFirewallManager
+import com.celzero.bravedns.service.TunFlowManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
@@ -63,6 +68,7 @@ object TunDnsManager: KoinComponent {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val netLogTracker by inject<NetLogTracker>()
+    private val activityAggregator by inject<LogActivityAggregator>()
 
     private val rethinkUid = android.os.Process.myUid()
 
@@ -246,6 +252,18 @@ object TunDnsManager: KoinComponent {
             return opts
         }
 
+        // skip applying rules for system components (DNS and ANDROID) on Android 11 and below,
+        // as we cannot determine the actual app from which the request originated when split dns
+        // is disabled. However, when split dns is enabled, advanced dns filtering will also be
+        // enabled on Android 11 and below, allowing Rethink to determine the actual requesting app.
+        // In that case, we can apply the app-specific rules.
+        val isProtectedUid = uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid || uid == rethinkUid
+        if (isAtleastR() && isProtectedUid && !persistentState.splitDns) {
+            val opts = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
+            logd("onQuery: makeNsOpts(protected-uid) for $fqdn")
+            return opts
+        }
+
         if (uid == INVALID_UID) {
             val anyAppBypass = FirewallManager.isAnyAppBypassesDns()
             logd("onQuery: FirewallManager.isAnyAppBypassesDns for $fqdn")
@@ -320,8 +338,8 @@ object TunDnsManager: KoinComponent {
                 DomainRulesManager.Status.NONE -> {}
             }
 
-            // disable global rules check, see #onUpstreamAnswer() for more details.
-            val skipGlobalRules = true
+            // global trusted domains need to send noBlock as true
+            val skipGlobalRules = false
             if (!skipGlobalRules) {
                 val globalDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first
                 logd("onQuery: getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
@@ -332,11 +350,7 @@ object TunDnsManager: KoinComponent {
                         return opts
                     }
 
-                    DomainRulesManager.Status.BLOCK -> {
-                        val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                        logd("onQuery: makeNsOpts(global-blocked-df) for $fqdn")
-                        return opts
-                    }
+                    DomainRulesManager.Status.BLOCK -> {} // taken care in onUpstreamAnswer
 
                     DomainRulesManager.Status.NONE -> {}
                 }
@@ -765,8 +779,33 @@ object TunDnsManager: KoinComponent {
                 return
             }
         }
+        aggregateDnsActivity(summary)
         netLogTracker.processDnsLog(summary)
         onRegionUpdate(summary.region)
+    }
+
+    /**
+     * Arrival-time activity aggregation, owned at this caller level; the
+     * trackers stay persistence-only. Kept behind the same gates as
+     * processDnsLog so the in-memory grid and the dns-log table stay in sync.
+     */
+    private fun aggregateDnsActivity(summary: DNSSummary) {
+        if (!persistentState.logsEnabled) return
+
+        activityAggregator.recordOnArrival(
+            LogActivityEvent(
+                summary.start,
+                LogActivitySource.DNS,
+                DnsLogTracker.isBlockedDnsAnswer(
+                    transportId = summary.id,
+                    statusCode = summary.status,
+                    response = summary.rData ?: "",
+                    qType = summary.qType,
+                    blocklists = summary.blocklists ?: "",
+                    upstreamBlock = summary.upstreamBlocks
+                )
+            )
+        )
     }
 
     suspend fun handleOnUpstreamAnswer(params: UpstreamAnswerParams): DNSOpts {
@@ -802,7 +841,7 @@ object TunDnsManager: KoinComponent {
             "onUpstreamAnswer: init, ${params.id}, sum: ${params.smm}, ipcsv: ${params.ipcsv}, opts: ${params.rcvdDnsOpts}"
         )
         if (params.ipcsv.isEmpty()) {
-            Logger.e(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
+            Logger.w(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
             return dnsOptsFactory()
         }
         if (appConfig.getBraveMode().isDnsMode()) {

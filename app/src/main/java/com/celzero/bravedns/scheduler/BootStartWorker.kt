@@ -79,6 +79,12 @@ class BootStartWorker(context: Context, params: WorkerParameters) :
             } catch (_: NullPointerException) {
                 Logger.w(LOG_TAG_VPN, "device does not support system-wide VPN mode")
                 return Result.success()
+            } catch (e: IllegalStateException) {
+                // VpnService.prepare() throws IllegalStateException("Unavailable in lockdown
+                // mode") when another VPN app is set as Always-on VPN with "Block connections
+                // without VPN" enabled. Skip auto-start in that case.
+                Logger.w(LOG_TAG_VPN, "vpn unavailable: in lockdown mode, skipping boot start", e)
+                return Result.success()
             }
 
         if (prepareVpnIntent != null) {

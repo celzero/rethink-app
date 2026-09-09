@@ -239,6 +239,10 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

@@ -178,7 +178,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             when (status) {
                 IpRulesManager.IpRuleStatus.NONE -> {
                     b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.chipTextNeutral)
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
                     )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {

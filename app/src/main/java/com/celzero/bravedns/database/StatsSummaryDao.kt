@@ -419,7 +419,7 @@ interface StatsSummaryDao {
                   0 AS downloadBytes, 
                   0 AS uploadBytes
                 FROM DnsLogs 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                   AND status = 'COMPLETE' 
                   AND queryStr != '' 
                   AND time > :to 
@@ -434,7 +434,7 @@ interface StatsSummaryDao {
                   sum(downloadBytes) as downloadBytes, 
                   sum(uploadBytes) as uploadBytes 
                 FROM ConnectionTracker 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                   AND timeStamp > :to
                   AND dnsQuery != '' 
                 GROUP BY uid
@@ -467,7 +467,7 @@ interface StatsSummaryDao {
                   0 as downloadBytes, 
                   0 as uploadBytes 
                 FROM DnsLogs 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                   AND status = 'COMPLETE' 
                   AND queryStr != '' 
                   AND time > :to 
@@ -482,7 +482,7 @@ interface StatsSummaryDao {
                   sum(downloadBytes) as downloadBytes, 
                   sum(uploadBytes) as uploadBytes 
                 FROM ConnectionTracker 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                   AND timeStamp > :to 
                   AND dnsQuery != '' 
                 GROUP BY uid
@@ -519,7 +519,7 @@ interface StatsSummaryDao {
                    
                 UNION ALL 
                   
-                  -- From ConnectionTracker
+                -- From ConnectionTracker
                 SELECT uid as uid, 
                   appName AS appOrDnsName, 
                   COUNT(id) AS count 
@@ -610,6 +610,7 @@ interface StatsSummaryDao {
               FROM ConnectionTracker 
               WHERE isBlocked = 1 
                 AND timeStamp > :to 
+                AND dnsQuery != ''
                 AND blockedByRule LIKE 'Rule #2G%' 
               GROUP BY dnsQuery
             ) AS combined 
@@ -637,24 +638,25 @@ interface StatsSummaryDao {
                 -- From DnsLogs
                 SELECT RTRIM(queryStr, '.') AS appOrDnsName, 
                   COUNT(id) AS count, 
-                  flag 
-                FROM DnsLogs 
+                  flag
+                FROM DnsLogs
                 WHERE isBlocked = 1 
-                  AND time > :to 
+                  AND time > :to
                   AND queryStr != '' 
                 GROUP BY RTRIM(queryStr, '.')
                  
-                UNION ALL 
+                UNION ALL
                 
                 -- From ConnectionTracker
                 SELECT dnsQuery AS appOrDnsName, 
                   COUNT(id) AS count, 
-                  flag 
+                  flag
                 FROM ConnectionTracker 
-                WHERE isBlocked = 1 
+                WHERE isBlocked = 1
                   AND timeStamp > :to 
+                  AND dnsQuery != ''
                   AND blockedByRule LIKE 'Rule #2G%' 
-                GROUP BY 
+                GROUP BY
                   dnsQuery
               ) AS combined 
             GROUP BY appOrDnsName 
@@ -681,7 +683,7 @@ interface StatsSummaryDao {
                     COUNT(id) AS count, 
                     flag
                 FROM DnsLogs
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                       AND status = 'COMPLETE'
                       AND queryStr != '' 
                       AND time > :to 
@@ -694,7 +696,7 @@ interface StatsSummaryDao {
                     COUNT(id) AS count, 
                     flag
                 FROM ConnectionTracker 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                       AND timeStamp > :to 
                       AND dnsQuery != '' 
                 GROUP BY dnsQuery 
@@ -723,8 +725,8 @@ interface StatsSummaryDao {
                 SELECT RTRIM(queryStr, '.') AS appOrDnsName, 
                     COUNT(id) AS count, 
                     flag
-                FROM DnsLogs 
-                WHERE isBlocked = 0 
+                FROM DnsLogs
+                WHERE isBlocked = 0
                       AND status = 'COMPLETE'
                       AND queryStr != '' 
                       AND time > :to  
@@ -737,7 +739,7 @@ interface StatsSummaryDao {
                     COUNT(id) AS count, 
                     flag
                 FROM ConnectionTracker 
-                WHERE isBlocked = 0 
+                WHERE isBlocked = 0
                     AND timeStamp > :to 
                     AND dnsQuery != '' 
                 GROUP BY dnsQuery
@@ -764,27 +766,33 @@ interface StatsSummaryDao {
               (
                 -- From DnsLogs
                 SELECT COUNT(id) AS count, 
-                  flag 
-                FROM DnsLogs 
-                WHERE isBlocked = 0 
-                  AND status = 'COMPLETE' 
-                  AND queryStr != '' 
-                  AND time > :to 
-                GROUP BY flag 
+              flag 
+            FROM DnsLogs
+            WHERE isBlocked = 0
+              AND status = 'COMPLETE'
+              AND queryStr != '' 
+              AND time > :to
+              AND flag != ''
+            GROUP BY flag
 
-                UNION ALL 
-                
-                -- From ConnectionTracker
-                SELECT COUNT(id) AS count, 
-                  flag 
-                FROM ConnectionTracker 
-                WHERE isBlocked = 0 
-                  AND timeStamp > :to 
-                GROUP BY flag
-              ) AS combined 
-            GROUP BY flag 
-            ORDER BY count DESC 
-            LIMIT 7
+            UNION ALL
+
+            -- From ConnectionTracker
+            SELECT COUNT(id) AS count,
+              flag
+            FROM ConnectionTracker
+            WHERE isBlocked = 0
+              AND timeStamp > :to 
+              AND flag != ''
+            GROUP BY flag
+          ) AS combined
+        -- keep only valid flag emojis (U+1F1E6..U+1F1FF pairs, e.g. 'AA'..'ZZ'
+        -- in regional indicators). Excludes placeholders written by log trackers:
+        -- '?', warning sign and the invalid pair derived from CountryMap's "--" unknown marker.
+        WHERE flag BETWEEN char(127462, 127462) AND char(127487, 127487)
+        GROUP BY flag
+        ORDER BY count DESC
+        LIMIT 7
         """
     )
     fun getMostContactedCountries(to: Long): PagingSource<Int, AppConnection>
@@ -805,22 +813,22 @@ interface StatsSummaryDao {
               (
                 -- From DnsLogs
                 SELECT COUNT(id) AS count, 
-                  flag 
-                FROM DnsLogs 
-                WHERE isBlocked = 0 
-                  AND status = 'COMPLETE' 
-                  AND queryStr != '' 
-                  AND time > :to 
+                  flag
+                FROM DnsLogs
+                WHERE isBlocked = 0
+                  AND status = 'COMPLETE'
+                  AND queryStr != ''
+                  AND time > :to
+                  AND flag != ''
                 GROUP BY flag
-                   
-                UNION ALL 
-                  
+                UNION ALL
                 -- From ConnectionTracker
                 SELECT COUNT(id) AS count, 
                   flag 
                 FROM ConnectionTracker 
                 WHERE isBlocked = 0 
                   AND timeStamp > :to 
+                  AND flag != ''
                 GROUP BY flag
               ) AS combined 
             GROUP BY flag 
@@ -856,23 +864,23 @@ interface StatsSummaryDao {
                   AND isBlocked = :isBlocked
                 GROUP BY uid
                    
-                UNION ALL 
+                UNION ALL
 
                 -- From DnsLogs
-                SELECT uid, 
+                SELECT uid,
                   appName AS appOrDnsName, 
-                  COUNT(id) AS count, 
-                  0 AS uploadBytes, 
-                  0 AS downloadBytes 
-                FROM DnsLogs 
-                WHERE time > :to 
-                  AND queryStr like :query 
+                  COUNT(id) AS count,
+                  0 AS uploadBytes,
+                  0 AS downloadBytes
+                FROM DnsLogs
+                WHERE time > :to
+                  AND queryStr like :query
                   AND isBlocked = :isBlocked 
-                  AND status = 'COMPLETE' 
-                  AND queryStr != '' 
+                  AND status = 'COMPLETE'
+                  AND queryStr != ''
                 GROUP BY uid
-              ) AS combined 
-            GROUP BY uid 
+              ) AS combined
+            GROUP BY uid
             ORDER BY count DESC
         """
     )
@@ -909,17 +917,17 @@ interface StatsSummaryDao {
                 UNION ALL 
                 
                 -- From DnsLogs
-                SELECT uid, 
+                SELECT uid,
                   appName AS appOrDnsName, 
                   COUNT(id) AS count, 
-                  flag as flag, 
-                  0 AS uploadBytes, 
-                  0 AS downloadBytes 
-                FROM DnsLogs 
-                WHERE time > :to 
-                  AND flag = :flag 
-                  AND isBlocked = 0 
-                  AND status = 'COMPLETE' 
+                  flag as flag,
+                  0 AS uploadBytes,
+                  0 AS downloadBytes
+                FROM DnsLogs
+                WHERE time > :to
+                  AND flag = :flag
+                  AND isBlocked = 0
+                  AND status = 'COMPLETE'
                   AND queryStr != '' 
                 GROUP BY uid
               ) AS combined 
@@ -952,17 +960,17 @@ interface StatsSummaryDao {
                     AND timeStamp > :to
                     AND uid = :uid
                 GROUP BY dnsQuery
-                   
-                UNION ALL 
+
+                UNION ALL
         
                 -- From DnsLogs
                 SELECT queryStr AS appOrDnsName, 
                     COUNT(queryStr) AS count,
                     flag as flag
-                FROM DnsLogs 
+                FROM DnsLogs
                 WHERE uid = :uid
-                    AND time > :to 
-                    AND status = 'COMPLETE' 
+                    AND time > :to
+                    AND status = 'COMPLETE'
                     AND queryStr != '' 
                 GROUP BY queryStr
             ) AS combined 
@@ -992,22 +1000,20 @@ interface StatsSummaryDao {
                     COUNT(dnsQuery) AS count,
                     flag as flag
                 FROM ConnectionTracker 
-                WHERE dnsQuery != ''  
+                WHERE dnsQuery != ''
                     AND timeStamp > :to
                     AND uid = :uid
                     AND dnsQuery LIKE :input
                 GROUP BY dnsQuery
-                   
-                UNION ALL 
-            
+                UNION ALL
                 -- From DnsLogs
                 SELECT queryStr AS appOrDnsName, 
                     COUNT(queryStr) AS count, 
                     flag as flag
-                FROM DnsLogs 
+                FROM DnsLogs
                 WHERE uid = :uid
-                    AND time > :to 
-                    AND status = 'COMPLETE' 
+                    AND time > :to
+                    AND status = 'COMPLETE'
                     AND queryStr != '' 
                     AND queryStr LIKE :input
                 GROUP BY queryStr
@@ -1041,17 +1047,15 @@ interface StatsSummaryDao {
                     AND timeStamp > :to
                     AND uid = :uid
                 GROUP BY dnsQuery
-                   
-                UNION ALL 
-                
+                UNION ALL
                 -- From DnsLogs
                 SELECT queryStr AS appOrDnsName, 
                     COUNT(queryStr) AS count, 
                     flag as flag
-                FROM DnsLogs 
+                FROM DnsLogs
                 WHERE uid = :uid
-                    AND time > :to 
-                    AND status = 'COMPLETE' 
+                    AND time > :to
+                    AND status = 'COMPLETE'
                     AND queryStr != ''
                 GROUP BY queryStr
             ) AS combined 

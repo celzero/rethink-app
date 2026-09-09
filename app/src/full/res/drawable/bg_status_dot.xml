@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- small status dot used by connection rows in the activity detail sheet -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="8dp"
+        android:height="8dp" />
+    <solid android:color="#FF4081" />
+</shape>

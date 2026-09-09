@@ -31,7 +31,6 @@ import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
@@ -45,7 +44,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
@@ -53,7 +52,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,7 +63,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * One touch Orbot Integration. Bottom sheet dialog fragment shows UI that enables One touch
  * Integration from the settings page.
  */
-class OrbotBottomSheet : BottomSheetDialogFragment() {
+class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetOrbotBinding? = null
 
     private val b
@@ -404,30 +402,13 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     private fun openAppsDialog() {
         // treat proxyId and proxyName of Orbot as base
-        val appsAdapter =
-            WgIncludeAppsAdapter(
+        startActivity(
+            WgIncludeAppsActivity.newIntent(
                 requireContext(),
                 ProxyManager.ID_ORBOT_BASE,
                 ProxyManager.ORBOT_PROXY_NAME
             )
-        mappingViewModel.apps.observe(this.viewLifecycleOwner) {
-            appsAdapter.submitData(lifecycle, it)
-        }
-        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        if (Themes.isFrostTheme(themeId)) {
-            themeId = R.style.App_Dialog_NoDim
-        }
-        val includeAppsDialog =
-            WgIncludeAppsDialog(
-                requireActivity(),
-                appsAdapter,
-                mappingViewModel,
-                themeId,
-                ProxyManager.ID_ORBOT_BASE,
-                ProxyManager.ID_ORBOT_BASE
-            )
-        includeAppsDialog.setCanceledOnTouchOutside(false)
-        includeAppsDialog.show()
+        )
     }
 
     private fun updateOrbotNone() {
@@ -633,7 +614,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

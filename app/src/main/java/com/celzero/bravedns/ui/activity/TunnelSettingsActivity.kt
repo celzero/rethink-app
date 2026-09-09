@@ -271,6 +271,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun setupClickListeners() {
+        b.settingsRestoreDefaults.setOnClickListener { showRestoreDefaultsDialog() }
+
         b.settingsActivityAllNetworkRl.setOnClickListener {
             b.settingsActivityAllNetworkSwitch.isChecked =
                 !b.settingsActivityAllNetworkSwitch.isChecked
@@ -280,10 +282,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             _: CompoundButton,
             bool: Boolean ->
             persistentState.useMultipleNetworks = bool
-            if (!bool && persistentState.routeRethinkInRethink) {
-                persistentState.routeRethinkInRethink = false
-                displayRethinkInRethinkUi()
-            }
             logEvent(
                 "use all networks",
                 "Use all networks for VPN: $bool"
@@ -321,10 +319,6 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                     val rethinkUid = android.os.Process.myUid()
                     io {
                         FirewallManager.exemptRethinkApp(rethinkUid)
-                    }
-                    if (!persistentState.useMultipleNetworks) {
-                        b.settingsActivityAllNetworkSwitch.isChecked = true
-                        persistentState.useMultipleNetworks = true
                     }
                     persistentState.routeRethinkInRethink = true
                     logEvent(
@@ -622,6 +616,41 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.settingsCustomLanIpDesc.text = getString(R.string.custom_lan_ip_desc)
         b.settingsCustomLanIpRl.setOnClickListener {
             openCustomLanIpDialog()
+        }
+    }
+
+    private fun showRestoreDefaultsDialog() {
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(R.string.restore_defaults_dialog_title)
+            .setMessage(R.string.restore_defaults_dialog_message)
+            .setPositiveButton(R.string.lbl_proceed) { di, _ ->
+                di.dismiss()
+                restoreDefaults()
+            }
+            .setNegativeButton(R.string.lbl_cancel) { di, _ ->
+                di.dismiss()
+            }
+            .show()
+    }
+
+    private fun restoreDefaults() {
+        io {
+            // restore all tunnel settings values to their defaults (flavor aware)
+            persistentState.restoreTunnelSettingsDefaults()
+            logEvent(
+                "restore defaults",
+                "User restored tunnel settings to default values"
+            )
+            uiCtx {
+                // re-read all values from persistentState into the ui
+                initView()
+                handleLockdownModeIfNeeded()
+                Utilities.showToastUiCentered(
+                    this@TunnelSettingsActivity,
+                    getString(R.string.restore_defaults_success_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
         }
     }
 
@@ -1146,7 +1175,9 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         if (appConfig.isDnsProxyActive()) {
             val dnsDetails = appConfig.getSelectedDnsProxyDetails()
             val appName = dnsDetails?.proxyAppName
-            val hasConflict = !appName.isNullOrBlank()
+            val hasConflict =
+                !appName.isNullOrBlank() &&
+                    appName != getString(R.string.cd_custom_dns_proxy_default_app)
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_dns_proxy),
@@ -1177,12 +1208,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // HTTP proxy cannot be used in lockdown (any HTTP proxy conflicts, not just
         // app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName ?: ""
+            val appName = appConfig.getConnectedHttpProxy()?.proxyAppName
+            val hasConflict = !appName.isNullOrBlank() &&
+                    appName != getString(R.string.cd_custom_dns_proxy_default_app)
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_http_proxy),
                     description = getString(R.string.lockdown_check_http_proxy_desc, appName),
-                    hasConflict = true,
+                    hasConflict = hasConflict,
                     type = CheckType.HTTP_PROXY
                 )
             )
@@ -1192,12 +1225,13 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         // SOCKS5 proxy cannot be used in lockdown (any SOCKS5 proxy conflicts, not
         // just app-bound ones), since it would override the lockdown proxy.
         if (appConfig.isCustomSocks5Enabled()) {
-            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName ?: ""
+            val appName = appConfig.getConnectedSocks5Proxy()?.proxyAppName
+            val hasConflict = !appName.isNullOrBlank() && appName != getString(R.string.cd_custom_dns_proxy_default_app)
             checks.add(
                 LockdownCheckItem(
                     label = getString(R.string.lockdown_check_socks5),
                     description = getString(R.string.lockdown_check_socks5_desc, appName),
-                    hasConflict = true,
+                    hasConflict = hasConflict,
                     type = CheckType.SOCKS5
                 )
             )
@@ -1278,13 +1312,17 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                     }
                     CheckType.HTTP_PROXY -> {
                         if (!proxiesRemoved) {
-                            appConfig.removeAllProxies()
+                            val pt = AppConfig.ProxyType.valueOf(appConfig.getProxyType())
+                            val pp = AppConfig.ProxyProvider.valueOf(appConfig.getProxyProvider())
+                            appConfig.removeProxy(pt, pp)
                             proxiesRemoved = true
                         }
                     }
                     CheckType.SOCKS5 -> {
                         if (!proxiesRemoved) {
-                            appConfig.removeAllProxies()
+                            val pt = AppConfig.ProxyType.valueOf(appConfig.getProxyType())
+                            val pp = AppConfig.ProxyProvider.valueOf(appConfig.getProxyProvider())
+                            appConfig.removeProxy(pt, pp)
                             proxiesRemoved = true
                         }
                     }
@@ -1357,7 +1395,11 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     private fun uiCtx(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

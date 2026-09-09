@@ -809,7 +809,6 @@
     <string name="ci_trust_rule" translatable="true">Güvenilirlik</string>
     <string name="cd_dns_alg_heading" translatable="true">Gelişmiş DNS filtreleme (deneysel)</string>
     <string name="lbl_qr_code" translatable="true">QR kod</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s yalnızca Rethink\'in DNS\'si ile çalışır</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">En Çok İleti̇şi̇me Geçi̇len IP\'ler</string>
     <string name="fapps_info_isolate_msg" translatable="true">Güvenilir IP\'ler hariç tümünü engelleyin.</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Uygulama başına IP / Etki alanı kurallarını değiştirin.</string>

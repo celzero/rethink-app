@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Toggle-chip outline (Allowed/Blocked on the home logs card): a quiet
+     grey border (theme outline color) marks the selected chip; unselected
+     chips have no stroke so the border alone reads as the selection state. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="?attr/colorOutline" />
+    <item android:color="@android:color/transparent" />
+</selector>

@@ -190,12 +190,17 @@ class ProxyManagerTest : KoinTest {
     // Helpers
     // ========================================================================
 
-    private fun buildAppInfo(uid: Int, pkg: String, name: String) = AppInfo(
+    private fun buildAppInfo(
+        uid: Int,
+        pkg: String,
+        name: String,
+        tombstoneTs: Long = 0L
+    ) = AppInfo(
         packageName = pkg, appName = name, uid = uid, isSystemApp = false,
         firewallStatus = FirewallManager.FirewallStatus.NONE.id, appCategory = "Test",
         wifiDataUsed = 0L, mobileDataUsed = 0L,
         connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id,
-        isProxyExcluded = false, screenOffAllowed = true, backgroundAllowed = true, tombstoneTs = 0L
+        isProxyExcluded = false, screenOffAllowed = true, backgroundAllowed = true, tombstoneTs = tombstoneTs
     )
 
     /** Convenience factory for ProxyApplicationMapping test rows. */
@@ -587,6 +592,45 @@ class ProxyManagerTest : KoinTest {
         coVerify(exactly = 2) { mockDb.insert(match { it.proxyId == rpnProxyId }) }
     }
 
+    @Test
+    fun `setProxyIdForAllApps skips tombstoned apps`() = runBlocking {
+        loadMappings()
+        stubFwApps(FirewallManager.AppInfoTuple(uid1, pkg1))
+        coEvery { FirewallManager.getAppInfoByUidAndPackage(uid1, pkg1) } returns buildAppInfo(
+            uid1, pkg1, name1, tombstoneTs = 999L
+        )
+
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+
+        coVerify(exactly = 0) { mockDb.insert(any()) }
+        assertFalse(ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
+    }
+
+    /**
+     * Regression: bulk ops are serialized by ProxyManager's mutex. While a full deterministic
+     * race cannot be expressed here, this asserts that a remove followed immediately by an
+     * include converges to a clean state with no duplicate/ghost rows.
+     */
+    @Test
+    fun `remove all followed by include all converges without ghost rows`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, ""), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+        assertEquals(4, pamSetSize()) // 2 base + 2 proxy rows
+
+        ProxyManager.setNoProxyForAllAppsForProxy(wgProxyId0)
+        assertEquals(2, pamSetSize()) // only base rows remain
+
+        ProxyManager.setProxyIdForAllApps(wgProxyId0, "T0")
+        assertEquals(4, pamSetSize())
+        assertTrue(ProxyManager.getProxyIdsForApp(uid1, pkg1).contains(wgProxyId0))
+        assertTrue(ProxyManager.getProxyIdsForApp(uid2, pkg2).contains(wgProxyId0))
+        coVerify(exactly = 4) { mockDb.insert(match { it.proxyId == wgProxyId0 }) }
+    }
+
     // ========================================================================
     // 7. setProxyIdForUnselectedApps
     // ========================================================================
@@ -602,6 +646,43 @@ class ProxyManagerTest : KoinTest {
         coVerify(exactly = 0) { mockDb.insert(match { it.uid == uid1 && it.proxyId == wgProxyId0 }) }
         coVerify(exactly = 1) { mockDb.insert(match { it.uid == uid2 && it.proxyId == wgProxyId0 }) }
         assertTrue(ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
+    }
+
+    /**
+     * Regression: "remaining apps" must never touch apps routed by a *different* proxy.
+     * Previously it inserted new ProxyApplicationMapping rows for every app lacking this
+     * specific proxyId — silently assigning apps that already belong to another tunnel/server.
+     */
+    @Test
+    fun `setProxyIdForUnselectedApps skips apps routed by any other proxy`() = runBlocking {
+        // uid1 is routed by an RPN server (different proxy family); uid2 routes nothing yet
+        loadMappings(pam(uid1, pkg1, ""), pam(uid1, pkg1, rpnProxyId), pam(uid2, pkg2, ""))
+        stubFwApps(
+            FirewallManager.AppInfoTuple(uid1, pkg1),
+            FirewallManager.AppInfoTuple(uid2, pkg2)
+        )
+
+        ProxyManager.setProxyIdForUnselectedApps(wgProxyId0, "T0")
+
+        coVerify(exactly = 0) { mockDb.insert(match { it.uid == uid1 && it.proxyId == wgProxyId0 }) }
+        coVerify(exactly = 1) { mockDb.insert(match { it.uid == uid2 && it.proxyId == wgProxyId0 }) }
+        assertFalse("uid1 must not be hijacked from its RPN server", ProxyManager.getProxyIdsForApp(uid1).contains(wgProxyId0))
+        assertTrue(ProxyManager.getProxyIdsForApp(uid1).contains(rpnProxyId))
+        assertTrue(ProxyManager.getProxyIdsForApp(uid2).contains(wgProxyId0))
+    }
+
+    @Test
+    fun `setProxyIdForUnselectedApps skips tombstoned apps`() = runBlocking {
+        loadMappings()
+        stubFwApps(FirewallManager.AppInfoTuple(uid1, pkg1))
+        coEvery { FirewallManager.getAppInfoByUidAndPackage(uid1, pkg1) } returns buildAppInfo(
+            uid1, pkg1, name1, tombstoneTs = 999L
+        )
+
+        ProxyManager.setProxyIdForUnselectedApps(wgProxyId0, "T0")
+
+        coVerify(exactly = 0) { mockDb.insert(any()) }
+        assertTrue(ProxyManager.getProxyIdsForApp(uid1).isEmpty())
     }
 
     // ========================================================================
@@ -1245,149 +1326,6 @@ class ProxyManagerTest : KoinTest {
         assertEquals("Tunnel0", captured[0].proxyName)
         assertEquals(rpnProxyId, captured[1].proxyId)
         assertEquals(rpnServerKey, captured[1].proxyName)
-    }
-
-    // ========================================================================
-    // 28. purgeGhostMappings — remove entries referencing deleted WG/RPN proxies
-    // ========================================================================
-
-    @Test
-    fun `purgeGhostMappings removes stale WG proxy entries from cache and DB`() = runBlocking {
-        loadMappings(
-            pam(uid1, pkg1, ""),            // base row
-            pam(uid1, pkg1, wgProxyId0),    // valid WG
-            pam(uid1, pkg1, wgProxyId1),    // ghost WG (config deleted)
-            pam(uid2, pkg2, "")             // another app base row
-        )
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = setOf(wgProxyId0),   // only wg0 still exists
-            validRpnProxyIds = emptySet()
-        )
-        assertEquals(1, purged)
-        assertTrue("valid WG survives", pamSetContains(uid1, pkg1, wgProxyId0))
-        assertFalse("ghost WG removed from cache", pamSetContains(uid1, pkg1, wgProxyId1))
-        assertTrue("base rows untouched", pamSetContains(uid1, pkg1, ""))
-        assertTrue("base rows untouched", pamSetContains(uid2, pkg2, ""))
-        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, wgProxyId1) }
-    }
-
-    @Test
-    fun `purgeGhostMappings removes stale RPN proxy entries from cache and DB`() = runBlocking {
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid1, pkg1, rpnProxyId),     // valid RPN
-            pam(uid1, pkg1, rpnProxyId2),    // ghost RPN (server removed)
-            pam(uid2, pkg2, rpnProxyId2)     // ghost RPN on another app
-        )
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = emptySet(),
-            validRpnProxyIds = setOf(rpnProxyId)  // only first server still exists
-        )
-        assertEquals(2, purged)
-        assertTrue("valid RPN survives", pamSetContains(uid1, pkg1, rpnProxyId))
-        assertFalse("ghost RPN removed", pamSetContains(uid1, pkg1, rpnProxyId2))
-        assertFalse("ghost RPN removed on uid2", pamSetContains(uid2, pkg2, rpnProxyId2))
-        coVerify(exactly = 1) { mockDb.deleteMapping(uid1, pkg1, rpnProxyId2) }
-        coVerify(exactly = 1) { mockDb.deleteMapping(uid2, pkg2, rpnProxyId2) }
-    }
-
-    @Test
-    fun `purgeGhostMappings does NOT misclassify RPN ids as WG despite shared prefix`() = runBlocking {
-        // Backend.RpnWin = "wgyrpn" starts with ID_WG_BASE = "wg"; the purge must check RPN
-        // before WG so a valid RPN id is never evaluated against the WG valid-set.
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid1, pkg1, rpnProxyId),    // valid RPN, must survive
-            pam(uid1, pkg1, wgProxyId0)     // valid WG, must survive
-        )
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = setOf(wgProxyId0),
-            validRpnProxyIds = setOf(rpnProxyId)
-        )
-        assertEquals(0, purged)
-        assertTrue(pamSetContains(uid1, pkg1, rpnProxyId))
-        assertTrue(pamSetContains(uid1, pkg1, wgProxyId0))
-    }
-
-    @Test
-    fun `purgeGhostMappings retains Orbot SOCKS5 HTTP TCP assignments regardless of valid sets`() = runBlocking {
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid1, pkg1, orbotProxyId),
-            pam(uid1, pkg1, s5ProxyId),
-            pam(uid1, pkg1, httpProxyId),
-            pam(uid1, pkg1, tcpProxyId)
-        )
-        // pass EMPTY valid sets — none of these proxy types should be purged
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = emptySet(),
-            validRpnProxyIds = emptySet()
-        )
-        assertEquals(0, purged)
-        assertTrue(pamSetContains(uid1, pkg1, orbotProxyId))
-        assertTrue(pamSetContains(uid1, pkg1, s5ProxyId))
-        assertTrue(pamSetContains(uid1, pkg1, httpProxyId))
-        assertTrue(pamSetContains(uid1, pkg1, tcpProxyId))
-    }
-
-    @Test
-    fun `purgeGhostMappings never removes base rows`() = runBlocking {
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid2, pkg2, ""),
-            pam(uid2, pkg2, wgProxyId0)     // ghost WG
-        )
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = emptySet(),
-            validRpnProxyIds = emptySet()
-        )
-        assertEquals(1, purged)
-        assertTrue("base row kept", pamSetContains(uid1, pkg1, ""))
-        assertTrue("base row kept", pamSetContains(uid2, pkg2, ""))
-        assertFalse("ghost WG purged", pamSetContains(uid2, pkg2, wgProxyId0))
-    }
-
-    @Test
-    fun `purgeGhostMappings returns 0 and is a no-op when there are no ghosts`() = runBlocking {
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid1, pkg1, wgProxyId0),
-            pam(uid1, pkg1, rpnProxyId)
-        )
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = setOf(wgProxyId0),
-            validRpnProxyIds = setOf(rpnProxyId)
-        )
-        assertEquals(0, purged)
-        coVerify(exactly = 0) { mockDb.deleteMapping(any(), any(), any()) }
-    }
-
-    @Test
-    fun `purgeGhostMappings handles empty pamSet`() = runBlocking {
-        val purged = ProxyManager.purgeGhostMappings(
-            validWgProxyIds = setOf(wgProxyId0),
-            validRpnProxyIds = setOf(rpnProxyId)
-        )
-        assertEquals(0, purged)
-    }
-
-    @Test
-    fun `purgeGhostMappings clears ghost from getProxyIdForApp so AppInfoActivity shows correct proxies`() = runBlocking {
-        // simulates the user-reported bug: AppInfoActivity.displayProxyStatus shows a deleted WG
-        loadMappings(
-            pam(uid1, pkg1, ""),
-            pam(uid1, pkg1, wgProxyId0),    // live
-            pam(uid1, pkg1, wgProxyId1)     // deleted tunnel, still in DB
-        )
-        // before purge, getProxyIdForApp returns the ghost
-        assertTrue(ProxyManager.getProxyIdForApp(uid1).contains(wgProxyId1))
-
-        ProxyManager.purgeGhostMappings(setOf(wgProxyId0), emptySet())
-
-        // after purge, only the live proxy remains
-        val proxies = ProxyManager.getProxyIdForApp(uid1)
-        assertTrue(proxies.contains(wgProxyId0))
-        assertFalse("ghost proxy no longer reported", proxies.contains(wgProxyId1))
     }
 
     // --- helper -------------------------------------------------------------------------

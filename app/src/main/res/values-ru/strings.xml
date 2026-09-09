@@ -815,7 +815,6 @@
     <string name="lbl_maybe_blocked" translatable="true">Может быть заблокирован</string>
     <string name="lbl_network" translatable="true">Cеть</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизировать частные IP-адреса (экспериментально)</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s работает только с Rethink DNS</string>
     <string name="settings_allow_lan_desc" translatable="true">Исключить маршруты LAN, loopback, multicast, link-local из VPN-туннеля Rethink.</string>
     <string name="crypt_relay_france" translatable="true">Анонимный ретранслятор DNS от https://cryptostrom.is/, размещенный в Париже, Франция.</string>
     <string name="crypt_relay_sweden" translatable="true">Анонимный ретранслятор DNS от https://cryptostrom.is/, размещенный в Швеции.</string>

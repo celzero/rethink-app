@@ -174,6 +174,15 @@ fun ProxyScreen(navController: NavController) {
                 value = if (proxyDetails.orbot) "Active" else null,
                 onClick = null,
             )
+            // TV counterpart of the phone's `RpnBypassAppsActivity`
+            // (reached there via ServerSelectionFragment). RPN purchase
+            // flows stay off-TV (F-Droid, no billing) but the per-app
+            // bypass list is manageable once any proxy exists.
+            ProxyStatusCard(
+                label = "RPN bypass",
+                value = "Manage excluded apps",
+                onClick = { navController.navigate("proxy/rpn-bypass") },
+            )
 
             Spacer(Modifier.height(24.dp))
             Text(

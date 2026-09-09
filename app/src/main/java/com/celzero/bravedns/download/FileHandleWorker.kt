@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.celzero.bravedns.R
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteBlocklistResidue
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteOldFiles
 import com.celzero.bravedns.service.PersistentState
@@ -33,9 +34,6 @@ import com.celzero.bravedns.util.Utilities.calculateMd5
 import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.localBlocklistFileDownloadPath
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -55,13 +53,16 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     val persistentState by inject<PersistentState>()
 
     override suspend fun doWork(): Result {
+        setProgress(workDataOf("processing" to true))
         try {
             val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", Long.MIN_VALUE)
             Logger.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
 
             // invalid download initiated time
             if (timestamp <= INIT_TIME_MS) {
-                Logger.w(LOG_TAG_DOWNLOAD, "timestamp version invalid $timestamp")
+                val msg = context.getString(R.string.download_err_internal)
+                Logger.w(LOG_TAG_DOWNLOAD, "Invalid timestamp: $timestamp")
+                persistentState.lastDownloadFailureReason = msg
                 return Result.failure()
             }
 
@@ -73,11 +74,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
             return if (response) Result.success(outputData) else Result.failure()
         } catch (e: Exception) {
-            Logger.e(
-                LOG_TAG_DOWNLOAD,
-                "FileHandleWorker Error while moving files to canonical path ${e.message}",
-                e
-            )
+            val msg = context.getString(R.string.download_err_internal)
+            Logger.e(LOG_TAG_DOWNLOAD, "Processing failure: ${e.message}", e)
+            persistentState.lastDownloadFailureReason = msg
         }
         return Result.failure()
     }
@@ -85,22 +84,24 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     private suspend fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
             if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp)) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_internal)
                 return false
             }
 
             val dir =
                 File(BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
-                Logger.w(
-                    LOG_TAG_DOWNLOAD,
-                    "Abort: file download path ${dir.absolutePath} isn't a directory"
-                )
+                val msg = context.getString(R.string.download_err_storage)
+                Logger.w(LOG_TAG_DOWNLOAD, "Download directory missing: ${dir.absolutePath}")
+                persistentState.lastDownloadFailureReason = msg
                 return false
             }
 
             val children = dir.list()
             if (children.isNullOrEmpty()) {
-                Logger.w(LOG_TAG_DOWNLOAD, "Abort: ${dir.absolutePath} is empty directory")
+                val msg = context.getString(R.string.download_err_internal)
+                Logger.w(LOG_TAG_DOWNLOAD, "Download directory empty: ${dir.absolutePath}")
+                persistentState.lastDownloadFailureReason = msg
                 return false
             }
 
@@ -112,13 +113,17 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 val from = dir.absolutePath + File.separator + children[i]
                 val to = localBlocklistFileDownloadPath(context, children[i], timestamp)
                 if (to.isEmpty()) {
-                    Logger.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
+                    val msg = context.getString(R.string.download_err_internal)
+                    Logger.w(LOG_TAG_DOWNLOAD, "Copy failed: destination path empty for ${children[i]}")
+                    persistentState.lastDownloadFailureReason = msg
                     return false
                 }
                 val result = Utilities.copy(from, to)
 
                 if (!result) {
-                    Logger.w(LOG_TAG_DOWNLOAD, "Copy failed from: $from, to: $to")
+                    val msg = context.getString(R.string.download_err_storage)
+                    Logger.w(LOG_TAG_DOWNLOAD, "Copy failed from $from to $to")
+                    persistentState.lastDownloadFailureReason = msg
                     return false
                 }
             }
@@ -132,11 +137,21 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 "After copy, dest dir: $destinationDir, ${destinationDir.isDirectory}, ${destinationDir.list()?.count()}"
             )
 
-            if (!hasLocalBlocklists(context, timestamp) || !isDownloadValid(timestamp)) {
+            if (!hasLocalBlocklists(context, timestamp)) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_validation)
+                return false
+            }
+
+            if (!isDownloadValid(timestamp)) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_validation)
                 return false
             }
 
             val result = updateTagsToDb(timestamp)
+            if (!result) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_internal)
+                return false
+            }
 
             updatePersistenceOnCopySuccess(timestamp)
             // delete the old files in the external directory (downloaded by the download manager)
@@ -150,7 +165,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             Logger.i(LOG_TAG_DOWNLOAD, "FileHandleWorker, copyFiles success? $result")
             return true
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_DOWNLOAD, "FileHandleWorker Copy exception: ${e.message}", e)
+            val msg = context.getString(R.string.download_err_internal)
+            Logger.e(LOG_TAG_DOWNLOAD, "Copy files exception: ${e.message}", e)
+            persistentState.lastDownloadFailureReason = msg
         }
         return false
     }
@@ -163,12 +180,14 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         )
     }
 
+    // Must write synchronously: copyFiles() deletes blocklist residue keyed on
+    // localBlocklistTimestamp right after this call. An async write would let the
+    // residue-sweep read the *old* timestamp and delete the freshly downloaded
+    // <timestamp> directory as "residue".
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        ui {
-            persistentState.localBlocklistTimestamp = timestamp
-            persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
-            persistentState.blocklistEnabled = true
-        }
+        persistentState.localBlocklistTimestamp = timestamp
+        persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
+        persistentState.blocklistEnabled = true
     }
 
     /**
@@ -202,9 +221,5 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             Logger.e(LOG_TAG_DOWNLOAD, "FileHandleWorker, isDownloadValid err: ${e.message}", e)
         }
         return false
-    }
-
-    private fun ui(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.Main).launch { f() }
     }
 }

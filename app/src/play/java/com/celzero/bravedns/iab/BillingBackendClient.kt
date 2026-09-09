@@ -181,7 +181,10 @@ class BillingBackendClient(
 
         if (recvCid.isNotEmpty() && storedCid != recvCid) {
             Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: recvCid differs from storedCid; re-registering device under new cid, recvCid=${recvCid.take(8)}, storedCid=${storedCid?.take(8) ?: "null"}, storedDid=${storedDid?.length ?: "null"}")
-            val didResult = createOrRegisterDid(recvCid, "")
+            // Re-bind first: send the stored DID (when present) so the server re-associates
+            // the existing device with recvCid instead of minting a second token seed.
+            // A blank DID header is sent only when nothing is stored (legitimate first mint).
+            val didResult = createOrRegisterDid(recvCid, storedDid ?: "")
             if (didResult.isSuccess) {
                 identityStore.save(env, recvCid, didResult.deviceId)
                 Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: re-registered device (didLen=${didResult.deviceId.length})")
@@ -242,7 +245,10 @@ class BillingBackendClient(
             Logger.d(LOG_IAB, "$TAG reconcileDidForCid [${env.label}]: did already present (len=${storedDid.length})")
             return@withLock DidResult(storedDid)
         }
-        val existing = if (storedCid == cid) (storedDid ?: "") else ""
+        // Re-bind first: always send the stored DID (when present) so the server
+        // re-associates the existing device with [cid] rather than minting a fresh
+        // token seed for every CID mismatch. Blank header only when nothing is stored.
+        val existing = storedDid ?: ""
         val didResult = createOrRegisterDid(cid, existing)
         if (didResult.isSuccess) {
             identityStore.save(env, cid, didResult.deviceId)
@@ -883,11 +889,11 @@ class BillingBackendClient(
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: server business error, ${result.payload}")
-                    if (result.payload.isSubscriptionExpired) {
-                        // Server definitively confirmed subscription is expired —
+                    if (result.payload.isSubscriptionExpired || result.payload.isPurchaseCancelled) {
+                        // Server definitively confirmed the purchase is no longer valid —
                         // callers must NOT preserve the old purchase or entitlement.
-                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: subscription definitively expired on server " +
-                            "(state=${result.payload.state}); returning Expired to caller")
+                        Logger.w(LOG_IAB, "$TAG $mname [${handle.envLabel}]: purchase definitively expired/cancelled on server " +
+                            "(error=${result.payload.error}, state=${result.payload.state}); returning Expired to caller")
                         QueryEntitlementResult.Expired(purchase)
                     } else {
                         // Other business errors (revoked, linked purchase, etc.) — preserve the local

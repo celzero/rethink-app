@@ -247,7 +247,7 @@ class NotificationHandlerActivity: BaseActivity() {
                 deviceIdPrefix = intent.getStringExtra(DeviceNotRegisteredNotifier.EXTRA_DEVICE_ID_PREFIX) ?: ""
             )
 
-            // Re-post to LiveData on main thread so ManageRpnPurchaseBtmSht's observer
+            // Re-post to LiveData on main thread so RethinkPlusDashboardFragment's observer
             // picks it up and shows DeviceNotRegisteredBottomSheet automatically.
             InAppBillingHandler.serverApiErrorLiveData.value = error
 

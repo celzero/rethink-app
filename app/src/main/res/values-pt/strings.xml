@@ -885,7 +885,6 @@
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Não validar certificados TLS do servidor (ative apenas se souber o que está a fazer)</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignorar regras de DNS e de firewall.</string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.]]></string>
-    <string name="bypass_dns_firewall_tooltip">%1$s apenas funciona com o DNS Rethink</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Chave inválida</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Número inválido</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erro de sintaxe</string>

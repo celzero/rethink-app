@@ -49,7 +49,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,7 +56,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 
-class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
+class RethinkLogBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
 
     private var _binding: BottomSheetConnTrackBinding? = null
 
@@ -431,6 +430,10 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { if (isAdded) f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

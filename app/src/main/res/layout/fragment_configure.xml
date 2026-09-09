@@ -8,17 +8,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="80dp">
+        android:paddingBottom="90dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="700dp">
+            app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -35,8 +34,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:alpha="0.55"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="4dp"
                     android:text="@string/app_name_small_case" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -45,9 +42,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:alpha="0.45"
-                    android:paddingStart="6dp"
                     android:paddingTop="2dp"
-                    android:paddingEnd="6dp"
                     android:text="@string/settings_title_desc" />
 
             </LinearLayout>
@@ -60,17 +55,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_apps_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_apps_icon"
@@ -82,11 +79,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_apps_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_apps_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_apps_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_apps_tv"
@@ -109,11 +111,13 @@
                         android:id="@+id/fs_apps_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -124,17 +128,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_dns_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_dns_icon"
@@ -146,11 +152,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_dns_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_dns_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_dns_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_dns_tv"
@@ -173,11 +184,13 @@
                         android:id="@+id/fs_dns_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -188,17 +201,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_firewall_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_firewall_icon"
@@ -210,11 +225,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_firewall_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_firewall_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_firewall_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_firewall_tv"
@@ -237,11 +257,13 @@
                         android:id="@+id/fs_firewall_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -252,17 +274,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_proxy_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_proxy_icon"
@@ -274,11 +298,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_proxy_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_proxy_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_proxy_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_proxy_tv"
@@ -301,11 +330,13 @@
                         android:id="@+id/fs_proxy_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -316,17 +347,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_network_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_network_icon"
@@ -338,11 +371,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_network_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_network_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_network_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_network_tv"
@@ -365,11 +403,13 @@
                         android:id="@+id/fs_network_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -380,17 +420,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_others_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_others_icon"
@@ -402,11 +444,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_others_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_others_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_others_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_others_tv"
@@ -429,11 +476,13 @@
                         android:id="@+id/fs_others_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -444,17 +493,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_logs_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_logs_icon"
@@ -466,11 +517,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_logs_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_logs_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_logs_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_logs_tv"
@@ -493,11 +549,13 @@
                         android:id="@+id/fs_logs_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -508,17 +566,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_anti_censorship_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_anti_censorship_icon"
@@ -530,11 +590,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_anti_censorship_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_anti_censorship_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_anti_censorship_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_anti_censorship_tv"
@@ -557,11 +622,13 @@
                         android:id="@+id/fs_anti_censorship_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -572,17 +639,19 @@
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <FrameLayout
+                        android:id="@+id/fs_advanced_icon_container"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
-                        android:background="@drawable/bg_configure_icon_container">
+                        android:background="@drawable/bg_configure_icon_container"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/fs_advanced_icon"
@@ -594,11 +663,16 @@
                     </FrameLayout>
 
                     <LinearLayout
+                        android:id="@+id/fs_advanced_text_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fs_advanced_iv"
+                        app:layout_constraintStart_toEndOf="@+id/fs_advanced_icon_container"
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fs_advanced_tv"
@@ -621,11 +695,13 @@
                         android:id="@+id/fs_advanced_iv"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:layout_marginStart="8dp"
                         android:alpha="0.4"
                         android:src="@drawable/ic_right_arrow_white"
-                        android:tint="?attr/primaryLightColorText" />
-                </LinearLayout>
+                        android:tint="?attr/primaryLightColorText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>

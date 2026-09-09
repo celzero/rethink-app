@@ -51,6 +51,15 @@
         android:gravity="center_vertical"
         android:layout_marginStart="12dp">
 
+        <View
+            android:id="@+id/view_load_dot"
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/dot_accent"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_load"
             android:layout_width="wrap_content"

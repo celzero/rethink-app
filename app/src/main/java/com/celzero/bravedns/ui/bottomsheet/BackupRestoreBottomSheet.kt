@@ -36,6 +36,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.work.BackoffPolicy
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -59,7 +60,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
@@ -67,7 +67,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
+class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: ActivityBackupRestoreBinding? = null
 
     private val b
@@ -194,13 +194,14 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun observeBackupWorker() {
+    private fun observeBackupWorker(workId: java.util.UUID) {
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
 
-        // observer for backup agent worker
-        workManager.getWorkInfosByTagLiveData(BackupAgent.TAG).observe(viewLifecycleOwner) {
-            workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+        // observe by id, not by tag: the tag query also returns terminal WorkInfos of
+        // previous attempts and emits them immediately upon registration (pruneWork is
+        // async), which would show a failure dialog / cancel work that is unrelated
+        workManager.getWorkInfoByIdLiveData(workId).observe(viewLifecycleOwner) { workInfo ->
+            if (workInfo == null) return@observe
 
             Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
@@ -214,7 +215,6 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                 WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> {
                     showBackupFailureDialog()
                     workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(BackupAgent.TAG)
                 }
                 else -> {
                     // no-op
@@ -223,29 +223,28 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun observeRestoreWorker() {
+    private fun observeRestoreWorker(workId: java.util.UUID) {
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
 
-        // observer for restore agent worker
-        workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(viewLifecycleOwner) {
-            workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+        // observe by id, not by tag (see observeBackupWorker)
+        workManager.getWorkInfoByIdLiveData(workId).observe(viewLifecycleOwner) { workInfo ->
+            if (workInfo == null) return@observe
             Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
             )
-            if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                showRestoreSuccessUi()
-                workManager.pruneWork()
-            } else if (
-                WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
-            ) {
-                showRestoreFailureDialog()
-                workManager.pruneWork()
-                workManager.cancelAllWorkByTag(RestoreAgent.TAG)
-            } else { // state == blocked
-                // no-op
+            when (workInfo.state) {
+                WorkInfo.State.SUCCEEDED -> {
+                    showRestoreSuccessUi()
+                    workManager.pruneWork()
+                }
+                WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> {
+                    showRestoreFailureDialog()
+                    workManager.pruneWork()
+                }
+                else -> {
+                    // no-op
+                }
             }
         }
     }
@@ -381,7 +380,14 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                 )
                 .addTag(RestoreAgent.TAG)
                 .build()
-        WorkManager.getInstance(requireContext()).beginWith(importWorker).enqueue()
+        // unique work: a concurrent restore (double-tap or the other entry point)
+        // would close/copy the same database files simultaneously and corrupt them
+        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+            RestoreAgent.TAG,
+            ExistingWorkPolicy.KEEP,
+            importWorker
+        )
+        observeRestoreWorker(importWorker.id)
     }
 
     private fun startBackupProcess(backupUri: Uri?) {
@@ -412,17 +418,17 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                 .addTag(BackupAgent.TAG)
                 .build()
         WorkManager.getInstance(requireContext()).beginWith(downloadWatcher).enqueue()
+        observeBackupWorker(downloadWatcher.id)
     }
 
     private fun showBackupFailureDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_backup_dialog_failure_title)
         builder.setMessage(R.string.brbs_backup_dialog_failure_message)
-        builder.setPositiveButton(getString(R.string.brbs_backup_dialog_failure_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.brbs_backup_dialog_failure_positive)) { _, _
+            ->
             backup()
-            observeBackupWorker()
         }
-
         builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _ ->
             // no-op
         }
@@ -471,7 +477,6 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_failure_positive)) { _, _
             ->
             restore()
-            observeRestoreWorker()
         }
 
         builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _ ->
@@ -488,7 +493,6 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
             restore()
-            observeRestoreWorker()
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
@@ -505,7 +509,6 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         builder.setMessage(R.string.brbs_backup_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_backup_dialog_positive)) { _, _ ->
             backup()
-            observeBackupWorker()
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->

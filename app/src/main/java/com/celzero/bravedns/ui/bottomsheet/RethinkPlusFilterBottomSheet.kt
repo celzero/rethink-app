@@ -32,11 +32,10 @@ import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.viewmodel.RethinkBlocklistViewModel
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFilterBottomSheet : BottomSheetDialogFragment() {
+class RethinkPlusFilterBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomSheetRethinkPlusFilterBinding? = null
 

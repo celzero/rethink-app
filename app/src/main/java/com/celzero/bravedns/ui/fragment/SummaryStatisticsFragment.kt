@@ -19,35 +19,46 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
+import com.celzero.bravedns.databinding.ViewInsightsRankRowBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
+import com.celzero.bravedns.ui.custom.DonutChartView
+import com.celzero.bravedns.ui.stats.CountryInsightsMapper
+import com.celzero.bravedns.ui.stats.StatsInsightsMath
+import com.celzero.bravedns.ui.stats.StatsViewMode
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import androidx.lifecycle.LiveData
+import androidx.paging.PagingData
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import android.widget.LinearLayout
+import androidx.core.graphics.ColorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,19 +74,23 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private val eventLogger by inject<EventLogger>()
 
     private var isVpnActive: Boolean = false
-    private var loadMoreClicked: Boolean = false
+    private var loadMoreInitialized: Boolean = false
 
-    private var contactedDomainsAdapter: SummaryStatisticsAdapter? = null
-    private var blockedDomainsAdapter: SummaryStatisticsAdapter? = null
-    private var contactedAsnAdapter: SummaryStatisticsAdapter? = null
-    private var blockedAsnAdapter: SummaryStatisticsAdapter? = null
-    private var contactedCountriesAdapter: SummaryStatisticsAdapter? = null
-    private var contactedIpsAdapter: SummaryStatisticsAdapter? = null
-    private var blockedIpsAdapter: SummaryStatisticsAdapter? = null
+    // current Stats presentation mode; persisted across sessions via PersistentState
+    private var statsViewMode: StatsViewMode = StatsViewMode.INSIGHTS
 
-    // Remove unused loadMore overlay views and rotation animator; add progress drawable for FAB
-    private var progressDrawable: CircularProgressDrawable? = null
-    private var originalFabText: CharSequence? = null
+    // latest snapshot per section, kept in sync with the (shared) adapters so
+    // switching to Insights renders instantly without refetching anything
+    private val insightsSnapshots = mutableMapOf<SummaryStatisticsType, List<AppConnection>>()
+
+    // theme-resolved Insights colors; refreshed on every full render
+    private var allowedColor: Int = 0
+    private var blockedColor: Int = 0
+    private var trackColor: Int = 0
+    private var centerTextColor: Int = 0
+
+    // adapters keyed by section type; used to propagate time-category changes
+    private val adaptersByType = mutableMapOf<SummaryStatisticsType, SummaryStatisticsAdapter>()
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
@@ -98,13 +113,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        io {
-            uiCtx {
-                initView()
-                observeAppStart()
-                initClickListeners()
-            }
-        }
+        // all of these are main-thread operations; running them directly avoids
+        // two unnecessary thread hops and renders the first frame sooner
+        initView()
+        observeAppStart()
+        initClickListeners()
     }
 
     private fun initView() {
@@ -114,6 +127,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssTitleRethink.setText(R.string.app_name_alpha)
             b.fssTitleRethink.isAllCaps = false
         }
+        // restore the persisted presentation mode before listeners attach
+        // (setting checkedButton here does not fire the toggle listener)
+        statsViewMode = StatsViewMode.fromId(persistentState.statsViewMode)
+        val modeBtn = b.fssViewModeToggleGroup.findViewById<MaterialButton>(
+            if (statsViewMode == StatsViewMode.INSIGHTS) {
+                b.fssViewModeInsightsBtn.id
+            } else {
+                b.fssViewModeListBtn.id
+            }
+        )
+        modeBtn.isChecked = true
+        applyViewModeUi()
         setTabbedViewTxt()
         highlightToggleBtn()
         showTopActiveApps()
@@ -125,6 +150,56 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         } else {
             b.fssAsnAllowedLl.visibility = View.GONE
             b.fssAsnBlockedLl.visibility = View.GONE
+            b.fssIaAsnAllowedLl.visibility = View.GONE
+            b.fssIaAsnBlockedLl.visibility = View.GONE
+        }
+        // load domain/ip/country sections eagerly; previously these were gated
+        // behind the (now removed) "load more" FAB
+        initLazySections()
+    }
+
+    /** Flips the two presentation containers; does not touch any data state. */
+    private fun applyViewModeUi() {
+        val insights = statsViewMode == StatsViewMode.INSIGHTS
+        b.fssListContainer.visibility = if (insights) View.GONE else View.VISIBLE
+        b.fssInsightsContainer.visibility = if (insights) View.VISIBLE else View.GONE
+        refreshViewModeToggleUi()
+        if (insights) {
+            renderInsights()
+            refreshInsightsTraffic()
+        }
+    }
+
+    /** Applies the selected/unselected styling to both view-mode buttons. */
+    private fun refreshViewModeToggleUi() {
+        styleViewModeBtn(b.fssViewModeListBtn)
+        styleViewModeBtn(b.fssViewModeInsightsBtn)
+    }
+
+    private fun styleViewModeBtn(mb: MaterialButton) {
+        // derive selection from statsViewMode (not isChecked): the group fires
+        // the checked/unchecked pair in quick succession and isChecked can be
+        // mid-transition, which previously left both buttons looking selected
+        val selected =
+            (mb.id == b.fssViewModeInsightsBtn.id) == (statsViewMode == StatsViewMode.INSIGHTS)
+        if (selected) {
+            mb.backgroundTintList =
+                ColorStateList.valueOf(
+                    UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood)
+                )
+            mb.iconTint =
+                ColorStateList.valueOf(
+                    UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor)
+                )
+        } else {
+            mb.backgroundTintList =
+                ColorStateList.valueOf(
+                    UIUtils.fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
+                )
+            mb.iconTint =
+                ColorStateList.valueOf(
+                    UIUtils.fetchColor(requireContext(), R.attr.defaultToggleBtnTxt)
+                )
         }
     }
 
@@ -142,7 +217,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val tc = viewModel.getTimeCategory().value.toString()
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(tc)
         btn.isChecked = true
+        refreshViewModeToggleUi()
         handleTotalUsagesUi()
+        if (statsViewMode == StatsViewMode.INSIGHTS) {
+            refreshInsightsTraffic()
+        }
     }
 
     private fun handleTotalUsagesUi() {
@@ -210,11 +289,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initClickListeners() {
-        b.fssFabLoadMore.setOnClickListener {
-            showLoadMoreProgress(!loadMoreClicked)
-        }
         b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
+
+        b.fssViewModeToggleGroup.addOnButtonCheckedListener(viewModeToggleListener)
+
+        // list-view chips
         b.fssCloseConnsChip.setOnClickListener {
             showCloseConnectionDialog()
         }
@@ -250,7 +330,66 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssCountriesLogsChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_COUNTRIES)
         }
+
+        // insights-view chips (same detailed screens as the list view)
+        b.fssIaCloseConnsChip.setOnClickListener {
+            showCloseConnectionDialog()
+        }
+        b.fssIaActiveConnsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.TOP_ACTIVE_CONNS)
+        }
+        b.fssIaAllowedAppsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_APPS)
+        }
+        b.fssIaBlockedAppsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_APPS)
+        }
+        b.fssIaAsnAllowedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_ASN)
+        }
+        b.fssIaAsnBlockedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_ASN)
+        }
+        b.fssIaCountriesChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_COUNTRIES)
+        }
+        b.fssIaDomainsAllowedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_DOMAINS)
+        }
+        b.fssIaDomainsBlockedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_DOMAINS)
+        }
+        b.fssIaIpsAllowedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_IPS)
+        }
+        b.fssIaIpsBlockedChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_IPS)
+        }
     }
+
+    /**
+     * View-mode switch: persists the mode and flips the presentation only.
+     * The time category and the loaded Stats state are shared by both views,
+     * so switching never refetches data and never resets the time range.
+     */
+    private val viewModeToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, _, isChecked ->
+            // restyle on BOTH events (checked + unchecked): the group emits the
+            // unchecked callback for the old button after (or before) the checked
+            // callback for the new one, so each event re-syncs the visuals
+            refreshViewModeToggleUi()
+            if (!isChecked) return@OnButtonCheckedListener
+            val newMode =
+                if (b.fssViewModeInsightsBtn.id == b.fssViewModeToggleGroup.checkedButtonId) {
+                    StatsViewMode.INSIGHTS
+                } else {
+                    StatsViewMode.LIST
+                }
+            if (newMode == statsViewMode) return@OnButtonCheckedListener
+            statsViewMode = newMode
+            persistentState.statsViewMode = newMode.id
+            applyViewModeUi()
+        }
 
     private val listViewToggleListener =
         MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
@@ -263,13 +402,13 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                         ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
                 viewModel.timeCategoryChanged(timeCategory)
                 handleTotalUsagesUi()
-                contactedDomainsAdapter?.setTimeCategory(timeCategory)
-                blockedDomainsAdapter?.setTimeCategory(timeCategory)
-                contactedCountriesAdapter?.setTimeCategory(timeCategory)
-                contactedAsnAdapter?.setTimeCategory(timeCategory)
-                blockedAsnAdapter?.setTimeCategory(timeCategory)
-                contactedIpsAdapter?.setTimeCategory(timeCategory)
-                blockedIpsAdapter?.setTimeCategory(timeCategory)
+                adaptersByType.values.forEach { it.setTimeCategory(timeCategory) }
+                // sections re-render automatically when the adapters receive
+                // the new paged data; traffic/graph depend on the time
+                // category directly and are refreshed here
+                if (statsViewMode == StatsViewMode.INSIGHTS) {
+                    refreshInsightsTraffic()
+                }
                 return@OnButtonCheckedListener
             }
 
@@ -292,11 +431,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             )
     }
 
-    private fun handleLoadMore(isClicked: Boolean) {
-        viewModel.setLoadMoreClicked(isClicked)
-        if (!isClicked) {
+    /**
+     * Wires the domain/ip/country sections. The ViewModel primes their
+     * LiveData (domains/ips/countries) in [SummaryStatisticsViewModel.setLoadMoreClicked],
+     * which MUST run before the observers below attach — switchMap only computes
+     * upon observation, so the primed values are picked up then. Runs once.
+     */
+    private fun initLazySections() {
+        if (loadMoreInitialized) {
             return
         }
+        loadMoreInitialized = true
+        viewModel.setLoadMoreClicked(true)
         showMostContactedDomain()
         showMostBlockedDomains()
         showMostContactedIps()
@@ -324,43 +470,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         dialog.show()
     }
 
-    private fun showLoadMoreProgress(isClicked: Boolean) {
-        if (isClicked) {
-            loadMoreClicked = true
-            b.fssFabLoadMore.isEnabled = false
-            // cache original text
-            if (originalFabText == null) originalFabText = b.fssFabLoadMore.text
-            // create or reuse progress drawable
-            if (progressDrawable == null) {
-                progressDrawable = CircularProgressDrawable(requireContext()).apply {
-                    strokeWidth = PROGRESS_STROKE_WIDTH
-                    centerRadius = PROGRESS_CENTER_RADIUS
-                    setStyle(CircularProgressDrawable.LARGE)
-                }
-            }
-            progressDrawable?.start()
-            // shrink to icon-only then set icon to progress indicator
-            b.fssFabLoadMore.shrink()
-            b.fssFabLoadMore.icon = progressDrawable
-            b.fssFabLoadMore.text = "" // ensure no residual text
-            handleLoadMore(true)
-            Utilities.delay(LOAD_MORE_TIMEOUT, lifecycleScope) {
-                if (!isAdded) return@delay
-                progressDrawable?.stop()
-                b.fssFabLoadMore.visibility = View.GONE
-                loadMoreClicked = false
-            }
-        } else {
-            // reset early
-            progressDrawable?.stop()
-            b.fssFabLoadMore.text = originalFabText ?: getString(R.string.load_more)
-            b.fssFabLoadMore.extend()
-            b.fssFabLoadMore.isEnabled = true
-            loadMoreClicked = false
-            handleLoadMore(false)
-        }
-    }
-
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
         val mb = b.toggleGroup.checkedButtonId
         val timeCategory =
@@ -378,263 +487,136 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     companion object {
         fun newInstance() = SummaryStatisticsFragment()
 
-        // Recycler view height constants
-        private const val RECYCLER_ITEM_VIEW_HEIGHT = 480
-        private const val RECYCLER_HEIGHT_OFFSET = 80
-
         // UI constants
-        private const val LOAD_MORE_TIMEOUT: Long = 1000
         private const val ALPHA_HALF_TRANSPARENT = 128
         private const val PERCENTAGE_MULTIPLIER = 100
+        private const val UNKNOWN_COUNTRY_LABEL = "--"
 
-        // Progress drawable constants
-        private const val PROGRESS_STROKE_WIDTH = 5f
-        private const val PROGRESS_CENTER_RADIUS = 18f
+        // donut slices: top items only, one hue stepped by intensity
+        private const val TOP_SLICES = 5
+        private val SLICE_ALPHAS = intArrayOf(255, 190, 140, 100, 70)
+    }
+
+    /**
+     * Wires a summary section: creates the adapter, observes the paged data and
+     * toggles the section's visibility based on load state.
+     *
+     * Height: the RecyclerView uses wrap_content with nested scrolling disabled,
+     * so it sizes itself exactly to its content — no pre-computed heights needed.
+     */
+    private fun setupSummaryRecycler(
+        recyclerView: RecyclerView,
+        container: View,
+        type: SummaryStatisticsType,
+        data: LiveData<PagingData<AppConnection>>
+    ): SummaryStatisticsAdapter {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // fixed-size assumption is wrong here: wrap_content height means data
+        // changes resize the view, so the RecyclerView must re-layout on updates
+        recyclerView.setHasFixedSize(false)
+        recyclerView.itemAnimator = null
+
+        val adapter = SummaryStatisticsAdapter(
+            requireContext(),
+            persistentState,
+            appConfig,
+            type
+        )
+        // automatically reverts to ALLOW once the adapter is non-empty, so no
+        // post-based hacks are required
+        adapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        adaptersByType[type] = adapter
+
+        data.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        // hide the whole section (header + list) when there is no data
+        adapter.addLoadStateListener { loadStates ->
+            if (loadStates.append.endOfPaginationReached) {
+                container.visibility =
+                    if (adapter.itemCount < 1) View.GONE else View.VISIBLE
+            } else {
+                container.visibility = View.VISIBLE
+            }
+        }
+
+        // keep the Insights snapshot for this section in sync with the exact
+        // same data the list view renders; no second query is issued
+        adapter.registerAdapterDataObserver(InsightsSnapshotObserver(type))
+
+        recyclerView.adapter = adapter
+        return adapter
+    }
+
+    /**
+     * Mirrors adapter list changes into [insightsSnapshots] and re-renders the
+     * matching Insights section (only when the Insights view is visible).
+     */
+    private inner class InsightsSnapshotObserver(
+        private val type: SummaryStatisticsType
+    ) : RecyclerView.AdapterDataObserver() {
+        private fun cacheAndRender() {
+            insightsSnapshots[type] = adaptersByType[type]?.snapshot()?.items.orEmpty()
+            if (statsViewMode == StatsViewMode.INSIGHTS) {
+                renderInsightsSection(type)
+            }
+        }
+
+        override fun onChanged() = cacheAndRender()
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = cacheAndRender()
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) =
+            cacheAndRender()
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = cacheAndRender()
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = cacheAndRender()
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) =
+            cacheAndRender()
     }
 
     private fun showTopActiveApps() {
-        b.fssActiveAppsRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssActiveAppsRecyclerView.layoutManager = layoutManager
-        b.fssActiveAppsRecyclerView.itemAnimator = null
-
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.TOP_ACTIVE_CONNS
-            )
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        viewModel.getTopActiveConns.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssActiveAppsRecyclerView.post {
-                try {
-                    if (recyclerAdapter.itemCount > 0) {
-                        recyclerAdapter.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.fssActiveAppsLl.visibility = View.GONE
-                } else {
-                    b.fssActiveAppsLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssActiveAppsLl.visibility = View.VISIBLE
-            }
-        }
-
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssActiveAppsRecyclerView.minimumHeight = pixels.toInt()
-        b.fssActiveAppsRecyclerView.adapter = recyclerAdapter
+        setupSummaryRecycler(
+            b.fssActiveAppsRecyclerView,
+            b.fssActiveAppsLl,
+            SummaryStatisticsType.TOP_ACTIVE_CONNS,
+            viewModel.getTopActiveConns
+        )
     }
 
     private fun showAppNetworkActivity() {
-        b.fssAppNetworkActivityRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssAppNetworkActivityRecyclerView.layoutManager = layoutManager
-        b.fssAppNetworkActivityRecyclerView.itemAnimator = null
-
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONNECTED_APPS)
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        viewModel.getAllowedAppNetworkActivity.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssAppNetworkActivityRecyclerView.post {
-                try {
-                    if (recyclerAdapter.itemCount > 0) {
-                        recyclerAdapter.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        // remove the view if there is no data
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.fssAppAllowedLl.visibility = View.GONE
-                } else {
-                    b.fssAppAllowedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssAppAllowedLl.visibility = View.VISIBLE
-            }
-        }
-
-        val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
-        b.fssAppNetworkActivityRecyclerView.minimumHeight = pixels.toInt()
-        b.fssAppNetworkActivityRecyclerView.adapter = recyclerAdapter
+        setupSummaryRecycler(
+            b.fssAppNetworkActivityRecyclerView,
+            b.fssAppAllowedLl,
+            SummaryStatisticsType.MOST_CONNECTED_APPS,
+            viewModel.getAllowedAppNetworkActivity
+        )
     }
 
     private fun showBlockedApps() {
-        b.fssAppBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssAppBlockedRecyclerView.layoutManager = layoutManager
-        b.fssAppBlockedRecyclerView.itemAnimator = null
-
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_BLOCKED_APPS
-            )
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        viewModel.getBlockedAppNetworkActivity.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssAppBlockedRecyclerView.post {
-                try {
-                    if (recyclerAdapter.itemCount > 0) {
-                        recyclerAdapter.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.fssAppBlockedLl.visibility = View.GONE
-                } else {
-                    b.fssAppBlockedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssAppBlockedLl.visibility = View.VISIBLE
-            }
-        }
-
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
-        b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
+        setupSummaryRecycler(
+            b.fssAppBlockedRecyclerView,
+            b.fssAppBlockedLl,
+            SummaryStatisticsType.MOST_BLOCKED_APPS,
+            viewModel.getBlockedAppNetworkActivity
+        )
     }
 
     private fun showMostConnectedASN() {
-        b.fssAsnAllowedRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssAsnAllowedRecyclerView.layoutManager = layoutManager
-        b.fssAsnAllowedRecyclerView.itemAnimator = null
-
-        contactedAsnAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONNECTED_ASN
-            )
-        contactedAsnAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-
-        val timeCategory = viewModel.getTimeCategory()
-        contactedAsnAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.getMostConnectedASN.observe(viewLifecycleOwner) {
-            contactedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssAsnAllowedRecyclerView.post {
-                try {
-                    if ((contactedAsnAdapter?.itemCount ?: 0) > 0) {
-                        contactedAsnAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        contactedAsnAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((contactedAsnAdapter?.itemCount ?: 0) < 1) {
-                    b.fssAsnAllowedLl.visibility = View.GONE
-                } else {
-                    b.fssAsnAllowedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssAsnAllowedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssAsnAllowedRecyclerView.minimumHeight = pixels.toInt()
-        b.fssAsnAllowedRecyclerView.adapter = contactedAsnAdapter
+        setupSummaryRecycler(
+            b.fssAsnAllowedRecyclerView,
+            b.fssAsnAllowedLl,
+            SummaryStatisticsType.MOST_CONNECTED_ASN,
+            viewModel.getMostConnectedASN
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostBlockedASN() {
-        b.fssAsnBlockedRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssAsnBlockedRecyclerView.layoutManager = layoutManager
-        b.fssAsnBlockedRecyclerView.itemAnimator = null
-
-        blockedAsnAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_BLOCKED_ASN
-            )
-        blockedAsnAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        val timeCategory = viewModel.getTimeCategory()
-        blockedAsnAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.getMostBlockedASN.observe(viewLifecycleOwner) {
-            blockedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssAsnBlockedRecyclerView.post {
-                try {
-                    if ((blockedAsnAdapter?.itemCount ?: 0) > 0) {
-                        blockedAsnAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        blockedAsnAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((blockedAsnAdapter?.itemCount ?: 0) < 1) {
-                    b.fssAsnBlockedLl.visibility = View.GONE
-                } else {
-                    b.fssAsnBlockedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssAsnBlockedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssAsnBlockedRecyclerView.minimumHeight = pixels.toInt()
-        b.fssAsnBlockedRecyclerView.adapter = blockedAsnAdapter
+        setupSummaryRecycler(
+            b.fssAsnBlockedRecyclerView,
+            b.fssAsnBlockedLl,
+            SummaryStatisticsType.MOST_BLOCKED_ASN,
+            viewModel.getMostBlockedASN
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostContactedDomain() {
@@ -643,55 +625,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssDomainAllowedLl.visibility = View.GONE
             return
         }
-
-        b.fssContactedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssContactedDomainRecyclerView.layoutManager = layoutManager
-        b.fssContactedDomainRecyclerView.itemAnimator = null
-
-        contactedDomainsAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONTACTED_DOMAINS
-            )
-        contactedDomainsAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-
-        val timeCategory = viewModel.getTimeCategory()
-        contactedDomainsAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.mcd.observe(viewLifecycleOwner) {
-            contactedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssContactedDomainRecyclerView.post {
-                try {
-                    if ((contactedDomainsAdapter?.itemCount ?: 0) > 0) {
-                        contactedDomainsAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        contactedDomainsAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((contactedDomainsAdapter?.itemCount ?: 0) < 1) {
-                    b.fssDomainAllowedLl.visibility = View.GONE
-                } else {
-                    b.fssDomainAllowedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssDomainAllowedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedDomainRecyclerView.adapter = contactedDomainsAdapter
+        setupSummaryRecycler(
+            b.fssContactedDomainRecyclerView,
+            b.fssDomainAllowedLl,
+            SummaryStatisticsType.MOST_CONTACTED_DOMAINS,
+            viewModel.mcd
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostBlockedDomains() {
@@ -700,53 +639,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssDomainBlockedLl.visibility = View.GONE
             return
         }
-        b.fssBlockedDomainRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
-        b.fssBlockedDomainRecyclerView.itemAnimator = null
-
-        blockedDomainsAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-            )
-        blockedDomainsAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        val timeCategory = viewModel.getTimeCategory()
-        blockedDomainsAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.mbd.observe(viewLifecycleOwner) {
-            blockedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssBlockedDomainRecyclerView.post {
-                try {
-                    if ((blockedDomainsAdapter?.itemCount ?: 0) > 0) {
-                        blockedDomainsAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        blockedDomainsAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((blockedDomainsAdapter?.itemCount ?: 0) < 1) {
-                    b.fssDomainBlockedLl.visibility = View.GONE
-                } else {
-                    b.fssDomainBlockedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssDomainBlockedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
-        b.fssBlockedDomainRecyclerView.adapter = blockedDomainsAdapter
+        setupSummaryRecycler(
+            b.fssBlockedDomainRecyclerView,
+            b.fssDomainBlockedLl,
+            SummaryStatisticsType.MOST_BLOCKED_DOMAINS,
+            viewModel.mbd
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostContactedIps() {
@@ -755,53 +653,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssIpAllowedLl.visibility = View.GONE
             return
         }
-
-        b.fssContactedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssContactedIpsRecyclerView.layoutManager = layoutManager
-        b.fssContactedIpsRecyclerView.itemAnimator = null
-
-        contactedIpsAdapter = SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONTACTED_IPS
-            )
-        contactedIpsAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        val timeCategory = viewModel.getTimeCategory()
-        contactedIpsAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.getMostContactedIps.observe(viewLifecycleOwner) {
-            contactedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssContactedIpsRecyclerView.post {
-                try {
-                    if ((contactedIpsAdapter?.itemCount ?: 0) > 0) {
-                        contactedIpsAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        contactedIpsAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((contactedIpsAdapter?.itemCount ?: 0) < 1) {
-                    b.fssIpAllowedLl.visibility = View.GONE
-                } else {
-                    b.fssIpAllowedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssIpAllowedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedIpsRecyclerView.adapter = contactedIpsAdapter
+        setupSummaryRecycler(
+            b.fssContactedIpsRecyclerView,
+            b.fssIpAllowedLl,
+            SummaryStatisticsType.MOST_CONTACTED_IPS,
+            viewModel.getMostContactedIps
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostBlockedIps() {
@@ -810,53 +667,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssIpBlockedLl.visibility = View.GONE
             return
         }
-
-        b.fssBlockedIpsRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
-        b.fssBlockedIpsRecyclerView.itemAnimator = null
-
-        blockedIpsAdapter = SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_BLOCKED_IPS
-            )
-        blockedIpsAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        val timeCategory = viewModel.getTimeCategory()
-        blockedIpsAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.getMostBlockedIps.observe(viewLifecycleOwner) {
-            blockedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssBlockedIpsRecyclerView.post {
-                try {
-                    if ((blockedIpsAdapter?.itemCount ?: 0) > 0) {
-                        blockedIpsAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        blockedIpsAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((blockedIpsAdapter?.itemCount ?: 0) < 1) {
-                    b.fssIpBlockedLl.visibility = View.GONE
-                } else {
-                    b.fssIpBlockedLl.visibility = View.VISIBLE
-                }
-            } else {
-                b.fssIpBlockedLl.visibility = View.VISIBLE
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
-        b.fssBlockedIpsRecyclerView.adapter = blockedIpsAdapter
+        setupSummaryRecycler(
+            b.fssBlockedIpsRecyclerView,
+            b.fssIpBlockedLl,
+            SummaryStatisticsType.MOST_BLOCKED_IPS,
+            viewModel.getMostBlockedIps
+        ).setTimeCategory(viewModel.getTimeCategory())
     }
 
     private fun showMostContactedCountries() {
@@ -865,54 +681,290 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssCountriesAllowedLl.visibility = View.GONE
             return
         }
+        setupSummaryRecycler(
+            b.fssContactedCountriesRecyclerView,
+            b.fssCountriesAllowedLl,
+            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES,
+            viewModel.getMostContactedCountries
+        ).setTimeCategory(viewModel.getTimeCategory())
+    }
 
-        b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
-        b.fssContactedCountriesRecyclerView.itemAnimator = null
+    /** Re-renders every Insights section from the cached snapshots. */
+    private fun renderInsights() {
+        applyInsightsTheme()
+        SummaryStatisticsType.entries.forEach { renderInsightsSection(it) }
+        applyInsightsSectionGating()
+    }
 
-        contactedCountriesAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
+    /** Hides Insights sections whose list-view counterparts are unavailable. */
+    private fun applyInsightsSectionGating() {
+        if (persistentState.downloadIpInfo) {
+            b.fssIaAsnAllowedLl.visibility = View.VISIBLE
+            b.fssIaAsnBlockedLl.visibility = View.VISIBLE
+        } else {
+            b.fssIaAsnAllowedLl.visibility = View.GONE
+            b.fssIaAsnBlockedLl.visibility = View.GONE
+        }
+        val dnsActive = appConfig.getBraveMode().isDnsActive()
+        b.fssIaDomainsAllowedLl.visibility = if (dnsActive) View.VISIBLE else View.GONE
+        b.fssIaDomainsBlockedLl.visibility = if (dnsActive) View.VISIBLE else View.GONE
+        val firewallActive = appConfig.getBraveMode().isFirewallActive()
+        b.fssIaIpsAllowedLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
+        b.fssIaIpsBlockedLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
+        b.fssIaCountriesLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
+    }
+
+    /** Resolves every Insights color from the active theme; no hardcoded colors. */
+    private fun applyInsightsTheme() {
+        allowedColor = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
+        blockedColor = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
+        trackColor = UIUtils.fetchColor(requireContext(), R.attr.colorSurfaceContainerHighest)
+        centerTextColor = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
+        val subtle = UIUtils.fetchColor(requireContext(), R.attr.secondaryTextColor)
+        b.fssIaCountriesMap.setColors(trackColor, allowedColor, subtle)
+        allInsightsDonuts().forEach { donut ->
+            donut.setTrackColor(trackColor)
+            donut.setCenterTextColor(centerTextColor)
+        }
+    }
+
+    private fun allInsightsDonuts(): List<DonutChartView> {
+        return listOf(
+            b.fssIaActiveConnsDonut,
+            b.fssIaAllowedAppsDonut,
+            b.fssIaBlockedAppsDonut,
+            b.fssIaAsnAllowedDonut,
+            b.fssIaAsnBlockedDonut,
+            b.fssIaDomainsAllowedDonut,
+            b.fssIaDomainsBlockedDonut,
+            b.fssIaIpsAllowedDonut,
+            b.fssIaIpsBlockedDonut
+        )
+    }
+
+    private fun renderInsightsSection(type: SummaryStatisticsType) {
+        val items = insightsSnapshots[type].orEmpty()
+        when (type) {
+            SummaryStatisticsType.TOP_ACTIVE_CONNS ->
+                renderRanking(
+                    b.fssIaActiveConnsRows, b.fssIaActiveConnsEmpty,
+                    b.fssIaActiveConnsDonut, false, type, items
+                )
+            SummaryStatisticsType.MOST_CONNECTED_APPS ->
+                renderRanking(
+                    b.fssIaAllowedAppsRows, b.fssIaAllowedAppsEmpty,
+                    b.fssIaAllowedAppsDonut, false, type, items
+                )
+            SummaryStatisticsType.MOST_BLOCKED_APPS ->
+                renderRanking(
+                    b.fssIaBlockedAppsRows, b.fssIaBlockedAppsEmpty,
+                    b.fssIaBlockedAppsDonut, true, type, items
+                )
+            SummaryStatisticsType.MOST_CONNECTED_ASN ->
+                renderRanking(
+                    b.fssIaAsnAllowedRows, b.fssIaAsnAllowedEmpty,
+                    b.fssIaAsnAllowedDonut, false, type, items
+                )
+            SummaryStatisticsType.MOST_BLOCKED_ASN ->
+                renderRanking(
+                    b.fssIaAsnBlockedRows, b.fssIaAsnBlockedEmpty,
+                    b.fssIaAsnBlockedDonut, true, type, items
+                )
+            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                renderRanking(
+                    b.fssIaCountriesRows, b.fssIaCountriesEmpty,
+                    null, false, type, items
+                )
+                updateCountryMap(items)
+            }
+            SummaryStatisticsType.MOST_CONTACTED_DOMAINS ->
+                renderRanking(
+                    b.fssIaDomainsAllowedRows, b.fssIaDomainsAllowedEmpty,
+                    b.fssIaDomainsAllowedDonut, false, type, items
+                )
+            SummaryStatisticsType.MOST_BLOCKED_DOMAINS ->
+                renderRanking(
+                    b.fssIaDomainsBlockedRows, b.fssIaDomainsBlockedEmpty,
+                    b.fssIaDomainsBlockedDonut, true, type, items
+                )
+            SummaryStatisticsType.MOST_CONTACTED_IPS ->
+                renderRanking(
+                    b.fssIaIpsAllowedRows, b.fssIaIpsAllowedEmpty,
+                    b.fssIaIpsAllowedDonut, false, type, items
+                )
+            SummaryStatisticsType.MOST_BLOCKED_IPS ->
+                renderRanking(
+                    b.fssIaIpsBlockedRows, b.fssIaIpsBlockedEmpty,
+                    b.fssIaIpsBlockedDonut, true, type, items
+                )
+        }
+    }
+
+    /**
+     * Renders a section as a donut chart (top slices, single hue stepped by
+     * intensity) plus normalized ranking rows (bar length = value / maxValue,
+     * the longest item at ~100%), or the section's empty state.
+     */
+    private fun renderRanking(
+        rowsContainer: LinearLayout,
+        emptyView: View,
+        donut: DonutChartView?,
+        isBlockedSection: Boolean,
+        type: SummaryStatisticsType,
+        items: List<AppConnection>
+    ) {
+        if (items.isEmpty()) {
+            rowsContainer.removeAllViews()
+            emptyView.visibility = View.VISIBLE
+            donut?.visibility = View.GONE
+            return
+        }
+        emptyView.visibility = View.GONE
+        donut?.visibility = View.VISIBLE
+        val fractions = StatsInsightsMath.normalizeFractions(items.map { metricValue(it, type) })
+        renderDonut(donut, isBlockedSection, type, fractions, items)
+        val inflater = LayoutInflater.from(requireContext())
+        val allowed = allowedColor
+        val blocked = blockedColor
+        rowsContainer.removeAllViews()
+        items.forEachIndexed { index, item ->
+            val rowBinding = ViewInsightsRankRowBinding.inflate(
+                inflater,
+                rowsContainer,
+                false
             )
-        contactedCountriesAdapter?.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        val timeCategory = viewModel.getTimeCategory()
-        contactedCountriesAdapter?.setTimeCategory(timeCategory)
-
-        viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
-            contactedCountriesAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-            b.fssContactedCountriesRecyclerView.post {
-                try {
-                    if ((contactedCountriesAdapter?.itemCount ?: 0) > 0) {
-                        contactedCountriesAdapter?.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
+            val label = rowLabel(item, type)
+            val metric = metricLabel(item, type)
+            rowBinding.irName.text = label
+            rowBinding.irCount.text = metric
+            rowBinding.irBar.max = PERCENTAGE_MULTIPLIER
+            rowBinding.irBar.progress = (fractions[index] * PERCENTAGE_MULTIPLIER).toInt()
+            rowBinding.irBar.setIndicatorColor(if (item.blocked) blocked else allowed)
+            rowBinding.root.contentDescription = getString(R.string.ci_desc, label, metric)
+            rowsContainer.addView(rowBinding.root)
         }
+    }
 
-        contactedCountriesAdapter?.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if ((contactedCountriesAdapter?.itemCount ?: 0) < 1) {
-                    b.fssCountriesAllowedLl.visibility = View.GONE
+    /**
+     * Donut slices: the top [TOP_SLICES] items, one hue (accent for
+     * allowed/contacted sections, red for blocked sections) at stepped
+     * intensities; the remainder stays visible as the neutral track ring.
+     * The center carries the section total.
+     */
+    private fun renderDonut(
+        donut: DonutChartView?,
+        isBlockedSection: Boolean,
+        type: SummaryStatisticsType,
+        fractions: List<Float>,
+        items: List<AppConnection>
+    ) {
+        donut ?: return
+        val base = if (isBlockedSection) blockedColor else allowedColor
+        val top = minOf(TOP_SLICES, fractions.size)
+        val slices = (0 until top).map { i ->
+            DonutChartView.Slice(fractions[i], ColorUtils.setAlphaComponent(base, SLICE_ALPHAS[i]))
+        }
+        donut.setData(slices)
+        donut.setCenterText(metricTotalLabel(type, items))
+    }
+
+    /** Human-readable total of the section metric for the donut center. */
+    private fun metricTotalLabel(type: SummaryStatisticsType, items: List<AppConnection>): String {
+        val total = items.sumOf { metricValue(it, type) }
+        return if (type == SummaryStatisticsType.MOST_CONNECTED_APPS) {
+            Utilities.humanReadableByteCount(total, true)
+        } else {
+            total.toString()
+        }
+    }
+
+    /** Value used for ranking bars, mirroring the list adapter's semantics. */
+    private fun metricValue(item: AppConnection, type: SummaryStatisticsType): Long {
+        return if (type == SummaryStatisticsType.MOST_CONNECTED_APPS) {
+            (item.downloadBytes ?: 0L) + (item.uploadBytes ?: 0L)
+        } else {
+            item.count.toLong()
+        }
+    }
+
+    /** Human-readable form of the ranking metric (bytes for allowed apps). */
+    private fun metricLabel(item: AppConnection, type: SummaryStatisticsType): String {
+        val value = metricValue(item, type)
+        return if (type == SummaryStatisticsType.MOST_CONNECTED_APPS) {
+            Utilities.humanReadableByteCount(value, true)
+        } else {
+            value.toString()
+        }
+    }
+
+    private fun rowLabel(item: AppConnection, type: SummaryStatisticsType): String {
+        return when (type) {
+            SummaryStatisticsType.TOP_ACTIVE_CONNS,
+            SummaryStatisticsType.MOST_CONNECTED_APPS,
+            SummaryStatisticsType.MOST_BLOCKED_APPS ->
+                item.appOrDnsName?.takeIf { it.isNotEmpty() }
+                    ?: getString(R.string.network_log_app_name_unnamed, item.uid.toString())
+            SummaryStatisticsType.MOST_CONNECTED_ASN,
+            SummaryStatisticsType.MOST_BLOCKED_ASN ->
+                getString(R.string.two_argument_space, item.flag, item.appOrDnsName.orEmpty())
+            SummaryStatisticsType.MOST_CONTACTED_DOMAINS,
+            SummaryStatisticsType.MOST_BLOCKED_DOMAINS ->
+                item.appOrDnsName?.dropLastWhile { it == '.' }.orEmpty()
+            SummaryStatisticsType.MOST_CONTACTED_IPS,
+            SummaryStatisticsType.MOST_BLOCKED_IPS -> item.ipAddress
+            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                val name = getCountryNameFromFlag(item.flag)
+                if (name.isNotEmpty() && name != UNKNOWN_COUNTRY_LABEL) {
+                    name
                 } else {
-                    b.fssCountriesAllowedLl.visibility = View.VISIBLE
+                    getString(
+                        R.string.two_argument_space,
+                        getString(R.string.network_log_app_name_unknown),
+                        item.flag
+                    )
                 }
-            } else {
-                b.fssCountriesAllowedLl.visibility = View.VISIBLE
             }
         }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - RECYCLER_HEIGHT_OFFSET) * scale + 0.5f)
-        b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedCountriesRecyclerView.adapter = contactedCountriesAdapter
+    }
+
+    /** Feeds the offline map: emoji flag -> ISO code -> connection count. */
+    private fun updateCountryMap(items: List<AppConnection>) {
+        val stats = items.mapNotNull { item ->
+            CountryInsightsMapper.toCountryCode(item.flag)?.let { it to item.count }
+        }.toMap()
+        b.fssIaCountriesMap.setCountryCounts(stats)
+        // accessibility summary: top few countries, list holds exact numbers
+        val summary = stats.entries.take(3).joinToString(", ") {
+            getString(R.string.ci_desc, it.key, it.value.toString())
+        }
+        b.fssIaCountriesMap.contentDescription =
+            if (summary.isEmpty()) {
+                getString(R.string.cd_stats_country_map)
+            } else {
+                getString(R.string.two_argument_colon, getString(R.string.cd_stats_country_map), summary)
+            }
+    }
+
+    /** Loads traffic totals + timeline (same DAO/VM as the list view). */
+    private fun refreshInsightsTraffic() {
+        // resolve the lazily created view model on the main thread first: its
+        // init touches LiveData, which must never happen on a background thread
+        val vm = viewModel
+        io {
+            val usage = vm.totalUsage()
+            uiCtx { setInsightsTrafficUi(usage) }
+        }
+    }
+
+    private fun setInsightsTrafficUi(usage: DataUsageSummary) {
+        val total = usage.totalDownload + usage.totalUpload
+        val unmetered = total - usage.meteredDataUsage
+        val metered = usage.meteredDataUsage
+
+        // KPI metric cards: value first, label below (set in XML)
+        b.fssIaKpiUnmetered.text = Utilities.humanReadableByteCount(unmetered, true)
+        b.fssIaKpiMetered.text = Utilities.humanReadableByteCount(metered, true)
+        b.fssIaKpiTotal.text = Utilities.humanReadableByteCount(total, true)
     }
 
     private fun logEvent(msg: String, details: String) {
@@ -924,6 +976,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

@@ -48,13 +48,12 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener {
+class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     private val b
@@ -309,7 +308,22 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         val ip = ipPair.first ?: return
 
         // set port number as null for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "") }
+        io {
+            // reject non-CIDR-able input; the ip trie only accepts CIDR notation,
+            // such a rule would be stored but never enforced
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                Logger.w(LOG_TAG_FIREWALL, "$TAG ip rule not enforceable (not a valid CIDR): $ipAddress")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.ci_dialog_error_invalid_cidr),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                return@io
+            }
+            IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "")
+        }
         logEvent("IP Rule set to ${status.name} for IP: $ipAddress, UID: $uid")
     }
 
@@ -354,7 +368,11 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     override fun onDismissWg(obj: Any?) {

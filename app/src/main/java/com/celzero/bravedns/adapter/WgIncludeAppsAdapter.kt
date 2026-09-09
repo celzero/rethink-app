@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
@@ -51,7 +52,8 @@ import kotlinx.coroutines.withContext
 class WgIncludeAppsAdapter(
     private val context: Context,
     private val proxyId: String,
-    private val proxyName: String
+    private val proxyName: String,
+    private val onAppModified: (() -> Unit)? = null
 ) :
     PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
         DIFF_CALLBACK
@@ -90,7 +92,7 @@ class WgIncludeAppsAdapter(
 
     override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
         // Guard against stale positions during layout pass after data change
-        if (position < 0 || position >= itemCount) {
+        if (position !in 0..<itemCount) {
             Logger.w(LOG_TAG_PROXY, "Invalid position $position for itemCount $itemCount")
             return
         }
@@ -117,7 +119,7 @@ class WgIncludeAppsAdapter(
                 val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
                 val hasInternetPerm = mapping.hasInternetPermission(packageManager)
                 val iconDrawable = getIcon(context, itemPackageName, itemAppName)
-                Logger.d(LOG_TAG_PROXY, "INCLUDE(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
+                Logger.d(LOG_TAG_PROXY, "include(${mapping.appName}): $isIncludedInCurrent, $isProxyExcluded, $proxyName, $proxyId, $proxyIdsForApp, $isIncludedInCurrent")
                 uiCtx {
                     // Update UI synchronously on the main thread
                     // enable/disable UI based on exclusion
@@ -243,7 +245,16 @@ class WgIncludeAppsAdapter(
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
                     Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
                 }
-                uiCtx { refresh() }
+                notifyAppModified()
+                uiCtx {
+                    refresh()
+                }
+            }
+        }
+
+        private suspend fun notifyAppModified() {
+            withContext(Dispatchers.Main.immediate) {
+                onAppModified?.invoke()
             }
         }
 
@@ -298,7 +309,10 @@ class WgIncludeAppsAdapter(
                                 }
                             }
                         }
-                        uiCtx { refresh() }
+                        notifyAppModified()
+                        uiCtx {
+                            refresh()
+                        }
                     }
                 }
                 .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
@@ -311,7 +325,15 @@ class WgIncludeAppsAdapter(
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
 

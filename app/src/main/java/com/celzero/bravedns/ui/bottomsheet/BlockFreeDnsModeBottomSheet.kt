@@ -26,10 +26,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
-class BlockFreeDnsModeBottomSheet : BottomSheetDialogFragment() {
+class BlockFreeDnsModeBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomSheetBlockFreeDnsModeBinding? = null
     private val b

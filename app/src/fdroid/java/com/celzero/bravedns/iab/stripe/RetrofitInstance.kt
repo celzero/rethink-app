@@ -2,13 +2,17 @@ package com.celzero.bravedns.iab.stripe
 
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import okhttp3.OkHttpClient
+import java.net.Proxy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
     private const val BASE_URL = "https://api.stripe.com/"
 
-    private val client = OkHttpClient.Builder().build()
+    // NO_PROXY: never consult ProxySelector.getDefault(), which throws
+    // IllegalArgumentException("port out of range:-1") when the device has a global
+    // HTTP proxy configured without a port (http(s).proxyPort system property is -1).
+    private val client = OkHttpClient.Builder().proxy(Proxy.NO_PROXY).build()
 
     /*val api: StripeApiService by lazy {
         RetrofitManager.getStripeBaseBuilder(0)

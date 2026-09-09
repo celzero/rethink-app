@@ -8,5 +8,27 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        // firestack AAR is not on google()/mavenCentral(); it must be fetched
+        // from the repository selected via `firestackRepo` in gradle.properties.
+        // NOTE: with RepositoriesMode.PREFER_SETTINGS, repositories declared in
+        // project build.gradle files are ignored
+        def firestackRepo = providers.gradleProperty("firestackRepo").orElse("github").get()
+
+        if (firestackRepo == "jitpack") {
+            // jitpack.io/#celzero/firestack
+            maven { url 'https://jitpack.io' }
+        } else if (firestackRepo == "github") {
+            // maven.pkg.github.com/celzero/firestack
+            maven {
+                name = 'GitHubPackages'
+                url = uri("https://maven.pkg.github.com/celzero/firestack")
+                credentials {
+                    username = providers.gradleProperty("gpr.user").orElse(providers.environmentVariable("USERNAME_GITHUB")).getOrNull()
+                    password = providers.gradleProperty("gpr.key").orElse(providers.environmentVariable("TOKEN_GITHUB")).getOrNull()
+                }
+            }
+        }
+        // "ossrh": no-op; mavenCentral (com.celzero:firestack) is already included
     }
 }

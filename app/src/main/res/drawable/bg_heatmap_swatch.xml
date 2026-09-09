@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral, low-emphasis default for the home-screen heatmap legend
+     swatches. Runtime colors are applied in HomeScreenFragment
+     (buildLogsHeatmap); this keeps the layout preview consistent with the
+     rendered legend: round and muted instead of loud green/red. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#26808080" />
+</shape>

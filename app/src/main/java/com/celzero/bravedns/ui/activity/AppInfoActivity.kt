@@ -103,8 +103,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
-
-    private var showBypassToolTip: Boolean = true
     private var isWarningAcknowledged: Boolean = false
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
@@ -446,25 +444,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
         }
 
-        TooltipCompat.setTooltipText(
-            b.aadAppSettingsBypassDnsFirewall,
-            getString(
-                R.string.bypass_dns_firewall_tooltip,
-                getString(R.string.ada_app_bypass_dns_firewall)
-            )
-        )
-
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
-                // show the tooltip only once when app is not bypassed (dns + firewall) earlier
-                if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
-                    b.aadAppSettingsBypassDnsFirewall.performLongClick()
-                    showBypassToolTip = false
-                    return@guardAppInfoInitialized
-                }
-
                 if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                     updateFirewallStatus(
                         FirewallManager.FirewallStatus.NONE,
@@ -952,14 +935,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     ) {
         io {
             val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
-            uiCtx {
-                if (appNames.count() > 1) {
-                    showDialog(appNames, appInfo, aStat, cStat, prevConnStat)
-                    return@uiCtx
-                }
-
-                completeFirewallChanges(aStat, cStat)
+            if (appNames.count() > 1) {
+                // guard only the dialog: showing it is pointless once the
+                // activity is finishing
+                uiCtx { showDialog(appNames, appInfo, aStat, cStat, prevConnStat) }
+                return@io
             }
+            completeFirewallChanges(aStat, cStat)
         }
     }
 
@@ -970,11 +952,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         appStatus = aStat
         connStatus = cStat
         io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
-        updateFirewallStatusUi(aStat, cStat)
         logEvent(
             "firewall rule change",
             "Firewall status changed for ${appInfo.appName} (${appInfo.uid}), new status: $aStat, conn status: $cStat"
         )
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) updateFirewallStatusUi(aStat, cStat)
+        }
     }
 
     private fun enableAppBypassedUi() {
@@ -1169,7 +1153,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-        if (isDestroyed) return
+        if (isFinishing || isDestroyed) return
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
@@ -1287,7 +1271,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
-            if (!isFinishing) f()
+            if (!isFinishing && !isDestroyed) f()
         }
     }
 }

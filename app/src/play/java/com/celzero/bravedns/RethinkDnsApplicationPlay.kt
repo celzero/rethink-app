@@ -26,6 +26,9 @@ import com.celzero.bravedns.service.PlayInAppMessageProvider
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP
+import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -67,14 +70,18 @@ class RethinkDnsApplicationPlay : Application() {
 
         // Initialize exception handlers
         GlobalExceptionHandler.initialize(this)
-        FirebaseErrorReporting.initialize()
-        GoReportingHandler.initialize(appScope, this)
-
-        // On every app start, report any tombstone files from the previous session
-        val appCtx = this
         appScope.launch(Dispatchers.IO) {
-             EnhancedBugReport.reportTombstonesToFirebaseOnStartup(appCtx)
+            try {
+                FirebaseApp.initializeApp(this@RethinkDnsApplicationPlay)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_APP, "firebase app init failed: ${e.message}")
+            }
+            FirebaseErrorReporting.initialize()
+            // On every app start, report any tombstone files from the previous session
+            EnhancedBugReport.reportTombstonesToFirebaseOnStartup(
+                this@RethinkDnsApplicationPlay)
         }
+        GoReportingHandler.initialize(appScope, this)
 
         appScope.launch {
             scheduleJobs()

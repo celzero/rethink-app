@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -343,7 +344,12 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
             if (ip.isNullOrBlank()) {
                 val c = WireguardManager.getConfigById(configId)
-                val host = c?.getPeers()?.getOrNull(0)?.getEndpoint()?.orElse(null)?.host
+                val host =
+                    c?.getPeers()
+                        ?.getOrNull(0)
+                        ?.getEndpoint()
+                        ?.orElse(null)
+                        ?.let { stripPort(it) }
                 if (!host.isNullOrBlank() && HostName(host).asAddress() != null) {
                     ip = host
                 }
@@ -559,7 +565,15 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun io(f: suspend () -> Unit): Job? {

@@ -30,6 +30,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.iab.BillingBackendClient
+import com.celzero.bravedns.iab.DeviceRegistrationGuard
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.RegisterDeviceResult
@@ -226,6 +227,10 @@ class RpnProxyUpdateWorker(
      */
     private suspend fun checkAndRegisterDeviceIfNeeded() {
         val mname = "checkAndRegisterDeviceIfNeeded"
+        // Single-flight: SubscriptionCheckWorker (enqueued from doWork) runs the same
+        // check concurrently. Coalesce overlapping runs so concurrent reconciles cannot
+        // race into minting duplicate DIDs (two POST /d/reg at the same second).
+        if (!DeviceRegistrationGuard.tryBegin(mname)) return
         try {
             val storedAccountId = billingBackendClient.getAccountId()
             val storedDeviceId  = billingBackendClient.getDeviceId()
@@ -274,6 +279,8 @@ class RpnProxyUpdateWorker(
         } catch (e: Exception) {
             // failure here must not block purchase validation
             Logger.e(LOG_IAB, "$TAG; $mname: error (non-fatal): ${e.message}", e)
+        } finally {
+            DeviceRegistrationGuard.end(mname)
         }
     }
 

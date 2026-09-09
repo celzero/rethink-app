@@ -108,7 +108,7 @@
                 android:alpha="0.75"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="12sp"
-                tools:text="At least 5 countries must remain available for AUTO selection" />
+                tools:text="At least 5 countries must remain available for Auto selection" />
 
         </LinearLayout>
 

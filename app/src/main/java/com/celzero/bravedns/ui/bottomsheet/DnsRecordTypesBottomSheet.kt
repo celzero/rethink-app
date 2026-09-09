@@ -32,11 +32,10 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import org.koin.android.ext.android.inject
 
-class DnsRecordTypesBottomSheet : BottomSheetDialogFragment() {
+class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsRecordTypesBinding? = null
     private val b
         get() = checkNotNull(_binding)

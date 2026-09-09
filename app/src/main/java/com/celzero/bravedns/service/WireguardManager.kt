@@ -87,14 +87,14 @@ object WireguardManager : KoinComponent {
         io { load(forceRefresh = false) }
     }
 
-    suspend fun load(forceRefresh: Boolean): Int {
+    suspend fun load(forceRefresh: Boolean): Int = withContext(Dispatchers.IO) {
         // migration: old encrypted wg configs to plain text files.
         // must run before any config read so that the rest of this always uses plaintext files
         migrateEncryptedConfigsIfNeeded()
 
         if (!forceRefresh && configs.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "configs already loaded; returning...")
-            return configs.size
+            return@withContext configs.size
         }
         // go through all files in the wireguard directory and load them
         // parse the files as those are now plain text
@@ -145,7 +145,7 @@ object WireguardManager : KoinComponent {
                 configs.add(c)
             }
         }
-        return configs.size
+        configs.size
     }
 
     /**

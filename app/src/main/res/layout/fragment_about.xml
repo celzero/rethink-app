@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:layout_marginBottom="60dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
@@ -42,18 +45,27 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
                     android:orientation="vertical"
-                    android:padding="5dp">
+                    android:paddingStart="6dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="6dp"
+                    android:paddingBottom="5dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.AppCompat.Subhead"
@@ -64,9 +76,9 @@
                         android:elevation="10dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingTop="10dp"
-                        android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:text="@string/about_bravedns_explantion"
                         android:textSize="@dimen/large_font_text_view" />
 
@@ -77,8 +89,8 @@
                         android:layout_marginBottom="20dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:text="@string/about_bravedns_whoarewe"
                         android:textSize="@dimen/large_font_text_view" />
 
@@ -90,8 +102,8 @@
                         android:layout_marginBottom="10dp"
                         android:gravity="center_vertical"
                         android:lineSpacingExtra="5dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:textSize="@dimen/large_font_text_view" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -102,10 +114,10 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_heart_accent"
@@ -113,10 +125,10 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:paddingStart="15dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="15dp"
-                    android:paddingBottom="10dp"
+                    android:paddingStart="18dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
                     android:text="@string/about_sponsor_link_text"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -126,10 +138,10 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_rethink_plus"
@@ -137,10 +149,11 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:paddingStart="15dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="15dp"
-                    android:paddingBottom="10dp"
+                    android:paddingStart="18dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
+                    android:visibility="gone"
                     android:text="Manage RPN"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -149,6 +162,7 @@
                     android:id="@+id/about_community_sponsor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp"
@@ -157,9 +171,9 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:alpha="0.7"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_sponsor_badge"
-                        android:alpha="0.7"
                         app:tint="?attr/colorPrimary" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -206,6 +220,7 @@
                 </LinearLayout>
 
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
@@ -214,6 +229,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:baselineAligned="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:elevation="10dp"
             android:orientation="horizontal"
             android:weightSum="1">
@@ -224,14 +241,14 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.5"
+                android:clipChildren="false"
                 android:orientation="vertical">
-
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/about_telegram"
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_telegram"
@@ -239,11 +256,11 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:paddingStart="15dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="15dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
                     android:drawableTint="?attr/primaryTextColor"
-                    android:paddingBottom="10dp"
                     android:text="@string/about_join_telegram"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -257,8 +274,8 @@
                     android:text="@string/about_bravedns_toreport_text"
                     android:textSize="@dimen/large_font_text_view" />
 
-
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -266,8 +283,8 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="20dp"
                 android:layout_weight="0.5"
+                android:clipChildren="false"
                 android:orientation="vertical">
-
 
                 <RelativeLayout
                     android:id="@+id/progress_layout"
@@ -295,6 +312,7 @@
                         android:padding="2dp"
                         android:text="@string/collecting_logs_progress_text"
                         android:textColor="?attr/colorSecondary" />
+
                 </RelativeLayout>
 
 
@@ -302,7 +320,7 @@
                     android:id="@+id/about_crash_log"
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_android_icon"
@@ -310,10 +328,10 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:paddingStart="15dp"
-                    android:paddingTop="10dp"
-                    android:paddingEnd="15dp"
-                    android:paddingBottom="10dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
                     android:text="@string/about_bug_report"
                     android:drawableTint="?attr/primaryTextColor"
                     android:textColor="?attr/primaryTextColor"
@@ -328,8 +346,8 @@
                     android:text="@string/about_bug_report_desc"
                     android:textSize="@dimen/large_font_text_view" />
 
-
             </LinearLayout>
+
         </LinearLayout>
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -340,13 +358,13 @@
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="60dp"
                 android:text="@string/about_app"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:padding="5dp"
                 android:textColor="?attr/colorPrimary" />
 
@@ -354,15 +372,15 @@
                 android:id="@+id/about_app_update"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_update"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_app_update_check"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -370,15 +388,15 @@
                 android:id="@+id/about_app_contributors"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_authors"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_app_contributors"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -386,15 +404,15 @@
                 android:id="@+id/about_app_translate"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_translate"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_app_translate"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -404,34 +422,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="15dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="60dp"
                 android:padding="5dp"
                 android:text="@string/about_web"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:textColor="?attr/colorPrimary" />
-
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_website"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_website"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_website"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -439,15 +456,15 @@
                 android:id="@+id/about_github"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_github"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_github"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -455,15 +472,15 @@
                 android:id="@+id/about_faq"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_faq"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_faq"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -471,15 +488,15 @@
                 android:id="@+id/about_blog"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_blog"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_docs"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -487,32 +504,31 @@
                 android:id="@+id/about_privacy_policy"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_privacy_policy"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_privacy_policy"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <!-- add terms of service and license text -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_terms_of_service"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_terms_service"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_terms_of_service"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -522,17 +538,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="60dp"
                 android:text="@string/about_connect"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:padding="5dp"
                 android:textColor="?attr/colorPrimary" />
 
@@ -540,15 +556,15 @@
                 android:id="@+id/about_twitter"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_twitter"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_twitter"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -556,49 +572,47 @@
                 android:id="@+id/about_mail"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_mail"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_email"
                 android:textSize="@dimen/large_font_text_view" />
-
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_reddit"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_reddit"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_reddit"
                 android:textSize="@dimen/large_font_text_view" />
-
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_element"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_element"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_matrix"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -606,15 +620,15 @@
                 android:id="@+id/about_mastodon"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_mastodon"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_mastodon"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -624,17 +638,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="60dp"
                 android:text="@string/about_settings"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:padding="5dp"
                 android:textColor="?attr/colorPrimary" />
 
@@ -642,15 +656,15 @@
                 android:id="@+id/about_app_info"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_app_info"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_settings_app_info"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -658,15 +672,15 @@
                 android:id="@+id/about_vpn_profile"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_about_key"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_settings_vpn_profile"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -674,15 +688,15 @@
                 android:id="@+id/about_app_notification"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_notification"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/about_settings_notification"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -692,18 +706,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/title_stats"
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="60dp"
                 android:text="@string/title_statistics"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:padding="5dp"
                 android:textColor="?attr/colorPrimary" />
 
@@ -711,15 +725,15 @@
                 android:id="@+id/about_stats"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_log_level"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/title_statistics"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -727,15 +741,15 @@
                 android:id="@+id/about_proc"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_proc"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/title_proc"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -743,15 +757,15 @@
                 android:id="@+id/about_stack_trace"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="21dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_stack_trace"
                 android:drawablePadding="22dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="Stacktrace"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -759,15 +773,15 @@
                 android:id="@+id/about_memory_profile"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_profile_memory"
                 android:drawablePadding="22dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="Profile Memory"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -775,15 +789,15 @@
                 android:id="@+id/about_db_stats"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_backup"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/title_database_dump"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -791,15 +805,15 @@
                 android:id="@+id/about_console_logs"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_app_log"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/console_log_title"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -807,25 +821,37 @@
                 android:id="@+id/about_event_logs"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_event_note"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/event_logs_title"
                 android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:text="@string/about_mozilla"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:orientation="vertical"
             android:weightSum="1">
 
@@ -856,23 +882,12 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="center"
-            android:text="@string/about_mozilla"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:alpha="0.75"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
             android:paddingTop="20dp"
             android:textColor="?attr/primaryLightColorText"
             android:textIsSelectable="true"
@@ -883,30 +898,32 @@
             android:id="@+id/token_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
             android:alpha="0.75"
+            android:ellipsize="end"
             android:gravity="center"
+            android:lineSpacingExtra="4dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:textColor="?attr/primaryLightColorText"
             android:textIsSelectable="true"
-            android:typeface="monospace"
-            android:textSize="@dimen/small_font_text_view" />
+            android:textSize="@dimen/small_font_text_view"
+            android:typeface="monospace" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_license"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:paddingBottom="40dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
             android:gravity="center"
+            android:paddingBottom="40dp"
             android:text="@string/about_license"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
             android:typeface="monospace" />
 
     </LinearLayout>
+
 </androidx.core.widget.NestedScrollView>

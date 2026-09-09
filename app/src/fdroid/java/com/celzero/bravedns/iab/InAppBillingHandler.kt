@@ -43,7 +43,9 @@ object InAppBillingHandler {
     const val REVOKE_WINDOW_SUBS_MONTHLY_DAYS = 3
     const val REVOKE_WINDOW_SUBS_YEARLY_DAYS = 7
     const val REVOKE_WINDOW_ONE_TIME_2YRS_DAYS = 14  // 2 * 7
-    const val REVOKE_WINDOW_ONE_TIME_5YRS_DAYS = 35  // 5 * 7
+    const val REVOKE_WINDOW_ONE_TIME_5YRS_DAYS = 28  // 4 * 7
+
+    const val MONEYBACK_WINDOW_DAYS = 31
 
     const val PLAY_SUBS_LINK = "https://play.google.com/store/account/subscriptions?sku=\$1&package=\$2"
     const val HISTORY_LINK = ""

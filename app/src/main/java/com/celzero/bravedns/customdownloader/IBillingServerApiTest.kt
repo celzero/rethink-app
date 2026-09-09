@@ -43,9 +43,10 @@ import retrofit2.http.Query
  *                           primary; safe for all read (GET) endpoints.
  *
  * ### Identity headers
- * CID and DID are no longer passed as URL query parameters. All endpoints send:
+ * CID, DID, and purchaseToken are no longer passed as URL query parameters. All endpoints send:
  *   `x-rethink-app-cid: <account id>`
  *   `x-rethink-app-did: <device id>`
+ *   `x-rethink-app-purchase-token: <purchase token>`
  * Bootstrap endpoints (`registerCustomer`, `registerDevice`) accept nullable headers
  * so Retrofit omits them for first-time registrations.
  *
@@ -85,7 +86,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
       */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/d/acc")
     suspend fun registerCustomer(
         @Header("x-rethink-app-cid") accountId: String?,
@@ -110,7 +114,10 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/d/reg")
     suspend fun registerDevice(
         @Header("x-rethink-app-cid") accountId: String,
@@ -123,11 +130,12 @@ interface IBillingServerApiTest {
 
     /*
       * Cancel the subscription for the given account ID (test path).
-      * URL shape: /g/stop?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/stop?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement] (typically "test").
@@ -135,24 +143,28 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/stop")
     suspend fun cancelSubscription(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Refund / revoke the subscription for the given account ID (test path).
-      * URL shape: /g/refund?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/refund?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -160,48 +172,56 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/refund")
     suspend fun revokeSubscription(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Acknowledge a purchase (test path). POST
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/ack?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/ack")
     suspend fun acknowledgePurchase(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Query entitlement for a purchase (test path). GET
-      * URL shape: /g/ack?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/ack?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -209,24 +229,28 @@ interface IBillingServerApiTest {
       * DB routing: read-only; first-unconstrained allows the server to use the nearest
       * replica (or primary) with no consistency constraint.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-unconstrained",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @GET("/g/ack")
     suspend fun queryEntitlement(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Consume an expired one-time (INAPP) purchase server-side (test path).
-      * URL shape: /g/con?sku=xxx&purchaseToken=xxx&test=<value>
+      * URL shape: /g/con?sku=xxx&test=<value>
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -235,24 +259,28 @@ interface IBillingServerApiTest {
       *
       * DB routing: write; first-primary ensure to use the primary DB.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-primary")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-primary",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @POST("/g/con")
     suspend fun consumePurchase(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
         @Query("sku") sku: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("vcode") vcode: String,
         @Query("test") test: String
     ): Response<JsonObject?>?
 
     /*
       * Fetch purchase/order history from the server (test path).
-      * URL shape: /g/tx?purchaseToken=xxx&test=<value>[&tot=n][&active]
+      * URL shape: /g/tx?test=<value>[&tot=n][&active]
       *
       * Headers:
       *   x-rethink-app-cid: <account id>
       *   x-rethink-app-did: <device id>
+      *   x-rethink-app-purchase-token: <purchase token>
       *
       * `test` is required and must be the non-null string returned by
       * [RpnProxyManager.getIsTestEntitlement].
@@ -262,12 +290,15 @@ interface IBillingServerApiTest {
       * DB routing: read-only; first-unconstrained allows the server to use the nearest
       * replica (or primary) with no consistency constraint.
      */
-    @Headers("x-rethink-db-rpn-test-session: first-unconstrained")
+    @Headers(
+        "x-rethink-db-rpn-test-session: first-unconstrained",
+        "User-Agent: ${RetrofitManager.USER_AGENT}"
+    )
     @GET("/g/tx")
     suspend fun getPurchaseHistory(
         @Header("x-rethink-app-cid") accountId: String,
         @Header("x-rethink-app-did") deviceId: String,
-        @Query("purchaseToken") purchaseToken: String,
+        @Header("x-rethink-app-purchase-token") purchaseToken: String,
         @Query("tot") total: Int? = null,
         @Query("active") active: String? = null,
         @Query("test") test: String,

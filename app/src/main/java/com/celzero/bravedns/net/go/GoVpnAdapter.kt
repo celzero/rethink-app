@@ -42,6 +42,7 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.database.SmartDnsMode
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
@@ -163,6 +164,7 @@ class GoVpnAdapter : KoinComponent {
         // TODO: ideally the values required for transport, alg and rdns should be set in the
         // opts itself.
         setRDNS()
+        setPlusStrategy()
         addTransport()
         setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
         setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
@@ -3609,10 +3611,6 @@ class GoVpnAdapter : KoinComponent {
                     // default transport-id(Plus), append index & individual id with this
                     val id = Backend.Plus + DOT_INDEX + dot.id
                     url = dot.url
-                    // skip mullvad dots
-                    if (url.contains("mullvad.net") || url.contains("mullvad.org")) {
-                        return@io
-                    }
                     // if tls is present, remove it and pass it to getIpString
                     val ips: String = getIpString(context, url.replace("tls://", ""))
                     if (ips.isEmpty()) {
@@ -3708,12 +3706,18 @@ class GoVpnAdapter : KoinComponent {
         return false
     }
 
-    fun setPlusStrategy(option: Long): Tunnel {
-        // Settings.PlusFilterSafest, Settings.PlusOrderFastest
-        // default value for PlusStrategy is Safest, which is the safest strategy
-        // fastest is another strategy, which is not used for now (v055n)
-        Settings.setPlusStrategy(Settings.PlusFilterSafest)
-        return tunnel
+    suspend fun setPlusStrategy() {
+        if (appConfig.getDnsType().isSmartDns()) {
+            val chosenSmartDns = appConfig.getSelectedSmartDnsEndpoint()
+            if (chosenSmartDns == null) {
+                Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+            } else {
+                val mode = SmartDnsMode.getTunMode(chosenSmartDns.id)
+                Settings.setPlusStrategy(Settings.PlusOrderFastest, mode)
+            }
+        } else {
+            Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+        }
     }
 
     fun tunMtu(): Int {

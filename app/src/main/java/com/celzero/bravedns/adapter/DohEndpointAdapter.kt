@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
@@ -93,6 +95,8 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
     inner class DoHEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
         private var statusCheckJob: Job? = null
+        private val selectionIndicator =
+            SelectionIndicator(b.endpointSelectionOrbital, b.endpointSelectionPill)
 
         fun update(endpoint: DoHEndpoint) {
             displayDetails(endpoint)
@@ -102,7 +106,6 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         private fun setupClickListeners(endpoint: DoHEndpoint) {
             b.root.setOnClickListener { updateConnection(endpoint) }
             b.endpointInfoImg.setOnClickListener { showExplanationOnImageClick(endpoint) }
-            b.endpointCheck.setOnClickListener { updateConnection(endpoint) }
         }
 
         private fun displayDetails(endpoint: DoHEndpoint) {
@@ -116,7 +119,13 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                         context.getString(R.string.lbl_insecure)
                     )
             }
-            b.endpointCheck.isChecked = endpoint.isSelected
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    b.endpointName.text
+                )
+            selectionIndicator.update(endpoint.isSelected)
             if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
             } else if (endpoint.isSelected) {
@@ -207,13 +216,14 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
         private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
             if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint.id)
-            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
+            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohIp, endpoint.dohExplanation)
         }
 
-        private fun showDohMetadataDialog(title: String, url: String, message: String?) {
+        private fun showDohMetadataDialog(title: String, url: String, ips: String?, message: String?) {
             val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + getDnsDesc(message))
+            val msg = url + if (!ips.isNullOrEmpty()) "\n\n$ips" else "" + "\n\n" + getDnsDesc(message)
+            builder.setMessage(msg)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
@@ -298,7 +308,15 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner ?: return
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
 
         private fun ui(f: suspend () -> Unit): Job? {

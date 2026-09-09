@@ -833,7 +833,6 @@
     <string name="ada_app_dns_settings" translatable="true">Setări DNS</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Șterge jurnalele</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Șterge toate jurnalele pentru această aplicație.</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s funcționează doar cu DNS-ul Rethink</string>
     <string name="exclude_apps_from_proxy">Exclude aplicația la toate proxy-urile</string>
     <string name="exclude_apps_from_proxy_failure_toast">Această aplicație ocolește proxy-urile</string>
     <string name="bsac_title_desc" translatable="true">Regulile se aplică numai pentru această aplicație.</string>

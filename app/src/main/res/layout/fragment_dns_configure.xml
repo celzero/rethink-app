@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -26,10 +26,20 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/dc_refresh"
+                android:layout_toStartOf="@id/dc_restore_defaults"
                 android:padding="5dp"
                 android:text="@string/dc_global_heading"
                 android:textColor="?attr/colorPrimary" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dc_restore_defaults"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/dc_refresh"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/ic_backup_restore" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/dc_refresh"
@@ -40,20 +50,25 @@
                 android:layout_gravity="center"
                 android:padding="5dp"
                 android:src="@drawable/ic_refresh_white" />
+
         </RelativeLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
+            android:layout_marginTop="5dp"
             app:cardCornerRadius="8dp"
-            android:layout_marginTop="5dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
 
@@ -68,7 +83,7 @@
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/network_dns_rb"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center"
@@ -93,7 +108,7 @@
                 <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/custom_dns_rb"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
@@ -108,7 +123,7 @@
                 <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/rethink_plus_dns_rb"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
@@ -119,37 +134,19 @@
                     android:padding="10dp"
                     android:text="@string/dc_rethink_dns_radio" />
 
-                <RelativeLayout
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/smart_dns_rb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp">
-
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/smart_dns_rb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:enabled="true"
-                        android:minHeight="48dp"
-                        android:padding="10dp"
-                        android:text="@string/smart_dns" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/smart_dns_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_gravity="center"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_info_white_16" />
-
-                </RelativeLayout>
+                    android:layout_marginBottom="10dp"
+                    android:drawableEnd="@drawable/ic_right_arrow_white"
+                    android:enabled="true"
+                    android:minHeight="48dp"
+                    android:padding="10dp"
+                    android:text="@string/smart_dns" />
 
                 <LinearLayout
                     android:id="@+id/query_card_view_top"
@@ -187,8 +184,11 @@
                         android:padding="5dp"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view" />
+
                 </LinearLayout>
+
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -206,20 +206,23 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
-            app:cardCornerRadius="8dp">
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_local_blocklist_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -239,7 +242,7 @@
 
                     <LinearLayout
                         android:id="@+id/dc_local_blocklist_container"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_local_blocklist_img"
@@ -251,8 +254,6 @@
                             style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="5dp"
                             android:text="@string/dc_local_block_heading" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -271,6 +272,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_local_block_desc_1"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -289,14 +291,14 @@
                     android:id="@+id/divider_local_blocklist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_downloader_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -315,7 +317,7 @@
                         android:src="@drawable/ic_update" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_downloader_switch"
@@ -336,6 +338,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/settings_custom_downloader_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -346,19 +349,20 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
+
                 </RelativeLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_check_update_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -377,7 +381,7 @@
                         android:src="@drawable/ic_blocklist_update_check" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_check_update_switch"
@@ -398,6 +402,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_check_update_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -412,6 +417,7 @@
                 </RelativeLayout>
 
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -429,20 +435,23 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
-            app:cardCornerRadius="8dp">
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_alg_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -462,7 +471,7 @@
                         android:src="@drawable/ic_adv_dns_filter" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_alg_switch"
@@ -483,6 +492,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/cd_dns_alg_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -499,14 +509,14 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_split_dns_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -526,7 +536,7 @@
                         android:src="@drawable/ic_split_dns" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_split_dns_switch"
@@ -548,6 +558,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/cd_split_dns_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -565,14 +576,14 @@
                     android:id="@+id/divider_split_dns"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_allowed_record_types_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -592,7 +603,7 @@
                         android:src="@drawable/ic_allow_dns_records" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_allowed_record_types_count"
@@ -614,6 +625,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/cd_allowed_dns_record_types_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -647,20 +659,23 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
-            app:cardCornerRadius="8dp">
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
                 android:orientation="vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="10dp">
 
                 <RelativeLayout
                     android:id="@+id/dc_favicon_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -680,7 +695,7 @@
                         android:src="@drawable/ic_fav_icon" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_favicon_switch"
@@ -701,6 +716,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_dns_website_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -717,14 +733,14 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_enable_cache_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -743,7 +759,7 @@
                         android:src="@drawable/ic_auto_start" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_enable_cache_switch"
@@ -764,6 +780,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_setting_dns_cache_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -774,19 +791,20 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
+
                 </RelativeLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_proxy_dns_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -805,7 +823,7 @@
                         android:src="@drawable/ic_prevent_dns_proxy" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_proxy_dns_switch"
@@ -826,6 +844,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_proxy_dns_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -839,18 +858,17 @@
 
                 </RelativeLayout>
 
-
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_prevent_dns_leaks_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -860,15 +878,15 @@
                         android:id="@+id/dc_prevent_dns_leaks_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
-                        android:layout_centerVertical="true"
                         android:layout_marginEnd="5dp"
                         android:padding="10dp"
                         android:src="@drawable/ic_prevent_dns_leaks" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_prevent_dns_leaks_switch"
@@ -889,6 +907,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_dns_leaks_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -905,14 +924,14 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_block_heading_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -932,7 +951,7 @@
                         android:src="@drawable/ic_block_unknown_dns" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_unknown_switch"
@@ -953,6 +972,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_block_unknown_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -969,23 +989,23 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:visibility="gone"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp"
+                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:id="@+id/dc_undelegated_domains_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1004,7 +1024,7 @@
                         android:src="@drawable/ic_undelegated_domain" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_undelegated_domains_switch"
@@ -1025,6 +1045,7 @@
                             android:paddingTop="3dp"
                             android:text="@string/dc_use_sys_dns_undelegated_desc"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -1041,14 +1062,14 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginStart="56dp"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
                     android:id="@+id/dc_block_free_dns_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1068,7 +1089,7 @@
                         android:src="@drawable/ic_use_fallback_bypass" />
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_free_dns_arrow"
@@ -1090,6 +1111,7 @@
                             android:paddingTop="3dp"
                             android:text=""
                             android:textColor="?attr/colorOnSurfaceVariant" />
+
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -1104,12 +1126,13 @@
 
                 </RelativeLayout>
 
-
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="40dp" />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

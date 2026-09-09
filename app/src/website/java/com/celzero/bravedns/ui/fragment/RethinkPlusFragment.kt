@@ -37,9 +37,11 @@ import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
@@ -48,11 +50,9 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
-import java.util.Locale
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -104,6 +104,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     override fun onResume() {
         super.onResume()
         if (b.loadingContainer.isVisible) startShimmer()
+        startHeaderAnimations()
         if (shouldRecheckOnResume) {
             shouldRecheckOnResume = false
             viewModel.initializeBilling()
@@ -124,40 +125,42 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     override fun onPause() {
         super.onPause()
         stopShimmer()
+        stopHeaderAnimations()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        stopHeaderAnimations()
         cancelProcessingTimeout()
         dismissProcessingBottomSheet()
         adapter = null
     }
 
     private fun setupUI() {
-        b.fhsTitleRethink.text = getString(R.string.rpn_title).lowercase()
         applyButtonTheme()
         setupRecyclerView()
         setupTermsAndPolicy()
         setupProductTypeToggle()
         adjustCtaBottomMargin()
+        startHeaderAnimations()
 
         if (viewModel.extendMode) {
             // In extend mode: hide the tab toggle and the page title,show only one-time products.
-            b.productTypeToggle.isVisible = false
+            b.productTypeToggleContainer.isVisible = false
             // Show the extend-mode banner so the user knows they are adding more access time.
             b.extendModeBanner.isVisible = true
             // hide the connection info card since it's not relevant in extend mode
             b.connectionInfoCard.visibility = View.GONE
-            }
         }
+    }
 
     private fun applyButtonTheme() {
         val ctx = requireContext()
 
         // subscribe button
         val accentGood = UIUtils.fetchColor(ctx, R.attr.accentGood)
-        val lightText  = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
-        val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenHeaderTextColor)
+        val lightText = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenBtnBackground)
 
         b.subscribeButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
@@ -230,25 +233,34 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun updateToggleState(selectedType: RethinkPlusViewModel.ProductTypeFilter) {
+        val ctx = requireContext()
+        val surfaceColor = UIUtils.fetchColor(ctx, R.attr.background)
+        val onSurfaceColor = UIUtils.fetchColor(ctx, R.attr.colorOnSurface)
+        val lightTextColor = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+
         when (selectedType) {
             RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
                 b.btnSubscription.apply {
-                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.primaryColor))
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setBackgroundColor(surfaceColor)
+                    setTextColor(onSurfaceColor)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
                 }
                 b.btnOneTime.apply {
                     setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                    setTextColor(lightTextColor)
+                    typeface = android.graphics.Typeface.DEFAULT
                 }
             }
             RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
                 b.btnOneTime.apply {
-                    setBackgroundColor(UIUtils.fetchColor(requireContext(), R.attr.primaryColor))
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.accentGood))
+                    setBackgroundColor(surfaceColor)
+                    setTextColor(onSurfaceColor)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
                 }
                 b.btnSubscription.apply {
                     setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+                    setTextColor(lightTextColor)
+                    typeface = android.graphics.Typeface.DEFAULT
                 }
             }
         }
@@ -299,14 +311,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun openHelpAndSupport() {
-        val args = Bundle().apply { putString("ARG_KEY", "Launch_Rethink_Support_Dashboard") }
-        startActivity(
-            FragmentHostActivity.createIntent(
-                context = requireContext(),
-                fragmentClass = RethinkPlusDashboardFragment::class.java,
-                args = args
-            )
-        )
+        CustomerSupportActivity.start(requireContext())
     }
 
     private fun setupObservers() {
@@ -328,7 +333,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.selectedProduct.collect { selection ->
                     adapter?.setSelectedProduct(selection?.first, selection?.second)
-                    updateMoneyBackBadge(selection?.first, selection?.second)
+                    updateMoneyBackBadge()
+                    updateCancelPolicyText(selection?.first, selection?.second)
                 }
             }
         }
@@ -524,6 +530,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             b.ispContainer.isVisible = false
             b.vDivider.isVisible = false
         }
+        b.ispContainer.isVisible = false
+        b.vDivider.isVisible = false
     }
 
     private fun showProcessing(message: String) {
@@ -900,6 +908,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     private fun updateHtmlEncodedText(text: String): Spanned =
         htmlToSpannedText(text)
 
+    // The header hosts a self-contained ocean scene (DolphinOceanView) that
+    // draws the water surface, the dolphin breach cycle, splashes and sparse
+    // bubbles. The fragment only drives its lifecycle.
+    private fun startHeaderAnimations() {
+        b.dolphinOcean.start()
+    }
+
+    private fun stopHeaderAnimations() {
+        b.dolphinOcean.stop()
+    }
+
     override fun onConnectionResult(isSuccess: Boolean, message: String) {
         viewModel.onBillingConnected(isSuccess, message)
     }
@@ -916,25 +935,27 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         viewModel.selectProduct(productId, planId)
     }
 
-    private fun updateMoneyBackBadge(productId: String?, planId: String?) {
+    private fun updateMoneyBackBadge() {
+        b.moneyBackBadge.setDays(MONEYBACK_WINDOW_DAYS)
+    }
+
+    private fun updateCancelPolicyText(productId: String?, planId: String?) {
         var days = when (productId) {
-            InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
-            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
-            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
-            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+            InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+            InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
             else -> 0
         }
-
         if (days == 0) {
             days = when (planId) {
-                InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_MONTHLY_DAYS
-                InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.MONEYBACK_WINDOW_SUBS_YEARLY_DAYS
-                InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_2YRS_DAYS
-                InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.MONEYBACK_WINDOW_ONE_TIME_5YRS_DAYS
+                InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+                InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
+                InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
                 else -> 7
-            }
+                }
         }
-
-        b.moneyBackBadge.setDays(days)
+        b.cancelPolicy.text = getString(R.string.cancel_refund_policy, days.toString())
     }
 }

@@ -38,13 +38,13 @@ import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,7 +56,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * bottom sheet combining DNS filter settings and new Configuration Handling section.
  */
-class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
+class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetServerSettingsBinding? = null
     private val binding
@@ -109,7 +109,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
          */
         fun onDnsModeChanged(tunTypes: String)
         /**
-         * Fired once when the sheet is dismissed (Done tap or swipe-away), but
+         * Fired once when the sheet is dismissed (back press or swipe-away), but
          * **only** if at least one of the four configuration values changed since
          * the sheet was opened. The caller reads the final values from
          * [PersistentState] directly.
@@ -196,7 +196,6 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
         setupConfigHandlingSection()
         setupExcludeCountriesRow()
 
-        binding.btnDone.setOnClickListener { dismiss() }
         binding.btnResetRpn.setOnClickListener {
             if (!VpnController.hasTunnel()) {
                 Logger.w(LOG_TAG_UI, "$TAG: reset tapped but no VPN tunnel, showing hint")
@@ -608,7 +607,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
      * uses [R.attr.primaryTextColor].
      */
     private fun updateToggleTextColors(isManual: Boolean) {
-        val selectedColor = UIUtils.fetchColor(requireContext(), R.attr.secondaryTextColor)
+        val selectedColor = UIUtils.fetchColor(requireContext(), R.attr.invertedPrimaryTextColor)
         val unselectedColor = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
         binding.btnConfigManual.setTextColor(if (isManual) selectedColor else unselectedColor)
         binding.btnConfigAuto.setTextColor(if (isManual) unselectedColor else selectedColor)
@@ -743,7 +742,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
 
         // lbl_random string resource as updatePortValueLabel()
         // replace 0 to "RANDOM" in the dialog list
-        val randomLabel = getString(R.string.lbl_random).trim('(', ')').uppercase()
+        val randomLabel = getString(R.string.lbl_random).trim('(', ')').capitalizeWords()
         val portLabels  = arrayOf(randomLabel, "80", "443", "53", "123", "1194", "65142")
 
         val currentPort = persistentState.rpnPort
@@ -768,7 +767,7 @@ class ServerSettingsBottomSheet : BottomSheetDialogFragment() {
     private fun updatePortValueLabel(port: Int) {
         binding.tvPortValue.text = if (port == 0) {
             // Use lbl_random ("(random)"), strip the parentheses, and display in caps → "RANDOM"
-            getString(R.string.lbl_random).trim('(', ')').uppercase()
+            getString(R.string.lbl_random).trim('(', ')').capitalizeWords()
         } else {
             port.toString()
         }

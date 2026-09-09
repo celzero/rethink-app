@@ -64,8 +64,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -161,6 +164,86 @@ object RpnProxyManager : KoinComponent {
         extraBufferCapacity = 1
     )
     val serverRemovedEvent: SharedFlow<List<CountryConfig>> = _serverRemovedEvent.asSharedFlow()
+
+    /**
+     * Outcome of a single RPN reachability (ping) test, as shown in the
+     * ping-test history list of [com.celzero.bravedns.ui.activity.PingTestActivity].
+     */
+    enum class PingTestOutcome(val id: String) {
+        SUCCESS("success"),
+        PARTIAL("partial"),
+        FAILURE("failure");
+
+        companion object {
+            fun fromId(id: String): PingTestOutcome =
+                entries.firstOrNull { it.id == id } ?: FAILURE
+        }
+    }
+
+    /**
+     * One recorded reachability test. Kept in-memory only (lifetime of this
+     * singleton — i.e. the app process); NOT persisted. Surfaced to the UI via
+     * [pingTestHistory] (newest first).
+     */
+    data class PingTestHistoryEntry(
+        val timestamp: Long,    // when the test completed; also the unique identity
+        val targets: String,    // CSV of tested targets; blank = AUTO (default probes)
+        val outcome: String,    // see [PingTestOutcome.id]
+        val latencyMs: Long,    // total wall-clock duration of the test
+        val passed: Int,        // number of targets that were reachable
+        val total: Int          // total number of targets tested (1 for AUTO)
+    ) {
+        fun outcomeEnum(): PingTestOutcome = PingTestOutcome.fromId(outcome)
+        fun isAuto(): Boolean = targets.isBlank()
+    }
+
+    private const val MAX_PING_TEST_HISTORY = 20
+
+    // Insertion-ordered set of recent tests (oldest first internally); guarded by
+    // [pingTestHistoryMutex]. In-memory only by design — history resets when the
+    // app process dies.
+    private val pingTestHistorySet = LinkedHashSet<PingTestHistoryEntry>()
+    private val pingTestHistoryMutex = Mutex()
+
+    private val _pingTestHistory = MutableStateFlow<List<PingTestHistoryEntry>>(emptyList())
+
+    /**
+     * Recent ping-test results, newest first. Collect in the UI to render the
+     * history list; the current value is also available immediately.
+     */
+    val pingTestHistory: StateFlow<List<PingTestHistoryEntry>> = _pingTestHistory.asStateFlow()
+
+    /**
+     * Records a completed reachability test into the history (capped at
+     * [MAX_PING_TEST_HISTORY], deduped by timestamp). Safe to call from any
+     * thread; the set mutation runs on io.
+     */
+    fun recordPingTest(targets: String, outcome: PingTestOutcome, latencyMs: Long, passed: Int, total: Int) {
+        io {
+            try {
+                val entry = PingTestHistoryEntry(
+                    timestamp = System.currentTimeMillis(),
+                    targets = targets,
+                    outcome = outcome.id,
+                    latencyMs = latencyMs,
+                    passed = passed,
+                    total = total
+                )
+                val snapshot: List<PingTestHistoryEntry>
+                pingTestHistoryMutex.withLock {
+                    pingTestHistorySet.add(entry)
+                    while (pingTestHistorySet.size > MAX_PING_TEST_HISTORY) {
+                        pingTestHistorySet.remove(pingTestHistorySet.first())
+                    }
+                    snapshot = pingTestHistorySet.toList().sortedByDescending { it.timestamp }
+                }
+                _pingTestHistory.value = snapshot
+                Logger.d(LOG_TAG_PROXY, "$TAG; recorded ping test: $entry")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; error recording ping test: ${e.message}", e)
+            }
+        }
+    }
 
     private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
     private val stateObserverJob = SupervisorJob()
@@ -421,7 +504,7 @@ object RpnProxyManager : KoinComponent {
 
         // Check if current state allows RPN activation
         if (!subscriptionStateMachine.hasValidSubscription()) {
-            val currentState = subscriptionStateMachine.getCurrentState()
+            val currentState = subscriptionStateMachine.currentMachineState()
             Logger.w(LOG_TAG_PROXY, "$TAG; activateRpn: cannot activate RPN - no valid subscription, current state: ${currentState.name}")
             return
         }
@@ -1360,7 +1443,7 @@ object RpnProxyManager : KoinComponent {
      * Used by UI to display the current state of the subscription.
      */
     fun getSubscriptionState(): SubscriptionStateMachineV2.SubscriptionState {
-        return subscriptionStateMachine.getCurrentState()
+        return subscriptionStateMachine.currentMachineState()
     }
 
     fun getCurrentSubscription(): SubscriptionStateMachineV2.SubscriptionData? {
@@ -2407,6 +2490,8 @@ object RpnProxyManager : KoinComponent {
             winCacheMutex.withLock {
                 winServersCache.filter { it.key == key }.forEach { it.isEnabled = true }
             }
+            config.catchAll = true
+            config.lockdown = true
             config.isEnabled = true
             try {
                 countryConfigRepo.update(config)
@@ -2419,6 +2504,7 @@ object RpnProxyManager : KoinComponent {
                 winCacheMutex.withLock {
                     winServersCache.filter { it.key == key }.forEach { it.isEnabled = false }
                 }
+                config.catchAll = false
                 config.isEnabled = false
                 return Pair(false, "Failed to update database: ${e.message}")
             }
@@ -2716,7 +2802,7 @@ object RpnProxyManager : KoinComponent {
             isActive = true,
             isEnabled = false, // Not enabled by default
             catchAll = true,
-            lockdown = false,
+            lockdown = true,
             mobileOnly = false,
             ssidBased = false,
             priority = 999, // Highest priority so it appears first
@@ -2760,6 +2846,20 @@ object RpnProxyManager : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; getAutoServer: err: ${e.message}", e)
             null
+        }
+    }
+
+    /**
+     * True when the AUTO sentinel has automation (mobile-only or
+     * SSID-based) enabled
+     */
+    suspend fun isAutoAutomationEnabled(): Boolean {
+        return try {
+            val auto = getAutoServer() ?: return false
+            auto.mobileOnly || auto.ssidBased
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; isAutoAutomationEnabled: err: ${e.message}")
+            false
         }
     }
 

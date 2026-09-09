@@ -38,10 +38,11 @@ import com.celzero.bravedns.databinding.ActivityCustomerSupportBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
-import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -54,6 +55,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.exp
 
 /**
  * CustomerSupportActivity: lets users submit a support request via email.
@@ -73,9 +75,31 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         private const val SUPPORT_ZIP_FILE_NAME = "rpn_support_diagnostics.zip"
         private const val WIRELOG_ATTACH_LIMIT_BYTES = 1 * 1024 * 1024L  // 1 MB
         private const val OTHER_ATTACH_THRESHOLD_BYTES = 1 * 1024 * 1024L // cap wirelog at 1 MB if other attachments exceed this
+        // process info (stack traces) larger than this is zipped as process_info.zip
+        private const val PROC_INFO_ZIP_THRESHOLD_BYTES = 512 * 1024
+        // bugreport zips larger than this keep only the newest entries when attached
+        private const val BUG_ZIP_TRIM_THRESHOLD_BYTES = 8L * 1024L * 1024L // 8 MB
+        // hard cap on uncompressed bytes kept from a trimmed bugreport zip
+        private const val BUG_ZIP_TRIM_BUDGET_BYTES = 6L * 1024L * 1024L // 6 MB
+
+        private const val EXTRA_ACCOUNT_ID = "extra_account_id"
+        private const val EXTRA_DEVICE_ID_PREFIX = "extra_device_id_prefix"
 
         fun start(context: Context) {
             context.startActivity(Intent(context, CustomerSupportActivity::class.java))
+        }
+
+        /**
+         * Entry point used by error flows (e.g. [DeviceAuthErrorBottomSheet]):
+         * opens the support screen with the description pre-filled
+         */
+        fun start(context: Context, accountId: String, deviceIdPrefix: String) {
+            context.startActivity(
+                Intent(context, CustomerSupportActivity::class.java).apply {
+                    putExtra(EXTRA_ACCOUNT_ID, accountId)
+                    putExtra(EXTRA_DEVICE_ID_PREFIX, deviceIdPrefix)
+                }
+            )
         }
     }
 
@@ -97,8 +121,21 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
         setupToolbar()
         loadSubscriptionSummary()
+        prefillDescriptionFromExtras()
         setupSendButton()
         applyScrollPadding()
+    }
+
+    private fun prefillDescriptionFromExtras() {
+        val accountId = intent.getStringExtra(EXTRA_ACCOUNT_ID) ?: return
+        val deviceIdPrefix = intent.getStringExtra(EXTRA_DEVICE_ID_PREFIX).orEmpty()
+        if (accountId.isBlank() && deviceIdPrefix.isBlank()) return
+
+        val sb = StringBuilder()
+        sb.append("Device authorization issue (HTTP 401).\n")
+        if (accountId.isNotBlank()) sb.append("Account ID: $accountId\n")
+        if (deviceIdPrefix.isNotBlank()) sb.append("Device ID: $deviceIdPrefix\n")
+        b.etDescription.setText(sb.toString().trimEnd())
     }
 
     private fun applyScrollPadding() {
@@ -118,22 +155,30 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
-    /** Called after subscription data is loaded to fill the hero subtitle. */
-    private fun updateHeroSubtitle(sub: SubscriptionStatus?, deviceId: String) {
-        if (sub == null || sub.purchaseToken.isEmpty()) return
+    /**
+     * Called after subscription data is loaded to fill the hero subtitle: purchase
+     * token (first 12 chars) · accountId (first 12 chars) • deviceId (first 4 chars).
+     * The exact same value that [RethinkPlusDashboardFragment],
+     * [RethinkPlusManagePurchaseFragment] and [ServerOrderHistoryActivity] show as
+     * their hero's last line.
+     */
+    private fun updateHeroSubtitle(sub: SubscriptionStatus?, deviceId: String, expiry: String) {
+        if (sub == null) return
+        b.tvHeroSubtitle.text = heroIdentityLine(sub.purchaseToken, sub.accountId, deviceId, expiry)
+    }
 
-        // Purchase token (show first 12 chars)
-        var token = sub.purchaseToken
-        token = token.length.let { if (it > 12) token.take(12) else token.ifBlank { "" } }
-        val accountId = sub.accountId.take(12).ifBlank { return }
-        val deviceId = deviceId.take(4).ifBlank { return }
-        val id = "$accountId • $deviceId"
-        b.tvHeroSubtitle.text = if (token.isNotEmpty()) "$token \u00B7 $id" else id
+    private fun heroIdentityLine(token: String, accountId: String, deviceId: String, expiry: String): String {
+        val t = token.take(12)
+        val a = accountId.take(12)
+        val d = deviceId.take(4)
+        val idPart = listOf(a, d).filter { it.isNotBlank() }.joinToString(" • ")
+        return listOf(t, idPart, expiry).filter { it.isNotBlank() }.joinToString(" · ")
     }
 
     /**
      * Loads the current subscription from the DB and populates the summary card.
-     * Runs on IO, posts result to Main.
+     * Also toggles the refund/moneyback category chips based on how long ago the
+     * purchase was made
      */
     private fun loadSubscriptionSummary() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -144,8 +189,23 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 null
             }
             val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
+            val expiry = VpnController.getWinExpiryTs() ?: 0L
+            val hex = expiry.toString(16)
+
+            // Refund is available within the purchase revoke window; moneyback
+            // within the global moneyback window
+            val purchaseTs = sub?.purchaseTime ?: 0L
+            val elapsedMs = if (purchaseTs > 0L) System.currentTimeMillis() - purchaseTs else Long.MAX_VALUE
+            val dayMs = 24 * 60 * 60 * 1000L
+            val windowDays = sub?.windowDays?.takeIf { it > 0 } ?: InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
+            val refundVisible = elapsedMs < windowDays * dayMs
+            val moneybackVisible = elapsedMs < InAppBillingHandler.MONEYBACK_WINDOW_DAYS * dayMs
+
             withContext(Dispatchers.Main) {
-                updateHeroSubtitle(sub, deviceId)
+                if (isFinishing || isDestroyed) return@withContext
+                updateHeroSubtitle(sub, deviceId, hex)
+                b.chipRefund.isVisible = refundVisible
+                b.chipMoneyback.isVisible = moneybackVisible
             }
         }
     }
@@ -171,6 +231,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             b.chipActivation.isChecked -> getString(R.string.support_category_activation)
             b.chipConnectivity.isChecked -> getString(R.string.support_category_connectivity)
             b.chipRefund.isChecked -> getString(R.string.support_category_refund)
+            b.chipMoneyback.isChecked -> getString(R.string.support_category_moneyback)
             b.chipOther.isChecked -> getString(R.string.category_name_others)
             else -> null
         }
@@ -185,6 +246,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         val includeStatus = b.switchAttachStatus.isChecked
         val includeHistory = b.switchAttachHistory.isChecked
         val includeStats = b.switchAttachStats.isChecked
+        val includeProcInfo = b.switchAttachProcInfo.isChecked
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -229,19 +291,37 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
                 val diagFile = writeDiagFile(diagContent)
 
-                val bugZip = EnhancedBugReport.getTombstoneZipFile(this@CustomerSupportActivity)
-                val wirelogBytes = prepareWirelogAttachment(diagFile?.length() ?: 0L)
-                val supportZip = buildSupportZip(diagFile, wirelogBytes, bugZip)
+                val procInfoBytes = if (includeProcInfo) {
+                    try {
+                        ProcessInfoCollector.collect(this@CustomerSupportActivity)
+                            .toByteArray(Charsets.UTF_8)
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_UI, "$TAG proc info error: ${e.message}", e)
+                        null
+                    }
+                } else null
+
+                // attach the bug report zip produced by BugReportZipper
+                // (files/rethinkdns.bugreport.zip); absent unless the user has
+                // generated a bug report via About > Bug Report
+                val bugZip = File(BugReportZipper.getZipFileName(filesDir))
+                    .takeIf { it.exists() && it.length() > 0L }
+                    ?.let { trimBugZipIfNeeded(it) }
+                val otherAttachSize = (diagFile?.length() ?: 0L) + (procInfoBytes?.size?.toLong() ?: 0L)
+                val wirelogBytes = prepareWirelogAttachment(otherAttachSize)
+                val supportZip = buildSupportZip(diagFile, wirelogBytes, procInfoBytes, bugZip)
 
                 val emailBody = buildEmailBody(description, category)
 
                 withContext(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@withContext
                     setLoading(false)
                     launchEmailIntent(emailBody, supportZip, category)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG collectAndSend error: ${e.message}", e)
                 withContext(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@withContext
                     setLoading(false)
                     Toast.makeText(
                         this@CustomerSupportActivity,
@@ -405,14 +485,33 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         }
     }
 
-    private fun buildSupportZip(diagFile: File?, wirelogBytes: ByteArray?, bugZip: File?): File? {
-        if (diagFile == null && wirelogBytes == null && bugZip == null) return null
+    private fun buildSupportZip(
+        diagFile: File?,
+        wirelogBytes: ByteArray?,
+        procInfoBytes: ByteArray?,
+        bugZip: File?
+    ): File? {
+        if (diagFile == null && wirelogBytes == null && procInfoBytes == null && bugZip == null) {
+            return null
+        }
         return try {
             val outFile = File(File(filesDir, "support").also { it.mkdirs() }, SUPPORT_ZIP_FILE_NAME)
             java.util.zip.ZipOutputStream(outFile.outputStream().buffered()).use { zos ->
                 diagFile?.takeIf { it.exists() }?.let {
                     zos.putNextEntry(java.util.zip.ZipEntry("diagnostic_report.txt"))
                     it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+                procInfoBytes?.takeIf { it.isNotEmpty() }?.let {
+                    if (it.size > PROC_INFO_ZIP_THRESHOLD_BYTES) {
+                        // large snapshots (full JVM/Go stack traces) are added as a
+                        // compressed process_info.zip to keep the support zip lean
+                        zos.putNextEntry(java.util.zip.ZipEntry("process_info.zip"))
+                        zos.write(zipBytes("process_info.txt", it))
+                    } else {
+                        zos.putNextEntry(java.util.zip.ZipEntry("process_info.txt"))
+                        zos.write(it)
+                    }
                     zos.closeEntry()
                 }
                 wirelogBytes?.takeIf { it.isNotEmpty() }?.let {
@@ -430,6 +529,57 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG buildSupportZip error: ${e.message}", e)
             null
+        }
+    }
+
+    /** Returns [bytes] compressed as a single-entry zip named [entryName]. */
+    private fun zipBytes(entryName: String, bytes: ByteArray): ByteArray {
+        return java.io.ByteArrayOutputStream().also { bos ->
+            java.util.zip.ZipOutputStream(bos).use { zos ->
+                zos.putNextEntry(java.util.zip.ZipEntry(entryName))
+                zos.write(bytes)
+                zos.closeEntry()
+            }
+        }.toByteArray()
+    }
+
+    /**
+     * If [bugZip] exceeds [BUG_ZIP_TRIM_THRESHOLD_BYTES], returns a trimmed copy
+     * (cacheDir/bugreport_trimmed.zip) keeping only the newest entries that fit
+     * within [BUG_ZIP_TRIM_BUDGET_BYTES] of uncompressed data — always at least
+     * the single newest entry. Falls back to the original zip on any error.
+     */
+    private fun trimBugZipIfNeeded(bugZip: File): File {
+        if (bugZip.length() <= BUG_ZIP_TRIM_THRESHOLD_BYTES) return bugZip
+
+        val trimmed = File(cacheDir, "bugreport_trimmed.zip")
+        try {
+            java.util.zip.ZipFile(bugZip).use { zf ->
+                // newest first; ZipEntry.time reflects when the entry was written
+                val newestFirst = zf.entries().toList()
+                    .filter { !it.isDirectory }
+                    .sortedByDescending { it.time }
+
+                java.util.zip.ZipOutputStream(trimmed.outputStream().buffered()).use { zos ->
+                    var kept = 0L
+                    for (e in newestFirst) {
+                        val entrySize = (if (e.size > 0) e.size else zf.getInputStream(e).use { it.available().toLong() })
+                        if (kept > 0 && kept + entrySize > BUG_ZIP_TRIM_BUDGET_BYTES) break
+                        zf.getInputStream(e).use { ins ->
+                            zos.putNextEntry(java.util.zip.ZipEntry(e.name))
+                            ins.copyTo(zos)
+                            zos.closeEntry()
+                        }
+                        kept += entrySize
+                    }
+                }
+            }
+            Logger.i(LOG_TAG_UI, "$TAG trimmed bugzip: ${bugZip.length()} -> ${trimmed.length()} bytes")
+            return trimmed
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "$TAG trim bugzip error: ${e.message}", e)
+            trimmed.delete()
+            return bugZip
         }
     }
 
@@ -526,7 +676,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         b.btnSendEmail.text = if (loading)
             getString(R.string.support_btn_sending)
         else
-            getString(R.string.support_btn_send)
+            getString(R.string.about_bug_report_dialog_positive_btn)
         b.layoutLoading.isVisible = loading
     }
 

@@ -35,18 +35,6 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_comparison_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAlignment="center"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:text="✅"
-            tools:visibility="visible" />
-
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.Material3.CardView.Outlined"
             android:layout_width="match_parent"

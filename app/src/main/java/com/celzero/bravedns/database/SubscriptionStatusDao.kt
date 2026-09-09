@@ -79,7 +79,7 @@ interface SubscriptionStatusDao {
     @Query("""
         SELECT * FROM SubscriptionStatus
         WHERE status IN (1, 2, 5, 6, 9, 10, 11)
-        ORDER BY lastUpdatedTs DESC
+        ORDER BY CASE WHEN status = 1 THEN 0 ELSE 1 END, lastUpdatedTs DESC
         LIMIT 1
     """)
     suspend fun getCurrentValidSubscription(): SubscriptionStatus?
@@ -132,7 +132,11 @@ interface SubscriptionStatusDao {
     suspend fun markExpiredSubscriptions(currentTime: Long): Int
 
     // Reactive queries with Flow
-    @Query("SELECT * FROM SubscriptionStatus ORDER BY lastUpdatedTs DESC LIMIT 1")
+    @Query("""
+        SELECT * FROM SubscriptionStatus
+        ORDER BY CASE WHEN status = 1 THEN 0 ELSE 1 END, lastUpdatedTs DESC
+        LIMIT 1
+    """)
     fun observeCurrentSubscription(): Flow<SubscriptionStatus?>
 
     @Query("SELECT * FROM SubscriptionStatus ORDER BY lastUpdatedTs DESC")

@@ -254,7 +254,11 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

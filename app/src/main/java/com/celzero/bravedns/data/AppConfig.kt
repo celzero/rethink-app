@@ -19,6 +19,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
@@ -41,7 +42,10 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
+import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.database.SmartDnsEndpoint
+import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -66,10 +70,12 @@ internal constructor(
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val doTEndpointRepository: DoTEndpointRepository,
     private val oDoHEndpointRepository: ODoHEndpointRepository,
+    private val smartDnsEndpointRepository: SmartDnsEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
     private val persistentState: PersistentState,
     private val networkLogs: ConnectionTrackerRepository,
     private val dnsLogs: DnsLogRepository,
+    private val rethinkLogs: RethinkLogRepository,
     private val eventLogger: EventLogger
 ) {
     private val braveModeObserver: MutableLiveData<Int> = MutableLiveData()
@@ -582,7 +588,10 @@ internal constructor(
                 postConnectedDnsName(context.getString(R.string.network_dns))
             }
             DnsType.SMART_DNS -> {
-                postConnectedDnsName(context.getString(R.string.smart_dns))
+                val endpointName = getSelectedSmartDnsEndpoint()?.dnsName
+                    ?: ""
+                val name = context.getString(R.string.two_argument_space, context.getString(R.string.smart_dns), endpointName)
+                postConnectedDnsName(name)
             }
         }
     }
@@ -896,18 +905,24 @@ internal constructor(
         )
     }
 
-    suspend fun enableSmartDns() {
+    suspend fun enableSmartDns(id: Int) {
         if (getDnsType() != DnsType.SMART_DNS) {
             removeConnectionStatus()
         }
 
         val prev = persistentState.connectedDnsName
+        // persist the user's smart dns selection before triggering the dns change
+        smartDnsEndpointRepository.select(id)
         onDnsChange(DnsType.SMART_DNS)
         logEvent(
             EventType.DNS_SERVER_CHANGE,
             "Smart DNS enabled",
-            "Smart DNS enabled, prev: $prev"
+            "Smart DNS enabled, id: $id, prev: $prev"
         )
+    }
+
+    suspend fun getSelectedSmartDnsEndpoint(): SmartDnsEndpoint? {
+        return smartDnsEndpointRepository.getSelectedEndpoint()
     }
 
     fun isSystemDns(): Boolean {
@@ -951,7 +966,7 @@ internal constructor(
                 // no-op, no need to remove connection status
             }
             DnsType.SMART_DNS -> {
-                // no-op, no need to remove connection status
+                smartDnsEndpointRepository.removeConnectionStatus()
             }
         }
     }
@@ -1301,7 +1316,25 @@ internal constructor(
         return a
     }
 
-    val networkLogsCount: LiveData<Long> = networkLogs.logsCount()
+    // total connections available in the database. Network logs are split
+    // across two tables with disjoint uid ranges (RethinkLog holds Rethink's
+    // own traffic), so the true count is the sum of both; each source emits
+    // on its table's invalidation and the sum re-publishes on either change.
+    val networkLogsCount: LiveData<Long> = MediatorLiveData<Long>().apply {
+        var connCount = 0L
+        var rethinkCount = 0L
+        fun recompute() {
+            value = connCount + rethinkCount
+        }
+        addSource(networkLogs.logsCount()) {
+            connCount = it
+            recompute()
+        }
+        addSource(rethinkLogs.logsCount()) {
+            rethinkCount = it
+            recompute()
+        }
+    }
 
     val dnsLogsCount: LiveData<Long> = dnsLogs.logsCount()
 

@@ -13,7 +13,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_glass"
+        android:background="@drawable/bg_plus_hero_gradient"
         android:fitsSystemWindows="true"
         app:elevation="4dp">
 
@@ -23,7 +23,7 @@
             android:layout_height="180dp"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:contentScrim="@drawable/bg_vpn_header_gradient"
+            app:contentScrim="@drawable/bg_plus_hero_gradient"
             app:expandedTitleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:collapsedTitleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:expandedTitleMarginStart="24dp"
@@ -46,7 +46,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="18dp"
-                android:textSize="13sp"
+                android:textSize="@dimen/mini_font_text_view"
                 android:textColor="?attr/primaryTextColor"
                 android:alpha="0.7"
                 android:ellipsize="end"
@@ -76,7 +76,7 @@
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="80dp">
+            android:paddingBottom="112dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
@@ -148,6 +148,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/support_category_refund"
+                            android:checkable="true"
+                            style="@style/Widget.Material3.Chip.Filter" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_moneyback"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/support_category_moneyback"
                             android:checkable="true"
                             style="@style/Widget.Material3.Chip.Filter" />
 
@@ -358,6 +366,52 @@
 
                     </LinearLayout>
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/divider"
+                        android:layout_marginBottom="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/support_attach_proc_info"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="?attr/primaryTextColor" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/support_attach_proc_info_desc"
+                                android:textSize="12sp"
+                                android:textColor="?attr/primaryLightColorText" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switch_attach_proc_info"
+                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -388,46 +442,62 @@
 
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_send_email"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/support_btn_send"
-                android:textSize="16sp"
-                app:cornerRadius="28dp"
-                app:iconGravity="textStart"
-                android:textColor="?attr/accentGood"
-                app:iconPadding="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
-
-            <LinearLayout
-                android:id="@+id/layout_loading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:padding="8dp"
-                android:visibility="gone">
-
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="12dp"
-                    style="@android:style/Widget.ProgressBar.Small" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/support_loading_data"
-                    android:textSize="14sp"
-                    android:textColor="?attr/primaryLightColorText" />
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:background="?attr/colorSurface"
+        android:elevation="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_send_email"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/about_bug_report_dialog_positive_btn"
+            android:textSize="16sp"
+            app:cornerRadius="28dp"
+            app:iconGravity="textStart"
+            android:textColor="?attr/accentGood"
+            app:iconPadding="8dp"
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+        <LinearLayout
+            android:id="@+id/layout_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
+                style="@android:style/Widget.ProgressBar.Small" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/support_loading_data"
+                android:textSize="14sp"
+                android:textColor="?attr/primaryLightColorText" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

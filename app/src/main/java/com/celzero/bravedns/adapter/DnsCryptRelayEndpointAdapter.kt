@@ -23,12 +23,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
@@ -95,6 +97,11 @@ class DnsCryptRelayEndpointAdapter(
 
     inner class DnsCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private val selectionIndicator =
+            SelectionIndicator(
+                b.dnsCryptEndpointListSelectionOrbital,
+                b.dnsCryptEndpointListSelectionPill
+            )
 
         fun update(endpoint: DnsCryptRelayEndpoint) {
             displayDetails(endpoint)
@@ -103,13 +110,7 @@ class DnsCryptRelayEndpointAdapter(
 
         private fun setupClickListener(endpoint: DnsCryptRelayEndpoint) {
             b.root.setOnClickListener {
-                b.dnsCryptEndpointListActionImage.isChecked =
-                    !b.dnsCryptEndpointListActionImage.isChecked
-                updateDNSCryptRelayDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
-            }
-
-            b.dnsCryptEndpointListActionImage.setOnClickListener {
-                updateDNSCryptRelayDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
+                updateDNSCryptRelayDetails(endpoint, !endpoint.isSelected)
             }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener { promptUser(endpoint) }
@@ -117,6 +118,13 @@ class DnsCryptRelayEndpointAdapter(
 
         private fun displayDetails(endpoint: DnsCryptRelayEndpoint) {
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptRelayName
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.dnsCryptRelayName
+                )
+            selectionIndicator.update(endpoint.isSelected)
             if (endpoint.isSelected && !appConfig.isSmartDnsEnabled()) {
                 updateSelectedStatus()
             } else {
@@ -124,7 +132,6 @@ class DnsCryptRelayEndpointAdapter(
                 b.dnsCryptEndpointListUrlExplanation.visibility = View.GONE
             }
 
-            b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
             if (endpoint.isDeletable()) {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall)
@@ -231,7 +238,6 @@ class DnsCryptRelayEndpointAdapter(
                             context.getString(R.string.dns_crypt_relay_error_toast),
                             Toast.LENGTH_LONG
                         )
-                        b.dnsCryptEndpointListActionImage.isChecked = false
                     }
                     return@io
                 }
@@ -291,7 +297,15 @@ class DnsCryptRelayEndpointAdapter(
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
     }
 }

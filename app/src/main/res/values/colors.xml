@@ -28,6 +28,8 @@
     <color name="accentBad">#ff4081</color>
 
     <color name="accentWarning">#ffd149</color>
+    <color name="accentInfo">#64B5F6</color>
+    <color name="accentInfoLight">#1565C0</color>
     <color name="border">#3F4145</color>
     <color name="textViewBackground">#1A000000</color>
     <color name="buttonBackground">#006f67</color>
@@ -76,6 +78,16 @@
     <color name="vpnHeaderGradientCenter">#3318ffff</color>
     <color name="vpnHeaderGradientEnd">#3380CBC4</color>
 
+    <!-- Server selection header card gradient - deep green (dark themes) -->
+    <color name="serverHeaderGradientStartDark">#15493A</color>
+    <color name="serverHeaderGradientCenterDark">#0E3D30</color>
+    <color name="serverHeaderGradientEndDark">#07271F</color>
+
+    <!-- Server selection header card gradient - soft blue (light themes) -->
+    <color name="serverHeaderGradientStartLight">#EAF4FE</color>
+    <color name="serverHeaderGradientCenterLight">#DEEDFC</color>
+    <color name="serverHeaderGradientEndLight">#CCE3FA</color>
+
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
     <color name="colorPrimaryDarkLight">#1e88e5</color>
@@ -90,7 +102,7 @@
 
     <color name="borderLight">#77757575</color>
     <color name="textViewBackgroundLight">#1A000000</color>
-    <color name="homeScreenBtnBackgroundLight">#F0005cb2</color>
+    <color name="homeScreenBtnBackgroundLight">#E6EEF7</color>
     <color name="buttonBackgroundLight">#F0005cb2</color>
     <color name="tabIndicatorLight">#ff4081</color>
     <color name="btmSheetBgColorLight">#ececec</color>

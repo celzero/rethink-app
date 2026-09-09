@@ -57,6 +57,46 @@ internal constructor(
         val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
         private const val EMPTY_RESPONSE = "--"
+
+        /**
+         * Arrival-time blocked classification for a dns answer, derived from the
+         * raw [com.celzero.firestack.backend.DNSSummary] fields. Mirrors the
+         * isBlocked assignments made by [makeDnsLogObj] (including the
+         * COMPLETE+ip override of an earlier BlockAll marker) so callers can
+         * aggregate at log-arrival time without duplicating or re-deriving this
+         * logic. makeDnsLogObj remains the persistence-side authority.
+         */
+        fun isBlockedDnsAnswer(
+            transportId: String,
+            statusCode: Int,
+            response: String,
+            qType: Long,
+            blocklists: String,
+            upstreamBlock: Boolean
+        ): Boolean {
+            var blocked = false
+
+            // mark the query as blocked if the transport id is BlockAll/Block;
+            // no need to check for blocklist as it is already marked as blocked
+            if (transportId == Backend.BlockAll || transportId == Backend.Block) {
+                blocked = true
+            }
+
+            if (Transaction.Status.fromId(statusCode) == Transaction.Status.COMPLETE &&
+                ResourceRecordTypes.mayContainIP(qType.toInt())
+            ) {
+                val destination = normalizeIp(response.split(",").firstOrNull())
+                if (destination != null) {
+                    // overwrites any earlier BlockAll marker, matching makeDnsLogObj
+                    blocked = destination.hostAddress == UNSPECIFIED_IP_IPV4 ||
+                            destination.hostAddress == UNSPECIFIED_IP_IPV6
+                } else if (response == EMPTY_RESPONSE && (blocklists.isNotEmpty() || upstreamBlock)) {
+                    blocked = true
+                }
+            }
+
+            return blocked
+        }
     }
 
     fun processOnResponse(summary: DNSSummary): Transaction {

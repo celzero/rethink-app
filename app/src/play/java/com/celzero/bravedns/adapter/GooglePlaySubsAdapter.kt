@@ -20,11 +20,12 @@ import com.celzero.bravedns.util.Logger.LOG_IAB
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.billingclient.api.BillingClient.ProductType
@@ -33,9 +34,7 @@ import com.celzero.bravedns.databinding.ListItemPlaySubsBinding
 import com.celzero.bravedns.databinding.ListItemShimmerCardBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
-import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.facebook.shimmer.ShimmerFrameLayout
-import java.util.Locale
 
 class GooglePlaySubsAdapter(
     val listener: SubscriptionChangeListener,
@@ -100,6 +99,7 @@ class GooglePlaySubsAdapter(
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         if (holder is ShimmerViewHolder) holder.shimmerLayout.stopShimmer()
+        if (holder is SubscriptionPlansViewHolder) holder.stopBorderAnimation()
         super.onViewRecycled(holder)
     }
 
@@ -127,16 +127,15 @@ class GooglePlaySubsAdapter(
     inner class SubscriptionPlansViewHolder(private val binding: ListItemPlaySubsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        private var rotationAnimator: ObjectAnimator? = null
+
         fun bind(prod: ProductDetail, pos: Int) {
             val pricing = prod.pricingDetails.firstOrNull() ?: return
 
             val planTitle = pricing.planTitle
 
             var currentPrice = ""
-            var currentPriceMicros = 0L
             var discountedPrice = ""
-            var discountedPriceMicros = 0L
-            var currencyCode = ""
             var freeTrialDays = 0
             var isYearly = false
 
@@ -145,20 +144,15 @@ class GooglePlaySubsAdapter(
                     phase.freeTrialPeriod > 0 -> freeTrialDays = phase.freeTrialPeriod
                     phase.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED -> {
                         discountedPrice = phase.price
-                        discountedPriceMicros = phase.priceAmountMicros
-                        currencyCode = phase.currencyCode
                     }
                     phase.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL -> {
                         currentPrice = phase.price
-                        currentPriceMicros = phase.priceAmountMicros
                         isYearly = phase.billingPeriod.contains("Y")
-                        currencyCode = phase.currencyCode
                     }
                 }
             }
 
             val displayPrice = discountedPrice.ifEmpty { currentPrice }
-            val displayPriceMicros = if (discountedPriceMicros > 0) discountedPriceMicros else currentPriceMicros
             val isSelected = prod.productId == selectedProductId && prod.planId == selectedPlanId
             val isInApp = prod.productType == ProductType.INAPP
 
@@ -172,51 +166,7 @@ class GooglePlaySubsAdapter(
 
             Logger.d(LOG_TAG_UI, "$TAG InAppBilling Binding plan: ${prod.productId}, ${prod.planId}, Title: $planTitle, Price: $displayPrice, discount: $discountedPrice FreeTrial: $freeTrialDays days, Yearly: $isYearly, InApp: $isInApp")
 
-            // Original Price (struck through, below price)
-            if (discountedPrice.isNotEmpty() && currentPrice.isNotEmpty()) {
-                binding.originalPrice.visibility = View.VISIBLE
-                binding.originalPrice.text = currentPrice
-                binding.originalPrice.paintFlags = binding.originalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            } else {
-                binding.originalPrice.visibility = View.GONE
-            }
-
-            val durationMonthsForCalc: Int = when {
-                isInApp  -> getInAppDurationMonths(prod.planId)
-                isYearly -> 12
-                else     -> 1 // monthly subscription
-            }
-
-            if (displayPriceMicros > 0 && durationMonthsForCalc > 0) {
-                val perMonthMicros = displayPriceMicros / durationMonthsForCalc
-                val perMonthFormatted = formatMicrosAsCurrency(perMonthMicros, currencyCode, displayPrice)
-                if (perMonthFormatted != null) {
-                    binding.pricePerMonth.visibility = View.VISIBLE
-                    binding.pricePerMonth.text = context.getString(R.string.price_per_month_format, perMonthFormatted)
-                } else {
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-                // Show the aggregate total only for multi-period plans (yearly subs, 2yr/5yr INAPP).
-                // For monthly subs durationMonthsForCalc == 1, so the per-month price IS the total
-                // no need to repeat it in the smaller field.
-                if (durationMonthsForCalc > 1 && displayPrice.isNotEmpty()) {
-                    binding.price.visibility = View.VISIBLE
-                    binding.price.text = displayPrice
-                } else {
-                    binding.price.text = displayPrice
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-            } else {
-                // per-month cannot be calculated (unknown purchase duration).
-                // Show at least the full price in the primary field.
-                binding.price.visibility = View.GONE
-                if (displayPrice.isNotEmpty()) {
-                    binding.pricePerMonth.visibility = View.VISIBLE
-                    binding.pricePerMonth.text = displayPrice
-                } else {
-                    binding.pricePerMonth.visibility = View.GONE
-                }
-            }
+            binding.price.text = displayPrice
 
             val billingText = getBillingText(prod.productType)
             if (freeTrialDays > 0) {
@@ -225,11 +175,22 @@ class GooglePlaySubsAdapter(
                 binding.billingInfo.text = billingText
             }
 
-            if (discountedPrice.isNotEmpty()) {
+            if (isInApp) {
+                // one-time purchase options carry the offer discount directly
+                // (PricingPhase.discountPercent is populated from Play's
+                // DiscountDisplayInfo.percentageDiscount or the full-vs-offer price)
+                val offerPct = pricing.discountPercent
+                if (offerPct > 0) {
+                    binding.savingsText.visibility = View.VISIBLE
+                    binding.savingsText.text = context.getString(R.string.savings_percent, "$offerPct%")
+                } else {
+                    binding.savingsText.visibility = View.GONE
+                }
+            } else if (discountedPrice.isNotEmpty()) {
                 val pct = calculateSavings(currentPrice, discountedPrice)
                 if (pct > 0) {
                     binding.savingsText.visibility = View.VISIBLE
-                    binding.savingsText.text = context.getString(R.string.save_percentage, "${pct}%")
+                    binding.savingsText.text = context.getString(R.string.savings_percent, "$pct%")
                 } else {
                     binding.savingsText.visibility = View.GONE
                 }
@@ -281,38 +242,32 @@ class GooglePlaySubsAdapter(
             }
         }
 
-        /**
-         * Attempts to format [micros] as a currency string using the same symbol/format as
-         * [sampleFormatted] (the already-formatted full price from Play). Strips digits/decimal
-         * from [sampleFormatted] and replaces with the per-month amount.
-         */
-        private fun formatMicrosAsCurrency(micros: Long, currencyCode: String, sampleFormatted: String): String? {
-            return try {
-                val amount = micros / 1_000_000.0
-                // Extract currency prefix/suffix from sample (e.g. "₹" or "US$")
-                val numericPart = sampleFormatted.replace(Regex("[0-9,. ]+"), "").trim()
-                val formatted = if (amount >= 100) {
-                    String.format(Locale.getDefault(), "%.0f", amount)
-                } else {
-                    String.format(Locale.getDefault(), "%.2f", amount).trimEnd('0').trimEnd('.')
-                }
-                if (numericPart.isNotEmpty()) "$numericPart$formatted" else "$currencyCode $formatted"
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG GPPA err formatting micros as currency, ${e.message}")
-                null
+        private fun applySelectionStyle(selected: Boolean) {
+            if (selected) {
+                binding.selectionBorderContainer.visibility = View.VISIBLE
+                binding.planCard.cardElevation = context.resources.displayMetrics.density * 4f
+                startBorderAnimation()
+            } else {
+                binding.selectionBorderContainer.visibility = View.GONE
+                binding.planCard.cardElevation = context.resources.displayMetrics.density * 1f
+                stopBorderAnimation()
             }
         }
 
-        private fun applySelectionStyle(selected: Boolean) {
-            if (selected) {
-                binding.planCard.strokeWidth = 3
-                binding.planCard.strokeColor = fetchColor(context, R.attr.accentGood)
-                binding.planCard.cardElevation = context.resources.displayMetrics.density * 4f
-            } else {
-                binding.planCard.strokeWidth = 1
-                binding.planCard.strokeColor = fetchColor(context, R.attr.chipBgColorNeutral)
-                binding.planCard.cardElevation = context.resources.displayMetrics.density * 1f
+        private fun startBorderAnimation() {
+            if (rotationAnimator?.isRunning == true) return
+
+            rotationAnimator = ObjectAnimator.ofFloat(binding.animatedBorderView, "rotation", 0f, 360f).apply {
+                duration = 3000
+                interpolator = LinearInterpolator()
+                repeatCount = ValueAnimator.INFINITE
+                start()
             }
+        }
+
+        fun stopBorderAnimation() {
+            rotationAnimator?.cancel()
+            rotationAnimator = null
         }
 
         private fun animateSelection() {

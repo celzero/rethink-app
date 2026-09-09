@@ -46,6 +46,8 @@ import com.celzero.bravedns.databinding.ListItemDnsLogBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -405,6 +407,13 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun displayDnsType(log: DnsLog) {
+            if (ProxyManager.isRpnProxy(log.proxyId)) {
+                b.dnsTypeName.text = context.getString(R.string.rpn_title)
+                return
+            } else if (isConnectionProxied(log.proxyId) && log.proxyId.startsWith(ID_WG_BASE)) {
+                b.dnsTypeName.text = context.getString(R.string.lbl_wg)
+                return
+            }
             val type = Transaction.TransportType.fromOrdinal(log.dnsType)
             when (type) {
                 Transaction.TransportType.DOH -> {

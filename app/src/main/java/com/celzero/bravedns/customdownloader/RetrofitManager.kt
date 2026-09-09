@@ -17,6 +17,7 @@ package com.celzero.bravedns.customdownloader
 
 import android.content.Context
 import android.net.Uri
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_OKHTTP
@@ -34,6 +35,7 @@ import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
 import org.koin.core.context.GlobalContext
 import java.net.InetAddress
+import java.net.Proxy
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.enums.enumEntries
@@ -63,6 +65,12 @@ class RetrofitManager {
         // Single-thread dispatcher dedicated to fire-and-forget log I/O so that
         // log writes never block OkHttp's network threads.
         private val logScope = CoroutineScope(Daemons.make("RayIdLogger"))
+
+        /**
+         * Compile-time constant User-Agent identifying app-originated requests.
+         * Usable directly inside Retrofit @Headers annotations
+         */
+        const val USER_AGENT: String = "rethink-app/${BuildConfig.VERSION_NAME}"
 
         /** Captures Cloudflare's cf-ray header for request tracing. */
         val rayIdInterceptor = Interceptor { chain ->
@@ -120,6 +128,12 @@ class RetrofitManager {
             b.readTimeout(READ_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.writeTimeout(WRITE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
+            // Never consult ProxySelector.getDefault(): when a device-wide HTTP proxy is set
+            // without a port (Settings.Global.HTTP_PROXY), the platform populates
+            // http(s).proxyPort with -1 and DefaultProxySelector.select() throws
+            // IllegalArgumentException("port out of range:-1") inside OkHttp's RouteSelector.
+            // Pinning NO_PROXY bypasses the selector entirely (see RethinkGlideModule).
+            b.proxy(Proxy.NO_PROXY)
             // Always active: captures cf-ray header; never logs
             // request headers (cid / did / sessionToken stay out of logs).
             b.addInterceptor(rayIdInterceptor)

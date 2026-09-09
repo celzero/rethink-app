@@ -36,7 +36,6 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +43,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class CustomDomainRulesBtmSheet :
-    BottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
+    BaseBottomSheetDialogFragment(), ProxyCountriesBtmSheet.CountriesDismissListener, WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetCustomDomainsBinding? = null
 
     private val b
@@ -378,7 +377,7 @@ class CustomDomainRulesBtmSheet :
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
-            if (_binding != null) { f() }
+            if (isAdded && _binding != null) { f() }
         }
     }
 

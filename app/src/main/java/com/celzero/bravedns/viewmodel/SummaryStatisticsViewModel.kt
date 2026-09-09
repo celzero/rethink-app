@@ -44,12 +44,6 @@ class SummaryStatisticsViewModel(
     private val startTime: MutableLiveData<Long> = MutableLiveData()
     private var loadMoreClicked: Boolean = false
 
-    companion object {
-        private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
-        private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
-        private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
-    }
-
     enum class TimeCategory(val value: Int) {
         ONE_HOUR(0),
         TWENTY_FOUR_HOUR(1),
@@ -203,5 +197,11 @@ class SummaryStatisticsViewModel(
     suspend fun totalUsage(): DataUsageSummary {
         val to = startTime.value ?: 0L
         return connectionTrackerDAO.getTotalUsages(to, ConnectionTracker.ConnType.METERED.value)
+    }
+
+    companion object {
+        private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
+        private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
+        private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
     }
 }

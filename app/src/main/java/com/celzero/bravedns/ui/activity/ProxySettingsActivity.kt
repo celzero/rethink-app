@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import android.annotation.SuppressLint
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.ActivityNotFoundException
@@ -25,6 +26,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
+import android.view.MotionEvent
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -175,16 +177,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
-            // Proxy lockdown: SOCKS5 cannot be toggled at all (enforcement; the row click
-            // listener and handleProxyUi() already prevent user interaction).
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnCheckedChangeListener
-            }
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text =
@@ -264,15 +256,6 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
-            // Proxy lockdown: HTTP proxy cannot be toggled. Inform instead of silently ignoring.
-            if (persistentState.wgGlobalLockdown) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.lockdown_check_setting_disabled),
-                    Toast.LENGTH_SHORT,
-                )
-                return@setOnCheckedChangeListener
-            }
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
@@ -527,11 +510,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             isEnabled && isActive -> {
                 io {
                     val selectedConfigs = RpnProxyManager.getSelectedCCs()
-                    val ccs = selectedConfigs.map { if (it.city.equals(AUTO_SERVER_ID, true)) it.city.capitalizeWords() else it.city.capitalizeWords() + ":" + it.cc.uppercase() }
+                    val ccs = selectedConfigs.map { it.city.capitalizeWords() }
                     val desc =
                         if (selectedConfigs.isNotEmpty()) {
                             val countryList =
-                                ccs.take(3).joinToString(", ")
+                                ccs.take(6).joinToString(", ")
                             getString(
                                 R.string.two_argument_dot,
                                 getString(R.string.lbl_active),
@@ -812,6 +795,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun showSocks5ProxyDialog(
         endpoint: ProxyEndpoint,
         appNames: List<String>,
@@ -887,6 +871,22 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
         headerTxt.text = getString(R.string.settings_dns_proxy_dialog_header)
         headerDesc.text = getString(R.string.settings_dns_proxy_dialog_app_desc)
+
+        if (persistentState.wgGlobalLockdown) {
+            appNameSpinner.setSelection(0)
+            appNameSpinner.alpha = 0.5f
+            appNameSpinner.setOnTouchListener { _, event ->
+                // the listener fires for every touch event (down, up); toast only once.
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.lockdown_check_setting_disabled),
+                        Toast.LENGTH_SHORT,
+                    )
+                }
+                true
+            }
+        }
 
         lockdownDesc.setOnClickListener {
             dialog.dismiss()
@@ -979,51 +979,39 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         dialog.show()
     }
 
-    // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode,
-    // or when proxy lockdown is enabled (Orbot, HTTP and SOCKS5 cannot be used under it).
     private fun handleProxyUi() {
         val canEnableProxy = appConfig.canEnableProxy()
         val isProxyLockdown = persistentState.wgGlobalLockdown
-        // Orbot, HTTP and SOCKS5 proxies are unavailable in DNS-only mode or under proxy
-        // lockdown. WireGuard and RPN remain available (they are the lockdown proxy itself).
-        val canUseOtherProxies = canEnableProxy && !isProxyLockdown
 
-        // Show the lockdown / DNS-mode description. Proxy lockdown takes precedence.
-        if (!canEnableProxy || isProxyLockdown) {
+        if (!canEnableProxy) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityVpnLockdownDesc.text =
-                if (isProxyLockdown) {
-                    getString(R.string.lockdown_check_proxy_options_disabled)
-                } else {
-                    getString(R.string.settings_lock_down_proxy_desc)
-                }
+                getString(R.string.settings_lock_down_proxy_desc)
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
         }
 
-        if (canUseOtherProxies) {
-            b.settingsActivityOrbotContainer.alpha = 1f
-            b.settingsActivitySocks5Rl.alpha = 1f
-            b.settingsActivityHttpProxyContainer.alpha = 1f
-        } else {
-            b.settingsActivityOrbotContainer.alpha = 0.5f
-            b.settingsActivitySocks5Rl.alpha = 0.5f
-            b.settingsActivityHttpProxyContainer.alpha = 0.5f
-        }
+        // Orbot is unavailable under proxy lockdown (or DNS mode); the row stays
+        // clickable so tapping surfaces the lockdown toast.
+        val isOrbotUsable = canEnableProxy && !isProxyLockdown
+        b.settingsActivityOrbotContainer.alpha = if (isOrbotUsable) 1f else 0.5f
+        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
+        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
+
+        // SOCKS5 and HTTP remain usable under proxy lockdown (app selection is
+        // disallowed in the proxy dialogs instead).
+        b.settingsActivitySocks5Rl.alpha = if (canEnableProxy) 1f else 0.5f
+        b.settingsActivityHttpProxyContainer.alpha = if (canEnableProxy) 1f else 0.5f
+        b.settingsActivitySocks5Switch.isEnabled = canEnableProxy
+        b.settingsActivityHttpProxySwitch.isEnabled = canEnableProxy
 
         // Wireguard (gated only on canEnableProxy; it remains usable under proxy lockdown)
         b.settingsActivityWireguardImg.isEnabled = canEnableProxy
         b.settingsActivityWireguardContainer.isEnabled = canEnableProxy
         b.settingsActivityWireguardContainer.alpha = if (canEnableProxy) 1f else 0.5f
-        // Orbot (container/img kept enabled so tapping surfaces the lockdown toast)
-        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
-        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
-        // SOCKS5 (row kept clickable so tapping surfaces the lockdown toast; switch disabled)
-        b.settingsActivitySocks5Switch.isEnabled = canUseOtherProxies
-        // HTTP Proxy (row kept clickable so tapping surfaces the lockdown toast; switch disabled)
-        b.settingsActivityHttpProxySwitch.isEnabled = canUseOtherProxies
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun showHttpProxyDialog(
         endpoint: ProxyEndpoint,
         appNames: List<String>,
@@ -1113,6 +1101,24 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
         headerTxt.text = getString(R.string.http_proxy_dialog_heading)
         headerDesc.text = getString(R.string.http_proxy_dialog_desc)
+
+        // Proxy lockdown: app selection is not allowed, force "None" (index 0) and
+        // inform the user if they attempt to change it.
+        if (persistentState.wgGlobalLockdown) {
+            appNameSpinner.setSelection(0)
+            appNameSpinner.alpha = 0.5f
+            appNameSpinner.setOnTouchListener { _, event ->
+                // the listener fires for every touch event (down, up); toast only once.
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.lockdown_check_setting_disabled),
+                        Toast.LENGTH_SHORT,
+                    )
+                }
+                true
+            }
+        }
 
         applyURLBtn.setOnClickListener {
             host = ipAddressEditText.text.toString()
@@ -1282,6 +1288,10 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 }

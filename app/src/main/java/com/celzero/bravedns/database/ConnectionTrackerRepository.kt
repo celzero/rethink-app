@@ -22,9 +22,7 @@ import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO): KoinComponent {
-
-    private val persistentState by inject<PersistentState>()
+class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)
@@ -101,12 +99,91 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getBlockedUniversalRulesCount()
     }
 
+    suspend fun getRecentRoutedAppsForProxy(proxyId: String, limit: Int = 3): List<ConnectionTracker> {
+        val seen = mutableSetOf<String>()
+        return connectionTrackerDAO.getRecentRoutedConnectionsForProxy(proxyId)
+            .filter { seen.add(it.appName) }
+            .take(limit)
+    }
+
     suspend fun closeConnections( connIds: List<String>, reason: String) {
         connectionTrackerDAO.closeConnections(connIds, reason)
     }
 
     suspend fun closeConnectionForUids( uids: List<Int>, reason: String) {
         connectionTrackerDAO.closeConnectionForUids(uids, reason)
+    }
+
+    suspend fun getActivityBuckets(
+        rangeStart: Long,
+        rangeEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow> {
+        return connectionTrackerDAO.getActivityBuckets(rangeStart, rangeEnd, bucketMs)
+    }
+
+    suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow {
+        return connectionTrackerDAO.getWindowCounts(start, end)
+    }
+
+    suspend fun getAppActivity(start: Long, end: Long, limit: Int): List<AppActivityRow> {
+        return connectionTrackerDAO.getAppActivity(start, end, limit)
+    }
+
+    suspend fun getConnectionsInWindowForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<ConnectionTracker> {
+        return connectionTrackerDAO.getConnectionsInWindowForUid(start, end, uid, limit)
+    }
+
+    suspend fun getRpnActivityBuckets(
+        proxyIdFilter: String,
+        rangeStart: Long,
+        rangeEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow> {
+        return connectionTrackerDAO.getRpnActivityBuckets(
+            proxyIdFilter,
+            rangeStart,
+            rangeEnd,
+            bucketMs
+        )
+    }
+
+    suspend fun getRpnWindowCounts(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long
+    ): WindowCountRow {
+        return connectionTrackerDAO.getRpnWindowCounts(proxyIdFilter, start, end)
+    }
+
+    suspend fun getRpnAppActivity(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long,
+        limit: Int
+    ): List<AppActivityRow> {
+        return connectionTrackerDAO.getRpnAppActivity(proxyIdFilter, start, end, limit)
+    }
+
+    suspend fun getRpnConnectionsInWindowForUid(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<ConnectionTracker> {
+        return connectionTrackerDAO.getRpnConnectionsInWindowForUid(
+            proxyIdFilter,
+            start,
+            end,
+            uid,
+            limit
+        )
     }
 
     private val BLOCKED_WINDOW_MS = 5 * 60 * 1000L // 5 minutes

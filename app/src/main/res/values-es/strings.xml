@@ -814,7 +814,6 @@
     <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Excluye las rutas LAN, loopback, multicast, enlace-local del túnel VPN de Rethink.</string>
     <string name="lbl_network" translatable="true">Red</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s funciona sólo con el DNS de Rethink</string>
     <string name="lbl_maybe_blocked" translatable="true">Posiblemente bloqueado</string>
     <string name="lbl_very" translatable="true">muy</string>
     <string name="lbl_app_wise" translatable="true">Por aplicación</string>
