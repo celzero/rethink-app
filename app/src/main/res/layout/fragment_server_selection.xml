@@ -95,7 +95,7 @@
                                             android:shadowDx="1"
                                             android:shadowRadius="10"
                                             android:textAllCaps="true"
-                                            android:textColor="?attr/svgStrokeColor"
+                                            android:textColor="@android:color/white"
                                             android:textSize="@dimen/small_font_text_view"
                                             android:textStyle="bold"
                                             tools:text="IN" />

@@ -247,7 +247,14 @@ class VpnServerAdapter(
                 leastLoad = if (list.all { it.load > 0 }) list.minOfOrNull { it.load } ?: 0 else 0,
                 isActive = list.any { it.isActive }
             )
-        }.sortedBy { it.cityName.lowercase() }
+        }.sortedWith(
+            compareBy(
+                // AUTO is always pinned to the top of the selected list...
+                { !it.key.equals(AUTO_SERVER_ID, ignoreCase = true) },
+                // ...then remaining groups are arranged alphabetically by city name
+                { it.cityName.lowercase() }
+            )
+        )
         updateServerGroups(groups)
     }
 

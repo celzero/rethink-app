@@ -1265,8 +1265,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
                 gravity = Gravity.CENTER
                 textSize = 10f
-                setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
                 setTypeface(typeface, Typeface.BOLD)
+                setTextColor(Color.WHITE)
                 setShadowLayer(2f * density, 0f, 1f * density, Color.argb(128, 0, 0, 0))
                 text = config.cc.uppercase(Locale.US)
             }
@@ -2430,7 +2430,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             val leastLoad = if (grouped.all { it.load > 0 }) grouped.minOfOrNull { it.load } ?: 0 else 0
             val bestLink  = if (grouped.all { it.link > 0 }) grouped.maxOfOrNull { it.link } ?: 0 else 0
             VpnServerAdapter.ServerGroup(key, grouped, rep.countryName, rep.flagEmoji, rep.serverLocation, rep.cc, bestLink, leastLoad, grouped.any { it.isActive })
-        }.sortedBy { it.cityName.lowercase() }
+        }
+        .sortedWith(
+            compareBy(
+                { !it.key.equals(AUTO_SERVER_ID, ignoreCase = true) },
+                { it.cityName.lowercase() }
+            )
+        )
     }
 
     /**
