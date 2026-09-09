@@ -44,6 +44,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.BackoffPolicy
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -57,6 +58,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.SmartDnsEndpoint
@@ -213,7 +215,14 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             )
         } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
             Logger.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
-            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE) }
+            io {
+                // post-restore DB work must run here (fresh Room connections, post
+                // process restart): the restore worker's close()/reopen() cycle
+                // permanently poisons the previous process' RoomDatabase instances
+                RemoteFileTagUtil.moveFileToLocalDir(applicationContext, persistentState)
+                RestoreAgent.clearSubscriptionEntries(get<AppDatabase>())
+                rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE)
+            }
         }
     }
 
@@ -255,8 +264,8 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
-            startRestore(uri)
-            observeRestoreWorker()
+            val workId = startRestore(uri)
+            observeRestoreWorker(workId)
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
@@ -268,7 +277,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         dialog.show()
     }
 
-    private fun startRestore(fileUri: Uri) {
+    private fun startRestore(fileUri: Uri): java.util.UUID? {
         Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
         data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
@@ -283,15 +292,26 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                 )
                 .addTag(RestoreAgent.TAG)
                 .build()
-        WorkManager.getInstance(this).beginWith(importWorker).enqueue()
+        // unique work: a concurrent restore (double-tap or the other entry point)
+        // would close/copy the same database files simultaneously and corrupt them
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            RestoreAgent.TAG,
+            ExistingWorkPolicy.KEEP,
+            importWorker
+        )
+        return importWorker.id
     }
 
-    private fun observeRestoreWorker() {
+    private fun observeRestoreWorker(workId: java.util.UUID?) {
+        if (workId == null) return
         val workManager = WorkManager.getInstance(this.applicationContext)
 
-        // observer for custom download manager worker
-        workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(this) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+        // observe by id, not by tag: the tag query also returns terminal WorkInfos of
+        // previous restore attempts and emits them immediately upon registration
+        // (pruneWork is async). Reacting to a stale FAILED/CANCELLED info here cancelled
+        // the just-started, running restore (JobCancellationException inside the worker).
+        workManager.getWorkInfoByIdLiveData(workId).observe(this) { workInfo ->
+            if (workInfo == null) return@observe
             Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
@@ -317,9 +337,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                     getString(R.string.brbs_restore_no_uri_toast),
                     Toast.LENGTH_SHORT
                 )
+                // no cancelAllWorkByTag here: the observed work is already terminal and
+                // a tag-scoped cancel would only kill a different, running restore
                 workManager.pruneWork()
-                workManager.cancelAllWorkByTag(RestoreAgent.TAG)
-            } else { // state == blocked
+            } else { // state == enqueued, running, blocked
                 // no-op
             }
         }
