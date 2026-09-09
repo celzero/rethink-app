@@ -265,6 +265,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // fraction of the max cell size per intensity level
         private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.30f, 0.78f, 0.78f, 1f, 1f)
+
+        // alpha of the unselected allowed/blocked header block; the block
+        // matching the active toggle mode renders at full opacity
+        private const val LOGS_HEADER_UNSELECTED_ALPHA = 0.7f
     }
 
     enum class ScreenType {
@@ -774,7 +778,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             observeLogsCount()
         } else {
             disableLogsCard()
-            unObserveLogsCount()
         }
     }
 
@@ -1254,10 +1257,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disableLogsCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardNetworkLogsCount.visibility = View.GONE
-        b.fhsCardNetworkLogsLabel.text = getString(R.string.lbl_disabled)
-        b.fhsCardDnsLogsCount.visibility = View.GONE
-        b.fhsCardDnsLogsLabel.visibility = View.GONE
+        b.fhsCardAllowedLogsCount.visibility = View.GONE
+        b.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_disabled)
+        b.fhsCardBlockedLogsCount.visibility = View.GONE
+        b.fhsCardBlockedLogsLabel.visibility = View.GONE
         b.fhsCardLogsDuration.visibility = View.GONE
     }
 
@@ -1400,10 +1403,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun toggleLogsView(mode: ActivityDisplayMode) {
         if (displayMode == mode) return
         displayMode = mode
+        updateLogsHeaderEmphasis(mode == ActivityDisplayMode.BLOCKED)
 
         // re-render from the cached aggregate only; the toggle must not
         // trigger another database query
         lastActivityState?.let { buildLogsHeatmap(it, mode) }
+    }
+
+    /**
+     * Dims the logs-card header block that does not match the active toggle
+     * mode so the emphasized (full-opacity) count always tracks the selected
+     * allowed/blocked chip. Idempotent; safe to call on every toggle and
+     * re-render.
+     */
+    private fun updateLogsHeaderEmphasis(blocked: Boolean) {
+        if (view == null || !isAdded) return
+
+        b.fhsLogsAllowedHeader.alpha =
+            if (blocked) LOGS_HEADER_UNSELECTED_ALPHA else 1f
+        b.fhsLogsBlockedHeader.alpha =
+            if (blocked) 1f else LOGS_HEADER_UNSELECTED_ALPHA
     }
 
     private fun updateLogsToggleUi(blocked: Boolean) {
@@ -1413,6 +1432,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             b.fhsLogsAllowedChip.isChecked = true
         }
+        updateLogsHeaderEmphasis(blocked)
     }
 
     /**
@@ -1530,6 +1550,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     (legendBaseH * frac).toInt()
                 ).apply { gravity = Gravity.CENTER_VERTICAL }
         }
+
+        renderLogsHeaderCount(state)
+    }
+
+    private fun renderLogsHeaderCount(state: LogActivityState) {
+        if (view == null || !isAdded) return
+        if (!isVpnActivated) return
+
+        var allowed = 0L
+        var blocked = 0L
+        for (interval in state.intervals) {
+            allowed += interval.allowed
+            blocked += interval.blocked
+        }
+        b.fhsCardAllowedLogsCount.text = formatDecimal(allowed)
+        b.fhsCardAllowedLogsCount.isSelected = true
+        b.fhsCardBlockedLogsCount.text = formatDecimal(blocked)
+        b.fhsCardBlockedLogsCount.isSelected = true
+
+        b.fhsCardLogsDuration.visibility = View.VISIBLE
     }
 
     /**
@@ -1771,43 +1811,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return sb
     }
 
+    /**
+     * Prepares the logs card header for rendering. The cumulative
+     * allowed/blocked counts are derived from the [LogActivityAggregator]
+     * state (the same source as the heatmap) inside [buildLogsHeatmap];
+     * nothing is observed from the log databases here.
+     */
     private fun observeLogsCount() {
-        b.fhsCardNetworkLogsLabel.text = "CONNECTIONS"
-        b.fhsCardNetworkLogsLabel.visibility = View.VISIBLE
-        b.fhsCardNetworkLogsCount.visibility = View.VISIBLE
-        b.fhsCardDnsLogsCount.visibility = View.VISIBLE
-        b.fhsCardDnsLogsLabel.visibility = View.VISIBLE
+        b.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_allowed)
+        b.fhsCardAllowedLogsLabel.visibility = View.VISIBLE
+        b.fhsCardAllowedLogsCount.visibility = View.VISIBLE
+        b.fhsCardBlockedLogsCount.visibility = View.VISIBLE
+        b.fhsCardBlockedLogsLabel.visibility = View.VISIBLE
         b.fhsCardLogsDuration.visibility = View.VISIBLE
-        io {
-            val time = appConfig.getLeastLoggedNetworkLogs()
-            if (time == 0L) return@io
 
-            val now = System.currentTimeMillis()
-            // returns a string describing 'time' as a time relative to 'now'
-            val t =
-                DateUtils.getRelativeTimeSpanString(
-                    time,
-                    now,
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
-            uiCtx {
-                b.fhsCardLogsDuration.visibility = View.VISIBLE
-                b.fhsCardLogsDuration.text = getString(R.string.logs_card_duration, t)
-            }
-        }
-
-        appConfig.dnsLogsCount.observe(viewLifecycleOwner) {
-            val count = formatDecimal(it)
-            b.fhsCardDnsLogsCount.text = count
-            b.fhsCardDnsLogsCount.isSelected = true
-        }
-
-        appConfig.networkLogsCount.observe(viewLifecycleOwner) {
-            val count = formatDecimal(it)
-            b.fhsCardNetworkLogsCount.text = count
-            b.fhsCardNetworkLogsCount.isSelected = true
-        }
+        // render immediately from the cached aggregate so the header counts
+        // are not blank until the next aggregator emission
+        lastActivityState?.let { buildLogsHeatmap(it, displayMode) }
     }
 
     private fun formatDecimal(i: Long?): String {
@@ -1870,11 +1890,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             label = "${value / 10}${units[unit]}"
         }
         return label
-    }
-
-    private fun unObserveLogsCount() {
-        appConfig.dnsLogsCount.removeObservers(viewLifecycleOwner)
-        appConfig.networkLogsCount.removeObservers(viewLifecycleOwner)
     }
 
     private fun unObserveCustomRulesCount() {

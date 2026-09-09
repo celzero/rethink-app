@@ -618,12 +618,13 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <LinearLayout
+                            android:id="@+id/fhs_logs_allowed_header"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_network_logs_count"
+                                android:id="@+id/fhs_card_allowed_logs_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="monospace"
@@ -632,40 +633,40 @@
                                 android:textSize="@dimen/rethink_header_text" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_network_logs_label"
+                                android:id="@+id/fhs_card_allowed_logs_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:alpha="0.8"
                                 android:letterSpacing="0.15"
-                                tools:text="CONNECTIONS"
+                                android:text="@string/lbl_allowed"
                                 android:textAllCaps="true"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/small_font_text_view" />
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/fhs_logs_blocked_header"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="24dp"
                             android:orientation="vertical">
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_dns_logs_count"
+                                android:id="@+id/fhs_card_blocked_logs_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:alpha="0.7"
                                 android:fontFamily="monospace"
                                 tools:text="65K"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/rethink_header_text" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_dns_logs_label"
+                                android:id="@+id/fhs_card_blocked_logs_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:alpha="0.8"
                                 android:letterSpacing="0.15"
-                                android:text="QUERIES"
+                                android:text="@string/lbl_blocked"
                                 android:textAllCaps="true"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/small_font_text_view" />
@@ -733,10 +734,11 @@
                         android:layout_marginTop="16dp"
                         android:alpha="0.8"
                         android:letterSpacing="0.08"
-                        tools:text="last 24 hours · 10-min cells"
+                        tools:text="last 24 hours"
                         android:textAllCaps="true"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/small_font_text_view"
+                        android:text="@string/logs_card_heatmap_window"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/fhs_logs_grid" />
 
