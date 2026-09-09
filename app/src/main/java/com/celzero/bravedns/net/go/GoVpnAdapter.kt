@@ -3711,12 +3711,15 @@ class GoVpnAdapter : KoinComponent {
             val chosenSmartDns = appConfig.getSelectedSmartDnsEndpoint()
             if (chosenSmartDns == null) {
                 Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+                Logger.w(LOG_TAG_VPN, "$TAG no smart dns endpoint selected, using default(PlusFilterAdblock)")
             } else {
-                val mode = SmartDnsMode.getTunMode(chosenSmartDns.id)
+                val mode = SmartDnsMode.getTunMode(chosenSmartDns.dnsMode)
                 Settings.setPlusStrategy(Settings.PlusOrderFastest, mode)
+                Logger.i(LOG_TAG_VPN, "$TAG smart dns endpoint selected: $chosenSmartDns, mode: $mode")
             }
         } else {
             Settings.setPlusStrategy(Settings.PlusOrderFastest, Settings.PlusFilterAdblock)
+            Logger.i(LOG_TAG_VPN, "$TAG not smart dns, using default(PlusFilterAdblock)")
         }
     }
 

@@ -101,7 +101,8 @@ class TourOverlayController(
     private val btnClose: View               = tooltipView.findViewById(R.id.tour_close_btn)
     private val dotsContainer: ViewGroup     = tooltipView.findViewById(R.id.tour_dots_container)
     private val premiumBadge: View           = tooltipView.findViewById(R.id.tour_premium_badge)
-    private val tooltipCard: MaterialCardView = tooltipView as MaterialCardView
+    private val tooltipCard: MaterialCardView =
+        tooltipView.findViewById(R.id.tour_tooltip_card)
 
     /** Default card stroke color, cached once so we can restore it on non-premium steps. */
     private val defaultStrokeColor: Int by lazy { tooltipCard.strokeColorStateList?.defaultColor ?: 0 }

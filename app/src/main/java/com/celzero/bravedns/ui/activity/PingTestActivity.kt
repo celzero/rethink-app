@@ -39,6 +39,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.PingTestOutcome
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -97,10 +98,16 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         // Input stays empty; an empty input runs the AUTO (default probes) test,
         // conveyed via the field's hint so the user can type straight away.
         showReadyState()
+        setDolphinSignature()
         if (!allowCustomTargets) {
             b.rpnInactiveNote.visibility = View.VISIBLE
             setInputEnabled(false)
         }
+    }
+
+    /** Dolphin signature (at the end of the scrollable content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun setupClickListeners() {

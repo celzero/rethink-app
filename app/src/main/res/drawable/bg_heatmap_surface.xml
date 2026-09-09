@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral surface "well" for the RPN heat map inside the Plus hero card.
+     The heat-map dots use the same color+alpha recipe as HomeScreenFragment's
+     activity wall, which sits on ?attr/colorSurfaceContainer. Rendering them
+     over the saturated hero gradient makes them read noticeably brighter, so
+     the grid is drawn over this neutral surface instead to match Home. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="12dp" />
+    <solid android:color="?attr/colorSurfaceContainer" />
+</shape>

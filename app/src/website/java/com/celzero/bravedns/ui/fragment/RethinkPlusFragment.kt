@@ -54,6 +54,7 @@ import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -569,6 +570,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorIcon.setImageResource(R.drawable.ic_error_state)
         b.errorTitle.text = getString(R.string.no_internet_title)
         b.errorMessage.text = message.ifBlank { getString(R.string.no_internet_premium_msg) }
+        b.errorMessage.isVisible = true
         b.errorReason.isVisible = false
         b.retryButton.isVisible = true
     }
@@ -634,11 +636,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
-        b.errorMessage.text = message
-        // Render the specific failure cause (if any) in a small text element directly below
-        // the primary error message so the user understands why the fetch failed.
-        b.errorReason.text = reason
-        b.errorReason.isVisible = reason.isNotEmpty()
+        if (reason.isNotEmpty()) {
+            b.errorMessage.isVisible = false
+            b.errorReason.text = reason
+            b.errorReason.isVisible = true
+        } else {
+            b.errorMessage.text = message
+            b.errorMessage.isVisible = true
+            b.errorReason.isVisible = false
+        }
         b.retryButton.isVisible = isRetryable
     }
 
@@ -668,6 +674,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
         b.errorMessage.text = fullMessage
+        b.errorMessage.isVisible = true
         b.errorReason.isVisible = false
         b.retryButton.isVisible = canRetry
     }
@@ -869,6 +876,34 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             Logger.w(Logger.LOG_IAB, "$TAG: connectivity check failed: ${e.message}")
             true // fail-open so a transient SystemService error does not block purchase
         }
+    }
+
+    /**
+     * Explicitly restore purchases. Re-queries Google Play; the resulting
+     * state-machine transition drives the UI.
+     */
+    private fun restorePurchases() {
+        if (!isOnline()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.no_internet_purchase_msg),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            InAppBillingHandler.fetchPurchases(
+                listOf(
+                    com.android.billingclient.api.BillingClient.ProductType.SUBS,
+                    com.android.billingclient.api.BillingClient.ProductType.INAPP
+                )
+            )
+        }
+        Utilities.showToastUiCentered(
+            requireContext(),
+            getString(R.string.pending_checking_status),
+            Toast.LENGTH_SHORT
+        )
     }
 
 

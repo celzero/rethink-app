@@ -44,6 +44,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * RPN-scoped variant of [LogActivityIntervalBottomSheet]: identical list
  * interaction (per-app summaries, lazy expansion), but every query is
@@ -163,8 +165,14 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         }
         b.bsLaiRecycler.layoutManager = LinearLayoutManager(requireContext())
         b.bsLaiRecycler.adapter = adapter
+        setDolphinSignature()
 
         load(currentWindow)
+    }
+
+    /** Dolphin signature (at the end of the sheet content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun load(window: LogActivityWindow) {

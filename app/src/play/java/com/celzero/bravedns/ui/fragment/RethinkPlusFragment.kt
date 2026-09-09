@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
@@ -39,18 +37,19 @@ import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
-import com.celzero.bravedns.iab.ServerApiError
+import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
-import java.util.Locale
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
 import com.facebook.shimmer.Shimmer
@@ -153,16 +152,16 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             b.extendModeBanner.isVisible = true
             // hide the connection info card since it's not relevant in extend mode
             b.connectionInfoCard.visibility = View.GONE
-            }
         }
+    }
 
     private fun applyButtonTheme() {
         val ctx = requireContext()
 
         // subscribe button
         val accentGood = UIUtils.fetchColor(ctx, R.attr.accentGood)
-        val lightText  = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
-        val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenHeaderTextColor)
+        val lightText = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
+        val htxtClr = UIUtils.fetchColor(ctx, R.attr.homeScreenBtnBackground)
 
         b.subscribeButton.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(accentGood)
@@ -524,6 +523,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
         b.connectionLocation.text = locationText
 
+        if (state.asorg.isNotEmpty()) {
+            b.ispContainer.isVisible = true
+            b.vDivider.isVisible = true
+            b.connectionIsp.text = state.asorg
+        } else {
+            b.ispContainer.isVisible = false
+            b.vDivider.isVisible = false
+        }
         b.ispContainer.isVisible = false
         b.vDivider.isVisible = false
     }
@@ -563,6 +570,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorIcon.setImageResource(R.drawable.ic_error_state)
         b.errorTitle.text = getString(R.string.no_internet_title)
         b.errorMessage.text = message.ifBlank { getString(R.string.no_internet_premium_msg) }
+        b.errorMessage.isVisible = true
         b.errorReason.isVisible = false
         b.retryButton.isVisible = true
     }
@@ -628,11 +636,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
-        b.errorMessage.text = message
-        // Render the specific failure cause (if any) in a small text element directly below
-        // the primary error message so the user understands why the fetch failed.
-        b.errorReason.text = reason
-        b.errorReason.isVisible = reason.isNotEmpty()
+        if (reason.isNotEmpty()) {
+            b.errorMessage.isVisible = false
+            b.errorReason.text = reason
+            b.errorReason.isVisible = true
+        } else {
+            b.errorMessage.text = message
+            b.errorMessage.isVisible = true
+            b.errorReason.isVisible = false
+        }
         b.retryButton.isVisible = isRetryable
     }
 
@@ -662,6 +674,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.errorContainer.isVisible = true
         b.errorTitle.text = title
         b.errorMessage.text = fullMessage
+        b.errorMessage.isVisible = true
         b.errorReason.isVisible = false
         b.retryButton.isVisible = canRetry
     }
@@ -976,7 +989,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                 InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
                 InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
                 else -> 7
-            }
+                }
         }
         b.cancelPolicy.text = getString(R.string.cancel_refund_policy, days.toString())
     }

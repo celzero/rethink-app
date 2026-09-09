@@ -835,94 +835,138 @@
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/TextAppearance.AppCompat.Subhead"
+        <!-- Sponsor coda: the end of the About page dissolves into a faint, full-width
+             tonal wash that peaks behind the sponsor logos and the version footer, then
+             fades back into the page. No card, border, or solid background — the wash
+             (about_sponsor_blend) is drawn by a separate non-interactive view so only
+             the background is softened, never the logos or text. -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="center"
-            android:text="@string/about_mozilla"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
-            android:weightSum="1">
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:alpha="0.55"
+                android:background="@drawable/about_sponsor_blend"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/mozilla_img"
-                android:layout_width="160dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@string/about_mozilla"
-                android:src="@drawable/mozilla" />
+                android:orientation="vertical"
+                android:paddingTop="36dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/foss_img"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/about_mozilla"
-                app:srcCompat="@drawable/foss_logo" />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.6"
+                    android:gravity="center"
+                    android:lineSpacingExtra="3dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="@string/about_mozilla"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/small_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/floss_funds_img"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/about_mozilla"
-                app:srcCompat="@drawable/ic_floss_fund_badge" />
+                <!-- Logos: all three render inside identical 80x24dp bounds so the row
+                     reads as one evenly-sized composition; fitCenter preserves each
+                     asset's own aspect ratio inside the box (letterboxing is invisible
+                     on the transparent wash). To scale the whole row, change the box
+                     size on all three images together. -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-        </LinearLayout>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/mozilla_img"
+                        android:layout_width="80dp"
+                        android:layout_height="24dp"
+                        android:alpha="0.75"
+                        android:contentDescription="@string/about_mozilla"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/mozilla" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/about_app_version"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alpha="0.75"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:paddingTop="20dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textIsSelectable="true"
-            android:textSize="@dimen/small_font_text_view"
-            android:typeface="monospace" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/foss_img"
+                        android:layout_width="80dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:alpha="0.75"
+                        android:contentDescription="@string/about_mozilla"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/foss_logo" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/token_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alpha="0.75"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textIsSelectable="true"
-            android:textSize="@dimen/small_font_text_view"
-            android:typeface="monospace" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/floss_funds_img"
+                        android:layout_width="80dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="16dp"
+                        android:alpha="0.75"
+                        android:contentDescription="@string/about_mozilla"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_floss_fund_badge" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/about_license"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:paddingBottom="40dp"
-            android:text="@string/about_license"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view"
-            android:typeface="monospace" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/about_app_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:alpha="0.75"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textIsSelectable="true"
+                    android:textSize="@dimen/small_font_text_view"
+                    android:typeface="monospace" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/token_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.75"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textIsSelectable="true"
+                    android:textSize="@dimen/small_font_text_view"
+                    android:typeface="monospace" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/about_license"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center"
+                    android:alpha="0.75"
+                    android:paddingBottom="40dp"
+                    android:text="@string/about_license"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/small_font_text_view"
+                    android:typeface="monospace" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

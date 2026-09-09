@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<!-- Caps the tooltip card to 600dp on expanded windows (foldables open, tablets) and
+     centers it, mirroring BaseActivity/BaseBottomSheetDialogFragment behaviour. -->
+<com.celzero.bravedns.ui.MaxWidthFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/tour_tooltip_card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
-    app:cardBackgroundColor="?attr/tourTooltipBackground"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="?attr/border"
-    app:strokeWidth="0.5dp">
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/tour_tooltip_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="?attr/tourTooltipBackground"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="?attr/border"
+        app:strokeWidth="0.5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -169,6 +176,8 @@
 
     </LinearLayout>
 
-</com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+
+</com.celzero.bravedns.ui.MaxWidthFrameLayout>
 
 

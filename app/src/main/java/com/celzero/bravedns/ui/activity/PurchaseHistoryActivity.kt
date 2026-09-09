@@ -45,6 +45,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * Displays the full purchase / subscription state-change history stored in
  * the SubscriptionStateHistory table, loaded in pages of 30 rows at a time
@@ -90,6 +92,12 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
         observeTotalCount()
         loadHeroSubtitle()
         applyScrollPadding()
+        setDolphinSignature()
+    }
+
+    /** Dolphin signature (at the bottom of the content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun applyScrollPadding() {

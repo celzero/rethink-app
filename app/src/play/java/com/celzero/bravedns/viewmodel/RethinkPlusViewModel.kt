@@ -262,7 +262,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     Logger.d(LOG_IAB, "$TAG: Billing not ready, waiting for connection callback")
                     // Maintain Loading state, onBillingConnected() will drive the rest.
                     // Guard against race: connection may complete between initiate() and here.
-                    delay(500)
+                    delay(500.milliseconds)
                     if (_uiState.value is SubscriptionUiState.Loading && InAppBillingHandler.isBillingClientSetup()) {
                         Logger.d(LOG_IAB, "$TAG: Billing became ready during wait, querying products now")
                         InAppBillingHandler.queryProductDetailsWithTimeout()
@@ -910,9 +910,9 @@ sealed class SubscriptionUiState {
         val message: String,
         val isRetryable: Boolean,
         /**
-         * Optional specific cause of the failure (e.g. "Google Play did not respond in time.").
-         * Rendered in a small text element directly below [message]. Empty when the cause is
-         * not known or not applicable (e.g. non-product-fetch errors).
+         * Optional specific cause of the failure. When non-empty, the UI renders this
+         * in place of [message] as the sole explanatory text under the title. Empty
+         * when the cause is not known or not applicable (e.g. non-product-fetch errors).
          */
         val reason: String = ""
     ) : SubscriptionUiState()

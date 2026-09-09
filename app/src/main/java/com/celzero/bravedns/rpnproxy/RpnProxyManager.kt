@@ -2864,6 +2864,25 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
+     * True when at least one enabled non-AUTO location has relay (hop) on.
+     * Used to warn before enabling automation (mobile-only / SSID) on AUTO:
+     * relayed traffic enters via AUTO, so AUTO being paused pauses every
+     * relayed location with it.
+     */
+    suspend fun isRelayEnabledForAnyLocation(): Boolean {
+        return try {
+            winCacheMutex.withLock {
+                winServersCache.any {
+                    it.isEnabled && !it.id.equals(AUTO_SERVER_ID, true) && it.hopEnabled
+                }
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; isRelayEnabledForAnyLocation: err: ${e.message}")
+            false
+        }
+    }
+
+    /**
      * Updates AUTO server state in database and cache
      */
     suspend fun updateAutoServerState(autoServer: CountryConfig) {
