@@ -50,7 +50,7 @@ object GuidedTourManager {
             spotlightShape = SpotlightShape.ROUNDED_RECT,
         ),
         TourStep(
-            targetViewId   = R.id.fhs_card_firewall_ll,
+            targetViewId   = R.id.fhs_card_apps_cv,
             titleRes       = R.string.tour_step_firewall_title,
             descRes        = R.string.tour_step_firewall_desc,
             tooltipSide    = TooltipSide.BELOW,
@@ -68,6 +68,13 @@ object GuidedTourManager {
             titleRes       = R.string.tour_step_logs_title,
             descRes        = R.string.tour_step_logs_desc,
             tooltipSide    = TooltipSide.AUTO,
+            spotlightShape = SpotlightShape.ROUNDED_RECT,
+        ),
+        TourStep(
+            targetViewId   = R.id.fhs_card_firewall_ll,
+            titleRes       = R.string.tour_step_rules_title,
+            descRes        = R.string.tour_step_rules_desc,
+            tooltipSide    = TooltipSide.BELOW,
             spotlightShape = SpotlightShape.ROUNDED_RECT,
         ),
         TourStep(

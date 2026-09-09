@@ -110,7 +110,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         // Guided tour version bump this constant to re-show the tour after major UI changes.
         // Any stored version lower than this will cause the tour to re-trigger.
         // v2: added Rethink+ premium nav-item step (step 6) + fixed tour button text contrast.
-        const val GUIDED_TOUR_CURRENT_VERSION = 2
+        // v3: rewrote step copy; firewall step now targets the apps card; added Universal &
+        // Per-App Rules step targeting the firewall card.
+        const val GUIDED_TOUR_CURRENT_VERSION = 3
 
         // RPN (ServerSelection) onboarding tour version. Bump to re-show the premium
         // RPN onboarding to existing subscribers after a major dashboard UI change.

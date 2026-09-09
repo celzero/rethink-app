@@ -2752,23 +2752,27 @@
 
     <!-- Step 1: VPN / Protection Toggle -->
     <string name="tour_step_vpn_title" translatable="false">Your Privacy Shield</string>
-    <string name="tour_step_vpn_desc" translatable="false">This button starts and stops Rethink\'s VPN tunnel. When active, all app traffic is routed through your chosen DNS and firewall rules - nothing leaves unguarded.</string>
+    <string name="tour_step_vpn_desc" translatable="false">Start or stop Rethink\'s VPN tunnel. When active, your app traffic is routed through your chosen DNS, firewall, and network rules for greater control and privacy.</string>
 
     <!-- Step 2: DNS Card -->
-    <string name="tour_step_dns_title" translatable="false">DNS &amp; Blocklists</string>
-    <string name="tour_step_dns_desc" translatable="false">Configure your DNS resolver and activate on-device blocklists. Block ads, trackers, and malware domains before any connection is made.</string>
+    <string name="tour_step_dns_title" translatable="false">DNS Protection</string>
+    <string name="tour_step_dns_desc" translatable="false">Choose the DNS resolver used by your device and protect connections from known malicious or unwanted domains before they connect.</string>
 
     <!-- Step 3: Firewall Card -->
     <string name="tour_step_firewall_title" translatable="false">Per-App Firewall</string>
-    <string name="tour_step_firewall_desc" translatable="false">Decide which apps can reach the internet, which are isolated, and which are blocked entirely even when the VPN is off.</string>
+    <string name="tour_step_firewall_desc" translatable="false">Control which apps can access the internet. Allow, restrict, or block network access for individual apps.</string>
 
     <!-- Step 4: Proxy Card -->
     <string name="tour_step_proxy_title" translatable="false">Proxy &amp; Routing</string>
-    <string name="tour_step_proxy_desc" translatable="false">Chain a WireGuard, SOCKS5, or HTTP proxy to shape exactly how your traffic exits. Combine with DNS for full control.</string>
+    <string name="tour_step_proxy_desc" translatable="false">Route your traffic through a WireGuard, SOCKS5, or HTTP proxy. Combine proxies with DNS and firewall rules for flexible network control.</string>
 
     <!-- Step 5: Logs Card -->
     <string name="tour_step_logs_title" translatable="false">Connection Logs</string>
-    <string name="tour_step_logs_desc" translatable="false">Every DNS query and network connection is logged here. Review what your apps are doing and block anything suspicious with one tap.</string>
+    <string name="tour_step_logs_desc" translatable="false">See the DNS queries and network connections made by your apps. Understand what is connecting and take action when something looks unexpected.</string>
+
+    <!-- Step 6: Universal / Per-App Rules -->
+    <string name="tour_step_rules_title" translatable="false">Universal &amp; Per-App Rules</string>
+    <string name="tour_step_rules_desc" translatable="false">Create rules using domains or IP addresses and apply them everywhere or only to selected apps. Combine multiple rules to customize how your traffic is handled.</string>
 
     <!-- Duration labels for one-time purchase plan cards -->
     <plurals name="duration_years" translatable="false">
@@ -2777,25 +2781,26 @@
     </plurals>
 
     <!-- Rethink+ step -->
-    <string name="tour_step_rpn_desc" translatable="false">Unlock advanced privacy features with RPN: hide your real IP with rotating exits, access anti-censorship servers, and route traffic through private proxy networks for total control.</string>
+    <string name="tour_step_rpn_desc" translatable="false">Go beyond a regular VPN with RPN. Chain countries, relay servers, and private networks to build your own path to the internet with more privacy, flexibility, and control.</string>
     <!-- Label shown in the golden badge strip inside the tooltip card -->
     <string name="tour_premium_badge_label" translatable="false">Premium Feature</string>
 
     <!-- RPN (Server Selection) premium onboarding tour steps -->
     <string name="rpn_tour_welcome_title" translatable="false">Welcome to Rethink Private Network</string>
-    <string name="rpn_tour_welcome_desc" translatable="false">Your traffic now exits through private, encrypted servers - your real IP stays hidden. Here\'s a quick tour of what your subscription unlocks.</string>
-    <string name="rpn_tour_add_location_title" translatable="false">Add up to 5 locations</string>
-    <string name="rpn_tour_add_location_desc" translatable="false">Tap + to add up to 5 countries. Choose where each app connects from, or let RPN make the pick for you.</string>
-    <string name="rpn_tour_relay_title" translatable="false">Relay for an extra hop</string>
-    <string name="rpn_tour_relay_desc" translatable="false">Relay sends your connection through Auto server first, then your chosen country, adding a second layer between you and the internet</string>
+    <string name="rpn_tour_welcome_desc" translatable="false">Your traffic now exits through private, encrypted servers, keeping your real IP hidden. Here\'s a quick tour of what your subscription unlocks.</string>
+    <string name="rpn_tour_add_location_title" translatable="false">Connect through up to 5 locations</string>
+    <string name="rpn_tour_add_location_desc" translatable="false">Tap + to add up to 5 countries. Choose where each app connects from, or let RPN choose for you.</string>
+    <string name="rpn_tour_relay_title" translatable="false">Add an extra relay hop</string>
+    <string name="rpn_tour_relay_desc" translatable="false">Relay sends your connection through an Auto server first, then your chosen country, adding an extra hop between you and the internet.</string>
     <string name="rpn_tour_bypass_title" translatable="false">Bypass apps that need direct access</string>
-    <string name="rpn_tour_bypass_desc" translatable="false">Banking, gaming, or streaming apps that dislike proxies? Exclude them here and their traffic skips RPN entirely while everything else stays protected.</string>
-    <string name="rpn_tour_per_app_title" translatable="false">Route each app through its own country</string>
-    <string name="rpn_tour_per_app_desc" translatable="false">Tap the apps icon on any location to send specific apps through it - app A via Germany, app B via Japan, all at the same time.</string>
-    <string name="rpn_tour_stats_title" translatable="false">Live activity at a glance</string>
-    <string name="rpn_tour_stats_desc" translatable="false">Watch live throughput and a 6-hour activity heat map, so you always know exactly how much traffic RPN is carrying for you.</string>
-    <string name="rpn_tour_settings_title" translatable="false">Built-in DNS filters</string>
-    <string name="rpn_tour_settings_desc" translatable="false">Tap the gear to layer Privacy, Security, or Family blocklists onto your RPN exit point, identity protection mode and a custom connection port.</string>
+    <string name="rpn_tour_bypass_desc" translatable="false">Some banking, gaming, or streaming apps may not work with proxies. Exclude them here to send their traffic directly while everything else stays protected.</string>
+    <string name="rpn_tour_per_app_title" translatable="false">Give each app its own route</string>
+    <string name="rpn_tour_per_app_desc" translatable="false">Tap the apps icon on any location to route specific apps through it, app A via Germany, app B via Japan, all at the same time.</string>
+    <string name="rpn_tour_stats_title" translatable="false">See your activity at a glance</string>
+    <string name="rpn_tour_stats_desc" translatable="false">See live throughput and a 24-hour activity heat map to know how much traffic RPN is carrying for you.</string>
+    <string name="rpn_tour_settings_title" translatable="false">Customize your RPN connection</string>
+    <string name="rpn_tour_settings_desc" translatable="false">Tap the gear to add Privacy, Security, or Family blocklists to your RPN exit point, enable identity protection, or choose a custom connection port.</string>
+
 
     <!-- Configure fragment card subtitles -->
     <string name="fs_configure_apps_desc" translatable="true">Per-app firewall rules and network policy</string>
@@ -2860,6 +2865,9 @@
 
     <string name="qs_relay_automation_dialog_title" translatable="true">Automation enabled</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">Automation is enabled for the Auto location, which will affect this location as well. Do you want to proceed?</string>
+    <!-- Shown before enabling automation (mobile-only / SSID) on AUTO when relay is on -->
+    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay enabled</string>
+    <string name="rpn_automation_relay_dialog_message" translatable="true">Relay is enabled for one or more locations. Enabling automation on the Auto location will pause those locations as well. Do you want to proceed?</string>
 
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>
@@ -2882,5 +2890,51 @@
     <string name="rpn_stats_conn_count" translatable="true">%1$s conns</string>
 
     <string name="blocklist_count_home_screen" translatable="false">%1$s lists</string>
+
+    <!-- Embedded dolphin signature quotes (visual easter egg, not user-facing copy) -->
+    <string name="dolphin_quote_no_trails" translatable="false">No trails. Just waves.</string>
+    <string name="dolphin_quote_take_the_long_way" translatable="false">Take the long way around.</string>
+    <string name="dolphin_quote_beneath_the_surface" translatable="false">Stay beneath the surface.</string>
+    <string name="dolphin_quote_move_freely" translatable="false">Move freely. Stay private.</string>
+    <string name="dolphin_quote_surf_without_tracks" translatable="false">Surf without leaving tracks.</string>
+    <string name="dolphin_quote_not_the_obvious_path" translatable="false">Never take the obvious path.</string>
+    <string name="dolphin_quote_let_traffic_wander" translatable="false">Let your traffic wander.</string>
+    <string name="dolphin_quote_privacy_in_motion" translatable="false">Privacy, in motion.</string>
+    <string name="dolphin_quote_go_further" translatable="false">Go further. Leave less behind.</string>
+    <string name="dolphin_quote_your_current" translatable="false">Your connection. Your current.</string>
+    <string name="dolphin_quote_swim_quietly" translatable="false">Swim quietly.</string>
+    <string name="dolphin_quote_leave_only_ripples" translatable="false">Leave only ripples.</string>
+    <string name="dolphin_quote_hard_to_catch" translatable="false">Hard to catch a dolphin.</string>
+    <string name="dolphin_quote_gone_with_the_current" translatable="false">Gone with the current.</string>
+    <string name="dolphin_quote_keep_wake_private" translatable="false">Keep your wake private.</string>
+    <string name="dolphin_quote_swim_without_a_trace" translatable="false">Swim without a trace.</string>
+    <string name="dolphin_quote_out_of_sight_online" translatable="false">Out of sight, still online.</string>
+    <string name="dolphin_quote_privacy_likes_the_deep" translatable="false">Privacy likes the deep.</string>
+    <string name="dolphin_quote_internet_neednt_know" translatable="false">The internet doesn\'t need to know.</string>
+    <string name="dolphin_quote_ride_private_wave" translatable="false">Ride the private wave.</string>
+    <string name="dolphin_quote_browse_swim_repeat" translatable="false">Browse. Swim. Repeat.</string>
+    <string name="dolphin_quote_keep_swimming_keep_private" translatable="false">Keep swimming, keep private.</string>
+    <string name="dolphin_quote_your_current_your_rules" translatable="false">Your current, your rules.</string>
+    <string name="dolphin_quote_quieter_way_online" translatable="false">A quieter way online.</string>
+    <string name="dolphin_quote_surf_freely" translatable="false">Surf freely.</string>
+    <string name="dolphin_quote_stay_private_keep_moving" translatable="false">Stay private. Keep moving.</string>
+    <string name="dolphin_quote_web_wide_swim_freely" translatable="false">The web is wide. Swim freely.</string>
+    <string name="dolphin_quote_one_hop_at_a_time" translatable="false">One hop at a time.</string>
+    <string name="dolphin_quote_hop_skip_swim" translatable="false">Hop. Skip. Swim.</string>
+    <string name="dolphin_quote_why_direct_route" translatable="false">Why take the direct route?</string>
+    <string name="dolphin_quote_little_detour" translatable="false">A little detour never hurts.</string>
+    <string name="dolphin_quote_this_way_nope" translatable="false">This way? Nope.</string>
+    <string name="dolphin_quote_not_going_straight" translatable="false">Not going straight today.</string>
+    <string name="dolphin_quote_scenic_route" translatable="false">Your traffic takes the scenic route.</string>
+    <string name="dolphin_quote_no_shortcuts" translatable="false">Dolphins don\'t use shortcuts.</string>
+    <string name="dolphin_quote_just_keep_swimming" translatable="false">Just keep swimming. Privately.</string>
+    <string name="dolphin_quote_no_breadcrumbs" translatable="false">No breadcrumbs down here.</string>
+    <string name="dolphin_quote_nice_try_tracker" translatable="false">Nice try, tracker.</string>
+    <string name="dolphin_quote_catch_me_if_you_can" translatable="false">Catch me if you can.</string>
+    <string name="dolphin_quote_where_did_i_swim_off" translatable="false">Where did I swim off to?</string>
+    <string name="dolphin_quote_avoiding_obvious_route" translatable="false">Currently avoiding the obvious route.</string>
+    <string name="dolphin_quote_swimming_somewhere_else" translatable="false">Swimming somewhere else.</string>
+    <string name="dolphin_quote_lost_we_meant_it" translatable="false">Lost? We meant to do that.</string>
+    <string name="dolphin_quote_nothing_suspicious" translatable="false">Nothing suspicious. Just swimming.</string>
 
 </resources>
