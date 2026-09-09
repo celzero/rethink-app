@@ -787,7 +787,7 @@
     <string name="lockdown_download_message" translatable="true">&lt;/i&gt;</string>
     <string name="lbl_notes" translatable="true">یادداشت‌ها</string>
     <string name="hint_notes" translatable="true">اضافه کردن یادداشت در مورد این برنامه</string>
-    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d%2$d</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
     <string name="ctbs_app_notes_too_long" translatable="true">یادداشت‌ها می‌توانند حداکثر ۵۰۰ کاراکتر باشند</string>
     <string name="ctbs_app_notes_save_failed" translatable="true">یادداشت‌ها ذخیره نشدند</string>
     <string name="lbl_saving" translatable="true">ذخیره…</string>
