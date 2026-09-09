@@ -403,9 +403,13 @@ private fun onToggleVpnClicked(
     // Defensive try/catch: some Android builds throw NPE here when the
     // device doesn't actually support system-wide VPN. Upstream catches
     // this too — see HomeScreenFragment.prepareVpnService.
+    // IllegalStateException is thrown when another VPN app is set as
+    // Always-on VPN with "Block connections without VPN" (lockdown).
     val consentIntent: Intent? = try {
         VpnService.prepare(context)
     } catch (_: NullPointerException) {
+        return
+    } catch (_: IllegalStateException) {
         return
     }
     if (consentIntent == null) {
