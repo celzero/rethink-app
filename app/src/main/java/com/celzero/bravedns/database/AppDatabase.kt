@@ -74,6 +74,12 @@ abstract class AppDatabase : RoomDatabase() {
         // "Bad database header" failure seen after clearing app storage.
         private const val DATABASE_PATH = "database/rethink_v31.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
+        // cap the WAL file size (32MB). Without this, the -wal file stays at its
+        // high-water mark forever: SQLite reuses WAL space after a checkpoint but
+        // never shrinks the file, so a single large transaction (e.g. a bulk log
+        // purge) can leave a multi-hundred-MB -wal on disk for the lifetime of the
+        // installation.
+        private const val JOURNAL_SIZE_LIMIT_BYTES = 32 * 1024 * 1024
         private const val APP_NOTES_MAX_LENGTH = 500
 
         // setJournalMode() is added as part of issue #344
@@ -86,7 +92,7 @@ abstract class AppDatabase : RoomDatabase() {
         // with the 16-byte magic string "SQLite format 3\0". Files failing this check are
         // treated as corrupt/truncated so the pre-packaged asset can be re-copied by Room's
         // createFromAsset() instead of being reused as-is.
-        private fun isValidSQLiteFile(file: java.io.File): Boolean {
+        internal fun isValidSQLiteFile(file: java.io.File): Boolean {
             if (file.length() < 100) return false
             return try {
                 java.io.RandomAccessFile(file, "r").use { raf ->
@@ -185,7 +191,6 @@ abstract class AppDatabase : RoomDatabase() {
                     createAppInfoNotesLengthTriggers(db)
                     Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
                 }
-
                 override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
                     super.onDestructiveMigration(db)
                     Logger.i(LOG_TAG_APP_DB, "Database destructively migrated, ${db.version}")
@@ -193,9 +198,25 @@ abstract class AppDatabase : RoomDatabase() {
 
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onOpen(db)
+                    setJournalSizeLimit(db)
                     Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
                 }
             }
+
+        // PRAGMA journal_size_limit sets *and* returns the new limit, i.e. it is a
+        // result-returning pragma; SQLiteDatabase.execSQL() rejects such statements
+        // ("Queries can be performed using SQLiteDatabase query or rawQuery methods
+        // only"), so it must run through the query path with the cursor drained.
+        private fun setJournalSizeLimit(db: SupportSQLiteDatabase) {
+            try {
+                db.query(
+                    SimpleSQLiteQuery("PRAGMA journal_size_limit = $JOURNAL_SIZE_LIMIT_BYTES")
+                ).use { it.moveToFirst() }
+            } catch (e: Exception) {
+                // non-fatal: without the limit the WAL simply keeps its high-water mark
+                Logger.w(LOG_TAG_APP_DB, "err setting journal_size_limit: ${e.message}", e)
+            }
+        }
         private fun createAppInfoNotesLengthTriggers(db: SupportSQLiteDatabase) {
             db.execSQL(
                 "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_insert " +
@@ -1339,14 +1360,48 @@ abstract class AppDatabase : RoomDatabase() {
                     } else {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
                     }
+
+                    createSponsorTable(db)
                 }
             }
+
+        private fun createSponsorTable(db: SupportSQLiteDatabase) {
+            try {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS Sponsor (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "purchase_token TEXT NOT NULL, " +
+                        "product_id TEXT NOT NULL, " +
+                        "purchase_time INTEGER NOT NULL, " +
+                        "sponsor_since INTEGER NOT NULL, " +
+                        "consumed INTEGER NOT NULL DEFAULT 1, " +
+                        "contribution_count INTEGER NOT NULL DEFAULT 1, " +
+                        "last_contribution_time INTEGER NOT NULL DEFAULT 0)"
+                )
+                Logger.i(LOG_TAG_APP_DB, "created Sponsor table")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_APP_DB, "failed to create Sponsor table", e)
+                throw e
+            }
+        }
         private val MIGRATION_31_32: Migration =
             object : Migration(31, 32) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    db.execSQL(
-                        "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
-                    )
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_31_32: added AppInfo.notes")
+                    } catch (e: Exception) {
+                        if (!e.message.orEmpty().contains("duplicate column name: notes", ignoreCase = true)) {
+                            Logger.e(LOG_TAG_APP_DB, "MIGRATION_31_32: failed to add notes column", e)
+                            throw e
+                        }
+                        Logger.i(
+                            LOG_TAG_APP_DB,
+                            "MIGRATION_31_32: notes column already exists in AppInfo, skip"
+                        )
+                    }
 
                     createAppInfoNotesLengthTriggers(db)
 
@@ -1412,7 +1467,7 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +
                                     "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
-                                    "VALUES (1, 'No Filter', 0, 'Prefers any of the default DNS resolvers without applying any filtering.', 0, 0, 0)"
+                                    "VALUES (1, 'Unfiltered', 0, 'Prefers any of the default DNS resolvers without applying any filtering.', 0, 0, 0)"
                         )
                         execSQL(
                             "INSERT OR REPLACE INTO SmartDnsEndpoint" +

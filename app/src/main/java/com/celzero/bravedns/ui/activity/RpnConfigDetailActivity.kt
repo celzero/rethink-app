@@ -114,6 +114,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
 
+
+    private var suppressHopListener: Boolean = false
+
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
@@ -683,8 +686,17 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = stats?.since ?: 0L
 
+        // when Auto is paused the relay is effectively paused too, regardless of this
+        // location's own state
+        var isAutoPaused = false
+        if (!id.contains(AUTO_SERVER_ID, ignoreCase = true) && config?.hopEnabled == true) {
+            isAutoPaused = runCatching {
+                VpnController.getProxyStatusById(Backend.RpnWin).first == Backend.TPU
+            }.getOrDefault(false)
+        }
+
         uiCtx {
-            applyStats(statusPair, stats, config, selectedSinceTs)
+            applyStats(statusPair, stats, config, selectedSinceTs, isAutoPaused)
         }
     }
 
@@ -699,10 +711,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         statusPair: Pair<Int?, String>,
         stats: RouterStats?,
         config: CountryConfig?,
-        selectedSinceTs: Long
+        selectedSinceTs: Long,
+        isAutoPaused: Boolean = false
     ) {
         val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-        val statusColor = fetchColor(this, buildStatusColor(ps))
+        // Paused override (same as VpnServerAdapter): a relayed (hop) location
+        // whose AUTO is paused shows "Paused" even when it reports failing.
+        val effectiveStatus =
+            if (isAutoPaused && ps != UIUtils.ProxyStatus.TPU) UIUtils.ProxyStatus.TPU else ps
+        val statusColor = fetchColor(this, buildStatusColor(effectiveStatus))
 
         b.valueStatus.text = getString(R.string.lbl_active)
 
@@ -714,7 +731,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
 
         // e.g. "Connected · 🤝 1m · 🔃 12m"
-        val statusText = buildStatusText(ps, statusPair.second)
+        val statusText = buildStatusText(effectiveStatus, statusPair.second)
         val lastOK = stats?.lastOK ?: 0L
         val lastOpen = stats?.lastOpen ?: 0L
         val okTxt = if (lastOK > 0L)
@@ -768,8 +785,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             buildLoadSpeedText(loadPct, linkMbps)
         }
 
-        // only shown when proxy is in a failing state.
-        val isFailing = isFailing(ps)
+        // only shown when proxy is in a failing state (suppressed while the
+        // paused override is active — a relay paused via AUTO is not an error).
+        val isFailing = isFailing(effectiveStatus)
         if (isFailing && (rx == 0L && tx == 0L && selectedSinceTs > 0L)) {
             b.rowErrors.visibility = View.VISIBLE
             b.dividerErrors.visibility = View.VISIBLE
@@ -980,18 +998,33 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         b.hopCheck.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressHopListener) {
+                suppressHopListener = false
+                return@setOnCheckedChangeListener
+            }
+            if (!isChecked) {
+                applyHop(false)
+                return@setOnCheckedChangeListener
+            }
+            // enabling relay: confirm when AUTO has automation
             io {
-                RpnProxyManager.setHopForWinServer(configKey, isChecked)
-                // Re-render the client IP row so the Entry (AUTO) ↓ Exit relay
-                // presentation reflects the new hop state immediately.
-                countryConfig?.hopEnabled = isChecked
-                runCatching { resolveClientIps(configKey) }
-                uiCtx {
-                    Utilities.showToastUiCentered(
-                        this,
-                        if (isChecked) "Hop mode enabled" else "Hop mode disabled",
-                        Toast.LENGTH_SHORT
-                    )
+                val automationEnabled = runCatching { RpnProxyManager.isAutoAutomationEnabled() }
+                    .onFailure { Logger.w(LOG_TAG_UI, "RpnConfigDetailActivity hopCheck: automation check failed: ${it.message}") }
+                    .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!automationEnabled) {
+                        applyHop(true)
+                        return@ui
+                    }
+                    // Revert the checkbox first; re-applied on proceed.
+                    setHopCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyHop(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
                 }
             }
         }
@@ -1058,6 +1091,31 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             )
         }
         // ssidFilterRl click listener and ssidCheck listener are managed by setupSsidSectionUI
+    }
+
+
+    private fun applyHop(enabled: Boolean) {
+        io {
+            RpnProxyManager.setHopForWinServer(configKey, enabled)
+            countryConfig?.hopEnabled = enabled
+            runCatching { resolveClientIps(configKey) }
+            uiCtx {
+                Utilities.showToastUiCentered(
+                    this,
+                    if (enabled) "Hop mode enabled" else "Hop mode disabled",
+                    Toast.LENGTH_SHORT
+                )
+                // Sync the checkbox in case the toggle was initiated from the dialog.
+                setHopCheckSilently(enabled)
+            }
+        }
+    }
+
+    /** Updates the hop checkbox without re-triggering its checked-change listener. */
+    private fun setHopCheckSilently(checked: Boolean) {
+        if (b.hopCheck.isChecked == checked) return
+        suppressHopListener = true
+        b.hopCheck.isChecked = checked
     }
 
     private fun initiateRefresh(key: String) {

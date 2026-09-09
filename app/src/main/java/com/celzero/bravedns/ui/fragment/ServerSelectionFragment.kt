@@ -1655,6 +1655,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * Relay-all toggle: enables (or disables) hop for **all** enabled non-AUTO
      * locations. Toggling ON only after every location reports hop-enabled, so a
      * single disabled location flips the tile back to OFF (see [refreshRelayTileState]).
+     *
+     * Enabling is gated behind a confirmation when the AUTO location has
+     * automation on: relayed traffic enters via AUTO, so
+     * AUTO's automation (and its paused state) affects every relayed location.
      */
     private fun onRelayQuickSettingClicked() {
         if (isProxyStopped) {
@@ -1669,8 +1673,42 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             return
         }
 
-        relayToggleInFlight = true
         val target = !isRelayAllOn
+        if (!target) {
+            startRelayBulkToggle(target)
+            return
+        }
+
+        // confirm when AUTO has automation since it will affect the relayed locations as well.
+        io {
+            val automationEnabled = runCatching { RpnProxyManager.isAutoAutomationEnabled() }
+                .onFailure { Logger.w(LOG_TAG_UI, "$TAG.onRelayQuickSettingClicked: automation check failed: ${it.message}") }
+                .getOrDefault(false)
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                if (automationEnabled) {
+                    showRelayAutomationDialog { startRelayBulkToggle(target) }
+                } else {
+                    startRelayBulkToggle(target)
+                }
+            }
+        }
+    }
+
+    /** Confirmation dialog shown when AUTO automation (mobileOnly/ssidBased) is active. */
+    private fun showRelayAutomationDialog(onProceed: () -> Unit) {
+        if (!isAdded || isStateSaved) return
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+            .setMessage(getString(R.string.qs_relay_automation_dialog_message))
+            .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> onProceed() }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
+            .show()
+    }
+
+    private fun startRelayBulkToggle(target: Boolean) {
+        if (relayToggleInFlight) return
+        relayToggleInFlight = true
 
         io {
             val toUpdate = try {

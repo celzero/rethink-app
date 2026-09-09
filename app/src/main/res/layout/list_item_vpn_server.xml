@@ -256,7 +256,7 @@
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
-                android:padding="2dp"
+                android:padding="1dp"
                 android:scaleType="fitCenter"
                 android:visibility="gone"
                 tools:src="@mipmap/ic_launcher"
@@ -271,7 +271,7 @@
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
-                android:padding="2dp"
+                android:padding="1dp"
                 android:scaleType="fitCenter"
                 android:visibility="gone"
                 tools:src="@mipmap/ic_launcher"
@@ -286,7 +286,7 @@
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
-                android:padding="2dp"
+                android:padding="1dp"
                 android:scaleType="fitCenter"
                 tools:src="@mipmap/ic_launcher" />
 

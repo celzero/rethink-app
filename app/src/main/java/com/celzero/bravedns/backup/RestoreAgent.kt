@@ -39,11 +39,10 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.deleteRecursive
+import kotlinx.coroutines.delay
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -62,9 +61,43 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
     companion object {
         const val TAG = "RestoreAgent"
+
+        // sidecar files sqlite may place next to the main database file: WAL + shared
+        // memory (WAL mode) and the rollback journal (TRUNCATE/PERSIST journal modes
+        // seen on low-RAM devices or some OEM builds)
+        private val DB_SIDECAR_SUFFIXES = listOf("-wal", "-shm", "-journal")
+
+        // vpn stop is fire-and-forget (signalStopService); the service keeps flushing
+        // connection summaries to the log database during async teardown. retries give
+        // that teardown time to finish before the database files are replaced.
+        private const val CLOSE_ATTEMPTS = 5
+        private const val CLOSE_RETRY_DELAY_MS = 500L
+
+        /**
+         * Clears SubscriptionStatus and SubscriptionStateHistory tables after a restore.
+         */
+        suspend fun clearSubscriptionEntries(appDb: AppDatabase) {
+            try {
+                appDb.subscriptionStatusDao().deleteAll()
+                appDb.subscriptionStateHistoryDao().deleteAll()
+                Logger.i(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "cleared subscription status and history entries during restore"
+                )
+            } catch (e: Exception) {
+                // non-fatal: reconcileWithPlayBilling() will expire orphaned rows on the
+                // next Play snapshot even if this cleanup fails
+                Logger.crash(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "err while clearing subscription entries during restore, reason? ${e.message}",
+                    e
+                )
+            }
+        }
     }
 
     override suspend fun doWork(): Result {
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "restore worker started, workId? $id, isStopped? $isStopped")
         val restoreUri = inputData.getString(DATA_BUILDER_RESTORE_URI)?.toUri()
         if (restoreUri == null) {
             Logger.w(LOG_TAG_BACKUP_RESTORE, "restore uri is null, return failure")
@@ -146,13 +179,17 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // open log database if its not open
             handleDatabaseInit()
 
-            // remove subscription state and history entries restored from the backup,
-            // Google Play will re-fetch purchase details via queryPurchasesAsync and
-            // reconcileWithPlayBilling() on the next app start (Play is the source of truth)
-            clearSubscriptionEntries()
-
-            // copy the blocklist file from assets to the remote blocklist folder
-            moveRemoteBlocklistFileFromAsset()
+            // NOTE: do NOT touch any DAO beyond this point in this process.
+            // RoomDatabase.close() (called above to swap the files) permanently cancels
+            // Room's internal transaction SupervisorJob and invalidates the pooled
+            // connection of the Koin-singleton instance; a reopen restores the file
+            // level (migrations, isOpen) but not those. Any DAO call here fails with
+            // JobCancellationException / "Error code: 21, connection is closed" and
+            // every later retry in this process fails the same way.
+            // Post-restore DB work (subscription cleanup, blocklist tag seeding, wg
+            // configs) therefore runs after the caller restarts the app, in
+            // HomeScreenActivity's INTENT_RESTART_APP branch ->
+            // RefreshDatabase.ACTION_REFRESH_RESTORE.
 
             // update app version after the restore process
             updateLatestVersion()
@@ -172,35 +209,16 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 "exception during restore process, reason? ${e.message}",
                 e
             )
+            // a failure between closeDatabases() and handleDatabaseInit() (e.g. a failed
+            // migration during reopen) leaves both Koin-singleton databases closed; the
+            // next restore attempt would then fail at checkPoint() with
+            // "Error code: 21, connection is closed". best-effort reopen so the app and
+            // any retry start from open, consistent databases.
+            reopenDatabases()
             return false
         } finally {
             inputStream?.close()
         }
-    }
-
-    private suspend fun moveRemoteBlocklistFileFromAsset() {
-        // already there is a remote blocklist file available
-        if (
-            persistentState.remoteBlocklistTimestamp >
-            Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
-        ) {
-            try {
-                RethinkBlocklistManager.readJson(
-                    context,
-                    RethinkBlocklistManager.DownloadType.REMOTE,
-                    persistentState.remoteBlocklistTimestamp
-                )
-                return
-            } catch (_: Exception) {
-                Logger.w(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "remote blocklist file not found locally (timestamp: ${persistentState.remoteBlocklistTimestamp}), falling back to packaged asset"
-                )
-                // fall through to use the packaged asset version
-            }
-        }
-
-        RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
     }
 
     private fun handleDatabaseInit() {
@@ -213,6 +231,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             logDatabase.openHelper.writableDatabase
         } else {
             // no-op
+            Logger.vv(LOG_TAG_BACKUP_RESTORE, "log database is already open, no-op")
         }
 
         // get writable database for app
@@ -224,72 +243,90 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             appDatabase.openHelper.writableDatabase
         } else {
             // no-op
+            Logger.vv(LOG_TAG_BACKUP_RESTORE, "app database is already open, no-op")
         }
     }
 
-    /**
-     * Clears SubscriptionStatus and SubscriptionStateHistory tables after a restore.
-     *
-     * The restored database carries subscription rows (purchase tokens, account ids,
-     * expiry estimates) from the *backing-up* device. These rows dangle mid-state on
-     * the new install and can put the subscription state machine in an inconsistent
-     * position until the next Play query. Since Google Play is the source of truth
-     * (see SubscriptionStateMachineV2.reconcileWithPlayBilling), the tables are
-     * emptied here so Play re-fetches purchases via queryPurchasesAsync on the next
-     * app start and repopulates both tables from scratch.
-     */
-    private suspend fun clearSubscriptionEntries() {
-        try {
-            appDatabase.subscriptionStatusDao().deleteAll()
-            appDatabase.subscriptionStateHistoryDao().deleteAll()
-            Logger.i(
-                LOG_TAG_BACKUP_RESTORE,
-                "cleared subscription status and history entries during restore"
-            )
-        } catch (e: Exception) {
-            // non-fatal: reconcileWithPlayBilling() will expire orphaned rows on the
-            // next Play snapshot even if this cleanup fails
-            Logger.crash(
-                LOG_TAG_BACKUP_RESTORE,
-                "err while clearing subscription entries during restore, reason? ${e.message}",
-                e
-            )
-        }
-    }
 
     // Restore database file stored at tempDir/nameOfFileToRestore.
-    private fun restoreDatabaseFile(tempDir: File): Boolean {
+    private suspend fun restoreDatabaseFile(tempDir: File): Boolean {
         checkPoint()
+
+        // databases must be closed before their files are replaced on disk. Copying over
+        // an open database leaves the live sqlite connection serving pages of the old
+        // file: Room never re-checks the version/identity hash on an already-open db,
+        // so a backup made by an older app version (smaller schema) is served as-is and
+        // the first "select *" fails with "column does not exist" (no migration runs).
+        // close is verified: if any connection survives the retries (e.g. a long
+        // transaction in flight during vpn teardown), abort instead of copying over a
+        // live database.
+        if (!closeDatabases()) {
+            Logger.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "databases still open after retries; aborting database restore"
+            )
+            return false
+        }
 
         Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore database to temp dir: ${tempDir.path}")
 
         val files = tempDir.listFiles()
         if (files == null) {
             Logger.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${tempDir.path}")
+            reopenDatabases()
             return false
+        }
+
+        val mainDbNames = listOf(AppDatabase.DATABASE_NAME, LogDatabase.LOGS_DATABASE_NAME)
+
+        // validate the backup's main database files BEFORE touching the current ones.
+        // users restore backups created long ago (and by uninstalled installs), so a
+        // corrupt/truncated/0-byte file in the zip must not destroy the working
+        // database; abort instead and let the caller surface the failure.
+        files.filter { it.name in mainDbNames }.forEach { backupMain ->
+            if (!AppDatabase.isValidSQLiteFile(backupMain)) {
+                Logger.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "backup db file is not a valid sqlite file: ${backupMain.name}, " +
+                        "size: ${backupMain.length()}; aborting database restore"
+                )
+                reopenDatabases()
+                return false
+            }
+        }
+
+        // remove stale sidecar files of the current databases so they cannot be
+        // recovered onto the restored main file. Sidecar handling is tolerant of
+        // every on-disk state: WAL (normal), TRUNCATE journal (low-RAM devices,
+        // "-journal" suffix), PERSIST journal (some OEMs), or no sidecars at all.
+        deleteDatabaseSidecarFiles()
+
+        val mainFiles = files.filter { it.name in mainDbNames }
+        // a sidecar from the backup is only restored together with its own main file,
+        // so a stray -wal/-shm in an old backup can never be recovered onto a main
+        // file it does not belong to (SQLite checksums would discard it anyway, but
+        // do not rely on that for data from an unknown device)
+        val sidecarFiles = files.filter { file ->
+            file.name != AppDatabase.DATABASE_NAME &&
+                file.name != LogDatabase.LOGS_DATABASE_NAME &&
+                mainDbNames.any { name -> file.name.startsWith(name) } &&
+                DB_SIDECAR_SUFFIXES.any { file.name.endsWith(it) }
         }
 
         Logger.d(
             LOG_TAG_BACKUP_RESTORE,
-            "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
+            "restore db files, main: ${mainFiles.map { it.name }}, " +
+                "sidecars: ${sidecarFiles.map { it.name }}"
         )
-        for (file in files) {
+
+        for (file in mainFiles + sidecarFiles) {
             val currentDbFile = File(context.getDatabasePath(file.name).path)
-            if (
-                !file.name.contains(AppDatabase.DATABASE_NAME) &&
-                    !file.name.contains(LogDatabase.LOGS_DATABASE_NAME)
-            ) {
-                Logger.w(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "restore process, file name is not db, file name: ${file.name}"
-                )
-                continue
-            }
             if (!Utilities.copy(file.path, currentDbFile.path)) {
                 Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "restore process, failure copying database file: ${file.path} to ${currentDbFile.path}"
                 )
+                reopenDatabases()
                 return false
             }
             Logger.i(
@@ -298,7 +335,89 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             )
         }
 
+        // close anything that may have auto-reopened on the old file during the copy
+        // window (a DAO call from the UI or a background worker). the subsequent open
+        // in handleDatabaseInit() must read the restored files fresh so Room runs its
+        // version check and the migrations needed to bring an older backup's schema
+        // (e.g. a CustomIp table without proxyId/proxyCC) up to the current version.
+        // this pass is best-effort: the files are already swapped, a survivor gets
+        // closed by handleDatabaseInit()'s reopen path below.
+        closeDatabasesQuietly()
+
         return true
+    }
+
+    // attempts to close both databases until neither reports open. returns true only
+    // when a full close was observed on the final check; on false the caller must not
+    // assume the files are safe to replace.
+    private suspend fun closeDatabases(): Boolean {
+        for (attempt in 1..CLOSE_ATTEMPTS) {
+            closeDatabasesQuietly()
+            if (!appDatabase.isOpen && !logDatabase.isOpen) {
+                return true
+            }
+            Logger.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "databases still open (attempt $attempt/$CLOSE_ATTEMPTS), retrying"
+            )
+            delay(CLOSE_RETRY_DELAY_MS)
+        }
+        return !appDatabase.isOpen && !logDatabase.isOpen
+    }
+
+    private fun closeDatabasesQuietly() {
+        // stack trace identifies exactly which code path (this worker, a concurrent
+        // restore attempt, or anything else) is closing the databases
+        val closer = Exception("closeDatabasesQuietly call site")
+        try {
+            if (appDatabase.isOpen) {
+                appDatabase.close()
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "app database closed before restore", closer)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "err closing app database before restore", e)
+        }
+        try {
+            if (logDatabase.isOpen) {
+                logDatabase.close()
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "log database closed before restore", closer)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "err closing log database before restore", e)
+        }
+    }
+
+    // remove stale wal/shm/journal sidecars of the current databases so they cannot be
+    // recovered onto the restored main file. Sidecars shipped inside the backup (if any)
+    // are copied afterwards and form a consistent set with the restored db.
+    private fun deleteDatabaseSidecarFiles() {
+        val names = listOf(AppDatabase.DATABASE_NAME, LogDatabase.LOGS_DATABASE_NAME)
+        names.forEach { name ->
+            DB_SIDECAR_SUFFIXES.forEach { suffix ->
+                val sidecar = context.getDatabasePath(name + suffix)
+                if (sidecar.exists() && !sidecar.delete()) {
+                    Logger.w(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "failed to delete database sidecar file: ${sidecar.path}"
+                    )
+                }
+            }
+        }
+    }
+
+    // reopen both databases after the files were replaced; Room will run the version
+    // check on open and execute the migrations needed to bring an older backup's
+    // schema (e.g. a CustomIp table without proxyId/proxyCC) up to the current version
+    private fun reopenDatabases() {
+        try {
+            handleDatabaseInit()
+        } catch (e: Exception) {
+            Logger.crash(
+                LOG_TAG_BACKUP_RESTORE,
+                "err reopening databases during restore, reason? ${e.message}",
+                e
+            )
+        }
     }
 
     private fun checkPoint() {
