@@ -86,6 +86,8 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * Detail screen for a server-provided WireGuard / WIN proxy.
  *
@@ -116,6 +118,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
 
     private var suppressHopListener: Boolean = false
+
+    /** One-shot guard for useMobileCheck programmatic updates (see suppressHopListener). */
+    private var suppressMobileListener: Boolean = false
+
+    /**
+     * Last value written to the ssid switch programmatically. The checked-change
+     * listener skips an event whose value matches this (and clears it), so
+     * programmatic updates — including ones made before the listener is
+     * attached — never re-trigger the toggle gate, while user toggles
+     * (which flip the value) always pass through.
+     */
+    private var lastProgrammaticSsidState: Boolean? = null
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
@@ -193,6 +207,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         configKey = intent.getStringExtra(INTENT_EXTRA_CONFIG_KEY) ?: ""
         applyScrollPadding()
+        setDolphinSignature()
+    }
+
+    /** Dolphin signature (at the end of the scrollable content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun applyScrollPadding() {
@@ -1065,14 +1085,37 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         b.useMobileCheck.setOnCheckedChangeListener { _, isChecked ->
+            // Guard: skip programmatic updates (dialog revert / post-confirm re-check).
+            if (suppressMobileListener) {
+                suppressMobileListener = false
+                return@setOnCheckedChangeListener
+            }
+            if (!isChecked) {
+                applyMobileOnly(false)
+                return@setOnCheckedChangeListener
+            }
+            // Enabling automation on AUTO: confirm when relay is enabled on any
+            // location — relayed traffic enters via AUTO, so AUTO being paused
+            // (mobile-only / SSID mismatch) pauses those locations as well.
             io {
-                RpnProxyManager.setMobileOnlyForWinServer(configKey, isChecked)
-                uiCtx {
-                    Utilities.showToastUiCentered(
-                        this,
-                        if (isChecked) "Mobile data only enabled" else "Mobile data only disabled",
-                        Toast.LENGTH_SHORT
-                    )
+                val needsConfirm = configKey.equals(AUTO_SERVER_ID, ignoreCase = true) &&
+                    runCatching { RpnProxyManager.isRelayEnabledForAnyLocation() }
+                        .onFailure { Logger.w(LOG_TAG_UI, "useMobileCheck: relay check failed: ${it.message}") }
+                        .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!needsConfirm) {
+                        applyMobileOnly(true)
+                        return@ui
+                    }
+                    // Revert the checkbox first; re-applied on proceed.
+                    setMobileCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
+                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyMobileOnly(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
                 }
             }
         }
@@ -1116,6 +1159,37 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         if (b.hopCheck.isChecked == checked) return
         suppressHopListener = true
         b.hopCheck.isChecked = checked
+    }
+
+    /**
+     * Applies the mobile-only automation for [configKey] in the tunnel.
+     */
+    private fun applyMobileOnly(enabled: Boolean) {
+        io {
+            RpnProxyManager.setMobileOnlyForWinServer(configKey, enabled)
+            uiCtx {
+                Utilities.showToastUiCentered(
+                    this,
+                    if (enabled) "Mobile data only enabled" else "Mobile data only disabled",
+                    Toast.LENGTH_SHORT
+                )
+                // Sync the checkbox in case the toggle was initiated from the dialog.
+                setMobileCheckSilently(enabled)
+            }
+        }
+    }
+
+    /** Updates the mobile-only checkbox without re-triggering its checked-change listener. */
+    private fun setMobileCheckSilently(checked: Boolean) {
+        if (b.useMobileCheck.isChecked == checked) return
+        suppressMobileListener = true
+        b.useMobileCheck.isChecked = checked
+    }
+
+    /** Updates the SSID switch without re-triggering its checked-change listener. */
+    private fun setSsidCheckSilently(checked: Boolean) {
+        lastProgrammaticSsidState = if (b.ssidCheck.isChecked == checked) null else checked
+        b.ssidCheck.isChecked = checked
     }
 
     private fun initiateRefresh(key: String) {
@@ -1370,7 +1444,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         val enabled = config.ssidBased
         val ssidItems = SsidItem.parseStorageList(config.ssids)
-        sw.isChecked = enabled
+        // Silent update: a plain assignment here would re-enter the
+        // checked-change listener and re-trigger the AUTO/relay gate on every
+        // section refresh.
+        setSsidCheckSilently(enabled)
 
         if (enabled && hasPermissions && isLocationEnabled) {
             // SSID enabled and all permissions/location available — show current values
@@ -1395,6 +1472,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
+            // Guard: skip the echo of a programmatic update (section refresh,
+            // dialog revert / post-confirm re-check). A user toggle always
+            // flips the value, so it never matches the stored state.
+            if (lastProgrammaticSsidState == isChecked) {
+                lastProgrammaticSsidState = null
+                return@setOnCheckedChangeListener
+            }
             val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
             val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
@@ -1421,37 +1505,72 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 return@setOnCheckedChangeListener
             }
 
-            // Persist the new state
-            io { RpnProxyManager.updateSsidBased(configKey, isChecked) }
+            val persistSsid: (Boolean) -> Unit = { checked ->
+                // Sync the switch: on the dialog-proceed path it was reverted
+                // to off while awaiting confirmation.
+                setSsidCheckSilently(checked)
+                // Persist the new state
+                io { RpnProxyManager.updateSsidBased(configKey, checked) }
 
-            if (isChecked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-                // Load and display the latest SSID list
-                io {
-                    val cur = RpnProxyManager.getCountryConfigByKey(configKey)?.ssids.orEmpty()
-                    val list = SsidItem.parseStorageList(cur)
-                    uiCtx {
-                        if (list.isEmpty()) {
-                            val allTxt = getString(
-                                R.string.single_argument_parenthesis,
-                                getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
-                            )
-                            valueTv.text = allTxt
-                        } else {
-                            valueTv.text = list.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this@RpnConfigDetailActivity)})" }
-                        }
-                        displayGroup.visibility = View.VISIBLE
+                if (checked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
+                    if (persistentState.enableStabilityDependentSettings()) {
+                        SnackbarHelper.showStabilityProgram(b.root, persistentState)
                     }
+                    // Load and display the latest SSID list
+                    io {
+                        val cur = RpnProxyManager.getCountryConfigByKey(configKey)?.ssids.orEmpty()
+                        val list = SsidItem.parseStorageList(cur)
+                        uiCtx {
+                            if (list.isEmpty()) {
+                                val allTxt = getString(
+                                    R.string.single_argument_parenthesis,
+                                    getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
+                                )
+                                valueTv.text = allTxt
+                            } else {
+                                valueTv.text = list.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this@RpnConfigDetailActivity)})" }
+                            }
+                            displayGroup.visibility = View.VISIBLE
+                        }
+                    }
+                    Logger.i(LOG_TAG_UI, "SSID feature enabled for configKey: $configKey")
+                } else {
+                    displayGroup.visibility = View.GONE
+                    Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
                 }
-                Logger.i(LOG_TAG_UI, "SSID feature enabled for configKey: $configKey")
-            } else {
-                displayGroup.visibility = View.GONE
-                Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
+
+                updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
             }
 
-            updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+            if (!isChecked) {
+                persistSsid(false)
+                return@setOnCheckedChangeListener
+            }
+
+            // Enabling automation on AUTO: confirm when relay is enabled on any
+            // location — relayed traffic enters via AUTO, so AUTO being paused
+            // (SSID mismatch) pauses those locations as well.
+            io {
+                val needsConfirm = configKey.equals(AUTO_SERVER_ID, ignoreCase = true) &&
+                    runCatching { RpnProxyManager.isRelayEnabledForAnyLocation() }
+                        .onFailure { Logger.w(LOG_TAG_UI, "setupSsidSectionUI: relay check failed: ${it.message}") }
+                        .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!needsConfirm) {
+                        persistSsid(true)
+                        return@ui
+                    }
+                    // Revert the switch first; re-applied on proceed.
+                    setSsidCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
+                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> persistSsid(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
+                }
+            }
         }
 
         layout.setOnClickListener { sw.performClick() }

@@ -225,11 +225,6 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
 
     private fun handlePurchases(purchases: List<Purchase>) {
         purchases.forEach { purchase ->
-            // This app owns a second BillingClient (RPN's InAppBillingHandler) whose
-            // purchases (e.g. onetime.tier / standard.tier) are ALSO delivered to this
-            // client's listener and returned by queryPurchasesAsync. Acknowledging or
-            // consuming those would void the user's RPN entitlement, so strictly
-            // ignore anything that is not the sponsor product.
             if (!purchase.products.contains(SponsorProductIds.PRODUCT_ID)) {
                 Logger.i(TAG, "Ignoring non-sponsor purchase: ${purchase.products}")
                 return@forEach
@@ -248,9 +243,6 @@ class SponsorBillingManagerImpl(context: Context) : SponsorBillingManager {
                     // Sponsorship is a one-time INAPP product. Consume it immediately on
                     // success so the SKU is re-purchasable (contributors can give again),
                     // and so the purchase doesn't linger as an un-consumed entitlement.
-                    // Consuming implicitly acknowledges the purchase, so no separate
-                    // acknowledgePurchase() call is needed; if consume fails, the
-                    // purchase stays unacknowledged and the next query cycle retries.
                     consumePurchase(purchase.purchaseToken)
                 }
                 Purchase.PurchaseState.PENDING -> _purchaseResult.tryEmit(SponsorPurchaseResult.Pending)

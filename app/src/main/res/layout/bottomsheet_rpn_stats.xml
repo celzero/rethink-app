@@ -336,4 +336,9 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
+    <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
+        android:id="@+id/dolphin_signature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

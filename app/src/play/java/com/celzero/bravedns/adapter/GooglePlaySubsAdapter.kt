@@ -168,7 +168,7 @@ class GooglePlaySubsAdapter(
 
             binding.price.text = displayPrice
 
-            val billingText = getBillingText(prod.productType)
+            val billingText = getBillingText(prod.productType, pricing.billingPeriod)
             if (freeTrialDays > 0) {
                 binding.billingInfo.text = context.getString(R.string.trial_days_format, freeTrialDays)
             } else {
@@ -190,7 +190,8 @@ class GooglePlaySubsAdapter(
                 val pct = calculateSavings(currentPrice, discountedPrice)
                 if (pct > 0) {
                     binding.savingsText.visibility = View.VISIBLE
-                    binding.savingsText.text = context.getString(R.string.savings_percent, "$pct%")
+                    binding.savingsText.text =
+                        context.getString(R.string.savings_percent, "$pct%")
                 } else {
                     binding.savingsText.visibility = View.GONE
                 }
@@ -291,11 +292,15 @@ class GooglePlaySubsAdapter(
             }
         }
 
-        private fun getBillingText(productType: String): String {
+        private fun getBillingText(productType: String, billingPeriod: String): String {
             if (productType == ProductType.INAPP) {
                 return context.getString(R.string.billing_no_recurring)
             }
-            return context.getString(R.string.billing_info)
+            return when {
+                billingPeriod.contains("P1M", true) -> context.getString(R.string.billing_monthly_cancel)
+                billingPeriod.contains("P1Y", true) -> context.getString(R.string.billing_annually_cancel)
+                else -> context.getString(R.string.billing_sub_cancel)
+            }
         }
     }
 

@@ -52,6 +52,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * Shows the user's raw purchase / order records fetched live from the billing
  * server's `GET /g/tx?cid=&purchaseToken=&tot=20` endpoint.
@@ -95,6 +97,12 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
         observeUiState()
         loadHeroSubtitle()
         applyScrollPadding()
+        setDolphinSignature()
+    }
+
+    /** Dolphin signature (at the bottom of the content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun applyScrollPadding() {

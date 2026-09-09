@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.activity.ServerOrderHistoryActivity
 import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -94,6 +95,12 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun initView() {
         loadSubscriptionDetails()
+        setDolphinSignature()
+    }
+
+    /** Dolphin signature (at the end of the manage-purchase content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     override fun onResume() {

@@ -121,7 +121,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="100dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
             app:strokeWidth="0dp"
@@ -247,5 +247,15 @@
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
+
+    <!-- pinned outside the scrolling container: the appbar behavior offsets the
+         container below the screen while the hero is expanded, which would hide
+         the signature entirely -->
+    <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
+        android:id="@+id/dolphin_signature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="12dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -135,7 +135,6 @@ object InAppBillingHandler : KoinComponent {
 
     const val MONEYBACK_WINDOW_DAYS = 31
 
-
     private lateinit var queryUtils: QueryUtils
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
     private val storeProductDetails: CopyOnWriteArrayList<QueryProductDetail> =

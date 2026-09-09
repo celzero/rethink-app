@@ -53,6 +53,8 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * bottom sheet combining DNS filter settings and new Configuration Handling section.
  */
@@ -195,6 +197,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         setupDnsSection()
         setupConfigHandlingSection()
         setupExcludeCountriesRow()
+        setDolphinSignature()
 
         binding.btnResetRpn.setOnClickListener {
             if (!VpnController.hasTunnel()) {
@@ -383,6 +386,11 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      *
      * [OnSettingsChangedListener.onDnsModeChanged] is fired on every real change.
      */
+    /** Dolphin signature (at the end of the sheet content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        binding.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+    }
+
     private fun setupDnsSection() {
         // restore initial selection (DEFAULT is filtered out and migrated to Privacy)
         val activeModes = getActiveModesFromState()

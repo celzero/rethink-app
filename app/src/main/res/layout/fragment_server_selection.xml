@@ -209,6 +209,11 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
+                                android:background="@drawable/bg_heatmap_surface"
+                                android:paddingStart="10dp"
+                                android:paddingTop="8dp"
+                                android:paddingEnd="10dp"
+                                android:paddingBottom="8dp"
                                 android:orientation="vertical">
 
                                 <GridLayout
@@ -1066,6 +1071,11 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
+
+            <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
+                android:id="@+id/dolphin_signature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

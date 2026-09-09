@@ -72,6 +72,7 @@ import com.celzero.bravedns.ui.bottomsheet.RpnLogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.RpnStatsBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 import com.celzero.bravedns.ui.tour.RpnOnboardingManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.SnackbarHelper
@@ -316,6 +317,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         ViewCompat.requestApplyInsets(b.root)
 
         applyScrollPadding()
+        setDolphinSignature()
 
         setupNavigationButtons()
         setupSearchBar()
@@ -439,6 +441,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.serversScrollView.paddingBottom
             )
         }
+    }
+
+    /** Dolphin signature (at the end of the scrollable content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     /**
@@ -1698,12 +1705,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Confirmation dialog shown when AUTO automation (mobileOnly/ssidBased) is active. */
     private fun showRelayAutomationDialog(onProceed: () -> Unit) {
         if (!isAdded || isStateSaved) return
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.qs_relay_automation_dialog_title))
             .setMessage(getString(R.string.qs_relay_automation_dialog_message))
             .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> onProceed() }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .show()
+            .create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun startRelayBulkToggle(target: Boolean) {
@@ -2618,7 +2627,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         )
         container.addView(favChip)
 
-        MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.server_selection_filter_locations))
             .setView(container)
             .setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
@@ -2636,7 +2645,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 refreshUnselectedList()
             }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .show()
+            .create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     /**
@@ -2896,7 +2907,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             showToast(getString(R.string.server_selection_auto_always_on))
             return
         }
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.server_selection_remove_title))
             .setMessage(getString(R.string.server_selection_remove_message, group.countryName, group.cityName))
             .setPositiveButton(getString(R.string.lbl_remove)) { _, _ ->
@@ -2928,7 +2939,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 }
             }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .show()
+            .create()
+        dialog.show()
+        UIUtils.capDialogWidth(dialog)
     }
 
     private fun showToast(msg: String) {
@@ -3448,6 +3461,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .create()
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
+        UIUtils.capDialogWidth(dialog)
         dialog.setOnCancelListener {
             Logger.i(LOG_TAG_UI, "$TAG: reset dialog dismissed by user, switching to inline bar")
             resetDialogDismissedByUser = true

@@ -50,6 +50,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 /**
  * Premium stats bottom sheet for Rethink Proxy Network (RPN) traffic.
  *
@@ -117,7 +119,13 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         }
         b.rpnStatsBlockedCard.isVisible = false
         b.rpnStatsViewLogs.setOnClickListener { openConnectionLogs() }
+        setDolphinSignature()
         loadStats()
+    }
+
+    /** Dolphin signature (at the end of the sheet content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     override fun onDestroyView() {

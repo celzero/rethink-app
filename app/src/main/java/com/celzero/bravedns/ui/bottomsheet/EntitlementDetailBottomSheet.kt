@@ -37,6 +37,8 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+
 class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
     private var _b: BottomsheetEntitlementDetailBinding? = null
     private val b get() = checkNotNull(_b) { "Binding accessed outside of view lifecycle" }
@@ -81,6 +83,7 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun initView() {
         b.btnDismiss.setOnClickListener { dismiss() }
+        setDolphinSignature()
         b.btnRestore.setOnClickListener { viewModel.reset() }
 
         // Fetch happens on the ViewModel scope (survives sheet dismissal); the
@@ -89,6 +92,11 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         viewModel.resetEntitlement()
         viewModel.onResetConsumed()
         viewModel.loadEntitlement()
+    }
+
+    /** Dolphin signature (above the dismiss action.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun observeEntitlementState() {
