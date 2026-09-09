@@ -630,7 +630,7 @@
                                 android:fontFamily="monospace"
                                 tools:text="62K"
                                 android:textColor="?attr/primaryTextColor"
-                                android:textSize="@dimen/rethink_header_text" />
+                                android:textSize="@dimen/rethink_sub_header_text" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/fhs_card_allowed_logs_label"
