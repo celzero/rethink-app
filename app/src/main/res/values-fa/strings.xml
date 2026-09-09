@@ -98,7 +98,7 @@
     <string name="conn_track_clear_logs_message" translatable="true">این ulg فقط \'chvahj شبکه را حذف می کند اما قوانین فایروال را حذف نمی کند. این عمل برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
     <string name="notification_action_pause_vpn" translatable="true">مکث</string>
     <string name="bypass_universal" translatable="true">دور زدن کلی</string>
-    <string name="allow" translatable="true">همیشه</string>
+    <string name="allow" translatable="true">اجازه</string>
     <string name="status_protected_with_private_dns" translatable="true">محافظت شده با DNS خصوصی</string>
     <string name="notification_action_resume_vpn" translatable="true">ادامه</string>
     <string name="status_protected_with_tor" translatable="true">محافظت شده توسط تور</string>
@@ -119,7 +119,7 @@
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">برطرف کننده DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">رله DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
     <string name="private_dns_dialog_heading" translatable="true">DNS خصوصی را خاموش کنید</string>
-    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است. \n \nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
+    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS ری‌تینک توسط DNS خصوصی اندروید لغو می‌شود.\n\nبرای استفاده از DNS ری‌تینک، به تنظیمات اندروید بروید و DNS خصوصی را خاموش کنید.</string>
     <string name="private_dns_dialog_positive" translatable="true">برو به تنظیمات</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">شبکه</string>
     <string name="dns_act_configure_tab" translatable="true">پیکربندی</string>
@@ -180,7 +180,7 @@
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="relative_time_today" translatable="true">امروز</string>
     <string name="relative_time_yesterday" translatable="true">دیروز</string>
-    <string name="settings_allow_lan_heading" translatable="true">IP های خصوصی را مسیریابی نکنید (آزمایشی)</string>
+    <string name="settings_allow_lan_heading" translatable="true">عدم مسیریابی آی‌پی‌های خصوصی</string>
     <string name="settings_allow_lan_desc" translatable="true">حذف LAN، Loopback و مسیرهای پیوند محلی از تونل VPN Rethink.</string>
     <string name="settings_ip_network_heading" translatable="true">نسخه IP را انتخاب کنید</string>
     <string name="settings_ptrans_desc" translatable="true">ترافیک IPv6 خروجی را به IPv4 روی دستگاه ترجمه کنید؛ اگر به یک شبکه IPv4 متصل هستید، فعال کنید.</string>
@@ -257,7 +257,7 @@
     <string name="lbl_auto" translatable="true">(خودکار)</string>
     <string name="settings_http_proxy_toast_success" translatable="true">پروکسی HTTP تنظیم شده است</string>
     <string name="lbl_slow" translatable="true">آهسته</string>
-    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (آزمایشی)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">آی‌پی‌وی۶</string>
     <string name="lbl_day" translatable="true">روز</string>
     <string name="lbl_fast" translatable="true">سریع</string>
     <string name="lbl_inactive" translatable="true">غیر فعال</string>
@@ -282,7 +282,7 @@
     <string name="lbl_listen_port" translatable="true">پورت‌های مشغول</string>
     <string name="lbl_random" translatable="true">(تصادفی)</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start on power-up (experimental)</string>
-    <string name="settings_general_header" translatable="true">general</string>
+    <string name="settings_general_header" translatable="true">کلی</string>
     <string name="settings_orbot_install_desc" translatable="true">برای نصب اوربات اینجا ضربه را لمس کنید</string>
     <string name="settings_orbot_desc" translatable="true">Orbot در حالت غیر vpn با HTTPS/SOCKS5.</string>
     <string name="settings_https_disabled_error" translatable="true">Connected to %1$s. Turn it off to continue.</string>
@@ -290,7 +290,7 @@
     <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used</string>
     <string name="settings_check_update_desc" translatable="true">Automatically check for app updates once a week.</string>
     <string name="about_settings_notification" translatable="true">تنظیمات اعلان</string>
-    <string name="settings_network_all_networks" translatable="true">Use all available networks (experimental)</string>
+    <string name="settings_network_all_networks" translatable="true">از تمام شبکه‌های موجود استفاده کنید</string>
     <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
     <string name="public_key_copy_toast_msg" translatable="true">Public key copied.</string>
     <string name="settings_orbot_header" translatable="true">اوربات</string>
@@ -346,7 +346,7 @@
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">شماره پورت</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">بازارسال به %1$s:%2$s</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">پسوورد</string>
-    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">ست</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">تنظیم</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">نام میزبان</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">نام کاربری</string>
     <string name="settings_socks_forwarding_desc" translatable="true">بازارسال به %1$s:%2$s، %3$s</string>
@@ -356,13 +356,13 @@
     <string name="settings_app_list_default_app" translatable="true">هیچ یک</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">نشانی IP</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">درگاه (port)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">خودکار (تجربی)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">خودکار</string>
     <string name="settings_ip_text_ipv46" translatable="true">خودکار</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_biometric_desc" translatable="true">این برنامه را با قفل صفحهٔ نمایشتان ایمن کنید</string>
     <string name="settings_protocol_translation_dns_inactive" translatable="true">برای فعال کردن این گزینه حالت DNS/DNS+دیوارهٔ آتش را روشن کنید</string>
-    <string name="settings_default_dns_heading" translatable="true">DNS پشتیبان را انتخاب کنید</string>
-    <string name="settings_default_dns_desc" translatable="true">در موارد نادر، هنگامی که نمی‌توان از DNS مورد نظر کاربر استفاده کرد، از DNS پشتیبان استفاده می‌شود.</string>
+    <string name="settings_default_dns_heading" translatable="true">انتخاب دی</string>
+    <string name="settings_default_dns_desc" translatable="true">فقط در هنگام راه‌اندازی برای یافتن آدرس IP سرور DNS رمزگذاری شده استفاده می‌شود.</string>
     <string name="logs_card_duration" translatable="true">از %1$s</string>
     <string name="settings_socks5_dialog_hint_username" translatable="true">نام کاربری (اختیاری)</string>
     <string name="settings_theme_dialog_themes_2" translatable="true">روشن</string>
@@ -418,7 +418,7 @@
     <string name="settings_notification_dialog_title" translatable="true">انتخاب اقدام اعلان</string>
     <string name="hs_biometeric_desc" translatable="true">برای باز کردن قفل Rethink از احراز هویت بیومتریک استفاده کنید</string>
     <string name="hsf_whats_new_remove_text" translatable="true">بستن…</string>
-    <string name="dc_dns_website_heading" translatable="true">نمایش آیکون وب‌سایت در گزارش‌های دی ان اس (آزمایشی)</string>
+    <string name="dc_dns_website_heading" translatable="true">نمایش آیکون وب‌سایت در گزارشات دی‌ان‌اس</string>
     <string name="dc_check_update_desc" translatable="true">هر <i>سه</i> روز یکبار، به‌روزرسانی‌های فهرست مسدودی‌ها را بررسی کنید</string>
     <string name="about_bravedns_toreport_text" translatable="true">کمک و بازخورد</string>
     <string name="about_privacy_policy" translatable="true">سیاست حفظ حریم خصوصی را بخوانید</string>
@@ -434,7 +434,7 @@
     <string name="firewall_status_isolate" translatable="true">ایزوله</string>
     <string name="about_bug_report_dialog_positive_btn" translatable="true">ارسال ایمیل</string>
     <string name="about_app" translatable="true">برنامه</string>
-    <string name="about_web" translatable="true">لینک ها</string>
+    <string name="about_web" translatable="true">پیوند‌ها</string>
     <string name="settings_notification_desc" translatable="true">دکمه‌های عملیاتی برای نمایش با اعلان Rethink: %1$s</string>
     <string name="settings_pcap_heading" translatable="true">ضبط بسته</string>
     <string name="firewall_status_block_metered" translatable="true">در شبکه‌های محدود شده (موبایل) مسدود شده است</string>
@@ -476,7 +476,7 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">قوانین دی ان اس و فایروال را دور می‌زند</string>
     <string name="firewall_status_block_unmetered" translatable="true">مسدود شدن در شبکه‌های نامحدود (وای‌فای)</string>
     <string name="apps_card_ips_count" translatable="true">%1$s قانون(های) آی‌پی و پورت</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink برای راه‌اندازی VPN محلی جهت رمزگذاری درخواست‌های DNS دستگاه، پیاده‌سازی مانیتور شبکه و اجرای قوانین دیوار‌آتش به مجوز نیاز دارد.\n\nRethink هیچ اطلاعاتی را جمع‌آوری نمی‌کند و به هیچ وجه از شما جاسوسی نمی‌کند.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink برای راه‌اندازی VPN محلی جهت رمزگذاری درخواست‌های DNS دستگاه، پیاده‌سازی مانیتور شبکه و اجرای قوانین فایروال به مجوز نیاز دارد.\n\nخودکارسازی پروکسی مبتنی بر Wi-Fi برای شناسایی شبکه Wi-Fi متصل (SSID) به مجوز موقعیت مکانی نیاز دارد. این مجوز فقط زمانی درخواست می‌شود که این ویژگی را فعال کنید.\n\nRethink هیچ اطلاعاتی را جمع‌آوری نمی‌کند و به هیچ وجه از شما جاسوسی نمی‌کند.</string>
     <string name="dc_other_dns_heading" translatable="true">نوع</string>
     <string name="about_github" translatable="true">مشارکت در گیت‌هاب</string>
     <string name="about_twitter" translatable="true">ما را در توییتر دنبال کنید</string>
@@ -487,7 +487,7 @@
     <string name="lbl_service_providers" translatable="true">ارائه دهندگان خدمات</string>
     <string name="lbl_hop" translatable="true">رله‌ها</string>
     <string name="lbl_manual" translatable="true">دستی</string>
-    <string name="lbl_bootstrap" translatable="true">عقب‌گرد</string>
+    <string name="lbl_bootstrap" translatable="true">خود راه انداز</string>
     <string name="lbl_default" translatable="true">پیش‌فرض</string>
     <string name="lbl_action" translatable="true">عمل</string>
     <string name="lbl_connect" translatable="true">اتصال</string>
@@ -535,67 +535,7 @@
     <string name="error_loading_log_file" translatable="true">خطا در بارگیری فایل گزارش</string>
     <string name="collecting_logs_progress_text" translatable="true">در حال ضبط…</string>
     <string name="logs_disclaimer" translatable="true">نمایش ۲۰٬۰۰۰ کاراکتر اول</string>
-    <string name="contributors_list" translatable="true">سازندگان<![CDATA[پروژه متن‌باز <i>Rethink</i> وجود خود را مدیون این داوطلبان است
-که ساعت‌های بی‌شماری را صرف توسعهٔ آن می‌کنند.<br/> <br/>🛡️ برنامه اندروید <br/>
-<a href="https://github.com/anthonyryan1">Anthony Ryan</a> / <a
-href="https://github.com/BayLee4">BayLee4</a> / <a
-href="https://github.com/Ch4t4r">Ch4t4r</a> / <a
-href="https://github.com/samthesamman">CodingAttack</a> / <a
-href="https://github.com/HrBDev">HrBDev</a> / <a
-href="https://github.com/hussainmohd-a">hussainmohd-a</a> / <a
-href="https://github.com/ignoramous">ignoramous</a> / <a
-href="https://github.com/ironveil">ironveil</a> / <a
-href="https://github.com/markwmuller">markwmuller</a> / <a
-href="https://github.com/mohammaduvez">Mohammaduvez</a> / <a
-href="https://github.com/Mygod">Mygod</a> / <a
-href="https://github.com/Poussinou">Poussinou</a> / <a
-href="https://github.com/pjosingh">pjosingh</a> / <a
-href="https://github.com/RohitSurwase">RohitSurwase</a> / <a
-href="https://github.com/ShantanuVichare">Shantanu</a> / <a
-href="https://github.com/Uldiniad">Uldiniad</a><br/> / <a
-href="https://github.com/yurtpage">yurtpage</a><br/> <br/>🚂 موتور شبکه <br/> <a
-href="https://github.com/alalamav">alalamav</a> / <a
-href="https://github.com/bemasc">bemasc</a> / <a
-href="https://github.com/dmcardle">dmcardle</a> / <a
-href="https://github.com/fortuna">fortuna</a> / <a
-href="https://github.com/ignoramous">ignoramous</a> / <a
-href="https://github.com/PeterDaveHello">PeterDaveHello</a> / <a
-href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> / <a
-href="https://github.com/SeanBurford">SeanBurford</a><br/> <br/>📚 تفکیک‌کننده
-(Resolver) <br/> <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> / <a
-href="https://github.com/amithm7">amithm7</a> / <a
-href="https://github.com/arfshl">arfshl</a> / <a
-href="https://github.com/badmojr">badmojr</a> / <a
-href="https://github.com/bongochong">bongochong</a> / <a
-href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> / <a
-href="https://github.com/georgyo">georgyo</a> / <a
-href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> / <a
-href="https://github.com/Harish-Narayan">Harish-Narayan</a> / <a
-href="https://github.com/ignoramous">ignoramous</a> / <a
-href="https://github.com/JakeChampion">JakeChampion</a> / <a
-href="https://github.com/MasterKia">MasterKia</a> / <a
-href="https://github.com/mtxadmin">mtxadmin</a> / <a
-href="https://github.com/neneeen">neneeen</a> / <a
-href="https://github.com/PeterDaveHello">PeterDaveHello</a> / <a
-href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> / <a
-href="https://github.com/shruuub">shruuub</a> / <a
-href="https://github.com/shuvashish76">shuvashish76</a><br/> <br/>⚜ مدیران انجمن
-<br/> <a href="https://t.me/amithm7">amithm7</a> / <a
-href="https://t.me/TronSlayer">Andersen</a> / <a
-href="https://t.me/ppatra">ppatra</a> / <a
-href="https://t.me/InFamous23">InFamous23</a> / <a
-href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> / <a
-href="https://t.me/Ch4t4r">Ch4t4r</a> / <a
-href="https://t.me/Billi_ance">Billi_ance</a> / <a
-href="https://t.me/kaliangel">kaliangel</a> / <a
-href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/> <br/>📌
-موقعیت جغرافیایی IP <br/> <a href="https://db-ip.com">db-ip.com</a> / <a
-href="https://ipinfo.io/lite">IPinfo Lite</a><br/> <br/>❇ ترجمه‌ها <br/> <a
-href="https://weblate.org/en/">Weblate</a><br/> <br/>🦆 آیکون‌ها <br/> <a
-href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/> <br/>📦
-سرورهای ساخت <br/> <a href="https://jitpack.io/">JitPack</a> / <a
-href="https://github.com/">GitHub</a> / <a
-href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
+    <string name="contributors_list" translatable="true"><![CDATA["سازندگان[پروژه متن‌باز <i>Rethink</i> وجود خود را مدیون این داوطلبان است\nکه ساعت‌های بی‌شماری را صرف توسعهٔ آن می‌کنند.<br/> <br/>🛡️ برنامه اندروید <br/>\n<a href=\"https://github.com/anthonyryan1\">Anthony Ryan</a> / <a\nhref=\"https://github.com/BayLee4\">BayLee4</a> / <a\nhref=\"https://github.com/Ch4t4r\">Ch4t4r</a> / <a\nhref=\"https://github.com/samthesamman\">CodingAttack</a> / <a\nhref=\"https://github.com/HrBDev\">HrBDev</a> / <a\nhref=\"https://github.com/hussainmohd-a\">hussainmohd-a</a> / <a\nhref=\"https://github.com/ignoramous\">ignoramous</a> / <a\nhref=\"https://github.com/ironveil\">ironveil</a> / <a\nhref=\"https://github.com/markwmuller\">markwmuller</a> / <a\nhref=\"https://github.com/mohammaduvez\">Mohammaduvez</a> / <a\nhref=\"https://github.com/Mygod\">Mygod</a> / <a\nhref=\"https://github.com/Poussinou\">Poussinou</a> / <a\nhref=\"https://github.com/pjosingh\">pjosingh</a> / <a\nhref=\"https://github.com/RohitSurwase\">RohitSurwase</a> / <a\nhref=\"https://github.com/ShantanuVichare\">Shantanu</a> / <a\nhref=\"https://github.com/Uldiniad\">Uldiniad</a><br/> / <a\nhref=\"https://github.com/yurtpage\">yurtpage</a><br/> <br/>🚂 موتور شبکه <br/> <a\nhref=\"https://github.com/alalamav\">alalamav</a> / <a\nhref=\"https://github.com/bemasc\">bemasc</a> / <a\nhref=\"https://github.com/dmcardle\">dmcardle</a> / <a\nhref=\"https://github.com/fortuna\">fortuna</a> / <a\nhref=\"https://github.com/ignoramous\">ignoramous</a> / <a\nhref=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> / <a\nhref=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> / <a\nhref=\"https://github.com/SeanBurford\">SeanBurford</a><br/> <br/>📚 تفکیک‌کننده\n(Resolver) <br/> <a href=\"https://github.com/ahmed-tasaly\">ahmed-tasaly</a> / <a\nhref=\"https://github.com/amithm7\">amithm7</a> / <a\nhref=\"https://github.com/arfshl\">arfshl</a> / <a\nhref=\"https://github.com/badmojr\">badmojr</a> / <a\nhref=\"https://github.com/bongochong\">bongochong</a> / <a\nhref=\"https://github.com/elliotwutingfeng\">elliotwutingfeng</a> / <a\nhref=\"https://github.com/georgyo\">georgyo</a> / <a\nhref=\"https://github.com/GiddyGoatGaming\">GiddyGoatGaming</a> / <a\nhref=\"https://github.com/Harish-Narayan\">Harish-Narayan</a> / <a\nhref=\"https://github.com/ignoramous\">ignoramous</a> / <a\nhref=\"https://github.com/JakeChampion\">JakeChampion</a> / <a\nhref=\"https://github.com/MasterKia\">MasterKia</a> / <a\nhref=\"https://github.com/mtxadmin\">mtxadmin</a> / <a\nhref=\"https://github.com/neneeen\">neneeen</a> / <a\nhref=\"https://github.com/PeterDaveHello\">PeterDaveHello</a> / <a\nhref=\"https://github.com/santhosh-ponnusamy\">santhosh-ponnusamy</a> / <a\nhref=\"https://github.com/shruuub\">shruuub</a> / <a\nhref=\"https://github.com/shuvashish76\">shuvashish76</a><br/> <br/>⚜ مدیران انجمن\n<br/> <a href=\"https://t.me/amithm7\">amithm7</a> / <a\nhref=\"https://t.me/TronSlayer\">Andersen</a> / <a\nhref=\"https://t.me/ppatra\">ppatra</a> / <a\nhref=\"https://t.me/InFamous23\">InFamous23</a> / <a\nhref=\"https://t.me/TheTr1ckst3r\">TheTr1ckst3r</a> / <a\nhref=\"https://t.me/Ch4t4r\">Ch4t4r</a> / <a\nhref=\"https://t.me/Billi_ance\">Billi_ance</a> / <a\nhref=\"https://t.me/kaliangel\">kaliangel</a> / <a\nhref=\"https://github.com/PoneyClairDeLune\">PoneyClairDeLune</a><br/> <br/>📌\nموقعیت جغرافیایی IP <br/> <a href=\"https://db-ip.com\">db-ip.com</a> / <a\nhref=\"https://ipinfo.io/lite\">IPinfo Lite</a><br/> <br/>❇ ترجمه‌ها <br/> <a\nhref=\"https://weblate.org/en/\">Weblate</a><br/> <br/>🦆 آیکون‌ها <br/> <a\nhref=\"https://github.com/celzero/rethink-app/issues/346\">Icons</a><br/> <br/>📦\nسرورهای ساخت <br/> <a href=\"https://jitpack.io/\">JitPack</a> / <a\nhref=\"https://github.com/\">GitHub</a> / <a\nhref=\"https://central.sonatype.com/\">Sonatype</a><br/> ]]]]><![CDATA[>\n                                              "]]></string>
     <string name="cd_dns_crypt_title" translatable="true">تفکیک‌کننده‌ها</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">نشانی سرور سفارشی</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
@@ -845,4 +785,51 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="other_dns_list_tab3" translatable="true">پروکسی دی ان اس</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">امکان تغییر حالت‌ها زمانی که VPN در <i>Lockdown</i> است وجود ندارد. برای &lt;u&gt;ویرایش تنظیمات VPN&lt;/u&gt; ضربه بزنید.</string>
     <string name="lockdown_download_message" translatable="true">&lt;/i&gt;</string>
+    <string name="lbl_notes" translatable="true">یادداشت‌ها</string>
+    <string name="hint_notes" translatable="true">اضافه کردن یادداشت در مورد این برنامه</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">یادداشت‌ها می‌توانند حداکثر ۵۰۰ کاراکتر باشند</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">یادداشت‌ها ذخیره نشدند</string>
+    <string name="lbl_saving" translatable="true">ذخیره…</string>
+    <string name="lbl_plan" translatable="true">طرح</string>
+    <string name="lbl_expires_on" translatable="true">معتبر تا</string>
+    <string name="lbl_cancelled" translatable="true">لغو شد</string>
+    <string name="lbl_expired" translatable="true">منقضی شده</string>
+    <string name="lbl_grace_period" translatable="true">دوره اقبال</string>
+    <string name="lbl_paused" translatable="true">مکث شد</string>
+    <string name="ip_mismatch_notification_title" translatable="true">عدم تطابق پروتکل شبکه</string>
+    <string name="ip_mismatch_notification_content" translatable="true">پروتکل IP انتخابی شما در شبکه فعلی موجود نیست. برای حفظ اتصال، به حالت \"IPv4 و IPv6\" یا \"خودکار\" بروید.</string>
+    <string name="doh_empty_state_title" translatable="true">DoH بدون نقطه پایانی</string>
+    <string name="doh_empty_state_desc" translatable="true">برای شروع، یک نقطه پایانی DNS روی HTTPS اضافه کنید.</string>
+    <string name="odoh_empty_state_title" translatable="true">بدون نقاط پایانی ODoH</string>
+    <string name="odoh_empty_state_desc" translatable="true">برای شروع، یک نقطه پایانی DNS بی‌توجه روی HTTPS اضافه کنید.</string>
+    <string name="dot_empty_state_title" translatable="true">بدون نقاط پایانی DoT</string>
+    <string name="dot_empty_state_desc" translatable="true">برای شروع، یک نقطه پایانی DNS روی TLS اضافه کنید.</string>
+    <string name="dns_proxy_empty_state_title" translatable="true">بدون نقاط پایانی پروکسی DNS</string>
+    <string name="dns_proxy_empty_state_desc" translatable="true">برای شروع، یک نقطه پایانی DNS Proxy اضافه کنید.</string>
+    <string name="dns_crypt_empty_state_title" translatable="true">بدون نقاط پایانی دی‌ان‌اس‌کریپت</string>
+    <string name="dns_crypt_empty_state_desc" translatable="true">برای شروع، یک نقطه پایانی دی‌ان‌اس‌کریپت اضافه کنید.</string>
+    <string name="rethink_empty_state_title" translatable="true">هیچ لیست مسدودی یافت نشد</string>
+    <string name="rethink_empty_state_desc" translatable="true">برای شروع، یک لیست مسدود شده را بارگیری یا پیکربندی کنید.</string>
+    <string name="settings_log_lifespan_heading" translatable="true">⁦طول عمر گزارش</string>
+    <string name="settings_log_lifespan_desc_default" translatable="true">۷ روز (پیش‌فرض)</string>
+    <string name="settings_rinr_btmsht_title" translatable="true">حلقه برگشتی (آزمایشی)</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">در حالت حلقه برگشتی، Rethink می‌تواند ترافیک شبکه خود را تغییر مسیر دهد. این بدان معناست که Rethink می‌تواند قوانین IP و دامنه، قوانین فایروال جهانی و قوانین پروکسی را مانند هر برنامه معمولی دیگری بر ترافیک Rethink اعمال کند. حتی اگر حلقه برگشتی کنترل بیشتری ارائه دهد، رفتار حاصل ممکن است همیشه مطلوب نباشد.\n\nتوصیه می‌شود Rethink را از قوانین فایروال، DNS و پروکسی معاف کنید. انجام این کار بر نظارت یا ثبت وقایع شبکه تأثیری ندارد، بلکه فقط بر قوانین تأثیر می‌گذارد.\n\nدر حالت حلقه برگشتی، قفل پروکسی فعلاً اجرا نخواهد شد.</string>
+    <string name="settings_rinr_exempt_btn" translatable="true">معاف کردن Rethink</string>
+    <string name="app_info_rethink_warning_title" translatable="true">احتیاط</string>
+    <string name="app_info_rethink_warning_desc" translatable="true">شما در شرف تغییر قوانین فایروال Rethink هستید. از آنجایی که Rethink تونل فیلترشکن را مدیریت می‌کند، اجازه دادن، مسدود کردن یا ایزوله کردن ترافیک خودش می‌تواند دسترسی به شبکه را در همه جا مختل کند.</string>
+    <string name="app_info_rethink_warning_proceed" translatable="true">می‌فهمم</string>
+    <string name="rethink_home_screen_warning" translatable="true">ممکن است بر اتصال تأثیر بگذارد ⚠️</string>
+    <string name="settings_log_lifespan_dialog_option_0" translatable="true">۱ ساعت</string>
+    <string name="settings_log_lifespan_dialog_option_1" translatable="true">۳ ساعت</string>
+    <string name="settings_log_lifespan_dialog_option_2" translatable="true">۶ ساعت</string>
+    <string name="settings_log_lifespan_dialog_option_3" translatable="true">۱۲ ساعت</string>
+    <string name="settings_log_lifespan_dialog_option_4" translatable="true">۱ روز</string>
+    <string name="settings_log_lifespan_dialog_option_5" translatable="true">۳ روز</string>
+    <string name="settings_log_lifespan_dialog_option_6" translatable="true">۷ روز</string>
+    <string name="hsf_local_network_permission_dialog_heading" translatable="true">مجوز شبکه محلی</string>
+    <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s برای عملکرد برخی از ویژگی‌ها به مجوز شبکه محلی نیاز دارد. فیلترشکن غیرفعال شده است. از تنظیمات برنامه، مجوز را اعطا و دوباره امتحان کنید.</string>
+    <string name="dc_global_heading" translatable="true">سراسری</string>
+    <string name="dc_block_unknown_heading" translatable="true">مسدود کردن DNS از منبع ناشناخته</string>
+    <string name="dc_block_unknown_desc" translatable="true">تمام درخواست‌های DNS که از برنامه‌های ناشناخته سرچشمه می‌گیرند را مسدود کنید.</string>
 </resources>
