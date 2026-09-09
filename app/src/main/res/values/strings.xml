@@ -827,10 +827,14 @@
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
 
+    <string name="logs_card_heatmap_window" translatable="true">last 24 hours</string>
+
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules.\n\nWi-Fi-based proxy automation requires Location permission to identify the connected Wi-Fi network (SSID). This permission is requested only when you enable the feature.\n\nRethink does not collect any information or spy on you in any way.</string>
 
     <string name="hsf_vpn_prepare_failure" translatable="true">Either VPN permission missing, or another app is in Always-on VPN mode.</string>
+
+    <string name="hsf_vpn_lockdown_prepare_failure" translatable="true">Rethink cannot start while another app is set as Always-on VPN with \"Block connections without VPN\" (lockdown). Edit VPN settings to proceed.</string>
 
     <string name="hsf_notification_permission_failure" translatable="true">Enable notification permission from Settings screen</string>
 
@@ -1357,7 +1361,7 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxy Error</string>
     <string name="firewall_rule_temp_allow" translatable="false">Temporary Allow</string>
-    <string name="bsct_allow_reason" translatable="true">Allow reason: %1$s</string>
+    <string name="bsct_allow_reason" translatable="true">%1$s</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1589,6 +1593,8 @@
     <string name="lbl_advanced" translatable="true">Advanced</string>
 
     <string name="rt_filter_parent_selected" translatable="true">Selected</string>
+    <string name="dns_list_item_select_cd" translatable="true">Select %1$s</string>
+    <string name="dns_list_item_selected_cd" translatable="true">%1$s, selected</string>
 
     <string name="rt_download_desc" translatable="true">Download blocklists (around 60MB) to use this feature.</string>
 
@@ -2170,9 +2176,8 @@
     <string name="lockdown_check_cancel" translatable="false">Cancel</string>
     <string name="lockdown_check_all_ok" translatable="false">All checks passed. No conflicts detected.</string>
     <string name="lockdown_check_setting_disabled" translatable="false">Proxy Lockdown is enabled. This setting cannot be changed.</string>
-    <string name="lockdown_check_proxy_options_disabled" translatable="false">Proxy Lockdown is enabled. Orbot, HTTP and SOCKS5 proxies cannot be used.</string>
     <string name="lockdown_check_no_proxy" translatable="false">No Proxy Enabled</string>
-    <string name="lockdown_check_no_proxy_desc" translatable="false">No proxy (HTTP, SOCKS5, WireGuard, RPN, or Orbot) is enabled. Lockdown mode will block all non-VPN traffic.</string>
+    <string name="lockdown_check_no_proxy_desc" translatable="false">No proxy (HTTP, SOCKS5, WireGuard, RPN, or Orbot) is enabled. Lockdown mode will block all traffic.</string>
     <string name="lockdown_check_rethink_bypass" translatable="false">Rethink Bypass</string>
     <string name="lockdown_check_rethink_bypass_desc" translatable="false">Rethink is in loopback mode but is set to bypass the proxy. Traffic will not route through Rethink.</string>
 
@@ -2444,7 +2449,7 @@
     <string name="support_section_attachments" translatable="false">Diagnostic Data</string>
     <string name="support_issue_category_label" translatable="false">What is your issue about?</string>
     <string name="support_category_payment" translatable="false">Payment</string>
-    <string name="support_category_moneyback" translatable="false">Money Back</string>
+    <string name="support_category_moneyback" translatable="false">Money-Back</string>
     <string name="support_category_activation" translatable="false">Activation</string>
     <string name="support_category_connectivity" translatable="false">Connectivity</string>
     <string name="support_category_refund" translatable="false">Refund</string>
@@ -2459,10 +2464,9 @@
     <string name="support_attach_proc_info" translatable="false">Process / Memory / Threads</string>
     <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state.</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
-    <string name="support_btn_send" translatable="false">Send to Support</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
     <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
-    <string name="support_email_chooser_title" translatable="false">Send support email via…</string>
+    <string name="support_email_chooser_title" translatable="false">Send email via…</string>
     <string name="support_error_empty_description" translatable="false">Please describe your issue or select a category</string>
     <string name="support_error_collect" translatable="false">Failed to collect diagnostic data. Please try again.</string>
     <string name="support_error_email" translatable="false">Could not open email app. Please email hello@celzero.com directly.</string>
@@ -2500,11 +2504,11 @@
 
     <!-- Auto Exclude Countries bottom sheet -->
     <string name="auto_exclude_cc_title" translatable="false">Exclude Countries</string>
-    <string name="auto_exclude_cc_subtitle" translatable="false">Selected countries will be skipped during AUTO server selection</string>
-    <string name="auto_exclude_cc_row_title" translatable="false">Excluded Countries for AUTO</string>
+    <string name="auto_exclude_cc_subtitle" translatable="false">Selected countries will be skipped during Auto server selection</string>
+    <string name="auto_exclude_cc_row_title" translatable="false">Excluded Countries for Auto</string>
     <string name="auto_exclude_cc_none" translatable="false">None excluded</string>
     <string name="auto_exclude_cc_count" translatable="false">%d countries excluded</string>
-    <string name="auto_exclude_cc_min_info" translatable="false">At least %d countries must remain available for AUTO selection</string>
+    <string name="auto_exclude_cc_min_info" translatable="false">At least %d countries must remain available for Auto selection</string>
     <string name="auto_exclude_cc_limit_reached" translatable="false">Limit reached, at least %d countries must remain available</string>
     <string name="auto_exclude_cc_no_servers" translatable="false">No countries available</string>
     <string name="auto_exclude_cc_loading" translatable="false">Loading countries…</string>
@@ -2514,8 +2518,8 @@
     <string name="server_settings_sheet_subtitle" translatable="false">Configure VPN server preferences</string>
     <string name="server_settings_config_handling_section" translatable="false">Configuration Handling</string>
     <string name="server_settings_config_handling_desc" translatable="false">Choose how connection settings should be managed</string>
-    <string name="server_settings_config_mode_auto" translatable="false">AUTO</string>
-    <string name="server_settings_config_mode_manual" translatable="false">MANUAL</string>
+    <string name="server_settings_config_mode_auto" translatable="false">Auto</string>
+    <string name="server_settings_config_mode_manual" translatable="false">Manual</string>
     <string name="server_settings_config_auto_hint" translatable="false">The app automatically selects the port, identity, and configuration</string>
     <string name="server_settings_config_manual_hint" translatable="false">Manually control the identity, port, and configuration mode</string>
     <string name="server_settings_identity_title" translatable="false">Always Change Identity</string>
@@ -2526,7 +2530,7 @@
     <string name="server_settings_permanent_config_desc" translatable="false">Keep the same server configuration across reconnections</string>
     <string name="server_settings_port_dialog_title" translatable="false">Select Connection Port</string>
     <string name="server_selection_sub_expires_today" translatable="false">Valid until today</string>
-    <string name="server_selection_auto_always_on" translatable="false">AUTO is always connected and cannot be removed</string>
+    <string name="server_selection_auto_always_on" translatable="false">Auto is always connected and cannot be removed</string>
     <string name="server_selection_remove_title" translatable="false">Remove Server</string>
     <string name="server_selection_remove_message" translatable="false">Remove %1$s (%2$s) from your server list?</string>
     <string name="server_selection_frequent_label" translatable="false">Frequent</string>
@@ -2717,11 +2721,7 @@
     <string name="device_auth_error_device_id_label" translatable="false">Device ID</string>
     <string name="device_auth_error_device_id_partial" translatable="false">partial</string>
     <string name="device_auth_error_id_unavailable" translatable="false">-</string>
-    <string name="device_auth_error_btn_email" translatable="false">Email Customer Support</string>
-    <!-- Pre-filled email content -->
-    <string name="device_auth_error_email_body_greeting" translatable="false">Hello Rethink Support,</string>
-    <string name="device_auth_error_email_body_details" translatable="false">I am experiencing a device authorization issue (HTTP 401). My account details are:</string>
-    <string name="device_auth_error_email_body_closing" translatable="false">Help me resolve this.</string>
+    <string name="device_auth_error_btn_email" translatable="false">Contact Customer Support</string>
 
     <!-- Device Not Registered bottom sheet -->
     <string name="device_not_registered_title" translatable="false">Device Not Registered</string>
@@ -2781,6 +2781,22 @@
     <!-- Label shown in the golden badge strip inside the tooltip card -->
     <string name="tour_premium_badge_label" translatable="false">Premium Feature</string>
 
+    <!-- RPN (Server Selection) premium onboarding tour steps -->
+    <string name="rpn_tour_welcome_title" translatable="false">Welcome to Rethink Private Network</string>
+    <string name="rpn_tour_welcome_desc" translatable="false">Your traffic now exits through private, encrypted servers - your real IP stays hidden. Here\'s a quick tour of what your subscription unlocks.</string>
+    <string name="rpn_tour_add_location_title" translatable="false">Add up to 5 locations</string>
+    <string name="rpn_tour_add_location_desc" translatable="false">Tap + to add up to 5 countries. Choose where each app connects from, or let RPN make the pick for you.</string>
+    <string name="rpn_tour_relay_title" translatable="false">Relay for an extra hop</string>
+    <string name="rpn_tour_relay_desc" translatable="false">Relay sends your connection through Auto server first, then your chosen country, adding a second layer between you and the internet</string>
+    <string name="rpn_tour_bypass_title" translatable="false">Bypass apps that need direct access</string>
+    <string name="rpn_tour_bypass_desc" translatable="false">Banking, gaming, or streaming apps that dislike proxies? Exclude them here and their traffic skips RPN entirely while everything else stays protected.</string>
+    <string name="rpn_tour_per_app_title" translatable="false">Route each app through its own country</string>
+    <string name="rpn_tour_per_app_desc" translatable="false">Tap the apps icon on any location to send specific apps through it - app A via Germany, app B via Japan, all at the same time.</string>
+    <string name="rpn_tour_stats_title" translatable="false">Live activity at a glance</string>
+    <string name="rpn_tour_stats_desc" translatable="false">Watch live throughput and a 6-hour activity heat map, so you always know exactly how much traffic RPN is carrying for you.</string>
+    <string name="rpn_tour_settings_title" translatable="false">Built-in DNS filters</string>
+    <string name="rpn_tour_settings_desc" translatable="false">Tap the gear to layer Privacy, Security, or Family blocklists onto your RPN exit point, identity protection mode and a custom connection port.</string>
+
     <!-- Configure fragment card subtitles -->
     <string name="fs_configure_apps_desc" translatable="true">Per-app firewall rules and network policy</string>
     <string name="fs_configure_network_desc" translatable="true">VPN tunnel mode and network preferences</string>
@@ -2800,7 +2816,7 @@
     <string name="bfdm_option_auto_desc" translatable="false">Automatically select DNS based on other settings</string>
     <string name="bfdm_split_dns_disabled" translatable="false">Split DNS is disabled</string>
 
-    <string name="console_log_include_file_trace" translatable="false">Include file trace in logs</string>
+    <string name="console_log_include_file_trace" translatable="false">Include stack trace in logs</string>
 
     <string name="rethink_block_error_desc" translatable="false">Rethink may be blocked by firewall rules ⚠</string>
 
@@ -2833,6 +2849,7 @@
     <string name="download_err_internal" translatable="true">An internal error occurred. Please try again later.</string>
     <string name="download_err_flavor_not_supported" translatable="true">Local blocklist not available for this flavor.</string>
     <string name="download_switch_to_system" translatable="true">Use system downloader</string>
+    <string name="download_inapp_vpn_toast" translatable="true">VPN is on; using the in-app downloader for this download.</string>
     <string name="download_progress_format" translatable="false">%1$s (%2$d%%)</string>
 
     <!-- Quick settings tiles (Server Selection) -->
@@ -2840,6 +2857,9 @@
     <string name="qs_relay_disabled_toast" translatable="true">Relay disabled for all locations</string>
     <string name="qs_relay_no_locations_toast" translatable="true">Select a location to enable relay</string>
     <string name="qs_relay_failure_toast" translatable="true">Failed to update relay for %1$d location(s)</string>
+
+    <string name="qs_relay_automation_dialog_title" translatable="true">Automation enabled</string>
+    <string name="qs_relay_automation_dialog_message" translatable="true">Automation is enabled for the Auto location, which will affect this location as well. Do you want to proceed?</string>
 
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>
