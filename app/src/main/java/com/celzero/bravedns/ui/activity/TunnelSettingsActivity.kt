@@ -106,6 +106,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         private const val FOUR_MB_IN_BYTES = 4 * 1024 * 1024
     }
 
+    /** Applies the persisted theme and inflates the tunnel-settings screen. */
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         //setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -123,16 +124,19 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         setupClickListeners()
     }
 
+    /** Returns true when the system is in dark mode. */
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
     }
 
+    /** Re-evaluates lockdown-dependent row states when the screen returns to the foreground. */
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
     }
 
+    /** Hydrates all tunnel-setting rows (switches, labels, visibility) from [persistentState]. */
     private fun initView() {
         b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header)
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2), getString(R.string.lbl_ip))
@@ -143,6 +147,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
+        // allow apps to bypass the tunnel
+        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
         // show ping ips
         b.settingsActivityPingIpsBtn.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
         // exclude apps in proxy
@@ -209,11 +215,13 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
 
+    /** Renders the anti-censorship dialer timeout as a human-readable label. */
     private fun displayDialerTimeOutUi(progressSec: Int) {
         val displayText = formatTimeShort(progressSec)
         b.dvTimeoutValue.text = displayText
     }
 
+    /** Formats seconds as a compact h/m/s string (empty parts skipped). */
     private fun formatTimeShort(totalSeconds: Int): String {
         val hours = totalSeconds / SECONDS_PER_HOUR
         val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
@@ -228,17 +236,20 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         return if (parts.isEmpty()) getString(R.string.lbl_disabled) else parts.joinToString(" ")
     }
 
+    /** Persists the dialer timeout (minutes) and refreshes its label. */
     private fun updateDialerTimeOut(valueMin: Int) {
         val inSec = valueMin * SECONDS_PER_MINUTE
         persistentState.dialTimeoutSec = inSec
         displayDialerTimeOutUi(inSec)
     }
 
+    /** Renders the socket buffer size as a human-readable label. */
     private fun displaySocketBufferSizeUi(bytes: Int) {
         val displayText = formatSocketBufferSize(bytes)
         b.dvSocketBufferSizeValue.text = displayText
     }
 
+    /** Formats a byte count as KB/MB for display. */
     private fun formatSocketBufferSize(bytes: Int): String {
         val kb = bytes / 1024
         return if (kb >= 1024) {
@@ -262,6 +273,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         displaySocketBufferSizeUi(bytes)
     }
 
+    /** Shows the socket-buffer-size chooser, an advanced TCP/UDP tuning preference. */
     private fun suggestSocketBufferSize() {
         if (persistentState.socketBufferSizeBytes < FOUR_MB_IN_BYTES) {
             val progress = socketBufferSizeToProgress(FOUR_MB_IN_BYTES)
@@ -270,6 +282,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
     }
 
+    /** Wires row clicks and switch listeners; most write straight to [persistentState], which the VPN service observes. */
     private fun setupClickListeners() {
         b.settingsRestoreDefaults.setOnClickListener { showRestoreDefaultsDialog() }
 
@@ -366,6 +379,21 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             logEvent(
                 "route lan traffic",
                 "Route LAN traffic: $checked"
+            )
+        }
+
+        b.settingsActivityAllowBypassRl.setOnClickListener {
+            b.settingsActivityAllowBypassSwitch.isChecked =
+                !b.settingsActivityAllowBypassSwitch.isChecked
+        }
+
+        b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
+            _: CompoundButton,
+            checked: Boolean ->
+            persistentState.allowBypass = checked
+            logEvent(
+                "allow bypass",
+                "Allow apps to bypass the tunnel: $checked"
             )
         }
 
