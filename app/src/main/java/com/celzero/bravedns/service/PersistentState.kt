@@ -422,7 +422,26 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var nwEngExperimentalFeatures by booleanPref("network_engine_experimental").withDefault<Boolean>(false)
 
-    var dialTimeoutSec by intPref("dial_timeout_sec").withDefault<Int>(0)
+    // Default dial idle timeout, in seconds, for outgoing TCP/UDP connections.
+    //
+    // IMPORTANT: a value of 0 is not merely "no timeout" -- it changes code path.
+    // See intra/rwconn.go (rwext.SetTimeout()) and intra/common.go (forward()):
+    // when this is 0, SetTimeoutSockOpt() is never invoked, rwext.SetTimeout()
+    // returns didSet=false, and forward() unwraps the connection down past the
+    // *dialers.retrier entirely (a "zero-copy" optimization). That retrier is
+    // what performs automatic retry-on-stall/retry-on-error (up to
+    // maxRetryCount) for otherwise-silent connection stalls (no RST, no EOF,
+    // just zero bytes forever). With the default at 0, a silently-stalled TCP
+    // connection has no recovery path and hangs indefinitely.
+    //
+    // We observed this cause real, reproducible, permanent playback freezes on
+    // low-power Android TV/Fire TV Stick hardware: a video CDN connection would
+    // complete its TCP handshake via the VPN's Exit path and then simply never
+    // transfer another byte, with no error surfaced to the app or the VPN
+    // service. Changing this default to a small positive value (10s) restores
+    // the retrier safety net for everyone, at the cost of a small amount of
+    // deadline-tracking overhead per read/write on every connection.
+    var dialTimeoutSec by intPref("dial_timeout_sec").withDefault<Int>(10)
 
     // treat only mobile data as metered
     var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
@@ -889,7 +908,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         endpointIndependence = false
         nwEngExperimentalFeatures = false
         tcpKeepAlive = false
-        dialTimeoutSec = 0
+        dialTimeoutSec = 10
         socketBufferSizeBytes = DEFAULT_SOCKET_BUFFER_SIZE_BYTES
         useMaxMtu = false
         setVpnBuilderToMetered = false
