@@ -1265,4 +1265,6 @@
     <string name="download_err_validation" translatable="true">차단 목록을 확인하거나 처리할 수 없습니다. 손상되었을 수 있습니다.</string>
     <string name="ci_dialog_error_invalid_cidr" translatable="true">올바른 CIDR이 아닙니다. IP 범위(예: 1.1.1.1-55)와 비트에 꼭 맞지 않는 와일드카드는 지원되지 않습니다. 1.1.1.0/24와 같이 CIDR 표기를 사용하세요.</string>
     <string name="hsf_vpn_lockdown_prepare_failure" translatable="true">다른 앱이 \"VPN 항상 켜기\" 및 \"연결 차단(VPN 제외)\"으로 설정되어 있으면 Rethink를 시작할 수 없습니다. 계속하려면 VPN 설정을 바꾸세요.</string>
+    <string name="rpn_automation_relay_dialog_title" translatable="true">중계 켜짐</string>
+    <string name="rpn_automation_relay_dialog_message" translatable="true">중계가 한 곳 이상의 위치에서 켜져 있습니다. 자동 위치 지정 기능을 켜면 해당 위치도 중지됩니다. 진행하시겠습니까?</string>
 </resources>
