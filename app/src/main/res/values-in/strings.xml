@@ -1309,4 +1309,6 @@
     <string name="rpn_stats_empty" translatable="true">Tidak ada koneksi yang melalui server terpilih dalam 24 jam terakhir.</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Mulai Rethink untuk melihat statistik proksi</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s koneksi</string>
+    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay diaktifkan</string>
+    <string name="rpn_automation_relay_dialog_message" translatable="true">Relay diaktifkan untuk satu atau beberapa lokasi. Mengaktifkan otomatisasi pada lokasi Auto juga akan menjeda lokasi-lokasi tersebut. Apakah Anda ingin melanjutkan?</string>
 </resources>
