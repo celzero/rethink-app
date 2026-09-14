@@ -131,6 +131,7 @@ import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSOpts
 import com.celzero.firestack.backend.DNSSummary
 import com.celzero.firestack.backend.DNSTransport
+import com.celzero.firestack.backend.DomainOpts
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
@@ -3747,6 +3748,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     override fun onDNSStopped() {
         // no-op
         Logger.v(LOG_TAG_VPN, "onDNSStopped")
+    }
+
+    override fun onPrequery(p0: String, p1: String, p2: String, p3: Long): DomainOpts? {
+        return null
     }
 
     override fun onSvcComplete(p0: ServerSummary) {
