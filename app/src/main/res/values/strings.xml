@@ -847,14 +847,10 @@
     <string name="logs_card_apps_hint_blocked" translatable="true">Apps with the most blocked attempts · last 24 hours</string>
     <string name="logs_card_apps_count_label_allowed" translatable="true">data used</string>
     <string name="logs_card_apps_count_label_blocked" translatable="true">blocked</string>
-    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s mobile data</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s mobile</string>
     <string name="logs_card_apps_empty" translatable="true">Nothing to show yet</string>
     <string name="logs_card_apps_legend_wifi" translatable="true">Wi-Fi</string>
-    <string name="logs_card_apps_legend_mobile" translatable="true">Mobile data</string>
-    <string name="logs_card_apps_detail_allowed" translatable="true">%1$s used %2$s (Wi-Fi %3$s · Mobile data %4$s)</string>
-    <string name="logs_card_apps_detail_blocked" translatable="true">%1$s tried to make %2$s blocked connections</string>
-    <string name="logs_card_apps_allowed_cd" translatable="true">%1$s used %2$s of data</string>
-    <string name="logs_card_apps_blocked_cd" translatable="true">%1$s tried to make %2$s blocked connections</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">Mobile</string>
     <string name="logs_card_pager_desc" translatable="true">Swipe to switch between activity and top apps</string>
     <string name="logs_card_disabled_logs_hint" translatable="true">Enable logs to see your recent activity</string>
     <string name="logs_card_disabled_vpn_hint" translatable="true">Start the VPN to see your recent activity</string>

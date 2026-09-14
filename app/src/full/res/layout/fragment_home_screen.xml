@@ -88,14 +88,16 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
                         android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_connected_dns"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fontFamily="sans-serif-medium"
@@ -106,7 +108,7 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_latency"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:maxLines="1"
                             android:ellipsize="marquee"
@@ -568,6 +570,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom|center_horizontal"
                             android:layout_marginBottom="2dp"
+                            android:translationZ="-1dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 

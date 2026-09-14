@@ -365,7 +365,7 @@
                     android:id="@+id/quick_settings_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
@@ -376,6 +376,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginEnd="4dp"
                         android:layout_weight="1"
+                        app:strokeWidth="1dp"
                         android:backgroundTint="?attr/colorSurface">
 
                         <LinearLayout
@@ -410,6 +411,7 @@
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_gravity="center"
+                                        android:alpha="0.5"
                                         android:src="@drawable/ic_add"
                                         android:tint="?attr/primaryLightColorText" />
 
@@ -485,6 +487,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="4dp"
                         android:layout_weight="1"
+                        app:strokeWidth="1dp"
                         android:backgroundTint="?attr/colorSurface">
 
                         <LinearLayout
@@ -520,6 +523,7 @@
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_gravity="center"
+                                        android:alpha="0.5"
                                         android:src="@drawable/ic_hop"
                                         android:tint="?attr/primaryLightColorText" />
 
@@ -563,6 +567,7 @@
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_gravity="center"
+                                        android:alpha="0.5"
                                         android:src="@drawable/ic_statistics"
                                         android:tint="?attr/primaryLightColorText" />
 

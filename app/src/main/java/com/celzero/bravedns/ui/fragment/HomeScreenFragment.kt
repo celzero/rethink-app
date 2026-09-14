@@ -156,6 +156,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import android.graphics.drawable.Drawable
 import java.util.Locale
+import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
 import kotlin.time.Duration.Companion.milliseconds
@@ -1931,7 +1932,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         override fun onBindViewHolder(holder: FirewallRulesPageViewHolder, position: Int) {
             holder.itemBinding.itemRulesPageCount.text = counts[position]
-            holder.itemBinding.itemRulesPageLabel.text = labels[position]
+            holder.itemBinding.itemRulesPageLabel.text =
+                labels[position].replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
             holder.itemBinding.root.setOnClickListener { onRulePageTapped?.invoke(position) }
         }
     }

@@ -66,6 +66,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:overScrollMode="never"
+        android:layout_marginBottom="160dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
