@@ -1,6 +1,9 @@
 ## Rethink DNS + Firewall + VPN for Android
+
 A multi-hop [WireGuard](https://github.com/wireguard/wireguard-go) client, an [OpenSnitch](https://github.com/evilsocket/opensnitch)-inspired firewall and network monitor + a [pi-hole](https://github.com/pi-hole/pi-hole)-inspired DNS over HTTPS (DoH), Oblivious DoH, DNS over TLS (DoT), DNSCrypt client with blocklists.
 
+<div align="center">
+     
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="70">](https://f-droid.org/packages/com.celzero.bravedns/)
@@ -10,8 +13,9 @@ A multi-hop [WireGuard](https://github.com/wireguard/wireguard-go) client, an [O
 [<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/b1c8ac6f2ab08497189721a788a5763e28ff64cd/assets/graphics/badge_obtainium.png"
      alt="Get it with Obtainium"
      height="70">](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/celzero/rethink-app)
+</div>     
 
-### Release certificate SHA-256 digests:
+#### Release certificate SHA-256 digests:
 *Prod flavour on the [Play Store](https://play.google.com/store/apps/details?id=com.celzero.bravedns) & [Website](https://rethinkdns.com/download)*: 
 ```text
 1f32d432e81a1dc5c00aafeb0c6636cd7819965d174420e59db9675dff7a88e9
