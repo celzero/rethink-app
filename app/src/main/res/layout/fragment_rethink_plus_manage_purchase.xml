@@ -509,7 +509,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:cardCornerRadius="24dp"
-            app:cardElevation="16dp"
             app:strokeWidth="0dp">
 
             <LinearLayout

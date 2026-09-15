@@ -83,6 +83,10 @@
     <color name="serverHeaderGradientCenterDark">#0E3D30</color>
     <color name="serverHeaderGradientEndDark">#07271F</color>
 
+    <!-- Selected-server card chip surface -->
+    <color name="serverChipBgDark">#66006F67</color>
+    <color name="serverChipBgBlack">#66004D40</color>
+
     <!-- Server selection header card gradient - soft blue (light themes) -->
     <color name="serverHeaderGradientStartLight">#EAF4FE</color>
     <color name="serverHeaderGradientCenterLight">#DEEDFC</color>
@@ -419,5 +423,7 @@
     <!-- Frost Effect Colors -->
     <color name="frost_white_10">#1AFFFFFF</color>
     <color name="frost_black_30">#4D000000</color>
+
+    <color name="frost_glass_fill">#99111216</color>
 
 </resources>

@@ -338,7 +338,7 @@
         <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
         <item name="heroWatermarkTint">@color/heroWatermarkTintDark</item>
         <item name="serverHeaderStrokeColor">#33FFFFFF</item>
-        <item name="serverChipBgColor">@color/vpnHeaderGradientStart</item>
+        <item name="serverChipBgColor">@color/serverChipBgDark</item>
         <item name="serverChipStrokeColor">#33FFFFFF</item>
         <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGolden</item>
@@ -624,7 +624,7 @@
         <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
         <item name="heroWatermarkTint">@color/heroWatermarkTintTrueBlack</item>
         <item name="serverHeaderStrokeColor">#26FFFFFF</item>
-        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlack</item>
+        <item name="serverChipBgColor">@color/serverChipBgBlack</item>
         <item name="serverChipStrokeColor">#26FFFFFF</item>
         <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
@@ -906,7 +906,7 @@
         <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
         <item name="heroWatermarkTint">@color/heroWatermarkTintTrueBlack</item>
         <item name="serverHeaderStrokeColor">#26FFFFFF</item>
-        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlackPlus</item>
+        <item name="serverChipBgColor">@color/serverChipBgBlack</item>
         <item name="serverChipStrokeColor">#26FFFFFF</item>
         <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlackPlus</item>
@@ -974,7 +974,7 @@
         <item name="accentWarning">?attr/colorTertiary</item>
 
         <item name="background">@android:color/transparent</item>
-        <item name="cardBackgroundColor">@color/cardBackgroundBG</item>
+        <item name="cardBackgroundColor">@color/frost_glass_fill</item>
         <item name="divider">?attr/colorSurfaceVariant</item>
         <item name="border">?attr/colorOutline</item>
         <item name="homeScreenBtnBackground">?attr/colorSecondaryContainer</item>
@@ -1046,7 +1046,7 @@
         <item name="serverHeaderGradientEnd">@color/serverHeaderGradientEndDark</item>
         <item name="heroWatermarkTint">@color/heroWatermarkTintTrueBlack</item>
         <item name="serverHeaderStrokeColor">#26FFFFFF</item>
-        <item name="serverChipBgColor">@color/vpnHeaderGradientStartBlack</item>
+        <item name="serverChipBgColor">@color/serverChipBgBlack</item>
         <item name="serverChipStrokeColor">#26FFFFFF</item>
         <item name="serverChipTextColor">?attr/primaryLightColorText</item>
         <item name="colorGolden">@color/colorGoldenBlack</item>
@@ -1366,6 +1366,7 @@
         <item name="colorSurfaceVariant">@color/colorSurfaceVariantBlack</item>
         <item name="colorOnSurfaceVariant">@color/primaryLightColorTextBG</item>
         <item name="colorSurfaceContainer">@color/cardBackgroundBG</item>
+        <item name="cardBackgroundColor">@color/frost_glass_fill</item>
         <item name="materialCardViewStyle">@style/Widget.Rethink.MaterialCardView.Frost</item>
         <item name="colorPrimary">@color/accentGoodBG</item>
         <item name="colorOnPrimary">@android:color/black</item>
@@ -1562,7 +1563,6 @@
         <item name="cardElevation">0dp</item>
         <item name="cardCornerRadius">8dp</item>
         <item name="strokeWidth">0dp</item>
-        <item name="strokeColor">@android:color/transparent</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="android:clipToPadding">true</item>
     </style>

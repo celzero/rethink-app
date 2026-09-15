@@ -106,7 +106,6 @@
             android:layout_marginBottom="8dp"
             android:visibility="gone"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
             app:strokeWidth="0dp">
 
             <LinearLayout

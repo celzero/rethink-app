@@ -49,7 +49,6 @@
                 android:layout_marginEnd="16dp"
                 android:visibility="gone"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="?attr/background"
                 tools:visibility="visible">
@@ -301,7 +300,6 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="40dp"
                 app:cardCornerRadius="26dp"
-                app:cardElevation="1dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
