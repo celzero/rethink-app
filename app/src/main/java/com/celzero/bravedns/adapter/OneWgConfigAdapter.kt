@@ -93,7 +93,15 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        lifecycleOwner = null
+    }
+
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val wgConfigFiles: WgConfigFiles = getItem(position) ?: return
         holder.update(wgConfigFiles)
     }

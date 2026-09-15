@@ -90,7 +90,15 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
         return DnsCryptEndpointViewHolder(itemBinding)
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        lifecycleOwner = null
+    }
+
     override fun onBindViewHolder(holder: DnsCryptEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val dnsCryptEndpoint: DnsCryptEndpoint = getItem(position) ?: return
         holder.update(dnsCryptEndpoint)
     }

@@ -97,7 +97,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         return RethinkEndpointViewHolder(itemBinding)
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        lifecycleOwner = null
+    }
+
     override fun onBindViewHolder(holder: RethinkEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val doHEndpoint: RethinkDnsEndpoint = getItem(position) ?: return
         holder.update(doHEndpoint)
     }

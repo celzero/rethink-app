@@ -265,10 +265,12 @@ class VpnServerAdapter(
             override fun areContentsTheSame(o: Int, n: Int) = old[o] == newGroups[n]
         })
         serverGroups = newGroups.toList()
-        diff.dispatchUpdatesTo(this)
-        // The trailing add tile is derived state, not part of the diff; when it
-        // appears or disappears a full refresh keeps positions consistent.
-        if (oldHadAddTile != hasAddTile()) notifyDataSetChanged()
+        // The add tile is not represented in DiffUtil's lists.
+        if (oldHadAddTile != hasAddTile()) {
+            notifyDataSetChanged()
+        } else {
+            diff.dispatchUpdatesTo(this)
+        }
     }
 
     fun updateServers(newServers: List<CountryConfig>) {
@@ -830,7 +832,7 @@ class VpnServerAdapter(
          */
         private fun applyRelayAction(config: CountryConfig?) {
             if (config == null || config.id.equals(AUTO_SERVER_ID, true)) {
-                b.relayActionContainer.visibility = View.GONE
+                b.relayActionContainer.visibility = View.INVISIBLE
                 return
             }
             b.relayActionContainer.visibility = View.VISIBLE

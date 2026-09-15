@@ -306,7 +306,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_weight="1"
-            android:text="@string/lbl_app_rules"
+            android:textAllCaps="true"
+            android:text="@string/lbl_rules"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/default_font_text_view" />
 

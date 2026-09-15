@@ -254,7 +254,7 @@ class AppActivityAdapter(
             b.laaAllowedCount.text = formatCount(summary.allowed)
             b.laaBlockedCount.text = formatCount(summary.blocked)
             b.laaBlockedCount.visibility =
-                if (summary.blocked > 0) View.VISIBLE else View.GONE
+                if (showBlockedCount && summary.blocked > 0) View.VISIBLE else View.GONE
             b.laaAllowedCount.visibility =
                 if (summary.allowed > 0) View.VISIBLE else View.GONE
 

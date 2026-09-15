@@ -87,7 +87,15 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         return DoHEndpointViewHolder(itemBinding)
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        lifecycleOwner = null
+    }
+
     override fun onBindViewHolder(holder: DoHEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val doHEndpoint: DoHEndpoint = getItem(position) ?: return
         holder.update(doHEndpoint)
     }
