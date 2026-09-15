@@ -836,7 +836,6 @@
     <string name="exclude_apps_from_proxy">Exclude aplicația la toate proxy-urile</string>
     <string name="exclude_apps_from_proxy_failure_toast">Această aplicație ocolește proxy-urile</string>
     <string name="bsac_title_desc" translatable="true">Regulile se aplică numai pentru această aplicație.</string>
-    <string name="bsdl_block_desc" translatable="true">Blochează, permite &lt;u&gt;acest domeniu&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">%1$s blocată de %2$s</string>
     <string name="network_dns" translatable="true">DNS sistem</string>
     <string name="notif_download_content_title" translatable="true">Descărcare listă de blocat pe dispozitiv</string>
@@ -1189,7 +1188,6 @@
     <string name="dc_block_unknown_heading" translatable="true">Blochează DNS din surse necunoscute</string>
     <string name="dc_block_unknown_desc" translatable="true">Blochează toate cererile DNS de la aplicații necunoscute.</string>
     <string name="build_flavor_website_degoogled" translatable="true">site web-degoogled</string>
-    <string name="bsdl_app_block_desc" translatable="true">Blochează, permite &lt;u&gt;acest domeniu&lt;/u&gt; pentru această aplicație</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard nu poate fi activat în modul DNS-only. Schimbă la modul Firewall sau DNS+Firewall.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">O configurație activă One-WireGuard este în uz. Trebuie dezactivată înainte de a folosi configurații WireGuard individuale.</string>
     <string name="lbl_notes" translatable="true">Note</string>

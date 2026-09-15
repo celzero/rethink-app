@@ -768,7 +768,6 @@
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Bei ungetaktet zulassen</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Vertrauenswürdige Domain (App)</string>
     <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
-    <string name="bsdl_block_desc" translatable="true">&lt;u&gt;Diese(r) Domain&lt;/u&gt; blockieren, vertrauen</string>
     <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
     <string name="settings_general_customize" translatable="true">Anpassen</string>
     <string name="settings_default_dns_heading" translatable="true">Bootstrap-DNS wählen</string>
@@ -1222,7 +1221,6 @@
     <string name="fapps_filter_sort_package" translatable="true">Paketname</string>
     <string name="fapps_filter_sort_uid" translatable="true">UID</string>
     <string name="build_flavor_website_degoogled" translatable="true">Website – ohne Google</string>
-    <string name="bsdl_app_block_desc" translatable="true">&lt;u&gt;Diese(r) Domain&lt;/u&gt; für diese App blockieren, vertrauen</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard kann im reinen DNS-Modus nicht aktiviert werden. Wechsle zum Firewall- oder DNS+Firewall-Modus.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">Es ist eine aktive One-WireGuard-Konfiguration im Einsatz. Deaktiviere diese erst, um einzelne WireGuard-Konfigurationen zu verwenden.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Ungültige WireGuard-Konfiguration</string>

@@ -769,7 +769,6 @@
     <string name="firewall_rule_block_domain" translatable="true">域名（应用）</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[此连接因此<i>域名</i>被设置为信任域名而被放行。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[一项用户定义的全局防火墙规则拦截了此<i>域名</i>。<br><br>若需更改，请移步<i>分应用防火墙</i>屏。]]></string>
-    <string name="bsdl_block_desc" translatable="true">拦截、信任&lt;u&gt;此域名&lt;/u&gt;</string>
     <string name="bypass_dns_firewall" translatable="true">绕行 DNS 与防火墙</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s 项全局规则</string>
     <string name="logs_card_network_count" translatable="true">%1$s 个连接</string>
@@ -1209,7 +1208,6 @@
     <string name="app_info_rethink_warning_title" translatable="true">注意</string>
     <string name="app_info_rethink_warning_desc" translatable="true">您即将更改 Rethink 的防火墙规则。由于 Rethink 管理 VPN 隧道，因此放行、拦截或隔离其自身流量可能会导致整个网络访问中断。</string>
     <string name="settings_rinr_btmsht_desc" translatable="true">在环回模式下，Rethink 可以重新路由自身的网络流量。这意味着，Rethink 可以像对待其他常规应用一样，对其流量应用 IP 和域名规则、全局防火墙规则以及代理规则。尽管环回模式提供了更多控制权，但其最终行为可能并非总是理想的。\n\n\n建议将 Rethink 排除在防火墙、DNS 和代理规则之外。这样做不会影响网络监控或日志记录，只会影响规则本身。\n\n\n在环回模式下，代理锁定功能目前不会强制执行。</string>
-    <string name="bsdl_app_block_desc" translatable="true">此应用拦截、信任 &lt;u&gt;此域名&lt;/u&gt;</string>
     <string name="hsf_local_network_permission_dialog_heading" translatable="true">本地网络权限</string>
     <string name="hsf_local_network_permission_dialog_message" translatable="true">%1$s 的一些功能需要本地网络权限才能正常工作。 已停用 VPN 。从系统的应用设置授予该权限并重试。</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">无法在仅 DNS 模式下启用 WireGuard。切换到防火墙或 DNS+防火墙模式。</string>
