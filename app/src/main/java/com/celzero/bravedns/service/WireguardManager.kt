@@ -84,7 +84,13 @@ object WireguardManager : KoinComponent {
     const val SEC_WARP_NAME = "SEC_WARP"
 
     init {
-        io { load(forceRefresh = false) }
+        io {
+            try {
+                load(forceRefresh = false)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "err loading wg configs during init: ${e.message}")
+            }
+        }
     }
 
     suspend fun load(forceRefresh: Boolean): Int = withContext(Dispatchers.IO) {
@@ -363,7 +369,8 @@ object WireguardManager : KoinComponent {
                     map.useOnlyOnMetered,
                     map.isDeletable,
                     map.ssidEnabled,
-                    map.ssids
+                    map.ssids,
+                    map.isSplitProxy
                 )
             mappings.add(newMap)
             val dbMap = WgConfigFiles.fromImmutable(newMap)
@@ -473,7 +480,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 m.ssidEnabled,
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         mappings.add(newMap)
 
@@ -549,9 +557,13 @@ object WireguardManager : KoinComponent {
             }
 
             proxyIds.add(ID_WG_BASE + id)
-            // add default to the list, can route check is done in go-tun
-            // let one-wg use wg-dns no need to add the default to the list
-            if (default.isNotEmpty()) proxyIds.add(default)
+            // add default only when this is a split proxy.
+            // The reason why this check is in place is, if the proxy is not split
+            // proxy but adding default without this check can cause ip leaks if the proxy is
+            // not up and running.
+            // now split proxy is calculated on every proxyAdded/updated callback
+            val isSplitProxy = mappings.find { it.id == id }?.isSplitProxy ?: false
+            if (isSplitProxy && default.isNotEmpty()) proxyIds.add(default)
             Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
             return proxyIds
         }
@@ -856,7 +868,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 m.ssidEnabled,
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         )
         if (map?.isActive == true) {
@@ -889,7 +902,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 m.ssidEnabled,
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         mappings.add(newMap)
 
@@ -919,7 +933,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 m.ssidEnabled,
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         )
     }
@@ -947,7 +962,8 @@ object WireguardManager : KoinComponent {
                 useMobileNw, // just updating useMobileNw
                 m.isDeletable,
                 m.ssidEnabled,
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         mappings.add(newMap)
         if (m.isActive) {
@@ -955,6 +971,37 @@ object WireguardManager : KoinComponent {
             // Refresh proxies to immediately pause/resume based on new mobile-only setting and current network
             VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
+    }
+
+    suspend fun updateSplitProxyInfo(wgId: String, isSplitProxy: Boolean) {
+        val id = convertStringIdToId(wgId)
+        val config = configs.find { it.getId() == id }
+        if (config == null) {
+            Logger.e(LOG_TAG_PROXY, "update split proxy: wg not found, id: $id, ${configs.size}")
+            return
+        }
+
+        // no need to update the database, maintain this only in mappings as the data is
+        // calculated from firestack, required during request (flow) processing
+        val m = mappings.find { it.id == id } ?: return
+        mappings.remove(m)
+        val newMap =
+            WgConfigFilesImmutable(
+                id,
+                config.getName(),
+                m.configPath,
+                m.serverResponse,
+                m.isActive,
+                m.isCatchAll,
+                m.isLockdown,
+                m.oneWireGuard,
+                m.useOnlyOnMetered,
+                m.isDeletable,
+                m.ssidEnabled,
+                m.ssids,
+                isSplitProxy
+            )
+        mappings.add(newMap)
     }
 
     suspend fun updateSsidEnabled(id: Int, ssidEnabled: Boolean) {
@@ -986,7 +1033,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 ssidEnabled, // just updating ssidEnabled
-                m.ssids
+                m.ssids,
+                m.isSplitProxy
             )
         mappings.add(newMap)
         Logger.i(LOG_TAG_PROXY, "updated ssidEnabled as $ssidEnabled for config: $id, ${config.getName()}")
@@ -1022,7 +1070,8 @@ object WireguardManager : KoinComponent {
                 m.useOnlyOnMetered,
                 m.isDeletable,
                 m.ssidEnabled,
-                ssids // just updating ssids
+                ssids, // just updating ssids
+                m.isSplitProxy
             )
         mappings.add(newMap)
         if (m.isActive) {
@@ -1160,7 +1209,8 @@ object WireguardManager : KoinComponent {
                     isDeletable = true,
                     useOnlyOnMetered = false,
                     ssidEnabled = false,
-                    ssids = ""
+                    ssids = "",
+                    isSplitProxy = false
                 )
             mappings.add(wgf)
         } else {

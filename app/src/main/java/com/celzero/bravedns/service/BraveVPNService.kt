@@ -729,7 +729,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // buckets) from the databases so the heatmap is ready immediately
         // at VPN start.
         io("logActivityHistory") {
-            logActivityAggregator.restoreFromDatabase()
+            try {
+                logActivityAggregator.restoreFromDatabase()
+            } catch (e: Exception) {
+                // cache warm is best-effort; the heatmap repopulates later
+                Logger.w(LOG_TAG_VPN, "logActivityHistory warm failed: ${e.message}")
+            }
         }
 
 
@@ -3687,6 +3692,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyAdded: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             refreshOrPauseOrResumeOrReAddProxies()
         }
@@ -3729,6 +3735,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyUpdated: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             // pause/resume option is not handled here as firestack is taking care of maintaining
             // the state of the proxies
@@ -3836,6 +3843,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     // requires go2kt if there any calls to go functions
     override fun flowing(m: Mark?) {
         TunFlowManager.handleFlowing(m)
+    }
+
+    // call this method everytime when there is a proxy added or updated
+    private suspend fun updateSplitProxyInfo(pid: String) {
+        val supportedIpVersion = VpnController.getSupportedIpVersion(pid)
+        val splitProxyInfo = vpnAdapter?.isSplitTunnelProxy(pid, supportedIpVersion) ?: false
+        // update the info to the wireguard cache, so it can be used during flow requests
+        WireguardManager.updateSplitProxyInfo(pid, splitProxyInfo)
     }
 
     private fun isLockdown(): Boolean {
