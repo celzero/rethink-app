@@ -1,8 +1,14 @@
-rootProject.name='rethink'
-include ':app'
-include ':benchmark'
+rootProject.name = "rethink"
+include(":app")
+include(":benchmark")
 
 dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("gradle/lib.toml"))
+        }
+    }
+
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 
     repositories {
@@ -13,15 +19,15 @@ dependencyResolutionManagement {
         // from the repository selected via `firestackRepo` in gradle.properties.
         // NOTE: with RepositoriesMode.PREFER_SETTINGS, repositories declared in
         // project build.gradle files are ignored
-        def firestackRepo = providers.gradleProperty("firestackRepo").orElse("github").get()
+        val firestackRepo = providers.gradleProperty("firestackRepo").orElse("github").get()
 
         if (firestackRepo == "jitpack") {
             // jitpack.io/#celzero/firestack
-            maven { url 'https://jitpack.io' }
+            maven { url = uri("https://jitpack.io") }
         } else if (firestackRepo == "github") {
             // maven.pkg.github.com/celzero/firestack
             maven {
-                name = 'GitHubPackages'
+                name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/celzero/firestack")
                 credentials {
                     username = providers.gradleProperty("gpr.user").orElse(providers.environmentVariable("USERNAME_GITHUB")).getOrNull()
