@@ -138,15 +138,24 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         b.etDescription.setText(sb.toString().trimEnd())
     }
 
+    /**
+     * Pads the scroll view's bottom by the runtime height of the bottom bar so
+     * the send button bar never covers the last content.
+     */
     private fun applyScrollPadding() {
-        b.nestedScroll.post {
-            b.nestedScroll.setPadding(
-                b.nestedScroll.paddingLeft,
-                0,
-                b.nestedScroll.paddingRight,
-                b.nestedScroll.paddingBottom
-            )
+        b.layoutBottomBar.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateScrollPadding()
         }
+        b.nestedScroll.post { updateScrollPadding() }
+    }
+
+    private fun updateScrollPadding() {
+        b.nestedScroll.setPadding(
+            b.nestedScroll.paddingLeft,
+            b.nestedScroll.paddingTop,
+            b.nestedScroll.paddingRight,
+            b.layoutBottomBar.height
+        )
     }
 
     private fun setupToolbar() {
@@ -683,6 +692,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         else
             getString(R.string.about_bug_report_dialog_positive_btn)
         b.layoutLoading.isVisible = loading
+        // the bar's height changes with the loading row; refresh after re-layout
+        b.nestedScroll.post { updateScrollPadding() }
     }
 
     private fun hideKeyboard() {

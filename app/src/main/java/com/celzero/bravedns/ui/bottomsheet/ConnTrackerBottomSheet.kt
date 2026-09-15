@@ -658,19 +658,27 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
      */
     private fun cycleIpRule() {
         val currentInfo = info ?: return
+        // gate the row for the duration of the pending read-modify-write so a
+        // second tap cannot read a stale rule; every exit path re-enables it
+        // via the finally below (including the bypass-universal early return)
+        b.bsConnRuleRowIp.isEnabled = false
         io {
-            val current =
-                IpRulesManager.getMostSpecificRuleMatch(currentInfo.uid, currentInfo.ipAddress)
-            val next =
-                when (current) {
-                    IpRulesManager.IpRuleStatus.NONE -> IpRulesManager.IpRuleStatus.BLOCK
-                    IpRulesManager.IpRuleStatus.BLOCK -> IpRulesManager.IpRuleStatus.TRUST
-                    IpRulesManager.IpRuleStatus.TRUST -> IpRulesManager.IpRuleStatus.NONE
-                    // read-only here; cycling would silently drop the bypass rule
-                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> return@io
-                }
-            Logger.i(LOG_TAG_FIREWALL, "cycle ip-rule for ${currentInfo.uid}, ${currentInfo.ipAddress}: ${current.name} -> ${next.name}")
-            applyIpRule(next)
+            try {
+                val current =
+                    IpRulesManager.getMostSpecificRuleMatch(currentInfo.uid, currentInfo.ipAddress)
+                val next =
+                    when (current) {
+                        IpRulesManager.IpRuleStatus.NONE -> IpRulesManager.IpRuleStatus.BLOCK
+                        IpRulesManager.IpRuleStatus.BLOCK -> IpRulesManager.IpRuleStatus.TRUST
+                        IpRulesManager.IpRuleStatus.TRUST -> IpRulesManager.IpRuleStatus.NONE
+                        // read-only here; cycling would silently drop the bypass rule
+                        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> return@io
+                    }
+                Logger.i(LOG_TAG_FIREWALL, "cycle ip-rule for ${currentInfo.uid}, ${currentInfo.ipAddress}: ${current.name} -> ${next.name}")
+                applyIpRule(next)
+            } finally {
+                uiCtx { b.bsConnRuleRowIp.isEnabled = true }
+            }
         }
     }
 
@@ -678,16 +686,23 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
     private fun cycleDomainRule() {
         val currentInfo = info ?: return
         val dnsQuery = currentInfo.dnsQuery ?: return
+        // gate the row for the duration of the pending read-modify-write; the
+        // finally re-enables it on every exit path below
+        b.bsConnRuleRowDomain.isEnabled = false
         io {
-            val current = DomainRulesManager.getDomainRule(dnsQuery, currentInfo.uid)
-            val next =
-                when (current) {
-                    DomainRulesManager.Status.NONE -> DomainRulesManager.Status.BLOCK
-                    DomainRulesManager.Status.BLOCK -> DomainRulesManager.Status.TRUST
-                    DomainRulesManager.Status.TRUST -> DomainRulesManager.Status.NONE
-                }
-            Logger.i(LOG_TAG_FIREWALL, "cycle domain-rule for ${currentInfo.uid}, $dnsQuery: ${current.name} -> ${next.name}")
-            applyDomainRule(next)
+            try {
+                val current = DomainRulesManager.getDomainRule(dnsQuery, currentInfo.uid)
+                val next =
+                    when (current) {
+                        DomainRulesManager.Status.NONE -> DomainRulesManager.Status.BLOCK
+                        DomainRulesManager.Status.BLOCK -> DomainRulesManager.Status.TRUST
+                        DomainRulesManager.Status.TRUST -> DomainRulesManager.Status.NONE
+                    }
+                Logger.i(LOG_TAG_FIREWALL, "cycle domain-rule for ${currentInfo.uid}, $dnsQuery: ${current.name} -> ${next.name}")
+                applyDomainRule(next)
+            } finally {
+                uiCtx { b.bsConnRuleRowDomain.isEnabled = true }
+            }
         }
     }
 
@@ -829,70 +844,68 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
         )
     }
 
-    private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
+    /** Runs inline on the caller's IO coroutine so the tap-guard covers the write. */
+    private suspend fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
         val currentInfo = info ?: return
-        io {
-            // no need to apply rule, prev selection and current selection are same
-            if (
-                IpRulesManager.getMostSpecificRuleMatch(currentInfo.uid, currentInfo.ipAddress) ==
-                    ipRuleStatus
-            )
-                return@io
+        // no need to apply rule, prev selection and current selection are same
+        if (
+            IpRulesManager.getMostSpecificRuleMatch(currentInfo.uid, currentInfo.ipAddress) ==
+                ipRuleStatus
+        )
+            return
 
-            val ipPair = IpRulesManager.getIpNetPort(currentInfo.ipAddress)
-            val ip = ipPair.first ?: return@io
-            // reject non-CIDR-able input; the ip trie only accepts CIDR notation,
-            // such a rule would be stored but never enforced
-            if (!IpRulesManager.isCidrEnforceable(ip)) {
-                Logger.w(LOG_TAG_FIREWALL, "ip rule not enforceable (not a valid CIDR): ${currentInfo.ipAddress}")
-                uiCtx {
-                    showToastUiCentered(
-                        requireContext(),
-                        getString(R.string.ci_dialog_error_invalid_cidr),
-                        Toast.LENGTH_SHORT
-                    )
-                }
-                return@io
-            }
-            IpRulesManager.addIpRule(currentInfo.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
-            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${currentInfo.uid}, $ip, ${ipRuleStatus.name}")
-            logEvent("IP rule changed", "UID: ${currentInfo.uid}, IP: $ip, IpRuleStatus: ${ipRuleStatus.name}")
+        val ipPair = IpRulesManager.getIpNetPort(currentInfo.ipAddress)
+        val ip = ipPair.first ?: return
+        // reject non-CIDR-able input; the ip trie only accepts CIDR notation,
+        // such a rule would be stored but never enforced
+        if (!IpRulesManager.isCidrEnforceable(ip)) {
+            Logger.w(LOG_TAG_FIREWALL, "ip rule not enforceable (not a valid CIDR): ${currentInfo.ipAddress}")
             uiCtx {
-                val (text, colorAttr) =
-                    when (ipRuleStatus) {
-                        IpRulesManager.IpRuleStatus.NONE ->
-                            Pair(getString(R.string.ci_no_rule), R.attr.primaryLightColorText)
-                        IpRulesManager.IpRuleStatus.BLOCK ->
-                            Pair(getString(R.string.ci_block), R.attr.chipTextNegative)
-                        IpRulesManager.IpRuleStatus.TRUST ->
-                            Pair(getString(R.string.ci_trust_rule), R.attr.chipTextPositive)
-                        // not offered by this sheet's dialog
-                        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->
-                            Pair(getString(R.string.ci_bypass_universal), R.attr.primaryLightColorText)
-                    }
-                renderRuleState(b.bsConnIpRuleState, text, colorAttr)
-                b.bsConnIpRuleSwitch.setRuleState(ipRuleSwitchState(ipRuleStatus))
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.ci_dialog_error_invalid_cidr),
+                    Toast.LENGTH_SHORT
+                )
             }
+            return
+        }
+        IpRulesManager.addIpRule(currentInfo.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
+        Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${currentInfo.uid}, $ip, ${ipRuleStatus.name}")
+        logEvent("IP rule changed", "UID: ${currentInfo.uid}, IP: $ip, IpRuleStatus: ${ipRuleStatus.name}")
+        uiCtx {
+            val (text, colorAttr) =
+                when (ipRuleStatus) {
+                    IpRulesManager.IpRuleStatus.NONE ->
+                        Pair(getString(R.string.ci_no_rule), R.attr.primaryLightColorText)
+                    IpRulesManager.IpRuleStatus.BLOCK ->
+                        Pair(getString(R.string.ci_block), R.attr.chipTextNegative)
+                    IpRulesManager.IpRuleStatus.TRUST ->
+                        Pair(getString(R.string.ci_trust_rule), R.attr.chipTextPositive)
+                    // not offered by this sheet's dialog
+                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->
+                        Pair(getString(R.string.ci_bypass_universal), R.attr.primaryLightColorText)
+                }
+            renderRuleState(b.bsConnIpRuleState, text, colorAttr)
+            b.bsConnIpRuleSwitch.setRuleState(ipRuleSwitchState(ipRuleStatus))
         }
     }
 
-    private fun applyDomainRule(domainRuleStatus: DomainRulesManager.Status) {
+    /** Runs inline on the caller's IO coroutine so the tap-guard covers the write. */
+    private suspend fun applyDomainRule(domainRuleStatus: DomainRulesManager.Status) {
         val currentInfo = info ?: return
         val dnsQuery = currentInfo.dnsQuery ?: return
         Logger.i(
             LOG_TAG_FIREWALL,
             "Apply domain rule for $dnsQuery, ${domainRuleStatus.name}"
         )
-        io {
-            DomainRulesManager.addDomainRule(
-                dnsQuery,
-                domainRuleStatus,
-                DomainRulesManager.DomainType.DOMAIN,
-                currentInfo.uid,
-            )
-            logEvent("Domain rule changed", "Domain: $dnsQuery, UID: ${currentInfo.uid}, DomainRuleStatus: ${domainRuleStatus.name}")
-            uiCtx { renderDomainRuleState(domainRuleStatus) }
-        }
+        DomainRulesManager.addDomainRule(
+            dnsQuery,
+            domainRuleStatus,
+            DomainRulesManager.DomainType.DOMAIN,
+            currentInfo.uid,
+        )
+        logEvent("Domain rule changed", "Domain: $dnsQuery, UID: ${currentInfo.uid}, DomainRuleStatus: ${domainRuleStatus.name}")
+        uiCtx { renderDomainRuleState(domainRuleStatus) }
     }
 
     private fun logEvent(msg: String, details: String) {

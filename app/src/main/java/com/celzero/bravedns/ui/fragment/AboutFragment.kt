@@ -49,7 +49,9 @@ import androidx.core.net.toUri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -376,8 +378,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             // the "Sponsor" button (visible by default in the layout) is shown briefly
             // even for already-sponsored users on the initial launch.
             applySponsorState(sponsorRepository.isCurrentlySponsored())
-            sponsorRepository.isSponsored.collect { isSponsored ->
-                applySponsorState(isSponsored)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                sponsorRepository.isSponsored.collect { isSponsored ->
+                    applySponsorState(isSponsored)
+                }
             }
         }
     }

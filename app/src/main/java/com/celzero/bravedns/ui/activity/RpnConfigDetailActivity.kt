@@ -803,18 +803,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val linkMbps = config?.link ?: 0
             buildLoadSpeedText(loadPct, linkMbps)
         }
-
-        // only shown when proxy is in a failing state (a paused proxy reports TPU,
-        // which is not a failure, so the row stays hidden for it).
-        val isFailing = isFailing(ps)
-        if (isFailing && (rx == 0L && tx == 0L && selectedSinceTs > 0L)) {
-            b.rowErrors.visibility = View.VISIBLE
-            b.dividerErrors.visibility = View.VISIBLE
-            b.valueErrors.text = getString(R.string.status_failing)
-        } else {
-            b.rowErrors.visibility = View.GONE
-            b.dividerErrors.visibility = View.GONE
-        }
     }
 
 

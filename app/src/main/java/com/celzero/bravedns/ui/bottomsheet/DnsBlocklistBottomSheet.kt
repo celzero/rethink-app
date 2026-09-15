@@ -290,7 +290,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     /**
      * Tap-to-cycle for the app-scoped domain rule: no rule → block → trust → no
      * rule. The rule lookup is an in-memory trie read and safe on main; the DB
-     * write itself is dispatched to io inside applyAppDnsRule.
+     * write itself is dispatched to io inside applyAppRuleStatus.
      */
     private fun cycleAppRule() {
         val currentLog = log ?: return
@@ -301,6 +301,9 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             LOG_TAG_DNS,
             "cycle app domain-rule for $uid, ${currentLog.queryStr}: ${current.name} -> ${next.name}"
         )
+        // gate the row while the write below is pending so an overlapping tap
+        // cannot read a stale rule; re-enabled on every exit path
+        b.bsdlRuleRowApp.isEnabled = false
         applyAppRuleStatus(next, uid)
     }
 
@@ -314,6 +317,9 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             LOG_TAG_DNS,
             "cycle global domain-rule for ${currentLog.queryStr}: ${current.name} -> ${next.name}"
         )
+        // gate the row while the write below is pending so an overlapping tap
+        // cannot read a stale rule; re-enabled on every exit path
+        b.bsdlRuleRowGlobal.isEnabled = false
         applyDnsRuleStatus(next)
     }
 
@@ -328,27 +334,61 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     /** Re-renders the trailing state of the app-scoped rule row. */
     private fun applyAppRuleStatus(status: DomainRulesManager.Status, uid: Int) {
         // no need to apply rule, if prev selection and current selection are same
-        val queryStr = log?.queryStr ?: return
-        if (DomainRulesManager.getDomainRule(queryStr, uid) == status) {
-            renderAppRuleState(status)
+        val currentLog = log ?: run {
+            b.bsdlRuleRowApp.isEnabled = true
             return
         }
-        applyAppDnsRule(status, uid)
+        if (DomainRulesManager.getDomainRule(currentLog.queryStr, uid) == status) {
+            renderAppRuleState(status)
+            b.bsdlRuleRowApp.isEnabled = true
+            return
+        }
+        io {
+            try {
+                DomainRulesManager.changeStatus(
+                    currentLog.queryStr,
+                    uid,
+                    currentLog.responseIps,
+                    DomainRulesManager.DomainType.DOMAIN,
+                    status
+                )
+                logEvent("DNS app domain rule change", "${currentLog.queryStr} to ${status.name}")
+            } finally {
+                uiCtx { b.bsdlRuleRowApp.isEnabled = true }
+            }
+        }
         renderAppRuleState(status)
     }
 
     /** Re-renders the trailing state of the all-apps rule row. */
     private fun applyDnsRuleStatus(status: DomainRulesManager.Status) {
         // no need to apply rule, if prev selection and current selection are same
-        val queryStr = log?.queryStr ?: return
+        val currentLog = log ?: run {
+            b.bsdlRuleRowGlobal.isEnabled = true
+            return
+        }
         if (
-            DomainRulesManager.getDomainRule(queryStr, Constants.UID_EVERYBODY) ==
+            DomainRulesManager.getDomainRule(currentLog.queryStr, Constants.UID_EVERYBODY) ==
                 status
         ) {
             renderGlobalRuleState(status)
+            b.bsdlRuleRowGlobal.isEnabled = true
             return
         }
-        applyDnsRule(status)
+        io {
+            try {
+                DomainRulesManager.changeStatus(
+                    currentLog.queryStr,
+                    Constants.UID_EVERYBODY,
+                    currentLog.responseIps,
+                    DomainRulesManager.DomainType.DOMAIN,
+                    status
+                )
+                logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
+            } finally {
+                uiCtx { b.bsdlRuleRowGlobal.isEnabled = true }
+            }
+        }
         renderGlobalRuleState(status)
     }
 
@@ -393,24 +433,6 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         b.bsdlAppRuleSwitch.setRuleState(domainRuleSwitchState(status))
     }
 
-    private fun applyDnsRule(status: DomainRulesManager.Status) {
-        val currentLog = log
-        if (currentLog == null) {
-            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to apply dns rules")
-            return
-        }
-        io {
-            DomainRulesManager.changeStatus(
-                currentLog.queryStr,
-                Constants.UID_EVERYBODY,
-                currentLog.responseIps,
-                DomainRulesManager.DomainType.DOMAIN,
-                status
-            )
-            logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
-        }
-    }
-
     /**
      * Sets up the app-specific domain rule row. The row is shown only when the
      * DNS request originates from a real app (i.e. the uid resolves to an app in
@@ -451,27 +473,6 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
                 b.bsdlRuleRowApp.visibility = View.VISIBLE
             }
-        }
-    }
-
-    private fun applyAppDnsRule(status: DomainRulesManager.Status, uid: Int) {
-        val currentLog = log
-        if (currentLog == null) {
-            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to apply app dns rules")
-            return
-        }
-        io {
-            DomainRulesManager.changeStatus(
-                currentLog.queryStr,
-                uid,
-                currentLog.responseIps,
-                DomainRulesManager.DomainType.DOMAIN,
-                status
-            )
-            logEvent(
-                "DNS app domain rule change",
-                "${currentLog.queryStr} to ${status.name} for uid $uid"
-            )
         }
     }
 

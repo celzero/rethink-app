@@ -29,7 +29,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PingTestHistoryAdapter
@@ -133,9 +135,11 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.historyRecycler.addItemDecoration(historyDividerDecoration())
 
         lifecycleScope.launch {
-            RpnProxyManager.pingTestHistory.collect { entries ->
-                historyAdapter.submitList(entries)
-                b.historyCard.visibility = if (entries.isNotEmpty()) View.VISIBLE else View.GONE
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                RpnProxyManager.pingTestHistory.collect { entries ->
+                    historyAdapter.submitList(entries)
+                    b.historyCard.visibility = if (entries.isNotEmpty()) View.VISIBLE else View.GONE
+                }
             }
         }
     }
@@ -433,6 +437,11 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
             duration = 300
             start()
         }
+    }
+
+    override fun onDestroy() {
+        stopDolphinSwim()
+        super.onDestroy()
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

@@ -441,8 +441,10 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeAckFailureState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            InAppBillingHandler.ackFailureFlow.collect { info ->
-                updateAckFailureBanner(info)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                InAppBillingHandler.ackFailureFlow.collect { info ->
+                    updateAckFailureBanner(info)
+                }
             }
         }
     }
@@ -458,14 +460,16 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeSubscriptionState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            RpnProxyManager.collectSubscriptionState().collect { state ->
-                val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
-                val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
-                val subscriptionData = RpnProxyManager.getSubscriptionData()
-                val expiry = VpnController.getWinExpiryTs() ?: 0L
-                val hex = expiry.toString(16)
-                val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
-                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                RpnProxyManager.collectSubscriptionState().collect { state ->
+                    val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
+                    val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
+                    val subscriptionData = RpnProxyManager.getSubscriptionData()
+                    val expiry = VpnController.getWinExpiryTs() ?: 0L
+                    val hex = expiry.toString(16)
+                    val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+                    uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+                }
             }
         }
     }

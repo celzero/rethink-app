@@ -230,7 +230,7 @@
                         android:id="@+id/money_back_badge"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:layout_gravity="center|right"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginEnd="8dp" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>

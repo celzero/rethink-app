@@ -3049,6 +3049,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         topAppsHeaderRevertJob = null
         rulesPagerCallback?.let { b.fhsFirewallRulesPager.unregisterOnPageChangeCallback(it) }
         rulesPagerCallback = null
+        // RecyclerView unregisters its AdapterDataObserver only on adapter
+        // swap; the lazy rulesPagesAdapter outlives the view, so detach it
+        b.fhsFirewallRulesPager.adapter = null
+        b.fhsLogsPager.adapter = null
         super.onDestroyView()
     }
 

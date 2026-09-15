@@ -2018,9 +2018,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.activityFeedCard.isVisible = false
             return
         }
-        val appIcons = rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
-            runCatching { Utilities.getIcon(requireContext(), ct.packageName, ct.appName) }.getOrNull()
+        val iconEntries = rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
+            val icon = runCatching {
+                Utilities.getIcon(requireContext(), ct.packageName, ct.appName)
+            }.getOrNull() ?: return@mapNotNull null
+            ct.packageName to icon
         }
+        val appIcons = iconEntries.map { it.second }
+        val appIconKeys = iconEntries.map { it.first }
         val pages = mutableListOf(
             PulsePage(
                 type = PulsePageType.CONNECTIONS,
@@ -2045,7 +2050,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 value = appCount.toString(),
                 valueColorAttr = R.attr.primaryTextColor,
                 label = getString(R.string.server_selection_pulse_apps),
-                icons = appIcons
+                icons = appIcons,
+                iconKeys = appIconKeys
             )
         )
         pulsePagerAdapter.submit(pages)
@@ -2170,8 +2176,29 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val value: String,
         val valueColorAttr: Int,
         val label: String,
-        val icons: List<Drawable> = emptyList()
-    )
+        val icons: List<Drawable> = emptyList(),
+        // Stable identity for [icons] (e.g. package names). Drawables are
+        // rebuilt on every refresh, so equality uses these keys instead of
+        // Drawable references to avoid needless rebinds.
+        val iconKeys: List<String> = emptyList()
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is PulsePage) return false
+            return type == other.type && value == other.value &&
+                valueColorAttr == other.valueColorAttr && label == other.label &&
+                iconKeys == other.iconKeys
+        }
+
+        override fun hashCode(): Int {
+            var result = type.hashCode()
+            result = 31 * result + value.hashCode()
+            result = 31 * result + valueColorAttr
+            result = 31 * result + label.hashCode()
+            result = 31 * result + iconKeys.hashCode()
+            return result
+        }
+    }
 
     private inner class PulsePagerAdapter : RecyclerView.Adapter<PulsePagerAdapter.Holder>() {
 
@@ -2385,11 +2412,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val allOn = totalCount > 0 && relayOnCount == totalCount
         if (allOn) {
             val onColor = resolveAttrColor(R.attr.chipTextPositive)
-            // mutate() first: all tiles share the bg_qs_tile ConstantState, so
-            // tinting without mutation would recolour the other tiles as well.
-            b.qsRelayTile.background = b.qsRelayTile.background.mutate()
-            b.qsRelayTile.backgroundTintList =
-                ColorStateList.valueOf(resolveAttrColor(R.attr.chipBgColorPositive))
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
             // full-strength icon so the accent tint reads clearly in the on state
             b.qsRelayIcon.alpha = 1f
@@ -2397,11 +2419,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.qsRelayState.setTextColor(onColor)
         } else {
             val offColor = resolveAttrColor(R.attr.primaryLightColorText)
-            // Off state: clear the tint so the drawable's own @color/qs_tile_off_bg
-            // fill shows through. Stacking another translucent tint here erases the
-            // circle: background tint defaults to SRC_IN, so a ~12%-alpha tint over
-            // the drawable's ~12%-alpha fill multiplies down to near-invisible (~1%).
-            b.qsRelayTile.backgroundTintList = null
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
             // match the resting alpha of the other quick-setting tile icons
             b.qsRelayIcon.alpha = 0.5f
@@ -3955,16 +3972,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.shimmerSubscriptionBanner.startShimmer()
         b.subscriptionBanner.visibility = View.GONE
 
-        lifecycleScope.launch {
-            subscriptionStatusDao.observeCurrentSubscription().collectLatest { sub ->
-                if (!isAdded) return@collectLatest
-                uiCtx {
-                    b.shimmerSubscriptionBanner.stopShimmer()
-                    b.shimmerSubscriptionBanner.visibility = View.GONE
-                    // Subscription details belong to the account surface, not the
-                    // compact RPN connection header.
-                    b.subscriptionBanner.visibility = View.GONE
-                    maybeShowResubscribePrompt(sub)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                subscriptionStatusDao.observeCurrentSubscription().collectLatest { sub ->
+                    if (!isAdded) return@collectLatest
+                    uiCtx {
+                        b.shimmerSubscriptionBanner.stopShimmer()
+                        b.shimmerSubscriptionBanner.visibility = View.GONE
+                        // Subscription details belong to the account surface, not the
+                        // compact RPN connection header.
+                        b.subscriptionBanner.visibility = View.GONE
+                        maybeShowResubscribePrompt(sub)
+                    }
                 }
             }
         }
@@ -4145,46 +4164,48 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun observeServerRemovedEvents() {
-        lifecycleScope.launch {
-            RpnProxyManager.serverRemovedEvent.collect { removedConfigs ->
-                if (!isAdded || requireActivity().isFinishing) return@collect
-                Logger.w(
-                    LOG_TAG_UI,
-                    "$TAG.observeServerRemovedEvents: ${removedConfigs.size} server(s) removed from tunnel list"
-                )
-                // Fetch the refreshed list (already synced to DB+cache by updateWinProxy)
-                val refreshedServers = try {
-                    withContext(Dispatchers.IO) { RpnProxyManager.getWinServers() }
-                } catch (e: Exception) {
-                    Logger.w(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: could not fetch updated servers: ${e.message}")
-                    emptyList()
-                }
-                val selectedList = try {
-                    withContext(Dispatchers.IO) { RpnProxyManager.getEnabledConfigs() }
-                } catch (e: Exception) {
-                    Logger.w(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: could not fetch selectedList: ${e.message}")
-                    emptySet()
-                }
-
-                uiCtx {
-                    if (!isAdded || requireActivity().isFinishing) return@uiCtx
-                    // Guard: don't stack duplicate sheets
-                    if (parentFragmentManager.findFragmentByTag("ServerRemovalNotification") != null) {
-                        Logger.d(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: sheet already showing, skipping")
-                        // Still refresh the list even if the sheet is already up
-                        if (refreshedServers.isNotEmpty()) initServers(refreshedServers, selectedList)
-                        return@uiCtx
-                    }
-                    try {
-                        showServerRemovalNotifBottomSheet(
-                            removedServers   = removedConfigs,
-                            refreshedServers = refreshedServers,
-                            selectedList     = selectedList
-                        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                RpnProxyManager.serverRemovedEvent.collect { removedConfigs ->
+                    if (!isAdded || requireActivity().isFinishing) return@collect
+                    Logger.w(
+                        LOG_TAG_UI,
+                        "$TAG.observeServerRemovedEvents: ${removedConfigs.size} server(s) removed from tunnel list"
+                    )
+                    // Fetch the refreshed list (already synced to DB+cache by updateWinProxy)
+                    val refreshedServers = try {
+                        withContext(Dispatchers.IO) { RpnProxyManager.getWinServers() }
                     } catch (e: Exception) {
-                        Logger.e(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: error showing sheet: ${e.message}", e)
-                        // Fall back: just refresh the list so removed servers are gone from UI
-                        if (refreshedServers.isNotEmpty()) initServers(refreshedServers, selectedList)
+                        Logger.w(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: could not fetch updated servers: ${e.message}")
+                        emptyList()
+                    }
+                    val selectedList = try {
+                        withContext(Dispatchers.IO) { RpnProxyManager.getEnabledConfigs() }
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: could not fetch selectedList: ${e.message}")
+                        emptySet()
+                    }
+
+                    uiCtx {
+                        if (!isAdded || requireActivity().isFinishing) return@uiCtx
+                        // Guard: don't stack duplicate sheets
+                        if (parentFragmentManager.findFragmentByTag("ServerRemovalNotification") != null) {
+                            Logger.d(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: sheet already showing, skipping")
+                            // Still refresh the list even if the sheet is already up
+                            if (refreshedServers.isNotEmpty()) initServers(refreshedServers, selectedList)
+                            return@uiCtx
+                        }
+                        try {
+                            showServerRemovalNotifBottomSheet(
+                                removedServers   = removedConfigs,
+                                refreshedServers = refreshedServers,
+                                selectedList     = selectedList
+                            )
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_UI, "$TAG.observeServerRemovedEvents: error showing sheet: ${e.message}", e)
+                            // Fall back: just refresh the list so removed servers are gone from UI
+                            if (refreshedServers.isNotEmpty()) initServers(refreshedServers, selectedList)
+                        }
                     }
                 }
             }

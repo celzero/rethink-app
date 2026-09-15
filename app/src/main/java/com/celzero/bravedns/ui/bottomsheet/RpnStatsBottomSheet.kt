@@ -80,10 +80,13 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         const val TAG = "RpnStatsBtmSheet"
 
         private const val TIME_WINDOW_MS = 24L * 60 * 60 * 1000
+        private const val TIME_WINDOW_MS_ARG = "timeWindowMs"
         private const val TOP_APPS_LIMIT = 10
 
         fun newInstance(timeWindowMs: Long = TIME_WINDOW_MS): RpnStatsBottomSheet =
-            RpnStatsBottomSheet().apply { this.timeWindowMs = timeWindowMs }
+            RpnStatsBottomSheet().apply {
+                arguments = Bundle().apply { putLong(TIME_WINDOW_MS_ARG, timeWindowMs) }
+            }
     }
 
     private fun isDarkThemeOn(): Boolean =
@@ -96,6 +99,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCancelable = true
+        timeWindowMs = arguments?.getLong(TIME_WINDOW_MS_ARG, TIME_WINDOW_MS) ?: TIME_WINDOW_MS
     }
 
     override fun onCreateView(

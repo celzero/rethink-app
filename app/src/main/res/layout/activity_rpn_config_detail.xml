@@ -396,43 +396,6 @@
                             </FrameLayout>
                         </LinearLayout>
 
-                        <View
-                            android:id="@+id/divider_errors"
-                            android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
-                            android:alpha="0.08"
-                            android:background="?attr/divider"
-                            android:visibility="gone" />
-
-                        <LinearLayout
-                            android:id="@+id/row_errors"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp"
-                            android:visibility="gone">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/label_errors"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/lbl_errors"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="13sp" />
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/value_errors"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="?attr/chipTextNegative"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                tools:text="Rx: 3  Tx: 0" />
-                        </LinearLayout>
-
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

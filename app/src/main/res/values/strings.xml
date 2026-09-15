@@ -2619,7 +2619,7 @@
     <string name="ping_no_proxy_title" translatable="false">No Active Proxy</string>
     <string name="ping_status_failed" translatable="false">Failed</string>
     <string name="ping_test_again" translatable="false">Run Again</string>
-    <string name="ping_reach_hint" translatable="false">Auto (default probes) — or domains/IPs, comma-separated</string>
+    <string name="ping_reach_hint" translatable="false">Auto (default probes) or domains/IPs, comma-separated</string>
     <string name="ping_vpn_inactive_note" translatable="false">RPN is not active. Custom domain checks are unavailable; Run Test uses default probes.</string>
     <string name="ping_reach_reachable" translatable="false">Reachable</string>
     <string name="ping_reach_rpn_disabled" translatable="false">Enable RPN to run this test.</string>
