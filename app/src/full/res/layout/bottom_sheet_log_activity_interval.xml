@@ -86,47 +86,10 @@
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/bs_lai_blocked_card"
+                android:id="@+id/bs_lai_allowed_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?attr/border"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/bs_lai_blocked_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="?attr/accentBad"
-                        android:textSize="@dimen/heading_font_text_view"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.7"
-                        android:text="@string/lbl_blocked"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_subheading_text" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -154,6 +117,43 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.7"
                         android:text="@string/lbl_allowed"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/small_font_subheading_text" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/bs_lai_blocked_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/accentBad"
+                        android:textSize="@dimen/heading_font_text_view"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.7"
+                        android:text="@string/lbl_blocked"
                         android:textAllCaps="true"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/small_font_subheading_text" />

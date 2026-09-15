@@ -33,11 +33,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.adapter.AppActivityAdapter
 import com.celzero.bravedns.ui.adapter.AppActivityEntry
 import com.celzero.bravedns.ui.adapter.AppActivitySummary
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.convertLongToTime
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -127,11 +125,6 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         return b.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -160,7 +153,10 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         b.bsLaiRangeCard.isVisible = false
         b.bsLaiCountsRow.isVisible = false
 
-        adapter = AppActivityAdapter { summary ->
+        adapter = AppActivityAdapter(
+            persistentState.fetchFavIcon,
+            showBlockedCount = false
+        ) { summary ->
             viewLifecycleOwner.lifecycleScope.launch { onAppExpandRequested(summary) }
         }
         b.bsLaiRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -219,7 +215,7 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         val w = currentWindow
         val entries = withContext(Dispatchers.IO) {
             try {
-                connectionTrackerRepository.getRpnConnectionsInWindowForUid(
+                connectionTrackerRepository.getRpnDomainActivityForUid(
                     RPN_PROXY_FILTER,
                     w.startMs,
                     w.endMs,
@@ -227,12 +223,13 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
                     AppActivityAdapter.MAX_CHILD_ROWS
                 ).map {
                     AppActivityEntry(
-                        label(it.dnsQuery, it.ipAddress),
-                        convertLongToTime(it.timeStamp, TIME_FORMAT_1),
-                        it.isBlocked,
-                        it.timeStamp
+                        it.label,
+                        it.total - it.blocked,
+                        it.blocked,
+                        it.lastSeen,
+                        it.flag
                     )
-                }.sortedByDescending { it.timestampMs }
+                }.sortedByDescending { it.allowed + it.blocked }
                     .take(AppActivityAdapter.MAX_CHILD_ROWS)
             } catch (e: Exception) {
                 emptyList()
@@ -242,10 +239,6 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         if (_binding != null && isAdded) {
             adapter.setChildren(summary.uid, entries)
         }
-    }
-
-    private fun label(primary: String?, fallback: String): String {
-        return primary?.takeIf { it.isNotBlank() } ?: fallback
     }
 
     private fun render(window: LogActivityWindow, d: SheetData) {

@@ -110,6 +110,8 @@ class ConnectionMonitorTest {
         every { cm.registerNetworkCallback(any<NetworkRequest>(), any<ConnectivityManager.NetworkCallback>()) } just Runs
         every { cm.unregisterNetworkCallback(any<ConnectivityManager.NetworkCallback>()) } just Runs
 
+        // A failed @Before skips @After, so Koin from a previous test may still be running.
+        stopKoin()
         startKoin {
             modules(
                 module {
@@ -123,7 +125,9 @@ class ConnectionMonitorTest {
 
     @After
     fun tearDown() {
-        scope.cancel()
+        if (::scope.isInitialized) {
+            scope.cancel()
+        }
         stopKoin()
         unmockkAll()
         kotlinx.coroutines.Dispatchers.resetMain()

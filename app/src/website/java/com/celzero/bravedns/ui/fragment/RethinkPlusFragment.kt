@@ -23,6 +23,7 @@ import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.animation.AnticipateOvershootInterpolator
 import android.widget.Toast
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -131,9 +132,11 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Logger.d(Logger.LOG_IAB, "$TAG: onDestroyView called")
         stopHeaderAnimations()
         cancelProcessingTimeout()
         dismissProcessingBottomSheet()
+        InAppBillingHandler.unregisterListener(this)
         adapter = null
     }
 
@@ -476,7 +479,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.scrollView.isVisible = true
         b.ctaContainer.isVisible = true
 
-        b.ctaContainer.post { syncScrollBottomPaddingWithCta() }
+        b.ctaContainer.doOnNextLayout { syncScrollBottomPaddingWithCta() }
 
         Logger.i(LOG_TAG_UI, "$TAG: Ready: ${products.size} products, resubscribe=$isResubscribe")
 

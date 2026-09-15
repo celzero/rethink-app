@@ -47,7 +47,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -111,11 +110,6 @@ class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmS
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

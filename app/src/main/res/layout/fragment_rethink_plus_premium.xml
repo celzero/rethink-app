@@ -49,7 +49,6 @@
                 android:layout_marginEnd="16dp"
                 android:visibility="gone"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="?attr/background"
                 tools:visibility="visible">
@@ -81,7 +80,7 @@
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/symbol_rocket"
+                                    android:text="@string/symbol_infinity"
                                     android:textSize="@dimen/default_font_text_view"
                                     android:textColor="?attr/colorOnSurface"
                                     android:alpha="0.75"/>
@@ -229,10 +228,9 @@
 
                     <com.celzero.bravedns.ui.custom.MoneyBackBadgeView
                         android:id="@+id/money_back_badge"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
-                        android:layout_gravity="top|end"
-                        android:layout_marginTop="8dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginEnd="8dp" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -302,7 +300,6 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="40dp"
                 app:cardCornerRadius="26dp"
-                app:cardElevation="1dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="?attr/colorSurfaceVariant">
 

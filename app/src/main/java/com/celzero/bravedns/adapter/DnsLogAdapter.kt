@@ -350,7 +350,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
         private fun getRethinkUnicode(log: DnsLog): String {
             // resolver check for rethink dns is done before calling this method
-            if (log.relayIP.endsWith(Backend.RPN) || log.relayIP == Backend.Auto) return context.getString(
+            if (log.relayIP.startsWith(Backend.RpnWin) || log.relayIP == Backend.Auto) return context.getString(
                 R.string.symbol_sparkle
             )
 

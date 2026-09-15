@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/fhs_logs_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/fhs_logs_allowed_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_card_allowed_logs_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/rethink_sub_header_text"
+                tools:text="62K" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_card_allowed_logs_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:letterSpacing="0.15"
+                android:text="@string/lbl_allowed"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fhs_logs_blocked_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_card_blocked_logs_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/rethink_header_text"
+                tools:text="65K" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_card_blocked_logs_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:letterSpacing="0.15"
+                android:text="@string/lbl_blocked"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/fhs_logs_toggle_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chipSpacingHorizontal="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/fhs_logs_allowed_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:checkable="true"
+            android:checked="true"
+            android:text="@string/lbl_allowed"
+            android:textColor="@color/chip_toggle_text"
+            android:textSize="@dimen/small_font_text_view"
+            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+            app:chipEndPadding="4dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="4dp"
+            app:chipStrokeColor="@color/chip_toggle_stroke"
+            app:chipStrokeWidth="1dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/fhs_logs_blocked_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:checkable="true"
+            android:text="@string/lbl_blocked"
+            android:textColor="@color/chip_toggle_text"
+            android:textSize="@dimen/small_font_text_view"
+            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+            app:chipEndPadding="4dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="4dp"
+            app:chipStrokeColor="@color/chip_toggle_stroke"
+            app:chipStrokeWidth="1dp" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <LinearLayout
+        android:id="@+id/fhs_logs_hour_axis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="8"
+        app:layout_constraintTop_toBottomOf="@id/fhs_logs_header"
+        tools:ignore="HardcodedText">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="start"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="24hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="18hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="12hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="6hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="end"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="now"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+    </LinearLayout>
+
+    <GridLayout
+        android:id="@+id/fhs_logs_grid"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        android:columnCount="24"
+        android:rowCount="6"
+        app:layout_constraintBottom_toTopOf="@id/fhs_card_logs_duration"
+        app:layout_constraintTop_toBottomOf="@id/fhs_logs_hour_axis"
+        app:layout_constraintVertical_bias="0" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fhs_card_logs_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:letterSpacing="0.08"
+        android:text="@string/logs_card_heatmap_window"
+        android:textAllCaps="true"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/small_font_text_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="last 24 hours" />
+
+    <LinearLayout
+        android:id="@+id/fhs_logs_legend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/fhs_card_logs_duration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/fhs_card_logs_duration">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:text="less"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view" />
+
+        <View
+            android:id="@+id/fhs_logs_swatch_0"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_heatmap_swatch" />
+
+        <View
+            android:id="@+id/fhs_logs_swatch_1"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/bg_heatmap_swatch" />
+
+        <View
+            android:id="@+id/fhs_logs_swatch_2"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/bg_heatmap_swatch" />
+
+        <View
+            android:id="@+id/fhs_logs_swatch_3"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/bg_heatmap_swatch" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:alpha="0.8"
+            android:text="more"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

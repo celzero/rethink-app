@@ -71,7 +71,7 @@
                 android:id="@+id/fhs_card_dns_ll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="24dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/fhs_protection_bar"
@@ -88,27 +88,28 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
                         android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_connected_dns"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ellipsize="marquee"
                             android:fontFamily="sans-serif-medium"
                             android:maxLines="1"
                             tools:text="DNS · Connected"
-                            android:textColor="?attr/primaryLightColorText"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_latency"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:alpha="0.5"
                             android:maxLines="1"
                             android:ellipsize="marquee"
                             tools:text="BLR(– ms)"
@@ -126,7 +127,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:layout_marginEnd="2dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="24dp"
                 app:layout_constraintBottom_toBottomOf="@id/fhs_card_dns_ll"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -154,7 +155,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:alpha="0.8"
                         tools:text="B/S"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/mini_font_text_view" />
@@ -182,123 +182,68 @@
 
                     <LinearLayout
                         android:id="@+id/fhs_firewall_badges_row"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/fhs_card_firewall_univ_card"
-                            android:layout_width="68dp"
-                            android:layout_height="80dp"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainer"
-                            app:cardCornerRadius="12dp">
+                            android:id="@+id/fhs_card_firewall_rules_card"
+                            android:layout_width="match_parent"
+                            android:layout_height="84dp"
+                            app:cardBackgroundColor="?attr/cardBackgroundColor"
+                            app:cardCornerRadius="18dp"
+                            app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:paddingStart="14dp"
+                                android:paddingTop="10dp"
+                                android:paddingEnd="14dp"
+                                android:paddingBottom="8dp">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/fhs_card_firewall_univ_rules_count"
-                                    android:layout_width="wrap_content"
+                                <androidx.viewpager2.widget.ViewPager2
+                                    android:id="@+id/fhs_firewall_rules_pager"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:contentDescription="@string/hsf_rules_pager_desc" />
+
+                                <LinearLayout
+                                    android:id="@+id/fhs_firewall_pager_dots"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="monospace"
-                                    android:maxLines="1"
-                                    tools:text="0"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="@dimen/extra_large_font_text_view"
-                                    android:textStyle="bold" />
+                                    android:layout_marginTop="6dp"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="horizontal">
 
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    android:letterSpacing="0.08"
-                                    android:text="UNIV"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="@dimen/extra_small_font_text_view" />
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
+                                    <View
+                                        android:id="@+id/fhs_rules_dot_0"
+                                        android:layout_width="6dp"
+                                        android:layout_height="6dp"
+                                        android:alpha="0.35"
+                                        android:background="@drawable/ic_circle"
+                                        android:backgroundTint="?attr/primaryLightColorText" />
 
-                        <Space
-                            android:layout_width="6dp"
-                            android:layout_height="1dp" />
+                                    <View
+                                        android:id="@+id/fhs_rules_dot_1"
+                                        android:layout_width="6dp"
+                                        android:layout_height="6dp"
+                                        android:layout_marginStart="6dp"
+                                        android:alpha="0.35"
+                                        android:background="@drawable/ic_circle"
+                                        android:backgroundTint="?attr/primaryLightColorText" />
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/fhs_card_firewall_ip_card"
-                            android:layout_width="68dp"
-                            android:layout_height="80dp"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainer"
-                            app:cardCornerRadius="12dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/fhs_card_ip_rules_count"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="monospace"
-                                    android:maxLines="1"
-                                    tools:text="0"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="@dimen/extra_large_font_text_view"
-                                    android:textStyle="bold" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    android:letterSpacing="0.08"
-                                    android:text="@string/lbl_ip"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="@dimen/extra_small_font_text_view" />
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <Space
-                            android:layout_width="6dp"
-                            android:layout_height="1dp" />
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/fhs_card_firewall_dom_card"
-                            android:layout_width="68dp"
-                            android:layout_height="80dp"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainer"
-                            app:cardCornerRadius="12dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/fhs_card_domain_rules_count"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="monospace"
-                                    android:maxLines="1"
-                                    tools:text="0"
-                                    android:textColor="?attr/primaryTextColor"
-                                    android:textSize="@dimen/extra_large_font_text_view"
-                                    android:textStyle="bold" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    android:letterSpacing="0.08"
-                                    android:text="DOM"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/primaryLightColorText"
-                                    android:textSize="@dimen/extra_small_font_text_view" />
+                                    <View
+                                        android:id="@+id/fhs_rules_dot_2"
+                                        android:layout_width="6dp"
+                                        android:layout_height="6dp"
+                                        android:layout_marginStart="6dp"
+                                        android:alpha="0.35"
+                                        android:background="@drawable/ic_circle"
+                                        android:backgroundTint="?attr/primaryLightColorText" />
+                                </LinearLayout>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -309,7 +254,7 @@
                     android:id="@+id/fhs_card_proxy_ll"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardBackgroundColor="?attr/cardBackgroundColor"
                     app:cardCornerRadius="18dp"
                     android:layout_marginEnd="2dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -430,7 +375,7 @@
                                         android:text="@string/lbl_active"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMaxTextSize="8sp"
                                         app:autoSizeMinTextSize="6sp"
                                         app:autoSizeStepGranularity="1sp"
                                         app:autoSizeTextType="uniform" />
@@ -479,7 +424,7 @@
                                         android:text="@string/lbl_idle"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMaxTextSize="8sp"
                                         app:autoSizeMinTextSize="6sp"
                                         app:autoSizeStepGranularity="1sp"
                                         app:autoSizeTextType="uniform" />
@@ -528,7 +473,7 @@
                                         android:text="@string/status_failing"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMaxTextSize="8sp"
                                         app:autoSizeMinTextSize="6sp"
                                         app:autoSizeStepGranularity="1sp"
                                         app:autoSizeTextType="uniform" />
@@ -579,7 +524,7 @@
                                         android:text="@string/lbl_stopped"
                                         android:textAllCaps="true"
                                         android:textColor="?attr/primaryLightColorText"
-                                        app:autoSizeMaxTextSize="10sp"
+                                        app:autoSizeMaxTextSize="8sp"
                                         app:autoSizeMinTextSize="6sp"
                                         app:autoSizeStepGranularity="1sp"
                                         app:autoSizeTextType="uniform" />
@@ -597,215 +542,106 @@
                 android:id="@+id/fhs_card_logs_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="18dp"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
                 app:layout_constraintTop_toBottomOf="@id/fhs_firewall_proxy_row">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="20dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <LinearLayout
-                        android:id="@+id/fhs_logs_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="bottom"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <LinearLayout
-                            android:id="@+id/fhs_logs_allowed_header"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_allowed_logs_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                tools:text="62K"
-                                android:textColor="?attr/primaryTextColor"
-                                android:textSize="@dimen/rethink_sub_header_text" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_allowed_logs_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:alpha="0.8"
-                                android:letterSpacing="0.15"
-                                android:text="@string/lbl_allowed"
-                                android:textAllCaps="true"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/small_font_text_view" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/fhs_logs_blocked_header"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="24dp"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_blocked_logs_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="monospace"
-                                tools:text="65K"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/rethink_header_text" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/fhs_card_blocked_logs_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:alpha="0.8"
-                                android:letterSpacing="0.15"
-                                android:text="@string/lbl_blocked"
-                                android:textAllCaps="true"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/small_font_text_view" />
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/fhs_logs_toggle_group"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipSpacingHorizontal="4dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:selectionRequired="true"
-                        app:singleSelection="true">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/fhs_logs_allowed_chip"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:checkable="true"
-                            android:checked="true"
-                            android:text="@string/lbl_allowed"
-                            android:textColor="@color/chip_toggle_text"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
-                            app:chipEndPadding="4dp"
-                            app:chipMinHeight="24dp"
-                            app:chipStartPadding="4dp"
-                            app:chipStrokeColor="@color/chip_toggle_stroke"
-                            app:chipStrokeWidth="1dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/fhs_logs_blocked_chip"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:checkable="true"
-                            android:text="@string/lbl_blocked"
-                            android:textColor="@color/chip_toggle_text"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
-                            app:chipEndPadding="4dp"
-                            app:chipMinHeight="24dp"
-                            app:chipStartPadding="4dp"
-                            app:chipStrokeColor="@color/chip_toggle_stroke"
-                            app:chipStrokeWidth="1dp" />
-                    </com.google.android.material.chip.ChipGroup>
-
-                    <GridLayout
-                        android:id="@+id/fhs_logs_grid"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="20dp"
-                        android:columnCount="24"
-                        android:rowCount="6"
-                        app:layout_constraintTop_toBottomOf="@id/fhs_logs_header" />
+                        android:layout_height="wrap_content">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_card_logs_duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:alpha="0.8"
-                        android:letterSpacing="0.08"
-                        tools:text="last 24 hours"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_text_view"
-                        android:text="@string/logs_card_heatmap_window"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/fhs_logs_grid" />
+                        <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/fhs_logs_pager"
+                            android:layout_width="match_parent"
+                            android:layout_height="190dp"
+                            android:contentDescription="@string/logs_card_pager_desc" />
+
+                        <LinearLayout
+                            android:id="@+id/fhs_logs_dots"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:layout_marginBottom="2dp"
+                            android:translationZ="-1dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:id="@+id/fhs_logs_dot_0"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:alpha="0.35"
+                                android:background="@drawable/ic_circle"
+                                android:backgroundTint="?attr/primaryLightColorText" />
+
+                            <View
+                                android:id="@+id/fhs_logs_dot_1"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_marginStart="6dp"
+                                android:alpha="0.35"
+                                android:background="@drawable/ic_circle"
+                                android:backgroundTint="?attr/primaryLightColorText" />
+                        </LinearLayout>
+                    </FrameLayout>
 
                     <LinearLayout
-                        android:id="@+id/fhs_logs_legend"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/fhs_logs_disabled_row"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        app:layout_constraintBottom_toBottomOf="@id/fhs_card_logs_duration"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/fhs_card_logs_duration">
+                        android:visibility="gone">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/fhs_logs_disabled_txt"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:alpha="0.8"
-                            android:text="less"
+                            android:ellipsize="end"
+                            android:maxLines="2"
                             android:textColor="?attr/primaryLightColorText"
-                            android:textSize="@dimen/small_font_text_view" />
+                            android:textSize="@dimen/small_font_text_view"
+                            tools:text="Enable logs to see your recent activity" />
 
-                        <View
-                            android:id="@+id/fhs_logs_swatch_0"
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="4dp"
-                            android:background="@drawable/bg_heatmap_swatch" />
-
-                        <View
-                            android:id="@+id/fhs_logs_swatch_1"
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/bg_heatmap_swatch" />
-
-                        <View
-                            android:id="@+id/fhs_logs_swatch_2"
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/bg_heatmap_swatch" />
-
-                        <View
-                            android:id="@+id/fhs_logs_swatch_3"
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginStart="2dp"
-                            android:background="@drawable/bg_heatmap_swatch" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/fhs_logs_enable_chip"
+                            style="@style/ThinnerChip.Action"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:alpha="0.8"
-                            android:text="more"
-                            android:textColor="?attr/primaryLightColorText"
-                            android:textSize="@dimen/small_font_text_view" />
+                            android:layout_height="32dp"
+                            android:layout_marginStart="8dp"
+                            android:checkable="false"
+                            android:text="@string/lbl_enable"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/small_font_text_view"
+                            android:visibility="gone"
+                            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+                            app:chipEndPadding="4dp"
+                            app:chipMinHeight="24dp"
+                            app:chipStartPadding="4dp"
+                            app:chipStrokeColor="@color/chip_toggle_stroke"
+                            app:chipStrokeWidth="1dp"
+                            tools:visibility="visible" />
                     </LinearLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/fhs_card_apps_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardBackgroundColor="?attr/cardBackgroundColor"
                 app:cardCornerRadius="18dp"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
@@ -960,7 +796,7 @@
             android:layout_height="56dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardBackgroundColor="?attr/cardBackgroundColor"
             app:cardCornerRadius="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -1019,7 +855,7 @@
             android:layout_height="56dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardBackgroundColor="?attr/cardBackgroundColor"
             app:cardCornerRadius="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

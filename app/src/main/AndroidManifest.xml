@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="68"
+    android:versionCode="69"
     android:versionName="v057"> <!-- 69 for v057 -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

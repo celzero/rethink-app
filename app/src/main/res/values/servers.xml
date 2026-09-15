@@ -30,20 +30,18 @@
     <string name="ips12" translatable="false">1.0.0.1,2606:4700:4700::1001</string>
     <string name="url13" translatable="false">tls://dns.adguard-dns.com</string>
     <string name="ips13" translatable="false">94.140.14.14,94.140.15.15,2a10:50c0::ad1:ff,2a10:50c0::ad2:ff</string>
-    <string name="url14" translatable="false">tls://adblock.dns.mullvad.net</string>
-    <string name="ips14" translatable="false">194.242.2.3,2a07:e340::3</string>
-    <string name="url15" translatable="false">tls://extended.dns.mullvad.net</string>
-    <string name="ips15" translatable="false">194.242.2.5,2a07:e340::5</string>
-    <string name="url16" translatable="false">tls://p0.freedns.controld.com</string>
-    <string name="ips16" translatable="false">76.76.2.0,76.76.10.0,2606:1a40::,2606:1a40:1::</string>
-    <string name="url17" translatable="false">tls://p2.freedns.controld.com</string>
-    <string name="ips17" translatable="false">76.76.2.2,76.76.10.2,2606:1a40::2,2606:1a40:1::2</string>
-    <string name="url18" translatable="false">tls://family.freedns.controld.com</string>
-    <string name="ips18" translatable="false">76.76.2.4,76.76.10.4,2606:1a40::4,2606:1a40:1::4</string>
-    <string name="url19" translatable="false">tls://p1.freedns.controld.com</string>
-    <string name="ips19" translatable="false">76.76.2.1,76.76.10.1,2606:1a40::1,2606:1a40:1::1</string>
-    <string name="url20" translatable="false">https://dl.rethinkdns.com</string>
-    <string name="ips20" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::681a:e1e,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e</string>
-    <string name="url21" translatable="false">https://svc.rethinkdns.com</string>
-    <string name="ips21" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e,2606:4700:20::681a:e1e</string>
+    <string name="url14" translatable="false">tls://p0.freedns.controld.com</string>
+    <string name="ips14" translatable="false">76.76.2.11,2606:1a40::11</string>
+    <string name="url15" translatable="false">tls://p2.freedns.controld.com</string>
+    <string name="ips15" translatable="false">76.76.2.11,2606:1a40::11</string>
+    <string name="url16" translatable="false">tls://p3.freedns.controld.com</string>
+    <string name="ips16" translatable="false">76.76.2.11,2606:1a40::11</string>
+    <string name="url17" translatable="false">tls://p1.freedns.controld.com</string>
+    <string name="ips17" translatable="false">76.76.2.11,2606:1a40::11</string>
+    <string name="url18" translatable="false">https://dl.rethinkdns.com</string>
+    <string name="ips18" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::681a:e1e,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e</string>
+    <string name="url19" translatable="false">https://svc.rethinkdns.com</string>
+    <string name="ips19" translatable="false">172.67.70.254,104.26.14.30,104.26.15.30,2606:4700:20::ac43:46fe,2606:4700:20::681a:f1e,2606:4700:20::681a:e1e</string>
+    <string name="url20" translatable="false">https://freedns.controld.com/p1</string>
+    <string name="ips20" translatable="false">76.76.2.11,2606:1a40::11</string>
 </resources>

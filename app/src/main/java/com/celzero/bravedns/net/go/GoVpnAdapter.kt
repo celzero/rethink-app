@@ -1590,17 +1590,28 @@ class GoVpnAdapter : KoinComponent {
         if (!RpnProxyManager.isRpnActive()) {
             return
         }
+        // Relay (hop) traffic enters via AUTO, so a relayed config's pause/resume state
+        // is driven by AUTO's automation settings (mobile-only / SSID) rather than its
+        // own; the pause/resume actions below still target the relayed proxy itself.
+        val hasRelayedConfigs =
+            rpnConfigs.any { !it.key.contains(AUTO_SERVER_ID, ignoreCase = true) && it.hopEnabled }
+        val autoConfig =
+            if (hasRelayedConfigs) runCatching { RpnProxyManager.getAutoServer() }.getOrNull() else null
         rpnConfigs.forEach {
-            val key = if (it.key.contains(AUTO_SERVER_ID, ignoreCase = true)) {
+            val isAuto = it.key.contains(AUTO_SERVER_ID, ignoreCase = true)
+            val key = if (isAuto) {
                 ""
             } else {
                 it.key
             }
-            val isWireGuardMobileOnly = it.mobileOnly
+            val automationConfig = if (!isAuto && it.hopEnabled) autoConfig else it
+            // true when the pause/resume conditions below were inherited from AUTO
+            val automationViaAuto = !isAuto && it.hopEnabled
+            val isWireGuardMobileOnly = automationConfig?.mobileOnly == true
             val canResumeMobileWg = isWireGuardMobileOnly && isMobileActive
 
-            val useOnlyOnSsid = it.ssidBased
-            val configuredSsids = it.ssids
+            val useOnlyOnSsid = automationConfig?.ssidBased == true
+            val configuredSsids = automationConfig?.ssids.orEmpty()
             val ssidMatch = RpnProxyManager.matchesSsidList(configuredSsids, ssid) && ssid.isNotEmpty()
             val canResumeSsidWg = useOnlyOnSsid && ssidMatch
 
@@ -1629,7 +1640,7 @@ class GoVpnAdapter : KoinComponent {
                 logEvent(
                     Severity.LOW,
                     "rpn proxy paused",
-                    "rpn proxy with id $key paused, reason: mobile data"
+                    "rpn proxy with id $key paused, reason: mobile data${if (automationViaAuto) " (auto)" else ""}"
                 )
             } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
                 // when the ssidEnabled is set and the ssid does not match
@@ -1638,7 +1649,7 @@ class GoVpnAdapter : KoinComponent {
                 logEvent(
                     Severity.LOW,
                     "rpn proxy paused",
-                    "rpn proxy with id $key paused, reason: ssid mismatch"
+                    "rpn proxy with id $key paused, reason: ssid mismatch${if (automationViaAuto) " (auto)" else ""}"
                 )
             }
 
@@ -3573,6 +3584,10 @@ class GoVpnAdapter : KoinComponent {
         // the tunnel handles concurrent transport additions; fire them off without
         // awaiting completion. each job logs its own success/failure.
         dohList.forEach { doh ->
+            if (!tunnel.isConnected) {
+                Logger.e(LOG_TAG_VPN, "$TAG; smart-dns; no tunnel, skip set multi dns as plus")
+                return
+            }
             io {
                 try {
                     var url = doh.dohURL
@@ -3605,6 +3620,10 @@ class GoVpnAdapter : KoinComponent {
 
         // DoT endpoints
         dots.forEach { dot ->
+            if (!tunnel.isConnected) {
+                Logger.e(LOG_TAG_VPN, "$TAG; smart-dns; no tunnel, skip set multi dns as plus")
+                return
+            }
             io {
                 var url: String? = null
                 try {

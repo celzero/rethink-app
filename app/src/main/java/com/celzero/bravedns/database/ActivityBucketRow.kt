@@ -47,3 +47,57 @@ data class AppActivityRow(
     val total: Long,
     val blocked: Long
 )
+
+/**
+ * Per-app data usage within a time window, aggregated from the
+ * connection-tracker table and split by connection type and direction.
+ * Values are byte sums of the corresponding rows for that (uid, appName).
+ * [lastSeen] is the most recent timestamp of any row for that app in the
+ * window, letting callers order results by recency without a second query.
+ */
+data class AppUsageRow(
+    val uid: Int,
+    val appName: String,
+    val meteredUploadBytes: Long,
+    val meteredDownloadBytes: Long,
+    val unmeteredUploadBytes: Long,
+    val unmeteredDownloadBytes: Long,
+    val lastSeen: Long
+) {
+
+    fun meteredTotalBytes(): Long = meteredUploadBytes + meteredDownloadBytes
+
+    fun unmeteredTotalBytes(): Long = unmeteredUploadBytes + unmeteredDownloadBytes
+
+    fun totalBytes(): Long = meteredTotalBytes() + unmeteredTotalBytes()
+}
+
+/**
+ * Per-app count of blocked rows within a time window, aggregatable across
+ * the dns-log and connection-tracker tables. Rows from the two tables are
+ * distinct events (a blocked dns query vs a blocked connection); merging by
+ * (uid, appName) keeps one entry per app so an app present in both sources
+ * contributes a single summed entry instead of two. [lastSeen] is the most
+ * recent timestamp of any row for that app in the window.
+ */
+data class AppBlockedRow(
+    val uid: Int,
+    val appName: String,
+    val blocked: Long,
+    val lastSeen: Long
+)
+
+/**
+ * Per-domain activity counts within a time window for a single uid, grouped
+ * across the dns/connection log tables. [label] is the domain (dnsQuery),
+ * falling back to the IP address when no domain was resolved for the
+ * connection; [lastSeen] is the most recent timestamp for that label and
+ * [flag] is the region emoji recorded on that latest row.
+ */
+data class DomainActivityRow(
+    val label: String,
+    val total: Long,
+    val blocked: Long,
+    val lastSeen: Long,
+    val flag: String
+)

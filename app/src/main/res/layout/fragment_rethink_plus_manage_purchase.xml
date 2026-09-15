@@ -15,6 +15,7 @@
         android:visibility="visible">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/manage_purchase_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -63,7 +64,7 @@
                                     android:layout_width="5dp"
                                     android:layout_height="5dp"
                                     android:background="@drawable/ic_circle"
-                                    android:backgroundTint="?attr/accentGood" />
+                                    android:backgroundTint="?attr/chipTextPositive" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:id="@+id/tv_manage_status_text"
@@ -130,11 +131,8 @@
                             android:id="@+id/tv_hero_who"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
                             android:background="?attr/selectableItemBackground"
-                            android:paddingStart="2dp"
                             android:paddingTop="2dp"
-                            android:paddingEnd="2dp"
                             android:paddingBottom="2dp"
                             android:alpha="0.7"
                             android:ellipsize="end"
@@ -183,10 +181,10 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:background="@drawable/ic_circle"
-                                android:backgroundTint="?attr/colorSurfaceVariant"
+                                android:backgroundTint="?attr/chipBgColorPositive"
                                 android:padding="8dp"
                                 android:src="@drawable/ic_rethink_plus"
-                                android:tint="?attr/accentGood" />
+                                android:tint="?attr/chipTextPositive" />
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -239,10 +237,10 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:background="@drawable/ic_circle"
-                                android:backgroundTint="?attr/colorSurfaceVariant"
+                                android:backgroundTint="?attr/chipBgColorPositive"
                                 android:padding="8dp"
                                 android:src="@drawable/ic_rethink_plus"
-                                android:tint="?attr/accentGood" />
+                                android:tint="?attr/chipTextPositive" />
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -319,10 +317,10 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:background="@drawable/ic_circle"
-                                android:backgroundTint="?attr/colorSurfaceVariant"
+                                android:backgroundTint="?attr/chipBgColorPositive"
                                 android:padding="8dp"
                                 android:src="@drawable/ic_rethink_plus"
-                                android:tint="?attr/accentGood" />
+                                android:tint="?attr/chipTextPositive" />
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -379,10 +377,10 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:background="@drawable/ic_circle"
-                                android:backgroundTint="?attr/colorSurfaceVariant"
+                                android:backgroundTint="?attr/chipBgColorPositive"
                                 android:padding="8dp"
                                 android:src="@drawable/ic_cross"
-                                android:tint="?attr/accentGood" />
+                                android:tint="?attr/chipTextPositive" />
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -418,20 +416,6 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_end_note"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="24dp"
-                    android:lineSpacingMultiplier="1.5"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="11sp"
-                    android:visibility="gone"
-                    tools:text="Refund window closed Jul 29, 2026. Cancelling is the only option from here."
-                    tools:visibility="visible" />
-
-                <androidx.appcompat.widget.AppCompatTextView
                     style="@style/RethinkPlus.SectionLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -461,10 +445,10 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:background="@drawable/ic_circle"
-                            android:backgroundTint="?attr/colorSurfaceVariant"
+                            android:backgroundTint="?attr/chipBgColorPositive"
                             android:padding="8dp"
                             android:src="@drawable/ic_info_white"
-                            android:tint="?attr/accentGood" />
+                            android:tint="?attr/chipTextPositive" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -485,7 +469,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="@string/rpn_overhauled_report_billing_issue_desc"
+                                android:text="@string/rpn_report_desc"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="11.5sp" />
                         </LinearLayout>
@@ -498,14 +482,17 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
-                    android:id="@+id/dolphin_signature"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
+
+    <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
+        android:id="@+id/dolphin_signature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="48dp"
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/loading_overlay"
@@ -522,7 +509,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:cardCornerRadius="24dp"
-            app:cardElevation="16dp"
             app:strokeWidth="0dp">
 
             <LinearLayout
@@ -544,7 +530,7 @@
                         android:id="@+id/progress_spinner"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:indeterminateTint="?attr/accentGood" />
+                        android:indeterminateTint="?attr/chipTextPositive" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_loading_message"

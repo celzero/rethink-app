@@ -46,6 +46,12 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
+    private companion object {
+        // Minimum window width (in dp) at which the DNS card grid switches from
+        // 2 to 3 columns; unfolded foldables (~590dp) and tablets cross this.
+        const val GRID_WIDE_MIN_WIDTH_DP = 480
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
@@ -58,7 +64,18 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             window.isNavigationBarContrastEnforced = false
         }
 
+        setupGridColumns()
         setupClickListeners()
+    }
+
+    /**
+     * Adapts the DNS card grid to the available width: phones stay at 2 columns,
+     * while unfolded foldables and tablets (>= 480dp) get 3 columns so all six
+     * square cards keep a consistent, unstretched size on every screen.
+     */
+    private fun setupGridColumns() {
+        val widthDp = resources.configuration.screenWidthDp
+        b.gridLayoutDnsCards.columnCount = if (widthDp >= GRID_WIDE_MIN_WIDTH_DP) 3 else 2
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

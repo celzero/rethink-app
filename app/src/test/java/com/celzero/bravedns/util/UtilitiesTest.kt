@@ -28,8 +28,8 @@ class UtilitiesTest {
 
     @Test
     fun testIsMissingOrInvalidUid() {
-        assertTrue(Utilities.isMissingOrInvalidUid(-1))
-        assertTrue(Utilities.isMissingOrInvalidUid(-1000))
+        assertTrue(Utilities.isMissingOrInvalidUid(-1)) // Constants.INVALID_UID
+        assertTrue(Utilities.isMissingOrInvalidUid(-2000)) // Constants.MISSING_UID
         assertFalse(Utilities.isMissingOrInvalidUid(0))
         assertFalse(Utilities.isMissingOrInvalidUid(1000))
     }

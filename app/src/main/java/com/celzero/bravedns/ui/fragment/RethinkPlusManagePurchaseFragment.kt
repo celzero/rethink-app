@@ -98,9 +98,10 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         setDolphinSignature()
     }
 
-    /** Dolphin signature (at the end of the manage-purchase content.); random pairing, fresh on every visit. */
+    /** Dolphin signature: bottom overlay revealed at the end of the content scroll. */
     private fun setDolphinSignature() {
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+        b.dolphinSignature.revealAtScrollEndOf(b.managePurchaseScroll)
     }
 
     override fun onResume() {
@@ -137,7 +138,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val fmt = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
         val model = SubscriptionUiStateResolver.resolve(state, sub)
 
-        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
+        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.chipTextPositive)
         val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
         val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
 
@@ -303,7 +304,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         b.rowCancelPurchase.isVisible = false
         b.rowRequestRefund.isVisible = false
         b.dividerRefund.isVisible = false
-        b.tvEndNote.isVisible = false
 
         // dbRowCancelled covers the cold-start restoration case where the machine is
         // Active-in-memory but the persisted row is CANCELLED (and Play does not report
@@ -318,10 +318,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val canRevoke = canRevoke(subscriptionData)
         if (canRevoke) {
             b.rowRequestRefund.isVisible = true
-            b.tvEndNote.text = getString(R.string.revoke_subscription_note)
         } else if (!isInApp) {
             b.rowCancelPurchase.isVisible = true
-            b.tvEndNote.text = getString(R.string.cancel_subscription_note_future)
         }
 
         // Never render a dangling "Ending your plan" header or an empty card shell:
@@ -330,7 +328,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val hasEndingOption = b.rowRequestRefund.isVisible || b.rowCancelPurchase.isVisible
         b.tvEndingPlanHeader.isVisible = hasEndingOption
         b.cardEndingPlan.isVisible = hasEndingOption
-        b.tvEndNote.isVisible = hasEndingOption
 
         if (b.rowRequestRefund.isVisible && b.rowCancelPurchase.isVisible) {
             b.dividerRefund.isVisible = true
@@ -444,8 +441,10 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeAckFailureState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            InAppBillingHandler.ackFailureFlow.collect { info ->
-                updateAckFailureBanner(info)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                InAppBillingHandler.ackFailureFlow.collect { info ->
+                    updateAckFailureBanner(info)
+                }
             }
         }
     }
@@ -461,14 +460,16 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeSubscriptionState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            RpnProxyManager.collectSubscriptionState().collect { state ->
-                val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
-                val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
-                val subscriptionData = RpnProxyManager.getSubscriptionData()
-                val expiry = VpnController.getWinExpiryTs() ?: 0L
-                val hex = expiry.toString(16)
-                val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
-                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                RpnProxyManager.collectSubscriptionState().collect { state ->
+                    val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
+                    val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
+                    val subscriptionData = RpnProxyManager.getSubscriptionData()
+                    val expiry = VpnController.getWinExpiryTs() ?: 0L
+                    val hex = expiry.toString(16)
+                    val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+                    uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+                }
             }
         }
     }

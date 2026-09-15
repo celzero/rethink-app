@@ -1,358 +1,537 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dns_block_scroll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="60dp"
-        android:layout_height="3dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
-        android:background="?attr/border" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/dns_record_type_chip"
-            style="@style/ThinnerChip.Action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:layout_toStartOf="@id/dns_block_chip_group"
-            android:padding="5dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
-
-        <LinearLayout
-            android:id="@+id/dns_block_chip_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dns_block_blocklist_chip"
-                style="@style/ThinnerChip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
-                android:padding="5dp"
-                android:textColor="?attr/chipTextColor"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:chipSurfaceColor="@null" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dns_block_ips_chip"
-                style="@style/ThinnerChip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
-                android:padding="5dp"
-                android:textColor="?attr/chipTextColor"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone"
-                app:chipSurfaceColor="@null" />
-
-        </LinearLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="40dp">
-
-        <LinearLayout
-            android:id="@+id/dns_block_header_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="5dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/dns_block_fav_icon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@android:color/transparent"
-                android:visibility="gone" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dns_block_url"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/heading_font_text_view" />
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/dns_blocked_target"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:layout_below="@id/dns_block_header_container"
-            android:layout_centerHorizontal="true"
-            android:foregroundGravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <RelativeLayout
-            android:id="@+id/dns_app_name_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_marginBottom="10dp"
-            android:layout_below="@id/dns_blocked_target"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/dns_app_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:alpha="0.7"
-                android:layout_marginEnd="10dp"
-                android:contentDescription="@string/apps_icon_content_desc"
-                android:src="@drawable/default_app_icon" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dns_app_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp"
-                android:layout_toEndOf="@id/dns_app_icon"
-                android:gravity="center"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/large_font_text_view" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/dns_block_ip_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_app_name_header"
-            android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:weightSum="1">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dns_block_connection_flag"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.15"
-                android:ellipsize="none"
-                android:gravity="center"
-                android:minWidth="24dp"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="26sp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dns_block_ip_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:layout_weight="0.65"
-                android:ellipsize="end"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textAlignment="viewStart"
-                android:textColor="?attr/primaryTextColor"
-                android:textIsSelectable="true"
-                android:textSize="@dimen/large_font_text_view"
-                android:typeface="monospace" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/dns_block_ip_latency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="5dp"
-                android:layout_weight="0.1"
-                android:background="@drawable/drawable_purple_gradient"
-                android:textAlignment="center"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
-
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/dns_block_blocked_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_ip_header"
-            android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="@string/bsdl_blocked_desc"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/dns_region"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_blocked_desc"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-smallcaps"
-            android:gravity="center"
-            android:padding="5dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
-
-        <LinearLayout
-            android:id="@+id/bsdl_domain_rule_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_region"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:weightSum="1">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/bsdl_domain_rule_desc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.6"
-                android:padding="5dp"
-                android:text="@string/bsdl_block_desc"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/bsdl_domain_rule_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.4"
-                android:background="@drawable/spinner_outline"
-                android:popupBackground="@drawable/spinner_outline_with_bg"
-                android:spinnerMode="dropdown"
-                tools:listitem="@layout/spinner_item_firewall_status" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bsdl_app_domain_rule_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/bsdl_domain_rule_ll"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:visibility="gone"
-            android:weightSum="1">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/bsdl_app_domain_rule_desc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.6"
-                android:padding="5dp"
-                android:text="@string/bsdl_app_block_desc"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/bsdl_app_domain_rule_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.4"
-                android:background="@drawable/spinner_outline"
-                android:popupBackground="@drawable/spinner_outline_with_bg"
-                android:spinnerMode="dropdown"
-                tools:listitem="@layout/spinner_item_firewall_status" />
-
-        </LinearLayout>
-    </RelativeLayout>
+    android:overScrollMode="never">
 
     <LinearLayout
-        android:id="@+id/dns_message_ll"
+        android:id="@+id/dns_block_top_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:baselineAligned="false"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="60dp"
+            android:layout_height="3dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:background="?attr/border" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/dns_block_hero_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="18dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:id="@+id/dns_block_header_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_block_fav_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:color/transparent"
+                        android:visibility="gone" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_header_flag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:minWidth="24dp"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        tools:text="🇩🇪"
+                        tools:visibility="visible" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/dns_block_url"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="start"
+                            android:maxLines="2"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/heading_font_text_view"
+                            android:textStyle="bold"
+                            tools:text="example.com" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/dns_block_blocked_desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view"
+                            tools:text="blocked 4m ago" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:alpha="0.5"
+                        android:contentDescription="@string/bsdl_open_domain_connections"
+                        android:src="@drawable/ic_right_arrow_small"
+                        app:tint="?attr/primaryLightColorText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dns_block_blocklist_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_block_blocklist_info_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@string/bsdl_meta_app"
+                        tools:src="@drawable/ic_block" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_blocklist_info_txt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="Blocked by firewall rule" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_block_blocklist_info_arrow"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="8dp"
+                        android:alpha="0.5"
+                        android:contentDescription="@string/bsdl_open_domain_connections"
+                        android:src="@drawable/ic_right_arrow_small"
+                        app:tint="?attr/primaryLightColorText" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:alpha="0.5"
+                    android:background="?attr/border" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.55"
+                    android:text="@string/bsdl_meta_app"
+                    android:textAllCaps="true"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/mini_font_text_view" />
+
+                <LinearLayout
+                    android:id="@+id/dns_app_name_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_app_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@string/apps_icon_content_desc"
+                        android:src="@drawable/default_app_icon" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_app_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="Firefox (10100)" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.55"
+                    android:text="@string/bsdl_meta_response"
+                    android:textAllCaps="true"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/mini_font_text_view" />
+
+                <LinearLayout
+                    android:id="@+id/dns_block_ip_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_connection_flag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="none"
+                        android:gravity="center"
+                        android:minWidth="22dp"
+                        android:singleLine="true"
+                        android:textSize="18sp"
+                        tools:text="🇩🇪" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_ip_address"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAlignment="viewStart"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textIsSelectable="true"
+                        android:textSize="@dimen/default_font_text_view"
+                        android:typeface="monospace"
+                        tools:text="142.250.77.238" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_ip_latency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/drawable_purple_gradient"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:singleLine="true"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view"
+                        tools:text="TTL 300" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dns_block_type_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.55"
+                        android:text="@string/bsdl_meta_query_type"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_record_type_chip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-light"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/small_font_text_view"
+                        tools:text="A" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dns_block_info_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:alpha="0.55"
+                        android:text="@string/bsdl_meta_resolver"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_block_info_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textIsSelectable="true"
+                        android:textSize="@dimen/small_font_text_view"
+                        tools:text="by 9.9.9.9 via ORBOT" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dns_blocked_target_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    tools:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:alpha="0.55"
+                        android:text="@string/bsdl_meta_alias"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_blocked_target"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textIsSelectable="true"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="cname.example.net" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dns_region_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    tools:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:alpha="0.55"
+                        android:text="@string/bsdl_meta_region"
+                        android:textAllCaps="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/mini_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_region"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:maxLines="1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="Germany" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bsdl_rules_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:rippleColor="#22000000"
+            app:strokeColor="?attr/border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bsdl_rules_domain_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.55"
+                    android:ellipsize="middle"
+                    android:fontFamily="sans-serif-light"
+                    android:maxLines="1"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/mini_font_text_view"
+                    tools:text="example.com" />
+
+                <LinearLayout
+                    android:id="@+id/bsdl_rule_row_app"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:minHeight="52dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="10dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/bsdl_rule_app_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/bsdl_rule_scope_app_title"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/bsdl_app_rule_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/bsdl_rule_status_none"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="No rule" />
+
+                    <com.celzero.bravedns.ui.custom.RuleStateSwitch
+                        android:id="@+id/bsdl_app_rule_switch"
+                        android:layout_width="@dimen/rule_state_switch_width"
+                        android:layout_height="@dimen/rule_state_switch_height"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="@string/bsdl_rule_scope_app_title" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bsdl_rule_row_global"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:minHeight="52dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/bsdl_rule_scope_global_title"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/bsdl_global_rule_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/bsdl_rule_status_none"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="No rule" />
+
+                    <com.celzero.bravedns.ui.custom.RuleStateSwitch
+                        android:id="@+id/bsdl_global_rule_switch"
+                        android:layout_width="@dimen/rule_state_switch_width"
+                        android:layout_height="@dimen/rule_state_switch_height"
+                        android:layout_marginStart="10dp"
+                        android:contentDescription="@string/bsdl_rule_scope_global_title" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dns_message"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:alpha="0.8"
-            android:ellipsize="start"
+            android:layout_marginTop="10dp"
+            android:alpha="0.7"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
-            android:textIsSelectable="true"
-            android:marqueeRepeatLimit="marquee_forever"
             android:maxLines="5"
             android:paddingStart="8dp"
-            android:paddingEnd="10dp"
-            android:scrollHorizontally="true"
-            android:singleLine="false"
+            android:paddingEnd="8dp"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/mini_font_text_view" />
-
+            android:textIsSelectable="true"
+            android:textSize="@dimen/mini_font_text_view"
+            tools:text="message" />
     </LinearLayout>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

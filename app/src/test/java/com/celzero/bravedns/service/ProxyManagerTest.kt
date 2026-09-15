@@ -994,16 +994,16 @@ class ProxyManagerTest : KoinTest {
     }
 
     // ========================================================================
-    // 19. isRpnProxy - ANOMALY: WIN proxyIds misclassified
+    // 19. isRpnProxy - WIN proxyIds are classified as RPN
     // ========================================================================
 
     @Test
-    fun `ANOMALY isRpnProxy returns false for WIN proxyId`() {
+    fun `isRpnProxy returns true for WIN proxyId`() {
         // WIN proxyIds are Backend.RpnWin + configKey (e.g. "wgyrpnsrv-us-ny-abc123").
-        // isRpnProxy uses endsWith(Backend.RPN) -- unless configKey ends with Backend.RPN
-        // this returns false, causing WIN traffic to miss the RPN badge in connection-log.
-        assertFalse(
-            "ANOMALY: WIN proxyId '$rpnProxyId' does not endWith '${Backend.RPN}'",
+        // isRpnProxy matches via startsWith(Backend.RpnWin); historically it used
+        // endsWith(Backend.RPN), which caused WIN traffic to miss the RPN badge.
+        assertTrue(
+            "WIN proxyId '$rpnProxyId' should be classified as RPN",
             ProxyManager.isRpnProxy(rpnProxyId)
         )
     }

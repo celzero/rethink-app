@@ -6,33 +6,82 @@
     android:minHeight="40dp"
     android:orientation="horizontal"
     android:paddingStart="48dp"
+    android:paddingEnd="6dp"
     android:paddingTop="6dp"
     android:paddingBottom="6dp">
 
-    <View
-        android:id="@+id/lac_status_dot"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:background="@drawable/bg_status_dot" />
+    <FrameLayout
+        android:layout_width="18dp"
+        android:layout_height="18dp">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/lac_label"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/lac_flag"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/lac_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
         android:layout_weight="1"
-        android:ellipsize="middle"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="13sp" />
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/lac_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:alpha="0.55"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="11sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/lac_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textIsSelectable="true"
+                android:ellipsize="end"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="13sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/lac_allowed_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="?attr/accentGood"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/lac_blocked_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="?attr/accentBad"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/lac_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.55"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="11sp" />
+    </LinearLayout>
 </LinearLayout>

@@ -75,10 +75,10 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.InetAddress
+import java.time.Duration
 import java.util.Collections
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 object TunFlowManager : KoinComponent {
     private const val TAG = "TunFlowManager"
@@ -147,7 +147,7 @@ object TunFlowManager : KoinComponent {
     // remove the entry from this map
     private val trackedConnMetaData: Cache<String, ConnTrackerMetaData> =
         CacheBuilder.newBuilder()
-            .expireAfterWrite(300, TimeUnit.SECONDS) // entry removed 300s after creation/update
+            .expireAfterWrite(Duration.ofSeconds(300)) // entry removed 300s after creation/update
             .removalListener<String, ConnTrackerMetaData> { notification ->
                 handleExpiredConnMetaData(notification)
             }

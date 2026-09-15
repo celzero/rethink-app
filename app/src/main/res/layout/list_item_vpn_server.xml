@@ -1,162 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/server_card"
+    style="@style/RethinkPlus.ContentCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:background="@drawable/bg_vpn_server_item"
     android:clickable="true"
     android:focusable="true"
-    android:paddingStart="16dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="10dp">
+    app:rippleColor="?attr/colorControlHighlight">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_flag"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:background="@drawable/bg_server_avatar_circle"
-        android:gravity="center"
-        android:textSize="21sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="🇺🇸" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="10dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_flag_image"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:alpha="0.9"
-        android:padding="11dp"
-        android:src="@drawable/ic_rpn_auto"
-        android:tint="?attr/primaryTextColor"
+    <com.celzero.bravedns.ui.custom.FlagWatermarkView
+        android:id="@+id/flag_watermark"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
         android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/refresh_stop_icon"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_marginTop="19dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="2dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_remove"
-        android:padding="8dp"
+        android:padding="7dp"
         android:src="@drawable/ic_cross"
         android:tint="?attr/primaryLightColorText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/country_info_layout"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_country_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:layout_marginEnd="6dp"
-        android:orientation="vertical"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.01"
+        android:maxLines="1"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
-        app:layout_constraintStart_toEndOf="@id/tv_flag"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Singapore" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+    <LinearLayout
+        android:id="@+id/status_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_country_name">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_country_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.01"
-                android:maxLines="1"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="16sp"
-                tools:text="Singapore" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_status_check"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_check_circle"
+            android:alpha="0.75"
+            android:tint="?attr/chipBgColorPositive"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
-        </LinearLayout>
-
-        <LinearLayout
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_server_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginStart="4dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="10sp"
+            tools:text="Connected" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_server_ip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.02"
-                android:maxLines="1"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="11sp"
-                android:visibility="gone"
-                tools:text="82.102.25.218"
-                tools:visibility="visible" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_status_check"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginStart="6dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_check_circle"
-                android:tint="?attr/accentGood"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_server_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingStart="0dp"
-                android:paddingTop="3dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="3dp"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="10sp"
-                tools:text="Connected" />
-
-        </LinearLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_server_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:ellipsize="end"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="9sp"
+            android:visibility="gone"
+            tools:text="82.102.25.218"
+            tools:visibility="visible" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chips_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_row">
 
     <LinearLayout
         android:id="@+id/apps_action_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
         android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="11dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="6dp"
-        app:layout_constraintStart_toEndOf="@id/tv_flag"
-        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
+        android:paddingStart="12dp"
+        android:paddingTop="7dp"
+        android:paddingEnd="9dp"
+        android:paddingBottom="7dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/apps_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:duplicateParentState="true"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
@@ -181,31 +164,28 @@
         android:id="@+id/relay_action_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="11dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="6dp"
-        app:layout_constraintStart_toEndOf="@id/apps_action_container"
-        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
+        android:paddingStart="12dp"
+        android:paddingTop="7dp"
+        android:paddingEnd="9dp"
+        android:paddingBottom="7dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/relay_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
             android:duplicateParentState="true"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
+            android:gravity="center"
             android:letterSpacing="0.02"
             android:maxLines="1"
+            android:minWidth="56dp"
             android:textColor="?attr/serverChipTextColor"
             android:textSize="11sp"
             tools:text="Relay · On" />
@@ -223,35 +203,35 @@
 
     </LinearLayout>
 
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/last_routed_app_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/bg_vpn_server_chip"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="7dp"
-        android:paddingTop="5dp"
-        android:paddingEnd="7dp"
-        android:paddingBottom="5dp"
-        app:layout_constraintStart_toEndOf="@id/relay_action_container"
-        app:layout_constraintTop_toBottomOf="@id/country_info_layout">
+        android:paddingStart="6dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chips_row">
 
         <FrameLayout
             android:id="@+id/last_routed_app_icon_stack"
-            android:layout_width="40dp"
-            android:layout_height="18dp"
+            android:layout_width="36dp"
+            android:layout_height="16dp"
             android:duplicateParentState="true">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/routed_app_icon_2"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="start|center_vertical"
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
@@ -264,10 +244,10 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/routed_app_icon_1"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="11dp"
+                android:layout_marginStart="10dp"
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
@@ -279,10 +259,10 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/routed_app_icon_0"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="22dp"
+                android:layout_marginStart="20dp"
                 android:background="@drawable/bg_server_avatar_circle"
                 android:duplicateParentState="true"
                 android:importantForAccessibility="no"
@@ -294,8 +274,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/last_routed_app_fallback_icon"
-            android:layout_width="13dp"
-            android:layout_height="13dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
             android:duplicateParentState="true"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_timer"
@@ -306,21 +286,23 @@
             android:id="@+id/last_routed_app_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="4dp"
             android:duplicateParentState="true"
             android:ellipsize="marquee"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"
             android:marqueeRepeatLimit="marquee_forever"
-            android:maxWidth="80dp"
+            android:maxWidth="72dp"
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:textColor="?attr/colorPrimary"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:visibility="gone"
             tools:text="Chrome"
             tools:visibility="visible" />
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -7,7 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -25,7 +25,8 @@ class DnsLogViewModelTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
+    // Unconfined so the switchMap -> Pager chain runs eagerly on setFilter/observe
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var viewModel: DnsLogViewModel
     private val dnsLogDAO: DnsLogDAO = mockk(relaxed = true)
 
@@ -43,28 +44,29 @@ class DnsLogViewModelTest {
     @Test
     fun `test setFilter triggers DAO call`() {
         viewModel.setFilter("example", DnsLogFragment.DnsLogFilter.ALL)
-        
-        // Observe dnsLogsList to trigger the switchMap
+
+        // Observe dnsLogsList to trigger the switchMap; the Pager invokes the DAO
+        // lazily on its load dispatcher, so wait for the async call
         viewModel.dnsLogsList.observeForever {}
 
-        verify { dnsLogDAO.getDnsLogsByName("%example%") }
+        verify(timeout = 5000) { dnsLogDAO.getDnsLogsByName("%example%") }
     }
 
     @Test
     fun `test setFilter with empty search triggers getAllDnsLogs`() {
         viewModel.setFilter("", DnsLogFragment.DnsLogFilter.ALL)
-        
+
         viewModel.dnsLogsList.observeForever {}
 
-        verify { dnsLogDAO.getAllDnsLogs() }
+        verify(timeout = 5000) { dnsLogDAO.getAllDnsLogs() }
     }
 
     @Test
     fun `test setFilter with ALLOWED type`() {
         viewModel.setFilter("example", DnsLogFragment.DnsLogFilter.ALLOWED)
-        
+
         viewModel.dnsLogsList.observeForever {}
 
-        verify { dnsLogDAO.getAllowedDnsLogsByName("%example%") }
+        verify(timeout = 5000) { dnsLogDAO.getAllowedDnsLogsByName("%example%") }
     }
 }

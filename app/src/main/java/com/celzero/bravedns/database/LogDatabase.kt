@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -83,6 +83,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
+                .addMigrations(MIGRATION_15_16)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -423,6 +424,20 @@ abstract class LogDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_14_15: added timeStamp index on RethinkLog")
                     } catch (e: Exception) {
                         Logger.e(LOG_TAG_APP_DB, "MIGRATION_14_15: index may already exist: ${e.message}", e)
+                    }
+                }
+            }
+
+        private val MIGRATION_15_16: Migration =
+            object : Migration(15, 16) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE DnsLogs ADD COLUMN blockedReason TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_15_16: added blockedReason to DnsLogs")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_15_16: blockedReason already exists, ignore", e)
                     }
                 }
             }

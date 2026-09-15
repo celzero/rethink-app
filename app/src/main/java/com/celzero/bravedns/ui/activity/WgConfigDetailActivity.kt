@@ -637,8 +637,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
         return when (status) {
             UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-            else -> R.attr.chipTextNegative // TKO, TEND
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative // TKO, TEND, TNT
         }
     }
 

@@ -21,6 +21,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
@@ -88,6 +89,8 @@ object RpnProxyManager : KoinComponent {
     private val db: RpnProxyRepository by inject()
     private val countryConfigRepo: CountryConfigRepository by inject()
     private val persistentState by inject<PersistentState>()
+
+    private val appConfig by inject<AppConfig>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val subscriptionStatusRepository: SubscriptionStatusRepository by inject()
 
@@ -441,6 +444,9 @@ object RpnProxyManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG; startProxy: proxy already running (mode=${rpnMode()})")
             VpnController.handleRpnProxies()
             return
+        }
+        if (!appConfig.getBraveMode().isDnsFirewallMode()) {
+            appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode)
         }
         setRpnMode(RpnMode.ANTI_CENSORSHIP)
         setRpnState(RpnState.ENABLED)

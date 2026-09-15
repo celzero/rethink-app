@@ -145,7 +145,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         lastConnectivityCheckState = ConnectivityCheckState(time, networkHandles)
     }
 
-    fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
+    private fun createInternetValidatedCallback(): ConnectivityManager.NetworkCallback {
         return if (isAtleastS()) {
             // Only called on S+ devices
             object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
@@ -252,7 +252,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         }
     }
 
-    fun transportCallback(): ConnectivityManager.NetworkCallback {
+    private fun createTransportCallback(): ConnectivityManager.NetworkCallback {
         return if (isAtleastS()) {
             object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
                 override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
@@ -340,6 +340,14 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 }
             }
         }
+    }
+
+    fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
+        return validatedCallback ?: createInternetValidatedCallback().also { validatedCallback = it }
+    }
+
+    fun transportCallback(): ConnectivityManager.NetworkCallback {
+        return transportNetworkCallback ?: createTransportCallback().also { transportNetworkCallback = it }
     }
 
 
@@ -529,6 +537,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     private lateinit var wm: WifiManager
 
     private var diagsMgr: DiagnosticsManager? = null
+    private var validatedCallback: ConnectivityManager.NetworkCallback? = null
+    private var transportNetworkCallback: ConnectivityManager.NetworkCallback? = null
 
     companion object {
         // add active network as underlying vpn network
@@ -754,8 +764,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     fun registerDiags(context: Context) {
         if (isAtleastR()) {
             try {
-                val diagnosticMgr = DiagnosticsManager(context, scope, this)
-                diagnosticMgr.register()
+                diagsMgr = DiagnosticsManager(context, scope, this)
+                diagsMgr?.register()
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while getting connectivity diagnostics manager")
             }
@@ -783,16 +793,24 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // check if connectivity manager is initialized as it is lazy initialized
                 if (::cm.isInitialized) {
                     try {
-                        cm.unregisterNetworkCallback(internetValidatedCallback())
+                        validatedCallback?.let {
+                            Logger.d(LOG_TAG_CONNECTION, "unregister internetValidatedCallback")
+                            cm.unregisterNetworkCallback(it)
+                        }
                     } catch (_: Exception) { }
                     try {
-                        cm.unregisterNetworkCallback(transportCallback())
+                        transportNetworkCallback?.let {
+                            Logger.d(LOG_TAG_CONNECTION, "unregister transportCallback")
+                            cm.unregisterNetworkCallback(it)
+                        }
                     } catch (_: Exception) { }
                 }
                 if (isAtleastR()) {
                     unregisterDiags()
                 }
                 networkSet.clear()
+                validatedCallback = null
+                transportNetworkCallback = null
                 if (::channel.isInitialized) {
                     channel.close()
                 }

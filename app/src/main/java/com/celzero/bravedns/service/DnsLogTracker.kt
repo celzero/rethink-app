@@ -33,6 +33,7 @@ import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.celzero.bravedns.tunnel.TunDnsManager
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
@@ -136,6 +137,9 @@ internal constructor(
         transaction.dnssecValid = summary.ad
         transaction.blockedTarget = summary.blockedTarget
         transaction.isEch = summary.ech
+        // consume the dns-filter decision recorded in onUpstreamAnswer for this query's
+        // flow id; consumed exactly once so a reason is never duplicated across logs
+        transaction.blockedReason = TunDnsManager.consumeDnsFilterReason(summary.fid)
         return transaction
     }
 
@@ -163,6 +167,7 @@ internal constructor(
         dnsLog.dnssecValid = transaction.dnssecValid
         dnsLog.blockedTarget = transaction.blockedTarget
         dnsLog.isEch = transaction.isEch
+        dnsLog.blockedReason = transaction.blockedReason
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()

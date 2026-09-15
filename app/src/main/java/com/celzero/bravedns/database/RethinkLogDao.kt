@@ -76,6 +76,16 @@ interface RethinkLogDao {
     ): List<RethinkLog>
 
     @Query(
+        "select coalesce(nullif(dnsQuery, ''), ipAddress) as label, count(id) as total, sum(case when isBlocked then 1 else 0 end) as blocked, max(timeStamp) as lastSeen, substr(max(printf('%016d', timeStamp) || flag), 17) as flag from RethinkLog where timeStamp >= :start and timeStamp < :end and uid = :uid group by label order by total desc limit :limit"
+    )
+    suspend fun getDomainActivityForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DomainActivityRow>
+
+    @Query(
         "update RethinkLog set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
     fun updateSummary(

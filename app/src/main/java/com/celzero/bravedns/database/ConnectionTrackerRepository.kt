@@ -106,6 +106,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
             .take(limit)
     }
 
+    suspend fun getRecentConnectionsByProxyPrefix(prefix: String, limit: Int = 4): List<ConnectionTracker> {
+        return connectionTrackerDAO.getRecentConnectionsByProxyPrefix(prefix, limit)
+    }
+
     suspend fun closeConnections( connIds: List<String>, reason: String) {
         connectionTrackerDAO.closeConnections(connIds, reason)
     }
@@ -130,6 +134,14 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getAppActivity(start, end, limit)
     }
 
+    suspend fun getTopAppsByUsage(start: Long, end: Long, limit: Int): List<AppUsageRow> {
+        return connectionTrackerDAO.getTopAppsByUsage(start, end, limit)
+    }
+
+    suspend fun getTopBlockedApps(start: Long, end: Long, limit: Int): List<AppBlockedRow> {
+        return connectionTrackerDAO.getTopBlockedApps(start, end, limit)
+    }
+
     suspend fun getConnectionsInWindowForUid(
         start: Long,
         end: Long,
@@ -137,6 +149,15 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         limit: Int
     ): List<ConnectionTracker> {
         return connectionTrackerDAO.getConnectionsInWindowForUid(start, end, uid, limit)
+    }
+
+    suspend fun getDomainActivityForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DomainActivityRow> {
+        return connectionTrackerDAO.getDomainActivityForUid(start, end, uid, limit)
     }
 
     suspend fun getRpnActivityBuckets(
@@ -178,6 +199,22 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         limit: Int
     ): List<ConnectionTracker> {
         return connectionTrackerDAO.getRpnConnectionsInWindowForUid(
+            proxyIdFilter,
+            start,
+            end,
+            uid,
+            limit
+        )
+    }
+
+    suspend fun getRpnDomainActivityForUid(
+        proxyIdFilter: String,
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DomainActivityRow> {
+        return connectionTrackerDAO.getRpnDomainActivityForUid(
             proxyIdFilter,
             start,
             end,

@@ -28,7 +28,6 @@ import com.celzero.bravedns.databinding.BottomSheetRethinkListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -65,11 +64,6 @@ class RethinkListBottomSheet : BaseBottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetRethinkListBinding.inflate(inflater, container, false)
         return b.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
