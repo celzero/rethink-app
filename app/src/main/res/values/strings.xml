@@ -2502,7 +2502,7 @@
     <string name="support_category_connectivity" translatable="false">Connectivity</string>
     <string name="support_category_refund" translatable="false">Refund</string>
     <string name="support_description_hint" translatable="false">Describe the issue you\'re experiencing…</string>
-    <string name="support_attachments_desc" translatable="false">The following data will be included as an attachment.</string>
+    <string name="support_attachments_desc" translatable="false">Includes the following data in the attachment.</string>
     <string name="support_attach_sub_status" translatable="false">Purchase Status</string>
     <string name="support_attach_sub_status_desc" translatable="false">Recent purchase records</string>
     <string name="support_attach_vpn_stats" translatable="false">Proxy Stats</string>
