@@ -41,7 +41,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
@@ -1041,10 +1041,9 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
               if (persistentState.appTriggerPackages.isNotEmpty()) {
                   setText(persistentState.appTriggerPackages)
               }
-              setPadding(50, 40, 50, 40)
-              gravity = Gravity.TOP or Gravity.START
-              android.R.style.Widget_Material_EditText
-          }
+            setPadding(50, 40, 50, 40)
+            gravity = Gravity.TOP or Gravity.START
+        }
 
           val selectableTextView = AppCompatTextView(context).apply {
               text = context.getString(R.string.adv_tasker_dialog_msg)
@@ -1074,7 +1073,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
               addView(linearLayout)
           }
 
-          AlertDialog.Builder(context)
+          MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
               .setTitle(context.getString(R.string.adv_taster_title))
               .setView(scrollView)
               .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
