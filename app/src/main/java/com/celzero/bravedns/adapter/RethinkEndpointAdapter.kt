@@ -63,6 +63,9 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
 
     var lifecycleOwner: LifecycleOwner? = null
 
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<RethinkEndpointViewHolder>()
+
     companion object {
         private const val ONE_SEC = 1000L
         private const val TAG = "RethinkEndpointAdapter"
@@ -94,11 +97,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                 false
             )
         lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return RethinkEndpointViewHolder(itemBinding)
+        return RethinkEndpointViewHolder(itemBinding).also { activeHolders.add(it) }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelStatusCheckIfAny() }
+        activeHolders.clear()
         lifecycleOwner = null
     }
 
@@ -122,6 +129,10 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         fun update(endpoint: RethinkDnsEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
+        }
+
+        fun cancelStatusCheckIfAny() {
+            statusCheckJob?.cancel()
         }
 
         private fun setupClickListeners(endpoint: RethinkDnsEndpoint) {

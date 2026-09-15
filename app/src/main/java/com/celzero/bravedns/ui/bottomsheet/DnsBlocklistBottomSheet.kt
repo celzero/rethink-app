@@ -67,6 +67,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -343,6 +344,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             b.bsdlRuleRowApp.isEnabled = true
             return
         }
+        val previous = DomainRulesManager.getDomainRule(currentLog.queryStr, uid)
         io {
             try {
                 DomainRulesManager.changeStatus(
@@ -353,11 +355,20 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
                     status
                 )
                 logEvent("DNS app domain rule change", "${currentLog.queryStr} to ${status.name}")
+                uiCtx { renderAppRuleState(status) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_DNS,
+                    "app domain rule change failed for ${currentLog.queryStr}: ${e.message}"
+                )
+                // the write did not persist; fall back to the previously persisted state
+                uiCtx { renderAppRuleState(previous) }
             } finally {
                 uiCtx { b.bsdlRuleRowApp.isEnabled = true }
             }
         }
-        renderAppRuleState(status)
     }
 
     /** Re-renders the trailing state of the all-apps rule row. */
@@ -369,12 +380,14 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         }
         if (
             DomainRulesManager.getDomainRule(currentLog.queryStr, Constants.UID_EVERYBODY) ==
-                status
+            status
         ) {
             renderGlobalRuleState(status)
             b.bsdlRuleRowGlobal.isEnabled = true
             return
         }
+        val previous =
+            DomainRulesManager.getDomainRule(currentLog.queryStr, Constants.UID_EVERYBODY)
         io {
             try {
                 DomainRulesManager.changeStatus(
@@ -385,11 +398,20 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
                     status
                 )
                 logEvent("DNS domain rule change", "${currentLog.queryStr} to ${status.name}")
+                uiCtx { renderGlobalRuleState(status) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_DNS,
+                    "global domain rule change failed for ${currentLog.queryStr}: ${e.message}"
+                )
+                // the write did not persist; fall back to the previously persisted state
+                uiCtx { renderGlobalRuleState(previous) }
             } finally {
                 uiCtx { b.bsdlRuleRowGlobal.isEnabled = true }
             }
         }
-        renderGlobalRuleState(status)
     }
 
     // trailing state text of the rule rows; the color comes from statusColor()

@@ -57,6 +57,9 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
     var lifecycleOwner: LifecycleOwner? = null
 
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<DoHEndpointViewHolder>()
+
     companion object {
         private const val ONE_SEC = 1000L
         private const val TAG = "DohEndpointAdapter"
@@ -84,11 +87,15 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         val itemBinding =
             ListItemEndpointBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return DoHEndpointViewHolder(itemBinding)
+        return DoHEndpointViewHolder(itemBinding).also { activeHolders.add(it) }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelStatusCheckIfAny() }
+        activeHolders.clear()
         lifecycleOwner = null
     }
 
@@ -109,6 +116,10 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         fun update(endpoint: DoHEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
+        }
+
+        fun cancelStatusCheckIfAny() {
+            statusCheckJob?.cancel()
         }
 
         private fun setupClickListeners(endpoint: DoHEndpoint) {

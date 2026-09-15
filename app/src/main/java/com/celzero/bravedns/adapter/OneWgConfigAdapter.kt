@@ -67,6 +67,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     private var lifecycleOwner: LifecycleOwner? = null
 
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<WgInterfaceViewHolder>()
+
     interface DnsStatusListener {
         fun onDnsStatusChanged()
     }
@@ -95,6 +98,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelJobIfAny() }
+        activeHolders.clear()
         lifecycleOwner = null
     }
 
@@ -116,7 +123,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         if (lifecycleOwner == null) {
             lifecycleOwner = parent.findViewTreeLifecycleOwner()
         }
-        return WgInterfaceViewHolder(itemBinding)
+        return WgInterfaceViewHolder(itemBinding).also { activeHolders.add(it) }
     }
 
     override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
