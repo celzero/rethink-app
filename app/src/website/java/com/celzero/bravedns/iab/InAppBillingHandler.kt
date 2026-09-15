@@ -385,7 +385,7 @@ object InAppBillingHandler : KoinComponent {
                     isInitialized.set(false)
                     loge(mname, "failed to initialize state machine: ${e.message}", e)
                     withContext(Dispatchers.Main) {
-                        billingListener?.onConnectionResult(false, "State machine initialization failed: ${e.message}")
+                        this@InAppBillingHandler.billingListener?.onConnectionResult(false, "State machine initialization failed: ${e.message}")
                     }
                     return@launch
                 }
@@ -400,7 +400,7 @@ object InAppBillingHandler : KoinComponent {
                 } else {
                     loge(mname, "billing connection failed: $message")
                 }
-                billingListener?.onConnectionResult(isSuccess, message)
+                this@InAppBillingHandler.billingListener?.onConnectionResult(isSuccess, message)
             }
         }
     }
@@ -409,6 +409,16 @@ object InAppBillingHandler : KoinComponent {
         val mname = this::registerListener.name
         this.billingListener = billingListener
         log(mname, "listener registered")
+    }
+
+    fun unregisterListener(billingListener: BillingListener?) {
+        val mname = this::unregisterListener.name
+        if (this.billingListener == billingListener) {
+            this.billingListener = null
+            log(mname, "listener unregistered")
+        } else {
+            logd(mname, "unregisterListener: listener mismatch or already null")
+        }
     }
 
     private fun setupBillingClient(context: Context) {

@@ -21,52 +21,65 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Path
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
+import android.widget.EditText
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.forEachIndexed
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
+import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
@@ -76,6 +89,8 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnBypassAppsActivity
 import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
@@ -88,6 +103,7 @@ import com.celzero.bravedns.ui.tour.RpnOnboardingManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
@@ -126,6 +142,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val countryConfigRepository by inject<CountryConfigRepository>()
     private val appInfoRepository by inject<AppInfoRepository>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
+    private val dnsLogDAO by inject<DnsLogDAO>()
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
     private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
@@ -138,7 +155,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val selectedServers = mutableListOf<CountryConfig>()
 
     private var statusUpdateJob: Job? = null
-    private var headerScrollListener: NestedScrollView.OnScrollChangeListener? = null
 
     /** Last touch position on the RPN heat map, used to resolve the tapped cell. */
     private var lastHeatmapTouchX = 0f
@@ -158,6 +174,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private var serverLoadingJob: Job? = null
     /** Job driving the RPN reset progress loop. */
     private var rpnResetJob: Job? = null
+    /** Job driving the live-activity feed refresh loop. */
+    private var activityFeedJob: Job? = null
+    /** Job auto-advancing the pulse carousel. */
+    private var pulseAutoAdvanceJob: Job? = null
+    /** Per-frame animator driving the pulse page transition. */
+    private var pulsePageAnimator: ValueAnimator? = null
+    /** Timestamp of the last user touch on the pulse pager. */
+    private var lastPulseTouchTs = 0L
+    /** Pages for the network-pulse carousel. */
+    private lateinit var pulsePagerAdapter: PulsePagerAdapter
     /**
      * Gentle looping bob on the error card's dolphin while the error/empty
      * state is visible; cancelled when the state is dismissed.
@@ -190,10 +216,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     /** One-shot dolphin arc played on the fx overlay when a location finishes connecting. */
     private var connectArcAnimator: AnimatorSet? = null
-
-    /** Looping dolphin orbit on the relay tile while a bulk toggle is in flight. */
-    private var relayOrbitAnimator: AnimatorSet? = null
-    private var relayOrbitView: FrameLayout? = null
 
     /** Last caption rendered on the relay tile state text; drives the change pop. */
     private var lastRelayCaption: String? = null
@@ -347,11 +369,30 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         /** Duration of one full left-to-right refresh swim, in milliseconds. */
         private const val REFRESH_SWIM_DURATION_MS = 2400L
 
-        /** Relay toggle in-flight feedback: one dolphin lap around the tile. */
-        private const val RELAY_ORBIT_DURATION_MS = 1100L
+        /** Rows sampled for the pulse carousel's app-icon stack. */
+        private const val ACTIVITY_FEED_MAX_ROWS = 15
 
-        /** Minimum time the relay orbit stays on screen, even for instant toggles. */
-        private const val MIN_RELAY_ORBIT_MS = 900L
+        /** Rolling window the pulse aggregates are measured over. */
+        private const val ACTIVITY_FEED_WINDOW_MS = 60L * 60L * 1000L
+
+        /** Refresh cadence for the network-pulse summary, in milliseconds. */
+        private const val ACTIVITY_FEED_REFRESH_MS = 10_000L
+
+        /** Auto-advance cadence for the pulse carousel, in milliseconds. */
+        private const val ACTIVITY_FEED_AUTO_ADVANCE_MS = 5_000L
+
+        /** Auto-advance pauses for this long after the user touches the pager. */
+        private const val PULSE_USER_INTERACTION_GRACE_MS = 2_500L
+
+        /** Page-transition duration for a single-page hop, in milliseconds. */
+        private const val PULSE_PAGE_TRANSITION_MS = 750L
+
+        /** Upper bound so long wraps stay calm, not sluggish. */
+        private const val PULSE_PAGE_TRANSITION_MAX_MS = 2_000L
+
+        /** Alpha of the inactive carousel dots. */
+        private const val PULSE_DOT_INACTIVE_ALPHA = 0.3f
+        private const val PULSE_DOT_ACTIVE_ALPHA = 0.7f
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -396,6 +437,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupHeaderUI()
         setupRpnState()
         setupQuickSettings()
+        setupActivityFeed()
         setupRpnHeatmapClicks()
         setupSwipeToRefresh()
         loadRpnHeatmap()
@@ -423,14 +465,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 )
             }
         }
-
-        // Fade in the pinned collapsed title (flag + count) as the hero scrolls away.
-        headerScrollListener = NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
-            val bar = b.collapsedTitleBar
-            val range = (b.headerContainer.height - bar.height).coerceAtLeast(1)
-            bar.alpha = (scrollY.toFloat() / range).coerceIn(0f, 1f)
-        }
-        b.serversScrollView.setOnScrollChangeListener(headerScrollListener)
 
         animateHeaderEntry()
         observeRefreshState()
@@ -661,6 +695,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Refresh the RPN heat map so newly logged connections show up when
         // the user returns to this screen.
         loadRpnHeatmap()
+        // Same for the live-activity feed: connections logged while away.
+        refreshActivityFeed()
     }
 
     /**
@@ -930,8 +966,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     override fun onDestroyView() {
         // Cancel animations before the binding is torn down
         runCatching {
-            b.serversScrollView.setOnScrollChangeListener(null as NestedScrollView.OnScrollChangeListener?)
-            headerScrollListener = null
             fabLoadingAnimator?.cancel()
             fabLoadingAnimator = null
             blinkAnimator?.cancel()
@@ -941,7 +975,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.statusIndicator.animate().cancel()
             b.statusCard.animate().cancel()
             b.searchCard.animate().cancel()
-            b.searchClearBtn.animate().cancel()
         }
         runCatching {
             b.rvServers.suppressLayout(false)
@@ -951,14 +984,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         statusUpdateJob = null
         tunnelWatchJob?.cancel()
         tunnelWatchJob = null
+        activityFeedJob?.cancel()
+        activityFeedJob = null
+        pulseAutoAdvanceJob?.cancel()
+        pulseAutoAdvanceJob = null
+        pulsePageAnimator?.cancel()
+        pulsePageAnimator = null
         refreshSwimAnimator?.cancel()
         refreshSwimAnimator = null
         connectArcAnimator?.cancel()
         connectArcAnimator = null
-        relayOrbitAnimator?.cancel()
-        relayOrbitAnimator = null
-        relayOrbitView?.let { runCatching { (it.parent as? ViewGroup)?.removeView(it) } }
-        relayOrbitView = null
         dismissServerLoadingDialog()
         dismissRpnResetDialog()
         super.onDestroyView()
@@ -990,6 +1025,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.frequentCountriesSection.isVisible = false
             b.locationCapacityIndicator.isVisible = false
             b.errorStateContainer.isVisible = false
+            b.activityFeedCard.isVisible = false
 
             // Disable search bar and action icons while data is loading
             setSearchAndActionsEnabled(false)
@@ -1010,6 +1046,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             // Re-enable search bar and action icons once data is ready
             setSearchAndActionsEnabled(true)
             b.swipeRefresh.isEnabled = true
+            // Paint the activity feed immediately instead of waiting a tick.
+            refreshActivityFeed()
         }
     }
 
@@ -1319,13 +1357,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val nonAutoServers = selectedServers.filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
         val distinctCountries = nonAutoServers.distinctBy { it.cc }
 
-        // Collapsed app-bar title: first selected location's flag + location count.
-        val collapsedFlag = distinctCountries.firstOrNull()?.flagEmoji.orEmpty()
-        b.tvCollapsedFlag.text = collapsedFlag
-        b.tvCollapsedFlag.isVisible = collapsedFlag.isNotEmpty()
-        b.tvCollapsedTitle.text = if (distinctCountries.isEmpty()) "" else resources.getQuantityString(
-            R.plurals.server_count, distinctCountries.size, distinctCountries.size
-        )
         populateAvatarRow(distinctCountries)
         updateCapacityIndicator()
     }
@@ -1529,16 +1560,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             Configuration.UI_MODE_NIGHT_YES
 
     /**
-     * Updates the minimalist "N of M" capacity indicator: the Add-location
-     * quick-settings tile caption shows the count as "N/M" and the capacity
-     * pills below the connection list mirror the same state visually.
+     * Updates the minimalist "N of M" capacity indicator: the capacity
+     * pills below the connection list mirror the number of active
+     * (non-AUTO) locations visually.
      */
     private fun updateCapacityIndicator() {
         if (!isAdded) return
         val filled = selectedServers.count { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
             .coerceIn(0, MAX_SELECTIONS)
         b.locationCapacityIndicator.isVisible = !isLoading && !isProxyStopped
-        b.qsAddLocationState.text = String.format(Locale.US, "%d/%d", filled, MAX_SELECTIONS)
         val dots = listOf(
             b.capacityDotOne, b.capacityDotTwo, b.capacityDotThree,
             b.capacityDotFour, b.capacityDotFive
@@ -1816,13 +1846,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
         b.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
         b.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
-        // Collapsed-bar search pill: jump to (and focus) the real search field so
-        // the user can search without scrolling back up. Ignored while the
-        // search field is disabled (initial load, reset in progress, stopped).
-        b.collapsedSearchPill.setOnClickListener {
-            if (!isAdded || !b.searchCard.isEnabled) return@setOnClickListener
-            focusLocationSearch()
-        }
         // Status chip: open settings when running, show a hint when stopped
         b.statusChip.setOnClickListener {
             if (isProxyStopped) {
@@ -1852,9 +1875,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun focusLocationSearch() {
-        if (!isAdded) return
+        if (!isAdded || !b.searchCard.isEnabled) return
         b.serversScrollView.smoothScrollTo(0, b.searchCard.top)
-        b.searchBar.requestFocus()
+        // Expanding an iconified SearchView focuses its query editor.
+        b.searchBar.isIconified = false
+        // Focus alone doesn't raise the keyboard; ask the IME explicitly once
+        // the scroll has settled.
+        b.searchBar.post {
+            if (!isAdded) return@post
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
+                as? InputMethodManager
+            imm?.showSoftInput(b.searchBar, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     /**
@@ -1863,10 +1895,373 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun setupQuickSettings() {
         b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
-        b.qsAddLocationTile.setOnClickListener { focusLocationSearch() }
         b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
         b.qsStatsTile.setOnClickListener { showRpnStatsBottomSheet() }
         refreshQuickSettingCaptions()
+    }
+
+    /**
+     * Live-activity strip under the quick-settings pills: the most recent
+     * connections routed through any selected location, polled from
+     * ConnectionTracker. Tapping the card opens the network-logs screen
+     * filtered to RPN traffic.
+     */
+    private fun setupActivityFeed() {
+        // Each carousel page opens its own destination (logs for connections /
+        // blocked, the stats sheet for data / apps); no card-level click.
+        // One page per snap; dots track the centred page.
+        pulsePagerAdapter = PulsePagerAdapter()
+        b.activityFeedPager.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        b.activityFeedPager.adapter = pulsePagerAdapter
+        PagerSnapHelper().attachToRecyclerView(b.activityFeedPager)
+        b.activityFeedPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                val lm = rv.layoutManager as? LinearLayoutManager ?: return
+                val pos = lm.findFirstCompletelyVisibleItemPosition()
+                    .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
+                updatePulseDots(pos)
+            }
+        })
+        // Note user interaction so auto-advance can yield to an active swipe.
+        b.activityFeedPager.setOnTouchListener { v, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    lastPulseTouchTs = System.currentTimeMillis()
+                    pulsePageAnimator?.cancel()
+                }
+            }
+            v.performClick()
+        }
+        // Auto-advance the carousel; skips while the user is interacting.
+        pulseAutoAdvanceJob = lifecycleScope.launch {
+            while (true) {
+                delay(ACTIVITY_FEED_AUTO_ADVANCE_MS.milliseconds)
+                if (!isAdded || isProxyStopped) continue
+                if (System.currentTimeMillis() - lastPulseTouchTs <
+                    PULSE_USER_INTERACTION_GRACE_MS
+                ) continue
+                val lm = b.activityFeedPager.layoutManager as? LinearLayoutManager ?: continue
+                val count = pulsePagerAdapter.itemCount
+                if (count <= 1) continue
+                val cur = lm.findFirstCompletelyVisibleItemPosition()
+                    .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
+                if (cur < 0) continue
+                animatePulsePage((cur + 1) % count)
+            }
+        }
+        activityFeedJob = lifecycleScope.launch {
+            while (true) {
+                delay(ACTIVITY_FEED_REFRESH_MS.milliseconds)
+                if (isAdded && !isLoading && !isProxyStopped &&
+                    !b.errorStateContainer.isVisible
+                ) {
+                    refreshActivityFeed()
+                }
+            }
+        }
+    }
+
+    private fun refreshActivityFeed() {
+        io {
+            val since = System.currentTimeMillis() - ACTIVITY_FEED_WINDOW_MS
+            // Sample for the app-icon stack; aggregates come from the window.
+            val rows = try {
+                connectionTrackerDAO.getRecentConnectionsByProxyPrefix(
+                    Backend.RpnWin, ACTIVITY_FEED_MAX_ROWS
+                )
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshActivityFeed: ${e.message}")
+                emptyList()
+            }
+            var connCount = 0
+            var bytes = 0L
+            var appCount = 0
+            var blockedCount = 0
+            try {
+                connCount = connectionTrackerDAO.countConnectionsByProxyPrefix(Backend.RpnWin, since)
+                bytes = connectionTrackerDAO.sumBytesByProxyPrefix(Backend.RpnWin, since)
+                appCount = connectionTrackerDAO.countDistinctAppsByProxyPrefix(Backend.RpnWin, since)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshActivityFeed: aggregates failed: ${e.message}")
+            }
+            try {
+                // Blocked = connection-level blocks + DNS-level blocks across
+                // the whole device (not scoped to any proxy).
+                blockedCount = connectionTrackerDAO.countBlockedConnectionsSince(since) +
+                    dnsLogDAO.countBlockedDnsSince(since)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshActivityFeed: blocked count failed: ${e.message}")
+            }
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                renderPulse(rows, connCount, bytes, appCount, blockedCount)
+            }
+        }
+    }
+
+    /**
+     * Fills the network-pulse carousel: single-line pages, each a big number
+     * followed by a short label — connections, data volume and distinct apps,
+     * all measured over the past hour ([rows] only feeds the app-icon stack).
+     * Pages are auto-advanced; the card hides itself when there is nothing to
+     * show.
+     */
+    private fun renderPulse(
+        rows: List<ConnectionTracker>,
+        connCount: Int,
+        bytes: Long,
+        appCount: Int,
+        blockedCount: Int
+    ) {
+        if (rows.isEmpty() && connCount == 0) {
+            b.activityFeedCard.isVisible = false
+            return
+        }
+        val appIcons = rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
+            runCatching { Utilities.getIcon(requireContext(), ct.packageName, ct.appName) }.getOrNull()
+        }
+        val pages = mutableListOf(
+            PulsePage(
+                type = PulsePageType.CONNECTIONS,
+                value = connCount.toString(),
+                valueColorAttr = R.attr.primaryTextColor,
+                label = getString(R.string.server_selection_pulse_connections)
+            ),
+            PulsePage(
+                type = PulsePageType.BLOCKED,
+                value = blockedCount.toString(),
+                valueColorAttr = if (blockedCount > 0) R.attr.accentBad else R.attr.primaryTextColor,
+                label = getString(R.string.server_selection_pulse_blocked)
+            ),
+            PulsePage(
+                type = PulsePageType.DATA,
+                value = formatBytes(bytes),
+                valueColorAttr = R.attr.primaryTextColor,
+                label = getString(R.string.server_selection_pulse_data)
+            ),
+            PulsePage(
+                type = PulsePageType.APPS,
+                value = appCount.toString(),
+                valueColorAttr = R.attr.primaryTextColor,
+                label = getString(R.string.server_selection_pulse_apps),
+                icons = appIcons
+            )
+        )
+        pulsePagerAdapter.submit(pages)
+        rebuildPulseDots()
+        b.activityFeedCard.isVisible = true
+    }
+
+    /** Human byte size: "512 KB", "13.2 MB", "1.05 GB". */
+    private fun formatBytes(bytes: Long): String {
+        if (bytes < 1024) return "$bytes B"
+        val kb = bytes / 1024.0
+        if (kb < 1024) return String.format(Locale.US, "%.0f KB", kb)
+        val mb = kb / 1024.0
+        if (mb < 1024) return String.format(Locale.US, "%.1f MB", mb)
+        return String.format(Locale.US, "%.2f GB", mb / 1024.0)
+    }
+
+    /** Rebuilds the dot row when the page count changes. */
+    private fun rebuildPulseDots() {
+        val dots = b.activityFeedDots
+        if (dots.childCount == pulsePagerAdapter.itemCount) return
+        dots.removeAllViews()
+        repeat(pulsePagerAdapter.itemCount) {
+            dots.addView(View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(dpPx(5), dpPx(5)).apply {
+                    marginStart = dpPx(4)
+                }
+                background = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_circle)
+                alpha = PULSE_DOT_INACTIVE_ALPHA
+            })
+        }
+        updatePulseDots(0)
+    }
+
+    /** Selected dot grows slightly but stays a circle; the rest stay faint. */
+    private fun updatePulseDots(position: Int) {
+        val dots = b.activityFeedDots
+        dots.forEachIndexed { i, dot ->
+            val active = i == position
+            val size = dpPx(if (active) 6 else 5)
+            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
+                width = size
+                height = size
+            }
+            dot.alpha = if (active) PULSE_DOT_ACTIVE_ALPHA else PULSE_DOT_INACTIVE_ALPHA
+            dot.backgroundTintList = ColorStateList.valueOf(
+                resolveAttrColor(
+                    if (active) R.attr.primaryTextColor else R.attr.primaryLightColorText
+                )
+            )
+            dot.requestLayout()
+        }
+    }
+
+    /**
+     * Animates the pulse pager to [position] with a decelerate curve whose
+     * duration scales with the distance traveled: a one-page hop keeps its
+     * quick feel, while the end-of-list wrap (last → first) sweeps back at a
+     * slower, calmer pace instead of flashing across every page.
+     */
+    private fun animatePulsePage(position: Int) {
+        val pager = b.activityFeedPager
+        val pageWidth = pager.width.takeIf { it > 0 } ?: return
+        val target = position * pageWidth
+        val delta = target - pager.computeHorizontalScrollOffset()
+        if (delta == 0) return
+
+        val pagesCrossed =
+            (kotlin.math.abs(delta).toFloat() / pageWidth).coerceAtLeast(1f)
+        val duration = (PULSE_PAGE_TRANSITION_MS * pagesCrossed)
+            .toLong()
+            .coerceAtMost(PULSE_PAGE_TRANSITION_MAX_MS)
+
+        pulsePageAnimator?.cancel()
+        pulsePageAnimator = ValueAnimator.ofInt(0, delta).apply {
+            this.duration = duration
+            interpolator = DecelerateInterpolator(1.2f)
+            var last = 0
+            addUpdateListener { anim ->
+                val v = anim.animatedValue as Int
+                pager.scrollBy(v - last, 0)
+                last = v
+            }
+            start()
+        }
+    }
+
+    /** Which screen a pulse page opens when tapped. */
+    private enum class PulsePageType { CONNECTIONS, BLOCKED, DATA, APPS }
+
+    /** Opens the destination screen for a tapped pulse page. */
+    private fun onPulsePageOpened(type: PulsePageType) {
+        if (!isAdded || isStateSaved) return
+        when (type) {
+            PulsePageType.CONNECTIONS -> {
+                val intent = Intent(requireContext(), NetworkLogsActivity::class.java)
+                intent.putExtra(
+                    Constants.SEARCH_QUERY,
+                    NetworkLogsActivity.RULES_SEARCH_ID_RPN + Backend.RpnWin
+                )
+                startActivity(intent)
+            }
+
+            PulsePageType.BLOCKED -> startActivity(
+                Intent(requireContext(), NetworkLogsActivity::class.java)
+            )
+
+            PulsePageType.DATA, PulsePageType.APPS -> showPulseStatsSheet()
+        }
+    }
+
+    /** Stats sheet over the same window the pulse card displays. */
+    private fun showPulseStatsSheet() {
+        if (parentFragmentManager.findFragmentByTag(RpnStatsBottomSheet.TAG) != null) return
+        RpnStatsBottomSheet.newInstance(ACTIVITY_FEED_WINDOW_MS)
+            .show(parentFragmentManager, RpnStatsBottomSheet.TAG)
+    }
+
+    /** One single-line metric page: big number, short label, optional icons. */
+    private data class PulsePage(
+        val type: PulsePageType,
+        val value: String,
+        val valueColorAttr: Int,
+        val label: String,
+        val icons: List<Drawable> = emptyList()
+    )
+
+    private inner class PulsePagerAdapter : RecyclerView.Adapter<PulsePagerAdapter.Holder>() {
+
+        private val pages = mutableListOf<PulsePage>()
+
+        fun submit(newPages: List<PulsePage>) {
+            if (pages == newPages) return
+            pages.clear()
+            pages.addAll(newPages)
+            notifyDataSetChanged()
+        }
+
+        override fun getItemCount(): Int = pages.size
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+            val row = LinearLayout(parent.context).apply {
+                layoutParams = RecyclerView.LayoutParams(
+                    RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT
+                )
+                gravity = Gravity.CENTER_VERTICAL
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(dpPx(8), 0, dpPx(8), 0)
+            }
+            return Holder(row)
+        }
+
+        override fun onBindViewHolder(holder: Holder, position: Int) {
+            holder.row.removeAllViews()
+            val page = pages[position]
+            val ctx = holder.row.context
+            // Tap a page to open its destination: logs for connections /
+            // blocked, the stats sheet (matching window) for data / apps.
+            holder.row.setOnClickListener { onPulsePageOpened(page.type) }
+
+            holder.row.addView(AppCompatTextView(ctx).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                textSize = 22f
+                maxLines = 1
+                setTextColor(resolveAttrColor(page.valueColorAttr))
+                text = page.value
+            })
+
+            holder.row.addView(AppCompatTextView(ctx).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginStart = dpPx(10) }
+                textSize = 10.5f
+                maxLines = 1
+                letterSpacing = 0.08f
+                alpha = 0.75f
+                setTextColor(resolveAttrColor(R.attr.primaryLightColorText))
+                text = page.label
+            })
+
+            // Overlapping recent-app icons (apps page only).
+            if (page.icons.isNotEmpty()) {
+                holder.row.addView(LinearLayout(ctx).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginStart = dpPx(10) }
+                    gravity = Gravity.CENTER_VERTICAL
+                    orientation = LinearLayout.HORIZONTAL
+                    page.icons.forEachIndexed { i, d ->
+                        addView(AppCompatImageView(ctx).apply {
+                            layoutParams = LinearLayout.LayoutParams(dpPx(20), dpPx(20)).apply {
+                                marginStart = if (i == 0) 0 else -dpPx(6)
+                            }
+                            background = AppCompatResources.getDrawable(
+                                ctx, R.drawable.bg_server_avatar_circle
+                            )
+                            setImageDrawable(d)
+                            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                        })
+                    }
+                })
+            }
+
+            holder.row.addView(View(ctx).apply {
+                layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
+            })
+        }
+
+        inner class Holder(val row: LinearLayout) : RecyclerView.ViewHolder(row)
     }
 
     /**
@@ -1996,6 +2391,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.qsRelayTile.backgroundTintList =
                 ColorStateList.valueOf(resolveAttrColor(R.attr.chipBgColorPositive))
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
+            // full-strength icon so the accent tint reads clearly in the on state
+            b.qsRelayIcon.alpha = 1f
             b.qsRelayLabel.setTextColor(onColor)
             b.qsRelayState.setTextColor(onColor)
         } else {
@@ -2006,6 +2403,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             // the drawable's ~12%-alpha fill multiplies down to near-invisible (~1%).
             b.qsRelayTile.backgroundTintList = null
             b.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
+            // match the resting alpha of the other quick-setting tile icons
+            b.qsRelayIcon.alpha = 0.5f
             b.qsRelayLabel.setTextColor(offColor)
             b.qsRelayState.setTextColor(offColor)
         }
@@ -2072,8 +2471,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun startRelayBulkToggle(target: Boolean) {
         if (relayToggleInFlight) return
         relayToggleInFlight = true
-        startRelayToggleAnimation()
-        val startedAt = System.currentTimeMillis()
 
         io {
             val toUpdate = try {
@@ -2094,17 +2491,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 }
             }
 
-            // The backend round-trip can finish in tens of milliseconds; hold
-            // the orbit up for a perceptible beat regardless so the in-flight
-            // feedback is never just a single invisible frame.
-            val elapsed = System.currentTimeMillis() - startedAt
-            if (elapsed < MIN_RELAY_ORBIT_MS) {
-                delay(MIN_RELAY_ORBIT_MS - elapsed)
-            }
-
             uiCtx {
                 relayToggleInFlight = false
-                stopRelayToggleAnimation(settle = isAdded)
+                popRelayTile()
                 if (!isAdded) return@uiCtx
                 if (failures > 0) {
                     showToast(getString(R.string.qs_relay_failure_toast, failures))
@@ -2118,105 +2507,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 refreshRelayTileState()
             }
         }
-    }
-
-    /**
-     * In-flight feedback for a bulk relay toggle: a small dolphin fades in
-     * and orbits the tile ring (counter-rotated so the artwork stays upright)
-     * — the hop icon itself never spins, keeping the tile legible. The orbit
-     * is held for at least [MIN_RELAY_ORBIT_MS] so fast toggles still read.
-     */
-    private fun startRelayToggleAnimation() {
-        if (!isAdded) return
-        if (isReducedMotionPreferred()) return
-        if (relayOrbitAnimator?.isRunning == true) return
-
-        val tile = b.qsRelayTile
-        // drop any stale orbit left over from a torn-down previous run
-        relayOrbitView?.let { tile.removeView(it) }
-        relayOrbitView = null
-
-        val orbit = FrameLayout(requireContext()).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            isClickable = false
-            isFocusable = false
-        }
-        // parked one ring-radius above center; rotating the wrapper sends it
-        // around the hop icon without the icon itself moving
-        val dolphin = AppCompatImageView(requireContext()).apply {
-            setImageResource(R.drawable.dolphin_free)
-            layoutParams = FrameLayout.LayoutParams(dpPx(14), dpPx(11), Gravity.CENTER)
-            translationY = -dpPx(12).toFloat()
-            alpha = 0f
-        }
-        orbit.addView(dolphin)
-        tile.addView(orbit)
-        relayOrbitView = orbit
-
-        val fadeIn = ObjectAnimator.ofFloat(dolphin, View.ALPHA, 0f, 0.95f).apply {
-            duration = 180
-        }
-        val lap = ObjectAnimator.ofFloat(orbit, View.ROTATION, 0f, 360f).apply {
-            duration = RELAY_ORBIT_DURATION_MS
-            repeatCount = ObjectAnimator.INFINITE
-            interpolator = LinearInterpolator()
-        }
-        // counter-rotate the artwork so it stays upright while circling
-        val upright = ObjectAnimator.ofFloat(dolphin, View.ROTATION, 0f, -360f).apply {
-            duration = RELAY_ORBIT_DURATION_MS
-            repeatCount = ObjectAnimator.INFINITE
-            interpolator = LinearInterpolator()
-        }
-        relayOrbitAnimator = AnimatorSet().apply {
-            playTogether(fadeIn, lap, upright)
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    relayOrbitAnimator = null
-                }
-            })
-            start()
-        }
-    }
-
-    /**
-     * Ends the relay orbit: the dolphin dives into the tile center and fades,
-     * the tile pops once as the result lands, and the orbit wrapper is
-     * removed. Teardown paths skip straight to removal.
-     */
-    private fun stopRelayToggleAnimation(settle: Boolean) {
-        val animator = relayOrbitAnimator
-        val orbit = relayOrbitView
-        relayOrbitAnimator = null
-        if (animator != null) animator.cancel()
-        if (orbit == null) return
-        val tile = b.qsRelayTile
-        val dolphin = orbit.getChildAt(0)
-
-        if (!isAdded || !settle || dolphin == null || isReducedMotionPreferred()) {
-            tile.removeView(orbit)
-            relayOrbitView = null
-            return
-        }
-
-        dolphin.animate().cancel()
-        dolphin.animate()
-            .translationY(0f)
-            .scaleX(0.2f).scaleY(0.2f)
-            .alpha(0f)
-            .setDuration(260)
-            .setInterpolator(AccelerateDecelerateInterpolator())
-            .withEndAction {
-                if (isAdded) {
-                    tile.removeView(orbit)
-                    relayOrbitView = null
-                }
-            }
-            .start()
-        popRelayTile()
     }
 
     /** Small overshoot pop on the relay tile (result-landed beat). */
@@ -2257,7 +2547,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
         b.quickSettingsRow.alpha = alpha
-        listOf(b.qsRelayTile, b.qsAddLocationTile, b.qsBypassAppsTile, b.qsStatsTile).forEach { tile ->
+        listOf(b.qsRelayTile, b.qsBypassAppsTile, b.qsStatsTile).forEach { tile ->
             tile.isEnabled = enabled
         }
     }
@@ -2486,8 +2776,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         // Hero summary: stopped state, no avatars, no duration.
         b.tvActiveDuration.text = ""
-        b.tvCollapsedFlag.isVisible = false
-        b.tvCollapsedTitle.text = ""
         populateAvatarRow(emptyList())
         b.locationCapacityIndicator.isVisible = false
 
@@ -2518,6 +2806,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         // Hide frequent chips while proxy is stopped
         b.frequentCountriesSection.isVisible = false
+
+        // Live activity is meaningless while the proxy is stopped
+        b.activityFeedCard.isVisible = false
 
         // FAB: switch to "Start" (green VPN icon)
         applyFabStoppedState()
@@ -2595,41 +2886,34 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.rvServers.adapter = serverAdapter
         b.rvServers.itemAnimator?.apply { changeDuration = 200; moveDuration = 200; addDuration = 200; removeDuration = 200 }
 
-        b.rvSelectedServers.layoutManager = LinearLayoutManager(requireContext())
+        // Selected locations render as half-width cards, two per row, with a
+        // trailing "Add location" tile managed by the adapter itself.
+        b.rvSelectedServers.layoutManager = GridLayoutManager(requireContext(), 2)
         selectedAdapter = VpnServerAdapter(requireContext(), buildSelectedServerGroups(selectedServers), this)
         b.rvSelectedServers.adapter = selectedAdapter
         b.rvSelectedServers.itemAnimator?.apply { changeDuration = 200; moveDuration = 200; addDuration = 200; removeDuration = 200 }
     }
 
     private fun setupSearchBar() {
-        b.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { filterServers(s.toString()) }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-        b.searchClearBtn.setOnClickListener {
-            b.searchBar.text?.clear()
-            animateSearchClearButton(false)
+        // The SearchView's internal editor defaults to a large text size, which
+        // inflates the bar's height; slim it down to match the card's density.
+        b.searchBar.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
+            textSize = 14f
+            includeFontPadding = false
+            setPadding(0, 0, 0, 0)
         }
+        b.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterServers(newText.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean = true
+        })
         b.searchFilterBtn.setOnClickListener { showFilterDialog() }
         b.tvActiveFilterSummary.setOnClickListener { clearFilters() }
-        b.searchBar.setOnFocusChangeListener { _, hasFocus ->
+        b.searchBar.setOnQueryTextFocusChangeListener { _, hasFocus ->
             b.searchCard.animate().scaleX(if (hasFocus) 1.02f else 1f).scaleY(if (hasFocus) 1.02f else 1f).setDuration(150).start()
-        }
-    }
-
-    private fun animateSearchClearButton(show: Boolean) {
-        if (!isAdded) return
-        if (show && b.searchClearBtn.visibility != View.VISIBLE) {
-            b.searchClearBtn.visibility = View.VISIBLE
-            b.searchClearBtn.alpha = 0f; b.searchClearBtn.scaleX = 0.5f; b.searchClearBtn.scaleY = 0.5f
-            b.searchClearBtn.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(200)
-                .setInterpolator(AccelerateDecelerateInterpolator()).start()
-        } else if (!show && b.searchClearBtn.isVisible) {
-            b.searchClearBtn.animate().alpha(0f).scaleX(0.5f).scaleY(0.5f).setDuration(200)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .withEndAction { if (isAdded) b.searchClearBtn.visibility = View.GONE }
-                .start()
         }
     }
 
@@ -2706,8 +2990,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Keep the status card visible but update it for a premium feel.
         b.statusCard.isVisible = true
         updateConnectionStatus(if (isError) ConnectionUiState.FAILED else ConnectionUiState.DISCONNECTED)
-        b.tvCollapsedFlag.isVisible = false
-        b.tvCollapsedTitle.text = ""
         populateAvatarRow(emptyList())
 
         b.serverCountLayout.isVisible = false
@@ -3033,10 +3315,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun refreshUnselectedList() {
         if (!isAdded) return
-        val q = b.searchBar.text?.toString()?.trim()?.lowercase().orEmpty()
+        val q = b.searchBar.query?.toString()?.trim()?.lowercase().orEmpty()
         val filtered = unselectedServers.filter { matchesFilters(it, q) }
         serverAdapter.updateCountries(buildCountries(filtered))
-        animateSearchClearButton(q.isNotEmpty())
         updateFilterButtonState()
     }
 
@@ -3088,12 +3369,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun updateFilterButtonState() {
         if (!isAdded) return
         val active = isFilterActive()
+        val accent = resolveAttrColor(R.attr.accentGood)
 
         b.searchFilterBtn.iconTint = ColorStateList.valueOf(
             resolveAttrColor(if (active) R.attr.accentGood else R.attr.primaryTextColor)
         )
         b.searchFilterBtn.backgroundTintList = ColorStateList.valueOf(
-            resolveAttrColor(if (active) R.attr.chipBgColorPositive else R.attr.colorSurfaceVariant)
+            if (active) ColorUtils.setAlphaComponent(accent, 0x33)
+            else resolveAttrColor(R.attr.colorSurfaceVariant)
         )
         b.searchFilterBtn.contentDescription = if (active) {
             getString(
@@ -3115,6 +3398,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.tvActiveFilterSummary.isVisible = false
             return
         }
+        // Re-tint the pill's translucent shape with the accent so its wash
+        // matches the accent text/icon instead of the unrelated positive hue.
+        b.tvActiveFilterSummary.backgroundTintList = ColorStateList.valueOf(
+            ColorUtils.setAlphaComponent(resolveAttrColor(R.attr.accentGood), 0x33)
+        )
         b.tvActiveFilterSummary.text = summary
         b.tvActiveFilterSummary.isVisible = true
     }
@@ -3226,6 +3514,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             .create()
         dialog.show()
         UIUtils.capDialogWidth(dialog)
+        // Same accent as the checked chips, so the whole filter flow reads as
+        // one colour story instead of mixed palettes.
+        val accent = resolveAttrColor(R.attr.accentGood)
+        val neutral = resolveAttrColor(R.attr.primaryLightColorText)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(accent)
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(neutral)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(neutral)
     }
 
     /**
@@ -3264,6 +3559,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun createFilterChip(label: String, isChecked: Boolean): Chip {
         val density = resources.displayMetrics.density
+        // One accent carries the whole filter feature: the chips, the Apply
+        // button and the summary pill all use this single hue.
+        val accent = resolveAttrColor(R.attr.accentGood)
         return Chip(requireContext()).apply {
             text = label
             isCheckable = true
@@ -3274,7 +3572,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             chipBackgroundColor = ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
                 intArrayOf(
-                    resolveAttrColor(R.attr.chipBgColorPositive),
+                    ColorUtils.setAlphaComponent(accent, 0x33),
                     resolveAttrColor(R.attr.background)
                 )
             )
@@ -3282,14 +3580,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 ColorStateList(
                     arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
                     intArrayOf(
-                        resolveAttrColor(R.attr.chipTextPositive),
+                        accent,
                         resolveAttrColor(R.attr.primaryTextColor)
                     )
                 )
             )
             chipStrokeColor = ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(resolveAttrColor(R.attr.chipTextPositive), Color.TRANSPARENT)
+                intArrayOf(accent, Color.TRANSPARENT)
             )
             chipStrokeWidth = 1f * density
             // Compact but accessible touch target, matching the frequent-country chips.
@@ -3452,6 +3750,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     override fun onProxyStoppedItemTapped() {
         showToast(getString(R.string.server_settings_proxy_stopped))
+    }
+
+    override fun onAddServerTapped() {
+        // Surface the location picker: scroll to and focus the search bar that
+        // drives the "All locations" list (same entry point as the quick-settings tile).
+        focusLocationSearch()
     }
 
     override fun onRelayToggled() {

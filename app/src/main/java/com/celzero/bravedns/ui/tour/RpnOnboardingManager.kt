@@ -57,9 +57,10 @@ object RpnOnboardingManager {
             spotlightShape = SpotlightShape.ROUNDED_RECT,
             isPremium      = true,
         ),
-        // 2. Add-location quick tile — the "more than one country" discovery
+        // 2. In-grid "Add location" tile, the "more than one country" discovery.
+        // Lives inside the selected-servers grid
         TourStep(
-            targetViewId   = R.id.qs_add_location_tile,
+            targetViewId   = R.id.add_server_tile,
             titleRes       = R.string.rpn_tour_add_location_title,
             descRes        = R.string.rpn_tour_add_location_desc,
             tooltipSide    = TooltipSide.BELOW,

@@ -28,9 +28,7 @@
                 android:id="@+id/header_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
                 android:orientation="vertical"
-                android:layout_marginTop="4dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
@@ -48,6 +46,7 @@
                         android:orientation="vertical"
                         android:paddingStart="18dp"
                         android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
                         android:paddingEnd="12dp">
 
                         <LinearLayout
@@ -180,25 +179,25 @@
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/support_btn"
                                     style="@style/Widget.Material3.Button.IconButton"
-                                    android:layout_width="44dp"
-                                    android:layout_height="44dp"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
                                     android:contentDescription="@string/contact_support_title"
                                     app:icon="@drawable/ic_user_icon"
-                                    android:layout_marginEnd="2dp"
+                                    android:layout_marginEnd="4dp"
                                     app:iconGravity="textStart"
-                                    app:iconSize="26dp"
+                                    app:iconSize="22dp"
                                     app:iconTint="?attr/primaryLightColorText" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/settings_btn"
                                     style="@style/Widget.Material3.Button.IconButton"
-                                    android:layout_width="44dp"
-                                    android:layout_height="44dp"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
                                     android:contentDescription="@string/server_settings_open"
-                                    android:layout_marginEnd="-4dp"
+                                    android:layout_marginEnd="4dp"
                                     app:icon="@drawable/ic_settings"
                                     app:iconGravity="textStart"
-                                    app:iconSize="24dp"
+                                    app:iconSize="22dp"
                                     app:iconTint="?attr/primaryLightColorText" />
 
                             </LinearLayout>
@@ -334,19 +333,6 @@
 
                         </com.facebook.shimmer.ShimmerFrameLayout>
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/dolphin_watermark"
-                            android:layout_width="62dp"
-                            android:layout_height="32dp"
-                            android:layout_marginTop="-15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_gravity="end|bottom"
-                            android:translationZ="-1dp"
-                            android:visibility="visible"
-                            android:importantForAccessibility="no"
-                            android:src="@drawable/dolphin_happy_waves"
-                            app:tint="?attr/heroWatermarkTint" />
-
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
@@ -361,251 +347,186 @@
                     app:trackColor="@android:color/transparent"
                     app:trackThickness="3dp" />
 
+            <LinearLayout
+                android:id="@+id/quick_settings_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:baselineAligned="false"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
                 <LinearLayout
-                    android:id="@+id/quick_settings_row"
-                    android:layout_width="match_parent"
+                    android:id="@+id/qs_relay_tile"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
+                    android:background="@drawable/bg_qs_action_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="11dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="11dp"
+                    android:paddingBottom="8dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qs_card_actions"
-                        style="@style/RethinkPlus.ContentCard"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="4dp"
-                        android:layout_weight="1"
-                        app:strokeWidth="1dp"
-                        android:backgroundTint="?attr/colorSurface">
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/qs_relay_icon"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:alpha="0.55"
+                        android:src="@drawable/ic_hop"
+                        android:tint="?attr/primaryLightColorText" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:baselineAligned="false"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingStart="6dp"
-                            android:paddingTop="8dp"
-                            android:paddingEnd="6dp"
-                            android:paddingBottom="8dp">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/qs_relay_label"
+                        style="@style/RethinkPlus.TileLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/cd_dns_crypt_relay_heading" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:orientation="vertical">
-
-                                <FrameLayout
-                                    android:id="@+id/qs_add_location_tile"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
-                                    android:background="@drawable/bg_qs_tile"
-                                    android:clickable="true"
-                                    android:focusable="true"
-                                    android:foreground="?attr/selectableItemBackground">
-
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.5"
-                                        android:src="@drawable/ic_add"
-                                        android:tint="?attr/primaryLightColorText" />
-
-                                </FrameLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    style="@style/RethinkPlus.TileLabel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="@string/lbl_add" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/qs_add_location_state"
-                                    style="@style/RethinkPlus.TileValue"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    tools:text="2/5" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:orientation="vertical">
-
-                                <FrameLayout
-                                    android:id="@+id/qs_bypass_apps_tile"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
-                                    android:background="@drawable/bg_qs_tile"
-                                    android:clickable="true"
-                                    android:focusable="true"
-                                    android:foreground="?attr/selectableItemBackground">
-
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_gravity="center"
-                                        android:src="@drawable/ic_bypass"
-                                        android:tint="?attr/primaryLightColorText" />
-
-                                </FrameLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    style="@style/RethinkPlus.TileLabel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="@string/rpn_bypass_positive" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/qs_bypass_apps_state"
-                                    style="@style/RethinkPlus.TileValue"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    tools:text="345/462" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/qs_card_status"
-                        style="@style/RethinkPlus.ContentCard"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="4dp"
-                        android:layout_weight="1"
-                        app:strokeWidth="1dp"
-                        android:backgroundTint="?attr/colorSurface">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:baselineAligned="false"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingStart="6dp"
-                            android:paddingTop="8dp"
-                            android:paddingEnd="6dp"
-                            android:paddingBottom="8dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:orientation="vertical">
-
-                                <FrameLayout
-                                    android:id="@+id/qs_relay_tile"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
-                                    android:background="@drawable/bg_qs_tile"
-                                    android:clickable="true"
-                                    android:focusable="true"
-                                    android:foreground="?attr/selectableItemBackground">
-
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:id="@+id/qs_relay_icon"
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.5"
-                                        android:src="@drawable/ic_hop"
-                                        android:tint="?attr/primaryLightColorText" />
-
-                                </FrameLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/qs_relay_label"
-                                    style="@style/RethinkPlus.TileLabel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="@string/cd_dns_crypt_relay_heading" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/qs_relay_state"
-                                    style="@style/RethinkPlus.TileValue"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    tools:text="2/3" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center_horizontal"
-                                android:orientation="vertical">
-
-                                <FrameLayout
-                                    android:id="@+id/qs_stats_tile"
-                                    android:layout_width="38dp"
-                                    android:layout_height="38dp"
-                                    android:background="@drawable/bg_qs_tile"
-                                    android:clickable="true"
-                                    android:focusable="true"
-                                    android:foreground="?attr/selectableItemBackground">
-
-                                    <androidx.appcompat.widget.AppCompatImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_gravity="center"
-                                        android:alpha="0.5"
-                                        android:src="@drawable/ic_statistics"
-                                        android:tint="?attr/primaryLightColorText" />
-
-                                </FrameLayout>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    style="@style/RethinkPlus.TileLabel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="@string/title_statistics" />
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:id="@+id/qs_stats_state"
-                                    style="@style/RethinkPlus.TileValue"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="1dp"
-                                    tools:text="1,234" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/qs_relay_state"
+                        style="@style/RethinkPlus.TileValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        tools:text="2/3" />
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/qs_bypass_apps_tile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_qs_action_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="11dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="11dp"
+                    android:paddingBottom="8dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:alpha="0.55"
+                        android:src="@drawable/ic_bypass"
+                        android:tint="?attr/primaryLightColorText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/RethinkPlus.TileLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/rpn_bypass_positive" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/qs_bypass_apps_state"
+                        style="@style/RethinkPlus.TileValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        tools:text="345/462" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/qs_stats_tile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_qs_action_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="11dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="11dp"
+                    android:paddingBottom="8dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:alpha="0.55"
+                        android:src="@drawable/ic_statistics"
+                        android:tint="?attr/primaryLightColorText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/RethinkPlus.TileLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/title_statistics" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/qs_stats_state"
+                        style="@style/RethinkPlus.TileValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        tools:text="1,234" />
+
+                </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/activity_feed_card"
+                style="@style/RethinkPlus.ContentCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                tools:visibility="gone">
+                <LinearLayout
+                    android:id="@+id/activity_feed_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/activity_feed_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        tools:listitem="@layout/list_item_shimmer_card" />
+
+                    <LinearLayout
+                        android:id="@+id/activity_feed_dots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_selected_servers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="4dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
@@ -785,42 +706,21 @@
                     android:gravity="center_vertical"
                     android:minHeight="48dp"
                     android:orientation="horizontal"
-                    android:paddingStart="14dp"
+                    android:paddingStart="8dp"
                     android:paddingTop="6dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="6dp">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_search"
-                        android:tint="?attr/primaryLightColorText" />
-
-                    <androidx.appcompat.widget.AppCompatEditText
+                    <androidx.appcompat.widget.SearchView
                         android:id="@+id/search_bar"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:background="@null"
-                        android:hint="@string/server_selection_search_hint"
                         android:imeOptions="actionSearch"
-                        android:inputType="text"
                         android:maxLines="1"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textColorHint="?attr/primaryLightColorText"
-                        android:textCursorDrawable="@null"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/search_clear_btn"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/server_selection_clear_search"
-                        android:src="@drawable/ic_cross"
-                        android:tint="?attr/primaryLightColorText"
-                        android:visibility="gone" />
+                        app:closeIcon="@drawable/ic_cross"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="@string/server_selection_search_hint" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/search_filter_btn"
@@ -877,7 +777,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="4dp"
-                    android:textColor="?attr/chipTextPositive"
+                    android:textColor="?attr/accentGood"
                     android:textSize="12sp"
                     android:visibility="gone"
                     tools:text="Low (≤ 40%) • Favourites only"
@@ -1062,81 +962,6 @@
         android:layout_height="match_parent"
         android:clickable="false"
         android:focusable="false" />
-
-    <LinearLayout
-        android:id="@+id/collapsed_title_bar"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="top"
-        android:alpha="0"
-        android:background="?attr/background"
-        android:clickable="false"
-        android:elevation="4dp"
-        android:focusable="false"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_collapsed_flag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="22sp"
-            tools:text="🇮🇳" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_collapsed_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="2 locations" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:id="@+id/collapsed_search_pill"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:background="@drawable/bg_search_pill"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="14dp"
-            android:paddingEnd="12dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_search"
-                android:tint="?attr/primaryLightColorText" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="@string/server_selection_search_hint"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="13sp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_stop_proxy"

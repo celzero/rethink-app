@@ -40,6 +40,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
@@ -150,6 +151,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
             b.heroContent.alpha = alpha
             b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
+            // Flag watermark fades with the hero; visibility is owned by the
+            // view itself (GONE when no flag is set), so only alpha moves here.
+            b.flagWatermark.alpha = alpha
         }
 
     // SSID permission callback
@@ -342,7 +346,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Placeholder while we fetch from DB.
         b.configNameText.text = ""
         b.tvHeroCity.text = ""
-        b.tvHeroFlag.visibility = View.GONE
+        b.flagWatermark.clear()
         b.chipHeroStats.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
@@ -357,15 +361,20 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                 // SSID section needs countryConfig.
                 setupSsidSection(configKey)
-                // Banner.
+                // Banner. The flag renders as a full-banner watermark behind
+                // the hero content while expanded (same treatment as the
+                // server-list cards, scaled up); when collapsed it only
+                // travels with the collapsing-toolbar title.
                 if (config != null) {
+                    b.flagWatermark.setSpread(true)
                     if (configKey.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroFlag.visibility = View.GONE
-                        b.ivHeroFlag.visibility = View.VISIBLE
+                        // AUTO carries no country flag; fall back to the globe glyph.
+                        b.flagWatermark.setFlagDrawable(
+                            AppCompatResources.getDrawable(this@RpnConfigDetailActivity, R.drawable.ic_rpn_auto),
+                            R.attr.primaryTextColor
+                        )
                     } else {
-                        b.ivHeroFlag.visibility = View.GONE
-                        b.tvHeroFlag.visibility = View.VISIBLE
-                        b.tvHeroFlag.text = config.flagEmoji
+                        b.flagWatermark.setFlagText(config.flagEmoji)
                     }
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
@@ -377,7 +386,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.collapsingToolbar.title =
                         collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
                 } else {
-                    b.tvHeroFlag.visibility = View.GONE
+                    b.flagWatermark.clear()
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
                     b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
@@ -490,9 +499,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 val entryIp = addlInfo?.addr
                     ?.split(",")?.getOrNull(1)?.trim().orEmpty()
                 val entryCity = addlInfo?.city.orEmpty()
-                uiCtx { b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity) }
+                uiCtx {
+                    b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity)
+                    b.labelIpv4.visibility = View.GONE
+                }
             }
         } else {
+            b.labelIpv4.visibility = View.VISIBLE
             b.valueIpv4.text = ip4
                 ?.takeIf { it.ip?.isNotBlank() == true }
                 ?.let { buildIpDetailSpan(it) }

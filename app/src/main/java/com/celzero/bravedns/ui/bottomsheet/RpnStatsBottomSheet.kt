@@ -73,13 +73,17 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var loadJob: Job? = null
 
+    /** Aggregation window; callers may narrow it (e.g. the pulse card's 1h). */
+    private var timeWindowMs: Long = TIME_WINDOW_MS
+
     companion object {
         const val TAG = "RpnStatsBtmSheet"
 
         private const val TIME_WINDOW_MS = 24L * 60 * 60 * 1000
         private const val TOP_APPS_LIMIT = 10
 
-        fun newInstance(): RpnStatsBottomSheet = RpnStatsBottomSheet()
+        fun newInstance(timeWindowMs: Long = TIME_WINDOW_MS): RpnStatsBottomSheet =
+            RpnStatsBottomSheet().apply { this.timeWindowMs = timeWindowMs }
     }
 
     private fun isDarkThemeOn(): Boolean =
@@ -149,7 +153,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
             if (!isAdded) return@launch
 
-            val since = System.currentTimeMillis() - TIME_WINDOW_MS
+            val since = System.currentTimeMillis() - timeWindowMs
             val summary = withContext(Dispatchers.IO) {
                 try {
                     connectionTrackerDAO.getRpnConnStats(proxyId, since)

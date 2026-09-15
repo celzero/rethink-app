@@ -66,9 +66,9 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
     private lateinit var adapter: AppActivityAdapter
 
-    // built at open time; the sheet starts from the caller-selected window
-    // when given (see newInstance(startMs, endMs)), else from the latest
-    // ten-minute window
+    // caller-selected window (e.g. a tapped heatmap cell); re-selecting the
+    // default chip must restore this exact interval, not the latest one
+    private var callerWindow: LogActivityWindow? = null
     private var currentWindow: LogActivityWindow =
         LogActivityWindow.fromPreset(0, System.currentTimeMillis())
     private var selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
@@ -145,7 +145,10 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         if (args != null) {
             val start = args.getLong(ARG_WINDOW_START_MS)
             val end = args.getLong(ARG_WINDOW_END_MS, start + LogActivityWindow.TEN_MINUTES_MS)
-            currentWindow = LogActivityWindow(start, end)
+            LogActivityWindow(start, end).also {
+                callerWindow = it
+                currentWindow = it
+            }
             // a wall cell spans one 10-minute interval == the default chip
             selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
         } else {
@@ -205,7 +208,11 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun applyPreset(presetIndex: Int) {
         selectedPresetIndex = presetIndex
-        currentWindow = LogActivityWindow.fromPreset(presetIndex, System.currentTimeMillis())
+        // the default chip maps back to the interval the sheet was opened
+        // with (a tapped heatmap cell); only fall back to the latest window
+        // when there is no caller-selected interval
+        currentWindow = callerWindow?.takeIf { presetIndex == LogActivityWindow.defaultPresetIndex() }
+            ?: LogActivityWindow.fromPreset(presetIndex, System.currentTimeMillis())
         load(currentWindow)
     }
 

@@ -9,7 +9,7 @@
     <dimen name="max_size">1000dp</dimen>
     <dimen name="max_btn_size">340dp</dimen>
 
-    <dimen name="extra_small_font_text_view">6sp</dimen>
+    <dimen name="extra_small_font_text_view">8sp</dimen>
     <dimen name="mini_font_text_view">8sp</dimen>
     <dimen name="small_font_text_view">10sp</dimen>
     <dimen name="small_font_subheading_text">11sp</dimen>

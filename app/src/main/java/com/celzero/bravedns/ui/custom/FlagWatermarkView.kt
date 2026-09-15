@@ -32,10 +32,10 @@ import kotlin.math.roundToInt
 
 /**
  * Renders a flag (country-flag emoji text or a drawable) as a soft, upright
- * "wash" anchored to this view's end edge and vertically centred. The flag is
- * drawn large but at very low opacity, with a radial alpha mask that dissolves
- * it into the hosting card's surface; card content (text, icons) draws on top,
- * so the flag reads as ambient colour from that country rather than as an icon.
+ * "wash" anchored to this view's bottom-end corner. The flag is drawn large
+ * but at low opacity, with a radial alpha mask that dissolves it into the
+ * hosting card's surface; card content (text, icons) draws on top, so the
+ * flag reads as ambient colour from that country rather than as an icon.
  *
  * The view stretches to the full height of the hosting card (0dp + top/bottom
  * constraints in the layout) so the wash always spans the card. The card should
@@ -55,7 +55,7 @@ class FlagWatermarkView @JvmOverloads constructor(
          * Preferred side length of the square the flag content is rendered
          * into. Capped at draw time to fit shorter cards.
          */
-        const val CONTENT_SIZE_DP = 84f
+        const val CONTENT_SIZE_DP = 20f
 
         /**
          * Distance the flag used to be pushed past the card's top/end edges;
@@ -63,24 +63,44 @@ class FlagWatermarkView @JvmOverloads constructor(
          */
         const val CORNER_BLEED_DP = 18f
 
-        /**
-         * Flag opacity at its most visible point (the flag's centre). Low
-         * enough that overlapped card text stays fully legible.
-         */
-        private const val PEAK_ALPHA = 0.16f
+    /**
+     * Flag opacity at its most visible point (the flag's centre). Tuned so
+     * the country reads at a glance while overlapped card text stays legible.
+     */
+    private const val PEAK_ALPHA = 0.30f
 
-        /**
-         * How far the wash's centre sits inside the end edge, so the faintest
-         * part of the glyph stays clear of controls pinned to that edge.
-         */
-        private const val END_EDGE_INSET_DP = 60f
+    /**
+     * Distance from the end edge to the flag's near edge; small, so the wash
+     * hugs the card's bottom-end corner.
+     */
+    private const val END_EDGE_INSET_DP = 4f
 
-        /** Radial mask radius as a multiple of the content size. */
-        private const val MASK_RADIUS_FACTOR = 0.72f
+    /**
+     * Distance the flag's centre sits above the bottom edge; small, so the
+     * wash visibly anchors to the bottom-end corner of the card.
+     */
+    private const val BOTTOM_EDGE_INSET_DP = 2f
+
+    /** Radial mask radius as a multiple of the content size. */
+    private const val MASK_RADIUS_FACTOR = 0.85f
+
+    /**
+     * Fraction of the flag pushed past the end edge in spread mode, so only
+     * the remainder (1 - fraction) stays visible inside the banner.
+     */
+    private const val SPREAD_END_BLEED_FRACTION = 0.4f
     }
 
     private var flagText: String? = null
     private var flagDrawable: Drawable? = null
+
+    /**
+     * When true the wash is enlarged and anchored to the bottom-end corner,
+     * bleeding past the end edge so only part of the flag shows inside the
+     * view (banner usage); when false it stays small in the same corner
+     * (card usage).
+     */
+    private var spread = false
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -128,6 +148,18 @@ class FlagWatermarkView @JvmOverloads constructor(
         refresh()
     }
 
+    /**
+     * Switches between the small corner wash (cards) and the enlarged,
+     * end-anchored wash that bleeds off the banner's edge (banners). The
+     * cached mask is rebuilt since its geometry depends on the mode.
+     */
+    fun setSpread(enabled: Boolean) {
+        if (spread == enabled) return
+        spread = enabled
+        maskShader = null
+        invalidate()
+    }
+
     private fun refresh() {
         visibility = if (flagText != null || flagDrawable != null) VISIBLE else GONE
         contentDescription = null
@@ -164,34 +196,47 @@ class FlagWatermarkView @JvmOverloads constructor(
         if (layoutDirection == LAYOUT_DIRECTION_RTL) 1f else -1f
 
     /**
-     * Centre of the flag wash: inset from the end edge (keeping the corner
-     * area clear for overlay controls like the refresh icon) and vertically
-     * centred in the card.
+     * Centre of the flag wash. In card mode it is inset from the end edge and
+     * anchored near the bottom edge, small enough to stay clear of the title
+     * row and action chips. In spread mode the flag is larger and pushed past
+     * the end edge ([SPREAD_END_BLEED_FRACTION] bleeds off-view), so the wash
+     * fills the banner's end corner while the remaining part stays visible.
      */
     private fun flagCenter(w: Float, h: Float): Pair<Float, Float> {
         val anchor = cornerX(w)
         val dir = inwardDir(w)
-        val size = flagSize(h)
-        return (anchor + dir * (END_EDGE_INSET_DP * density + size / 2f)) to (h / 2f)
+        val size = flagSize(w, h)
+        if (spread) {
+            val bleed = size * SPREAD_END_BLEED_FRACTION
+            val cx = anchor + dir * (size / 2f - bleed)
+            val cy = h - BOTTOM_EDGE_INSET_DP * density - size / 2f
+            return cx to cy
+        }
+        val cx = anchor + dir * (END_EDGE_INSET_DP * density + size / 2f)
+        val cy = h - BOTTOM_EDGE_INSET_DP * density - size / 2f
+        return cx to cy
     }
 
     /** Content size, capped so it fits inside shorter cards. */
-    private fun flagSize(h: Float): Float =
-        min(preferredContentSize, h * 0.92f)
+    private fun flagSize(w: Float, h: Float): Float =
+        if (spread) min(w, h) * 0.95f else min(preferredContentSize, h * 0.92f)
 
     private fun buildMask(w: Float, h: Float): Shader {
         val (cx, cy) = flagCenter(w, h)
-        val size = flagSize(h)
-        // Even, gentle wash: full tint at the flag's centre, dissolving to
-        // nothing just past the glyph so card text stays legible on top.
+        val size = flagSize(w, h)
+        // Even wash: full tint at the flag's centre, holding most of that
+        // tint across the glyph before dissolving toward the view edges. In
+        // spread mode the radius extends past the glyph so the dissolve
+        // reaches the banner edges.
+        val radius = if (spread) size * 1.1f else size * MASK_RADIUS_FACTOR
         val stops = floatArrayOf(0f, 0.5f, 1f)
         val colors = intArrayOf(
             alphaColor(PEAK_ALPHA),
-            alphaColor(PEAK_ALPHA * 0.55f),
+            alphaColor(PEAK_ALPHA * 0.72f),
             alphaColor(0f)
         )
         return RadialGradient(
-            cx, cy, size * MASK_RADIUS_FACTOR,
+            cx, cy, radius,
             colors, stops, Shader.TileMode.CLAMP
         )
     }
@@ -201,18 +246,26 @@ class FlagWatermarkView @JvmOverloads constructor(
     private fun drawFlag(canvas: Canvas) {
         val w = width.toFloat()
         val h = height.toFloat()
-        val anchor = cornerX(w)
-        val dir = inwardDir(w)
-        val size = flagSize(h)
+        val size = flagSize(w, h)
+        val (cx, cy) = flagCenter(w, h)
 
-        // Content square drawn anchored at the end edge; the translate moves
-        // its centre onto the wash centre (inset from the edge, vertically
-        // centred) so the glyph stays aligned with the radial mask.
-        val rectLeft = min(anchor, anchor + dir * size)
-        val rectRight = if (rectLeft == anchor) anchor + size else anchor
+        // Content square: anchored at the end edge in card mode, positioned
+        // at the (partially off-view) wash centre in spread mode; the
+        // translate moves its centre onto the wash centre so the glyph stays
+        // aligned with the radial mask.
+        val rectLeft: Float
+        val rectRight: Float
+        if (spread) {
+            rectLeft = cx - size / 2f
+            rectRight = cx + size / 2f
+        } else {
+            val anchor = cornerX(w)
+            val dir = inwardDir(w)
+            rectLeft = min(anchor, anchor + dir * size)
+            rectRight = if (rectLeft == anchor) anchor + size else anchor
+        }
         val centreX = (rectLeft + rectRight) / 2f
         val centreY = size / 2f
-        val (cx, cy) = flagCenter(w, h)
 
         canvas.save()
         canvas.translate(cx - centreX, cy - centreY)

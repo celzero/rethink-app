@@ -2400,6 +2400,11 @@
     <string name="server_selection_filter_by_speed" translatable="false">Speed</string>
     <string name="server_selection_filter_active_desc" translatable="false">Active filter: %1$s</string>
     <string name="server_selection_filter_clear_desc" translatable="false">Tap to clear filters</string>
+    <string name="server_selection_add_tile" translatable="false">Add location</string>
+    <string name="server_selection_pulse_connections" translatable="false">connections · past hour</string>
+    <string name="server_selection_pulse_blocked" translatable="false">blocked · past hour</string>
+    <string name="server_selection_pulse_data" translatable="false">data · past hour</string>
+    <string name="server_selection_pulse_apps" translatable="false">apps · past hour</string>
     <string name="server_selection_max_info" translatable="false">Select up to 5 locations</string>
     <string name="server_selection_max_reached" translatable="false">Maximum %1$d locations can be selected</string>
     <string name="server_selection_no_servers" translatable="false">No locations found</string>
@@ -2408,7 +2413,7 @@
     <string name="server_selection_error_hint" translatable="false">Check your connection or try again in a moment.</string>
     <string name="server_selection_error_retry" translatable="false">Try Again</string>
     <string name="server_selection_vpn_stopped_title" translatable="false">Rethink is stopped</string>
-    <string name="server_selection_vpn_stopped_hint" translatable="false">Start Rethink to load your locations.</string>
+    <string name="server_selection_vpn_stopped_hint" translatable="false">Start Rethink to proceed.</string>
     <string name="server_selection_proxy_unavailable" translatable="false">Could not load locations. Proxy may not be ready yet.</string>
 
     <!-- RPN reset progress dialog (dialog_server_loading layout) -->
@@ -2503,9 +2508,9 @@
     <string name="support_attach_sub_status_desc" translatable="false">All purchase records</string>
     <string name="support_attach_history" translatable="false">State History</string>
     <string name="support_attach_history_desc" translatable="false">The last 50 purchase state transitions.</string>
-    <string name="support_attach_vpn_stats" translatable="false">VPN / Proxy Stats</string>
+    <string name="support_attach_vpn_stats" translatable="false">Proxy Stats</string>
     <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy connection statistics</string>
-    <string name="support_attach_proc_info" translatable="false">Process / Memory / Threads</string>
+    <string name="support_attach_proc_info" translatable="false">System Stats</string>
     <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state.</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
@@ -2832,7 +2837,7 @@
     <string name="rpn_tour_welcome_desc" translatable="false">Your traffic now exits through private, encrypted servers, keeping your real IP hidden. Here\'s a quick tour of what your subscription unlocks.</string>
     <string name="rpn_tour_add_location_title" translatable="false">Connect through up to 5 locations</string>
     <string name="rpn_tour_add_location_desc" translatable="false">Tap + to add up to 5 countries. Choose where each app connects from, or let RPN choose for you.</string>
-    <string name="rpn_tour_relay_title" translatable="false">Add an extra relay hop</string>
+    <string name="rpn_tour_relay_title" translatable="false">Add an extra relay</string>
     <string name="rpn_tour_relay_desc" translatable="false">Relay sends your connection through an Auto server first, then your chosen country, adding an extra hop between you and the internet.</string>
     <string name="rpn_tour_bypass_title" translatable="false">Bypass apps that need direct access</string>
     <string name="rpn_tour_bypass_desc" translatable="false">Some banking, gaming, or streaming apps may not work with proxies. Exclude them here to send their traffic directly while everything else stays protected.</string>

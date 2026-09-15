@@ -94,7 +94,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -216,7 +215,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -283,53 +281,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/support_attach_history"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium"
-                                android:textColor="?attr/primaryTextColor" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/support_attach_history_desc"
-                                android:textSize="12sp"
-                                android:textColor="?attr/primaryLightColorText" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/switch_attach_history"
-                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/divider"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical">
 
                         <LinearLayout
@@ -370,6 +321,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?attr/divider"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp" />
 
                     <LinearLayout
@@ -450,7 +402,8 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/support_privacy_note"
-            android:textSize="12sp"
+            android:textSize="10sp"
+            android:alpha="0.8"
             android:layout_marginTop="6dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"

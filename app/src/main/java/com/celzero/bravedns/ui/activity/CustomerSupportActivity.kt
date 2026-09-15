@@ -244,7 +244,6 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     private fun collectAndSend(description: String, category: String?) {
         setLoading(true)
         val includeStatus = b.switchAttachStatus.isChecked
-        val includeHistory = b.switchAttachHistory.isChecked
         val includeStats = b.switchAttachStats.isChecked
         val includeProcInfo = b.switchAttachProcInfo.isChecked
 
@@ -255,7 +254,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     runCatching { subscriptionStatusDao.getAllSubscriptions() }.getOrElse { emptyList() }
                 } else emptyList()
 
-                val recentHistory = if (includeHistory) {
+                val recentHistory = if (includeStatus) {
                     runCatching {
                         subscriptionStateHistoryDao.getRecentHistory(MAX_HISTORY_ENTRIES)
                     }.getOrElse { emptyList() }
