@@ -1228,5 +1228,4 @@
     <string name="dns_list_item_select_cd" translatable="true">Selectează %1$s</string>
     <string name="dns_list_item_selected_cd" translatable="true">%1$s, selectat</string>
     <string name="ssv_insights_no_active_conns" description="Shown in the insights view when there are no active connections." translatable="true">Nu există conexiuni active</string>
-    <string name="ssv_insights_no_data" description="Shown in the insights view when a stats section has no data for the selected period." translatable="true"></string>
 </resources>
