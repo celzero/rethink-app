@@ -53,7 +53,7 @@
         android:letterSpacing="0.01"
         android:maxLines="1"
         android:textColor="?attr/primaryTextColor"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

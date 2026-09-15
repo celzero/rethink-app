@@ -376,7 +376,7 @@
                                 android:id="@+id/qs_relay_icon"
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
-                                android:alpha="0.55"
+                                android:alpha="0.5"
                                 android:src="@drawable/ic_hop"
                                 android:tint="?attr/primaryLightColorText" />
 
@@ -416,7 +416,6 @@
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
-                                android:alpha="0.55"
                                 android:src="@drawable/ic_bypass"
                                 android:tint="?attr/primaryLightColorText" />
 

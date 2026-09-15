@@ -461,7 +461,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="@string/rpn_report_issue"
+                                android:text="@string/contact_support_title"
                                 android:textColor="?attr/primaryTextColor"
                                 android:textSize="14.5sp" />
 
