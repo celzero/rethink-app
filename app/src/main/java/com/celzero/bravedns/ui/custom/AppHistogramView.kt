@@ -33,7 +33,8 @@ import kotlin.math.roundToInt
 
 /**
  * Monochrome histogram of per-app activity for the home-screen logs card:
- * one fixed-width slot per app, ordered left to right by rank. Every slot
+ * one fixed-width slot per app, ordered left to right by the caller's chosen
+ * order (most recent activity first). Every slot
  * draws the app's icon above a rounded bar whose height encodes the value.
  *
  * Two render modes:
@@ -115,8 +116,9 @@ class AppHistogramView @JvmOverloads constructor(
     }
 
     /**
-     * Replaces the rendered data. [items] is expected pre-sorted by rank
-     * (highest value first); more entries than fit the width are simply not
+     * Replaces the rendered data. [items] is expected pre-sorted by the
+     * caller's display order (most recent activity first); more entries than
+     * fit the width are simply not
      * drawn. Icons must be resolved by the caller (off the ui thread) before
      * calling this.
      */

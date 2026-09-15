@@ -106,6 +106,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
             .take(limit)
     }
 
+    suspend fun getRecentConnectionsByProxyPrefix(prefix: String, limit: Int = 4): List<ConnectionTracker> {
+        return connectionTrackerDAO.getRecentConnectionsByProxyPrefix(prefix, limit)
+    }
+
     suspend fun closeConnections( connIds: List<String>, reason: String) {
         connectionTrackerDAO.closeConnections(connIds, reason)
     }

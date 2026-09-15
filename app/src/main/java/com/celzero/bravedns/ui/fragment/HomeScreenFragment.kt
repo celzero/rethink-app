@@ -213,6 +213,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // page-change callback kept so it can be unregistered in onDestroyView()
     private var logsPagerCallback: ViewPager2.OnPageChangeCallback? = null
 
+    // scheduled fade-out of the logs-card page dots; cancelled/restarted on
+    // every page selection and in onDestroyView()
+    private var logsDotsHideJob: Job? = null
+
     // page-change callback for the swipeable rules card; unregistered in
     // onDestroyView() for the same reason as [logsPagerCallback]
     private var rulesPagerCallback: ViewPager2.OnPageChangeCallback? = null
@@ -328,7 +332,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val HEATMAP_INTENSITY_LEVELS = 5
 
         private const val HEATMAP_GRID_ROWS = 6
-        private const val HEATMAP_GRID_HEIGHT_DP = 56
+        private const val HEATMAP_GRID_HEIGHT_DP = 60
 
         private const val HEATMAP_CELL_OVAL_RATIO = 2f
 
@@ -348,6 +352,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // page-dot indicator: unselected dots render dimmed; the selected dot
         // fills to full opacity
         private const val DOT_UNSELECTED_ALPHA = 0.35f
+
+        // how long the logs-card page dots stay visible before auto-hiding;
+        // every page selection restarts the dwell
+        private const val LOGS_DOTS_VISIBLE_MS = 3000L
 
         // how long a tapped app's values stay in the header before reverting
         // to the window totals
@@ -1350,7 +1358,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardBlockedLogsCount.visibility = View.GONE
         logsPage.fhsCardBlockedLogsLabel.visibility = View.GONE
         logsPage.fhsCardLogsDuration.visibility = View.GONE
-        // heatmap (grid + its legend) carries no data when logging is off
+        // heatmap (grid + its hour axis and legend) carries no data when
+        // logging is off
+        logsPage.fhsLogsHourAxis.visibility = View.GONE
         logsPage.fhsLogsGrid.visibility = View.GONE
         logsPage.fhsLogsLegend.visibility = View.GONE
         // allowed/blocked chips only make sense on an active card; when the
@@ -1572,6 +1582,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPagerCallback = object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 updatePagerDots(position)
+                // a swipe (or dot tap) re-reveals the dots for another dwell
+                showLogsDotsTemporarily()
                 savedLogsPagePosition = position
                 // load/refresh the histogram lazily: it sits at position 0
                 // (only when the two-page layout applies; position 0 is the
@@ -1633,14 +1645,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     /**
      * The dots exist only when the card is showing content AND the two-page
-     * layout applies. Centralized here so a brave-mode change running after
-     * disableLogsCard() cannot re-show the dots on a collapsed card.
+     * layout applies — and even then only transiently: they show for a short
+     * dwell, then auto-hide until the next page change. Centralized here so
+     * a brave-mode change running after disableLogsCard() cannot re-show the
+     * dots on a collapsed card.
      */
     private fun updateLogsDotsVisibility() {
         if (view == null || !isAdded) return
 
-        b.fhsLogsDots.visibility =
-            if (logsCardActive && pagerPageCount() > 1) View.VISIBLE else View.GONE
+        if (logsCardActive && pagerPageCount() > 1) {
+            showLogsDotsTemporarily()
+        } else {
+            logsDotsHideJob?.cancel()
+            logsDotsHideJob = null
+            b.fhsLogsDots.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Reveals the page dots and schedules them to hide after a short dwell
+     * so they never permanently occupy the card. Every page selection
+     * restarts the timer; the job is scoped to the view lifecycle so it
+     * cannot fire against a destroyed view.
+     */
+    private fun showLogsDotsTemporarily() {
+        if (view == null || !isAdded) return
+
+        b.fhsLogsDots.visibility = View.VISIBLE
+        logsDotsHideJob?.cancel()
+        logsDotsHideJob = viewLifecycleOwner.lifecycleScope.launch {
+            kotlinx.coroutines.delay(LOGS_DOTS_VISIBLE_MS)
+            if (isAdded && view != null) b.fhsLogsDots.visibility = View.GONE
+        }
     }
 
     private fun pagerPageCount(): Int {
@@ -1684,7 +1720,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * and dns-log rows — the two tables hold distinct event kinds, and the
      * merge key (uid, appName) collapses them into a single entry per app so
      * nothing is listed or counted twice. Unknown apps are excluded in both
-     * modes.
+     * modes. Membership in the top-20 is rank-based, but the returned order
+     * is by most recent activity so the bar layout shifts as apps connect.
      */
     private fun refreshTopAppsHistogram(force: Boolean = false) {
         if (!appConfig.getBraveMode().isFirewallActive()) return
@@ -1720,24 +1757,34 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (blocked) {
                 val conn = connectionTrackerRepository.getTopBlockedApps(start, end, TOP_APPS_COUNT)
                 val dns = dnsLogRepository.getTopBlockedApps(start, end, TOP_APPS_COUNT)
-                val merged = LinkedHashMap<Pair<Int, String>, Long>()
+                // value = (blocked count, most recent activity); the count
+                // picks the top-20 members, the timestamp orders their display
+                val merged = LinkedHashMap<Pair<Int, String>, Pair<Long, Long>>()
                 for (row in conn + dns) {
                     if (isUnknownAppName(row.appName)) continue
                     val key = row.uid to row.appName
-                    merged[key] = (merged[key] ?: 0L) + row.blocked
+                    val prev = merged[key]
+                    merged[key] =
+                        (prev?.first ?: 0L) + row.blocked to maxOf(prev?.second ?: 0L, row.lastSeen)
                 }
                 merged.entries
-                    .sortedByDescending { it.value }
+                    .sortedByDescending { it.value.first }
                     .take(TOP_APPS_COUNT)
+                    // stable sort: apps last active in the same millisecond
+                    // keep their blocked-count rank as the tie-breaker
+                    .sortedByDescending { it.value.second }
                     .map {
                         AppHistogramView.Entry(
-                            it.key.first, it.key.second, 0L, 0L, it.value,
+                            it.key.first, it.key.second, 0L, 0L, it.value.first,
                             iconForUid(ctx, it.key.first)
                         )
                     }
             } else {
+                // the query still picks the top-20 by bytes; display order is
+                // by last activity, with rank as the tie-breaker (stable sort)
                 connectionTrackerRepository.getTopAppsByUsage(start, end, TOP_APPS_COUNT)
                     .filter { !isUnknownAppName(it.appName) }
+                    .sortedByDescending { it.lastSeen }
                     .map {
                         AppHistogramView.Entry(
                             it.uid, it.appName,
@@ -2328,6 +2375,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardBlockedLogsLabel.visibility = View.VISIBLE
         logsPage.fhsCardLogsDuration.visibility = View.VISIBLE
         logsPage.fhsLogsGrid.visibility = View.VISIBLE
+        logsPage.fhsLogsHourAxis.visibility = View.VISIBLE
         logsPage.fhsLogsLegend.visibility = View.VISIBLE
         logsPage.fhsLogsToggleGroup.visibility = View.VISIBLE
         // expand the pager back; the transition grows the card smoothly so
@@ -2995,6 +3043,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // here prevents it from outliving the (recreated) view
         logsPagerCallback?.let { b.fhsLogsPager.unregisterOnPageChangeCallback(it) }
         logsPagerCallback = null
+        logsDotsHideJob?.cancel()
+        logsDotsHideJob = null
         topAppsHeaderRevertJob?.cancel()
         topAppsHeaderRevertJob = null
         rulesPagerCallback?.let { b.fhsFirewallRulesPager.unregisterOnPageChangeCallback(it) }

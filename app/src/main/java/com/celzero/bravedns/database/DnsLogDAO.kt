@@ -133,6 +133,11 @@ interface DnsLogDAO {
     )
     suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow
 
+    // Global blocked-DNS count over a window; pairs with
+    // ConnectionTrackerDAO.countBlockedConnectionsSince for the pulse card.
+    @Query("select count(id) from DNSLogs where isBlocked = 1 and time > :since")
+    suspend fun countBlockedDnsSince(since: Long): Int
+
     @Query(
         "select * from DNSLogs where time >= :start and time < :end order by id desc limit :limit"
     )
@@ -145,9 +150,10 @@ interface DnsLogDAO {
 
     // apps ranked by blocked dns queries within the window; rows are distinct
     // events from connection-tracker rows, so merging with ConnectionTrackerDAO
-    // results by (uid, appName) sums the two event kinds without double counting
+    // results by (uid, appName) sums the two event kinds without double
+    // counting; lastSeen is the app's most recent activity, for recency ordering
     @Query(
-        "select uid as uid, appName as appName, sum(case when isBlocked then 1 else 0 end) as blocked " +
+        "select uid as uid, appName as appName, sum(case when isBlocked then 1 else 0 end) as blocked, max(time) as lastSeen " +
             "from DNSLogs where time >= :start and time < :end " +
             "group by uid, appName having blocked > 0 order by blocked desc limit :limit"
     )

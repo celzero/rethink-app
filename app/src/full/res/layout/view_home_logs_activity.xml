@@ -115,28 +115,106 @@
             app:chipStrokeWidth="1dp" />
     </com.google.android.material.chip.ChipGroup>
 
+    <LinearLayout
+        android:id="@+id/fhs_logs_hour_axis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="8"
+        app:layout_constraintTop_toBottomOf="@id/fhs_logs_header"
+        tools:ignore="HardcodedText">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="start"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="24hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="18hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="12hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="6hr"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="0.55"
+            android:fontFamily="monospace"
+            android:gravity="end"
+            android:letterSpacing="0.05"
+            android:maxLines="1"
+            android:text="now"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_small_font_text_view" />
+    </LinearLayout>
+
     <GridLayout
         android:id="@+id/fhs_logs_grid"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
         android:columnCount="24"
         android:rowCount="6"
-        app:layout_constraintTop_toBottomOf="@id/fhs_logs_header" />
+        app:layout_constraintBottom_toTopOf="@id/fhs_card_logs_duration"
+        app:layout_constraintTop_toBottomOf="@id/fhs_logs_hour_axis"
+        app:layout_constraintVertical_bias="0" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fhs_card_logs_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:alpha="0.8"
         android:letterSpacing="0.08"
         android:text="@string/logs_card_heatmap_window"
         android:textAllCaps="true"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_text_view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fhs_logs_grid"
         tools:text="last 24 hours" />
 
     <LinearLayout
