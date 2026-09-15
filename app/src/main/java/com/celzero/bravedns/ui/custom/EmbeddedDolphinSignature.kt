@@ -267,6 +267,9 @@ class EmbeddedDolphinSignature @JvmOverloads constructor(
         visibility = View.GONE
         // evaluate once the host has laid out; the shared window watchers
         // registered at attach drive every update after that
+        if (isAttachedToWindow) {
+            addWindowWatchers()
+        }
         host.post { updateOverlayVisibility() }
     }
 
