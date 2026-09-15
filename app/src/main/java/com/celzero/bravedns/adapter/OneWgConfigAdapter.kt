@@ -60,6 +60,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val eventLogger: EventLogger) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -147,7 +148,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             job = io {
                 while (true) {
                     updateStatus(config)
-                    delay(DELAY_MS)
+                    delay(DELAY_MS.milliseconds)
                 }
             }
         }
