@@ -1311,4 +1311,5 @@
     <string name="logs_card_apps_hint_blocked" translatable="true">Apps mit den am meisten blockierten Versuchen · letzte 24 Stunden</string>
     <string name="logs_card_apps_count_label_allowed" translatable="true">Verbrauchte Daten</string>
     <string name="logs_card_apps_count_label_blocked" translatable="true">blockiert</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">WLAN</string>
 </resources>
