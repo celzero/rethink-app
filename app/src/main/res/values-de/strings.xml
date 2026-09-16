@@ -1298,4 +1298,17 @@
     <string name="rpn_stats_empty" translatable="true">In den letzten 24 Stunden sind keine Verbindungen über die ausgewählten Server gegangen.</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Rethink starten, um Proxy-Statistiken zu sehen</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s Verb</string>
+    <string name="lbl_enable" translatable="true">Aktivieren</string>
+    <string name="lbl_app_rules" translatable="true">App-Regeln</string>
+    <string name="bsct_meta_destination" translatable="true">Richtung</string>
+    <string name="bsct_meta_activity" translatable="true">Aktivität</string>
+    <string name="bsct_meta_info" translatable="true">Info</string>
+    <string name="hsf_rules_univ_label" translatable="true">Universelle Firewall-Regeln</string>
+    <string name="hsf_rules_ip_label" translatable="true">universelle IP-Regeln</string>
+    <string name="hsf_rules_dom_label" translatable="true">universelle Domain-Regeln</string>
+    <string name="hsf_rules_pager_desc" translatable="true">Wischen, um universelle Firewall-, IP- und Domainregeln zu sehen</string>
+    <string name="logs_card_apps_hint_allowed" translatable="true">Daten, die von deinen aktivsten Apps verwendet wurden · letzte 24 Stunden</string>
+    <string name="logs_card_apps_hint_blocked" translatable="true">Apps mit den am meisten blockierten Versuchen · letzte 24 Stunden</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">Verbrauchte Daten</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">blockiert</string>
 </resources>
