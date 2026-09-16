@@ -366,6 +366,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // killed; deliberately not persisted to disk
         private var savedLogsPagePosition = 0
         private var savedTopAppsBlockedMode = false
+        private var savedLogsDisplayMode = ActivityDisplayMode.ALLOWED
     }
 
     enum class ScreenType {
@@ -401,7 +402,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         captureActiveEmphasis()
         updateMainButtonUi()
         updateCardsUi()
-        updateLogsToggleUi(displayMode == ActivityDisplayMode.BLOCKED)
+        updateLogsToggleUi(savedLogsDisplayMode == ActivityDisplayMode.BLOCKED)
         observeLogActivity()
         // one listener on the grid container itself: every tap anywhere inside
         logsPage.fhsLogsGrid.isClickable = true
@@ -805,7 +806,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         disabledDnsCard()
         disableAppsCard()
         disableProxyCard()
-        disableLogsCard()
+        disableLogsCard(animateTransition = false)
     }
 
     private fun showActiveCards() {
@@ -875,9 +876,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableLogsCardIfNeeded() {
         if (isVpnActivated && persistentState.logsEnabled) {
-            observeLogsCount()
+            observeLogsCount(animateTransition = false)
         } else {
-            disableLogsCard()
+            disableLogsCard(animateTransition = false)
         }
     }
 
@@ -1350,7 +1351,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         proxyStateListenerJob = null
     }
 
-    private fun disableLogsCard() {
+    private fun disableLogsCard(animateTransition: Boolean = true) {
         if (view == null || !isAdded) return
 
         logsPage.fhsCardAllowedLogsCount.visibility = View.GONE
@@ -1368,7 +1369,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsLogsToggleGroup.visibility = View.GONE
         // collapse the pager, but keep a hint so the card never reads as
         // empty; the transition animates the collapse smoothly
-        animateLogsCardTransition()
+        animateLogsCardTransition(animateTransition)
         logsCardActive = false
         b.fhsLogsPager.visibility = View.GONE
         updateLogsDotsVisibility()
@@ -1522,6 +1523,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun toggleLogsView(mode: ActivityDisplayMode) {
         if (displayMode == mode) return
         displayMode = mode
+        savedLogsDisplayMode = mode
         updateLogsHeaderEmphasis(mode == ActivityDisplayMode.BLOCKED)
 
         // re-render from the cached aggregate only; the toggle must not
@@ -2134,8 +2136,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val state = lastActivityState ?: return null
         if (state.intervals.size < LogActivityAggregator.TOTAL_SLOTS) return null
         if (grid.width <= 0 || grid.height <= 0) return null
+        // handle layout RTL
+        val x =
+            if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                grid.width - lastGridTouchX
+            } else {
+                lastGridTouchX
+            }
         val col =
-            ((lastGridTouchX / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+            ((x / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
                 .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
         val row =
             ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
@@ -2367,7 +2376,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * state (the same source as the heatmap) inside [buildLogsHeatmap];
      * nothing is observed from the log databases here.
      */
-    private fun observeLogsCount() {
+    private fun observeLogsCount(animateTransition: Boolean = true) {
         logsPage.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_allowed)
         logsPage.fhsCardAllowedLogsLabel.visibility = View.VISIBLE
         logsPage.fhsCardAllowedLogsCount.visibility = View.VISIBLE
@@ -2379,8 +2388,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsLogsLegend.visibility = View.VISIBLE
         logsPage.fhsLogsToggleGroup.visibility = View.VISIBLE
         // expand the pager back; the transition grows the card smoothly so
-        // re-enabling never snaps the surrounding cards into place
-        animateLogsCardTransition()
+        animateLogsCardTransition(animateTransition)
         logsCardActive = true
         b.fhsLogsPager.visibility = View.VISIBLE
         updateLogsDotsVisibility()
@@ -2397,7 +2405,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * the collapse/expand of the pager animates instead of snapping the card
      * and everything below it into a new size.
      */
-    private fun animateLogsCardTransition() {
+    private fun animateLogsCardTransition(animate: Boolean = true) {
+        if (!animate) return
         (b.fhsCardLogsLl.parent as? ViewGroup)?.let { parent ->
             TransitionManager.beginDelayedTransition(parent)
         }
