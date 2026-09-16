@@ -804,6 +804,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // timestamp of the last successful /g/device registration call.
     var deviceRegistrationTimestamp by longPref("device_registration_timestamp").withDefault<Long>(0L)
 
+    // monthly entitlement reconcile
+    var lastForcedReconcileTimestamp by longPref("last_forced_reconcile_timestamp").withDefault<Long>(0L)
+
     // whether the guided tour has been completed; false = show the tour
     var guidedTourCompleted by booleanPref("guided_tour_completed").withDefault<Boolean>(false)
 
