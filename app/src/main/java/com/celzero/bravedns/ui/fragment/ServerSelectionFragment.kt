@@ -80,6 +80,7 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
 import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
@@ -115,6 +116,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
@@ -143,6 +146,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val appInfoRepository by inject<AppInfoRepository>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val dnsLogDAO by inject<DnsLogDAO>()
+    private val rethinkLogDao by inject<RethinkLogDao>()
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
     private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
@@ -541,7 +545,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.serversScrollView.post {
             b.serversScrollView.setPadding(
                 b.serversScrollView.paddingLeft,
-                dpPx(20),
+                0,
                 b.serversScrollView.paddingRight,
                 b.serversScrollView.paddingBottom
             )
@@ -1020,7 +1024,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.rvServers.isVisible = false
             b.emptySelectionCard.isVisible = false
             b.rvSelectedServers.isVisible = false
-            b.selectedLocationsHeader.isVisible = false
             b.frequentCountriesSection.isVisible = false
             b.locationCapacityIndicator.isVisible = false
             b.errorStateContainer.isVisible = false
@@ -1404,40 +1407,41 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    /**
-     * Loads the RPN-only activity heat map: aggregates connection logs routed
-     * through RPN proxies (proxyDetails prefixed with [Backend.RpnWin]) into
-     * 10-minute buckets over the trailing 24 hours, then renders the wall
-     * inside the hero banner (full card width). The window is anchored to the
-     * hour boundary so every COLUMN of the wall is an exact clock hour —
-     * column 23 (the last) is the current, partially-elapsed hour.
-     */
     private fun loadRpnHeatmap() {
         io {
             try {
-                // Exclusive end == start of the NEXT hour, so columns are
-                // exact clock hours (epoch-aligned, no timezone involvement).
-                // rangeStart then sits exactly 24 whole hours back.
+                val proxyIdFilter = Backend.RpnWin + "%"
                 val now = System.currentTimeMillis()
-                val hourMs = TimeUnit.HOURS.toMillis(1)
-                val rangeEnd = (now / hourMs + 1) * hourMs
+                val rangeEnd = (now / RPN_HEATMAP_BUCKET_MS + 1) * RPN_HEATMAP_BUCKET_MS
                 val rangeStart = rangeEnd - RPN_HEATMAP_WINDOW_MS
-                val rows = connectionTrackerDAO.getRpnActivityBuckets(
-                    Backend.RpnWin + "%",
-                    rangeStart,
-                    rangeEnd,
-                    RPN_HEATMAP_BUCKET_MS
-                )
-                // fold grouped rows into per-bucket counts, chronological
-                // (oldest bucket first) so the grid can be filled row-major
-                val counts = LongArray(RPN_HEATMAP_SLOTS)
-                rows.forEach { row ->
-                    val idx = row.bucketIndex.toInt()
-                    if (idx in counts.indices) counts[idx] += row.total
-                }
-                uiCtx {
-                    heatmapWindowEndMs = rangeEnd
-                    renderRpnHeatmap(counts)
+                coroutineScope {
+                    val dnsRows = async {
+                        dnsLogDAO.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+                    val connRows = async {
+                        connectionTrackerDAO.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+                    val rlogRows = async {
+                        rethinkLogDao.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+
+                    val counts = LongArray(RPN_HEATMAP_SLOTS)
+                    for (rows in listOf(dnsRows, connRows, rlogRows)) {
+                        rows.await().forEach { row ->
+                            val idx = row.bucketIndex.toInt()
+                            if (idx in counts.indices) counts[idx] += row.total
+                        }
+                    }
+                    uiCtx {
+                        heatmapWindowEndMs = rangeEnd
+                        renderRpnHeatmap(counts)
+                    }
                 }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "$TAG.loadRpnHeatmap failed: ${e.message}")
@@ -2897,7 +2901,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun updateSelectedSectionVisibility() {
         if (!isAdded) return
         val hasSelection = selectedServers.isNotEmpty()
-        b.selectedLocationsHeader.isVisible = hasSelection
         b.rvSelectedServers.isVisible = hasSelection
         b.rvSelectedServers.isVisible = hasSelection
 

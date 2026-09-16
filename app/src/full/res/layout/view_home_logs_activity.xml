@@ -134,7 +134,7 @@
             android:gravity="start"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="24hr"
+            android:text="24"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -147,7 +147,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="18hr"
+            android:text="18"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -160,7 +160,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="12hr"
+            android:text="12"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -173,7 +173,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="6hr"
+            android:text="6"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
