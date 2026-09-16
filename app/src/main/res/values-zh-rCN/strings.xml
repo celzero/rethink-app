@@ -751,7 +751,7 @@
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">拦截最多的 IP</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">连接最多的 IP</string>
     <string name="ssv_see_more">显示所有</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">启动 Rethink 以继续</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">启动 Rethink</string>
     <string name="lbl_all" translatable="true">全部</string>
     <string name="lbl_blocked" translatable="true">拦截</string>
     <string name="lbl_wildcard" translatable="true">通配</string>
@@ -1144,7 +1144,7 @@
     <string name="vpn_policy_relaxed_desc" translatable="true">对值得关注的连接变更作出响应。</string>
     <string name="vpn_policy_fixed_desc" translatable="true">对网络变更作出最低限度响应。</string>
     <string name="smart_dns" translatable="true">智能 DNS</string>
-    <string name="smart_dns_desc" translatable="true"><i>智能 DNS</i> 会随机使用以下任意一个 DNS 解析器：</string>
+    <string name="smart_dns_desc" translatable="true">根据所选筛选器自动选择合适的 DNS</string>
     <string name="title_database_dump" translatable="true">数据库</string>
     <plurals name="server_count">
         <item quantity="other">%1$d 个位置</item>
@@ -1297,4 +1297,41 @@
     <string name="rpn_stats_empty" translatable="true">过去 24 小时没有连接流经所选服务器。</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">启动 Rethink 查看代理统计数</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s 个连接</string>
+    <string name="lbl_enable" translatable="true">启用</string>
+    <string name="lbl_app_rules" translatable="true">应用程序规则</string>
+    <string name="bsct_meta_destination" translatable="true">目的地</string>
+    <string name="bsct_meta_activity" translatable="true">活动</string>
+    <string name="bsct_meta_info" translatable="true">信息</string>
+    <string name="hsf_rules_univ_label" translatable="true">全局防火墙规则</string>
+    <string name="hsf_rules_ip_label" translatable="true">全局 IP 规则</string>
+    <string name="hsf_rules_dom_label" translatable="true">全局域名规则</string>
+    <string name="hsf_rules_pager_desc" translatable="true">滑动查看全局防火墙、IP、域名规则</string>
+    <string name="logs_card_apps_hint_allowed" translatable="true">最活跃应用使用的数据 · 近 24 小时</string>
+    <string name="logs_card_apps_hint_blocked" translatable="true">连接尝试拦截最多的应用· 近24小时</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">所用数据</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">拦截</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s 蜂窝网络</string>
+    <string name="logs_card_apps_empty" translatable="true">还没有可显示的</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">Wi-Fi</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">蜂窝网络</string>
+    <string name="logs_card_pager_desc" translatable="true">滑动切换活动和 top 应用</string>
+    <string name="logs_card_disabled_logs_hint" translatable="true">启用日志查看近期活动</string>
+    <string name="logs_card_disabled_vpn_hint" translatable="true">启动 VPN 查看近期活动</string>
+    <string name="dns_btm_blocked" translatable="true">已拦截 %1$s</string>
+    <string name="dns_btm_resolved_anonymously" translatable="true">匿名解析了 %1$s</string>
+    <string name="dns_btm_info_via" translatable="true">%1$s via %2$s</string>
+    <string name="dns_btm_info_on_device" translatable="true">设备上</string>
+    <string name="bsdl_meta_resolver" translatable="true">解析器</string>
+    <string name="bsdl_meta_query_type" translatable="true">查询类型</string>
+    <string name="bsdl_open_domain_connections" translatable="true">未断开的域名连接</string>
+    <string name="bsdl_meta_app" translatable="true">应用</string>
+    <string name="bsdl_meta_response" translatable="true">响应</string>
+    <string name="bsdl_meta_alias" translatable="true">别名</string>
+    <string name="bsdl_meta_region" translatable="true">区域</string>
+    <string name="bsdl_rule_scope_app_title" translatable="true">此应用</string>
+    <string name="bsdl_rule_scope_app_title_fmt" translatable="true">%1$s</string>
+    <string name="bsdl_rule_scope_global_title" translatable="true">所有应用</string>
+    <string name="bsdl_rule_status_none" translatable="true">无规则</string>
+    <string name="bsdl_rule_status_blocked" translatable="true">已拦截</string>
+    <string name="bsdl_rule_status_trusted" translatable="true">已信任</string>
 </resources>
