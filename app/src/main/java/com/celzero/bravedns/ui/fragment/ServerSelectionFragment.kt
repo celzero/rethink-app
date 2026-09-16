@@ -379,16 +379,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         private const val ACTIVITY_FEED_REFRESH_MS = 10_000L
 
         /** Auto-advance cadence for the pulse carousel, in milliseconds. */
-        private const val ACTIVITY_FEED_AUTO_ADVANCE_MS = 5_000L
+        private const val ACTIVITY_FEED_AUTO_ADVANCE_MS = 8_000L
 
         /** Auto-advance pauses for this long after the user touches the pager. */
         private const val PULSE_USER_INTERACTION_GRACE_MS = 2_500L
 
         /** Page-transition duration for a single-page hop, in milliseconds. */
-        private const val PULSE_PAGE_TRANSITION_MS = 750L
+        private const val PULSE_PAGE_TRANSITION_MS = 1_500L
 
         /** Upper bound so long wraps stay calm, not sluggish. */
-        private const val PULSE_PAGE_TRANSITION_MAX_MS = 2_000L
+        private const val PULSE_PAGE_TRANSITION_MAX_MS = 3_000L
 
         /** Alpha of the inactive carousel dots. */
         private const val PULSE_DOT_INACTIVE_ALPHA = 0.3f
@@ -2217,7 +2217,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     RecyclerView.LayoutParams.MATCH_PARENT,
                     RecyclerView.LayoutParams.WRAP_CONTENT
                 )
-                gravity = Gravity.CENTER_VERTICAL
+                gravity = Gravity.CENTER
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(dpPx(8), 0, dpPx(8), 0)
             }
@@ -2280,10 +2280,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     }
                 })
             }
-
-            holder.row.addView(View(ctx).apply {
-                layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
-            })
         }
 
         inner class Holder(val row: LinearLayout) : RecyclerView.ViewHolder(row)
