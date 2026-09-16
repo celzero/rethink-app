@@ -107,7 +107,7 @@
     <string name="lbl_idle" translatable="true">Inactiv</string>
     <string name="lbl_peer" translatable="true">Pereche</string>
     <string name="lbl_split" translatable="true">Ramificat</string>
-    <string name="lbl_on_device" translatable="true">pe dispozitiv</string>
+    <string name="lbl_on_device" translatable="true">în dispozitiv</string>
     <string name="lbl_unselected" translatable="true">Neselectat</string>
     <string name="lbl_notification" translatable="true">Notificare</string>
     <string name="memory_notification_text">Rethink nu dispune de suficientă memorie. Operațiunile sistemului ar putea fi limitate.</string>
@@ -636,7 +636,7 @@
     <string name="firewall_rule_block_app_exception" translatable="true">Eroare</string>
     <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează <i>IP-ul destinație</i>.<br><br> Pentru a schimba, mergi la tab-ul <i>Firewall per Aplicație</i>.]]></string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>IP-ul destinație</i> este setat să ocolească toate regulile firewall.<br/><br/> Pentru a schimba, mergi la <i>Reguli IP<i> în tab-ul <i>Universal</i>.]]></string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că the <i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor dns și firewall</i>.<br><br> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor dns și firewall</i>.<br><br> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>domeniul</i> este setat de încredere de regulile Universale de domeniu.<br><br> Pentru modificare, mergi la tab-ul<i>Configurare DNS</i>.]]></string>
     <string name="new_app_bulk_notification_title" translatable="true">Atenție</string>
     <string name="new_app_notification_action_toast_deny" translatable="true">Conexiune de rețea refuzată pentru aplicație</string>
@@ -903,7 +903,7 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Cele mai contactate IP-uri</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Cele mai blocate IP-uri</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Cele mai blocate tari</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Pornește Rethink pentru a începe</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Pornește Rethink</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Valoarea nu e validă</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Numărul nu e valid</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Cheia nu e validă</string>
@@ -1065,7 +1065,7 @@
     <string name="smart_dns" translatable="true">Smart DNS</string>
     <string name="processing_dialog_title" translatable="true">Procesare</string>
     <string name="processing_dialog_desc" translatable="true">Te rog să aștepți până procesăm cererea ta.</string>
-    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> utilizează la întâmplare oricare din acești rezolvatori DNS:</string>
+    <string name="smart_dns_desc" translatable="true">Alege automat DNS-ul potrivit în funcție de filtrele selectate</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Modul Date-Mobile nu este acceptat pentru retransmitere</string>
     <string name="vpn_policy_auto_desc" translatable="true">Reacționează la schimbări importante ale rețelei și conectivității.</string>
     <string name="vpn_policy_sensitive" translatable="true">Sensibil</string>
@@ -1268,4 +1268,41 @@
     <string name="lbl_on" translatable="true">Pornit</string>
     <string name="lbl_off" translatable="true">Oprit</string>
     <string name="logs_card_grid_desc" translatable="true">Grilă activitate, tap pentru detalii</string>
+    <string name="lbl_enable" translatable="true">Activează</string>
+    <string name="lbl_app_rules" translatable="true">Reguli pt. aplicație</string>
+    <string name="bsct_meta_destination" translatable="true">Destinație</string>
+    <string name="bsct_meta_activity" translatable="true">Activitate</string>
+    <string name="bsct_meta_info" translatable="true">Info</string>
+    <string name="hsf_rules_univ_label" translatable="true">reguli universale firewall</string>
+    <string name="hsf_rules_ip_label" translatable="true">reguli universale IP</string>
+    <string name="hsf_rules_dom_label" translatable="true">reguli universale domeniu</string>
+    <string name="hsf_rules_pager_desc" translatable="true">Swipe pentru a vedea regulile universale de firewall, IP și domeniu</string>
+    <string name="logs_card_apps_hint_allowed" translatable="true">Date utilizate de cea mai activă aplicație</string>
+    <string name="logs_card_apps_hint_blocked" translatable="true">Aplicația cu cele mai multe încercări blocate</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">date utilizate</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">blocat</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s date mobile</string>
+    <string name="logs_card_apps_empty" translatable="true">Nimic de arătat deocamdată</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">Wi-Fi</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">Date mobile</string>
+    <string name="logs_card_pager_desc" translatable="true">Swipe pentru a comuta inte activitate și top aplicații</string>
+    <string name="logs_card_disabled_logs_hint" translatable="true">Activează jurnalele pentru a vedea activitatea recentă</string>
+    <string name="logs_card_disabled_vpn_hint" translatable="true">Pornește VPN pentru a vedea activitatea recentă</string>
+    <string name="dns_btm_blocked" translatable="true">blocate %1$s</string>
+    <string name="dns_btm_resolved_anonymously" translatable="true">rezolvate anonim %1$s</string>
+    <string name="dns_btm_info_via" translatable="true">%1$s via %2$s</string>
+    <string name="dns_btm_info_on_device" translatable="true">în dispozitiv</string>
+    <string name="bsdl_meta_resolver" translatable="true">Rezolvator</string>
+    <string name="bsdl_meta_query_type" translatable="true">Tip interogare</string>
+    <string name="bsdl_open_domain_connections" translatable="true">Conexiuni domeniu deschis</string>
+    <string name="bsdl_meta_app" translatable="true">Aplicația</string>
+    <string name="bsdl_meta_response" translatable="true">Răspuns</string>
+    <string name="bsdl_meta_alias" translatable="true">Alias</string>
+    <string name="bsdl_meta_region" translatable="true">Regiune</string>
+    <string name="bsdl_rule_scope_app_title" translatable="true">Pentru această aplicație</string>
+    <string name="bsdl_rule_scope_app_title_fmt" translatable="true">Pentru %1$s</string>
+    <string name="bsdl_rule_scope_global_title" translatable="true">Pentru toate aplicațiile</string>
+    <string name="bsdl_rule_status_none" translatable="true">Nu există reguli</string>
+    <string name="bsdl_rule_status_blocked" translatable="true">Blocată</string>
+    <string name="bsdl_rule_status_trusted" translatable="true">De încredere</string>
 </resources>
