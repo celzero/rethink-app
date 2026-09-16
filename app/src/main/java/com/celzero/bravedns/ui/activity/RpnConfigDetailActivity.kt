@@ -1098,8 +1098,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // Revert the checkbox first; re-applied on proceed.
                     setMobileCheckSilently(false)
                     MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
-                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
                         .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyMobileOnly(true) }
                         .setNegativeButton(getString(R.string.lbl_cancel), null)
                         .show()
@@ -1551,8 +1551,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // Revert the switch first; re-applied on proceed.
                     setSsidCheckSilently(false)
                     MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
-                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
                         .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> persistSsid(true) }
                         .setNegativeButton(getString(R.string.lbl_cancel), null)
                         .show()

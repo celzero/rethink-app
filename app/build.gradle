@@ -421,31 +421,6 @@ android {
     }
     lint {
         abortOnError true
-        // Lint analyzes main, androidTest and unitTest sources of the variant by
-        // default; the unitTest analysis (lintAnalyze<Variant>UnitTest) take more time
-        // to complete. Restrict lint to the variant's main sources.
-        ignoreTestSources true
-    }
-
-    testOptions {
-        unitTests {
-            // Plain JVM unit tests load the stubbed android.jar, whose methods
-            // throw "not mocked" by default.
-            returnDefaultValues = true
-            // NOTE: includeAndroidResources is intentionally left disabled.
-            // Enabling it makes Robolectric inflate the real manifest, which
-            // instantiates the app Application (initializes the gojni native
-            // backend, unavailable on the JVM) and breaks Material-themed
-            // activity tests.
-        }
-    }
-
-    // Test-task tuning is done lazily on the task container (configureEach)
-    // instead of unitTests.all {} to avoid eager configuration.
-    tasks.withType(Test).configureEach {
-        // Robolectric sandboxes across ~1200 tests exceed the 512m
-        // default, causing spurious OOMs in classes that run late.
-        maxHeapSize = "2g"
     }
 
     // ------------------------------------------------------------------

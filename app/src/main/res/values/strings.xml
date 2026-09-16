@@ -2263,22 +2263,21 @@
     <string name="rpn_title" translatable="false">RPN</string>
 
     <string name="rpn_overhauled_purchased_date_label" translatable="false">Purchased %1$s</string>
-    <string name="rpn_overhauled_manage_purchase_desc" translatable="false">Plan, orders, entitlement, cancel</string>
+    <string name="rpn_overhauled_manage_purchase_desc" translatable="false">Plan, orders, cancel.</string>
     <string name="rpn_overhauled_plan_details_header" translatable="false">Plan details</string>
     <string name="rpn_overhauled_ending_plan_header" translatable="false">Ending your plan</string>
     <string name="rpn_overhauled_request_refund_title" translatable="false">Request refund</string>
-    <string name="rpn_overhauled_request_refund_desc" translatable="false">Ends the plan now and refunds this purchase</string>
+    <string name="rpn_overhauled_request_refund_desc" translatable="false">Ends the plan now and refunds this purchase.</string>
     <string name="rpn_overhauled_manage_google_play_title" translatable="false">Manage on Google Play</string>
-    <string name="rpn_overhauled_manage_google_play_desc" translatable="false">Payment method, receipts, renewal</string>
+    <string name="rpn_overhauled_manage_google_play_desc" translatable="false">Payment method, receipts, renewal.</string>
     <string name="rpn_overhauled_current_plan_header" translatable="false">Current plan</string>
-    <string name="rpn_overhauled_cancel_purchase_desc" translatable="false">Cancels renewal. Access continues until the end of the current period</string>
+    <string name="rpn_overhauled_cancel_purchase_desc" translatable="false">Cancels renewal. Access continues until the end of the current period.</string>
 
     <string name="rpn_troubleshoot_title" translatable="false">troubleshoot</string>
 
     <string name="rpn_perform_test" translatable="false">Run test</string>
     <string name="rpn_test_desc" translatable="false">Test your connection to RPN proxies.</string>
 
-    <string name="rpn_report_issue" translatable="false">Report issue</string>
     <string name="rpn_report_desc" translatable="false">Report an issue with RPN.</string>
 
     <string name="payment_history_title" translatable="false">Device Order History</string>
@@ -2503,15 +2502,13 @@
     <string name="support_category_connectivity" translatable="false">Connectivity</string>
     <string name="support_category_refund" translatable="false">Refund</string>
     <string name="support_description_hint" translatable="false">Describe the issue you\'re experiencing…</string>
-    <string name="support_attachments_desc" translatable="false">The following data will be included as an attachment. Toggle off anything you don\'t want to share.</string>
+    <string name="support_attachments_desc" translatable="false">Includes the following data in the attachment.</string>
     <string name="support_attach_sub_status" translatable="false">Purchase Status</string>
-    <string name="support_attach_sub_status_desc" translatable="false">All purchase records</string>
-    <string name="support_attach_history" translatable="false">State History</string>
-    <string name="support_attach_history_desc" translatable="false">The last 50 purchase state transitions.</string>
+    <string name="support_attach_sub_status_desc" translatable="false">Recent purchase records</string>
     <string name="support_attach_vpn_stats" translatable="false">Proxy Stats</string>
-    <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy connection statistics</string>
-    <string name="support_attach_proc_info" translatable="false">System Stats</string>
-    <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state.</string>
+    <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy statistics</string>
+    <string name="support_attach_proc_info" translatable="false">System State</string>
+    <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
     <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
@@ -2649,7 +2646,7 @@
     <string name="server_order_expires_fmt" translatable="false">Until %1$s</string>
     <string name="server_order_auto_renew" translatable="false">Renews %1$s</string>
     <string name="server_order_id_fmt" translatable="false">Order: %1$s</string>
-    <string name="server_order_desc" translatable="false">View orders fetched from server</string>
+    <string name="server_order_desc" translatable="false">View historical orders.</string>
     <string name="server_order_open_error" translatable="false">Could not open order history</string>
 
     <string name="rpn_desc_one" translatable="true">Unlimited bandwidth • 100+ cities</string>
@@ -2910,11 +2907,9 @@
     <string name="qs_relay_no_locations_toast" translatable="true">Select a location to enable relay</string>
     <string name="qs_relay_failure_toast" translatable="true">Failed to update relay for %1$d location(s)</string>
 
-    <string name="qs_relay_automation_dialog_title" translatable="true">Automation enabled</string>
-    <string name="qs_relay_automation_dialog_message" translatable="true">Automation is enabled for the Auto location, which will affect this location as well. Do you want to proceed?</string>
     <!-- Shown before enabling automation (mobile-only / SSID) on AUTO when relay is on -->
-    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay enabled</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">Relay is enabled for one or more locations. Enabling automation on the Auto location will pause those locations as well. Do you want to proceed?</string>
+    <string name="qs_relay_automation_dialog_title" translatable="true">Automation warning</string>
+    <string name="qs_relay_automation_dialog_message" translatable="true">Since all other active locations will be relayed through Auto, its automation will be applied to all other locations. Do you want to proceed?</string>
 
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>

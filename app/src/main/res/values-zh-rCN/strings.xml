@@ -1281,8 +1281,6 @@
     <string name="qs_relay_failure_toast" translatable="true">%1$d 个位置的中继更新失败</string>
     <string name="qs_relay_automation_dialog_title" translatable="true">启用了自动化</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">自动位置开启了自动化功能，也会影响这个位置。要继续吗？</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">启用了中继</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">一个或多个位置启用了中继。对自动位置启用自动化功能也会暂停这些位置。要继续吗？</string>
     <string name="rpn_bypass_apps_count" translatable="true">%1$d 个应用不使用 RPN</string>
     <string name="rpn_bypass_apps_none" translatable="true">没有应用不用 RPN</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">全部应用都不使用 RPN？</string>

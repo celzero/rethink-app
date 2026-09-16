@@ -116,7 +116,7 @@
                         android:layout_height="wrap_content"
                         app:singleSelection="true"
                         app:selectionRequired="false"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="8dp">
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_payment"

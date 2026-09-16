@@ -1247,8 +1247,6 @@
     <string name="qs_relay_failure_toast" translatable="true">ອັບເດດການສົ່ງຕໍ່ສຳລັບ %1$d ສະຖານທີ່ລົ້ມເຫຼວ</string>
     <string name="qs_relay_automation_dialog_title" translatable="true">ເປີດໃຊ້ງານອັດຕະໂນມັດແລ້ວ</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">ເປີດໃຊ້ງານລະບົບອັດຕະໂນມັດສຳລັບສະຖານທີ່ອັດຕະໂນມັດແລ້ວ, ເຊິ່ງຈະມີຜົນຕໍ່ສະຖານທີ່ນີ້ເຊັ່ນກັນ. ທ່ານຕ້ອງການດຳເນີນການຕໍ່ບໍ່?</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">ເປີດໃຊ້ການສົ່ງຕໍ່ແລ້ວ</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">ເປີດໃຊ້ການສົ່ງຕໍ່ສຳລັບໜຶ່ງ ຫຼື ຫຼາຍສະຖານທີ່ແລ້ວ. ການເປີດໃຊ້ງານລະບົບອັດຕະໂນມັດໃນສະຖານທີ່ອັດຕະໂນມັດ ຈະເຮັດໃຫ້ສະຖານທີ່ເຫຼົ່ານັ້ນຖືກຢຸດຊົ່ວຄາວເຊັ່ນກັນ. ທ່ານຕ້ອງການດຳເນີນການຕໍ່ບໍ່?</string>
     <string name="rpn_bypass_apps_count" translatable="true">ຂ້າມ %1$d ແອັບ</string>
     <string name="rpn_bypass_apps_none" translatable="true">ບໍ່ມີແອັບທີ່ຖືກຂ້າມ</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">ຕ້ອງການຂ້າມແອັບທັງໝົດບໍ່?</string>

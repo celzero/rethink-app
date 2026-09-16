@@ -424,7 +424,7 @@
                                 style="@style/RethinkPlus.RowTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/rpn_report_issue" />
+                                android:text="@string/contact_support_title" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/RethinkPlus.RowSubtitle"

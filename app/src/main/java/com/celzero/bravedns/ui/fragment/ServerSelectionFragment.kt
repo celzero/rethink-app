@@ -690,7 +690,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Bypass apps / live-connection counts change outside this screen
         // (e.g. after returning from RpnBypassAppsActivity), so re-read them.
         refreshBypassAppsTileState()
-        refreshStatsTileState()
         refreshRelayTileState()
         // Refresh the RPN heat map so newly logged connections show up when
         // the user returns to this screen.
@@ -1896,7 +1895,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setupQuickSettings() {
         b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
         b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
-        b.qsStatsTile.setOnClickListener { showRpnStatsBottomSheet() }
         refreshQuickSettingCaptions()
     }
 
@@ -2300,7 +2298,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         refreshRelayTileState()
         updateCapacityIndicator()
         refreshBypassAppsTileState()
-        refreshStatsTileState()
     }
 
     /**
@@ -2322,39 +2319,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.qsBypassAppsState.text =
                     String.format(Locale.US, "%d/%d", bypassed, total)
             }
-        }
-    }
-
-    /**
-     * Refreshes the stats tile caption with the number of connections routed
-     * through the live WIN proxy in the last 24 hours (same window and query
-     * as [RpnStatsBottomSheet]); shows "0" when the tunnel or proxy is down.
-     */
-    private fun refreshStatsTileState() {
-        io {
-            val count = try {
-                val proxyId = Backend.RpnWin
-                connectionTrackerDAO.getRpnConnStats(
-                    proxyId,
-                    System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24)
-                ).connectionsCount
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG.refreshStatsTileState: ${e.message}")
-                0
-            }
-            uiCtx {
-                if (!isAdded) return@uiCtx
-                b.qsStatsState.text = formatCompactDecimal(count)
-            }
-        }
-    }
-
-    private fun formatCompactDecimal(i: Int): String {
-        return if (isAtleastN()) {
-            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
-                .format(i.toLong())
-        } else {
-            i.toString()
         }
     }
 
@@ -2564,7 +2528,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
         b.quickSettingsRow.alpha = alpha
-        listOf(b.qsRelayTile, b.qsBypassAppsTile, b.qsStatsTile).forEach { tile ->
+        listOf(b.qsRelayTile, b.qsBypassAppsTile).forEach { tile ->
             tile.isEnabled = enabled
         }
     }
