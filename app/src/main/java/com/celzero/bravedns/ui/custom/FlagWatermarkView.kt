@@ -64,25 +64,39 @@ class FlagWatermarkView @JvmOverloads constructor(
         const val CORNER_BLEED_DP = 18f
 
     /**
-     * Flag opacity at its most visible point (the flag's centre). Tuned so
-     * the country reads at a glance while overlapped card text stays legible.
+     * Flag opacity at the wash's most visible point (its centre) in banner
+     * (spread) mode; the enlarged glyph reads at this low opacity.
      */
-    private const val PEAK_ALPHA = 0.30f
+    private const val SPREAD_PEAK_ALPHA = 0.30f
 
     /**
-     * Distance from the end edge to the flag's near edge; small, so the wash
-     * hugs the card's bottom-end corner.
+     * Flag opacity at the wash centre in card mode. At the small fixed
+     * content size the wash must sit above ~0.5 to read at all; card content
+     * still draws on top of it.
      */
-    private const val END_EDGE_INSET_DP = 4f
+    private const val CARD_PEAK_ALPHA = 0.55f
 
     /**
-     * Distance the flag's centre sits above the bottom edge; small, so the
-     * wash visibly anchors to the bottom-end corner of the card.
+     * Distance from the end edge to the flag's near edge. Must keep the
+     * content square inside the hosting card's 16dp rounded corner outline
+     * (clipToOutline): with a 6dp inset the nearest glyph corner sits ~14dp
+     * from the arc centre, inside the clip radius.
      */
-    private const val BOTTOM_EDGE_INSET_DP = 2f
+    private const val END_EDGE_INSET_DP = 6f
 
-    /** Radial mask radius as a multiple of the content size. */
-    private const val MASK_RADIUS_FACTOR = 0.85f
+    /**
+     * Distance from the bottom edge to the flag's near edge; mirrors
+     * [END_EDGE_INSET_DP] so the wash anchors to the bottom-end corner of
+     * the card without being eaten by its rounded outline.
+     */
+    private const val BOTTOM_EDGE_INSET_DP = 6f
+
+    /**
+     * Radial mask radius as a multiple of the content size. One full content
+     * size keeps the glyph near peak alpha out to its edges, dissolving only
+     * past the glyph into the card surface.
+     */
+    private const val MASK_RADIUS_FACTOR = 1f
 
     /**
      * Fraction of the flag pushed past the end edge in spread mode, so only
@@ -229,10 +243,11 @@ class FlagWatermarkView @JvmOverloads constructor(
         // spread mode the radius extends past the glyph so the dissolve
         // reaches the banner edges.
         val radius = if (spread) size * 1.1f else size * MASK_RADIUS_FACTOR
+        val peak = if (spread) SPREAD_PEAK_ALPHA else CARD_PEAK_ALPHA
         val stops = floatArrayOf(0f, 0.5f, 1f)
         val colors = intArrayOf(
-            alphaColor(PEAK_ALPHA),
-            alphaColor(PEAK_ALPHA * 0.72f),
+            alphaColor(peak),
+            alphaColor(peak * 0.72f),
             alphaColor(0f)
         )
         return RadialGradient(

@@ -186,6 +186,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private var pulsePageAnimator: ValueAnimator? = null
     /** Timestamp of the last user touch on the pulse pager. */
     private var lastPulseTouchTs = 0L
+    /** Last pager position in the pulse dots; skips redundant dot work. */
+    private var lastPulseDotPosition = -1
     /** Pages for the network-pulse carousel. */
     private lateinit var pulsePagerAdapter: PulsePagerAdapter
     /**
@@ -700,6 +702,25 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         loadRpnHeatmap()
         // Same for the live-activity feed: connections logged while away.
         refreshActivityFeed()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        blinkAnimator?.let { if (it.isPaused) it.resume() }
+        errorDolphinAnimator?.let { if (it.isPaused) it.resume() }
+        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+            if (it.isVisible) it.startShimmer()
+        }
+    }
+
+    override fun onStop() {
+        pulsePageAnimator?.cancel()
+        blinkAnimator?.pause()
+        errorDolphinAnimator?.pause()
+        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+            if (it.isVisible) it.stopShimmer()
+        }
+        super.onStop()
     }
 
     /**
@@ -1334,7 +1355,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (blinkAnimator?.isRunning == true) return
         b.statusIndicator.alpha = 1f
         blinkAnimator = ObjectAnimator.ofFloat(b.statusIndicator, View.ALPHA, 1f, 0.25f).apply {
-            duration = 900L
+            duration = 2000L
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.REVERSE
             start()
@@ -1908,6 +1929,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * ConnectionTracker. Tapping the card opens the network-logs screen
      * filtered to RPN traffic.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupActivityFeed() {
         // Each carousel page opens its own destination (logs for connections /
         // blocked, the stats sheet for data / apps); no card-level click.
@@ -1935,30 +1957,33 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
             v.performClick()
         }
-        // Auto-advance the carousel; skips while the user is interacting.
-        pulseAutoAdvanceJob = lifecycleScope.launch {
-            while (true) {
-                delay(ACTIVITY_FEED_AUTO_ADVANCE_MS.milliseconds)
-                if (!isAdded || isProxyStopped) continue
-                if (System.currentTimeMillis() - lastPulseTouchTs <
-                    PULSE_USER_INTERACTION_GRACE_MS
-                ) continue
-                val lm = b.activityFeedPager.layoutManager as? LinearLayoutManager ?: continue
-                val count = pulsePagerAdapter.itemCount
-                if (count <= 1) continue
-                val cur = lm.findFirstCompletelyVisibleItemPosition()
-                    .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
-                if (cur < 0) continue
-                animatePulsePage((cur + 1) % count)
+        pulseAutoAdvanceJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    delay(ACTIVITY_FEED_AUTO_ADVANCE_MS.milliseconds)
+                    if (!isAdded || isProxyStopped) continue
+                    if (System.currentTimeMillis() - lastPulseTouchTs <
+                        PULSE_USER_INTERACTION_GRACE_MS
+                    ) continue
+                    val lm = b.activityFeedPager.layoutManager as? LinearLayoutManager ?: continue
+                    val count = pulsePagerAdapter.itemCount
+                    if (count <= 1) continue
+                    val cur = lm.findFirstCompletelyVisibleItemPosition()
+                        .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
+                    if (cur < 0) continue
+                    animatePulsePage((cur + 1) % count)
+                }
             }
         }
-        activityFeedJob = lifecycleScope.launch {
-            while (true) {
-                delay(ACTIVITY_FEED_REFRESH_MS.milliseconds)
-                if (isAdded && !isLoading && !isProxyStopped &&
-                    !b.errorStateContainer.isVisible
-                ) {
-                    refreshActivityFeed()
+        activityFeedJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    delay(ACTIVITY_FEED_REFRESH_MS.milliseconds)
+                    if (isAdded && !isLoading && !isProxyStopped &&
+                        !b.errorStateContainer.isVisible
+                    ) {
+                        refreshActivityFeed()
+                    }
                 }
             }
         }
@@ -2078,7 +2103,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         dots.removeAllViews()
         repeat(pulsePagerAdapter.itemCount) {
             dots.addView(View(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(dpPx(5), dpPx(5)).apply {
+                layoutParams = LinearLayout.LayoutParams(dpPx(4), dpPx(4)).apply {
                     marginStart = dpPx(4)
                 }
                 background = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_circle)
@@ -2093,7 +2118,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val dots = b.activityFeedDots
         dots.forEachIndexed { i, dot ->
             val active = i == position
-            val size = dpPx(if (active) 6 else 5)
+            val size = dpPx(if (active) 4 else 3)
             dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
                 width = size
                 height = size

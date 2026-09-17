@@ -322,22 +322,9 @@ class VpnServerAdapter(
             b.tvServerStatus.visibility = if (showCheck) View.GONE else View.VISIBLE
         }
 
-        /**
-         * Pushes the flag watermark past the card's top/end edges so the card's
-         * rounded outline clips it. XML presets the LTR translation; this keeps
-         * the bleed mirrored under RTL layout direction.
-         */
-        private fun applyWatermarkBleed() {
-            val bleed = FlagWatermarkView.CORNER_BLEED_DP * ctx.resources.displayMetrics.density
-            val rtl = b.serverCard.layoutDirection == View.LAYOUT_DIRECTION_RTL
-            //b.flagWatermark.translationX = if (rtl) -bleed else bleed
-            //b.flagWatermark.translationY = -bleed
-        }
-
-
         fun bind(group: ServerGroup) {
             b.tvServerIp.visibility = View.GONE
-            b.lastRoutedAppContainer.visibility = View.GONE
+            b.lastRoutedAppContainer.visibility = View.INVISIBLE
             currentIpText = null
             currentProxyStatus = null
             b.ivStatusCheck.visibility = View.GONE
@@ -360,7 +347,6 @@ class VpnServerAdapter(
                 // Regular server: render the country flag as the corner watermark.
                 b.flagWatermark.setFlagText(group.flagEmoji)
             }
-            applyWatermarkBleed()
 
             val locationText = if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
                 "${group.cityName.capitalizeWords()} · ${AUTO_COUNTRY_CODE.capitalizeWords()}"
@@ -689,7 +675,7 @@ class VpnServerAdapter(
         private fun applyLastRoutedApps(entries: List<Pair<ConnectionTracker, Drawable?>>) {
             val firstName = entries.firstOrNull()?.first?.appName?.trim().orEmpty()
             if (firstName.isEmpty()) {
-                b.lastRoutedAppContainer.visibility = View.GONE
+                b.lastRoutedAppContainer.visibility = View.INVISIBLE
                 b.lastRoutedAppContainer.contentDescription = null
                 return
             }
@@ -814,7 +800,7 @@ class VpnServerAdapter(
          * when the user returns to this list.
          */
         private fun showRelayAction(group: ServerGroup) {
-            b.relayActionContainer.visibility = View.GONE
+            b.relayActionContainer.visibility = View.INVISIBLE
             io {
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
                 uiCtx {

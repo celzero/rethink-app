@@ -77,6 +77,7 @@
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
             android:alpha="0.75"
+            android:layout_marginEnd="4dp"
             android:tint="?attr/chipBgColorPositive"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -85,7 +86,6 @@
             android:id="@+id/tv_server_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
@@ -132,9 +132,9 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="12dp"
-        android:paddingTop="7dp"
+        android:paddingTop="6dp"
         android:paddingEnd="9dp"
-        android:paddingBottom="7dp">
+        android:paddingBottom="6dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/apps_action"
@@ -146,7 +146,7 @@
             android:letterSpacing="0.02"
             android:maxLines="1"
             android:textColor="?attr/serverChipTextColor"
-            android:textSize="11sp"
+            android:textSize="@dimen/small_font_text_view"
             tools:text="Apps · 12" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -171,9 +171,9 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="12dp"
-        android:paddingTop="7dp"
+        android:paddingTop="6dp"
         android:paddingEnd="9dp"
-        android:paddingBottom="7dp">
+        android:paddingBottom="6dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/relay_action"
@@ -185,15 +185,14 @@
             android:gravity="center"
             android:letterSpacing="0.02"
             android:maxLines="1"
-            android:minWidth="56dp"
             android:textColor="?attr/serverChipTextColor"
-            android:textSize="11sp"
+            android:textSize="@dimen/small_font_text_view"
             tools:text="Relay · On" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/relay_icon"
-            android:layout_width="11dp"
-            android:layout_height="11dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:layout_marginStart="4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
