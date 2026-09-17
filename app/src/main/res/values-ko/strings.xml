@@ -781,7 +781,7 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">가장 많이 접속한 IP</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">가장 많이 차단된 IP</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">가장 많이 차단된 지역</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Rethink를 시작해 계속 진행</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Rethink 시작</string>
     <string name="ssv_see_more" translatable="true">모두 표시</string>
     <string name="bad_config_reason_invalid_key" translatable="true">잘못된 키</string>
     <string name="bad_config_reason_invalid_number" translatable="true">잘못된 숫자</string>
@@ -927,7 +927,7 @@
     <string name="close_all" translatable="true">모두 닫기</string>
     <string name="smart_dns" translatable="true">스마트 DNS</string>
     <string name="processing_dialog_desc" translatable="true">요청을 처리할 동안 잠시 기다려주세요.</string>
-    <string name="smart_dns_desc" translatable="true"><i>스마트 DNS</i>는 다음 DNS 리졸버 중 무작위로 이용합니다:</string>
+    <string name="smart_dns_desc" translatable="true">선택한 필터를 기반으로 올바른 DNS를 자동 선택</string>
     <string name="vpn_policy_sensitive" translatable="true">민감</string>
     <string name="vpn_policy_sensitive_desc" translatable="true">모든 네트워크 및 연결 상태 변화에 반응합니다.</string>
     <string name="vpn_policy_relaxed" translatable="true">느슨</string>
@@ -1265,4 +1265,34 @@
     <string name="hsf_vpn_lockdown_prepare_failure" translatable="true">다른 앱이 \"VPN 항상 켜기\" 및 \"연결 차단(VPN 제외)\"으로 설정되어 있으면 Rethink를 시작할 수 없습니다. 계속하려면 VPN 설정을 바꾸세요.</string>
     <string name="rpn_automation_relay_dialog_title" translatable="true">중계 켜짐</string>
     <string name="rpn_automation_relay_dialog_message" translatable="true">중계가 한 곳 이상의 위치에서 켜져 있습니다. 자동 위치 지정 기능을 켜면 해당 위치도 중지됩니다. 진행하시겠습니까?</string>
+    <string name="hsf_rules_univ_label" translatable="true">전역 방화벽 규칙</string>
+    <string name="hsf_rules_ip_label" translatable="true">전역 IP 규칙</string>
+    <string name="hsf_rules_dom_label" translatable="true">전역 도메인 규칙</string>
+    <string name="bsdl_meta_resolver" translatable="true">리졸버</string>
+    <string name="bsdl_meta_query_type" translatable="true">쿼리 유형</string>
+    <string name="bsdl_meta_app" translatable="true">앱</string>
+    <string name="bsdl_meta_response" translatable="true">응답</string>
+    <string name="bsdl_meta_alias" translatable="true">별칭</string>
+    <string name="bsdl_meta_region" translatable="true">지역</string>
+    <string name="bsct_meta_destination" translatable="true">대상</string>
+    <string name="bsct_meta_activity" translatable="true">활동</string>
+    <string name="bsct_meta_info" translatable="true">정보</string>
+    <string name="lbl_app_rules" translatable="true">앱 규칙</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">Wi-Fi</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">모바일</string>
+    <string name="lbl_enable" translatable="true">활성화</string>
+    <string name="bsdl_rule_status_none" translatable="true">규칙 없음</string>
+    <string name="bsdl_rule_status_blocked" translatable="true">차단함</string>
+    <string name="bsdl_rule_status_trusted" translatable="true">신뢰함</string>
+    <string name="bsdl_rule_scope_app_title" translatable="true">이 앱에</string>
+    <string name="bsdl_rule_scope_app_title_fmt" translatable="true">%1$s에</string>
+    <string name="bsdl_rule_scope_global_title" translatable="true">모든 앱에</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s 모바일</string>
+    <string name="logs_card_apps_empty" translatable="true">아직 표시할 항목 없음</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">데이터 사용</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">차단</string>
+    <string name="hsf_rules_pager_desc" translatable="true">밀어서 전역 방화벽, IP, 도메인 규칙 보기</string>
+    <string name="logs_card_disabled_logs_hint" translatable="true">최근 활동을 보려면 로그 켜기</string>
+    <string name="logs_card_disabled_vpn_hint" translatable="true">최근 활동을 보려면 VPN 시작하기</string>
+    <string name="bsdl_open_domain_connections" translatable="true">열린 도메인 연결</string>
 </resources>
