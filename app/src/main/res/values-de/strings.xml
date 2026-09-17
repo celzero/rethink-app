@@ -768,7 +768,6 @@
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Bei ungetaktet zulassen</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Vertrauenswürdige Domain (App)</string>
     <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
-    <string name="bsdl_block_desc" translatable="true">&lt;u&gt;Diese(r) Domain&lt;/u&gt; blockieren, vertrauen</string>
     <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
     <string name="settings_general_customize" translatable="true">Anpassen</string>
     <string name="settings_default_dns_heading" translatable="true">Bootstrap-DNS wählen</string>
@@ -1222,7 +1221,6 @@
     <string name="fapps_filter_sort_package" translatable="true">Paketname</string>
     <string name="fapps_filter_sort_uid" translatable="true">UID</string>
     <string name="build_flavor_website_degoogled" translatable="true">Website – ohne Google</string>
-    <string name="bsdl_app_block_desc" translatable="true">&lt;u&gt;Diese(r) Domain&lt;/u&gt; für diese App blockieren, vertrauen</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard kann im reinen DNS-Modus nicht aktiviert werden. Wechsle zum Firewall- oder DNS+Firewall-Modus.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">Es ist eine aktive One-WireGuard-Konfiguration im Einsatz. Deaktiviere diese erst, um einzelne WireGuard-Konfigurationen zu verwenden.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Ungültige WireGuard-Konfiguration</string>
@@ -1298,4 +1296,18 @@
     <string name="rpn_stats_empty" translatable="true">In den letzten 24 Stunden sind keine Verbindungen über die ausgewählten Server gegangen.</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Rethink starten, um Proxy-Statistiken zu sehen</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s Verb</string>
+    <string name="lbl_enable" translatable="true">Aktivieren</string>
+    <string name="lbl_app_rules" translatable="true">App-Regeln</string>
+    <string name="bsct_meta_destination" translatable="true">Richtung</string>
+    <string name="bsct_meta_activity" translatable="true">Aktivität</string>
+    <string name="bsct_meta_info" translatable="true">Info</string>
+    <string name="hsf_rules_univ_label" translatable="true">Universelle Firewall-Regeln</string>
+    <string name="hsf_rules_ip_label" translatable="true">universelle IP-Regeln</string>
+    <string name="hsf_rules_dom_label" translatable="true">universelle Domain-Regeln</string>
+    <string name="hsf_rules_pager_desc" translatable="true">Wischen, um universelle Firewall-, IP- und Domainregeln zu sehen</string>
+    <string name="logs_card_apps_hint_allowed" translatable="true">Daten, die von deinen aktivsten Apps verwendet wurden · letzte 24 Stunden</string>
+    <string name="logs_card_apps_hint_blocked" translatable="true">Apps mit den am meisten blockierten Versuchen · letzte 24 Stunden</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">Verbrauchte Daten</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">blockiert</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">WLAN</string>
 </resources>

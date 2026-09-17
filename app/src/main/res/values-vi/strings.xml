@@ -905,7 +905,6 @@
     <string name="exclude_apps_from_proxy">Bỏ qua ứng dụng đối với tất cả proxy</string>
     <string name="exclude_apps_from_proxy_failure_toast">Ứng dụng này bỏ qua proxy</string>
     <string name="bsac_title_desc" translatable="true">Quy tắc chỉ áp dụng cho ứng dụng này.</string>
-    <string name="bsdl_block_desc" translatable="true">Chặn, tin tưởng &lt;u&gt;tên miền này&lt;u&gt;&lt;/u&gt;&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">đã chặn %1$s bởi %2$s</string>
     <string name="notif_download_content_title" translatable="true">Tải xuống Danh sách chặn ngay tại thiết bị</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Chặn mã độc, mã độc tống tiền, mã độc đào tiền ảo, lừa đảo và các mối đe dọa khác.</string>

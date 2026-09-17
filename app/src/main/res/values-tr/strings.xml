@@ -863,7 +863,6 @@
     <string name="cloudflare_dns_desc" translatable="true">Herhangi bir DNS isteğini engellemez. Cloudflare\'in 1.1.1.1 DNS uç noktasını kullanır.</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">en çok engellenen ülkeler</string>
     <string name="lbl_app_wise" translatable="true">Uygulama Başına</string>
-    <string name="bsdl_block_desc" translatable="true">Engelle, &lt;u&gt;bu alan adına&lt;/u&gt; güven</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Alan adı (Univ)</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Uygulamaları izole edin</string>
     <string name="status_protected_with_wg" translatable="true">wireguard ile korunuyor</string>
