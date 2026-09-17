@@ -916,8 +916,6 @@
     <string name="exclude_apps_from_proxy">ໃຫ້ແອັບຂ້າມພຣັອກຊີທັງໝົດ</string>
     <string name="exclude_apps_from_proxy_failure_toast">ແອັບນີ້ຂ້າມພຣັອກຊີ</string>
     <string name="bsac_title_desc" translatable="true">ກົດນຳໃຊ້ກັບແອັບນີ້ເທົ່ານັ້ນ.</string>
-    <string name="bsdl_block_desc" translatable="true">ບລັອກ, ເຊື່ອຖື &lt;u&gt;ໂດເມນນີ້&lt;/u&gt;</string>
-    <string name="bsdl_app_block_desc" translatable="true">ບລັອກ, ເຊື່ອຖື &lt;u&gt;ໂດເມນນີ້&lt;/u&gt; ສຳລັບແອັບນີ້</string>
     <string name="bsdl_blocked_desc" translatable="true">ບລັອກ %1$s ໂດຍ %2$s</string>
     <string name="network_dns" translatable="true">DNS ຂອງລະບົບ</string>
     <string name="notif_download_content_title" translatable="true">ດາວໂຫຼດລາຍຊື່ບລັອກໃນອຸປະກອນ</string>

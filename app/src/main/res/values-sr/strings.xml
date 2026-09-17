@@ -615,7 +615,6 @@
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Очисти све записе повезане са овом апликацијом.</string>
     <string name="exclude_apps_from_proxy">Заобиђи апликацију од свих проксија</string>
     <string name="bsac_title_desc" translatable="true">Правила се примањују само на ову апликацију.</string>
-    <string name="bsdl_block_desc" translatable="true">Блокирај, веруј &lt;u&gt;овом домену&lt;/u&gt;</string>
     <string name="bsdl_blocked_desc" translatable="true">блокирано %1$s од %2$s</string>
     <string name="network_dns" translatable="true">Системски DNS</string>
     <string name="notif_download_content_title" translatable="true">Преузми блок листу на уређај</string>

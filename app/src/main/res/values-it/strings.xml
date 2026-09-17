@@ -768,7 +768,6 @@
     <string name="lbl_action_required" translatable="true">Azione richiesta</string>
     <string name="lbl_ip_rules" translatable="true">Regole IP</string>
     <string name="lbl_domain_rules" translatable="true">Regole dominio</string>
-    <string name="bsdl_block_desc" translatable="true">Blocca, autorizza &lt;u&gt;questo dominio&lt;/u&gt;</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Questa connessione è stata bloccata perché il dominio <i/> è bloccato dal DNS preferito dall\'utente.<br/><br/> Per modificare questo comportamento, accedere alla scheda <i>Configura DNS</i>.]]></string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Aggira DNS e firewall</string>
     <string name="lbl_maybe_blocked" translatable="true">Forse bloccato</string>
