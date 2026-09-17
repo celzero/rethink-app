@@ -72,11 +72,13 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_status_check"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_check_circle"
             android:alpha="0.75"
+            android:layout_gravity="center_vertical"
+            android:foregroundGravity="center_vertical"
             android:layout_marginEnd="4dp"
             android:tint="?attr/chipBgColorPositive"
             android:visibility="gone"
@@ -89,23 +91,23 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
+            android:layout_marginEnd="4dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="10sp"
+            android:textSize="@dimen/small_font_text_view"
             tools:text="Connected" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_server_ip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
             android:ellipsize="end"
             android:fontFamily="monospace"
             android:letterSpacing="0.02"
             android:maxLines="1"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="9sp"
+            android:textSize="@dimen/small_font_text_view"
             android:visibility="gone"
             tools:text="82.102.25.218"
             tools:visibility="visible" />
