@@ -13,5 +13,5 @@
 #   Regex matches every occurrence of View.GONE / View.INVISIBLE.
 #   Intended for sensitive data hidden in the UI (MSTG-STORAGE-7), but it
 #   fires on all ordinary visibility toggles. These are plain UI state changes.
-- ignore-rules:
-  - android_kotlin_hiddenui
+  ignore-rules:
+    - android_kotlin_hiddenui
