@@ -204,7 +204,7 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
             }
             // a preset change while this query was pending superseded it
             if (gen != requestGeneration) return@launch
-            render(window, result)
+            render(result)
         }
     }
 
@@ -231,7 +231,7 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
                     )
                 }.sortedByDescending { it.allowed + it.blocked }
                     .take(AppActivityAdapter.MAX_CHILD_ROWS)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 emptyList()
             }
         }
@@ -241,7 +241,7 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun render(window: LogActivityWindow, d: SheetData) {
+    private fun render(d: SheetData) {
         if (!isAdded || _binding == null) return
 
         b.bsLaiBlockedCount.text = d.counts.blocked.toString()
@@ -250,8 +250,10 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         if (d.apps.isEmpty()) {
             b.bsLaiEmpty.visibility = View.VISIBLE
             b.bsLaiRecycler.visibility = View.GONE
+            b.dolphinSignature.visibility = View.GONE
         } else {
             b.bsLaiEmpty.visibility = View.GONE
+            b.dolphinSignature.visibility = View.VISIBLE
             b.bsLaiRecycler.visibility = View.VISIBLE
             adapter.submit(d.apps)
         }
