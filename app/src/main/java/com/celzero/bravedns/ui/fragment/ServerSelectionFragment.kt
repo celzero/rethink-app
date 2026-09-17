@@ -171,6 +171,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private var heatmapWindowEndMs = 0L
 
+    /** In-flight heat-map load; cancelled when a newer load supersedes it. */
+    private var rpnHeatmapJob: Job? = null
+
     /** Looping alpha blink on the header status dot while connected. */
     private var blinkAnimator: ObjectAnimator? = null
 
@@ -1429,7 +1432,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun loadRpnHeatmap() {
-        io {
+        rpnHeatmapJob?.cancel()
+        rpnHeatmapJob = io {
             try {
                 val proxyIdFilter = Backend.RpnWin + "%"
                 val now = System.currentTimeMillis()
@@ -1929,7 +1933,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * ConnectionTracker. Tapping the card opens the network-logs screen
      * filtered to RPN traffic.
      */
-    @SuppressLint("ClickableViewAccessibility")
     private fun setupActivityFeed() {
         // Each carousel page opens its own destination (logs for connections /
         // blocked, the stats sheet for data / apps); no card-level click.
@@ -2020,9 +2023,20 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "$TAG.refreshActivityFeed: blocked count failed: ${e.message}")
             }
+            val ctx = context
+            val iconEntries = if (ctx == null) {
+                emptyList()
+            } else {
+                rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
+                    val icon = runCatching {
+                        Utilities.getIcon(ctx, ct.packageName, ct.appName)
+                    }.getOrNull() ?: return@mapNotNull null
+                    ct.packageName to icon
+                }
+            }
             uiCtx {
                 if (!isAdded) return@uiCtx
-                renderPulse(rows, connCount, bytes, appCount, blockedCount)
+                renderPulse(rows, iconEntries, connCount, bytes, appCount, blockedCount)
             }
         }
     }
@@ -2036,6 +2050,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun renderPulse(
         rows: List<ConnectionTracker>,
+        iconEntries: List<Pair<String, Drawable>>,
         connCount: Int,
         bytes: Long,
         appCount: Int,
@@ -2044,12 +2059,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (rows.isEmpty() && connCount == 0) {
             b.activityFeedCard.isVisible = false
             return
-        }
-        val iconEntries = rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
-            val icon = runCatching {
-                Utilities.getIcon(requireContext(), ct.packageName, ct.appName)
-            }.getOrNull() ?: return@mapNotNull null
-            ct.packageName to icon
         }
         val appIcons = iconEntries.map { it.second }
         val appIconKeys = iconEntries.map { it.first }
@@ -2110,26 +2119,25 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 alpha = PULSE_DOT_INACTIVE_ALPHA
             })
         }
+        lastPulseDotPosition = -1
         updatePulseDots(0)
     }
 
     /** Selected dot grows slightly but stays a circle; the rest stay faint. */
     private fun updatePulseDots(position: Int) {
+        if (position == lastPulseDotPosition) return
+        lastPulseDotPosition = position
         val dots = b.activityFeedDots
         dots.forEachIndexed { i, dot ->
             val active = i == position
-            val size = dpPx(if (active) 4 else 3)
-            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
-                width = size
-                height = size
-            }
+            dot.pivotX = dot.width / 2f
+            dot.pivotY = dot.height / 2f
             dot.alpha = if (active) PULSE_DOT_ACTIVE_ALPHA else PULSE_DOT_INACTIVE_ALPHA
             dot.backgroundTintList = ColorStateList.valueOf(
                 resolveAttrColor(
                     if (active) R.attr.primaryTextColor else R.attr.primaryLightColorText
                 )
             )
-            dot.requestLayout()
         }
     }
 
@@ -2233,9 +2241,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         fun submit(newPages: List<PulsePage>) {
             if (pages == newPages) return
+            val old = pages.toList()
             pages.clear()
             pages.addAll(newPages)
-            notifyDataSetChanged()
+            val overlap = minOf(old.size, newPages.size)
+            for (i in 0 until overlap) {
+                if (old[i] != newPages[i]) notifyItemChanged(i)
+            }
+            if (old.size > newPages.size) {
+                notifyItemRangeRemoved(overlap, old.size - newPages.size)
+            } else if (newPages.size > old.size) {
+                notifyItemRangeInserted(overlap, newPages.size - old.size)
+            }
         }
 
         override fun getItemCount(): Int = pages.size
@@ -4409,9 +4426,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
 
-    private fun io(f: suspend () -> Unit) {
+    private fun io(f: suspend () -> Unit): Job =
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
