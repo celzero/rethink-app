@@ -128,8 +128,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                         message = (state as? SubscriptionUiState.AcknowledgementFailed)?.message
                             ?: (state as? SubscriptionUiState.Error)?.message
                             ?: (state as? SubscriptionUiState.ServerAckPending)?.message
-                            ?: (state as? SubscriptionUiState.PendingTimeout)?.message
-                            ?: "",
+                            ?: (state as? SubscriptionUiState.PendingTimeout)?.message.orEmpty(),
                         canRetry = (state as? SubscriptionUiState.AcknowledgementFailed)?.canRetry
                             ?: (state as? SubscriptionUiState.Error)?.isRetryable
                             ?: true,
@@ -227,7 +226,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     cancelLoadingWatchdog()
                     isBillingInitializing.set(false)
                     setUi(SubscriptionUiState.AlreadySubscribed(
-                        RpnProxyManager.getRpnProductId() ?: ""
+                        RpnProxyManager.getRpnProductId()
                     ))
                     return@launch
                 }
@@ -358,7 +357,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     "hasValid=${currentState.hasValidSubscription}")
             if (currentState.hasValidSubscription) {
                 setUi( SubscriptionUiState.AlreadySubscribed(
-                    RpnProxyManager.getRpnProductId() ?: ""
+                    RpnProxyManager.getRpnProductId()
                 ))
             } else {
                 // Subscription is in a non-purchasable, non-valid state (e.g. Uninitialized).
@@ -461,7 +460,7 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
                     purchaseFlowActive = false
                     extendObserverJob = null
                     setUi(SubscriptionUiState.Success(
-                        productId = RpnProxyManager.getRpnProductId() ?: "",
+                        productId = RpnProxyManager.getRpnProductId(),
                         isExtend = true
                     ))
                     return@collect
@@ -473,149 +472,147 @@ class RethinkPlusViewModel(application: Application) : AndroidViewModel(applicat
     /**
      * Handle subscription state machine changes.
      *
+     * Pure dispatcher: each state's handling lives in a dedicated private handler
+     * below so this method stays within the complexity budget.
      */
     private fun handleSubscriptionStateChange(state: SubscriptionStateMachineV2.SubscriptionState) {
         Logger.d(LOG_IAB, "$TAG: handleSubscriptionStateChange: ${state.name}, purchaseFlowActive=$purchaseFlowActive")
         when (state) {
-            is SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated -> {
-                // Only PurchaseInitiated (triggered by user tapping Buy) marks an active flow.
-                purchaseFlowActive = true
-                setUi(SubscriptionUiState.Processing("Initializing purchase..."))
-            }
-
-            is SubscriptionStateMachineV2.SubscriptionState.PurchasePending -> {
-                // Only start polling if the user actually initiated a purchase in this session.
-                if (purchaseFlowActive) {
-                    setUi(SubscriptionUiState.PendingPurchase())
-                    startPendingPurchasePolling()
-                } else {
-                    Logger.d(LOG_IAB, "$TAG: PurchasePending without active flow, querying Play once to reconcile")
-                    viewModelScope.launch(Dispatchers.IO) {
-                        InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
-                    }
-                }
-            }
-
-            is SubscriptionStateMachineV2.SubscriptionState.Active -> {
-                stopPendingPurchasePolling()
-                if (purchaseFlowActive) {
-                    // Real new purchase completed (non-extend path) → show success with confetti.
-                    // In extend mode this block is typically skipped because StateFlow
-                    // de-duplicates the Active → Active transition; success is detected by
-                    // extendObserverJob watching oneTimePurchaseCompletedFlow instead.
-                    purchaseFlowActive = false
-                    extendObserverJob?.cancel()
-                    extendObserverJob = null
-                    setUi(SubscriptionUiState.Success(
-                        productId = RpnProxyManager.getRpnProductId() ?: "",
-                        isExtend = false
-                    ))
-                } else {
-                    val current = _uiState.value
-                    if (billingInitCalled && !extendMode && current is SubscriptionUiState.Loading) {
-                        setUi(SubscriptionUiState.AlreadySubscribed(
-                            RpnProxyManager.getRpnProductId() ?: ""
-                        ))
-                    }
-                    // If already in Ready/Error/etc., don't disrupt the current UI.
-                }
-            }
-
-            is SubscriptionStateMachineV2.SubscriptionState.ServerAckPending -> {
-                purchaseFlowActive = false
-                extendObserverJob?.cancel()
-                extendObserverJob = null
-                stopPendingPurchasePolling()
-                setUi(SubscriptionUiState.ServerAckPending())
-            }
-
-            is SubscriptionStateMachineV2.SubscriptionState.Error -> {
-                val wasInFlow = purchaseFlowActive
-                purchaseFlowActive = false
-                extendObserverJob?.cancel()
-                extendObserverJob = null
-                stopPendingPurchasePolling()
-                if (wasInFlow) {
-                    // Real purchase flow failed, show an actionable error.
-                    setUi(SubscriptionUiState.Error(
-                        title = "Subscription Error",
-                        message = "An error occurred while processing your payment",
-                        isRetryable = true
-                    ))
-                } else {
-                    // handlePurchase drove PurchasePending → Error because Play returned
-                    // no purchases (stale DB row, no real purchase). Show the payment
-                    // screen so the user can buy instead of seeing a cryptic error.
-                    Logger.d(LOG_IAB, "$TAG: Error state without active flow, showing payment screen")
-                    val products = _filteredProducts.value.ifEmpty { allProducts }
-                    if (products.isNotEmpty()) {
-                        setUi(SubscriptionUiState.Ready(
-                            products = products,
-                            isResubscribe = false,
-                            availabilityData = PipKeyManager.getAvailabilityData()
-                        ))
-                    } else {
-                        // Products not fetched yet trigger fetch; setProducts() will update UI
-                        viewModelScope.launch(Dispatchers.IO) {
-                            if (InAppBillingHandler.isBillingClientSetup()) {
-                                InAppBillingHandler.queryProductDetailsWithTimeout()
-                            }
-                        }
-                    }
-                }
-            }
-
+            is SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated -> onPurchaseInitiated()
+            is SubscriptionStateMachineV2.SubscriptionState.PurchasePending -> onPurchasePending()
+            is SubscriptionStateMachineV2.SubscriptionState.Active -> onSubscriptionActive()
+            is SubscriptionStateMachineV2.SubscriptionState.ServerAckPending -> onServerAckPending()
+            is SubscriptionStateMachineV2.SubscriptionState.Error -> onSubscriptionError()
             is SubscriptionStateMachineV2.SubscriptionState.Cancelled,
             is SubscriptionStateMachineV2.SubscriptionState.Revoked,
-            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
-                purchaseFlowActive = false
-                extendObserverJob?.cancel()
-                extendObserverJob = null
-                stopPendingPurchasePolling()
-                val currentUi = _uiState.value
-                // Don't disrupt Loading or Processing states triggered by an explicit action
-                if (currentUi is SubscriptionUiState.Loading || currentUi is SubscriptionUiState.Processing) return
-
-                val products = _filteredProducts.value.ifEmpty { allProducts }
-                if (products.isNotEmpty()) {
-                    setUi(SubscriptionUiState.Ready(
-                        products = products,
-                        isResubscribe = true,
-                        availabilityData = PipKeyManager.getAvailabilityData()
-                    ))
-                } else {
-                    // Products not loaded yet - trigger load; UI will update via onProductsFetched
-                    Logger.d(LOG_IAB, "$TAG: $state but no products loaded, triggering fetch")
-                    viewModelScope.launch(Dispatchers.IO) {
-                        if (InAppBillingHandler.isBillingClientSetup()) {
-                            InAppBillingHandler.queryProductDetailsWithTimeout()
-                        }
-                    }
-                }
-            }
-
+            is SubscriptionStateMachineV2.SubscriptionState.Expired -> onSubscriptionEnded()
             is SubscriptionStateMachineV2.SubscriptionState.Initial,
             is SubscriptionStateMachineV2.SubscriptionState.Uninitialized -> {
                 // Transient init states, ignore to avoid premature navigation.
                 // The state machine always passes through these during startup.
                 Logger.d(LOG_IAB, "$TAG: Ignoring transient init state ${state.name}")
             }
-
             is SubscriptionStateMachineV2.SubscriptionState.Grace,
             is SubscriptionStateMachineV2.SubscriptionState.OnHold,
-            is SubscriptionStateMachineV2.SubscriptionState.Paused -> {
-                // These are valid subscription sub-states. The user still has access.
-                // Keep the current UI state; show availability data so the dashboard
-                // reflects the real connection info.
-                Logger.d(LOG_IAB, "$TAG: Subscription in sub-state: ${state.name}, keeping current UI")
-                if (_uiState.value is SubscriptionUiState.Loading ||
-                    _uiState.value is SubscriptionUiState.Processing) {
-                    return
-                }
-                PipKeyManager.getAvailabilityData()?.let { avail ->
-                    setUi(avail)
+            is SubscriptionStateMachineV2.SubscriptionState.Paused -> onSubscriptionRestricted(state)
+        }
+    }
+
+    /** Clears the in-flight purchase markers so a future flow can start cleanly. */
+    private fun resetPurchaseFlow() {
+        purchaseFlowActive = false
+        extendObserverJob?.cancel()
+        extendObserverJob = null
+    }
+
+    private fun onPurchaseInitiated() {
+        // Only PurchaseInitiated (triggered by user tapping Buy) marks an active flow.
+        purchaseFlowActive = true
+        setUi(SubscriptionUiState.Processing("Initializing purchase..."))
+    }
+
+    private fun onPurchasePending() {
+        // Only start polling if the user actually initiated a purchase in this session.
+        if (purchaseFlowActive) {
+            setUi(SubscriptionUiState.PendingPurchase())
+            startPendingPurchasePolling()
+        } else {
+            Logger.d(LOG_IAB, "$TAG: PurchasePending without active flow, querying Play once to reconcile")
+            viewModelScope.launch(Dispatchers.IO) {
+                InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS, ProductType.INAPP))
+            }
+        }
+    }
+
+    private fun onSubscriptionActive() {
+        stopPendingPurchasePolling()
+        if (purchaseFlowActive) {
+            // Real new purchase completed (non-extend path) → show success with confetti.
+            // In extend mode this block is typically skipped because StateFlow
+            // de-duplicates the Active → Active transition; success is detected by
+            // extendObserverJob watching oneTimePurchaseCompletedFlow instead.
+            resetPurchaseFlow()
+            setUi(SubscriptionUiState.Success(
+                productId = RpnProxyManager.getRpnProductId(),
+                isExtend = false
+            ))
+        } else if (billingInitCalled && !extendMode && _uiState.value is SubscriptionUiState.Loading) {
+            setUi(SubscriptionUiState.AlreadySubscribed(
+                RpnProxyManager.getRpnProductId()
+            ))
+        }
+        // If already in Ready/Error/etc., don't disrupt the current UI.
+    }
+
+    private fun onServerAckPending() {
+        resetPurchaseFlow()
+        stopPendingPurchasePolling()
+        setUi(SubscriptionUiState.ServerAckPending())
+    }
+
+    private fun onSubscriptionError() {
+        val wasInFlow = purchaseFlowActive
+        resetPurchaseFlow()
+        stopPendingPurchasePolling()
+        if (wasInFlow) {
+            // Real purchase flow failed, show an actionable error.
+            setUi(SubscriptionUiState.Error(
+                title = "Subscription Error",
+                message = "An error occurred while processing your payment",
+                isRetryable = true
+            ))
+        } else {
+            // handlePurchase drove PurchasePending → Error because Play returned
+            // no purchases (stale DB row, no real purchase). Show the payment
+            // screen so the user can buy instead of seeing a cryptic error.
+            Logger.d(LOG_IAB, "$TAG: Error state without active flow, showing payment screen")
+            showPaymentScreenOrFetchProducts(isResubscribe = false)
+        }
+    }
+
+    private fun onSubscriptionEnded() {
+        resetPurchaseFlow()
+        stopPendingPurchasePolling()
+        val currentUi = _uiState.value
+        // Don't disrupt Loading or Processing states triggered by an explicit action
+        if (currentUi is SubscriptionUiState.Loading || currentUi is SubscriptionUiState.Processing) return
+        showPaymentScreenOrFetchProducts(isResubscribe = true)
+    }
+
+    /**
+     * Show the payment screen when products are already loaded; otherwise trigger a
+     * product fetch so [setProducts] drives the UI once results arrive.
+     */
+    private fun showPaymentScreenOrFetchProducts(isResubscribe: Boolean) {
+        val products = _filteredProducts.value.ifEmpty { allProducts }
+        if (products.isNotEmpty()) {
+            setUi(SubscriptionUiState.Ready(
+                products = products,
+                isResubscribe = isResubscribe,
+                availabilityData = PipKeyManager.getAvailabilityData()
+            ))
+        } else {
+            // Products not fetched yet; setProducts() will update the UI once loaded.
+            Logger.d(LOG_IAB, "$TAG: no products loaded, triggering fetch")
+            viewModelScope.launch(Dispatchers.IO) {
+                if (InAppBillingHandler.isBillingClientSetup()) {
+                    InAppBillingHandler.queryProductDetailsWithTimeout()
                 }
             }
+        }
+    }
+
+    private fun onSubscriptionRestricted(state: SubscriptionStateMachineV2.SubscriptionState) {
+        // These are valid subscription sub-states. The user still has access.
+        // Keep the current UI state; show availability data so the dashboard
+        // reflects the real connection info.
+        Logger.d(LOG_IAB, "$TAG: Subscription in sub-state: ${state.name}, keeping current UI")
+        if (_uiState.value is SubscriptionUiState.Loading ||
+            _uiState.value is SubscriptionUiState.Processing) {
+            return
+        }
+        PipKeyManager.getAvailabilityData()?.let { avail ->
+            setUi(avail)
         }
     }
 
