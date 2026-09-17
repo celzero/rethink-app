@@ -27,12 +27,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Resolve the newest detekt release, including pre-releases.
-          DETEKT_VER=$(gh api "repos/detekt/detekt/releases?per_page=1" --jq '.[0].tag_name' | sed 's/^v//')
-          echo "detekt version: ${DETEKT_VER}"
-
           # from: github.com/detekt/detekt/releases
-          # from: github.com/natiginfo/action-detekt-all
           wget -q "https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar" -O detekt-cli-all.jar
 
           java -jar detekt-cli-all.jar \
@@ -46,6 +41,7 @@ jobs:
         shell: bash
         env:
           RUNID: ${{ github.run_id }}
+          DETEKT_VER: "2.0.0-alpha.6"
           JVM_TARGET: "17"
           # one of: [Error, Warning, Info, Never]
           SEV: "Warning"
