@@ -51,6 +51,16 @@ interface RethinkLogDao {
     ): List<ActivityBucketRow>
 
     @Query(
+        "select cast((timeStamp - :rangeStart)/:bucketMs as integer) as bucketIndex, isBlocked as blocked, count(id) as total from RethinkLog where timeStamp >= :rangeStart and timeStamp < :rangeEnd and proxyDetails like :proxyIdFilter group by bucketIndex, blocked"
+    )
+    suspend fun getRpnActivityBuckets(
+        proxyIdFilter: String,
+        rangeStart: Long,
+        rangeEnd: Long,
+        bucketMs: Long
+    ): List<ActivityBucketRow>
+
+    @Query(
         "select coalesce(sum(case when isBlocked then 1 else 0 end), 0) as blocked, count(*) as total from RethinkLog where timeStamp >= :start and timeStamp < :end"
     )
     suspend fun getWindowCounts(start: Long, end: Long): WindowCountRow

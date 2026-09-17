@@ -22,6 +22,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
@@ -110,6 +111,15 @@ class AppHistogramView @JvmOverloads constructor(
     private val selectionInsetPx =
         SLOT_GAP_DP * resources.displayMetrics.density
 
+    // circular icon clip, built once since iconSizePx never changes
+    private val iconClipPath = Path().apply {
+        addCircle(iconSizePx / 2f, iconSizePx / 2f, iconSizePx / 2f, Path.Direction.CW)
+    }
+
+    // per-slot bounds, recomputed only when geometry or data changes
+    private var trackBounds: List<Rect> = emptyList()
+    private var selectionBounds: List<Rect> = emptyList()
+
     private fun isLightThemeBySystem(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK !=
             Configuration.UI_MODE_NIGHT_YES
@@ -191,10 +201,39 @@ class AppHistogramView @JvmOverloads constructor(
         segmentColorsResolved = true
 
         trackDrawables.clear()
-        if (entries.isEmpty()) return
+        trackBounds = emptyList()
+        selectionBounds = emptyList()
+        if (entries.isEmpty() || slotWidth <= 0f) return
 
         val track = roundedRect(ColorUtils.setAlphaComponent(base, trackAlpha))
-        repeat(entries.size) { trackDrawables.add(track) }
+        val halfBarWidth = barWidth / 2f
+        val halfSlotWidth = slotWidth / 2f
+        val trackTop = barTop.roundToInt()
+        val trackBottom = (barTop + barHeight).roundToInt()
+        val tBounds = ArrayList<Rect>(entries.size)
+        val sBounds = ArrayList<Rect>(entries.size)
+        entries.indices.forEach { index ->
+            val centerX = gridStartX + index * slotWidth + halfSlotWidth
+            tBounds.add(
+                Rect(
+                    (centerX - halfBarWidth).roundToInt(),
+                    trackTop,
+                    (centerX + halfBarWidth).roundToInt(),
+                    trackBottom
+                )
+            )
+            sBounds.add(
+                Rect(
+                    (centerX - halfSlotWidth + selectionInsetPx).roundToInt(),
+                    0,
+                    (centerX + halfSlotWidth - selectionInsetPx).roundToInt(),
+                    height
+                )
+            )
+            trackDrawables.add(track)
+        }
+        trackBounds = tBounds
+        selectionBounds = sBounds
     }
 
     /** Segment color for the Wi-Fi (unmetered) legend swatch. */
@@ -228,75 +267,72 @@ class AppHistogramView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (entries.isEmpty() || slotWidth <= 0f || !segmentColorsResolved) return
 
-        entries.forEachIndexed { index, entry ->
-            val slotLeft = gridStartX + index * slotWidth
-            val centerX = slotLeft + slotWidth / 2f
+        val halfBarWidth = barWidth / 2f
+        val halfSlotWidth = slotWidth / 2f
+        val halfIconSize = iconSizePx / 2f
+        val barBottom = barTop + barHeight
+        val radius = cornerRadiusPx
+        val iconBoundsPx = iconSizePx.roundToInt()
+        val tBounds = trackBounds
+        val sBounds = selectionBounds
+
+        for (index in entries.indices) {
+            val entry = entries[index]
+            val centerX = gridStartX + index * slotWidth + halfSlotWidth
 
             // selected slot: faint pill behind icon+bar so the tapped app is obvious
             if (index == selectedIndex) {
-                selectionDrawable.setBounds(
-                    (centerX - slotWidth / 2f + selectionInsetPx).roundToInt(),
-                    0,
-                    (centerX + slotWidth / 2f - selectionInsetPx).roundToInt(),
-                    height
-                )
+                selectionDrawable.bounds = sBounds[index]
                 selectionDrawable.draw(canvas)
             }
 
             // track
             val track = trackDrawables[index]
-            track.setBounds(
-                (centerX - barWidth / 2f).roundToInt(),
-                barTop.roundToInt(),
-                (centerX + barWidth / 2f).roundToInt(),
-                (barTop + barHeight).roundToInt()
-            )
+            track.bounds = tBounds[index]
             track.draw(canvas)
 
             // segments, bottom-up: unmetered (Wi-Fi) then metered (mobile);
             // plain rects clipped to the bar's pill shape so the stack keeps
             // one continuous curve at the top and bottom
-            val barLeft = (centerX - barWidth / 2f).roundToInt()
-            val barRight = (centerX + barWidth / 2f).roundToInt()
-            var bottom = barTop + barHeight
+            val barLeft = (centerX - halfBarWidth).roundToInt()
+            val barRight = (centerX + halfBarWidth).roundToInt()
+            val barLeftF = barLeft.toFloat()
+            val barRightF = barRight.toFloat()
+            var bottom = barBottom
             barClipPath.reset()
-            barClipPath.addRoundRect(
-                barLeft.toFloat(), barTop, barRight.toFloat(), (barTop + barHeight),
-                cornerRadiusPx, cornerRadiusPx, Path.Direction.CW
-            )
+            barClipPath.addRoundRect(barLeftF, barTop, barRightF, barBottom, radius, radius, Path.Direction.CW)
             canvas.save()
             canvas.clipPath(barClipPath)
             if (blockedMode) {
                 val segH = segmentHeight(entry.blockedCount)
                 if (segH > 0f) {
-                    drawSegment(canvas, barLeft.toFloat(), barRight.toFloat(), bottom - segH, bottom, segmentAlphaBlocked)
+                    drawSegment(canvas, barLeftF, barRightF, bottom - segH, bottom, segmentAlphaBlocked)
                 }
             } else {
                 val unmeteredH = segmentHeight(entry.unmeteredBytes)
                 if (unmeteredH > 0f) {
-                    drawSegment(canvas, barLeft.toFloat(), barRight.toFloat(), bottom - unmeteredH, bottom, segmentAlphaUnmetered)
+                    drawSegment(canvas, barLeftF, barRightF, bottom - unmeteredH, bottom, segmentAlphaUnmetered)
                     bottom -= unmeteredH
                 }
                 val meteredH = segmentHeight(entry.meteredBytes)
                 if (meteredH > 0f) {
-                    drawSegment(canvas, barLeft.toFloat(), barRight.toFloat(), bottom - meteredH, bottom, segmentAlphaMetered)
+                    drawSegment(canvas, barLeftF, barRightF, bottom - meteredH, bottom, segmentAlphaMetered)
                 }
             }
             canvas.restore()
 
-            // app icon above the bar, centered on the bar's axis
+            // app icon above the bar, centered on the bar's axis; the clip
+            // path lives in local (0, 0) space, so translate before clipping
             entry.icon?.let { icon ->
-                val iconLeftPos = centerX - iconSizePx / 2f
-                icon.setBounds(
-                    iconLeftPos.roundToInt(),
-                    0,
-                    (iconLeftPos + iconSizePx).roundToInt(),
-                    iconSizePx.roundToInt()
-                )
+                canvas.save()
+                canvas.translate(centerX - halfIconSize, 0f)
+                canvas.clipPath(iconClipPath)
+                icon.setBounds(0, 0, iconBoundsPx, iconBoundsPx)
                 // must be set before draw(): alpha changes only take effect
                 // on the next draw pass otherwise
                 icon.alpha = ICON_ALPHA
                 icon.draw(canvas)
+                canvas.restore()
             }
         }
     }

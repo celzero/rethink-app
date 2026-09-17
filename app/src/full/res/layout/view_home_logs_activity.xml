@@ -134,7 +134,7 @@
             android:gravity="start"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="24hr"
+            android:text="24"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -147,7 +147,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="18hr"
+            android:text="18"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -160,7 +160,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="12hr"
+            android:text="12"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -173,7 +173,7 @@
             android:gravity="center"
             android:letterSpacing="0.05"
             android:maxLines="1"
-            android:text="6hr"
+            android:text="6"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -210,6 +210,7 @@
         android:alpha="0.8"
         android:letterSpacing="0.08"
         android:text="@string/logs_card_heatmap_window"
+        android:layout_marginBottom="4dp"
         android:textAllCaps="true"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_text_view"
@@ -222,6 +223,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@id/fhs_card_logs_duration"
         app:layout_constraintEnd_toEndOf="parent"

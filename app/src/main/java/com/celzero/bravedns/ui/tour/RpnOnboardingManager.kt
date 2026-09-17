@@ -94,19 +94,7 @@ object RpnOnboardingManager {
             spotlightShape = SpotlightShape.ROUNDED_RECT,
             isPremium      = true,
         ),
-        // 6. Stats quick tile — live throughput + heat map.
-        // AUTO (not ABOVE): the tile sits low on screen and a forced ABOVE
-        // tooltip floats far away over the hero card; AUTO keeps the card
-        // adjacent (below, flipping to above only when out of space).
-        TourStep(
-            targetViewId   = R.id.qs_stats_tile,
-            titleRes       = R.string.rpn_tour_stats_title,
-            descRes        = R.string.rpn_tour_stats_desc,
-            tooltipSide    = TooltipSide.AUTO,
-            spotlightShape = SpotlightShape.ROUNDED_RECT,
-            isPremium      = true,
-        ),
-        // 7. Settings gear — Privacy / Security / Family blocklists
+        // 6. Settings gear — Privacy / Security / Family blocklists
         TourStep(
             targetViewId   = R.id.settings_btn,
             titleRes       = R.string.rpn_tour_settings_title,

@@ -240,7 +240,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
-                        android:maxLines="1"
+                        android:maxLines="2"
                         android:textAlignment="viewStart"
                         android:textColor="?attr/primaryTextColor"
                         android:textIsSelectable="true"

@@ -1280,8 +1280,6 @@
     <string name="qs_relay_failure_toast" translatable="true">Fehler bei der Aktualisierung von Relay für %1$d den Standort(e)</string>
     <string name="qs_relay_automation_dialog_title" translatable="true">Automation aktiviert</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">Die Automatisierung ist für den Auto-Standort aktiviert, der sich auch auf diesen Standort auswirkt. Fortfahren?</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay aktiviert</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">Das Relay ist für einen oder mehrere Standorte aktiviert. Die automatische Automatisierung am Standort Auto wird auch diese Standorte pausieren. Fortfahren?</string>
     <string name="rpn_bypass_apps_count" translatable="true">%1$d Apps umgangen</string>
     <string name="rpn_bypass_apps_none" translatable="true">Keine Apps umgangen</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">Alle Apps umgehen?</string>

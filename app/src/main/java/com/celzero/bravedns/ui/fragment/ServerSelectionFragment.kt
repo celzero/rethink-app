@@ -80,6 +80,7 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
 import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
@@ -115,6 +116,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
@@ -143,6 +146,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val appInfoRepository by inject<AppInfoRepository>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
     private val dnsLogDAO by inject<DnsLogDAO>()
+    private val rethinkLogDao by inject<RethinkLogDao>()
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(FragmentServerSelectionBinding::bind)
     private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
@@ -167,6 +171,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private var heatmapWindowEndMs = 0L
 
+    /** In-flight heat-map load; cancelled when a newer load supersedes it. */
+    private var rpnHeatmapJob: Job? = null
+
     /** Looping alpha blink on the header status dot while connected. */
     private var blinkAnimator: ObjectAnimator? = null
 
@@ -182,6 +189,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private var pulsePageAnimator: ValueAnimator? = null
     /** Timestamp of the last user touch on the pulse pager. */
     private var lastPulseTouchTs = 0L
+    /** Last pager position in the pulse dots; skips redundant dot work. */
+    private var lastPulseDotPosition = -1
     /** Pages for the network-pulse carousel. */
     private lateinit var pulsePagerAdapter: PulsePagerAdapter
     /**
@@ -379,16 +388,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         private const val ACTIVITY_FEED_REFRESH_MS = 10_000L
 
         /** Auto-advance cadence for the pulse carousel, in milliseconds. */
-        private const val ACTIVITY_FEED_AUTO_ADVANCE_MS = 5_000L
+        private const val ACTIVITY_FEED_AUTO_ADVANCE_MS = 8_000L
 
         /** Auto-advance pauses for this long after the user touches the pager. */
         private const val PULSE_USER_INTERACTION_GRACE_MS = 2_500L
 
         /** Page-transition duration for a single-page hop, in milliseconds. */
-        private const val PULSE_PAGE_TRANSITION_MS = 750L
+        private const val PULSE_PAGE_TRANSITION_MS = 1_500L
 
         /** Upper bound so long wraps stay calm, not sluggish. */
-        private const val PULSE_PAGE_TRANSITION_MAX_MS = 2_000L
+        private const val PULSE_PAGE_TRANSITION_MAX_MS = 3_000L
 
         /** Alpha of the inactive carousel dots. */
         private const val PULSE_DOT_INACTIVE_ALPHA = 0.3f
@@ -541,7 +550,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.serversScrollView.post {
             b.serversScrollView.setPadding(
                 b.serversScrollView.paddingLeft,
-                dpPx(20),
+                0,
                 b.serversScrollView.paddingRight,
                 b.serversScrollView.paddingBottom
             )
@@ -690,13 +699,31 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Bypass apps / live-connection counts change outside this screen
         // (e.g. after returning from RpnBypassAppsActivity), so re-read them.
         refreshBypassAppsTileState()
-        refreshStatsTileState()
         refreshRelayTileState()
         // Refresh the RPN heat map so newly logged connections show up when
         // the user returns to this screen.
         loadRpnHeatmap()
         // Same for the live-activity feed: connections logged while away.
         refreshActivityFeed()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        blinkAnimator?.let { if (it.isPaused) it.resume() }
+        errorDolphinAnimator?.let { if (it.isPaused) it.resume() }
+        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+            if (it.isVisible) it.startShimmer()
+        }
+    }
+
+    override fun onStop() {
+        pulsePageAnimator?.cancel()
+        blinkAnimator?.pause()
+        errorDolphinAnimator?.pause()
+        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+            if (it.isVisible) it.stopShimmer()
+        }
+        super.onStop()
     }
 
     /**
@@ -1021,7 +1048,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.rvServers.isVisible = false
             b.emptySelectionCard.isVisible = false
             b.rvSelectedServers.isVisible = false
-            b.selectedLocationsHeader.isVisible = false
             b.frequentCountriesSection.isVisible = false
             b.locationCapacityIndicator.isVisible = false
             b.errorStateContainer.isVisible = false
@@ -1332,7 +1358,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (blinkAnimator?.isRunning == true) return
         b.statusIndicator.alpha = 1f
         blinkAnimator = ObjectAnimator.ofFloat(b.statusIndicator, View.ALPHA, 1f, 0.25f).apply {
-            duration = 900L
+            duration = 2000L
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.REVERSE
             start()
@@ -1405,40 +1431,42 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    /**
-     * Loads the RPN-only activity heat map: aggregates connection logs routed
-     * through RPN proxies (proxyDetails prefixed with [Backend.RpnWin]) into
-     * 10-minute buckets over the trailing 24 hours, then renders the wall
-     * inside the hero banner (full card width). The window is anchored to the
-     * hour boundary so every COLUMN of the wall is an exact clock hour —
-     * column 23 (the last) is the current, partially-elapsed hour.
-     */
     private fun loadRpnHeatmap() {
-        io {
+        rpnHeatmapJob?.cancel()
+        rpnHeatmapJob = io {
             try {
-                // Exclusive end == start of the NEXT hour, so columns are
-                // exact clock hours (epoch-aligned, no timezone involvement).
-                // rangeStart then sits exactly 24 whole hours back.
+                val proxyIdFilter = Backend.RpnWin + "%"
                 val now = System.currentTimeMillis()
-                val hourMs = TimeUnit.HOURS.toMillis(1)
-                val rangeEnd = (now / hourMs + 1) * hourMs
+                val rangeEnd = (now / RPN_HEATMAP_BUCKET_MS + 1) * RPN_HEATMAP_BUCKET_MS
                 val rangeStart = rangeEnd - RPN_HEATMAP_WINDOW_MS
-                val rows = connectionTrackerDAO.getRpnActivityBuckets(
-                    Backend.RpnWin + "%",
-                    rangeStart,
-                    rangeEnd,
-                    RPN_HEATMAP_BUCKET_MS
-                )
-                // fold grouped rows into per-bucket counts, chronological
-                // (oldest bucket first) so the grid can be filled row-major
-                val counts = LongArray(RPN_HEATMAP_SLOTS)
-                rows.forEach { row ->
-                    val idx = row.bucketIndex.toInt()
-                    if (idx in counts.indices) counts[idx] += row.total
-                }
-                uiCtx {
-                    heatmapWindowEndMs = rangeEnd
-                    renderRpnHeatmap(counts)
+                coroutineScope {
+                    val dnsRows = async {
+                        dnsLogDAO.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+                    val connRows = async {
+                        connectionTrackerDAO.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+                    val rlogRows = async {
+                        rethinkLogDao.getRpnActivityBuckets(
+                            proxyIdFilter, rangeStart, rangeEnd, RPN_HEATMAP_BUCKET_MS
+                        )
+                    }
+
+                    val counts = LongArray(RPN_HEATMAP_SLOTS)
+                    for (rows in listOf(dnsRows, connRows, rlogRows)) {
+                        rows.await().forEach { row ->
+                            val idx = row.bucketIndex.toInt()
+                            if (idx in counts.indices) counts[idx] += row.total
+                        }
+                    }
+                    uiCtx {
+                        heatmapWindowEndMs = rangeEnd
+                        renderRpnHeatmap(counts)
+                    }
                 }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "$TAG.loadRpnHeatmap failed: ${e.message}")
@@ -1896,7 +1924,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setupQuickSettings() {
         b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
         b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
-        b.qsStatsTile.setOnClickListener { showRpnStatsBottomSheet() }
         refreshQuickSettingCaptions()
     }
 
@@ -1933,30 +1960,33 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
             v.performClick()
         }
-        // Auto-advance the carousel; skips while the user is interacting.
-        pulseAutoAdvanceJob = lifecycleScope.launch {
-            while (true) {
-                delay(ACTIVITY_FEED_AUTO_ADVANCE_MS.milliseconds)
-                if (!isAdded || isProxyStopped) continue
-                if (System.currentTimeMillis() - lastPulseTouchTs <
-                    PULSE_USER_INTERACTION_GRACE_MS
-                ) continue
-                val lm = b.activityFeedPager.layoutManager as? LinearLayoutManager ?: continue
-                val count = pulsePagerAdapter.itemCount
-                if (count <= 1) continue
-                val cur = lm.findFirstCompletelyVisibleItemPosition()
-                    .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
-                if (cur < 0) continue
-                animatePulsePage((cur + 1) % count)
+        pulseAutoAdvanceJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    delay(ACTIVITY_FEED_AUTO_ADVANCE_MS.milliseconds)
+                    if (!isAdded || isProxyStopped) continue
+                    if (System.currentTimeMillis() - lastPulseTouchTs <
+                        PULSE_USER_INTERACTION_GRACE_MS
+                    ) continue
+                    val lm = b.activityFeedPager.layoutManager as? LinearLayoutManager ?: continue
+                    val count = pulsePagerAdapter.itemCount
+                    if (count <= 1) continue
+                    val cur = lm.findFirstCompletelyVisibleItemPosition()
+                        .takeIf { it >= 0 } ?: lm.findFirstVisibleItemPosition()
+                    if (cur < 0) continue
+                    animatePulsePage((cur + 1) % count)
+                }
             }
         }
-        activityFeedJob = lifecycleScope.launch {
-            while (true) {
-                delay(ACTIVITY_FEED_REFRESH_MS.milliseconds)
-                if (isAdded && !isLoading && !isProxyStopped &&
-                    !b.errorStateContainer.isVisible
-                ) {
-                    refreshActivityFeed()
+        activityFeedJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    delay(ACTIVITY_FEED_REFRESH_MS.milliseconds)
+                    if (isAdded && !isLoading && !isProxyStopped &&
+                        !b.errorStateContainer.isVisible
+                    ) {
+                        refreshActivityFeed()
+                    }
                 }
             }
         }
@@ -1993,9 +2023,20 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "$TAG.refreshActivityFeed: blocked count failed: ${e.message}")
             }
+            val ctx = context
+            val iconEntries = if (ctx == null) {
+                emptyList()
+            } else {
+                rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
+                    val icon = runCatching {
+                        Utilities.getIcon(ctx, ct.packageName, ct.appName)
+                    }.getOrNull() ?: return@mapNotNull null
+                    ct.packageName to icon
+                }
+            }
             uiCtx {
                 if (!isAdded) return@uiCtx
-                renderPulse(rows, connCount, bytes, appCount, blockedCount)
+                renderPulse(rows, iconEntries, connCount, bytes, appCount, blockedCount)
             }
         }
     }
@@ -2009,6 +2050,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun renderPulse(
         rows: List<ConnectionTracker>,
+        iconEntries: List<Pair<String, Drawable>>,
         connCount: Int,
         bytes: Long,
         appCount: Int,
@@ -2017,12 +2059,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (rows.isEmpty() && connCount == 0) {
             b.activityFeedCard.isVisible = false
             return
-        }
-        val iconEntries = rows.distinctBy { it.packageName }.take(5).mapNotNull { ct ->
-            val icon = runCatching {
-                Utilities.getIcon(requireContext(), ct.packageName, ct.appName)
-            }.getOrNull() ?: return@mapNotNull null
-            ct.packageName to icon
         }
         val appIcons = iconEntries.map { it.second }
         val appIconKeys = iconEntries.map { it.first }
@@ -2076,33 +2112,32 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         dots.removeAllViews()
         repeat(pulsePagerAdapter.itemCount) {
             dots.addView(View(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(dpPx(5), dpPx(5)).apply {
+                layoutParams = LinearLayout.LayoutParams(dpPx(4), dpPx(4)).apply {
                     marginStart = dpPx(4)
                 }
                 background = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_circle)
                 alpha = PULSE_DOT_INACTIVE_ALPHA
             })
         }
+        lastPulseDotPosition = -1
         updatePulseDots(0)
     }
 
     /** Selected dot grows slightly but stays a circle; the rest stay faint. */
     private fun updatePulseDots(position: Int) {
+        if (position == lastPulseDotPosition) return
+        lastPulseDotPosition = position
         val dots = b.activityFeedDots
         dots.forEachIndexed { i, dot ->
             val active = i == position
-            val size = dpPx(if (active) 6 else 5)
-            dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
-                width = size
-                height = size
-            }
+            dot.pivotX = dot.width / 2f
+            dot.pivotY = dot.height / 2f
             dot.alpha = if (active) PULSE_DOT_ACTIVE_ALPHA else PULSE_DOT_INACTIVE_ALPHA
             dot.backgroundTintList = ColorStateList.valueOf(
                 resolveAttrColor(
                     if (active) R.attr.primaryTextColor else R.attr.primaryLightColorText
                 )
             )
-            dot.requestLayout()
         }
     }
 
@@ -2206,9 +2241,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         fun submit(newPages: List<PulsePage>) {
             if (pages == newPages) return
+            val old = pages.toList()
             pages.clear()
             pages.addAll(newPages)
-            notifyDataSetChanged()
+            val overlap = minOf(old.size, newPages.size)
+            for (i in 0 until overlap) {
+                if (old[i] != newPages[i]) notifyItemChanged(i)
+            }
+            if (old.size > newPages.size) {
+                notifyItemRangeRemoved(overlap, old.size - newPages.size)
+            } else if (newPages.size > old.size) {
+                notifyItemRangeInserted(overlap, newPages.size - old.size)
+            }
         }
 
         override fun getItemCount(): Int = pages.size
@@ -2219,7 +2263,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     RecyclerView.LayoutParams.MATCH_PARENT,
                     RecyclerView.LayoutParams.WRAP_CONTENT
                 )
-                gravity = Gravity.CENTER_VERTICAL
+                gravity = Gravity.CENTER
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(dpPx(8), 0, dpPx(8), 0)
             }
@@ -2282,10 +2326,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     }
                 })
             }
-
-            holder.row.addView(View(ctx).apply {
-                layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
-            })
         }
 
         inner class Holder(val row: LinearLayout) : RecyclerView.ViewHolder(row)
@@ -2300,7 +2340,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         refreshRelayTileState()
         updateCapacityIndicator()
         refreshBypassAppsTileState()
-        refreshStatsTileState()
     }
 
     /**
@@ -2322,39 +2361,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 b.qsBypassAppsState.text =
                     String.format(Locale.US, "%d/%d", bypassed, total)
             }
-        }
-    }
-
-    /**
-     * Refreshes the stats tile caption with the number of connections routed
-     * through the live WIN proxy in the last 24 hours (same window and query
-     * as [RpnStatsBottomSheet]); shows "0" when the tunnel or proxy is down.
-     */
-    private fun refreshStatsTileState() {
-        io {
-            val count = try {
-                val proxyId = Backend.RpnWin
-                connectionTrackerDAO.getRpnConnStats(
-                    proxyId,
-                    System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24)
-                ).connectionsCount
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG.refreshStatsTileState: ${e.message}")
-                0
-            }
-            uiCtx {
-                if (!isAdded) return@uiCtx
-                b.qsStatsState.text = formatCompactDecimal(count)
-            }
-        }
-    }
-
-    private fun formatCompactDecimal(i: Int): String {
-        return if (isAtleastN()) {
-            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
-                .format(i.toLong())
-        } else {
-            i.toString()
         }
     }
 
@@ -2564,7 +2570,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
         b.quickSettingsRow.alpha = alpha
-        listOf(b.qsRelayTile, b.qsBypassAppsTile, b.qsStatsTile).forEach { tile ->
+        listOf(b.qsRelayTile, b.qsBypassAppsTile).forEach { tile ->
             tile.isEnabled = enabled
         }
     }
@@ -2937,7 +2943,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun updateSelectedSectionVisibility() {
         if (!isAdded) return
         val hasSelection = selectedServers.isNotEmpty()
-        b.selectedLocationsHeader.isVisible = hasSelection
         b.rvSelectedServers.isVisible = hasSelection
         b.rvSelectedServers.isVisible = hasSelection
 
@@ -4421,9 +4426,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
 
-    private fun io(f: suspend () -> Unit) {
+    private fun io(f: suspend () -> Unit): Job =
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {

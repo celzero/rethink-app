@@ -186,7 +186,8 @@ class WireguardManagerTest : KoinTest {
             useOnlyOnMetered = useOnlyOnMetered,
             isDeletable = isDeletable,
             ssidEnabled = ssidEnabled,
-            ssids = ssids
+            ssids = ssids,
+            isSplitProxy = false
         )
     }
 

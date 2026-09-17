@@ -1244,8 +1244,6 @@
     <string name="qs_relay_failure_toast" translatable="true">Nu s-a reușit actualizarea releului pentru %1$d locații</string>
     <string name="qs_relay_automation_dialog_title" translatable="true">Automatizarea activată</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">Automatizarea e activată pentru Auto locație, ceea ce va afecta inclusiv această locație. Vrei să continui?</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">Releu activat</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">Releul este activat pentru una sau mai multe locații. Activarea automatizării la Auto locație va pune în pauză și aceste locații. Vrei să continui?</string>
     <string name="rpn_bypass_apps_count" translatable="true">%1$d aplicații ocolite</string>
     <string name="rpn_bypass_apps_none" translatable="true">Nu sunt aplicații ocolite</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">Ocolesc toate aplicațiile?</string>

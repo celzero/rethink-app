@@ -29,6 +29,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2.Companion.LOCAL_CANCEL_REVOKE_GUARD_MS
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -59,6 +60,7 @@ open class SubscriptionStateMachineV2 : KoinComponent {
 
     private val subscriptionDb by inject<SubscriptionStatusRepository>()
     private val dbSyncService: StateMachineDatabaseSyncService by inject()
+    private val persistentState by inject<PersistentState>()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     // Lock ordering (must always be acquired in this order to prevent deadlocks)
@@ -1849,6 +1851,11 @@ open class SubscriptionStateMachineV2 : KoinComponent {
             val existingByToken = subscriptionDb.getByPurchaseToken(purchaseDetail.purchaseToken)
             val existingLatest  = if (existingByToken == null) subscriptionDb.getCurrentSubscription() else null
             val existing        = existingByToken ?: existingLatest
+
+            if (existingByToken == null) {
+                // new purchase token: restart the monthly forced-reconcile window
+                persistentState.lastForcedReconcileTimestamp = System.currentTimeMillis()
+            }
 
             val billingExpiry = purchaseDetail.expiryTime
             val sessionToken = RpnProxyManager.getSessionTokenFromPayload(purchaseDetail.payload)
