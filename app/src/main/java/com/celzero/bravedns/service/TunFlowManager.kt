@@ -307,8 +307,8 @@ object TunFlowManager : KoinComponent {
         val srcIpPort = parseIpAndPort(src)
         val dstIpPort = parseIpAndPort(dst)
         Logger.d(LOG_TAG_VPN, "preflow: init, uid: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
-        val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
-            val resolvedUid = getUid(
+        var newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
+            getUid(
                 ctx,
                 uid,
                 protocol,
@@ -317,10 +317,11 @@ object TunFlowManager : KoinComponent {
                 dstIpPort.first,
                 dstIpPort.second
             )
-            resolvedUid
         } else {
             uid
         }
+        // fixme: see flow()
+        newUid = FirewallManager.appId(newUid, ctx.isPrimaryUser)
         Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIpPort, $dstIpPort")
 
         val p = PreMark()
