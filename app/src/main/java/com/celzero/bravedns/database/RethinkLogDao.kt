@@ -212,7 +212,7 @@ interface RethinkLogDao {
     fun getAllCountryLogs(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, isBlocked as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM RethinkLog WHERE timeStamp > :to and ipAddress like :query and (:isBlocked IS NULL OR isBlocked = :isBlocked) GROUP BY  uid, ipAddress, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, MAX(isBlocked) as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM RethinkLog WHERE timeStamp > :to and ipAddress like :query and (:isBlocked IS NULL OR isBlocked = :isBlocked) GROUP BY  uid, ipAddress, port ORDER BY count DESC"
     )
     fun getIpLogsFiltered(
         to: Long,
@@ -227,7 +227,7 @@ interface RethinkLogDao {
 
 
     @Query(
-        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, isBlocked as blocked, dnsQuery as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM RethinkLog WHERE timeStamp > :to and dnsQuery != '' and dnsQuery like :query and (:isBlocked IS NULL OR isBlocked = :isBlocked) GROUP BY dnsQuery ORDER BY count DESC"
+        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, MAX(isBlocked) as blocked, dnsQuery as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM RethinkLog WHERE timeStamp > :to and dnsQuery != '' and dnsQuery like :query and (:isBlocked IS NULL OR isBlocked = :isBlocked) GROUP BY dnsQuery ORDER BY count DESC"
     )
     fun getDomainLogsFiltered(
         to: Long,

@@ -142,6 +142,7 @@ object BlocklistStatsAggregator {
                 val token = rawToken.trim()
                 val colon = token.indexOf(':')
                 if (colon <= 0) return@forEach
+                if (colon != name.length) return@forEach
                 if (!token.regionMatches(0, name, 0, name.length, ignoreCase = true)) {
                     return@forEach
                 }
@@ -184,6 +185,7 @@ object BlocklistStatsAggregator {
             val token = rawToken.trim()
             val colon = token.indexOf(':')
             if (colon <= 0) return@forEach
+            if (colon != name.length) return@forEach
             if (!token.regionMatches(0, name, 0, name.length, ignoreCase = true)) {
                 return@forEach
             }

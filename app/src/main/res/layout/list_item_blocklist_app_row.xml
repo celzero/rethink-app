@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:alpha="0.4"
-        android:contentDescription="@string/ssv_blocklists_heading"
+        android:contentDescription="@null"
         android:padding="4dp"
         android:src="@drawable/ic_expand_more_24" />
 

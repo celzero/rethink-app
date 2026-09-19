@@ -105,7 +105,7 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
      * chips where every list starts checked and unchecking narrows results.
      */
     suspend fun getBlocklistApps(tags: Set<String>): List<AppConnection> {
-        if (blocklistName.isEmpty() || tags.isEmpty()) return emptyList()
+        if (blocklistName.isEmpty()) return emptyList()
         val rows = statsDao.getBlocklistAttributions(
             BlocklistStatsAggregator.escapeForLike(blocklistName),
             scopedUid(),
