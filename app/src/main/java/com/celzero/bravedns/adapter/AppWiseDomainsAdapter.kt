@@ -384,23 +384,29 @@ class AppWiseDomainsAdapter(
                 b.progress.visibility = View.GONE
                 return
             }
-            val status = DomainRulesManager.status(conn.appOrDnsName, uid)
-            Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
-            when (status) {
-                DomainRulesManager.Status.NONE -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
-                }
-                DomainRulesManager.Status.BLOCK -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                    )
-                }
-                DomainRulesManager.Status.TRUST -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
+            if (conn.blocked) {
+                b.progress.setIndicatorColor(
+                    UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                )
+            } else {
+                val status = DomainRulesManager.status(conn.appOrDnsName, uid)
+                Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
+                when (status) {
+                    DomainRulesManager.Status.NONE -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                        )
+                    }
+                    DomainRulesManager.Status.BLOCK -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                        )
+                    }
+                    DomainRulesManager.Status.TRUST -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                        )
+                    }
                 }
             }
 

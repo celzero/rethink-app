@@ -68,6 +68,8 @@ class AppWiseDomainLogsActivity :
     private lateinit var appInfo: AppInfo
     private var isActiveConns = false
 
+    private var isBlocked: Boolean? = null
+
     companion object {
         private const val QUERY_TEXT_DELAY: Long = 1000
     }
@@ -90,10 +92,15 @@ class AppWiseDomainLogsActivity :
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
         isActiveConns = intent.getBooleanExtra(AppInfoActivity.INTENT_ACTIVE_CONNS, false)
+        if (intent.hasExtra(AppInfoActivity.INTENT_IS_BLOCKED)) {
+            isBlocked = intent.getBooleanExtra(AppInfoActivity.INTENT_IS_BLOCKED, false)
+        }
 
         if (uid == INVALID_UID) {
             finish()
         }
+        // must be set before the adapters observe; the paged queries branch on it
+        networkLogsViewModel.setBlockedFilter(isBlocked)
         val isRethink = android.os.Process.myUid() == uid
         init()
         if (isActiveConns) {
