@@ -3570,6 +3570,10 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun addMultipleDnsAsPlus() {
+        // v058, for now the hostnames are not replaced with the ips, add a user settings?
+        // or enable it when firestack starts accepting urls (one with host name, another with ips)
+        // firestack will decide whether to use the ip based or host name based urls
+        val canReplaceHostWithIp = false
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG; smart-dns; no tunnel, skip set multi dns as plus")
             return
@@ -3604,7 +3608,7 @@ class GoVpnAdapter : KoinComponent {
                         Logger.d(LOG_TAG_VPN, "$TAG smart-dns; changing url from https to http for $url")
                         url = url.replace("https", "http")
                     }
-                    url = replaceHostWithIp(url, ips)
+                    url = if (canReplaceHostWithIp) replaceHostWithIp(url, ips) else url
                     // add replaces the existing transport with the same id if successful
                     // so no need to remove the transport before adding
                     Intra.addDoHTransport(tunnel, id, url, ips)

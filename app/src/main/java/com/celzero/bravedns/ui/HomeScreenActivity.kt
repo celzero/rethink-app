@@ -29,7 +29,6 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -52,7 +51,6 @@ import androidx.work.WorkRequest
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -71,7 +69,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -433,7 +430,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
             val endpoints = smartDnsEndpointRepository.getSmartDnsEndpoints()
 
-            val target = endpoints.firstOrNull { SmartDnsEndpoint.isSecurityMode(it.dnsMode) } ?: return
+            val target = endpoints.firstOrNull { SmartDnsEndpoint.isPrivacyMode(it.dnsMode) } ?: return
 
             val selected = appConfig.getSelectedSmartDnsEndpoint()
             if (selected != null &&
@@ -447,15 +444,15 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         }
     }
 
-    private suspend fun setDefaultSmartDnsSecurityForNewInstalls() {
+    private suspend fun setDefaultSmartDnsPrivacyForNewInstalls() {
         try {
             if (!appConfig.isRethinkDnsConnected()) return
 
-            val security = smartDnsEndpointRepository.getSmartDnsEndpoints()
-                .firstOrNull { SmartDnsEndpoint.isSecurityMode(it.dnsMode) } ?: return
+            val privacy = smartDnsEndpointRepository.getSmartDnsEndpoints()
+                .firstOrNull { SmartDnsEndpoint.isPrivacyMode(it.dnsMode) } ?: return
 
-            Logger.i(LOG_TAG_UI, "defaulting new install to smart dns security (id: ${security.id})")
-            appConfig.enableSmartDns(security.id)
+            Logger.i(LOG_TAG_UI, "defaulting new install to smart dns privacy (id: ${privacy.id})")
+            appConfig.enableSmartDns(privacy.id)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_UI, "err setting default smart dns: ${e.message}", e)
         }
@@ -513,7 +510,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         }
 
         if (prevVersion == 0 && isPlayStoreFlavour()) {
-            io { setDefaultSmartDnsSecurityForNewInstalls() }
+            io { setDefaultSmartDnsPrivacyForNewInstalls() }
         }
 
         // FIXME: remove this post v054
