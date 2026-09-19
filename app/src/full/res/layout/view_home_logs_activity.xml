@@ -126,10 +126,12 @@
         tools:ignore="HardcodedText">
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_logs_hour_start"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:alpha="0.55"
+            android:layout_marginStart="4dp"
             android:fontFamily="monospace"
             android:gravity="start"
             android:letterSpacing="0.05"
@@ -139,6 +141,7 @@
             android:textSize="@dimen/extra_small_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_logs_hour_start_plus_6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -152,6 +155,7 @@
             android:textSize="@dimen/extra_small_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_logs_hour_start_plus_12"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -165,6 +169,7 @@
             android:textSize="@dimen/extra_small_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_logs_hour_start_plus_18"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -184,6 +189,7 @@
             android:alpha="0.55"
             android:fontFamily="monospace"
             android:gravity="end"
+            android:layout_marginEnd="4dp"
             android:letterSpacing="0.05"
             android:maxLines="1"
             android:text="now"
