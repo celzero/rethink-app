@@ -431,16 +431,33 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             // user did not use smart dns previously, nothing to migrate
             if (!appConfig.isSmartDnsEnabled()) return
 
-            // an option is already selected (or migration ran before), do not overwrite
-            if (appConfig.getSelectedSmartDnsEndpoint() != null) return
+            val endpoints = smartDnsEndpointRepository.getSmartDnsEndpoints()
 
-            val noFilter = smartDnsEndpointRepository.getSmartDnsEndpoints()
-                .firstOrNull { SmartDnsEndpoint.isNoFilterMode(it.dnsMode) } ?: return
+            val target = endpoints.firstOrNull { SmartDnsEndpoint.isSecurityMode(it.dnsMode) } ?: return
 
-            Logger.i(LOG_TAG_UI, "migrating prev smart dns to no filter (id: ${noFilter.id})")
-            appConfig.enableSmartDns(noFilter.id)
+            val selected = appConfig.getSelectedSmartDnsEndpoint()
+            if (selected != null &&
+                (!isPlayStoreFlavour() || !SmartDnsEndpoint.isNoFilterMode(selected.dnsMode))
+            ) return
+
+            Logger.i(LOG_TAG_UI, "migrating smart dns selection (id: ${target.id})")
+            appConfig.enableSmartDns(target.id)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_UI, "err migrating smart dns selection: ${e.message}", e)
+        }
+    }
+
+    private suspend fun setDefaultSmartDnsSecurityForNewInstalls() {
+        try {
+            if (!appConfig.isRethinkDnsConnected()) return
+
+            val security = smartDnsEndpointRepository.getSmartDnsEndpoints()
+                .firstOrNull { SmartDnsEndpoint.isSecurityMode(it.dnsMode) } ?: return
+
+            Logger.i(LOG_TAG_UI, "defaulting new install to smart dns security (id: ${security.id})")
+            appConfig.enableSmartDns(security.id)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "err setting default smart dns: ${e.message}", e)
         }
     }
 
@@ -493,6 +510,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             io {
                 FirewallManager.exemptRethinkApp(rethinkUid)
             }
+        }
+
+        if (prevVersion == 0 && isPlayStoreFlavour()) {
+            io { setDefaultSmartDnsSecurityForNewInstalls() }
         }
 
         // FIXME: remove this post v054
