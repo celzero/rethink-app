@@ -53,7 +53,7 @@
                     android:id="@+id/firewall_app_label_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
+                    android:ellipsize="marquee"
                     android:maxLines="1"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:marqueeRepeatLimit="marquee_forever"
