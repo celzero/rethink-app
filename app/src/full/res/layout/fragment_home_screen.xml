@@ -220,16 +220,16 @@
 
                                     <View
                                         android:id="@+id/fhs_rules_dot_0"
-                                        android:layout_width="6dp"
-                                        android:layout_height="6dp"
+                                        android:layout_width="4dp"
+                                        android:layout_height="4dp"
                                         android:alpha="0.35"
                                         android:background="@drawable/ic_circle"
                                         android:backgroundTint="?attr/primaryLightColorText" />
 
                                     <View
                                         android:id="@+id/fhs_rules_dot_1"
-                                        android:layout_width="6dp"
-                                        android:layout_height="6dp"
+                                        android:layout_width="4dp"
+                                        android:layout_height="4dp"
                                         android:layout_marginStart="6dp"
                                         android:alpha="0.35"
                                         android:background="@drawable/ic_circle"
@@ -237,8 +237,8 @@
 
                                     <View
                                         android:id="@+id/fhs_rules_dot_2"
-                                        android:layout_width="6dp"
-                                        android:layout_height="6dp"
+                                        android:layout_width="4dp"
+                                        android:layout_height="4dp"
                                         android:layout_marginStart="6dp"
                                         android:alpha="0.35"
                                         android:background="@drawable/ic_circle"
@@ -576,16 +576,16 @@
 
                             <View
                                 android:id="@+id/fhs_logs_dot_0"
-                                android:layout_width="6dp"
-                                android:layout_height="6dp"
+                                android:layout_width="4dp"
+                                android:layout_height="4dp"
                                 android:alpha="0.35"
                                 android:background="@drawable/ic_circle"
                                 android:backgroundTint="?attr/primaryLightColorText" />
 
                             <View
                                 android:id="@+id/fhs_logs_dot_1"
-                                android:layout_width="6dp"
-                                android:layout_height="6dp"
+                                android:layout_width="4dp"
+                                android:layout_height="4dp"
                                 android:layout_marginStart="6dp"
                                 android:alpha="0.35"
                                 android:background="@drawable/ic_circle"

@@ -234,7 +234,7 @@
                                             android:gravity="start"
                                             android:letterSpacing="0.05"
                                             android:maxLines="1"
-                                            android:text="24"
+                                            android:text="-24H"
                                             android:textColor="?attr/primaryLightColorText"
                                             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -247,7 +247,7 @@
                                             android:gravity="center"
                                             android:letterSpacing="0.05"
                                             android:maxLines="1"
-                                            android:text="12"
+                                            android:text="-12H"
                                             android:textColor="?attr/primaryLightColorText"
                                             android:textSize="@dimen/extra_small_font_text_view" />
 

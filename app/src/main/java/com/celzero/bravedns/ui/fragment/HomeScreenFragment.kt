@@ -155,6 +155,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import android.graphics.drawable.Drawable
+import java.util.Calendar
 import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
@@ -1557,11 +1558,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Builds the two-page swipeable logs card. Page 1 is the top-apps
-     * histogram (the card's default view); the activity wall sits on page 2,
-     * one swipe to the right. The histogram page exists only when the active
-     * brave mode enforces the firewall — DNS-only mode shows a single page
-     * (the activity wall) with no page dots.
+     * Builds the two-page swipeable logs card. Page 1 is the activity wall
+     * with the heatmap grid (the card's default view); the top-apps
+     * histogram sits on page 2, one swipe to the right. The histogram page
+     * exists only when the active brave mode enforces the firewall —
+     * DNS-only mode shows a single page (the activity wall) with no page
+     * dots.
      */
     private fun setupLogsPager() {
         logsPage = ViewHomeLogsActivityBinding.inflate(layoutInflater)
@@ -1587,10 +1589,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // a swipe (or dot tap) re-reveals the dots for another dwell
                 showLogsDotsTemporarily()
                 savedLogsPagePosition = position
-                // load/refresh the histogram lazily: it sits at position 0
-                // (only when the two-page layout applies; position 0 is the
-                // activity wall in DNS-only mode)
-                if (position == 0 && pagerPageCount() > 1) refreshTopAppsHistogram()
+                // load/refresh the histogram lazily: it sits at position 1
+                // (only when the two-page layout applies; DNS-only mode has
+                // no histogram page)
+                if (position == 1 && pagerPageCount() > 1) refreshTopAppsHistogram()
             }
         }
         b.fhsLogsPager.registerOnPageChangeCallback(logsPagerCallback!!)
@@ -1626,7 +1628,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         renderTopAppsHeader(null)
-        // the histogram is the card's opening page; load it right away
+        // the histogram is the card's trailing page; prime it so it is ready
+        // on the first swipe
         refreshTopAppsHistogram()
     }
 
@@ -1635,7 +1638,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (!this::logsPage.isInitialized || !this::topAppsPage.isInitialized) return
         val twoPages = pagerPageCount() > 1
         // re-assigning the adapter rebuilds the page list; position 0 is the
-        // histogram in the two-page layout, the activity wall in DNS-only.
+        // activity wall (heatmap) in both layouts, the histogram trails at
+        // position 1 in the two-page layout.
         // The user's last page is restored when it still exists.
         b.fhsLogsPager.adapter = LogsPagesAdapter(pageViews())
         updateLogsDotsVisibility()
@@ -1687,8 +1691,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun pageViews(): List<View> {
         return if (pagerPageCount() > 1) {
-            // histogram first, activity wall one swipe to the right
-            listOf(topAppsPage.root, logsPage.root)
+            // heatmap (activity wall) first, histogram one swipe to the right
+            listOf(logsPage.root, topAppsPage.root)
         } else {
             listOf(logsPage.root)
         }
@@ -2004,11 +2008,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
+    private fun renderLogsHourAxisLabels() {
+        val startHour =
+            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        val labels = listOf(0, 6, 12, 18).map { offset ->
+            "%02d".format(Locale.getDefault(), (startHour + offset) % 24)
+        }
+
+        logsPage.fhsLogsHourStart.text = labels[0]
+        logsPage.fhsLogsHourStartPlus6.text = labels[1]
+        logsPage.fhsLogsHourStartPlus12.text = labels[2]
+        logsPage.fhsLogsHourStartPlus18.text = labels[3]
+    }
+
     /**
      * Renders the blocked/allowed activity wall: 24 columns (one per hour
      * over the trailing 24 hours, oldest left, latest right) x 6 rows (one
      * per 10-minute bucket within each hour, :00 at top, :50 at bottom). The
-        * newest bucket (now) is the bottom-right cell. Cell intensity is a
+     * newest bucket (now) is the bottom-right cell. Cell intensity is a
         * deterministic logarithmic level of the real aggregated count; a count
         * of zero renders a negligible placeholder dot (far smaller and fainter
         * than the lowest real level) while the cell itself stays reserved so
@@ -2019,6 +2037,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         state: LogActivityState,
         mode: ActivityDisplayMode = displayMode
     ) {
+        renderLogsHourAxisLabels()
         val grid = logsPage.fhsLogsGrid
         grid.removeAllViews()
 

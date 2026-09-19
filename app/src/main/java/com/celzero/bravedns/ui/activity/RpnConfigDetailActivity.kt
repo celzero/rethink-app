@@ -922,28 +922,20 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun observeAppCount(configKey: String) {
         if (configKey.isBlank()) return
         // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
-        io {
-            val pid = if (configKey == AUTO_SERVER_ID) {
-                VpnController.getWinProxyId() ?: configKey
-            } else {
-                Backend.RpnWin + configKey
-            }
-            Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
-            uiCtx {
-                mappingViewModel.getAppCountById(pid).observe(this) { count ->
-                    // Don't override the "All apps" state when catch-all is active
-                    if (b.catchAllCheck.isChecked) return@observe
-                    val c = count ?: 0
-                    b.appsLabel.text = getString(
-                        R.string.two_argument_parenthesis,
-                        getString(R.string.apps_info_title),
-                        c
-                    )
-                    b.appsLabel.setTextColor(
-                        fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
-                    )
-                }
-            }
+        val pid = Backend.RpnWin + configKey
+        Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
+        mappingViewModel.getAppCountById(pid).observe(this) { count ->
+            // Don't override the "All apps" state when catch-all is active
+            if (b.catchAllCheck.isChecked) return@observe
+            val c = count ?: 0
+            b.appsLabel.text = getString(
+                R.string.two_argument_parenthesis,
+                getString(R.string.apps_info_title),
+                c
+            )
+            b.appsLabel.setTextColor(
+                fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
+            )
         }
     }
 
@@ -1328,23 +1320,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey
         }
-        // AUTO (catch-all) has no per-key proxy id; resolve the live WIN proxy id
-        // from the tunnel, mirroring openLogsDialog().
-        if (configKey.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-            io {
-                val proxyId = VpnController.getWinProxyId()
-                uiCtx {
-                    if (proxyId.isNullOrBlank()) {
-                        Logger.e(LOG_TAG_UI, "openAppsDialog: win proxy id unavailable for AUTO")
-                        return@uiCtx
-                    }
-                    includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
-                }
-            }
-        } else {
-            val proxyId = Backend.RpnWin + configKey
-            includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
-        }
+
+        val proxyId = Backend.RpnWin + configKey
+        includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
     }
 
     /**

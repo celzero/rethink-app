@@ -315,7 +315,7 @@ class VpnServerAdapter(
         private fun renderStatusRow() {
             // Connected with a known exit IP: just the tick (the IP speaks for
             // itself). No IP yet: show the human status ("Checking…",
-            // "Connecting…", "Proxy Stopped") instead.
+            // "Connecting…", "Stopped") instead.
             val showCheck =
                 currentProxyStatus == UIUtils.ProxyStatus.TOK && !currentIpText.isNullOrEmpty()
             b.ivStatusCheck.visibility = if (showCheck) View.VISIBLE else View.GONE
@@ -605,7 +605,7 @@ class VpnServerAdapter(
                     key, ROUTED_APP_STACK_SIZE
                 )
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
-                val apps = ProxyManager.getAppCountForProxy(key)
+                val apps = ProxyManager.getAppCountForProxy(Backend.RpnWin + group.key)
 
                 val iconEntries = recents.map { ct ->
                     val icon = ct.packageName.takeIf { it.isNotBlank() }?.let {
@@ -752,7 +752,7 @@ class VpnServerAdapter(
             b.appsActionContainer.visibility = View.GONE
             io {
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
-                val apps = ProxyManager.getAppCountForProxy(group.proxyId())
+                val apps = ProxyManager.getAppCountForProxy(Backend.RpnWin + group.key)
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
                     applyAppsAction(config, apps)
@@ -994,13 +994,9 @@ class VpnServerAdapter(
             }
             io {
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
-                val proxyId = if (group.key.equals(AUTO_SERVER_ID, true)) {
-                    VpnController.getWinProxyId()
-                } else {
-                    Backend.RpnWin + group.key
-                }
+                val proxyId = Backend.RpnWin + group.key
                 uiCtx {
-                    if (proxyId.isNullOrBlank()) {
+                    if (proxyId.isBlank()) {
                         Logger.w(LOG_TAG_UI, "VpnServerAdapter openAppsScreen[${group.key}]: win proxy id unavailable")
                         return@uiCtx
                     }
