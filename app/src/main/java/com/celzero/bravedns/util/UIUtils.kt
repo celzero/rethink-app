@@ -21,6 +21,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.Typeface
@@ -61,10 +62,12 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.GoMetrics
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.chip.Chip
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -657,6 +660,7 @@ object UIUtils {
                 "🇺🇲" to "U.S. Outlying Islands",
                 "🇺🇳" to "United Nations",
                 "🇺🇸" to "United States",
+                "🇬🇧" to "United Kingdom",
                 "🇺🇾" to "Uruguay",
                 "🇺🇿" to "Uzbekistan",
                 "🇻🇦" to "Vatican City",
@@ -675,7 +679,23 @@ object UIUtils {
                 "🇿🇲" to "Zambia",
                 "🇿🇼" to "Zimbabwe"
             )
-        return flagCodePoints[flag] ?: Utilities.UNKNOWN_COUNTRY_FLAG
+        return flagCodePoints[flag] ?: resolveUnmappedCountryName(flag)
+    }
+
+    private fun resolveUnmappedCountryName(flag: String?): String {
+        if (flag == null || flag.codePointCount(0, flag.length) != 2) {
+            return Utilities.UNKNOWN_COUNTRY_FLAG
+        }
+        val a = flag.codePointAt(0) - REGIONAL_INDICATOR_A
+        val b = flag.codePointAt(flag.offsetByCodePoints(0, 1)) - REGIONAL_INDICATOR_A
+        if (a !in 0..25 || b !in 0..25) return Utilities.UNKNOWN_COUNTRY_FLAG
+        val code = "${'A' + a}${'A' + b}"
+        val name = Locale("", code).getDisplayCountry(Locale.ENGLISH)
+        return if (name.isNotEmpty() && !name.equals(code, ignoreCase = true)) {
+            name
+        } else {
+            Utilities.UNKNOWN_COUNTRY_FLAG
+        }
     }
 
     fun getAccentColor(appTheme: Int): Int {
@@ -826,6 +846,7 @@ object UIUtils {
      * (MAX_CONTENT_WIDTH_DP) and BaseBottomSheetDialogFragment (MAX_WIDTH_DP).
      */
     const val DIALOG_MAX_WIDTH_DP = 600
+    private const val REGIONAL_INDICATOR_A = 0x1F1E6
 }
 
 /**

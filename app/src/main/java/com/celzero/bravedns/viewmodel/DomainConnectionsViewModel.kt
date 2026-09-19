@@ -23,6 +23,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
+import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.data.BlocklistStatsAggregator
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.util.Constants
 
@@ -31,9 +33,21 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     private val asn: MutableLiveData<String> = MutableLiveData()
     private val flag: MutableLiveData<String> = MutableLiveData()
     private val ip: MutableLiveData<String> = MutableLiveData()
+
+    // blocklist drill-down is an expandable list instead of a paged flow, so
+    // its inputs are kept as plain fields and served through suspend fetchers
+    private var blocklistName: String = ""
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private val startTime: MutableLiveData<Long> = MutableLiveData()
     private var isBlocked: Boolean = false
+
+    // when set, the blocklist drill-down is scoped to this uid (per-app
+    // screen); INVALID_UID (the default, stats screen) keeps it device-wide
+    private var scopedUid: Int = Constants.INVALID_UID
+
+    fun setUid(uid: Int) {
+        this.scopedUid = uid
+    }
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
@@ -77,6 +91,57 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     fun setIp(ip: String, isBlocked: Boolean) {
         this.isBlocked = isBlocked
         this.ip.postValue(ip)
+    }
+
+    fun setBlocklist(name: String) {
+        // rows shown for a blocklist are always blocked queries
+        this.blocklistName = name
+    }
+
+    /**
+     * Apps with blocked-query counts attributed to the selected blocklist.
+     * [tags] holds the active chip filter: rows are counted for any of those
+     * `name:tag` lists (OR). An empty set excludes everything, mirroring the
+     * chips where every list starts checked and unchecking narrows results.
+     */
+    suspend fun getBlocklistApps(tags: Set<String>): List<AppConnection> {
+        if (blocklistName.isEmpty() || tags.isEmpty()) return emptyList()
+        val rows = statsDao.getBlocklistAttributions(
+            BlocklistStatsAggregator.escapeForLike(blocklistName),
+            scopedUid(),
+            startTime.value ?: 0L
+        )
+        return BlocklistStatsAggregator.appBreakdown(rows, blocklistName, tags)
+    }
+
+    /** Domains the blocklist blocked for one app (lazy, on expansion). */
+    suspend fun getBlocklistDomainsForApp(uid: Int, tags: Set<String>): List<AppConnection> {
+        if (blocklistName.isEmpty() || tags.isEmpty()) return emptyList()
+        val rows = statsDao.getBlocklistAttributions(
+            BlocklistStatsAggregator.escapeForLike(blocklistName),
+            scopedUid(),
+            startTime.value ?: 0L
+        )
+        return BlocklistStatsAggregator.domainBreakdown(rows, blocklistName, tags, uid)
+    }
+
+    /**
+     * Distinct list tags attributed to the selected blocklist in the selected
+     * window, most frequent first; shown as selectable filter chips.
+     */
+    suspend fun getBlocklistTags(): List<String> {
+        if (blocklistName.isEmpty()) return emptyList()
+        val combos = statsDao.getBlocklistTagCombos(
+            BlocklistStatsAggregator.escapeForLike(blocklistName),
+            scopedUid(),
+            startTime.value ?: 0L
+        )
+        return BlocklistStatsAggregator.tagsForBlocklist(combos, blocklistName)
+    }
+
+    /** INVALID_UID when unscoped (stats screen); the app uid on per-app screens. */
+    private fun scopedUid(): Int? {
+        return if (scopedUid == Constants.INVALID_UID) null else scopedUid
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {

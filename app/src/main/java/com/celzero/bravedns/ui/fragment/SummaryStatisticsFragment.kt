@@ -41,6 +41,7 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
+import com.celzero.bravedns.ui.bottomsheet.SummaryStatsFilterBottomSheet
 import com.celzero.bravedns.ui.custom.DonutChartView
 import com.celzero.bravedns.ui.stats.CountryInsightsMapper
 import com.celzero.bravedns.ui.stats.StatsInsightsMath
@@ -102,7 +103,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         MOST_BLOCKED_DOMAINS(6),
         MOST_CONTACTED_IPS(7),
         MOST_BLOCKED_IPS(8),
-        TOP_ACTIVE_CONNS(9);
+        TOP_ACTIVE_CONNS(9),
+        MOST_BLOCKED_BLOCKLISTS(10);
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
@@ -117,6 +119,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         // two unnecessary thread hops and renders the first frame sooner
         initView()
         observeAppStart()
+        initFilterChips()
         initClickListeners()
     }
 
@@ -156,6 +159,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         // load domain/ip/country sections eagerly; previously these were gated
         // behind the (now removed) "load more" FAB
         initLazySections()
+        showMostBlockedBlocklists()
     }
 
     /** Flips the two presentation containers; does not touch any data state. */
@@ -288,9 +292,99 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         selectToggleBtnUi(btn)
     }
 
+    /**
+     * Section filters (Apps/Countries/Providers/Blocklists/Domains/IPs) now
+     * live in a scrollable bottom sheet opened from the header filter button;
+     * all sections enabled by default, session-only.
+     */
+    private fun initFilterChips() {
+        if (SummaryStatsFilterBottomSheet.filters.value == null) {
+            SummaryStatsFilterBottomSheet.filters.value =
+                SummaryStatsFilterBottomSheet.SectionFilter.entries.toSet()
+        }
+        SummaryStatsFilterBottomSheet.filters.observe(viewLifecycleOwner) {
+            applyStatFilters(it)
+        }
+        // the button fills the container and is itself clickable, so it must
+        // carry the listener; a listener on the container alone never fires
+        b.fssFilterBtn.setOnClickListener { showStatsFilterSheet() }
+        applyStatFilters(SummaryStatsFilterBottomSheet.filters.value.orEmpty())
+    }
+
+    private fun showStatsFilterSheet() {
+        Logger.v(LOG_TAG_UI, "show summary stats filter sheet")
+        SummaryStatsFilterBottomSheet().show(
+            childFragmentManager,
+            SummaryStatsFilterBottomSheet::class.java.simpleName
+        )
+    }
+
+    /**
+     * Shows or hides the per-category group containers. The groups sit around
+     * the sections of both views, so filtering is independent of each
+     * section's own visibility logic (mode gating, empty-state hiding).
+     */
+    private fun applyStatFilters(selected: Set<SummaryStatsFilterBottomSheet.SectionFilter>) {
+        val apps = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.APPS)
+        val providers = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.PROVIDERS)
+        val countries = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.COUNTRIES)
+        val blocklists = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.BLOCKLISTS)
+        val domains = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.DOMAINS)
+        val ips = selected.contains(SummaryStatsFilterBottomSheet.SectionFilter.IPS)
+
+        b.fssGrpAppsLl.visibility = if (apps) View.VISIBLE else View.GONE
+        b.fssGrpCountriesLl.visibility = if (countries) View.VISIBLE else View.GONE
+        b.fssGrpAsnLl.visibility = if (providers) View.VISIBLE else View.GONE
+        b.fssGrpBlocklistLl.visibility = if (blocklists) View.VISIBLE else View.GONE
+        b.fssGrpDomainsLl.visibility = if (domains) View.VISIBLE else View.GONE
+        b.fssGrpIpsLl.visibility = if (ips) View.VISIBLE else View.GONE
+
+        b.fssIaGrpAppsLl.visibility = if (apps) View.VISIBLE else View.GONE
+        b.fssIaGrpCountriesLl.visibility = if (countries) View.VISIBLE else View.GONE
+        b.fssIaGrpAsnLl.visibility = if (providers) View.VISIBLE else View.GONE
+        b.fssIaGrpBlocklistLl.visibility = if (blocklists) View.VISIBLE else View.GONE
+        b.fssIaGrpDomainsLl.visibility = if (domains) View.VISIBLE else View.GONE
+        b.fssIaGrpIpsLl.visibility = if (ips) View.VISIBLE else View.GONE
+
+        updateFilterBadge(selected)
+    }
+
+    /**
+     * Badges the filter button with the number of selected sections so the
+     * state is visible without opening the sheet; the badge is dropped while
+     * every section is selected (the default state). Provider sections are
+     * not counted when they are unavailable (no ip-info download).
+     */
+    private fun updateFilterBadge(selected: Set<SummaryStatsFilterBottomSheet.SectionFilter>) {
+        // count the sections the user can actually toggle. providers are not
+        // eligible when ip-info metadata is absent; their chip is hidden in
+        // the sheet yet always stays checked, so it must be excluded from the
+        // count in both directions (a size-based diff would be off by one)
+        val eligible =
+            if (persistentState.downloadIpInfo) {
+                SummaryStatsFilterBottomSheet.SectionFilter.entries
+            } else {
+                SummaryStatsFilterBottomSheet.SectionFilter.entries -
+                    SummaryStatsFilterBottomSheet.SectionFilter.PROVIDERS
+            }
+        val selectedCount = eligible.count { selected.contains(it) }
+        if (selectedCount == eligible.size) {
+            b.fssFilterBadge.visibility = View.GONE
+            return
+        }
+        val wasHidden = b.fssFilterBadge.visibility != View.VISIBLE
+        b.fssFilterBadge.text = selectedCount.toString()
+        b.fssFilterBadge.visibility = View.VISIBLE
+        if (wasHidden) {
+            // short pop so the newly badge-d state catches the eye
+            b.fssFilterBadge.scaleX = SCALE_INVISIBLE
+            b.fssFilterBadge.scaleY = SCALE_INVISIBLE
+            b.fssFilterBadge.animate().scaleX(1f).scaleY(1f).setDuration(BADGE_POP_MS).start()
+        }
+    }
+
     private fun initClickListeners() {
         b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
-
 
         b.fssViewModeToggleGroup.addOnButtonCheckedListener(viewModeToggleListener)
 
@@ -331,6 +425,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_COUNTRIES)
         }
 
+        b.fssBlocklistChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS)
+        }
+
         // insights-view chips (same detailed screens as the list view)
         b.fssIaCloseConnsChip.setOnClickListener {
             showCloseConnectionDialog()
@@ -358,6 +456,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
         b.fssIaDomainsBlockedChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_DOMAINS)
+        }
+        b.fssIaBlocklistsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS)
         }
         b.fssIaIpsAllowedChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_IPS)
@@ -490,7 +591,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         // UI constants
         private const val ALPHA_HALF_TRANSPARENT = 128
         private const val PERCENTAGE_MULTIPLIER = 100
-        private const val UNKNOWN_COUNTRY_LABEL = "--"
+
+        // filter badge pop-in animation
+        private const val SCALE_INVISIBLE = 0f
+        private const val BADGE_POP_MS = 150L
 
         // donut slices: top items only, one hue stepped by intensity
         private const val TOP_SLICES = 5
@@ -689,29 +793,62 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         ).setTimeCategory(viewModel.getTimeCategory())
     }
 
+    /**
+     * Wires the per-blocklist section. Unlike the other sections, the data is
+     * aggregated in memory (the blocklist CSV cannot be grouped in SQL), so it
+     * arrives as a plain list which is converted into a static PagingData for
+     * the shared paged adapter; visibility is driven by the list itself.
+     */
+    private fun showMostBlockedBlocklists() {
+        // blocklist blocking only exists when dns is active
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.fssBlocklistLl.visibility = View.GONE
+            return
+        }
+        setupStaticSummaryRecycler(
+            b.fssBlocklistRecyclerView,
+            b.fssBlocklistLl,
+            SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS,
+            viewModel.mostBlockedBlocklists
+        )
+    }
+
+    private fun setupStaticSummaryRecycler(
+        recyclerView: RecyclerView,
+        container: View,
+        type: SummaryStatisticsType,
+        data: LiveData<List<AppConnection>>
+    ): SummaryStatisticsAdapter {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.setHasFixedSize(false)
+        recyclerView.itemAnimator = null
+
+        val adapter = SummaryStatisticsAdapter(
+            requireContext(),
+            persistentState,
+            appConfig,
+            type
+        )
+        adapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        adaptersByType[type] = adapter
+
+        data.observe(viewLifecycleOwner) { items ->
+            adapter.submitData(viewLifecycleOwner.lifecycle, PagingData.from(items))
+            container.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+        }
+
+        // same insights mirroring as the paged sections
+        adapter.registerAdapterDataObserver(InsightsSnapshotObserver(type))
+
+        recyclerView.adapter = adapter
+        return adapter
+    }
+
     /** Re-renders every Insights section from the cached snapshots. */
     private fun renderInsights() {
         applyInsightsTheme()
         SummaryStatisticsType.entries.forEach { renderInsightsSection(it) }
-        applyInsightsSectionGating()
-    }
-
-    /** Hides Insights sections whose list-view counterparts are unavailable. */
-    private fun applyInsightsSectionGating() {
-        if (persistentState.downloadIpInfo) {
-            b.fssIaAsnAllowedLl.visibility = View.VISIBLE
-            b.fssIaAsnBlockedLl.visibility = View.VISIBLE
-        } else {
-            b.fssIaAsnAllowedLl.visibility = View.GONE
-            b.fssIaAsnBlockedLl.visibility = View.GONE
-        }
-        val dnsActive = appConfig.getBraveMode().isDnsActive()
-        b.fssIaDomainsAllowedLl.visibility = if (dnsActive) View.VISIBLE else View.GONE
-        b.fssIaDomainsBlockedLl.visibility = if (dnsActive) View.VISIBLE else View.GONE
-        val firewallActive = appConfig.getBraveMode().isFirewallActive()
-        b.fssIaIpsAllowedLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
-        b.fssIaIpsBlockedLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
-        b.fssIaCountriesLl.visibility = if (firewallActive) View.VISIBLE else View.GONE
     }
 
     /** Resolves every Insights color from the active theme; no hardcoded colors. */
@@ -737,6 +874,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             b.fssIaAsnBlockedDonut,
             b.fssIaDomainsAllowedDonut,
             b.fssIaDomainsBlockedDonut,
+            b.fssIaBlocklistsDonut,
             b.fssIaIpsAllowedDonut,
             b.fssIaIpsBlockedDonut
         )
@@ -744,58 +882,67 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun renderInsightsSection(type: SummaryStatisticsType) {
         val items = insightsSnapshots[type].orEmpty()
+        // sections tied to a feature are only eligible when that feature is on;
+        // renderRanking additionally hides any section with no items to show
+        val dnsActive = appConfig.getBraveMode().isDnsActive()
+        val firewallActive = appConfig.getBraveMode().isFirewallActive()
         when (type) {
             SummaryStatisticsType.TOP_ACTIVE_CONNS ->
                 renderRanking(
-                    b.fssIaActiveConnsRows, b.fssIaActiveConnsEmpty,
-                    b.fssIaActiveConnsDonut, false, type, items
+                    b.fssIaActiveConnsLl, b.fssIaActiveConnsRows,
+                    b.fssIaActiveConnsDonut, false, true, type, items
                 )
             SummaryStatisticsType.MOST_CONNECTED_APPS ->
                 renderRanking(
-                    b.fssIaAllowedAppsRows, b.fssIaAllowedAppsEmpty,
-                    b.fssIaAllowedAppsDonut, false, type, items
+                    b.fssIaAllowedAppsLl, b.fssIaAllowedAppsRows,
+                    b.fssIaAllowedAppsDonut, false, true, type, items
                 )
             SummaryStatisticsType.MOST_BLOCKED_APPS ->
                 renderRanking(
-                    b.fssIaBlockedAppsRows, b.fssIaBlockedAppsEmpty,
-                    b.fssIaBlockedAppsDonut, true, type, items
+                    b.fssIaBlockedAppsLl, b.fssIaBlockedAppsRows,
+                    b.fssIaBlockedAppsDonut, true, true, type, items
                 )
             SummaryStatisticsType.MOST_CONNECTED_ASN ->
                 renderRanking(
-                    b.fssIaAsnAllowedRows, b.fssIaAsnAllowedEmpty,
-                    b.fssIaAsnAllowedDonut, false, type, items
+                    b.fssIaAsnAllowedLl, b.fssIaAsnAllowedRows,
+                    b.fssIaAsnAllowedDonut, false, persistentState.downloadIpInfo, type, items
                 )
             SummaryStatisticsType.MOST_BLOCKED_ASN ->
                 renderRanking(
-                    b.fssIaAsnBlockedRows, b.fssIaAsnBlockedEmpty,
-                    b.fssIaAsnBlockedDonut, true, type, items
+                    b.fssIaAsnBlockedLl, b.fssIaAsnBlockedRows,
+                    b.fssIaAsnBlockedDonut, true, persistentState.downloadIpInfo, type, items
                 )
             SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                 renderRanking(
-                    b.fssIaCountriesRows, b.fssIaCountriesEmpty,
-                    null, false, type, items
+                    b.fssIaCountriesLl, b.fssIaCountriesRows,
+                    null, false, firewallActive, type, items
                 )
                 updateCountryMap(items)
             }
             SummaryStatisticsType.MOST_CONTACTED_DOMAINS ->
                 renderRanking(
-                    b.fssIaDomainsAllowedRows, b.fssIaDomainsAllowedEmpty,
-                    b.fssIaDomainsAllowedDonut, false, type, items
+                    b.fssIaDomainsAllowedLl, b.fssIaDomainsAllowedRows,
+                    b.fssIaDomainsAllowedDonut, false, dnsActive, type, items
                 )
             SummaryStatisticsType.MOST_BLOCKED_DOMAINS ->
                 renderRanking(
-                    b.fssIaDomainsBlockedRows, b.fssIaDomainsBlockedEmpty,
-                    b.fssIaDomainsBlockedDonut, true, type, items
+                    b.fssIaDomainsBlockedLl, b.fssIaDomainsBlockedRows,
+                    b.fssIaDomainsBlockedDonut, true, dnsActive, type, items
+                )
+            SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS ->
+                renderRanking(
+                    b.fssIaBlocklistsLl, b.fssIaBlocklistsRows,
+                    b.fssIaBlocklistsDonut, true, dnsActive, type, items
                 )
             SummaryStatisticsType.MOST_CONTACTED_IPS ->
                 renderRanking(
-                    b.fssIaIpsAllowedRows, b.fssIaIpsAllowedEmpty,
-                    b.fssIaIpsAllowedDonut, false, type, items
+                    b.fssIaIpsAllowedLl, b.fssIaIpsAllowedRows,
+                    b.fssIaIpsAllowedDonut, false, firewallActive, type, items
                 )
             SummaryStatisticsType.MOST_BLOCKED_IPS ->
                 renderRanking(
-                    b.fssIaIpsBlockedRows, b.fssIaIpsBlockedEmpty,
-                    b.fssIaIpsBlockedDonut, true, type, items
+                    b.fssIaIpsBlockedLl, b.fssIaIpsBlockedRows,
+                    b.fssIaIpsBlockedDonut, true, firewallActive, type, items
                 )
         }
     }
@@ -803,23 +950,25 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     /**
      * Renders a section as a donut chart (top slices, single hue stepped by
      * intensity) plus normalized ranking rows (bar length = value / maxValue,
-     * the longest item at ~100%), or the section's empty state.
+     * the longest item at ~100%). The whole section — heading, action chips
+     * and chart — is hidden when there is nothing to show or the backing
+     * feature is unavailable; no separate empty-state message is displayed.
      */
     private fun renderRanking(
+        section: View,
         rowsContainer: LinearLayout,
-        emptyView: View,
         donut: DonutChartView?,
         isBlockedSection: Boolean,
+        available: Boolean,
         type: SummaryStatisticsType,
         items: List<AppConnection>
     ) {
-        if (items.isEmpty()) {
+        if (items.isEmpty() || !available) {
             rowsContainer.removeAllViews()
-            emptyView.visibility = View.VISIBLE
-            donut?.visibility = View.GONE
+            section.visibility = View.GONE
             return
         }
-        emptyView.visibility = View.GONE
+        section.visibility = View.VISIBLE
         donut?.visibility = View.VISIBLE
         val fractions = StatsInsightsMath.normalizeFractions(items.map { metricValue(it, type) })
         renderDonut(donut, isBlockedSection, type, fractions, items)
@@ -910,11 +1059,14 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             SummaryStatisticsType.MOST_CONTACTED_DOMAINS,
             SummaryStatisticsType.MOST_BLOCKED_DOMAINS ->
                 item.appOrDnsName?.dropLastWhile { it == '.' }.orEmpty()
+            SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> item.appOrDnsName.orEmpty()
             SummaryStatisticsType.MOST_CONTACTED_IPS,
             SummaryStatisticsType.MOST_BLOCKED_IPS -> item.ipAddress
             SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                // country-name lookups fail with a dash placeholder, never a
+                // real name; such rows render as "Unknown <flag>"
                 val name = getCountryNameFromFlag(item.flag)
-                if (name.isNotEmpty() && name != UNKNOWN_COUNTRY_LABEL) {
+                if (name.isNotEmpty() && !name.all { it == '-' }) {
                     name
                 } else {
                     getString(
