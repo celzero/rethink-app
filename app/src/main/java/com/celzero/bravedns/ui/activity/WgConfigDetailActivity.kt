@@ -966,7 +966,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             }
 
             // checks if the config's keys are already in use by another active config
-            if (!WireguardManager.canEnableProxy(configId)) {
+            if (enabled && !WireguardManager.canEnableProxy(configId)) {
                 Logger.i(
                     LOG_TAG_PROXY,
                     "wg keys overlap with an active config, cannot enable, id: $configId"

@@ -399,6 +399,7 @@ object WireguardManager : KoinComponent {
             val peerKeys = peers?.map { it.getPublicKey().base64() }?.toSet() ?: emptySet()
 
             val duplicate = getActiveConfigs().any { active ->
+                if (active.getId() == id) return@any false
                 val activePrivateKey =
                     active.getInterface()?.getKeyPair()?.getPrivateKey()?.base64()
                 if (privateKey != null && activePrivateKey == privateKey) return@any true
