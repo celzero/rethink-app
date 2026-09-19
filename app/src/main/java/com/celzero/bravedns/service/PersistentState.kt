@@ -88,6 +88,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
         const val USE_MAX_MTU = "use_max_mtu"
         const val SET_VPN_BUILDER_TO_METERED = "set_vpn_builder_to_metered"
+        const val ALLOW_BYPASS = "allow_bypass"
 
         // SE Proxy for Anti-Censorship
         const val AUTO_PROXY_ENABLED = "auto_proxy_enabled"
