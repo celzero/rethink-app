@@ -47,6 +47,7 @@ import androidx.tv.material3.Text
 import kotlinx.coroutines.delay
 import com.celzero.bravedns.tv.ui.apps.AppDetailScreen
 import com.celzero.bravedns.tv.ui.apps.AppsScreen
+import com.celzero.bravedns.tv.ui.apps.RpnBypassAppsScreen
 import com.celzero.bravedns.tv.ui.console.ConsoleLogScreen
 import com.celzero.bravedns.tv.ui.dns.DnsScreen
 import com.celzero.bravedns.tv.ui.dns.OdohAddScreen
@@ -58,6 +59,7 @@ import com.celzero.bravedns.tv.ui.proxy.ProxyEditorScreen
 import com.celzero.bravedns.tv.ui.proxy.ProxyScreen
 import com.celzero.bravedns.tv.ui.proxy.WgDetailScreen
 import com.celzero.bravedns.tv.ui.proxy.WgImportScreen
+import com.celzero.bravedns.tv.ui.proxy.WgIncludeAppsScreen
 import com.celzero.bravedns.tv.ui.rules.RulesScreen
 import com.celzero.bravedns.tv.ui.settings.AntiCensorshipScreen
 import com.celzero.bravedns.tv.ui.settings.PauseVpnScreen
@@ -198,10 +200,22 @@ fun TvNavScaffold() {
                             ),
                         ) { backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("id") ?: -1
-                            WgDetailScreen(configId = id)
+                            WgDetailScreen(configId = id, navController = navController)
+                        }
+                        composable(
+                            route = "wg/{id}/apps",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("id") {
+                                    type = androidx.navigation.NavType.IntType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("id") ?: -1
+                            WgIncludeAppsScreen(configId = id, navController = navController)
                         }
                         composable("proxy/socks5") { ProxyEditorScreen(kind = ProxyEditorKind.SOCKS5) }
                         composable("proxy/http") { ProxyEditorScreen(kind = ProxyEditorKind.HTTP) }
+                        composable("proxy/rpn-bypass") { RpnBypassAppsScreen() }
                         composable("wg/import") { WgImportScreen(navController) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen(navController) }

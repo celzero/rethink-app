@@ -130,11 +130,11 @@ class NetLogBatcher<T, V>(
         val u = updates.getAndSet(mutableListOf())
 
         if (b.isNotEmpty()) {
-            buffersCh.send(b)
+            buffersCh.trySend(b)
         }
         if (u.isNotEmpty()) {
             delay((waitms / 5).milliseconds)
-            updatesCh.send(u)
+            updatesCh.trySend(u)
         }
 
         logd( "txswap (${lsn}) b: ${b.size}, u: ${u.size}, lsn -> $lsn, reason: $reason")
@@ -152,7 +152,7 @@ class NetLogBatcher<T, V>(
             if (b.size >= batchSize) {
                 txswap("add-full")
             } else if (b.size == 1) {
-                signal.send(lsn) // start tracking 'lsn'
+                signal.trySend(lsn) // start tracking 'lsn'; fails only if closed
             }
         }
 
@@ -167,7 +167,7 @@ class NetLogBatcher<T, V>(
             if (u.size >= batchSize) {
                 txswap("update-full")
             } else if (u.size == 1) {
-                signal.send(lsn)
+                signal.trySend(lsn) // fails only if closed
             }
         }
 

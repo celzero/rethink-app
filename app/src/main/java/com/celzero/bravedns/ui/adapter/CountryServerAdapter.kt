@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.adapter
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CountryConfig
+import com.celzero.bravedns.databinding.ItemSectionHeaderBinding
 import com.celzero.bravedns.databinding.ItemServerGroupBinding
 import com.celzero.bravedns.databinding.ListItemCountryCardBinding
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -39,9 +41,9 @@ import java.util.Locale
  * Each country row can be expanded to reveal its city servers.
  */
 class CountryServerAdapter(
-    private var countries: List<CountryItem>,
+    countries: List<CountryItem>,
     private val listener: CitySelectionListener
-) : RecyclerView.Adapter<CountryServerAdapter.CountryViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface CitySelectionListener {
         fun onCitySelected(server: CountryConfig, isEnabled: Boolean)
@@ -82,6 +84,16 @@ class CountryServerAdapter(
         var isFavourite: Boolean = false
     )
 
+    private sealed class Row {
+        data class Header(val letter: String) : Row()
+        data class Country(val item: CountryItem) : Row()
+    }
+
+    /** Alphabetically sorted source countries */
+    private var countries: List<CountryItem> = sortCountries(countries)
+
+    private var rows: List<Row> = buildRows(countries)
+
     // track which countries are expanded by country code
     private val expandedCountries = mutableSetOf<String>()
 
@@ -106,35 +118,104 @@ class CountryServerAdapter(
         notifyItemRangeChanged(0, itemCount)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
-        val binding = ListItemCountryCardBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return CountryViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == TYPE_HEADER) {
+            HeaderViewHolder(ItemSectionHeaderBinding.inflate(inflater, parent, false))
+        } else {
+            CountryViewHolder(ListItemCountryCardBinding.inflate(inflater, parent, false))
+        }
     }
 
-    override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
-        val country = countries[position]
-        Logger.v(LOG_TAG_UI, "CountryServerAdapter.bind: ${country.countryName} with ${country.serverGroups.size} server groups")
-        holder.bind(country, expandedCountries.contains(country.countryCode))
+    override fun getItemViewType(position: Int): Int =
+        if (rows[position] is Row.Header) TYPE_HEADER else TYPE_COUNTRY
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val row = rows[position]) {
+            is Row.Header -> (holder as HeaderViewHolder).bind(row.letter)
+            is Row.Country -> {
+                Logger.v(LOG_TAG_UI, "CountryServerAdapter.bind: ${row.item.countryName} with ${row.item.serverGroups.size} server groups")
+                (holder as CountryViewHolder).bind(
+                    row.item,
+                    expandedCountries.contains(row.item.countryCode)
+                )
+            }
+        }
     }
 
-    override fun getItemCount(): Int = countries.size
+    override fun getItemCount(): Int = rows.size
 
     fun updateCountries(newCountries: List<CountryItem>) {
-        val old = countries
+        val sorted = sortCountries(newCountries)
+        val newRows = buildRows(sorted)
+        val old = rows
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = old.size
-            override fun getNewListSize() = newCountries.size
-            override fun areItemsTheSame(o: Int, n: Int) = old[o].countryCode == newCountries[n].countryCode
-            override fun areContentsTheSame(o: Int, n: Int) = old[o] == newCountries[n]
+            override fun getNewListSize() = newRows.size
+            override fun areItemsTheSame(o: Int, n: Int): Boolean {
+                val a = old[o]
+                val b = newRows[n]
+                return when {
+                    a is Row.Header && b is Row.Header -> a.letter == b.letter
+                    a is Row.Country && b is Row.Country ->
+                        a.item.countryCode == b.item.countryCode
+                    else -> false
+                }
+            }
+
+            override fun areContentsTheSame(o: Int, n: Int): Boolean {
+                val a = old[o]
+                val b = newRows[n]
+                return when {
+                    a is Row.Header && b is Row.Header -> a.letter == b.letter
+                    a is Row.Country && b is Row.Country -> a.item == b.item
+                    else -> false
+                }
+            }
         })
-        countries = newCountries
-        val newCodes = newCountries.map { it.countryCode }.toSet()
+        countries = sorted
+        rows = newRows
+        val newCodes = sorted.map { it.countryCode }.toSet()
         expandedCountries.retainAll(newCodes)
         diff.dispatchUpdatesTo(this)
+    }
+
+    /** Sorts countries A→Z by name so alphabet sections stay monotonic. */
+    private fun sortCountries(list: List<CountryItem>): List<CountryItem> {
+        return list.sortedBy { it.countryName.lowercase(Locale.getDefault()) }
+    }
+
+    /**
+     * Builds the flat row list: a [Row.Header] is inserted whenever the section
+     * letter of the current country differs from the previous one.
+     */
+    private fun buildRows(sorted: List<CountryItem>): List<Row> {
+        val out = mutableListOf<Row>()
+        var lastLetter: String? = null
+        for (country in sorted) {
+            val letter = sectionLetter(country.countryName)
+            if (letter != lastLetter) {
+                out.add(Row.Header(letter))
+                lastLetter = letter
+            }
+            out.add(Row.Country(country))
+        }
+        return out
+    }
+
+    /** Section letter for a country name; non-letter initials collapse to "#". */
+    private fun sectionLetter(name: String): String {
+        val c = name.trim().uppercase(Locale.getDefault()).firstOrNull() ?: return "#"
+        return if (c.isLetter()) c.toString() else "#"
+    }
+
+    class HeaderViewHolder(
+        private val binding: ItemSectionHeaderBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(letter: String) {
+            binding.tvSectionLetter.text = letter
+        }
     }
 
     inner class CountryViewHolder(
@@ -145,7 +226,9 @@ class CountryServerAdapter(
 
         fun bind(item: CountryItem, isExpanded: Boolean) {
             binding.apply {
+                // Circular avatar: country flag emoji above its code initials (e.g. "AL")
                 tvCountryFlag.text = item.flagEmoji
+                tvCountryCode.text = item.countryCode.uppercase(Locale.getDefault())
                 tvCountryName.text = item.countryName
 
                 // Count total servers across all groups
@@ -308,18 +391,27 @@ class CountryServerAdapter(
                         chipLinkSpeed.visibility = View.VISIBLE
                         val (speedStr, speedAttr) = speedInfo(group.avgLink)
                         chipLinkSpeed.text = speedStr
+                        val bgAttr =
+                            if (group.avgLink >= 10_000) speedAttr else R.attr.chipColorBgNormal
                         chipLinkSpeed.chipBackgroundColor =
-                            ColorStateList.valueOf(fetchColor(itemView.context, speedAttr))
+                            ColorStateList.valueOf(fetchColor(itemView.context, bgAttr))
                     } else {
                         chipLinkSpeed.visibility = View.GONE
                     }
 
                     if (group.avgLoad > 0) {
+                        viewLoadDot.visibility = View.VISIBLE
                         tvLoad.visibility = View.VISIBLE
                         val (loadStr, loadAttr) = loadInfo(group.avgLoad)
                         tvLoad.text = loadStr
-                        tvLoad.setTextColor(fetchColor(itemView.context, loadAttr))
+                        val color = fetchColor(itemView.context, loadAttr)
+                        viewLoadDot.background = GradientDrawable().apply {
+                            shape = GradientDrawable.OVAL
+                            setColor(color)
+                        }
+                        tvLoad.setTextColor(color)
                     } else {
+                        viewLoadDot.visibility = View.GONE
                         tvLoad.visibility = View.GONE
                     }
 
@@ -419,5 +511,10 @@ class CountryServerAdapter(
                 return Pair(label, attr)
             }
         }
+    }
+
+    private companion object {
+        const val TYPE_HEADER = 0
+        const val TYPE_COUNTRY = 1
     }
 }

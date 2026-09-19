@@ -36,6 +36,9 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
+import android.view.WindowManager
+import android.content.DialogInterface
+import android.app.Dialog
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -99,6 +102,18 @@ object UIUtils {
                 R.string.status_failing
             }
         }
+    }
+
+    /**
+     * Formats a latency value in milliseconds for display. Values below one
+     * second are shown as "ms"; values at or above one second are shown in
+     * seconds with at most one decimal (e.g. "45 ms", "1.5 s", "15 s").
+     */
+    fun formatLatency(latencyMs: Long): String {
+        if (latencyMs < 1000L) return "$latencyMs ms"
+        val wholeSec = latencyMs / 1000L
+        val tenths = (latencyMs % 1000L) / 100L
+        return if (tenths == 0L) "$wholeSec s" else "$wholeSec.$tenths s"
     }
 
     fun getProxyStatusStringRes(statusId: Int?): Int {
@@ -660,7 +675,7 @@ object UIUtils {
                 "🇿🇲" to "Zambia",
                 "🇿🇼" to "Zimbabwe"
             )
-        return flagCodePoints[flag] ?: "--"
+        return flagCodePoints[flag] ?: Utilities.UNKNOWN_COUNTRY_FLAG
     }
 
     fun getAccentColor(appTheme: Int): Int {
@@ -769,6 +784,48 @@ object UIUtils {
             setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
         }
     }
+
+    /**
+     * Caps a dialog window's width to [maxWidthDp] and keeps it centered, so dialogs
+     * render as a phone-like column on expanded windows (foldables in the open state,
+     * tablets, split-screen) instead of stretching edge-to-edge. Mirrors the 600dp cap
+     * applied by [com.celzero.bravedns.ui.BaseActivity] for activity content and
+     * [com.celzero.bravedns.ui.bottomsheet.BaseBottomSheetDialogFragment] for bottom
+     * sheets.
+     *
+     * Must be called **after** [Dialog.show] (the window must exist). No-op when the
+     * current window is no wider than the cap (regular phones), so default phone sizing
+     * is preserved untouched.
+     *
+     * Usage:
+     * ```
+     * val dialog = builder.create()
+     * dialog.show()
+     * UIUtils.capDialogWidth(dialog)
+     * ```
+     */
+    fun capDialogWidth(dialog: DialogInterface, maxWidthDp: Int = DIALOG_MAX_WIDTH_DP) {
+        val window = (dialog as? Dialog)?.window ?: return
+        val lp = window.attributes ?: return
+        val dm = window.context.resources.displayMetrics
+        val capPx = (maxWidthDp * dm.density).toInt()
+        // MATCH_PARENT/WRAP_CONTENT placeholders resolve to the full window width.
+        val currentWidth =
+            if (lp.width == WindowManager.LayoutParams.MATCH_PARENT || lp.width <= 0) {
+                dm.widthPixels
+            } else {
+                lp.width
+            }
+        if (currentWidth <= capPx) return // phone / narrow window: keep default sizing
+        lp.width = capPx
+        window.attributes = lp
+    }
+
+    /**
+     * Maximum dialog width in dp, matching the content cap applied by BaseActivity
+     * (MAX_CONTENT_WIDTH_DP) and BaseBottomSheetDialogFragment (MAX_WIDTH_DP).
+     */
+    const val DIALOG_MAX_WIDTH_DP = 600
 }
 
 /**

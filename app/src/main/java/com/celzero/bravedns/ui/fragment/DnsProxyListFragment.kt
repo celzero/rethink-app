@@ -89,7 +89,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         )
 
         dnsProxyRecyclerAdapter =
-            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get(), persistentState)
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
             dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
@@ -154,7 +154,12 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
+        // resize the dialog when the keyboard opens, so that the buttons
+        // remain visible on smaller screens (instead of panning the window)
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogDnsProxyCancelBtn
@@ -310,6 +315,10 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

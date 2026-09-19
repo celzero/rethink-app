@@ -770,7 +770,6 @@
     <string name="lbl_wildcard" translatable="true">Подстановочный знак</string>
     <string name="lbl_domain_rules" translatable="true">Правила домена</string>
     <string name="cd_no_rules_text" translatable="true">Нет правил домена.</string>
-    <string name="bsdl_block_desc" translatable="true">Блокировка, доверие к &lt;u&gt;этому домену&lt;/u&gt;</string>
     <string name="lbl_rules" translatable="true">Правила</string>
     <string name="lbl_configure" translatable="true">Настроить</string>
     <string name="lbl_logs" translatable="true">Журнал активности</string>
@@ -815,7 +814,6 @@
     <string name="lbl_maybe_blocked" translatable="true">Может быть заблокирован</string>
     <string name="lbl_network" translatable="true">Cеть</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизировать частные IP-адреса (экспериментально)</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s работает только с Rethink DNS</string>
     <string name="settings_allow_lan_desc" translatable="true">Исключить маршруты LAN, loopback, multicast, link-local из VPN-туннеля Rethink.</string>
     <string name="crypt_relay_france" translatable="true">Анонимный ретранслятор DNS от https://cryptostrom.is/, размещенный в Париже, Франция.</string>
     <string name="crypt_relay_sweden" translatable="true">Анонимный ретранслятор DNS от https://cryptostrom.is/, размещенный в Швеции.</string>

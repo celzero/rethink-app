@@ -105,7 +105,13 @@ internal constructor(
     init {
         io("RefreshDatabase") {
             for (action in actions) {
-                process(action)
+                try {
+                    process(action)
+                } catch (e: Exception) {
+                    // an uncaught exception here crashes the app and all subsequent refresh
+                    // actions would be dropped.
+                    Logger.crash(LOG_TAG_APP_DB, "refresh action failed, action: $action", e)
+                }
             }
         }
     }
@@ -213,7 +219,7 @@ internal constructor(
             printAll(packagesToDelete, "packagesToDelete")
             printAll(packagesToUpdate, "packagesToUpdate")
 
-            logEvent(Severity.LOW, "app refresh details", "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone")
+            logEvent(Severity.LOW, "app refresh details", "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size} [$packagesToAdd]; update: ${packagesToUpdate.size} [$packagesToUpdate], tombstone: ${packagesToTombstone.size} [$packagesToTombstone], action: $action, tombstoneEnabled? $canTombstone")
             Logger.i(
                 LOG_TAG_APP_DB,
                 "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone"
@@ -374,25 +380,33 @@ internal constructor(
         installedApps: Set<FirewallManager.AppInfoTuple>
     ) {
         // if a non-app appears installed-apps group, then upsert its db entry
-        // and give it a proper identity as retrieved from the package-manager
         val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
-        installedApps.forEach { x ->
-            if (nonApps.contains(x.uid)) {
-                val prevPackageName =
-                    trackedApps.filter { i -> i.uid == x.uid }.map { it.packageName }
-                upsertNonApp(x, prevPackageName.firstOrNull())
+        installedApps.filter { nonApps.contains(it.uid) }
+            .groupBy { it.uid }
+            .forEach { (uid, installed) ->
+                // only the placeholder (no_package_<uid>) must be replaced
+                val placeholder =
+                    trackedApps.firstOrNull { it.uid == uid && isNonApp(it.packageName) }?.packageName
+                upsertNonApp(uid, installed, placeholder)
             }
-        }
     }
 
     private suspend fun upsertNonApp(
-        appTuple: FirewallManager.AppInfoTuple,
-        prevPackageName: String?
+        uid: Int,
+        installed: List<FirewallManager.AppInfoTuple>,
+        placeholderPackageName: String?
     ) {
-        val appInfo = fetchApplicationInfo(appTuple.uid) ?: return
         // TODO: implement upsert logic handling all the edge cases
-        deletePackage(appTuple.uid, prevPackageName)
-        insertApp(appInfo)
+        if (placeholderPackageName != null) {
+            deletePackage(uid, placeholderPackageName)
+        }
+        // insert every installed package sharing this uid; skip ones already tracked
+        installed.forEach { x ->
+            val known = FirewallManager.getAppInfoByUidAndPackage(x.uid, x.packageName)
+            if (known != null) return@forEach
+            val ai = Utilities.getApplicationInfo(ctx, x.packageName) ?: return@forEach
+            insertApp(ai)
+        }
     }
 
     private suspend fun addMissingPackages(apps: Set<FirewallManager.AppInfoTuple>) {
@@ -632,7 +646,8 @@ internal constructor(
         newAppInfo.appCategory = ctx.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
         newAppInfo.uid = uid
 
-        if (persistentState.getBlockNewlyInstalledApp()) {
+        val isSystemComponent = newAppInfo.isSystemApp && !AndroidUidConfig.isUidAppRange(uid)
+        if (persistentState.getBlockNewlyInstalledApp() && !isSystemComponent) {
             newAppInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             newAppInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
@@ -657,6 +672,7 @@ internal constructor(
             ctx.getString(R.string.network_log_app_name_unnamed, ai.uid.toString())
         }
         val isSystemApp = isSystemApp(ai)
+        val isSystemComponent = isSystemComponent(ai)
         val entry = AppInfo(null)
 
         entry.appName = appName
@@ -668,7 +684,8 @@ internal constructor(
         entry.isSystemApp = isSystemApp
 
         // do not firewall app by default, if blockNewlyInstalledApp is set to false
-        if (persistentState.getBlockNewlyInstalledApp()) {
+        // skip blocking of system components
+        if (persistentState.getBlockNewlyInstalledApp() && !isSystemComponent) {
             entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         } else {

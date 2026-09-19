@@ -26,6 +26,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogInputIpsBinding
@@ -395,7 +396,11 @@ class NetworkReachabilityDialog(activity: Activity,
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@withContext
+
+            f()
+        }
     }
 
     private fun isValidIp(ipString: String, type: IPVersion): Boolean {

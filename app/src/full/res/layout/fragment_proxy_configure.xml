@@ -70,7 +70,6 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
             app:cardCornerRadius="8dp">
 
@@ -123,6 +122,7 @@
                             android:layout_gravity="center_vertical"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
+                            android:ellipsize="marquee"
                             android:text="@string/proxy_rpn_desc_inactive"
                             android:textSize="@dimen/default_font_text_view" />
 
@@ -181,7 +181,6 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
             app:cardCornerRadius="8dp">
 
@@ -269,7 +268,6 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
             app:cardCornerRadius="8dp">
 
@@ -357,7 +355,6 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
             android:layout_margin="4dp"
             app:cardCornerRadius="8dp">
 

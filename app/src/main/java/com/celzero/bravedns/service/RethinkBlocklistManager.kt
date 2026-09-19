@@ -347,28 +347,6 @@ object RethinkBlocklistManager : KoinComponent {
         localFileTagRepository.clearSelectedTags()
     }
 
-    fun cpSelectFileTag(localFileTags: RethinkLocalFileTag): Int {
-        io {
-            val selectedTags =
-                getTagsFromStamp(persistentState.localBlocklistStamp, RethinkBlocklistType.LOCAL)
-                    .toMutableSet()
-
-            // remove the tag from the local blocklist if it exists and current selection is 0
-            if (selectedTags.contains(localFileTags.value) && !localFileTags.isSelected) {
-                selectedTags.remove(localFileTags.value)
-            } else if (!selectedTags.contains(localFileTags.value) && localFileTags.isSelected) {
-                // only add the tag if it is not already present
-                selectedTags.add(localFileTags.value)
-            } else {
-                // no-op
-            }
-
-            val stamp = getStamp(selectedTags, RethinkBlocklistType.LOCAL)
-            persistentState.localBlocklistStamp = stamp
-        }
-        return localFileTagRepository.contentUpdate(localFileTags)
-    }
-
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         if (fileValues.isEmpty()) return ""
 

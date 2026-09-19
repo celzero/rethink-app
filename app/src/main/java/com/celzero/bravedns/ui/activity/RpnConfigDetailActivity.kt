@@ -39,6 +39,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
@@ -46,7 +48,6 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.databinding.ActivityRpnConfigDetailBinding
@@ -58,9 +59,9 @@ import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity.Companion.STATS_POLL_MS
 import com.celzero.bravedns.ui.dialog.RpnSsidDialog
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.SnackbarHelper
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -73,7 +74,7 @@ import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
-import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -85,6 +86,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
+
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 
 /**
  * Detail screen for a server-provided WireGuard / WIN proxy.
@@ -99,14 +102,59 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private val persistentState by inject<PersistentState>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
+    /**
+     * The apps screen signals (via [android.app.Activity.RESULT_OK]) that apps were
+     * individually modified or bulk removed; any such change turns off catch-all.
+     */
+    private val includeAppsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                onIndividualAppModified()
+            }
+        }
+
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
+
+
+    private var suppressHopListener: Boolean = false
+
+    /** One-shot guard for useMobileCheck programmatic updates (see suppressHopListener). */
+    private var suppressMobileListener: Boolean = false
+
+    /**
+     * Last value written to the ssid switch programmatically. The checked-change
+     * listener skips an event whose value matches this (and clears it), so
+     * programmatic updates — including ones made before the listener is
+     * attached — never re-trigger the toggle gate, while user toggles
+     * (which flip the value) always pass through.
+     */
+    private var lastProgrammaticSsidState: Boolean? = null
 
     /** Coroutine that polls VpnController every [STATS_POLL_MS] ms. */
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
     private var chipAnimator: ValueAnimator? = null
+
+    /**
+     * Fades the hero banner as the app bar collapses. Held as a property so it
+     * can be removed in [onDestroy]; AppBarLayout keeps delivering offset
+     * callbacks from an in-flight collapse animation even after the activity
+     * is destroyed, and touching the view binding then crashes.
+     */
+    private val appBarOffsetListener =
+        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            if (totalScrollRange == 0) return@OnOffsetChangedListener
+            val fraction = 1f - (abs(verticalOffset).toFloat() / totalScrollRange.toFloat())
+            val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
+            b.heroContent.alpha = alpha
+            b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
+            // Flag watermark fades with the hero; visibility is owned by the
+            // view itself (GONE when no flag is set), so only alpha moves here.
+            b.flagWatermark.alpha = alpha
+        }
 
     // SSID permission callback
     private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
@@ -163,6 +211,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         configKey = intent.getStringExtra(INTENT_EXTRA_CONFIG_KEY) ?: ""
         applyScrollPadding()
+        setDolphinSignature()
+    }
+
+    /** Dolphin signature (at the end of the scrollable content.); random pairing, fresh on every visit. */
+    private fun setDolphinSignature() {
+        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun applyScrollPadding() {
@@ -187,6 +241,18 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         cancelStatsJob()
         chipAnimator?.cancel()
         chipAnimator = null
+    }
+
+    override fun onDestroy() {
+        // Remove before the lifecycle clears the view binding; otherwise a
+        // still-running app-bar collapse animation keeps delivering
+        // onOffsetChanged callbacks that touch the (now cleared) binding.
+        try {
+            b.appBar.removeOnOffsetChangedListener(appBarOffsetListener)
+        } catch (e: IllegalStateException) {
+            Logger.w(LOG_TAG_UI, "onDestroy: offset listener not removed: ${e.message}")
+        }
+        super.onDestroy()
     }
 
     private fun init() {
@@ -225,6 +291,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 setupHeaderUI()
             }
         }
+
+        b.hopTitleTv.text = getString(
+            R.string.two_argument_space,
+            getString(R.string.cd_dns_crypt_relay_heading),
+            getString(R.string.symbol_bunny)
+        )
 
         b.lockdownTitleTv.text =
             getString(
@@ -274,7 +346,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Placeholder while we fetch from DB.
         b.configNameText.text = ""
         b.tvHeroCity.text = ""
-        b.tvHeroFlag.visibility = View.GONE
+        b.flagWatermark.clear()
         b.chipHeroStats.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
@@ -289,26 +361,40 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                 // SSID section needs countryConfig.
                 setupSsidSection(configKey)
-                // Banner.
+                // Banner. The flag renders as a full-banner watermark behind
+                // the hero content while expanded (same treatment as the
+                // server-list cards, scaled up); when collapsed it only
+                // travels with the collapsing-toolbar title.
                 if (config != null) {
+                    b.flagWatermark.setSpread(true)
                     if (configKey.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroFlag.visibility = View.GONE
-                        b.ivHeroFlag.visibility = View.VISIBLE
+                        // AUTO carries no country flag; fall back to the globe glyph.
+                        b.flagWatermark.setFlagDrawable(
+                            AppCompatResources.getDrawable(this@RpnConfigDetailActivity, R.drawable.ic_rpn_auto),
+                            R.attr.primaryTextColor
+                        )
                     } else {
-                        b.ivHeroFlag.visibility = View.GONE
-                        b.tvHeroFlag.visibility = View.VISIBLE
-                        b.tvHeroFlag.text = config.flagEmoji
+                        b.flagWatermark.setFlagText(config.flagEmoji)
                     }
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
-                    b.tvHeroCity.text = city.ifBlank { config.cc }
+
+                    b.tvHeroCity.text =
+                        if (configKey.equals(AUTO_SERVER_ID, true)) city.capitalizeWords()
+                        else city.ifBlank { config.cc }
+                    // Show the flag + city name in the collapsing toolbar title when collapsed.
+                    b.collapsingToolbar.title =
+                        collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
                 } else {
-                    b.tvHeroFlag.visibility = View.GONE
+                    b.flagWatermark.clear()
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
+                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
                 }
-                // Update the collapsing toolbar title now that we have the real config name.
-                b.collapsingToolbar.title = b.configNameText.text
+                // Fallback: if no city-based title was set above, use the config name.
+                if (b.collapsingToolbar.title.isNullOrBlank()) {
+                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
+                }
 
                 startStatsPolling(configKey)
             }
@@ -367,7 +453,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // update load if available
                     buildLoadSpeedText(addlInfo.load, addlInfo.link)
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc
+                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc.capitalizeWords()
+                        // Keep the collapsing toolbar title in sync with the hero city.
+                        b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
                     }
                 }
             }
@@ -400,10 +488,134 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.shimmerIpv4.stopShimmer()
         b.shimmerIpv4.visibility = View.GONE
         b.valueIpv4.visibility = View.VISIBLE
-        b.valueIpv4.text = ip4
-            ?.takeIf { it.ip?.isNotBlank() == true }
-            ?.let { buildIpDetailSpan(it) }
-            ?: na
+
+        val exitIp = ip4?.takeIf { it.ip?.isNotBlank() == true }?.ip
+        if (countryConfig?.hopEnabled == true && !exitIp.isNullOrBlank()) {
+            // Relayed connection: show Entry (AUTO) ↓ Exit with a relay marker.
+            // The AUTO entry IP is resolved on IO; the span is composed on the main thread.
+            io {
+                val addlInfo = runCatching { VpnController.getRpnAddlInfo(AUTO_SERVER_ID) }
+                    .getOrNull()
+                val entryIp = addlInfo?.addr
+                    ?.split(",")?.getOrNull(1)?.trim().orEmpty()
+                val entryCity = addlInfo?.city.orEmpty()
+                uiCtx {
+                    b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity)
+                    b.labelIpv4.visibility = View.GONE
+                }
+            }
+        } else {
+            b.labelIpv4.visibility = View.VISIBLE
+            b.valueIpv4.text = ip4
+                ?.takeIf { it.ip?.isNotBlank() == true }
+                ?.let { buildIpDetailSpan(it) }
+                ?: na
+        }
+    }
+
+    /**
+     * Returns [endpoint] without any trailing port. Handles "ipv4:port",
+     * "[ipv6]:port" and bare "ipv6" (colons preserved).
+     */
+    private fun stripPort(endpoint: String): String {
+        val v = endpoint.trim()
+        if (v.isEmpty()) return v
+        if (v.startsWith("[")) {
+            val end = v.indexOf(']')
+            if (end > 0) return v.substring(1, end)
+        }
+        // A single colon separates host and port in IPv4 endpoints; IPv6 has many.
+        if (v.count { it == ':' } == 1) return v.substringBefore(':')
+        return v
+    }
+
+    /**
+     * Builds the relayed Exit IP presentation:
+     *
+     * ```
+     * ENTRY  82.102.25.218 (AUTO)
+     *    ↓ 🐇
+     * EXIT   45.12.33.9
+     * ASN    AS13335 · Cloudflare Inc
+     * ```
+     *
+     * [entryIp] is AUTO's public IP (the relay entry); the exit is [meta] which
+     * carries the client's public IP and its ASN metadata as seen through the relay.
+     * [entryCity] is AUTO's city, shown alongside the AUTO marker when available.
+     */
+    private fun buildHopIpSpan(
+        entryIp: String,
+        meta: IPMetadata,
+        entryCity: String
+    ): SpannableStringBuilder {
+        val sb = SpannableStringBuilder()
+        val labelColor = fetchColor(this, R.attr.primaryLightColorText)
+        val accentColor = fetchColor(this, R.attr.accentGood)
+
+        fun mono(start: Int, end: Int) {
+            sb.setSpan(TypefaceSpan("monospace"), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.07f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        fun styleLabel(start: Int, end: Int, color: Int = labelColor) {
+            sb.setSpan(ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(0.80f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        // Entry row (AUTO)
+        val entryLabelStart = sb.length
+        sb.append("ENTRY")
+        styleLabel(entryLabelStart, sb.length)
+        sb.append("  ")
+        val entryIpStart = sb.length
+        sb.append(entryIp.ifBlank { getString(R.string.lbl_not_available_short) })
+        mono(entryIpStart, sb.length)
+        sb.append(" ")
+        val entrySuffixStart = sb.length
+        sb.append("(Auto")
+        if (entryCity.isNotBlank()) {
+            sb.append(" · ").append(entryCity)
+        }
+        sb.append(")")
+        styleLabel(entrySuffixStart, sb.length)
+
+        // Arrow row (relay marker)
+        sb.append("\n   ")
+        val arrowStart = sb.length
+        sb.append("↓ ${getString(R.string.symbol_bunny)}")
+        styleLabel(arrowStart, sb.length, accentColor)
+
+        // Exit row (relayed public IP)
+        sb.append("\n")
+        val exitLabelStart = sb.length
+        sb.append("EXIT ")
+        styleLabel(exitLabelStart, sb.length)
+        sb.append("  ")
+        val exitIpStart = sb.length
+        sb.append(meta.ip ?: "")
+        mono(exitIpStart, sb.length)
+
+        // ASN metadata of the exit hop
+        val asnParts = buildList {
+            val asn = meta.asn ?: ""
+            val org = meta.asnOrg ?: ""
+            val dom = meta.asnDom ?: ""
+            if (asn.isNotBlank()) add(asn)
+            if (org.isNotBlank()) add(org)
+            if (dom.isNotBlank()) add(dom)
+        }
+        if (asnParts.isNotEmpty()) {
+            sb.append("\n")
+            val asnLabelStart = sb.length
+            sb.append("ASN  ")
+            styleLabel(asnLabelStart, sb.length)
+            val vs = sb.length
+            sb.append(asnParts.joinToString(" · "))
+            sb.setSpan(TypefaceSpan("monospace"), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.07f), vs, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return sb
     }
 
     /**
@@ -554,7 +766,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             )
         else getString(R.string.lbl_never)
         val meta = SpannableStringBuilder(
-            getString(R.string.rpn_meta_last_times, statusText, okTxt, openTxt)
+            getString(R.string.rpn_meta_last_ok, statusText, okTxt)
         )
         // The status word is always the prefix of the formatted string.
         if (statusText.isNotEmpty()) {
@@ -568,8 +780,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // so they stay subtle. Color emoji glyphs ignore ForegroundColorSpan, so size is
         // the reliable lever here.
         shrinkEmoji(meta, HANDSHAKE_EMOJI, 0.70f)
-        shrinkEmoji(meta, RECONNECT_EMOJI, 0.70f)
         b.valueLastOk.text = meta
+
+        // Last-open gets its own cell (aligned end within the same row); the
+        // reconnect emoji is shrunk to match the handshake emoji above.
+        val metaOpen = SpannableStringBuilder(
+            getString(R.string.rpn_meta_last_open, openTxt)
+        )
+        shrinkEmoji(metaOpen, RECONNECT_EMOJI, 0.70f)
+        b.valueLastOpen.text = metaOpen
 
         // Show when the user selected this server, not the VPN tunnel's uptime.
         b.valueSince.text = if (selectedSinceTs > 0L)
@@ -583,17 +802,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val loadPct = config?.load ?: 0
             val linkMbps = config?.link ?: 0
             buildLoadSpeedText(loadPct, linkMbps)
-        }
-
-        // only shown when proxy is in a failing state.
-        val isFailing = isFailing(ps)
-        if (isFailing && (rx == 0L && tx == 0L && selectedSinceTs > 0L)) {
-            b.rowErrors.visibility = View.VISIBLE
-            b.dividerErrors.visibility = View.VISIBLE
-            b.valueErrors.text = getString(R.string.status_failing)
-        } else {
-            b.rowErrors.visibility = View.GONE
-            b.dividerErrors.visibility = View.GONE
         }
     }
 
@@ -624,7 +832,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         return when {
             status == null -> R.attr.primaryLightColorText
             isFailing(status) -> R.attr.chipTextNegative
-            status == UIUtils.ProxyStatus.TOK -> R.attr.accentGood
+            status == UIUtils.ProxyStatus.TOK -> R.attr.primaryTextColor
             status == UIUtils.ProxyStatus.TUP ||
             status == UIUtils.ProxyStatus.TZZ ||
             status == UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
@@ -714,15 +922,28 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun observeAppCount(configKey: String) {
         if (configKey.isBlank()) return
         // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
-        val pid = Backend.RpnWin + configKey
-        mappingViewModel.getAppCountById(pid).observe(this) { count ->
-            // Don't override the "All apps" state when catch-all is active
-            if (b.catchAllCheck.isChecked) return@observe
-            val c = count ?: 0
-            b.appsLabel.text = getString(R.string.two_argument_parenthesis, getString(R.string.apps_info_title), c)
-            b.appsLabel.setTextColor(
-                fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
-            )
+        io {
+            val pid = if (configKey == AUTO_SERVER_ID) {
+                VpnController.getWinProxyId() ?: configKey
+            } else {
+                Backend.RpnWin + configKey
+            }
+            Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
+            uiCtx {
+                mappingViewModel.getAppCountById(pid).observe(this) { count ->
+                    // Don't override the "All apps" state when catch-all is active
+                    if (b.catchAllCheck.isChecked) return@observe
+                    val c = count ?: 0
+                    b.appsLabel.text = getString(
+                        R.string.two_argument_parenthesis,
+                        getString(R.string.apps_info_title),
+                        c
+                    )
+                    b.appsLabel.setTextColor(
+                        fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
+                    )
+                }
+            }
         }
     }
 
@@ -743,11 +964,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.hopCheck.isChecked = config.hopEnabled
                     b.otherSettingsCard.visibility = View.VISIBLE
                     b.mobileSsidSettingsCard.visibility = View.VISIBLE
+
+                    // apps entry point always stays enabled, even under catch-all;
+                    // users must be able to review/override the implicit mapping
+                    b.applicationsBtn.isEnabled = true
+                    b.applicationsBtn.alpha = 1.0f
+
                     // Update apps section immediately based on catchAll state
                     if (config.catchAll) {
-                        b.applicationsBtn.isEnabled = false
-                        b.applicationsBtn.alpha = 0.5f
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.accentGood))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     }
                     if (config.id.equals(AUTO_SERVER_ID, true)) {
@@ -780,14 +1005,33 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         b.hopCheck.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressHopListener) {
+                suppressHopListener = false
+                return@setOnCheckedChangeListener
+            }
+            if (!isChecked) {
+                applyHop(false)
+                return@setOnCheckedChangeListener
+            }
+            // enabling relay: confirm when AUTO has automation
             io {
-                RpnProxyManager.setHopForWinServer(configKey, isChecked)
-                uiCtx {
-                    Utilities.showToastUiCentered(
-                        this,
-                        if (isChecked) "Hop mode enabled" else "Hop mode disabled",
-                        Toast.LENGTH_SHORT
-                    )
+                val automationEnabled = runCatching { RpnProxyManager.isAutoAutomationEnabled() }
+                    .onFailure { Logger.w(LOG_TAG_UI, "RpnConfigDetailActivity hopCheck: automation check failed: ${it.message}") }
+                    .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!automationEnabled) {
+                        applyHop(true)
+                        return@ui
+                    }
+                    // Revert the checkbox first; re-applied on proceed.
+                    setHopCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyHop(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
                 }
             }
         }
@@ -796,11 +1040,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             io {
                 RpnProxyManager.setCatchAllForWinServer(configKey, isChecked)
                 uiCtx {
-                    // Update apps section immediately to reflect the new catch-all state
-                    b.applicationsBtn.isEnabled = !isChecked
-                    b.applicationsBtn.alpha = if (isChecked) 0.5f else 1.0f
+                    // apps entry point remains usable regardless of catch-all state
+                    b.applicationsBtn.isEnabled = true
+                    b.applicationsBtn.alpha = 1.0f
                     if (isChecked) {
-                        b.appsLabel.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+                        b.appsLabel.setTextColor(fetchColor(this, R.attr.accentGood))
                         b.appsLabel.text = getString(R.string.lbl_all_apps)
                     } else {
                         observeAppCount(configKey)
@@ -828,14 +1072,37 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
 
         b.useMobileCheck.setOnCheckedChangeListener { _, isChecked ->
+            // Guard: skip programmatic updates (dialog revert / post-confirm re-check).
+            if (suppressMobileListener) {
+                suppressMobileListener = false
+                return@setOnCheckedChangeListener
+            }
+            if (!isChecked) {
+                applyMobileOnly(false)
+                return@setOnCheckedChangeListener
+            }
+            // Enabling automation on AUTO: confirm when relay is enabled on any
+            // location — relayed traffic enters via AUTO, so AUTO being paused
+            // (mobile-only / SSID mismatch) pauses those locations as well.
             io {
-                RpnProxyManager.setMobileOnlyForWinServer(configKey, isChecked)
-                uiCtx {
-                    Utilities.showToastUiCentered(
-                        this,
-                        if (isChecked) "Mobile data only enabled" else "Mobile data only disabled",
-                        Toast.LENGTH_SHORT
-                    )
+                val needsConfirm = configKey.equals(AUTO_SERVER_ID, ignoreCase = true) &&
+                    runCatching { RpnProxyManager.isRelayEnabledForAnyLocation() }
+                        .onFailure { Logger.w(LOG_TAG_UI, "useMobileCheck: relay check failed: ${it.message}") }
+                        .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!needsConfirm) {
+                        applyMobileOnly(true)
+                        return@ui
+                    }
+                    // Revert the checkbox first; re-applied on proceed.
+                    setMobileCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyMobileOnly(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
                 }
             }
         }
@@ -854,6 +1121,62 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             )
         }
         // ssidFilterRl click listener and ssidCheck listener are managed by setupSsidSectionUI
+    }
+
+
+    private fun applyHop(enabled: Boolean) {
+        io {
+            RpnProxyManager.setHopForWinServer(configKey, enabled)
+            countryConfig?.hopEnabled = enabled
+            runCatching { resolveClientIps(configKey) }
+            uiCtx {
+                Utilities.showToastUiCentered(
+                    this,
+                    if (enabled) "Hop mode enabled" else "Hop mode disabled",
+                    Toast.LENGTH_SHORT
+                )
+                // Sync the checkbox in case the toggle was initiated from the dialog.
+                setHopCheckSilently(enabled)
+            }
+        }
+    }
+
+    /** Updates the hop checkbox without re-triggering its checked-change listener. */
+    private fun setHopCheckSilently(checked: Boolean) {
+        if (b.hopCheck.isChecked == checked) return
+        suppressHopListener = true
+        b.hopCheck.isChecked = checked
+    }
+
+    /**
+     * Applies the mobile-only automation for [configKey] in the tunnel.
+     */
+    private fun applyMobileOnly(enabled: Boolean) {
+        io {
+            RpnProxyManager.setMobileOnlyForWinServer(configKey, enabled)
+            uiCtx {
+                Utilities.showToastUiCentered(
+                    this,
+                    if (enabled) "Mobile data only enabled" else "Mobile data only disabled",
+                    Toast.LENGTH_SHORT
+                )
+                // Sync the checkbox in case the toggle was initiated from the dialog.
+                setMobileCheckSilently(enabled)
+            }
+        }
+    }
+
+    /** Updates the mobile-only checkbox without re-triggering its checked-change listener. */
+    private fun setMobileCheckSilently(checked: Boolean) {
+        if (b.useMobileCheck.isChecked == checked) return
+        suppressMobileListener = true
+        b.useMobileCheck.isChecked = checked
+    }
+
+    /** Updates the SSID switch without re-triggering its checked-change listener. */
+    private fun setSsidCheckSilently(checked: Boolean) {
+        lastProgrammaticSsidState = if (b.ssidCheck.isChecked == checked) null else checked
+        b.ssidCheck.isChecked = checked
     }
 
     private fun initiateRefresh(key: String) {
@@ -997,43 +1320,72 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             Logger.e(LOG_TAG_UI, "openAppsDialog: configKey blank or proxy null")
             return
         }
-        val proxyId = Backend.RpnWin + configKey
         val cc = countryConfig
         val proxyName = when {
+            configKey.contains(AUTO_SERVER_ID, ignoreCase = true) ->
+                AUTO_SERVER_ID.capitalizeWords()
             cc != null && cc.city.isNotBlank() -> "${cc.cc} - ${cc.city}"
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey
         }
-        val adapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
-        // Remove any observers registered by previous openAppsDialog()
-        mappingViewModel.apps.removeObservers(this)
-        mappingViewModel.apps.observe(this) { adapter.submitData(lifecycle, it) }
-        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        if (Themes.isFrostTheme(themeId)) themeId = R.style.App_Dialog_NoDim
-        val dlg = WgIncludeAppsDialog(this, adapter, mappingViewModel, themeId, proxyId, proxyName)
-        dlg.setCanceledOnTouchOutside(false)
-        dlg.show()
+        // AUTO (catch-all) has no per-key proxy id; resolve the live WIN proxy id
+        // from the tunnel, mirroring openLogsDialog().
+        if (configKey.contains(AUTO_SERVER_ID, ignoreCase = true)) {
+            io {
+                val proxyId = VpnController.getWinProxyId()
+                uiCtx {
+                    if (proxyId.isNullOrBlank()) {
+                        Logger.e(LOG_TAG_UI, "openAppsDialog: win proxy id unavailable for AUTO")
+                        return@uiCtx
+                    }
+                    includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+                }
+            }
+        } else {
+            val proxyId = Backend.RpnWin + configKey
+            includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+        }
+    }
+
+    /**
+     * Catch-all only remains active while the routing is untouched by hand. Any individual
+     * app modification (or a bulk remove-all) from the apps dialog turns it off, since the
+     * per-app mapping now expresses the user's intent.
+     */
+    private fun onIndividualAppModified() {
+        if (!b.catchAllCheck.isChecked) return
+        // unchecking via the listener persists state and refreshes the apps section
+        b.catchAllCheck.isChecked = false
+    }
+
+    /**
+     * Builds the collapsing-toolbar (collapsed header) title as "<flag> <city>"
+     * (e.g. "🇩🇪 Frankfurt") so the country flag travels with the city name
+     * while the app bar is collapsed. Falls back to the plain title when
+     * [flag] is blank.
+     */
+    private fun collapsedHeaderTitle(flag: String, title: String): String {
+        val t = title.capitalizeWords()
+        if (flag.isBlank()) return t
+        return "$flag $t"
     }
 
     private fun setupHeaderUI() {
-        // Title will be set in populateHeroBanner() once the config name is loaded asynchronously.
+        // Title (city) is set asynchronously in populateHeroBanner(). Keep this identical to
+        // ServerOrderHistoryActivity / CustomerSupportActivity: no custom collapse mode and no
+        // programmatic collapsed title colors — theme defaults drive the pinned collapsed title.
         b.collapsingToolbar.title = ""
-        b.collapsingToolbar.titleCollapseMode = CollapsingToolbarLayout.TITLE_COLLAPSE_MODE_SCALE
+        // The hero already displays the city name while expanded, so keep the expanded CTL
+        // title transparent to avoid showing the city twice. Safe with the default FADE
+        // collapse mode: the collapsed title is drawn with the theme collapsed color (only
+        // TITLE_COLLAPSE_MODE_SCALE blends the expanded color into the collapsed title).
         b.collapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT)
-        b.collapsingToolbar.setCollapsedTitleTextColor(fetchColor(this, R.attr.primaryTextColor))
         setSupportActionBar(b.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         // Fade out the entire hero banner content as the toolbar collapses so that
         // other views do not peek through when fully collapsed.
-        b.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange
-            if (totalScrollRange == 0) return@addOnOffsetChangedListener
-            val fraction = 1f - (abs(verticalOffset).toFloat() / totalScrollRange.toFloat())
-            val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
-            b.heroContent.alpha = alpha
-            b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
-        }
+        b.appBar.addOnOffsetChangedListener(appBarOffsetListener)
     }
 
     private fun setupSsidSection(cc: String) {
@@ -1079,7 +1431,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         val enabled = config.ssidBased
         val ssidItems = SsidItem.parseStorageList(config.ssids)
-        sw.isChecked = enabled
+        // Silent update: a plain assignment here would re-enter the
+        // checked-change listener and re-trigger the AUTO/relay gate on every
+        // section refresh.
+        setSsidCheckSilently(enabled)
 
         if (enabled && hasPermissions && isLocationEnabled) {
             // SSID enabled and all permissions/location available — show current values
@@ -1104,6 +1459,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
+            // Guard: skip the echo of a programmatic update (section refresh,
+            // dialog revert / post-confirm re-check). A user toggle always
+            // flips the value, so it never matches the stored state.
+            if (lastProgrammaticSsidState == isChecked) {
+                lastProgrammaticSsidState = null
+                return@setOnCheckedChangeListener
+            }
             val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
             val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
@@ -1130,37 +1492,72 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 return@setOnCheckedChangeListener
             }
 
-            // Persist the new state
-            io { RpnProxyManager.updateSsidBased(configKey, isChecked) }
+            val persistSsid: (Boolean) -> Unit = { checked ->
+                // Sync the switch: on the dialog-proceed path it was reverted
+                // to off while awaiting confirmation.
+                setSsidCheckSilently(checked)
+                // Persist the new state
+                io { RpnProxyManager.updateSsidBased(configKey, checked) }
 
-            if (isChecked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
-                if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
-                }
-                // Load and display the latest SSID list
-                io {
-                    val cur = RpnProxyManager.getCountryConfigByKey(configKey)?.ssids.orEmpty()
-                    val list = SsidItem.parseStorageList(cur)
-                    uiCtx {
-                        if (list.isEmpty()) {
-                            val allTxt = getString(
-                                R.string.single_argument_parenthesis,
-                                getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
-                            )
-                            valueTv.text = allTxt
-                        } else {
-                            valueTv.text = list.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this@RpnConfigDetailActivity)})" }
-                        }
-                        displayGroup.visibility = View.VISIBLE
+                if (checked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
+                    if (persistentState.enableStabilityDependentSettings()) {
+                        SnackbarHelper.showStabilityProgram(b.root, persistentState)
                     }
+                    // Load and display the latest SSID list
+                    io {
+                        val cur = RpnProxyManager.getCountryConfigByKey(configKey)?.ssids.orEmpty()
+                        val list = SsidItem.parseStorageList(cur)
+                        uiCtx {
+                            if (list.isEmpty()) {
+                                val allTxt = getString(
+                                    R.string.single_argument_parenthesis,
+                                    getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
+                                )
+                                valueTv.text = allTxt
+                            } else {
+                                valueTv.text = list.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this@RpnConfigDetailActivity)})" }
+                            }
+                            displayGroup.visibility = View.VISIBLE
+                        }
+                    }
+                    Logger.i(LOG_TAG_UI, "SSID feature enabled for configKey: $configKey")
+                } else {
+                    displayGroup.visibility = View.GONE
+                    Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
                 }
-                Logger.i(LOG_TAG_UI, "SSID feature enabled for configKey: $configKey")
-            } else {
-                displayGroup.visibility = View.GONE
-                Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
+
+                updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
             }
 
-            updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+            if (!isChecked) {
+                persistSsid(false)
+                return@setOnCheckedChangeListener
+            }
+
+            // Enabling automation on AUTO: confirm when relay is enabled on any
+            // location — relayed traffic enters via AUTO, so AUTO being paused
+            // (SSID mismatch) pauses those locations as well.
+            io {
+                val needsConfirm = configKey.equals(AUTO_SERVER_ID, ignoreCase = true) &&
+                    runCatching { RpnProxyManager.isRelayEnabledForAnyLocation() }
+                        .onFailure { Logger.w(LOG_TAG_UI, "setupSsidSectionUI: relay check failed: ${it.message}") }
+                        .getOrDefault(false)
+                ui {
+                    if (isFinishing || isDestroyed) return@ui
+                    if (!needsConfirm) {
+                        persistSsid(true)
+                        return@ui
+                    }
+                    // Revert the switch first; re-applied on proceed.
+                    setSsidCheckSilently(false)
+                    MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
+                        .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> persistSsid(true) }
+                        .setNegativeButton(getString(R.string.lbl_cancel), null)
+                        .show()
+                }
+            }
         }
 
         layout.setOnClickListener { sw.performClick() }
@@ -1316,7 +1713,11 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     private suspend fun uiCtx(f: () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
+        }
     }
 }
 

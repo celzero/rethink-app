@@ -478,6 +478,8 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
     }
 
     private fun ui(f: suspend () -> Unit) {
+        if (isFinishing || isDestroyed) return
+
         lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

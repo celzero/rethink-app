@@ -42,7 +42,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -59,7 +58,7 @@ import org.koin.android.ext.android.inject
  * On DONE the current exclusion set is persisted in [PersistentState.rpnAutoExcludedCcs] and
  * delivered to the caller via [OnExcludeCountriesChangedListener.onExcludeCountriesChanged].
  */
-class AutoExcludeCountriesBottomSheet : BottomSheetDialogFragment() {
+class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetAutoExcludeCountriesBinding? = null
     private val b

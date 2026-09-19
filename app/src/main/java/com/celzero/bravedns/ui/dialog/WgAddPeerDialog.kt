@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Peer
@@ -63,6 +64,8 @@ class WgAddPeerDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
         )
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(this)
         setupAutoExpand(b.peerAllowedIps)
 
         if (wgPeer != null) {
@@ -73,7 +76,7 @@ class WgAddPeerDialog(
             }
             b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
             if (wgPeer.getEndpoint().isPresent) {
-                b.peerEndpoint.setText(wgPeer.getEndpoint().get().toString())
+                b.peerEndpoint.setText(wgPeer.getEndpoint().get())
             }
             if (wgPeer.persistentKeepalive.isPresent) {
                 val kas = wgPeer.persistentKeepalive.get()
@@ -191,6 +194,8 @@ class WgAddPeerDialog(
     }
 
     private fun ui(f: suspend () -> Unit) {
+        if (activity.isFinishing || activity.isDestroyed) return
+
         (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 

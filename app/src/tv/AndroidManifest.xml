@@ -187,11 +187,30 @@
         <activity
             android:name=".ui.activity.TcpProxyMainActivity"
             android:finishOnTaskLaunch="true" />
+        <!--
+          rethink-tv: mirrored from full's manifest. The tv flavor
+          compiles all of main (which owns full's java), so any
+          reachable startActivity() for these activities — e.g.
+          OrbotBottomSheet → WgIncludeAppsActivity — must find them
+          declared or it crashes with ActivityNotFoundException. The
+          TV UX itself uses the Compose screens (WgIncludeAppsScreen /
+          RpnBypassAppsScreen); these View-based activities are a
+          safety net for inherited code paths only.
+        -->
+        <activity
+            android:name=".ui.activity.WgIncludeAppsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.RpnBypassAppsActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.UniversalFirewallSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.ConfigureOtherDnsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.SmartDnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.AppWiseIpLogsActivity"

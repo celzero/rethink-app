@@ -27,10 +27,6 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         rethinkLocalFileTagDao.update(fileTag)
     }
 
-    fun contentUpdate(fileTag: RethinkLocalFileTag): Int {
-        return rethinkLocalFileTagDao.update(fileTag)
-    }
-
     fun contentInsert(fileTag: RethinkLocalFileTag): Long {
         return rethinkLocalFileTagDao.insert(fileTag)
     }

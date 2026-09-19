@@ -29,6 +29,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
@@ -51,6 +52,7 @@ import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.SnackbarHelper.italic
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
@@ -570,6 +572,8 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)
         if (customIp.port != 0) {
@@ -631,6 +635,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 dBind.daciFailureTextView.visibility = View.VISIBLE
                 return@ui
             }
+
+            // reject non-CIDR-able input such as "1.1.1.1-55"; the ip trie only
+            // accepts CIDR notation and would reject the rule (see isCidrEnforceable)
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                dBind.daciFailureTextView.text =
+                    context.getString(R.string.ci_dialog_error_invalid_cidr)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@ui
+            }
             Logger.i(LOG_TAG_UI, "$TAG ip: $ip, port: $port, status: $status")
             updateCustomIp(customIp, ip, port, status)
         }
@@ -657,7 +670,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

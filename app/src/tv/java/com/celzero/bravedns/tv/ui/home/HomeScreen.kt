@@ -134,7 +134,9 @@ fun HomeScreen() {
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            VpnController.start(context, true)
+            // user-initiated: autoAttempt=true would drop the start request
+            // when the service is alive without a tunnel
+            VpnController.start(context)
         }
     }
 
@@ -403,13 +405,19 @@ private fun onToggleVpnClicked(
     // Defensive try/catch: some Android builds throw NPE here when the
     // device doesn't actually support system-wide VPN. Upstream catches
     // this too — see HomeScreenFragment.prepareVpnService.
+    // IllegalStateException is thrown when another VPN app is set as
+    // Always-on VPN with "Block connections without VPN" (lockdown).
     val consentIntent: Intent? = try {
         VpnService.prepare(context)
     } catch (_: NullPointerException) {
         return
+    } catch (_: IllegalStateException) {
+        return
     }
     if (consentIntent == null) {
-        VpnController.start(context, true)
+        // user-initiated: autoAttempt=true would drop the start request
+        // when the service is alive without a tunnel
+        VpnController.start(context)
     } else {
         onNeedsConsent(consentIntent)
     }

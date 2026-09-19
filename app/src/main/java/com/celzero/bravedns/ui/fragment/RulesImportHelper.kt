@@ -142,7 +142,11 @@ object RulesImportHelper {
                             val hp = IpRulesManager.splitHostPort(line)
                             val explicitPortOk = hp.first.isEmpty() ||
                                 (hp.second.toIntOrNull() != null && port in 0..65535)
-                            if (ip != null && explicitPortOk) {
+                            // reject non-CIDR-able input (e.g. "1.1.1.1-55"): the ip trie only
+                            // accepts CIDR notation, such rules would be stored but never
+                            // enforced (see IpRulesManager.isCidrEnforceable)
+                            val cidrOk = IpRulesManager.isCidrEnforceable(ip)
+                            if (ip != null && explicitPortOk && cidrOk) {
                                 if (valid.size >= MAX_IMPORT_ENTRIES) return@useLines
                                 valid.add(line)
                             } else {

@@ -42,7 +42,7 @@ object IpRulesManager : KoinComponent {
 
     // separate tries are used internally for ip4 and ip6, if the implementation changes in the
     // future, ensure both cases continue to be handled correctly.
-    private val iptree = Backend.newIpTree()
+    private val iptree by lazy { Backend.newIpTree() }
 
     // key-value object for ip look-up
     data class CacheKey(val ipNetPort: String, val uid: Int)
@@ -103,7 +103,11 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun load(): Long {
-        iptree.clear()
+        try {
+            iptree.clear()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "err iptree.clear()", e)
+        }
         db.getIpRules().forEach {
             // adding as part of defensive programming, even adding these rules to cache will
             // not cause any issues, but to avoid unnecessary entries in the trie, skipping these
@@ -131,8 +135,14 @@ object IpRulesManager : KoinComponent {
                 }
             }
         }
-        Logger.i(LOG_TAG_FIREWALL, "ip rules loaded, count: ${iptree.len()}")
-        return iptree.len()
+        val count = try {
+            iptree.len()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "err iptree.len()", e)
+            -1L
+        }
+        Logger.i(LOG_TAG_FIREWALL, "ip rules loaded, count: $count")
+        return count.coerceAtLeast(0)
     }
 
     fun getAllUniqueCCs(): Set<String> {
@@ -144,8 +154,12 @@ object IpRulesManager : KoinComponent {
         return db.getRulesCountByCC(cc)
     }
 
+    // Room's DAO returns a new LiveData instance on every call; cache it so
+    // observers and value-reads share the same instance.
+    private val cachedIpsCountLiveData: LiveData<Int> by lazy { db.getCustomIpsLiveData() }
+
     fun getCustomIpsLiveData(): LiveData<Int> {
-        return db.getCustomIpsLiveData()
+        return cachedIpsCountLiveData
     }
 
     private fun normalize(ipaddr: IPAddress?): String? {
@@ -153,8 +167,25 @@ object IpRulesManager : KoinComponent {
         return treeKey(ipaddr.toNormalizedString())
     }
 
+    /**
+     * Never throws: returns the CIDR key for the trie, or null when the input
+     * cannot be enforced by the CIDR-only ip trie. treeKey is invoked from the
+     * per-connection firewall path (hasRule / getMostSpecificRuleMatch) as well
+     * as from rule insertion; the IPAddress library can throw
+     * IncompatibleAddressException on malformed or hostile input, which must
+     * never propagate into the tunnel's decision loop.
+     */
     private fun treeKey(ipstr: String?): String? {
         if (ipstr == null) return null
+        return try {
+            treeKey0(ipstr)
+        } catch (e: Exception) { // IncompatibleAddressException and friends
+            Logger.w(LOG_TAG_FIREWALL, "err treeKey('$ipstr'); rule stored but not enforced, ${e.message}", e)
+            null
+        }
+    }
+
+    private fun treeKey0(ipstr: String): String? {
         // "192/8" -> 0.0.0.192/32
         // "192.0.0.0" -> 192.0.0.0/32
         // "*.*" -> 0.0.0.0/0
@@ -187,7 +218,27 @@ object IpRulesManager : KoinComponent {
             }
             singleBlock?.toCanonicalString()
         } else {
-            ipAddr.toNormalizedString()
+            // The IPAddress library accepts sequential ranges such as
+            // "0.0.6.178-228"; toNormalizedString() would return the range
+            // verbatim, which the Go ip trie rejects (it only accepts CIDR
+            // notation) and panics across JNI (go.Universe$proxyerror). Convert
+            // to a single CIDR block when possible (e.g. "1.2.252-255" =>
+            // 1.2.252.0/22); otherwise return null so the rule is stored but not
+            // enforced (same as non-CIDR-able wildcards above).
+            if (!ipAddr.isMultiple) {
+                ipAddr.toNormalizedString()
+            } else {
+                val singleBlock = try {
+                    ipAddr.assignPrefixForSingleBlock()
+                } catch (e: Exception) { // IncompatibleAddressException for non-prefix-block ranges
+                    Logger.w(LOG_TAG_FIREWALL, "err converting range '$ipstr' to CIDR block", e)
+                    null
+                }
+                if (singleBlock == null) {
+                    Logger.w(LOG_TAG_FIREWALL, "ip range '$ipstr' has no single CIDR block; rule stored but not enforced")
+                }
+                singleBlock?.toCanonicalString()
+            }
         }
     }
 
@@ -212,7 +263,13 @@ object IpRulesManager : KoinComponent {
         db.deleteRule(uid, ipstr, port)
 
         val k = treeKey(ipstr)
-        if (!k.isNullOrEmpty()) iptree.escLike(k, treeValLike(uid, port))
+        if (!k.isNullOrEmpty()) {
+            try {
+                iptree.escLike(k, treeValLike(uid, port))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.escLike($k) for uid: $uid", e)
+            }
+        }
 
         resultsCache.invalidateAll()
     }
@@ -226,9 +283,13 @@ object IpRulesManager : KoinComponent {
         Logger.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: ${ci.uid}; status: ${ci.status}")
 
         if (!k.isNullOrEmpty()) {
-            // escape old entries and add updated rule using ci.port (not android attr)
-            iptree.escLike(k, treeValLike(ci.uid, ci.port))
-            iptree.add(k, treeVal(ci.uid, ci.port, ci.status, ci.proxyId, ci.proxyCC))
+            try {
+                // escape old entries and add updated rule using ci.port (not android attr)
+                iptree.escLike(k, treeValLike(ci.uid, ci.port))
+                iptree.add(k, treeVal(ci.uid, ci.port, ci.status, ci.proxyId, ci.proxyCC))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k) for uid: ${ci.uid}", e)
+            }
         }
         resultsCache.invalidateAll()
     }
@@ -368,7 +429,12 @@ object IpRulesManager : KoinComponent {
             val vlike = treeValLike(uid, port)
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
-            val x = iptree.getLike(k, vlike)
+            val x = try {
+                iptree.getLike(k, vlike)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.getLike($k, $vlike) for uid: $uid", e)
+                return IpRuleStatus.NONE
+            }
             logv("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
             val treeValues = x?.split(Backend.Vsep) ?: return IpRuleStatus.NONE
             treeValues.reversed().forEach {
@@ -418,7 +484,12 @@ object IpRulesManager : KoinComponent {
             val vlike = treeValLike(uid, port)
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
-            val x = iptree.getLike(k, vlike)
+            val x = try {
+                iptree.getLike(k, vlike)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.getLike($k, $vlike) for uid: $uid", e)
+                return Pair("", "")
+            }
             if (DEBUG) logv("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
             val treeVals = x?.split(Backend.Vsep) ?: return Pair("","")
 
@@ -443,7 +514,12 @@ object IpRulesManager : KoinComponent {
             val vlike = treeValLike(uid, port)
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
-            val x = iptree.valuesLike(k, vlike)
+            val x = try {
+                iptree.valuesLike(k, vlike)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.valuesLike($k, $vlike) for uid: $uid", e)
+                return IpRuleStatus.NONE
+            }
             // ex: uid: 10169, k: 142.250.67.78, vlike: 10169:443 => x: 10169:443:0
             // (10169:443:0) => (uid : port : rule[0->none, 1-> block, 2 -> trust, 3 -> bypass])
             logv("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
@@ -469,7 +545,12 @@ object IpRulesManager : KoinComponent {
             val vlike = treeValLike(uid, port)
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
-            val x = iptree.valuesLike(k, vlike)
+            val x = try {
+                iptree.valuesLike(k, vlike)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.valuesLike($k, $vlike) for uid: $uid", e)
+                return Pair("", "")
+            }
             // ex: uid: 10169, k: 142.250.67.78, vlike: 10169:443 => x: 10169:443:0
             // (10169:443:0) => (uid : port : rule[0->none, 1-> block, 2 -> trust, 3 -> bypass])
             logv("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
@@ -496,7 +577,11 @@ object IpRulesManager : KoinComponent {
             val port = pair.second
             val k = normalize(ipaddr)
             if (!k.isNullOrEmpty()) {
-                iptree.esc(k, treeVal(it.uid, port, it.status, it.proxyId, it.proxyCC))
+                try {
+                    iptree.esc(k, treeVal(it.uid, port, it.status, it.proxyId, it.proxyCC))
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_FIREWALL, "err iptree.esc($k) for uid: ${it.uid}", e)
+                }
             }
         }
         db.deleteRulesByUid(uid)
@@ -511,7 +596,11 @@ object IpRulesManager : KoinComponent {
             val port = pair.second
             val k = normalize(ipaddr)
             if (!k.isNullOrEmpty()) {
-                iptree.esc(k, treeVal(it.uid, port, it.status, it.proxyId, it.proxyCC))
+                try {
+                    iptree.esc(k, treeVal(it.uid, port, it.status, it.proxyId, it.proxyCC))
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_FIREWALL, "err iptree.esc($k) for uid: ${it.uid}", e)
+                }
             }
         }
         db.deleteRules(list)
@@ -520,7 +609,11 @@ object IpRulesManager : KoinComponent {
 
     suspend fun deleteAllAppsRules() {
         db.deleteAllAppsRules()
-        iptree.clear()
+        try {
+            iptree.clear()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "err iptree.clear()", e)
+        }
         resultsCache.invalidateAll()
     }
 
@@ -666,9 +759,13 @@ object IpRulesManager : KoinComponent {
         db.insert(c)
         val k = treeKey(normalizedIp)
         if (!k.isNullOrEmpty()) {
-            iptree.escLike(k, treeValLike(uid, port ?: 0))
-            iptree.add(k, treeVal(uid, port ?: 0, status.id, proxyId, proxyCC))
-            Logger.d(LOG_TAG_FIREWALL, "iptree.add($k, ${treeVal(uid, port ?: 0, status.id, proxyId, proxyCC)})")
+            try {
+                iptree.escLike(k, treeValLike(uid, port ?: 0))
+                iptree.add(k, treeVal(uid, port ?: 0, status.id, proxyId, proxyCC))
+                Logger.d(LOG_TAG_FIREWALL, "iptree.add($k, ${treeVal(uid, port ?: 0, status.id, proxyId, proxyCC)})")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k) for uid: $uid", e)
+            }
         }
         resultsCache.invalidateAll()
         return c
@@ -730,12 +827,20 @@ object IpRulesManager : KoinComponent {
         db.insert(newRule)
         val pk = treeKey(prevIpAddrStr)
         if (!pk.isNullOrEmpty()) {
-            iptree.escLike(pk, treeValLike(prevRule.uid, prevRule.port))
+            try {
+                iptree.escLike(pk, treeValLike(prevRule.uid, prevRule.port))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.escLike($pk) for uid: ${prevRule.uid}", e)
+            }
         }
         val nk = treeKey(newIpAddrStr)
         if (!nk.isNullOrEmpty()) {
-            iptree.escLike(nk, treeValLike(newRule.uid, port ?: 0))
-            iptree.add(nk, treeVal(newRule.uid, port ?: 0, newStatus.id, proxyId, proxyCC))
+            try {
+                iptree.escLike(nk, treeValLike(newRule.uid, port ?: 0))
+                iptree.add(nk, treeVal(newRule.uid, port ?: 0, newStatus.id, proxyId, proxyCC))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.add($nk) for uid: ${newRule.uid}", e)
+            }
         }
         resultsCache.invalidateAll()
     }
@@ -806,6 +911,26 @@ object IpRulesManager : KoinComponent {
         return Triple(host, port, err)
     }
 
+    /**
+     * Returns true if the parsed address can be enforced by the CIDR-only ip
+     * trie. Single addresses, CIDR notation, and wildcards that align to a
+     * single CIDR block are always enforceable. Sequential ranges such as
+     * "0.0.6.178-228" are enforceable only when their span aligns to a single
+     * CIDR block (e.g. "1.2.252-255.*" => 1.2.252.0/22); anything else would
+     * be rejected by the Go trie (see the crash in
+     * Backend$proxyIpTree.add) and should be refused by the UI.
+     */
+    fun isCidrEnforceable(ipaddr: IPAddress?): Boolean {
+        if (ipaddr == null) return false
+        return try {
+            if (!ipaddr.isMultiple) return true
+            ipaddr.assignPrefixForSingleBlock() != null
+        } catch (e: Exception) { // IncompatibleAddressException for non-prefix-block inputs
+            Logger.w(LOG_TAG_FIREWALL, "err isCidrEnforceable, ${e.message}", e)
+            false
+        }
+    }
+
     fun getIpNetPort(inp: String): Pair<IPAddress?, Int> {
         val h = splitHostPort(inp)
         var ipNet: IPAddress? = null
@@ -854,7 +979,13 @@ object IpRulesManager : KoinComponent {
 
     suspend fun stats(): String {
         val sb = StringBuilder()
-        sb.append("   iptree len: ${iptree.len()}\n")
+        val treeLen = try {
+            iptree.len()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "err iptree.len()", e)
+            -1L
+        }
+        sb.append("   iptree len: $treeLen\n")
         sb.append("   db len: ${db.getRulesCount()}\n")
 
         return sb.toString()
@@ -868,7 +999,12 @@ object IpRulesManager : KoinComponent {
             val normalized = normalize(ipaddr).orEmpty()
             if (normalized.isEmpty()) return@any false
 
-            val res = iptree.valuesLike(normalized, treeValLike(uid)) ?: return@any false
+            val res = try {
+                iptree.valuesLike(normalized, treeValLike(uid))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_FIREWALL, "err iptree.valuesLike($normalized) for uid: $uid", e)
+                return@any false
+            } ?: return@any false
             val reversed = res.split(Backend.Vsep).reversed()
             if (reversed.isEmpty()) return@any false
 

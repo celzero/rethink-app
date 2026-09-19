@@ -9,6 +9,9 @@
         android:id="@+id/dialog_dns_crypt_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/dialog_dns_crypt_ok_btn"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -123,8 +126,8 @@
         android:layout_marginBottom="10dp"
         android:text="@string/lbl_add"
         android:textColor="?attr/accentGood"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
@@ -137,8 +140,8 @@
         android:gravity="center"
         android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
-        app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn"
-        app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/dialog_custom_url_loading"
@@ -150,7 +153,7 @@
         android:layout_marginBottom="10dp"
         android:indeterminate="true"
         android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,6 +27,15 @@ data class PricingPhase(
     var billingPeriod: String,
     var priceAmountMicros: Long,
     var freeTrialPeriod: Int,
+    /**
+     * Offer discount percentage for one-time (INAPP) purchase options, derived by
+     * [InAppBillingHandler] from either Play offer type: percentage offers
+     * (DiscountDisplayInfo.percentageDiscount) or absolute/fixed-amount offers
+     * (DiscountDisplayInfo.discountAmount), with fullPriceMicros as fallback.
+     * 0 means no offer/discount. Always 0 for SUBS phases (their discounts are
+     * expressed via DISCOUNTED phases).
+     */
+    var discountPercent: Int = 0,
 ) {
     constructor() : this(
         recurringMode = RecurringMode.ORIGINAL,
@@ -37,5 +46,6 @@ data class PricingPhase(
         billingPeriod = "",
         priceAmountMicros = 0,
         freeTrialPeriod = 0,
+        discountPercent = 0,
     )
 }

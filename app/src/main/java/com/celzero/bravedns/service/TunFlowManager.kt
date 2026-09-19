@@ -38,6 +38,9 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.LogActivityAggregator
+import com.celzero.bravedns.service.LogActivityEvent
+import com.celzero.bravedns.service.LogActivitySource
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -72,10 +75,10 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.InetAddress
+import java.time.Duration
 import java.util.Collections
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 object TunFlowManager : KoinComponent {
     private const val TAG = "TunFlowManager"
@@ -125,6 +128,7 @@ object TunFlowManager : KoinComponent {
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
     private val netLogTracker by inject<NetLogTracker>()
+    private val activityAggregator by inject<LogActivityAggregator>()
 
     // Internal state previously in BraveVPNService
     private val rethinkUid: Int = Process.myUid()
@@ -143,7 +147,7 @@ object TunFlowManager : KoinComponent {
     // remove the entry from this map
     private val trackedConnMetaData: Cache<String, ConnTrackerMetaData> =
         CacheBuilder.newBuilder()
-            .expireAfterWrite(300, TimeUnit.SECONDS) // entry removed 300s after creation/update
+            .expireAfterWrite(Duration.ofSeconds(300)) // entry removed 300s after creation/update
             .removalListener<String, ConnTrackerMetaData> { notification ->
                 handleExpiredConnMetaData(notification)
             }
@@ -161,6 +165,21 @@ object TunFlowManager : KoinComponent {
 
     private fun logv(msg: String) {
         Logger.v(LOG_TAG_VPN, "$TAG $msg")
+    }
+
+    /**
+     * Arrival-time activity aggregation for connection logs, owned at this
+     * caller level; NetLogTracker/IPTracker stay persistence-only. Call beside
+     * every site that writes a connection-log row so the in-memory grid counts
+     * each row exactly once (including the deferred multi-proxy rows written
+     * from handlePostflow / handleExpiredConnMetaData).
+     */
+    private fun aggregateConnActivity(cm: ConnTrackerMetaData) {
+        if (!persistentState.logsEnabled) return
+
+        activityAggregator.recordOnArrival(
+            LogActivityEvent(cm.timestamp, LogActivitySource.NETWORK, cm.isBlocked, cm.connId)
+        )
     }
 
     // no need of go2kt here as it is called from go and just performs db operations
@@ -189,6 +208,7 @@ object TunFlowManager : KoinComponent {
                 cid,
                 ConnectionTracker.ConnType.UNMETERED,
             )
+            aggregateConnActivity(cm)
             netLogTracker.writeIpLog(cm)
             return
         }
@@ -215,6 +235,7 @@ object TunFlowManager : KoinComponent {
             cm.isBlocked = if (proxyRule.isEmpty()) true else cm.isBlocked
             cm.blockedByRule = proxyRule.ifEmpty { FirewallRuleset.RULE18.id }
             logd("onSocketClosed-flow/postflow: $s, pid: ${s.pid.isNullOrEmpty()}, cm: $cm")
+            aggregateConnActivity(cm)
             if (isRethink) {
                 netLogTracker.writeRethinkLog(cm)
             } else {
@@ -286,8 +307,8 @@ object TunFlowManager : KoinComponent {
         val srcIpPort = parseIpAndPort(src)
         val dstIpPort = parseIpAndPort(dst)
         Logger.d(LOG_TAG_VPN, "preflow: init, uid: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
-        val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
-            val resolvedUid = getUid(
+        var newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
+            getUid(
                 ctx,
                 uid,
                 protocol,
@@ -296,10 +317,11 @@ object TunFlowManager : KoinComponent {
                 dstIpPort.first,
                 dstIpPort.second
             )
-            resolvedUid
         } else {
             uid
         }
+        // fixme: see flow()
+        newUid = FirewallManager.appId(newUid, ctx.isPrimaryUser)
         Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIpPort, $dstIpPort")
 
         val p = PreMark()
@@ -591,6 +613,7 @@ object TunFlowManager : KoinComponent {
             cm.blockedByRule = FirewallRuleset.RULE12.id
         }
 
+        aggregateConnActivity(cm)
         if (cm.uid == rethinkUid) {
             netLogTracker.writeRethinkLog(cm)
         } else {
@@ -698,6 +721,7 @@ object TunFlowManager : KoinComponent {
         cm.duration = 0
         cm.synack = 0L
         cm.message = "no metadata"
+        aggregateConnActivity(cm)
         if (cm.uid == rethinkUid) {
             netLogTracker.writeRethinkLog(cm)
         } else {
@@ -1041,6 +1065,7 @@ object TunFlowManager : KoinComponent {
                     cm.blockedByRule = FirewallRuleset.RULE12.id
                 }
 
+                aggregateConnActivity(cm)
                 if (uid == rethinkUid) {
                     netLogTracker.writeRethinkLog(cm)
                 } else {

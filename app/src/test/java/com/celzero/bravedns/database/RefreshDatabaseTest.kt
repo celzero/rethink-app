@@ -3,9 +3,13 @@ package com.celzero.bravedns.database
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Utilities
@@ -43,14 +47,38 @@ class RefreshDatabaseTest {
                 org.koin.dsl.module {
                     single { context }
                     single { mockk<CustomIpRepository>(relaxed = true) }
+                    // ProxyManager.db resolves this lazily on first access
+                    single { mockk<ProxyAppMappingRepository>(relaxed = true) }
                 }
             )
         }
         mockkObject(IpRulesManager)
         mockkObject(FirewallManager)
         mockkObject(ProxyManager)
+        mockkObject(DomainRulesManager)
+        mockkObject(WireguardManager)
+        mockkObject(WgHopManager)
+        mockkObject(RpnProxyManager)
         mockkObject(Utilities)
         every { context.packageManager } returns packageManager
+        // RefreshDatabase posts notifications for batch new-app detection; the
+        // relaxed Context mock would fail the cast to NotificationManager
+        every {
+            context.getSystemService(Context.NOTIFICATION_SERVICE)
+        } returns mockk<android.app.NotificationManager>(relaxed = true)
+        // Domain rules go through Koin-injected repositories not present here
+        coEvery { DomainRulesManager.load() } returns 0L
+        coEvery { DomainRulesManager.tombstoneRulesByUid(any()) } just Runs
+        coEvery { DomainRulesManager.deleteRulesByUid(any()) } just Runs
+        coEvery { DomainRulesManager.updateUids(any(), any()) } just Runs
+        // RefreshDatabase.process() reloads every manager; stub the loads so the
+        // objects' original Koin-backed implementations never run
+        coEvery { FirewallManager.load() } returns 0
+        coEvery { IpRulesManager.load() } returns 0
+        coEvery { ProxyManager.load() } returns 0
+        coEvery { WireguardManager.load(any()) } returns 0
+        coEvery { WgHopManager.load(any()) } returns 0
+        coEvery { RpnProxyManager.load() } returns 0
         refreshDatabase = RefreshDatabase(
             context,
             connTrackerRepository,
@@ -63,10 +91,7 @@ class RefreshDatabaseTest {
 
     @After
     fun tearDown() {
-        unmockkObject(IpRulesManager)
-        unmockkObject(FirewallManager)
-        unmockkObject(ProxyManager)
-        unmockkObject(Utilities)
+        unmockkAll()
         org.koin.core.context.stopKoin()
     }
 
@@ -89,6 +114,10 @@ class RefreshDatabaseTest {
         
         coEvery { FirewallManager.persistAppInfo(any()) } just Runs
         coEvery { ProxyManager.addNewApp(any()) } just Runs
+        // Non-empty so the finally-block's "empty firewall rules" notification
+        // (which builds a real Notification, unsupported here) is skipped
+        coEvery { FirewallManager.getAllApps() } returns
+            setOf(FirewallManager.AppInfoTuple(uid, packageName))
 
         val action = RefreshDatabase.Action(RefreshDatabase.ACTION_INSERT_NEW_APP, uid)
         refreshDatabase.process(action)
@@ -107,8 +136,16 @@ class RefreshDatabaseTest {
         coEvery { FirewallManager.getAllApps() } returns trackedApps
         // Simulate no apps installed via Package Manager
         every { packageManager.getInstalledPackages(any<Int>()) } returns emptyList()
-        
+
+        // The tombstone path skips apps without a tracked AppInfo row
+        val trackedAppInfo = mockk<AppInfo>(relaxed = true)
+        every { trackedAppInfo.tombstoneTs } returns 0L
+        every { trackedAppInfo.uid } returns trackedUid
+        coEvery { FirewallManager.getAppInfoByPackage(trackedPackage) } returns trackedAppInfo
+
         coEvery { FirewallManager.tombstoneApp(any(), any(), any()) } just Runs
+        coEvery { IpRulesManager.tombstoneRulesByUid(any()) } just Runs
+        coEvery { ProxyManager.tombstoneApp(any()) } just Runs
         
         val action = RefreshDatabase.Action(RefreshDatabase.ACTION_REFRESH_AUTO)
         refreshDatabase.process(action)

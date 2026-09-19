@@ -18,12 +18,9 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,6 +47,7 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -260,7 +258,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         val dialog = builder.create()
         dialog.show()
         lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
@@ -291,33 +289,9 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
                 handleInsertIp(dBind, IpRulesManager.IpRuleStatus.TRUST)
             }
         }
-        adjustButtonLayoutOrientation(dBind.dialogButtonsContainer)
+        Utilities.adjustButtonLayoutOrientation(dBind.dialogButtonsContainer)
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
-    }
-
-    fun adjustButtonLayoutOrientation(buttonContainer: LinearLayout) {
-        buttonContainer.post {
-            val totalButtonsWidth = (0 until buttonContainer.childCount).sumOf { index ->
-                val child = buttonContainer.getChildAt(index)
-                val margins = (child.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
-                        it.marginStart + it.marginEnd
-                } ?: 0
-                child.measuredWidth + margins
-            }
-
-            val availableWidth = buttonContainer.width - buttonContainer.paddingStart - buttonContainer.paddingEnd
-
-            // If buttons don't fit horizontally, switch to vertical
-            if (totalButtonsWidth > availableWidth) {
-                buttonContainer.orientation = LinearLayout.VERTICAL
-                // Optional: center buttons vertically
-                buttonContainer.gravity = Gravity.CENTER_HORIZONTAL
-            } else {
-                buttonContainer.orientation = LinearLayout.HORIZONTAL
-                buttonContainer.gravity = Gravity.END
-            }
-        }
     }
 
 
@@ -340,6 +314,14 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
             if (ip == null || ipString.isEmpty()) {
                 dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@ui
+            }
+
+            // reject non-CIDR-able input such as "1.1.1.1-55"; the ip trie only
+            // accepts CIDR notation and would reject the rule (see isCidrEnforceable)
+            if (!IpRulesManager.isCidrEnforceable(ip)) {
+                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_cidr)
                 dBind.daciFailureTextView.visibility = View.VISIBLE
                 return@ui
             }
@@ -453,6 +435,8 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         dBind.dicFileName.text = parsed.fileName
         dBind.dicValidCount.text = parsed.valid.size.toString()
@@ -521,7 +505,11 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

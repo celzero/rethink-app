@@ -360,11 +360,6 @@ class AppListActivity :
                 BlockType.LOCKDOWN)
         }
 
-        TooltipCompat.setTooltipText(
-            b.ffaToggleAllBypassDnsFirewall,
-            getString(
-                R.string.bypass_dns_firewall_tooltip, getString(R.string.bypass_dns_firewall)))
-
         b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
             // show tooltip once the user clicks on the button
             if (showBypassToolTip) {

@@ -24,20 +24,33 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ProxyApplicationMappingDAO
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingDAO) : ViewModel() {
 
+    enum class TopLevelFilter(val id: Int) {
+        ALL_APPS(0),
+        SELECTED_APPS(1),
+        UNSELECTED_APPS(2);
+
+        fun getLabelId(): Int {
+            return when (this) {
+                ALL_APPS -> R.string.lbl_all
+                SELECTED_APPS -> R.string.rt_filter_parent_selected
+                UNSELECTED_APPS -> R.string.lbl_unselected
+            }
+        }
+    }
+
     private val filteredList: MutableLiveData<String> = MutableLiveData()
-    private var filterType: WgIncludeAppsDialog.TopLevelFilter =
-        WgIncludeAppsDialog.TopLevelFilter.ALL_APPS
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL_APPS
     private var proxyId: String = ""
 
     init {
-        filterType = WgIncludeAppsDialog.TopLevelFilter.ALL_APPS
+        filterType = TopLevelFilter.ALL_APPS
         proxyId = ""
         filteredList.postValue("%%")
     }
@@ -46,11 +59,10 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
         filteredList.switchMap { searchTxt ->
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                 when (filterType) {
-                    WgIncludeAppsDialog.TopLevelFilter.ALL_APPS ->
-                        mappingDAO.getAllAppsMapping(searchTxt, proxyId)
-                    WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS ->
+                    TopLevelFilter.ALL_APPS -> mappingDAO.getAllAppsMapping(searchTxt, proxyId)
+                    TopLevelFilter.SELECTED_APPS ->
                         mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
-                    WgIncludeAppsDialog.TopLevelFilter.UNSELECTED_APPS ->
+                    TopLevelFilter.UNSELECTED_APPS ->
                         mappingDAO.getUnSelectedAppsMapping(searchTxt, proxyId)
                 }
             }
@@ -63,7 +75,7 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
         return ProxyManager.getProxyIdsForApp(uid).contains(proxyId)
     }
 
-    fun setFilter(filter: String, type: WgIncludeAppsDialog.TopLevelFilter, pid: String) {
+    fun setFilter(filter: String, type: TopLevelFilter, pid: String) {
         filterType = type
         this.proxyId = pid
         filteredList.postValue("%$filter%")

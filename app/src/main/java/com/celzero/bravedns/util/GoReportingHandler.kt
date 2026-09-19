@@ -26,6 +26,7 @@ import com.celzero.firestack.backend.LogConsumer
 import com.celzero.firestack.intra.Console
 import com.celzero.firestack.intra.Intra
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -56,13 +57,15 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
     }
 
     init {
-        Intra.setupConsole(this)
-        val crashFile = getCrashFile()
-        if (crashFile == null) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create crash file")
-        } else {
-            Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${crashFile.absolutePath}")
-            Intra.setCrashOutput(crashFile.absolutePath, crashFile.absolutePath)
+        scope.launch {
+            Intra.setupConsole(this@GoReportingHandler)
+            val crashFile = getCrashFile()
+            if (crashFile == null) {
+                Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create crash file")
+            } else {
+                Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${crashFile.absolutePath}")
+                Intra.setCrashOutput(crashFile.absolutePath, crashFile.absolutePath)
+            }
         }
     }
 

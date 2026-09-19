@@ -98,7 +98,9 @@
             android:id="@+id/cda_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/cda_show_rules_rl" />
+            android:layout_below="@id/cda_show_rules_rl"
+            android:paddingBottom="96dp"
+            android:clipToPadding="false" />
 
 
     </RelativeLayout>

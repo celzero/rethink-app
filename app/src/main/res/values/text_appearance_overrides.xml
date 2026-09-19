@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    App-level overrides of the Material 3 type-scale leaf styles.
+
+    WHY THIS FILE EXISTS
+    ~~~~~~~~~~~~~~~~~~~~
+    Since material 1.13, every TextAppearance.Material3.* style ships with a
+    hard android:lineHeight (e.g. BodySmall = 12sp text forced into a 16sp
+    line box). android:lineHeight clamps the line box and overrides natural
+    font ascent/descent. On OEM ROMs whose default fonts have taller vertical
+    metrics than Roboto - notably Samsung One UI on Galaxy devices - glyphs
+    render taller than the forced box and get VERTICALLY CLIPPED, everywhere,
+    including direct `style="@style/TextAppearance.Material3.X"` usages in
+    layouts and hard-coded references inside library widget defaults.
+
+    WHAT THIS DOES
+    ~~~~~~~~~~~~~~
+    Redefines the exact M3 leaf style names with identical size/family/
+    letter-spacing metrics, but WITHOUT android:lineHeight so TextViews fall
+    back to font-metric-derived line heights that always fit any device font.
+    App resources take precedence over library resources during merging, so
+    no layout needs to change.
+
+    Baseline metrics copied verbatim from material-1.14.0
+    (TextAppearance.M3.Sys.Typescale.*). Keep in sync if the material
+    dependency is upgraded.
+
+    SAFETY NET (keep even after upgrading material):
+    If a future material release reintroduces clipping via different internals,
+    this override layer still pins the type scale.
+-->
+<resources>
+
+    <!-- ============ Regular roles ============ -->
+
+    <style name="TextAppearance.Material3.DisplayLarge" parent="TextAppearance.Rethink.DisplayLarge"/>
+    <style name="TextAppearance.Material3.DisplayMedium" parent="TextAppearance.Rethink.DisplayMedium"/>
+    <style name="TextAppearance.Material3.DisplaySmall" parent="TextAppearance.Rethink.DisplaySmall"/>
+
+    <style name="TextAppearance.Material3.HeadlineLarge" parent="TextAppearance.Rethink.HeadlineLarge"/>
+    <style name="TextAppearance.Material3.HeadlineMedium" parent="TextAppearance.Rethink.HeadlineMedium"/>
+    <style name="TextAppearance.Material3.HeadlineSmall" parent="TextAppearance.Rethink.HeadlineSmall"/>
+
+    <style name="TextAppearance.Material3.TitleLarge" parent="TextAppearance.Rethink.TitleLarge"/>
+    <style name="TextAppearance.Material3.TitleMedium" parent="TextAppearance.Rethink.TitleMedium"/>
+    <style name="TextAppearance.Material3.TitleSmall" parent="TextAppearance.Rethink.TitleSmall"/>
+
+    <style name="TextAppearance.Material3.BodyLarge" parent="TextAppearance.Rethink.BodyLarge"/>
+    <style name="TextAppearance.Material3.BodyMedium" parent="TextAppearance.Rethink.BodyMedium"/>
+    <style name="TextAppearance.Material3.BodySmall" parent="TextAppearance.Rethink.BodySmall"/>
+
+    <style name="TextAppearance.Material3.LabelLarge" parent="TextAppearance.Rethink.LabelLarge"/>
+    <style name="TextAppearance.Material3.LabelMedium" parent="TextAppearance.Rethink.LabelMedium"/>
+    <style name="TextAppearance.Material3.LabelSmall" parent="TextAppearance.Rethink.LabelSmall"/>
+
+    <!-- ============ Emphasized roles ============
+         Metrics identical to material-1.14.0 Typescale.*.Emphasized,
+         minus lineHeight. Emphasis is expressed as family/weight changes:
+         Display/Headline/TitleLarge -> sans-serif-medium;
+         Title(M,S)/Label(*)         -> sans-serif + bold;
+         Body(*)                     -> sans-serif-medium.                  -->
+
+    <style name="TextAppearance.Material3.DisplayLarge.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.DisplayMedium.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.DisplaySmall.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.HeadlineLarge.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.HeadlineMedium.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.HeadlineSmall.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.TitleLarge.Emphasized" parent="TextAppearance.Rethink.TitleLarge"/>
+
+    <style name="TextAppearance.Material3.TitleMedium.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.009375</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.TitleSmall.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.00714286</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.BodyLarge.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.009375</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.BodyMedium.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.01785714</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.BodySmall.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.03333333</item>
+        <item name="android:textStyle">normal</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.LabelLarge.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.00714286</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.LabelMedium.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.04166667</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="TextAppearance.Material3.LabelSmall.Emphasized" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.04545455</item>
+        <item name="android:textStyle">bold</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+</resources>

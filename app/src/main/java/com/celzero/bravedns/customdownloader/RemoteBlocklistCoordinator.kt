@@ -21,6 +21,8 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.celzero.bravedns.R
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -49,17 +51,22 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
 
     override suspend fun doWork(): Result {
         Logger.i(LOG_TAG_DOWNLOAD, "Remote blocklist download worker started")
+        setProgress(workDataOf("progress" to 0))
         try {
             val startTime = inputData.getLong("workerStartTime", 0)
             val timestamp = inputData.getLong("blocklistTimestamp", 0)
 
             if (SystemClock.elapsedRealtime() - startTime > BLOCKLIST_DOWNLOAD_TIMEOUT_MS) {
+                val msg = context.getString(R.string.download_err_network)
+                Logger.w(LOG_TAG_DOWNLOAD, "Timeout reached")
+                persistentState.lastDownloadFailureReason = msg
                 return Result.failure()
             }
 
             val downloadStatus = downloadRemoteBlocklist(timestamp)
             // reset updatable time stamp
             if (downloadStatus) {
+                setProgress(workDataOf("processing" to true))
                 // update the download related persistence status on download success
                 updatePersistenceOnCopySuccess(timestamp)
                 // Delete stale remote blocklist directories, keeping only the one whose
@@ -70,6 +77,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                     persistentState.remoteBlocklistTimestamp
                 )
             } else {
+                // failure reason should be set in downloadRemoteBlocklist
                 // clean up the partial directory created for this failed download attempt
                 cleanupFailedRemoteDownload(timestamp)
 
@@ -101,9 +109,13 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         } catch (ex: CancellationException) {
             Logger.e(
                 LOG_TAG_DOWNLOAD,
-                "Local blocklist download, received cancellation exception: ${ex.message}",
+                "Remote blocklist download, received cancellation exception: ${ex.message}",
                 ex
             )
+        } catch (ex: Exception) {
+            val msg = context.getString(R.string.download_err_internal)
+            Logger.e(LOG_TAG_DOWNLOAD, "Remote coordinator error: ${ex.message}", ex)
+            persistentState.lastDownloadFailureReason = msg
         }
         return Result.failure()
     }
@@ -129,16 +141,26 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             )
 
             if (response?.isSuccessful == true) {
+                setProgress(workDataOf("progress" to 100))
                 return saveRemoteFile(response.body(), timestamp)
+            } else {
+                val msg = context.getString(R.string.download_err_network)
+                Logger.e(LOG_TAG_DOWNLOAD, "Remote download failed: ${response?.message()} (${response?.code()})")
+                persistentState.lastDownloadFailureReason = msg
             }
+        } catch (ex: CancellationException) {
+            // never swallow cooperative cancellation
+            throw ex
         } catch (ex: Exception) {
-            Logger.e(LOG_TAG_DOWNLOAD, "err in downloadRemoteBlocklist: ${ex.message}", ex)
+            val msg = context.getString(R.string.download_err_network)
+            Logger.e(LOG_TAG_DOWNLOAD, "Remote download exception: ${ex.message}", ex)
+            persistentState.lastDownloadFailureReason = msg
         }
         return if (isRetryRequired(retryCount)) {
             Logger.i(LOG_TAG_DOWNLOAD, "retrying the downloadRemoteBlocklist")
             downloadRemoteBlocklist(timestamp, retryCount + 1)
         } else {
-            Logger.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+            Logger.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning false")
             false
         }
     }
@@ -154,13 +176,19 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             filetag.writeText(jsonObject.toString())
 
             // write the file tag json file into database
-            return RethinkBlocklistManager.readJson(
+            val result = RethinkBlocklistManager.readJson(
                 context,
                 RethinkBlocklistManager.DownloadType.REMOTE,
                 timestamp
             )
+            if (!result) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_internal)
+            }
+            return result
         } catch (e: IOException) {
-            Logger.w(LOG_TAG_DOWNLOAD, "could not create filetag.json at version $timestamp", e)
+            val msg = context.getString(R.string.download_err_storage)
+            Logger.w(LOG_TAG_DOWNLOAD, "IOException: could not create filetag.json", e)
+            persistentState.lastDownloadFailureReason = msg
         }
         return false
     }
@@ -172,7 +200,11 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp
-                ) ?: return null
+                )
+            if (dir == null) {
+                persistentState.lastDownloadFailureReason = context.getString(R.string.download_err_storage)
+                return null
+            }
 
             if (!dir.exists()) {
                 dir.mkdirs()
@@ -183,11 +215,9 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             }
             return filePath
         } catch (e: IOException) {
-            Logger.e(
-                LOG_TAG_DOWNLOAD,
-                "err creating remote blocklist, ts: $timestamp" + e.message,
-                e
-            )
+            val msg = context.getString(R.string.download_err_storage)
+            Logger.e(LOG_TAG_DOWNLOAD, "IOException while creating file: ${e.message}", e)
+            persistentState.lastDownloadFailureReason = msg
         }
         return null
     }

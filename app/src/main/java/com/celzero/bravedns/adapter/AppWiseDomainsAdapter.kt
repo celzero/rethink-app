@@ -389,7 +389,7 @@ class AppWiseDomainsAdapter(
             when (status) {
                 DomainRulesManager.Status.NONE -> {
                     b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.chipTextNeutral)
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
                     )
                 }
                 DomainRulesManager.Status.BLOCK -> {

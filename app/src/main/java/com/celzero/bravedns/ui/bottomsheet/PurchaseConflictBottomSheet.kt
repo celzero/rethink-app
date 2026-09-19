@@ -35,7 +35,6 @@ import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet.Companion
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,7 +53,7 @@ import org.koin.android.ext.android.inject
  * The sheet is self-contained: it receives a [ServerApiError.Conflict409] via [newInstance],
  * performs the refund call itself, and delivers the result via [onRefundResult].
  */
-class PurchaseConflictBottomSheet : BottomSheetDialogFragment() {
+class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetPurchaseConflictBinding? = null
     private val binding

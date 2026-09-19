@@ -48,6 +48,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
@@ -189,7 +190,6 @@ class CustomDomainFragment :
 
         // Import FAB is only shown and wired up in DEBUG builds.
         // The FAB itself is GONE in XML; this block also stays dead-code in release builds
-        // so ProGuard/R8 can strip it entirely.
         if (DEBUG) {
             b.cdaImportFab.visibility = View.VISIBLE
             b.cdaImportFab.setOnClickListener {
@@ -253,7 +253,7 @@ class CustomDomainFragment :
         val dialog = builder.create()
         dialog.show()
         lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
@@ -316,6 +316,7 @@ class CustomDomainFragment :
         }
 
         dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+        Utilities.adjustButtonLayoutOrientation(dBind.dacdButtonsContainer)
         dialog.show()
     }
 
@@ -475,6 +476,8 @@ class CustomDomainFragment :
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         dBind.dicFileName.text = parsed.fileName
         dBind.dicValidCount.text = parsed.valid.size.toString()
@@ -535,7 +538,11 @@ class CustomDomainFragment :
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }
 

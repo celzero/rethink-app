@@ -76,6 +76,8 @@ class SpotlightOverlayView @JvmOverloads constructor(
 
     private val overlayColor: Int = resolveAttrColor(R.attr.tourOverlayColor, Color.parseColor("#D1000000"))
     private val strokeColor: Int  = resolveAttrColor(R.attr.tourStrokeColor,  Color.parseColor("#FF18ffff"))
+    /** Golden tone used for the premium spotlight glow, resolved from the theme. */
+    private val premiumGlowColor: Int = resolveAttrColor(R.attr.colorGolden, 0xFFC9A000.toInt())
 
     private val scrimPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = overlayColor
@@ -90,6 +92,23 @@ class SpotlightOverlayView @JvmOverloads constructor(
         strokeWidth = dp(1.5f)
         alpha  = 140 // ~55% opacity
     }
+    /** Wide, faint golden halo drawn outside the ring for premium steps. */
+    private val premiumHaloPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style       = Paint.Style.STROKE
+        color       = premiumGlowColor
+        strokeWidth = dp(6f)
+        alpha       = 40  // ~16% opacity
+    }
+    /** Crisper golden ring drawn just outside the default ring for premium steps. */
+    private val premiumRingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style       = Paint.Style.STROKE
+        color       = premiumGlowColor
+        strokeWidth = dp(2f)
+        alpha       = 150 // ~59% opacity
+    }
+
+    /** When `true`, draws the golden premium halo + ring around the spotlight. */
+    private var premiumGlow = false
 
     /** Corner radius for ROUNDED_RECT spotlight, in pixels. */
     private val cornerRadius = dp(16f)
@@ -161,6 +180,16 @@ class SpotlightOverlayView @JvmOverloads constructor(
     }
 
     /**
+     * Enable/disable the golden "premium" halo drawn around the spotlight.
+     * Takes effect on the next frame; safe to call on every step advance.
+     */
+    fun setPremiumGlow(enabled: Boolean) {
+        if (premiumGlow == enabled) return
+        premiumGlow = enabled
+        invalidate()
+    }
+
+    /**
      * Fade out the overlay and call [onEnd] when the animation completes.
      * The view is NOT removed automatically, the caller must detach it.
      */
@@ -217,14 +246,29 @@ class SpotlightOverlayView @JvmOverloads constructor(
         // 4. Draw the subtle spotlight ring on top
         if (!currentRect.isEmpty) {
             when (shape) {
-                SpotlightShape.ROUNDED_RECT ->
+                SpotlightShape.ROUNDED_RECT -> {
+                    if (premiumGlow) drawPremiumGlowRoundRect(canvas)
                     canvas.drawRoundRect(currentRect, cornerRadius, cornerRadius, strokePaint)
+                }
                 SpotlightShape.CIRCLE -> {
                     val radius = maxOf(currentRect.width(), currentRect.height()) / 2f
+                    if (premiumGlow) drawPremiumGlowCircle(canvas, radius)
                     canvas.drawCircle(currentRect.centerX(), currentRect.centerY(), radius, strokePaint)
                 }
             }
         }
+    }
+
+    /** Draws the golden halo + ring around a rounded-rect spotlight. */
+    private fun drawPremiumGlowRoundRect(canvas: Canvas) {
+        canvas.drawRoundRect(currentRect, cornerRadius, cornerRadius, premiumHaloPaint)
+        canvas.drawRoundRect(currentRect, cornerRadius, cornerRadius, premiumRingPaint)
+    }
+
+    /** Draws the golden halo + ring around a circular spotlight. */
+    private fun drawPremiumGlowCircle(canvas: Canvas, radius: Float) {
+        canvas.drawCircle(currentRect.centerX(), currentRect.centerY(), radius, premiumHaloPaint)
+        canvas.drawCircle(currentRect.centerX(), currentRect.centerY(), radius, premiumRingPaint)
     }
 
     // -----------------------------------------------------------------------

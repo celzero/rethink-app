@@ -29,6 +29,7 @@ import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_
 import com.celzero.bravedns.iab.InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2.Companion.LOCAL_CANCEL_REVOKE_GUARD_MS
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -59,6 +60,7 @@ open class SubscriptionStateMachineV2 : KoinComponent {
 
     private val subscriptionDb by inject<SubscriptionStatusRepository>()
     private val dbSyncService: StateMachineDatabaseSyncService by inject()
+    private val persistentState by inject<PersistentState>()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     // Lock ordering (must always be acquired in this order to prevent deadlocks)
@@ -1069,9 +1071,17 @@ open class SubscriptionStateMachineV2 : KoinComponent {
      */
     private suspend fun updateCancelledStatusInDb(detail: PurchaseDetail) {
         try {
-            val existing = subscriptionDb.getByPurchaseToken(detail.purchaseToken)
-                ?: subscriptionDb.getCurrentSubscription()
-                ?: return
+            // Token-strict lookup: this function unconditionally writes CANCELLED, so it
+            // must NEVER fall back to getCurrentSubscription() — a Play snapshot whose
+            // token is unknown to the DB would otherwise stamp "the most recent row"
+            // (possibly a different, ACTIVE purchase) as CANCELLED. When the token is
+            // unknown, handlePaymentSuccessful is the correct writer: it creates the row
+            // with targetStatus derived from Play (CANCELLED for isAutoRenewing=false).
+            val existing = subscriptionDb.getByPurchaseToken(detail.purchaseToken) ?: run {
+                Logger.w(LOG_IAB, "$TAG: updateCancelledStatusInDb: no DB row for token " +
+                    "${detail.purchaseToken.take(8)}, skipping (token-strict)")
+                return
+            }
 
             if (existing.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id) {
                 Logger.d(LOG_IAB, "$TAG: updateCancelledStatusInDb: already CANCELLED, no-op (DB)")
@@ -1521,7 +1531,12 @@ open class SubscriptionStateMachineV2 : KoinComponent {
         }
     }
 
-    open fun getCurrentState(): SubscriptionState = stateMachine.getCurrentState()
+    // NOTE: intentionally NOT named `getCurrentState()` — the JVM signature would collide
+    // with the `currentState` property getter above (same name + params, return type only
+    // differs). ByteBuddy/MockK cannot proxy such colliding pairs, which broke every unit
+    // test that stubbed this class (the real getter ran on mocks whose `stateMachine` field
+    // is null, throwing NPE).
+    open fun currentMachineState(): SubscriptionState = stateMachine.getCurrentState()
     open fun getSubscriptionData(): SubscriptionData? = stateMachine.getCurrentData()
     open fun canMakePurchase(): Boolean = stateMachine.getCurrentState().canMakePurchase
     open fun hasValidSubscription(): Boolean = stateMachine.getCurrentState().hasValidSubscription
@@ -1836,6 +1851,11 @@ open class SubscriptionStateMachineV2 : KoinComponent {
             val existingByToken = subscriptionDb.getByPurchaseToken(purchaseDetail.purchaseToken)
             val existingLatest  = if (existingByToken == null) subscriptionDb.getCurrentSubscription() else null
             val existing        = existingByToken ?: existingLatest
+
+            if (existingByToken == null) {
+                // new purchase token: restart the monthly forced-reconcile window
+                persistentState.lastForcedReconcileTimestamp = System.currentTimeMillis()
+            }
 
             val billingExpiry = purchaseDetail.expiryTime
             val sessionToken = RpnProxyManager.getSessionTokenFromPayload(purchaseDetail.payload)

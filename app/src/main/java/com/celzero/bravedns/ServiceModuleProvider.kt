@@ -32,11 +32,18 @@ import com.celzero.bravedns.service.ServiceModule
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.viewmodel.ViewModelModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-private val rootModule = module { single<ContentResolver> { androidContext().contentResolver } }
+private val rootModule =
+    module {
+        single<ContentResolver> { androidContext().contentResolver }
+        single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
+    }
 private val updaterModule = module {
     single { NonStoreAppUpdater(Constants.RETHINK_APP_UPDATE_CHECK, get()) }
     single<AppUpdater> { get<NonStoreAppUpdater>() }

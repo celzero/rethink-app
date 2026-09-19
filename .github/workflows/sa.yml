@@ -26,35 +26,25 @@ jobs:
       - name: 🤺 Detekt
         run: |
           set -euo pipefail
-          # from: github.com/natiginfo/action-detekt-all
-          wget -q https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar -O detekt-cli-all.jar
 
-          # detekt.github.io/detekt/cli.html#use-the-cli
+          # from: github.com/detekt/detekt/releases
+          wget -q "https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar" -O detekt-cli-all.jar
+
           java -jar detekt-cli-all.jar \
               --build-upon-default-config \
               --config .github/detekt-config.yml \
-              --excludes '**/src/test/**,**/src/androidTest/**,**/src/testDebug/**,**/src/testRelease/**,**/src/androidTestDebug/**,**/src/androidTestRelease/**,**/*Test.kt,**/*Tests.kt,**/*Spec.kt' \
+              --excludes '**/src/test/**,**/src/androidTest/**,**/src/testDebug/**,**/src/testRelease/**,**/src/androidTestDebug/**,**/src/androidTestRelease/**,**/*Test.kt,**/*Tests.kt,**/*Spec.kt,**/build/**,**/.gradle/**,**/.kotlin/**' \
               --fail-on-severity ${SEV} \
-              --analysis-mode full \
-              --api-version ${KOTLIN_VER} \
               --jvm-target ${JVM_TARGET} \
-              --language-version ${KOTLIN_VER} \
               --parallel \
               --report sarif:rethink-app-detekt-${RUNID}.sarif
         shell: bash
         env:
           RUNID: ${{ github.run_id }}
-          # recommended versions: github.com/detekt/detekt?tab=readme-ov-file#executing-detekt
-          DETEKT_VER: "2.0.0-alpha.1"
-          # github.com/celzero/rethink-app/blob/main/app/build.gradle#L199
-          # one of:  [1.6, 1.8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+          DETEKT_VER: "2.0.0-alpha.6"
           JVM_TARGET: "17"
           # one of: [Error, Warning, Info, Never]
           SEV: "Warning"
-          # WARNING: Keep major.minor version (e.g., "2.1") in sync with build.gradle (ext.kotlin_version, line 4)!
-          # Only the major.minor part is required here, not the full version (e.g., "2.1.20").
-          # github.com/celzero/rethink-app/blob/main/build.gradle#L4
-          KOTLIN_VER: "2.1"
 
       - name: 📡 Upload to code-scanning
         if: always()

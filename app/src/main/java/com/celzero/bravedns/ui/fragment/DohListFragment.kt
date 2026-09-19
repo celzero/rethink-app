@@ -35,6 +35,7 @@ import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDohListBinding
 import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -138,13 +139,19 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
+        // resize the dialog when the keyboard opens, so that the buttons
+        // remain visible on smaller screens (instead of panning the window)
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val heading = dialogBinding.dialogCustomUrlTop
         val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
         val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
         val customName = dialogBinding.dialogCustomNameEditText
         val customURL = dialogBinding.dialogCustomUrlEditText
+        val customIp = dialogBinding.dialogCustomIpEditText
         val progressBar = dialogBinding.dialogCustomUrlLoading
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
         val checkBox = dialogBinding.dialogSecureCheckbox
@@ -170,10 +177,11 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
+            val ip = customIp.text?.toString()?.trim().orEmpty()
             val isSecure = !checkBox.isChecked
 
             if (checkUrl(url)) {
-                insertDoHEndpoint(name, url, isSecure)
+                insertDoHEndpoint(name, url, ip, isSecure)
                 dialog.dismiss()
             } else {
                 errorTxt.text = resources.getString(R.string.custom_url_error_invalid_url)
@@ -188,17 +196,20 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         dialog.show()
     }
 
-    private fun insertDoHEndpoint(name: String, url: String, isSecure: Boolean) {
+    private fun insertDoHEndpoint(name: String, url: String, ip: String, isSecure: Boolean) {
         io {
             var dohName: String = name
             if (name.isBlank()) {
                 dohName = url
             }
+            // persist the user-supplied IP as-is; blank input is stored as null
+            val dohIp = ip.takeIf { it.isNotBlank() }
             val doHEndpoint =
                 DoHEndpoint(
                     id = 0,
                     dohName,
                     url,
+                    dohIp,
                     dohExplanation = "",
                     isSelected = false,
                     isCustom = true,
@@ -230,6 +241,10 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

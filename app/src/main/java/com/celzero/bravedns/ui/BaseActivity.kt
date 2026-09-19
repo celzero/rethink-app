@@ -19,6 +19,8 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
@@ -62,6 +64,9 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
 
     private val persistentState: PersistentState by inject()
 
+    /** Guards against installing the max-width layout-change listener more than once. */
+    private var isMaxWidthHooked = false
+
     /**
      * Returns true when the device is currently in dark (night) mode.
      * Defined as a Context extension so callers read naturally without needing a receiver.
@@ -89,6 +94,61 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
         // behind the status bar, so the app must declare whether icons should be dark or
         // light; without this the icons default to white and are invisible on light surfaces.
         applyStatusBarAppearance()
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        applyMaxContentWidth()
+    }
+
+    /**
+     * Caps the app content to [MAX_CONTENT_WIDTH_DP] and centers it horizontally on
+     * expanded windows (foldables in the open state, tablets, split-screen).
+     *
+     * The width cap is applied by mutating the existing content view's LayoutParams inside
+     * [android.R.id.content] (a FrameLayout), **not** by re-parenting it into a wrapper
+     * view. Re-parenting breaks bind-mode `ViewBinding` delegates
+     * (`viewBinding(Binding::bind)`): they resolve `android.R.id.content`'s child lazily
+     * on first binding access (which may happen in `onResume` or later, i.e. after
+     * [onPostCreate]) and hard-cast it to the layout's declared root type — an inserted
+     * wrapper view at index 0 turns that cast into a `ClassCastException`
+     * (cr: `MaxWidthFrameLayout cannot be cast to CoordinatorLayout` in
+     * `WgConfigEditorActivity`). Keeping the content view's identity intact avoids the
+     * crash for every activity without per-screen workarounds.
+     *
+     * Windows narrower than the cap (regular phones) keep `MATCH_PARENT` width; wider
+     * windows cap the child to [MAX_CONTENT_WIDTH_DP] and center it, so the window
+     * background keeps drawing edge-to-edge. Width is re-evaluated whenever the content
+     * frame's width changes (first layout, fold/unfold, split-screen resize) via an
+     * [android.view.View.OnLayoutChangeListener]; the mutation is a no-op when the target
+     * width is unchanged.
+     */
+    private fun applyMaxContentWidth() {
+        val content = findViewById<FrameLayout>(android.R.id.content) ?: return
+        if (!isMaxWidthHooked) {
+            isMaxWidthHooked = true
+            content.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+                capContentChildWidth(view as FrameLayout, view.width)
+            }
+        }
+        // May be a no-op pre-layout (width 0); the layout-change listener covers first layout.
+        capContentChildWidth(content, content.width)
+    }
+
+    private fun capContentChildWidth(content: FrameLayout, contentWidth: Int) {
+        if (contentWidth <= 0) return
+        val child = content.getChildAt(0) ?: return
+        val lp = child.layoutParams as? FrameLayout.LayoutParams ?: return
+        val capPx = (MAX_CONTENT_WIDTH_DP * resources.displayMetrics.density).toInt()
+        val target = if (contentWidth <= capPx) {
+            FrameLayout.LayoutParams.MATCH_PARENT
+        } else {
+            capPx
+        }
+        if (lp.width == target && lp.gravity == Gravity.CENTER_HORIZONTAL) return
+        lp.width = target
+        lp.gravity = Gravity.CENTER_HORIZONTAL
+        child.layoutParams = lp
     }
 
     /**
@@ -120,5 +180,15 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
             R.style.ThemeOverlay_App_AlphaDark
         }
         theme.applyStyle(overlayRes, true)
+    }
+
+    companion object {
+        /**
+         * Maximum content width in dp. Keeps every screen rendered at phone proportions
+         * inside the centered column, so layouts with phone-tuned fixed sizes (square
+         * card grids, fixed margins) fit the screen exactly as they do on non-foldable
+         * phones.
+         */
+        private const val MAX_CONTENT_WIDTH_DP = 600
     }
 }

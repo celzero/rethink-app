@@ -181,7 +181,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
     @Test
     fun `machine is Initial after init when DB is empty`() {
         val machine = createMachine()
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
     }
 
     @Test
@@ -193,7 +193,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
         // Restoration is memory-only — upsert must NOT be called
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
@@ -209,7 +209,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 
@@ -223,7 +223,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 
@@ -241,7 +241,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val machine = createMachine()
 
         // Cancelled + billingExpiry in the future → Active in memory
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
         // DB status must NOT be overwritten during memory-only restoration
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
@@ -260,7 +260,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val machine = createMachine()
 
         // Cancelled + billingExpiry in the past → Expired
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
         // handleSubscriptionExpiredWithData writes EXPIRED to DB
         coVerify(atLeast = 1) { mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id }) }
     }
@@ -280,7 +280,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val machine = createMachine()
 
         // Expired stays Expired — Play reconcile will correct if needed
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     // =========================================================================
@@ -290,13 +290,13 @@ class SubscriptionStateMachineV2Test : KoinTest {
     @Test
     fun `paymentSuccessful from Initial transitions to Active and upserts DB`() = runBlocking {
         val machine = createMachine()
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
 
         val pd = makePurchaseDetail(STD_PRODUCT)
         machine.paymentSuccessful(pd)
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
         coVerify(atLeast = 1) { mockRepository.upsert(any()) }
     }
 
@@ -324,7 +324,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         // All fields already current → no DB write
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -352,7 +352,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
                 it.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id && it.purchaseToken == newToken
             })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -375,7 +375,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         // Guard fires — no DB upsert; state still transitions to Active in memory
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -438,7 +438,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         machine.paymentSuccessful(newPd)
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
 
         // Old token must be marked EXPIRED (plan-change expiry)
         coVerify {
@@ -487,7 +487,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -507,7 +507,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -520,7 +520,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
 
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
     }
 
     @Test
@@ -547,7 +547,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -576,7 +576,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         delay(100)
 
         // Machine → Active (user still has access during cancelled billing period)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
         // DB row updated to CANCELLED
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id })
@@ -604,7 +604,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         delay(100)
 
         // PENDING → PurchaseCompleted event → PurchasePending state
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
     }
 
     @Test
@@ -627,7 +627,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
     }
 
     @Test
@@ -654,7 +654,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
             queriedProductType = BillingClient.ProductType.SUBS
         )
         delay(100)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
 
         // Second reconcile: same token + same expiry → fast-path skip
         val savedRow = makeActiveSub(purchaseToken = token).also { it.billingExpiry = expiry }
@@ -742,7 +742,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -770,7 +770,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         delay(100)
 
         // INAPP: local clock is the sole authority for expiry
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -798,7 +798,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         delay(100)
 
         // hasRealExpiry = false (MAX_VALUE) → not considered expired → Active
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     // =========================================================================
@@ -823,7 +823,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
                 it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
             })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -845,7 +845,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
                 it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
             })
         } // All INAPP rows were expired → state should be Expired
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     /**
@@ -892,7 +892,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         assertEquals(
             "State must remain Active when a newer INAPP purchase is still valid in Play snapshot",
             SubscriptionStateMachineV2.SubscriptionState.Active,
-            machine.getCurrentState()
+            machine.currentMachineState()
         )
     }
 
@@ -911,7 +911,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -965,7 +965,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         machine.userCancelled()
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.currentMachineState())
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id })
         }
@@ -983,7 +983,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         machine.subscriptionExpired()
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
         }
@@ -1001,7 +1001,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         machine.subscriptionRevoked()
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id })
         }
@@ -1049,7 +1049,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         // First expiration: writes EXPIRED to DB, machine transitions to Expired
         machine.subscriptionExpired()
         delay(100)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
 
         // Reset verification counters; the idempotent Expired→Expired transition
         // uses a no-op action (line 472-474), not handleSubscriptionExpiredWithData
@@ -1084,7 +1084,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         machine.paymentSuccessful(pd)
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
         coVerify {
             mockRepository.upsert(match {
                 it.purchaseToken == newToken && it.status == SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
@@ -1160,7 +1160,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         // State machine should point to the valid one
         assertEquals(tokenValid, machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
     }
 
     @Test
@@ -1178,7 +1178,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
         delay(100)
 
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
     }
 
     @Test
@@ -1242,7 +1242,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
     @Test
     fun `getCurrentState returns Initial after empty-DB machine creation`() {
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, createMachine().getCurrentState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, createMachine().currentMachineState())
     }
 
     @Test

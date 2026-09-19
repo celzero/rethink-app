@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -60,6 +62,17 @@ class WgHopAdapter(
     }
 
     private var isAttached = false
+    private var recyclerView: RecyclerView? = null
+
+    // handleHop() runs in lifecycleScope (canceled only at DESTROYED). if it completes
+    // while the host is stopped (below STARTED), uiCtx skips the terminal update that
+    // dismisses the progress indicator and re-enables the checkbox, leaving the row
+    // stuck. restore the row state when the host becomes active again.
+    private val restoreStateObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+            restoreRowStates()
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HopViewHolder {
         val itemBinding =
@@ -81,18 +94,36 @@ class WgHopAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
         isAttached = true
+        (context as? LifecycleOwner)?.lifecycle?.addObserver(restoreStateObserver)
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        (context as? LifecycleOwner)?.lifecycle?.removeObserver(restoreStateObserver)
         isAttached = false
+        this.recyclerView = null
+    }
+
+    private fun restoreRowStates() {
+        val rv = recyclerView ?: return
+        for (i in 0 until rv.childCount) {
+            val child = rv.getChildAt(i)
+            val holder = rv.getChildViewHolder(child) as? HopViewHolder ?: continue
+            holder.restoreRowState()
+        }
     }
 
     inner class HopViewHolder(private val b: ListItemWgHopBinding) :
         RecyclerView.ViewHolder(b.root) {
 
+        // last-bound config, used to restore row state if a hop completes while
+        // the host is stopped (see restoreStateObserver)
+        private var boundConfig: Config? = null
+
         fun update(config: Config) {
+            boundConfig = config
             val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
             b.wgHopListNameTv.text = config.getName() + " (" + config.getId() + ")"
             b.wgHopListCheckbox.isChecked = config.getId() == selectedId
@@ -380,6 +411,19 @@ class WgHopAdapter(
             b.wgHopListCard.isEnabled = false
         }
 
+        // Called on the main thread when the host becomes STARTED again. Re-syncs the
+        // row with the adapter state in case handleHop() finished while stopped and
+        // its terminal uiCtx block was skipped.
+        fun restoreRowState() {
+            val config = boundConfig ?: return
+            dismissProgressIndicator()
+            b.wgHopListCard.isEnabled = true
+            val isSelected = config.getId() == selectedId
+            b.wgHopListCheckbox.isChecked = isSelected
+            val isActive = WireguardManager.getConfigFilesById(config.getId())?.isActive == true
+            setCardStroke(isSelected, isActive)
+        }
+
         fun dismissProgressIndicator() {
             if (!isAttached) return
 
@@ -403,7 +447,15 @@ class WgHopAdapter(
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

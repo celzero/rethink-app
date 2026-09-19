@@ -23,7 +23,6 @@ import android.os.StrictMode
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
 import kotlinx.coroutines.CoroutineScope
@@ -56,14 +55,9 @@ class RethinkDnsApplication : Application() {
 
         // Initialize global exception handler
         GlobalExceptionHandler.initialize(this)
-        FirebaseErrorReporting.initialize()
+        // firebase error reporting is play-flavor only; initialized in
+        // RethinkDnsApplicationPlay. website/fdroid variants use stubs.
         GoReportingHandler.initialize(appScope, this)
-
-        // On every app start, report any tombstone files from the previous session
-        val appCtx = this
-        appScope.launch(Dispatchers.IO) {
-            EnhancedBugReport.reportTombstonesToFirebaseOnStartup(appCtx)
-        }
 
         turnOnStrictMode()
 

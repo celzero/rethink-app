@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular accent badge used inside the RPN config-detail quick-action pills.
+     Theme-aware: mirrors the relay quick-settings tile's selected-state colours
+     (chipBgColorPositive / chipTextPositive) so the accent sits in the badge
+     while the pill label stays neutral and legible in every theme. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/chipBgColorPositive" />
+    <stroke
+        android:width="0.5dp"
+        android:color="?attr/border" />
+</shape>

@@ -32,8 +32,6 @@ import androidx.paging.LoadState
 import androidx.paging.filter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.LocalAdvancedViewAdapter
@@ -41,11 +39,13 @@ import com.celzero.bravedns.adapter.LocalSimpleViewAdapter
 import com.celzero.bravedns.adapter.RemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RemoteSimpleViewAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
+import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
@@ -72,6 +72,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,6 +85,7 @@ class RethinkBlocklistFragment :
 
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
+    private val appScope by inject<CoroutineScope>()
 
     private val viewModel: RethinkBlocklistViewModel by viewModel()
 
@@ -91,6 +93,10 @@ class RethinkBlocklistFragment :
     private var advanceLocalViewAdapter: LocalAdvancedViewAdapter? = null
     private var localSimpleViewAdapter: LocalSimpleViewAdapter? = null
     private var remoteSimpleViewAdapter: RemoteSimpleViewAdapter? = null
+
+    // Guards the one-time configure() call into the (surviving) ViewModel so that
+    // repeated onCreateView() invocations don't reset the user's in-progress selection.
+    private var blocklistConfigured = false
 
     private val remoteFileTagViewModel: RethinkRemoteFileTagViewModel by viewModel()
     private val localFileTagViewModel: RethinkLocalFileTagViewModel by viewModel()
@@ -141,8 +147,23 @@ class RethinkBlocklistFragment :
             )
         val remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
         val remoteUrl = bundle?.getString(RETHINK_BLOCKLIST_URL, "") ?: ""
-        viewModel.configure(type, remoteName, remoteUrl)
+        // onCreateView() is re-invoked on view recreation while the ViewModel
+        // (and its session state) survives. Avoid re-calling configure here so
+        // the user's in-progress stamp/tag selection is not reset. The ViewModel
+        // itself also guards against duplicate initialization.
+        if (!blocklistConfigured) {
+            blocklistConfigured = true
+            viewModel.configure(type, remoteName, remoteUrl)
+        }
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // a download-error dialog shown against this activity must not outlive the view,
+        // else the activity's window is torn down with the dialog attached (WindowLeaked)
+        downloadErrorDialog?.dismiss()
+        downloadErrorDialog = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -155,8 +176,10 @@ class RethinkBlocklistFragment :
 
     @SuppressLint("NotifyDataSetChanged")
     private fun initObservers() {
-        if (viewModel.isLocal()) {
-            observeWorkManager()
+        appDownloadManager.observeWorkManager(viewLifecycleOwner)
+
+        appDownloadManager.downloadState.observe(viewLifecycleOwner) {
+            handleDownloadState(it)
         }
 
         viewModel.selectedFileTags.observe(viewLifecycleOwner) {
@@ -176,6 +199,36 @@ class RethinkBlocklistFragment :
         }
     }
 
+    private fun handleDownloadState(state: AppDownloadManager.DownloadState) {
+        when (state) {
+            is AppDownloadManager.DownloadState.Idle -> {
+                b.lbDownloadBtn.isEnabled = true
+                hasBlocklist()
+            }
+            is AppDownloadManager.DownloadState.Starting -> {
+                onDownloadStart()
+                b.lbDownloadProgress.isIndeterminate = true
+            }
+            is AppDownloadManager.DownloadState.Downloading -> {
+                onDownloadStart()
+                b.lbDownloadProgress.isIndeterminate = false
+                b.lbDownloadProgress.progress = state.progress
+                b.lbDownloadBtn.text = getString(R.string.download_progress_format, getString(R.string.rt_download), state.progress)
+            }
+            is AppDownloadManager.DownloadState.Processing -> {
+                onDownloadStart()
+                b.lbDownloadProgress.isIndeterminate = true
+                b.lbDownloadBtn.text = getString(R.string.notif_download_content_text)
+            }
+            is AppDownloadManager.DownloadState.Success -> {
+                onDownloadSuccess()
+            }
+            is AppDownloadManager.DownloadState.Error -> {
+                onDownloadFail(state.reason)
+            }
+        }
+    }
+
     private fun init() {
         val typeName =
             if (viewModel.isLocal()) {
@@ -188,6 +241,10 @@ class RethinkBlocklistFragment :
 
         // update ui based on blocklist availability
         hasBlocklist()
+
+        // A terminal state (Error/Success) left over from a cancelled download or a
+        // previous attempt must not pop the error dialog when this screen is reopened.
+        maybeResetStaleTerminalDownloadState()
 
         // be default, select the simple blocklist view
         selectToggleBtnUi(b.lbSimpleToggleBtn)
@@ -217,9 +274,22 @@ class RethinkBlocklistFragment :
 
     private fun hasBlocklist() {
         go {
+            // downloadState is a sticky, process-wide LiveData; it can be left in an
+            // in-flight state when a download (started from, say, LocalBlocklistsBottomSheet)
+            // finished while no screen observing observeWorkManager() was alive. Reconcile
+            // it against actual WorkManager state (both calls do blocking queries: keep
+            // them off the main thread) before deciding which UI to show.
+            withContext(Dispatchers.IO) {
+                appDownloadManager.reconcileStaleInFlightDownloadState(downloadType())
+            }
+            val isDownloadWorkActive =
+                withContext(Dispatchers.IO) { appDownloadManager.isDownloadWorkActive(downloadType()) }
             uiCtx {
                 val blocklistsExist = withContext(Dispatchers.IO) { hasBlocklists() }
-                if (blocklistsExist) {
+                // trust actual WorkManager state over the possibly-stale sticky LiveData
+                val isDownloadRunning = isDownloadWorkActive
+
+                if (blocklistsExist && !isDownloadRunning) {
                     setListAdapter()
                     setSimpleAdapter()
                     showConfigureUi()
@@ -246,7 +316,12 @@ class RethinkBlocklistFragment :
             b.lbDownloadLayout.visibility = View.VISIBLE
         } else {
             b.lbDownloadProgressRemote.visibility = View.VISIBLE
-            downloadBlocklist(viewModel.getType())
+            // Only auto-start the remote download the first time (or if no download is already
+            // active). This prevents re-triggering the download on every recreation / Idle
+            // state transition / failure, which would otherwise start duplicate downloads.
+            if (!isRemoteDownloadActive()) {
+                downloadBlocklist(viewModel.getType())
+            }
         }
     }
 
@@ -273,18 +348,27 @@ class RethinkBlocklistFragment :
 
         b.lbCancelDownloadBtn.setOnClickListener {
             cancelDownload()
-            requireActivity().finish()
+            // the screen is going away; clear the sticky terminal state the cancellation
+            // produces so no later screen re-delivers it as an error dialog
+            appDownloadManager.resetDownloadState()
+            activity?.finish()
         }
 
         b.lbBlocklistApplyBtn.setOnClickListener {
-            viewModel.applyStamp()
-            requireActivity().finish()
+            val a = activity
+            appScope.launch {
+                viewModel.applyStamp()
+                uiCtx { a?.finish() }
+            }
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
             // close the activity associated with the fragment after reverting to old stamp
-            viewModel.revertStamp()
-            requireActivity().finish()
+            val a = activity
+            appScope.launch {
+                viewModel.revertStamp()
+                uiCtx { a?.finish() }
+            }
         }
 
         b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
@@ -298,7 +382,7 @@ class RethinkBlocklistFragment :
             // the fragment before saving
 
             if (!viewModel.isStampChanged()) {
-                requireActivity().finish()
+                activity?.finish()
                 return@addCallback
             }
 
@@ -306,9 +390,51 @@ class RethinkBlocklistFragment :
         }
     }
 
+    private fun downloadType(): RethinkBlocklistManager.DownloadType {
+        return if (viewModel.isLocal()) {
+            RethinkBlocklistManager.DownloadType.LOCAL
+        } else {
+            RethinkBlocklistManager.DownloadType.REMOTE
+        }
+    }
+
     private fun cancelDownload() {
-        // cancel the local blocklist download
-        appDownloadManager.cancelDownload(type = RethinkBlocklistManager.DownloadType.LOCAL)
+        // cancel the blocklist download for the type this screen shows
+        appDownloadManager.cancelDownload(type = downloadType())
+    }
+
+    private fun maybeResetStaleTerminalDownloadState() {
+        val state = appDownloadManager.downloadState.value ?: return
+        if (
+            state !is AppDownloadManager.DownloadState.Error &&
+                state !is AppDownloadManager.DownloadState.Success
+        ) {
+            return
+        }
+
+        // only clear when no download work is actually active; otherwise the live
+        // observers will re-drive the UI from the real worker states anyway
+        val ctx = requireContext()
+        val active =
+            WorkScheduler.isWorkScheduled(ctx, DOWNLOAD_TAG) ||
+                WorkScheduler.isWorkScheduled(ctx, FILE_TAG) ||
+                WorkScheduler.isWorkScheduled(ctx, CUSTOM_DOWNLOAD) ||
+                WorkScheduler.isWorkScheduled(ctx, RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
+
+        if (!active) {
+            appDownloadManager.resetDownloadState()
+        }
+    }
+
+    private fun isRemoteDownloadActive(): Boolean {
+        return WorkScheduler.isWorkScheduled(
+            requireContext(),
+            RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
+        ) ||
+            WorkScheduler.isWorkRunning(
+                requireContext(),
+                RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
+            )
     }
 
     private fun downloadBlocklist(type: RethinkBlocklistManager.RethinkBlocklistType) {
@@ -318,7 +444,23 @@ class RethinkBlocklistFragment :
             return
         }
 
-        proceedWithBlocklistDownload()
+        // Downloads are only allowed while the VPN is on, and while the VPN is the
+        // default network the system download manager's JobScheduler jobs never dispatch
+        // (downloads sit in STATUS_PENDING forever; see
+        // PersistentState.useCustomDownloadManager). Fall back to the in-app downloader
+        // for this attempt instead of starting a download that cannot proceed. Local
+        // downloads only: remote blocklists always use the in-app worker.
+        var forceInApp = false
+        if (type.isLocal() && !persistentState.useCustomDownloadManager && VpnController.hasTunnel()) {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.download_inapp_vpn_toast),
+                Toast.LENGTH_SHORT
+            )
+            forceInApp = true
+        }
+
+        proceedWithBlocklistDownload(forceInApp)
     }
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
@@ -339,7 +481,7 @@ class RethinkBlocklistFragment :
         builder.create().show()
     }
 
-    private fun proceedWithBlocklistDownload() {
+    private fun proceedWithBlocklistDownload(forceInApp: Boolean = false) {
         ui {
             if (viewModel.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
@@ -347,7 +489,8 @@ class RethinkBlocklistFragment :
                     status =
                         appDownloadManager.downloadLocalBlocklist(
                             persistentState.localBlocklistTimestamp,
-                            isRedownload = false
+                            isRedownload = false,
+                            forceInApp
                         )
                 }
                 handleDownloadStatus(status)
@@ -361,8 +504,10 @@ class RethinkBlocklistFragment :
                         isRedownload = true
                     )
                 }
-                b.lbDownloadProgressRemote.visibility = View.GONE
-                hasBlocklist()
+                // UI state is driven by the appDownloadManager.downloadState observer
+                // (Starting -> Downloading -> Processing -> Success/Error). Do not hide the
+                // progress bar or re-run hasBlocklist() here, as that would discard the
+                // in-flight download state on recreation.
             }
         }
     }
@@ -374,7 +519,6 @@ class RethinkBlocklistFragment :
             }
             AppDownloadManager.DownloadManagerStatus.STARTED -> {
                 // the job of download status stops after initiating the work manager observer
-                observeWorkManager()
             }
             AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
                 // no-op
@@ -386,7 +530,18 @@ class RethinkBlocklistFragment :
                 // the job of download status stops after initiating the work manager observer
             }
             AppDownloadManager.DownloadManagerStatus.FAILURE -> {
-                onDownloadFail()
+                // The actual failure UI is driven by the AppDownloadManager.downloadState
+                // observer (AppDownloadManager posts DownloadState.Error on early failures,
+                // and the WorkManager observers post it for worker failures). Handling it
+                // here too would show a duplicate error dialog.
+                // But a FAILURE can also arrive with no Error posted at all (eg, the
+                // "download already in progress" guard in AppDownloadManager); the click
+                // listener disabled the download button before this call, so re-enable it
+                // or the UI goes dead with no message until the process restarts.
+                ui {
+                    b.lbDownloadBtn.isEnabled = true
+                    b.lbDownloadBtn.isClickable = true
+                }
             }
             AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
                 // no-op, no need to update any ui in this screen
@@ -408,14 +563,17 @@ class RethinkBlocklistFragment :
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-            viewModel.applyStamp()
-            requireActivity().finish()
+            val a = activity
+            appScope.launch {
+                viewModel.applyStamp()
+                uiCtx { a?.finish() }
+            }
         }
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
         }
         builder.setNegativeButton(getString(R.string.notif_dialog_pause_dialog_negative)) { _, _ ->
-            requireActivity().finish()
+            activity?.finish()
         }
         builder.create().show()
     }
@@ -621,10 +779,13 @@ class RethinkBlocklistFragment :
         remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
             advanceRemoteViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
+        var prevLoadState: LoadState? = null
         advanceRemoteViewAdapter?.addLoadStateListener { loadState ->
-            if (loadState.refresh is LoadState.NotLoading) {
+            val currentState = loadState.refresh
+            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
                 b.lbAdvancedRecycler.scrollToPosition(0)
             }
+            prevLoadState = currentState
         }
         b.lbAdvancedRecycler.adapter = advanceRemoteViewAdapter
         setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
@@ -647,102 +808,18 @@ class RethinkBlocklistFragment :
         localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {
             advanceLocalViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
+        var prevLoadState: LoadState? = null
         advanceLocalViewAdapter?.addLoadStateListener { loadState ->
-            if (loadState.refresh is LoadState.NotLoading) {
+            val currentState = loadState.refresh
+            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
                 b.lbAdvancedRecycler.scrollToPosition(0)
             }
+            prevLoadState = currentState
         }
         b.lbAdvancedRecycler.adapter = advanceLocalViewAdapter
         setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
     }
 
-    private fun observeWorkManager() {
-        val workManager = WorkManager.getInstance(requireContext().applicationContext)
-
-        // observer for custom download manager worker
-        workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(viewLifecycleOwner) {
-            workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Logger.i(
-                Logger.LOG_TAG_DOWNLOAD,
-                "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD"
-            )
-            if (
-                WorkInfo.State.ENQUEUED == workInfo.state ||
-                    WorkInfo.State.RUNNING == workInfo.state
-            ) {
-                onDownloadStart()
-            } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                onDownloadSuccess()
-                workManager.pruneWork()
-            } else if (
-                WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
-            ) {
-                onDownloadFail()
-                workManager.pruneWork()
-                workManager.cancelAllWorkByTag(CUSTOM_DOWNLOAD)
-            } else { // state == blocked
-                // no-op
-            }
-        }
-
-        // observer for Androids default download manager
-        workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(viewLifecycleOwner) {
-            workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Logger.i(
-                Logger.LOG_TAG_DOWNLOAD,
-                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
-            )
-            if (
-                WorkInfo.State.ENQUEUED == workInfo.state ||
-                    WorkInfo.State.RUNNING == workInfo.state
-            ) {
-                onDownloadStart()
-            } else if (
-                WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
-            ) {
-                onDownloadFail()
-                workManager.pruneWork()
-                workManager.cancelAllWorkByTag(DOWNLOAD_TAG)
-                workManager.cancelAllWorkByTag(FILE_TAG)
-            } else { // state == blocked, succeeded
-                // no-op
-            }
-        }
-
-        workManager.getWorkInfosByTagLiveData(FILE_TAG).observe(viewLifecycleOwner) { workInfoList
-            ->
-            if (workInfoList != null && workInfoList.isNotEmpty()) {
-                val workInfo = workInfoList[0]
-                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Logger.i(
-                        Logger.LOG_TAG_DOWNLOAD,
-                        "AppDownloadManager Work Manager completed - $FILE_TAG"
-                    )
-                    onDownloadSuccess()
-                    workManager.pruneWork()
-                } else if (
-                    workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED
-                ) {
-                    onDownloadFail()
-                    workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(FILE_TAG)
-                    Logger.i(
-                        Logger.LOG_TAG_DOWNLOAD,
-                        "AppDownloadManager Work Manager failed - $FILE_TAG"
-                    )
-                } else {
-                    Logger.i(
-                        Logger.LOG_TAG_DOWNLOAD,
-                        "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}"
-                    )
-                }
-            }
-        }
-    }
 
     private fun onDownloadStart() {
         // update ui for download start
@@ -752,7 +829,7 @@ class RethinkBlocklistFragment :
         hideConfigureUi()
     }
 
-    private fun onDownloadFail() {
+    private fun onDownloadFail(reason: String? = null) {
         // update ui for download fail
         b.lbDownloadProgress.visibility = View.GONE
         b.lbDownloadProgressRemote.visibility = View.GONE
@@ -761,6 +838,55 @@ class RethinkBlocklistFragment :
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         showDownloadUi()
         hideConfigureUi()
+
+        if (reason != null) {
+            showDownloadErrorDialog(reason)
+        }
+    }
+
+    // tracked so the dialog can be dismissed when this view tears down; otherwise an
+    // Error delivered while the activity is finishing leaks the dialog's window
+    // (android.view.WindowLeaked)
+    private var downloadErrorDialog: androidx.appcompat.app.AlertDialog? = null
+
+    private fun showDownloadErrorDialog(reason: String) {
+        // the Error may have been posted while this screen was going away; showing a
+        // dialog against a finishing activity leaks its window. The sticky Error state
+        // is reset on the next entry to this screen (see maybeResetStaleTerminalDownloadState).
+        val a = activity
+        if (a == null || !isAdded || a.isFinishing || a.isDestroyed) return
+
+        val builder = MaterialAlertDialogBuilder(a, R.style.App_Dialog_NoDim)
+        builder.setTitle(R.string.download_update_dialog_failure_title)
+        builder.setMessage(getString(R.string.download_update_dialog_failure_message) + "\n\n" + reason)
+        builder.setPositiveButton(R.string.retry) { _, _ ->
+            appDownloadManager.resetDownloadState()
+            downloadBlocklist(viewModel.getType())
+        }
+        if (persistentState.useCustomDownloadManager) {
+            builder.setNeutralButton(R.string.download_switch_to_system) { _, _ ->
+                 // stop the in-app downloader chain before flipping mechanisms so the two
+                 // pipelines cannot run in parallel and race into the same target folder
+                 appDownloadManager.cancelDownload(type = downloadType())
+                 persistentState.useCustomDownloadManager = false
+                 appDownloadManager.resetDownloadState()
+                 downloadBlocklist(viewModel.getType())
+            }
+        } else {
+             builder.setNeutralButton(R.string.settings_custom_downloader_heading) { _, _ ->
+                 // stop any Android download-manager downloads before flipping mechanisms
+                 appDownloadManager.cancelDownload(type = downloadType())
+                 persistentState.useCustomDownloadManager = true
+                 appDownloadManager.resetDownloadState()
+                 downloadBlocklist(viewModel.getType())
+             }
+        }
+        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
+            appDownloadManager.resetDownloadState()
+            dialog.dismiss()
+        }
+        downloadErrorDialog = builder.create()
+        downloadErrorDialog?.show()
     }
 
     private fun onDownloadSuccess() {
@@ -769,8 +895,8 @@ class RethinkBlocklistFragment :
         b.lbDownloadProgressRemote.visibility = View.GONE
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         hideDownloadUi()
-        // showConfigureUi()
-        hasBlocklist()
+        appDownloadManager.resetDownloadState()
+        // hasBlocklist() is triggered by resetDownloadState -> Idle
         b.lbListToggleGroup.check(R.id.lb_simple_toggle_btn)
         showToastUiCentered(
             requireContext(),
@@ -780,7 +906,11 @@ class RethinkBlocklistFragment :
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

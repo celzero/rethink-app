@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
@@ -53,6 +55,9 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
         DIFF_CALLBACK
     ) {
     var lifecycleOwner: LifecycleOwner? = null
+
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<DnsCryptEndpointViewHolder>()
 
     companion object {
         private const val ONE_SEC = 1000L
@@ -85,10 +90,22 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
                 false
             )
         lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return DnsCryptEndpointViewHolder(itemBinding)
+        return DnsCryptEndpointViewHolder(itemBinding).also { activeHolders.add(it) }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelStatusCheckIfAny() }
+        activeHolders.clear()
+        lifecycleOwner = null
     }
 
     override fun onBindViewHolder(holder: DnsCryptEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val dnsCryptEndpoint: DnsCryptEndpoint = getItem(position) ?: return
         holder.update(dnsCryptEndpoint)
     }
@@ -96,20 +113,23 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
     inner class DnsCryptEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
         private var statusCheckJob: Job? = null
+        private val selectionIndicator =
+            SelectionIndicator(
+                b.dnsCryptEndpointListSelectionOrbital,
+                b.dnsCryptEndpointListSelectionPill
+            )
 
         fun update(endpoint: DnsCryptEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
         }
 
-        private fun setupClickListeners(endpoint: DnsCryptEndpoint) {
-            b.root.setOnClickListener {
-                b.dnsCryptEndpointListActionImage.isChecked =
-                    !b.dnsCryptEndpointListActionImage.isChecked
-                updateDnsCryptDetails(endpoint)
-            }
+        fun cancelStatusCheckIfAny() {
+            statusCheckJob?.cancel()
+        }
 
-            b.dnsCryptEndpointListActionImage.setOnClickListener { updateDnsCryptDetails(endpoint) }
+        private fun setupClickListeners(endpoint: DnsCryptEndpoint) {
+            b.root.setOnClickListener { updateDnsCryptDetails(endpoint) }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
                 showExplanationOnImageClick(endpoint)
@@ -118,7 +138,14 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
 
         private fun displayDetails(endpoint: DnsCryptEndpoint) {
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptName
-            b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isSelected) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.dnsCryptName
+                )
+            selectionIndicator.update(endpoint.isSelected)
+
 
             if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
@@ -305,7 +332,15 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner ?: return
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
 
         private fun ui(f: suspend () -> Unit): Job? {

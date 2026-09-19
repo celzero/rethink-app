@@ -62,4 +62,7 @@ interface SubscriptionStateHistoryDao {
     """)
     suspend fun getMeaningfulCount(): Int
 
+    @Query("DELETE FROM SubscriptionStateHistory")
+    suspend fun deleteAll()
+
 }

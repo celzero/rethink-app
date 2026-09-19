@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/fhs_top_apps_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toStartOf="@id/fhs_top_apps_toggle_group"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/fhs_top_apps_wifi_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_top_apps_wifi_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/heading_font_text_view"
+                tools:text="700 MB" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_top_apps_wifi_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:ellipsize="end"
+                android:letterSpacing="0.15"
+                android:maxLines="1"
+                android:text="@string/logs_card_apps_legend_wifi"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fhs_top_apps_mobile_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_top_apps_mobile_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/heading_font_text_view"
+                tools:text="300 MB" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fhs_top_apps_mobile_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:ellipsize="end"
+                android:letterSpacing="0.15"
+                android:maxLines="1"
+                android:text="@string/logs_card_apps_legend_mobile"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/fhs_top_apps_toggle_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chipSpacingHorizontal="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/fhs_top_apps_allowed_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:checkable="true"
+            android:checked="true"
+            android:text="@string/lbl_allowed"
+            android:textColor="@color/chip_toggle_text"
+            android:textSize="@dimen/small_font_text_view"
+            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+            app:chipEndPadding="4dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="4dp"
+            app:chipStrokeColor="@color/chip_toggle_stroke"
+            app:chipStrokeWidth="1dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/fhs_top_apps_blocked_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:checkable="true"
+            android:text="@string/lbl_blocked"
+            android:textColor="@color/chip_toggle_text"
+            android:textSize="@dimen/small_font_text_view"
+            app:chipBackgroundColor="?attr/homeScreenBtnBackground"
+            app:chipEndPadding="4dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="4dp"
+            app:chipStrokeColor="@color/chip_toggle_stroke"
+            app:chipStrokeWidth="1dp" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.celzero.bravedns.ui.custom.AppHistogramView
+        android:id="@+id/fhs_top_apps_histogram"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/fhs_top_apps_caption_row"
+        app:layout_constraintHeight_min="72dp"
+        app:layout_constraintTop_toBottomOf="@id/fhs_top_apps_header"
+        app:layout_constraintVertical_bias="0"
+        tools:background="#11000000" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fhs_top_apps_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.7"
+        android:text="@string/logs_card_apps_empty"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/fhs_top_apps_histogram"
+        app:layout_constraintEnd_toEndOf="@id/fhs_top_apps_histogram"
+        app:layout_constraintStart_toStartOf="@id/fhs_top_apps_histogram"
+        app:layout_constraintTop_toTopOf="@id/fhs_top_apps_histogram"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fhs_top_apps_caption_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fhs_top_apps_window"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:ellipsize="end"
+            android:letterSpacing="0.08"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@string/logs_card_heatmap_window"
+            android:textAllCaps="true"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fhs_top_apps_legend"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="last 24 hours" />
+
+        <LinearLayout
+            android:id="@+id/fhs_top_apps_legend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fhs_top_apps_swatch_wifi"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:contentDescription="@string/logs_card_apps_legend_wifi"
+                android:src="@drawable/ic_firewall_wifi_on" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fhs_top_apps_swatch_mobile"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/logs_card_apps_legend_mobile"
+                android:src="@drawable/ic_firewall_data_on" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

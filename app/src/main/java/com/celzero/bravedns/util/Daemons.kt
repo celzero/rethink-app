@@ -35,20 +35,25 @@ import java.util.concurrent.atomic.AtomicInteger
 
 object Daemons {
 
-    fun make(tag: String) = Executors.newSingleThreadExecutor(Factory(tag)).asCoroutineDispatcher()
-    fun makeThread(tag: String): ExecutorService = Executors.newSingleThreadExecutor(Factory(tag))
-    fun <T> ioDispatcher(tag: String, default: T, s: CoroutineScope) = CoFactory(tag, default, s, make(tag))
+    private fun makeExecutor(tag: String): ExecutorService = Executors.newSingleThreadExecutor(Factory(tag))
+
+    fun make(tag: String) = makeExecutor(tag).asCoroutineDispatcher()
+    fun makeThread(tag: String): ExecutorService = makeExecutor(tag)
+    fun <T> ioDispatcher(tag: String, default: T, s: CoroutineScope) = CoFactory(tag, default, s, makeExecutor(tag))
 }
 
 class CoFactory<T>(
     private val tag: String,
     private val default: T,
     private val scope: CoroutineScope,
-    private val d: CoroutineDispatcher = Dispatchers.IO
+    // keep the ExecutorService reachable so it can be shut down when the scope dies;
+    // ExecutorCoroutineDispatcher.close() (which shuts the executor down)
+    private val executor: ExecutorService
 ) {
     data class Msg<T>(val m: suspend () -> T, val reply: Channel<Deferred<T>>)
 
     private val taskChannel = Channel<Msg<T>>(Channel.UNLIMITED)
+    private val d: CoroutineDispatcher = executor.asCoroutineDispatcher()
 
     init {
         tasks()
@@ -62,6 +67,8 @@ class CoFactory<T>(
             withContext(NonCancellable) {
                 // close the task channel to stop accepting new tasks
                 taskChannel.close()
+                // release the executor's worker thread once ongoing tasks complete
+                executor.shutdown()
             }
         }
     }

@@ -30,17 +30,25 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.LruCache
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
@@ -85,7 +93,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("TooManyFunctions", "LargeClass")
@@ -93,6 +104,12 @@ object Utilities {
 
     private const val FLAG_BASE_OFFSET = 0x1F1E6
     private const val ALPHA_BASE_CODE = 'A'.code
+
+    // stored in DB flag columns when the country code is unknown/invalid;
+    // excluded from country-stat queries by the flag-emoji range filter.
+    // Three dashes so it can't be confused with CountryMap's "--" unknown
+    // marker or UIUtils' "--" country-name fallback.
+    const val UNKNOWN_COUNTRY_FLAG = "---"
     private const val BUFFER_SIZE = 256
     private const val HEX_FORMAT = "%02x"
     private const val BYTE_UNIT_THRESHOLD = 1000
@@ -220,8 +237,17 @@ object Utilities {
     }
 
     fun getFlag(countryCode: String?): String {
-        if (countryCode == null) {
-            return ""
+        // guard against invalid inputs (e.g. CountryMap's "--" marker for unassigned
+        // IP ranges, or null/short strings). Shifting such characters into the
+        // regional-indicator range produces invalid code points (tofu glyphs), and
+        // inputs shorter than 2 chars would throw StringIndexOutOfBoundsException.
+        if (
+            countryCode == null ||
+            countryCode.length != 2 ||
+            countryCode[0] !in 'A'..'Z' ||
+            countryCode[1] !in 'A'..'Z'
+        ) {
+            return UNKNOWN_COUNTRY_FLAG
         }
         // Flag emoji consist of two "regional indicator symbol letters", which are
         // Unicode characters that correspond to the English alphabet and are arranged in the
@@ -232,8 +258,8 @@ object Utilities {
         // indicator
         // symbol letter range.
         val offset = FLAG_BASE_OFFSET - ALPHA_BASE_CODE
-        val firstHalf = Character.codePointAt(countryCode, 0) + offset
-        val secondHalf = Character.codePointAt(countryCode, 1) + offset
+        val firstHalf = countryCode[0].code + offset
+        val secondHalf = countryCode[1].code + offset
         return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
     }
 
@@ -487,18 +513,31 @@ object Utilities {
     }
 
     object AppIconCache {
-        private const val CACHE_SIZE = 500
+        // Icons are stored as pre-scaled bitmaps, not raw drawables.
+        // Launcher icons (AdaptiveIconDrawable layers) are commonly >=432px,
+        // while list views draw them at ~40dp. Downscaling at draw time is a
+        // large bilinear resample on the (software-rasterized) UI thread and
+        // has caused main-thread ANRs while scrolling FastScrollRecyclerViews.
+        // Scaling once here makes every subsequent bind/draw a ~1:1 blit.
+        private const val CACHE_SIZE_BYTES = 16 shl 20 // 16 MiB
+        private const val ICON_SIZE_DP = 48
 
-        private val cache =
-            LruCache<String, Drawable.ConstantState>(CACHE_SIZE)
+        private val bitmapCache =
+            object : LruCache<String, Bitmap>(CACHE_SIZE_BYTES) {
+                override fun sizeOf(key: String, value: Bitmap): Int {
+                    return value.allocationByteCount
+                }
+            }
 
         fun get(
             context: Context,
             packageName: String,
             appName: String? = null
         ): Drawable? {
-            cache.get(packageName)?.let {
-                return it.newDrawable(context.resources)
+            val sizePx = iconSizePx(context)
+            val key = "${packageName}#${sizePx}"
+            bitmapCache.get(key)?.let {
+                return BitmapDrawable(context.resources, it)
             }
 
             if (!isValidAppName(appName, packageName)) {
@@ -512,11 +551,55 @@ object Utilities {
                 return getDefaultIcon(context)
             }
 
-            drawable.constantState?.let {
-                cache.put(packageName, it)
-            }
+            val bitmap = downscale(context, drawable, sizePx)
+            // fall back to the original drawable if rasterization failed
+            if (bitmap == null) return drawable
 
-            return drawable
+            bitmapCache.put(key, bitmap)
+            return BitmapDrawable(context.resources, bitmap)
+        }
+
+        /**
+         * Rasterizes [drawable] to fit inside a [sizePx] box (never upscales,
+         * never distorts: matches ImageView's fitCenter behaviour so visuals
+         * are identical to drawing the original drawable).
+         */
+        @Suppress("TooGenericExceptionCaught", "ReturnCount")
+        private fun downscale(context: Context, drawable: Drawable, sizePx: Int): Bitmap? {
+            return try {
+                val w = drawable.intrinsicWidth
+                val h = drawable.intrinsicHeight
+                if (w <= 0 || h <= 0) return null
+
+                val scale =
+                    if (w <= sizePx && h <= sizePx) 1f
+                    else min(sizePx.toFloat() / w, sizePx.toFloat() / h)
+                val dw = max(1, (w * scale).roundToInt())
+                val dh = max(1, (h * scale).roundToInt())
+
+                // createBitmap(metrics, ...) stamps the display density so the
+                // resulting BitmapDrawable reports dp-sized intrinsic bounds.
+                val bitmap =
+                    Bitmap.createBitmap(
+                        context.resources.displayMetrics,
+                        dw,
+                        dh,
+                        Bitmap.Config.ARGB_8888
+                    )
+                val canvas = Canvas(bitmap)
+                // mutate() so bounds changes never leak into a shared ConstantState
+                drawable.mutate().setBounds(0, 0, dw, dh)
+                drawable.draw(canvas)
+                bitmap
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "err downscaling icon: ${e.message}")
+                null
+            }
+        }
+
+        private fun iconSizePx(context: Context): Int {
+            val density = context.resources.displayMetrics.density
+            return max(1, (ICON_SIZE_DP * density).toInt())
         }
     }
 
@@ -566,13 +649,18 @@ object Utilities {
         try {
             return ctx.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found for uid: $uid, err: ${e.message}")
         } catch (e: SecurityException) {
-            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found for uid: $uid, err: ${e.message}")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "err fetching packages for uid: $uid, err: ${e.message}")
         }
         return null
     }
 
+    // annotated so lint's NewApi check treats calls guarded by this helper
+    // as safe (minSdk 23 < TileService's API 24 requirement)
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
     fun isAtleastN(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
     }
@@ -659,6 +747,7 @@ object Utilities {
         return BuildConfig.BUILD_TYPE == BUILD_TYPE_ALPHA
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun getApplicationInfo(ctx: Context, packageName: String): ApplicationInfo? {
         return try {
             if (isAtleastT()) {
@@ -670,22 +759,16 @@ object Utilities {
                 ctx.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
+            Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName, err: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "err fetching app info for package: $packageName, err: ${e.message}")
             null
         }
     }
 
     fun isUnspecifiedIp(serverIp: String): Boolean {
         return UNSPECIFIED_IP_IPV4 == serverIp || UNSPECIFIED_IP_IPV6 == serverIp
-    }
-
-    fun calculateTtl(ttl: Long): Long {
-        val now = System.currentTimeMillis()
-
-        // on negative ttl, cache dns record for a day
-        if (ttl < 0) return now + TimeUnit.DAYS.toMillis(1L)
-
-        return now + TimeUnit.SECONDS.toMillis((ttl + DnsLogTracker.DNS_TTL_GRACE_SEC))
     }
 
     fun deleteRecursive(fileOrDirectory: File): Boolean {
@@ -1026,6 +1109,39 @@ object Utilities {
             return ips[index].split(",").firstOrNull()?.trim()
         }
         return null
+    }
+
+    /**
+     * Keeps the buttons of [buttonContainer] on a single horizontal row while they
+     * fit, and stacks them vertically once they no longer do (small screens, long
+     * localized labels, foldables in the folded state). This prevents buttons from
+     * overlapping or clipping in wrap_content-width dialogs.
+     *
+     * Must be called after the container's content (text, visibility) is set; the
+     * check runs on the next layout pass via [View.post].
+     */
+    fun adjustButtonLayoutOrientation(buttonContainer: LinearLayout) {
+        buttonContainer.post {
+            var totalButtonsWidth = 0
+            for (index in 0 until buttonContainer.childCount) {
+                val child = buttonContainer.getChildAt(index)
+                if (child.visibility == View.GONE) continue
+                val margins =
+                    (child.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                        it.marginStart + it.marginEnd
+                    } ?: 0
+                totalButtonsWidth += child.measuredWidth + margins
+            }
+            // container.width includes its own horizontal padding
+            if (totalButtonsWidth > buttonContainer.width) {
+                // No space for a single row: order the buttons vertically.
+                buttonContainer.orientation = LinearLayout.VERTICAL
+                buttonContainer.gravity = Gravity.CENTER_HORIZONTAL
+            } else {
+                buttonContainer.orientation = LinearLayout.HORIZONTAL
+                buttonContainer.gravity = Gravity.END
+            }
+        }
     }
 
 }

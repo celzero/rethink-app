@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -62,7 +63,7 @@ class WgPeersAdapter(
 
         fun update(wgPeer: Peer) {
             if (wgPeer.getEndpoint().isPresent) {
-                b.endpointText.text = wgPeer.getEndpoint().get().toString()
+                b.endpointText.text = wgPeer.getEndpoint().get()
             } else {
                 b.endpointText.visibility = View.GONE
                 b.endpointLabel.visibility = View.GONE
@@ -139,7 +140,15 @@ class WgPeersAdapter(
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        val owner = context as? LifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

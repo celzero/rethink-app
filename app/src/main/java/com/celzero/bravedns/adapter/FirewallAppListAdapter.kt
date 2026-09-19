@@ -27,12 +27,12 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
@@ -125,11 +125,11 @@ class FirewallAppListAdapter(
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
                     b.firewallAppLabelTv.text = appInfo.appName
-                    b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
+                    /*b.firewallAppInfo.text = if (appInfo.packageName.startsWith(NO_PACKAGE_PREFIX)) {
                         context.getString(R.string.app_id_uid_only, appInfo.uid)
                     } else {
                         context.getString(R.string.app_id_package, appInfo.uid, appInfo.packageName)
-                    }
+                    }*/
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
@@ -291,12 +291,10 @@ class FirewallAppListAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-            ui {
-                Glide.with(context)
-                    .load(drawable)
-                    .error(Utilities.getDefaultIcon(context))
-                    .into(mIconImageView)
-            }
+            val target = drawable ?: Utilities.getDefaultIcon(context) ?: return
+            val current = mIconImageView.drawable?.constantState
+            if (current != null && current == target.constantState) return
+            mIconImageView.setImageDrawable(target)
         }
 
         private fun setupClickListeners(appInfo: AppInfo) {
@@ -482,11 +480,15 @@ class FirewallAppListAdapter(
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
+        val owner = context as? LifecycleOwner ?: return
 
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

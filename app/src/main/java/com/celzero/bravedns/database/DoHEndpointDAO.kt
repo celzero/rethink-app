@@ -37,7 +37,7 @@ interface DoHEndpointDAO {
     @Delete fun delete(doHEndpoint: DoHEndpoint)
 
     @Transaction
-    @Query("select * from DoHEndpoint order by isSelected desc")
+    @Query("select * from DoHEndpoint order by isSelected desc, isCustom asc")
     fun getDoHEndpointLiveData(): PagingSource<Int, DoHEndpoint>
 
     @Transaction

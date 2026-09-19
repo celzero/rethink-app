@@ -106,7 +106,7 @@
         android:layout_marginBottom="16dp"
         android:textColor="?attr/homeScreenHeaderTextColor"
         app:backgroundTint="?attr/buttonBackground"
-        android:text="@string/about_bug_report_desc" />
+        android:text="@string/about_email" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/console_log_list"

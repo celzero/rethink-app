@@ -25,6 +25,8 @@ class DoHEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dohName: String = ""
     var dohURL: String = ""
+    // user-supplied IP address (or comma-separated IPs) for the DoH URL; null if not set
+    var dohIp: String? = null
     var dohExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
@@ -49,6 +51,7 @@ class DoHEndpoint {
         id: Int,
         dohName: String,
         dohURL: String,
+        dohIp: String?,
         dohExplanation: String?,
         isSelected: Boolean,
         isCustom: Boolean,
@@ -61,6 +64,7 @@ class DoHEndpoint {
         this.id = id
         this.dohName = dohName
         this.dohURL = dohURL
+        this.dohIp = dohIp
         this.dohExplanation = dohExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom

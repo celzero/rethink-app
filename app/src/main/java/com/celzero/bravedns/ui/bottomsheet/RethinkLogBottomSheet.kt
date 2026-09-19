@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui.bottomsheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -27,6 +26,7 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -48,8 +48,6 @@ import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.util.useTransparentNoDimBackground
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,7 +55,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 
-class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
+class RethinkLogBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
 
     private var _binding: BottomSheetConnTrackBinding? = null
 
@@ -79,11 +77,6 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     ): View {
         _binding = BottomSheetConnTrackBinding.inflate(inflater, container, false)
         return b.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -133,10 +126,6 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
         b.bsConnConnectionFlag.text = logInfo.flag
 
-        b.bsConnBlockAppTxt.text = htmlToSpannedText(getString(R.string.bsct_block))
-        b.bsConnBlockConnAllTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
-        b.bsConnDomainTxt.text = htmlToSpannedText(getString(R.string.bsct_block_domain))
-
         // updates the application name and other details
         updateAppDetails()
         // updates the connection detail chip
@@ -170,10 +159,10 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val pkgName = FirewallManager.getPackageNameByUid(logInfo.uid)
             uiCtx {
                 if (pkgName == requireContext().packageName) {
-                    b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
+                    b.bsConnTrackAppNameHeader.visibility = View.GONE
                     b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-                    b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
-                    b.bsConnDomainRuleLl.visibility = View.GONE
+                    // the unified rules card holds the app/ip/domain rows
+                    b.bsConnRulesCard.visibility = View.GONE
                 }
             }
         }
@@ -187,16 +176,33 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (domain.isNullOrEmpty() || uid == null) {
             b.bsConnDnsCacheText.visibility = View.VISIBLE
             b.bsConnDnsCacheText.text = UIUtils.getCountryNameFromFlag(flag)
-            b.bsConnDomainRuleLl.visibility = View.GONE
+            b.bsConnRuleRowDomain.visibility = View.GONE
             return
         }
 
         val status = DomainRulesManager.getDomainRule(domain, uid)
-        b.bsConnDomainSpinner.setSelection(status.id)
+        // the row defaults to gone; only reveal it when a domain rule applies.
+        // this sheet only displays state, rule changes are handled in the
+        // connection tracker sheet
+        b.bsConnRuleRowDomain.visibility = View.VISIBLE
+        b.bsConnDomainRuleAddress.text = domain
+        when (status) {
+            DomainRulesManager.Status.NONE ->
+                renderRuleState(b.bsConnDomainRuleState, getString(R.string.ci_no_rule))
+            DomainRulesManager.Status.BLOCK ->
+                renderRuleState(b.bsConnDomainRuleState, getString(R.string.ci_block))
+            DomainRulesManager.Status.TRUST ->
+                renderRuleState(b.bsConnDomainRuleState, getString(R.string.ci_trust_rule))
+        }
         b.bsConnDnsCacheText.visibility = View.VISIBLE
         b.bsConnDnsCacheText.text =
             requireContext()
                 .getString(R.string.two_argument, UIUtils.getCountryNameFromFlag(flag), domain)
+    }
+
+    /** Trailing state label of a rule row; deliberately neutral-colored. */
+    private fun renderRuleState(view: TextView, text: String) {
+        view.text = text
     }
 
     private fun updateConnDetailsChip() {
@@ -228,7 +234,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun updateBlockedRulesChip() {
         val logInfo = info ?: return
         if (!logInfo.isBlocked) {
-            b.bsConnTrackAppInfo.text = getString(R.string.firewall_rule_no_rule)
+            b.bsConnTrackAppInfoTxt.text = getString(R.string.firewall_rule_no_rule)
             return
         }
     }
@@ -242,15 +248,17 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 val appCount = appNames.count()
                 if (appCount >= 1) {
                     b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+                    // the hero header's trailing arrow icon conveys tappability,
+                    // so the name itself carries no arrow suffix
                     b.bsConnTrackAppName.text =
                         if (appCount >= 2) {
                             getString(
                                 R.string.ctbs_app_other_apps,
                                 appNames[0],
                                 appCount.minus(1).toString()
-                            ) + "      ❯"
+                            )
                         } else {
-                            appNames[0] + "      ❯"
+                            appNames[0]
                         }
                     if (pkgName == null) return@uiCtx
                     b.bsConnTrackAppIcon.setImageDrawable(
@@ -287,7 +295,6 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val hasCid = VpnController.hasCid(logInfo.connId, logInfo.uid)
             uiCtx {
                 if (hasCid) {
-                    b.connectionMessageLl.visibility = View.VISIBLE
                     b.bsConnConnDuration.text =
                         getString(
                             R.string.two_argument_space,
@@ -334,14 +341,12 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun showMinimalSummary() {
-        b.connectionMessageLl.visibility = View.GONE
         b.bsConnSummaryDetailLl.visibility = View.GONE
         b.bsConnConnTypeSecondary.visibility = View.VISIBLE
         b.bsConnConnTypeSecondary.text = b.bsConnConnType.text
     }
 
     private fun showFullSummary(logInfo: RethinkLog) {
-        b.connectionMessageLl.visibility = View.VISIBLE
         val downloadBytes =
             getString(
                 R.string.symbol_download,
@@ -362,43 +367,30 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun lightenUpChip() {
         val logInfo = info ?: return
-        // Load icons for the firewall rules if available
-        b.bsConnTrackAppInfo.chipIcon =
+        // the verdict reason row flips its text + icon color with the verdict
+        val colorAttr =
+            if (logInfo.isBlocked) R.attr.chipTextNegative else R.attr.chipTextPositive
+        val color = fetchColor(requireContext(), colorAttr)
+        b.bsConnTrackAppInfoTxt.setTextColor(color)
+        b.bsConnTrackAppInfoIcon.setImageDrawable(
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_whats_new)
-        if (logInfo.isBlocked) {
-            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
-            val colorFilter =
-                PorterDuffColorFilter(
-                    fetchColor(requireContext(), R.attr.chipTextNegative),
-                    PorterDuff.Mode.SRC_IN
-                )
-            b.bsConnTrackAppInfo.chipBackgroundColor =
-                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
-            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
-        } else {
-            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
-            val colorFilter =
-                PorterDuffColorFilter(
-                    fetchColor(requireContext(), R.attr.chipTextPositive),
-                    PorterDuff.Mode.SRC_IN
-                )
-            b.bsConnTrackAppInfo.chipBackgroundColor =
-                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
-            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
-        }
+        )
+        b.bsConnTrackAppInfoIcon.colorFilter =
+            PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
     private fun handleNonApp() {
         val logInfo = info ?: return
         // show universal setting layout
         b.bsConnBlockedRule2HeaderLl.visibility = View.VISIBLE
-        // hide the app firewall layout
-        b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
+        // unknown uids have no meaningful app rule; hide that row only
+        b.bsConnRuleRowApp.visibility = View.GONE
         b.bsConnUnknownAppCheck.isChecked = persistentState.getBlockUnknownConnections()
         b.bsConnTrackAppName.text = logInfo.appName
     }
 
     private fun setupClickListeners() {
+        // app identity; tap opens the app's system info page
         b.bsConnTrackAppNameHeader.setOnClickListener {
             val logInfo = info ?: return@setOnClickListener
             io {
@@ -431,6 +423,10 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { if (isAdded) f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

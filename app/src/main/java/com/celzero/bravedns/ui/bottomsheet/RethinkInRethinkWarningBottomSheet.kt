@@ -10,10 +10,9 @@ import com.celzero.bravedns.databinding.BottomsheetRinrWarningBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
-class RethinkInRethinkWarningBottomSheet : BottomSheetDialogFragment() {
+class RethinkInRethinkWarningBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetRinrWarningBinding? = null
     private val binding

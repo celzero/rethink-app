@@ -147,6 +147,10 @@ data class CountryConfig(
     }
 
     private fun countryDisplayName(cc: String): String {
-        return try { Locale("", cc).displayCountry.ifBlank { cc } } catch (_: Throwable) { cc }
+        return try {
+            Locale("", cc).displayCountry.ifBlank {
+                if (cc.equals("AUTO", ignoreCase = true)) "Auto" else cc
+            }
+        } catch (_: Throwable) { cc }
     }
 }

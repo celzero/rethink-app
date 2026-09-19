@@ -128,10 +128,19 @@
             android:name=".ui.activity.TcpProxyMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.activity.WgIncludeAppsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.RpnBypassAppsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.activity.UniversalFirewallSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.ConfigureOtherDnsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.SmartDnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.BlockFreeDnsActivity"

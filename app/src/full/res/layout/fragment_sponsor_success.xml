@@ -64,21 +64,10 @@
             android:id="@+id/continue_button"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:background="@drawable/rectangle_border_background"
             android:text="@string/sponsor_continue"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            style="@style/Widget.Material3.Button.TonalButton" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/share_button"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginTop="12dp"
-            android:text="Share with friends"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            app:icon="@drawable/ic_share"
-            app:iconGravity="textStart"
-            app:iconPadding="12dp"
-            style="@style/Widget.Material3.Button.TextButton" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
     </LinearLayout>
 

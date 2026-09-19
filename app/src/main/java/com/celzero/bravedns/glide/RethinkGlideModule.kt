@@ -36,6 +36,7 @@ import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
 import okhttp3.OkHttpClient
+import java.net.Proxy
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
@@ -80,6 +81,10 @@ class RethinkGlideModule : AppGlideModule() {
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5, TimeUnit.SECONDS)
             .connectTimeout(3, TimeUnit.SECONDS)
+            // Pin NO_PROXY: with no explicit proxy, OkHttp consults ProxySelector.getDefault(),
+            // which crashes (IllegalArgumentException: port out of range:-1) on devices where
+            // the platform set http(s).proxyPort=-1 for a global proxy without a port.
+            .proxy(Proxy.NO_PROXY)
             .build()
         registry.replace(GlideUrl::class.java, InputStream::class.java, OkHttpUrlLoader.Factory(client))
 

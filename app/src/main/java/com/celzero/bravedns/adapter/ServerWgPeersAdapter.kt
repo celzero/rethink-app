@@ -75,7 +75,7 @@ class ServerWgPeersAdapter(
 
                 // Show endpoint
                 if (wgPeer.getEndpoint().isPresent) {
-                    b.endpointText.text = wgPeer.getEndpoint().get().toString()
+                    b.endpointText.text = wgPeer.getEndpoint().get()
                     b.endpointLabel.visibility = View.VISIBLE
                     b.endpointText.visibility = View.VISIBLE
                 } else {

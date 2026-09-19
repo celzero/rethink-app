@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tv_section_letter"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="4dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="4dp"
+    android:fontFamily="sans-serif-medium"
+    android:letterSpacing="0.1"
+    android:textColor="?attr/primaryLightColorText"
+    android:textSize="11sp"
+    android:textStyle="bold"
+    tools:text="A" />

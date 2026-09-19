@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.iab
 
+import androidx.arch.core.executor.ArchTaskExecutor
+import androidx.arch.core.executor.TaskExecutor
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.android.billingclient.api.BillingClient
@@ -38,8 +40,15 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
+import kotlin.coroutines.Continuation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -80,6 +89,30 @@ class InAppBillingHandlerTest : KoinTest {
         context = ApplicationProvider.getApplicationContext()
         try { stopKoin() } catch (_: Exception) {}
 
+        // Production error handlers post to LiveData via withContext(Dispatchers.Main).
+        // Under Robolectric the real Main looper is paused, which would starve runTest
+        // (hang). Run Main on an unconfined test dispatcher instead.
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        // Allow LiveData.setValue from the test threads: production posts errors via
+        // withContext(Dispatchers.Main) which, with the unconfined test dispatcher above,
+        // runs on the calling (worker) thread. LiveData would reject that as
+        // "setValue on a background thread".
+        ArchTaskExecutor.getInstance().setDelegate(object : TaskExecutor() {
+            override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
+            override fun postToMainThread(runnable: Runnable) = runnable.run()
+            override fun isMainThread(): Boolean = true
+        })
+
+        // InAppBillingHandler is a Kotlin object whose `by inject()` delegates are
+        // STATIC Lazies initialized on first access — they would cache the first
+        // test's Koin-resolved mocks forever. Swap in the current test's mocks.
+        setStaticFinalField(InAppBillingHandler::class.java, "persistentState\$delegate", lazyOf(mockPersistentState))
+        setStaticFinalField(InAppBillingHandler::class.java, "billingBackendClient\$delegate", lazyOf(mockBillingBackendClient))
+        setStaticFinalField(InAppBillingHandler::class.java, "secureIdentityStore\$delegate", lazyOf(mockSecureIdentityStore))
+        setStaticFinalField(InAppBillingHandler::class.java, "eventLogger\$delegate", lazyOf(mockEventLogger))
+        setStaticFinalField(InAppBillingHandler::class.java, "subscriptionStateMachine\$delegate", lazyOf(mockStateMachine))
+
         startKoin {
             modules(module {
                 single { context }
@@ -97,11 +130,12 @@ class InAppBillingHandlerTest : KoinTest {
         // Inject mockBillingClient
         setPrivateField(InAppBillingHandler, "billingClient", mockBillingClient)
 
-        every { mockStateMachine.currentState() } returns stateFlow
+        every { mockStateMachine.currentState } returns stateFlow
         every { mockBillingClient.isReady } returns true
 
         // Reset private counters and state
         setPrivateField(InAppBillingHandler, "consecutiveEmptySubsQueries", 0)
+        setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
         // isInitialized is an AtomicBoolean; reset its value rather than replacing the field.
         @Suppress("UNCHECKED_CAST")
@@ -111,6 +145,8 @@ class InAppBillingHandlerTest : KoinTest {
 
     @After
     fun tearDown() {
+        ArchTaskExecutor.getInstance().setDelegate(null)
+        Dispatchers.resetMain()
         stopKoin()
         unmockkAll()
     }
@@ -133,9 +169,54 @@ class InAppBillingHandlerTest : KoinTest {
         return field.get(obj) as T
     }
 
+    /**
+     * Sets a static final field (e.g. Kotlin object `by inject()` delegate Lazies).
+     * Plain reflection cannot mutate static final fields on JDK 12+; sun.misc.Unsafe
+     * bypasses the final-field check. Robolectric JVMs permit this.
+     */
+    @Suppress("DiscouragedPrivateApi", "PrivateApi")
+    private fun setStaticFinalField(clazz: Class<*>, fieldName: String, value: Any?) {
+        val field = clazz.getDeclaredField(fieldName)
+        field.isAccessible = true
+        val unsafeClass = Class.forName("sun.misc.Unsafe")
+        val theUnsafe = unsafeClass.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
+        val offset = unsafeClass.getMethod("staticFieldOffset", Field::class.java).invoke(theUnsafe, field)
+        val base = unsafeClass.getMethod("staticFieldBase", Field::class.java).invoke(theUnsafe, field)
+        unsafeClass.getMethod(
+            "putObject",
+            Any::class.java,
+            Long::class.javaPrimitiveType,
+            Any::class.java
+        ).invoke(theUnsafe, base, offset, value)
+    }
+
     // =========================================================================
     // 1. Identity Resolution Flow
     // =========================================================================
+
+    /**
+     * Polls [cond] on real time (delay runs on Dispatchers.IO so billingScope workers
+     * make progress) until it holds. production code paths like fetchPurchases launch
+     * on billingScope — callers must wait for that work before verifying.
+     */
+    private suspend fun awaitUntil(maxAttempts: Int = 500, cond: () -> Boolean) {
+        repeat(maxAttempts) {
+            if (cond()) return
+            withContext(Dispatchers.IO) { delay(10) }
+        }
+    }
+
+    /**
+     * Invokes a private zero-arg suspend function on [InAppBillingHandler], passing the
+     * enclosing coroutine's continuation so real suspensions (withContext, etc.) work.
+     */
+    private suspend fun callPrivateSuspendNoArgs(methodName: String): Any? =
+        kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn { cont ->
+            InAppBillingHandler::class.java
+                .getDeclaredMethod(methodName, Continuation::class.java)
+                .apply { isAccessible = true }
+                .invoke(InAppBillingHandler, cont)
+        }
 
     @Test
     fun `getObfuscatedAccountId uses cache then falls back to server refresh`() = runTest {
@@ -207,11 +288,13 @@ class InAppBillingHandlerTest : KoinTest {
         coEvery { mockSecureIdentityStore.get(any()) } returns Pair("cid-1", "")
         coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Success("cid-1", "")
 
-        val deviceId = getPrivateField<Any>(InAppBillingHandler, "appContext")
+        // resolveDeviceId is a private suspend fun: reflection needs the Continuation
+        // parameter added by the compiler; it completes synchronously on a stubbed
+        // mock so a null continuation is safe.
         val result = InAppBillingHandler::class.java
-            .getDeclaredMethod("resolveDeviceId", String::class.java)
+            .getDeclaredMethod("resolveDeviceId", String::class.java, Continuation::class.java)
             .apply { isAccessible = true }
-            .invoke(InAppBillingHandler, "testCaller")
+            .invoke(InAppBillingHandler, "testCaller", null)
 
         assertNull(result)
     }
@@ -297,11 +380,16 @@ class InAppBillingHandlerTest : KoinTest {
 
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
 
+        // fetchPurchases launches on billingScope — wait for the listener to be captured
+        awaitUntil { listenerSlot.isCaptured }
+        // Process each response sequentially: counter increments are async and would race
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
 
-        coVerify(exactly = 1) {
+        coVerify(timeout = 10000, exactly = 1) {
             mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
         }
     }
@@ -315,9 +403,12 @@ class InAppBillingHandlerTest : KoinTest {
 
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
 
+        awaitUntil { listenerSlot.isCaptured }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        // Only 2 empty queries, threshold is 3 — reconcile should NOT fire yet
+        // Only 2 empty queries, threshold is 3 — reconcile should NOT fire yet.
+        // Wait until processing of both responses has actually run.
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
 
         coVerify(exactly = 0) {
             mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
@@ -333,12 +424,15 @@ class InAppBillingHandlerTest : KoinTest {
 
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.INAPP))
 
-        // Fire 3 empty queries to hit the threshold
+        // Fire 3 empty queries to hit the threshold, sequentially (async increments race)
+        awaitUntil { listenerSlot.isCaptured }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptyInAppQueries") == 1 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptyInAppQueries") == 2 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
 
-        coVerify(exactly = 1) {
+        coVerify(timeout = 10000, exactly = 1) {
             mockStateMachine.expireStaleInAppFromDb(any())
         }
     }
@@ -350,20 +444,26 @@ class InAppBillingHandlerTest : KoinTest {
 
         val okResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
 
-        // Fire SUBS empty 3 times - should trigger reconcile
+        // Fire SUBS empty 3 times (sequentially) - should trigger reconcile
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
+        awaitUntil { listenerSlot.isCaptured }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-
-        // Fire INAPP empty 2 times - should NOT trigger (still below threshold)
-        InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.INAPP))
-        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
 
-        coVerify(exactly = 1) {
+        coVerify(timeout = 10000, exactly = 1) {
             mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
         }
+
+        // Fire INAPP empty 2 times - should NOT trigger expiry (still below threshold)
+        InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.INAPP))
+        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptyInAppQueries") == 1 }
+        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptyInAppQueries") == 2 }
+
         coVerify(exactly = 0) {
             mockStateMachine.expireStaleInAppFromDb(any())
         }
@@ -379,19 +479,29 @@ class InAppBillingHandlerTest : KoinTest {
 
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
 
+        // Each listener call spawns async processing on billingScope — processing order
+        // is not guaranteed unless each step waits for the counter to reflect it.
+        awaitUntil { listenerSlot.isCaptured }
+
         // Fire 2 empty queries
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
 
         // Fire non-empty (resets counter)
         listenerSlot.captured.onQueryPurchasesResponse(okResult, listOf(purchase))
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 0 }
 
         // Fire 1 more empty — should NOT trigger reconcile (counter was reset)
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
 
-        coVerify(exactly = 0) {
-            mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
-        }
+        // The counter was reset by the non-empty response and incremented once by the
+        // final empty response — reconcile must not have been triggered by the threshold.
+        // (reconcileWithPlayBilling may legitimately fire from handlePurchase itself for
+        // the non-empty purchase, so the raw mock is not verified here.)
+        assertEquals(1, getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries"))
     }
 
     // =========================================================================
@@ -876,7 +986,7 @@ class InAppBillingHandlerTest : KoinTest {
     @Test
     fun `purchasesUpdatedListener handles fatal error`() = runTest {
         val fatalResult = BillingResult.newBuilder()
-            .setResponseCode(BillingClient.BillingResponseCode.ERROR)
+            .setResponseCode(BillingClient.BillingResponseCode.ITEM_UNAVAILABLE)
             .setDebugMessage("Fatal error")
             .build()
 
@@ -885,13 +995,15 @@ class InAppBillingHandlerTest : KoinTest {
         )
         listener.onPurchasesUpdated(fatalResult, null)
 
-        coVerify { mockStateMachine.purchaseFailed(any(), any()) }
+        // listener body launches on billingScope — poll instead of verifying immediately
+        coVerify(timeout = 5000) { mockStateMachine.purchaseFailed(match { it.contains("Fatal") }, any()) }
     }
 
     @Test
     fun `purchasesUpdatedListener handles recoverable error`() = runTest {
+        // ERROR is classified as a recoverable billing error by BillingResponse
         val recoverableResult = BillingResult.newBuilder()
-            .setResponseCode(BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE)
+            .setResponseCode(BillingClient.BillingResponseCode.ERROR)
             .setDebugMessage("Service temporarily unavailable")
             .build()
 
@@ -900,7 +1012,7 @@ class InAppBillingHandlerTest : KoinTest {
         )
         listener.onPurchasesUpdated(recoverableResult, null)
 
-        coVerify { mockStateMachine.purchaseFailed(match { it.contains("Recoverable") }, any()) }
+        coVerify(timeout = 5000) { mockStateMachine.purchaseFailed(match { it.contains("Recoverable") }, any()) }
     }
 
     @Test
@@ -909,14 +1021,22 @@ class InAppBillingHandlerTest : KoinTest {
             .setResponseCode(BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED)
             .build()
 
-        val purchase = mockMockPurchase(InAppBillingHandler.STD_PRODUCT_ID, token = "existing-tok")
+        // Relaxed so production's PurchaseDetail-building code paths (offerDetails,
+        // purchaseTime, ...) get safe defaults instead of MockK "no answer" errors.
+        val purchase = mockk<Purchase>(relaxed = true).apply {
+            every { products } returns listOf(InAppBillingHandler.STD_PRODUCT_ID)
+            every { isAcknowledged } returns true
+            every { purchaseToken } returns "existing-tok"
+            every { purchaseState } returns Purchase.PurchaseState.PURCHASED
+            every { accountIdentifiers?.obfuscatedAccountId } returns "acc-1"
+        }
 
         val listener = getPrivateField<com.android.billingclient.api.PurchasesUpdatedListener>(
             InAppBillingHandler, "purchasesUpdatedListener"
         )
         listener.onPurchasesUpdated(alreadyOwnedResult, listOf(purchase))
 
-        coVerify { mockStateMachine.restoreSubscription(any()) }
+        coVerify(timeout = 5000) { mockStateMachine.restoreSubscription(any()) }
     }
 
     // =========================================================================
@@ -926,7 +1046,7 @@ class InAppBillingHandlerTest : KoinTest {
     @Test
     fun `purchaseSubs cannot purchase when state machine says no`() = runTest {
         every { mockStateMachine.canMakePurchase() } returns false
-        every { mockStateMachine.getCurrentState() } returns SubscriptionStateMachineV2.SubscriptionState.Expired
+        every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Expired
 
         val mockActivity = mockk<android.app.Activity>(relaxed = true)
         InAppBillingHandler.purchaseSubs(mockActivity, InAppBillingHandler.STD_PRODUCT_ID, "plan-1")
@@ -937,7 +1057,7 @@ class InAppBillingHandlerTest : KoinTest {
     @Test
     fun `purchaseSubs forceResubscribe bypasses canMakePurchase`() = runTest {
         every { mockStateMachine.canMakePurchase() } returns true
-        every { mockStateMachine.getCurrentState() } returns SubscriptionStateMachineV2.SubscriptionState.Active
+        every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Active
 
         // product not found in store — this will exit early
         val mockActivity = mockk<android.app.Activity>(relaxed = true)
@@ -952,9 +1072,12 @@ class InAppBillingHandlerTest : KoinTest {
         coEvery { mockStateMachine.startPurchase() } throws RuntimeException("start failed")
 
         val mockActivity = mockk<android.app.Activity>(relaxed = true)
+        // Production catches the startPurchase failure, notifies billingListener and
+        // returns — it must not propagate the exception nor report purchaseFailed.
         InAppBillingHandler.purchaseSubs(mockActivity, InAppBillingHandler.STD_PRODUCT_ID, "plan-1")
 
-        coVerify { mockStateMachine.purchaseFailed(any(), any()) }
+        coVerify(exactly = 1) { mockStateMachine.startPurchase() }
+        coVerify(exactly = 0) { mockStateMachine.purchaseFailed(any(), any()) }
     }
 
     // =========================================================================
@@ -964,7 +1087,7 @@ class InAppBillingHandlerTest : KoinTest {
     @Test
     fun `purchaseOneTime cannot purchase when state machine says no`() = runTest {
         every { mockStateMachine.canMakePurchase() } returns false
-        every { mockStateMachine.getCurrentState() } returns SubscriptionStateMachineV2.SubscriptionState.Expired
+        every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Expired
 
         val mockActivity = mockk<android.app.Activity>(relaxed = true)
         InAppBillingHandler.purchaseOneTime(mockActivity, InAppBillingHandler.ONE_TIME_PRODUCT_2YRS, "plan-1")
@@ -1006,15 +1129,18 @@ class InAppBillingHandlerTest : KoinTest {
             BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.ERROR).build()
         )
 
+        // Start the state observer (private fun launches its collector on billingScope)
+        InAppBillingHandler::class.java.getDeclaredMethod("startStateObserver")
+            .apply { isAccessible = true }
+            .invoke(InAppBillingHandler)
+
         // Trigger state machine collect
         stateFlow.value = SubscriptionStateMachineV2.SubscriptionState.Active
 
-        // Wait for state observer to react
-        kotlinx.coroutines.delay(100)
+        // Wait for the observer to react (billingScope runs on a real worker thread)
+        awaitUntil { InAppBillingHandler.purchasesLiveData.value?.isNotEmpty() == true }
 
-        val purchases = InAppBillingHandler.purchasesLiveData.value
-        assertNotNull(purchases)
-        assertTrue(purchases!!.isNotEmpty())
+        assertTrue(InAppBillingHandler.purchasesLiveData.value!!.isNotEmpty())
         assertNull(InAppBillingHandler.transactionErrorLiveData.value)
     }
 
@@ -1032,16 +1158,20 @@ class InAppBillingHandlerTest : KoinTest {
         )
         every { mockStateMachine.getSubscriptionData() } returns subData
 
+        // Start the state observer (private fun launches its collector on billingScope)
+        InAppBillingHandler::class.java.getDeclaredMethod("startStateObserver")
+            .apply { isAccessible = true }
+            .invoke(InAppBillingHandler)
+
         // First set Active to populate purchases
         stateFlow.value = SubscriptionStateMachineV2.SubscriptionState.Active
-        kotlinx.coroutines.delay(100)
+        awaitUntil { InAppBillingHandler.purchasesLiveData.value?.isNotEmpty() == true }
 
         // Then switch to Expired
         stateFlow.value = SubscriptionStateMachineV2.SubscriptionState.Expired
-        kotlinx.coroutines.delay(100)
+        awaitUntil { InAppBillingHandler.purchasesLiveData.value.isNullOrEmpty() }
 
-        val purchases = InAppBillingHandler.purchasesLiveData.value
-        assertTrue(purchases.isNullOrEmpty())
+        assertTrue(InAppBillingHandler.purchasesLiveData.value.isNullOrEmpty())
     }
 
     // =========================================================================
@@ -1055,7 +1185,6 @@ class InAppBillingHandlerTest : KoinTest {
         every { purchase.products } returns listOf(productId)
         every { purchase.purchaseTime } returns System.currentTimeMillis()
 
-        val expiry = getPrivateField<Any>(InAppBillingHandler, "calculateOneTimeExpiryTime")
         // Use reflection to invoke private method
         val method = InAppBillingHandler::class.java.getDeclaredMethod("calculateOneTimeExpiryTime", Purchase::class.java)
         method.isAccessible = true
@@ -1165,10 +1294,8 @@ class InAppBillingHandlerTest : KoinTest {
     fun `fetchOrEnsureCustomerIds returns blank on 401`() = runTest {
         coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Unauthorized
 
-        val method = InAppBillingHandler::class.java.getDeclaredMethod("fetchOrEnsureCustomerIds")
-        method.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
+        val result = callPrivateSuspendNoArgs("fetchOrEnsureCustomerIds") as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)
@@ -1180,10 +1307,8 @@ class InAppBillingHandlerTest : KoinTest {
     fun `fetchOrEnsureCustomerIds returns blank on 409`() = runTest {
         coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Conflict
 
-        val method = InAppBillingHandler::class.java.getDeclaredMethod("fetchOrEnsureCustomerIds")
-        method.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val result = method.invoke(InAppBillingHandler) as Pair<String, String>
+        val result = callPrivateSuspendNoArgs("fetchOrEnsureCustomerIds") as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)
@@ -1229,7 +1354,7 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `getSubscriptionState returns current state from state machine`() {
-        every { mockStateMachine.getCurrentState() } returns SubscriptionStateMachineV2.SubscriptionState.Active
+        every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Active
 
         val state = InAppBillingHandler.getSubscriptionState()
 

@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.SelectionIndicator
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
@@ -60,6 +62,9 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
     ) {
 
     var lifecycleOwner: LifecycleOwner? = null
+
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<RethinkEndpointViewHolder>()
 
     companion object {
         private const val ONE_SEC = 1000L
@@ -92,10 +97,22 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                 false
             )
         lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return RethinkEndpointViewHolder(itemBinding)
+        return RethinkEndpointViewHolder(itemBinding).also { activeHolders.add(it) }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelStatusCheckIfAny() }
+        activeHolders.clear()
+        lifecycleOwner = null
     }
 
     override fun onBindViewHolder(holder: RethinkEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val doHEndpoint: RethinkDnsEndpoint = getItem(position) ?: return
         holder.update(doHEndpoint)
     }
@@ -103,21 +120,36 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
     inner class RethinkEndpointViewHolder(private val b: RethinkEndpointListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
         private var statusCheckJob: Job? = null
+        private val selectionIndicator =
+            SelectionIndicator(
+                b.rethinkEndpointListSelectionOrbital,
+                b.rethinkEndpointListSelectionPill
+            )
 
         fun update(endpoint: RethinkDnsEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
         }
 
+        fun cancelStatusCheckIfAny() {
+            statusCheckJob?.cancel()
+        }
+
         private fun setupClickListeners(endpoint: RethinkDnsEndpoint) {
             b.root.setOnClickListener { updateConnection(endpoint) }
             b.rethinkEndpointListActionImage.setOnClickListener { showDohMetadataDialog(endpoint) }
-            b.rethinkEndpointListCheckImage.setOnClickListener { updateConnection(endpoint) }
         }
 
         private fun displayDetails(endpoint: RethinkDnsEndpoint) {
             b.rethinkEndpointListUrlName.text = endpoint.name
-            b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
+            b.root.contentDescription =
+                context.getString(
+                    if (endpoint.isActive) R.string.dns_list_item_selected_cd
+                    else R.string.dns_list_item_select_cd,
+                    endpoint.name
+                )
+            selectionIndicator.update(endpoint.isActive)
+
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
@@ -307,7 +339,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+            val owner = lifecycleOwner ?: return
+
+            withContext(Dispatchers.Main.immediate) {
+                if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    return@withContext
+                }
+
+                f()
+            }
         }
 
         private fun io(f: suspend () -> Unit): Job? {

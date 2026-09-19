@@ -88,6 +88,9 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
                 // ref stackoverflow.com/questions/73147633/getting-null-in-context-while-auto-restart-with-broadcast-receiver-in-android-ap
                 Logger.w(LOG_TAG_VPN, "$TAG Device does not support system-wide VPN mode")
                 return
+            } catch (e: IllegalStateException) {
+                Logger.w(LOG_TAG_VPN, "$TAG VPN unavailable: in lockdown mode", e)
+                return
             }
         if (prepareVpnIntent == null) {
             Logger.i(LOG_TAG_VPN, "$TAG VPN is prepared, invoking start")

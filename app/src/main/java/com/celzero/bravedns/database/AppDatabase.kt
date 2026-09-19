@@ -55,9 +55,10 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class,
         CountryConfig::class,
-        SponsorEntity::class
+        SponsorEntity::class,
+        SmartDnsEndpoint::class
     ],
-    version = 32,
+    version = 35,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -73,6 +74,12 @@ abstract class AppDatabase : RoomDatabase() {
         // "Bad database header" failure seen after clearing app storage.
         private const val DATABASE_PATH = "database/rethink_v31.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
+        // cap the WAL file size (32MB). Without this, the -wal file stays at its
+        // high-water mark forever: SQLite reuses WAL space after a checkpoint but
+        // never shrinks the file, so a single large transaction (e.g. a bulk log
+        // purge) can leave a multi-hundred-MB -wal on disk for the lifetime of the
+        // installation.
+        private const val JOURNAL_SIZE_LIMIT_BYTES = 32 * 1024 * 1024
         private const val APP_NOTES_MAX_LENGTH = 500
 
         // setJournalMode() is added as part of issue #344
@@ -85,7 +92,7 @@ abstract class AppDatabase : RoomDatabase() {
         // with the 16-byte magic string "SQLite format 3\0". Files failing this check are
         // treated as corrupt/truncated so the pre-packaged asset can be re-copied by Room's
         // createFromAsset() instead of being reused as-is.
-        private fun isValidSQLiteFile(file: java.io.File): Boolean {
+        internal fun isValidSQLiteFile(file: java.io.File): Boolean {
             if (file.length() < 100) return false
             return try {
                 java.io.RandomAccessFile(file, "r").use { raf ->
@@ -172,6 +179,9 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_29_30)
                 .addMigrations(MIGRATION_30_31)
                 .addMigrations(MIGRATION_31_32)
+                .addMigrations(MIGRATION_32_33)
+                .addMigrations(MIGRATION_33_34)
+                .addMigrations(MIGRATION_34_35)
                 .build()
 
         private val roomCallback: Callback =
@@ -181,7 +191,6 @@ abstract class AppDatabase : RoomDatabase() {
                     createAppInfoNotesLengthTriggers(db)
                     Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
                 }
-
                 override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
                     super.onDestructiveMigration(db)
                     Logger.i(LOG_TAG_APP_DB, "Database destructively migrated, ${db.version}")
@@ -189,9 +198,25 @@ abstract class AppDatabase : RoomDatabase() {
 
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onOpen(db)
+                    setJournalSizeLimit(db)
                     Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
                 }
             }
+
+        // PRAGMA journal_size_limit sets *and* returns the new limit, i.e. it is a
+        // result-returning pragma; SQLiteDatabase.execSQL() rejects such statements
+        // ("Queries can be performed using SQLiteDatabase query or rawQuery methods
+        // only"), so it must run through the query path with the cursor drained.
+        private fun setJournalSizeLimit(db: SupportSQLiteDatabase) {
+            try {
+                db.query(
+                    SimpleSQLiteQuery("PRAGMA journal_size_limit = $JOURNAL_SIZE_LIMIT_BYTES")
+                ).use { it.moveToFirst() }
+            } catch (e: Exception) {
+                // non-fatal: without the limit the WAL simply keeps its high-water mark
+                Logger.w(LOG_TAG_APP_DB, "err setting journal_size_limit: ${e.message}", e)
+            }
+        }
         private fun createAppInfoNotesLengthTriggers(db: SupportSQLiteDatabase) {
             db.execSQL(
                 "CREATE TRIGGER IF NOT EXISTS trg_appinfo_notes_length_insert " +
@@ -1319,7 +1344,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        private val MIGRATION_30_31: Migration =
+        val MIGRATION_30_31: Migration =
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
@@ -1335,14 +1360,48 @@ abstract class AppDatabase : RoomDatabase() {
                     } else {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_30_31: notes column already exists in AppInfo")
                     }
+
+                    createSponsorTable(db)
                 }
             }
+
+        private fun createSponsorTable(db: SupportSQLiteDatabase) {
+            try {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS Sponsor (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "purchase_token TEXT NOT NULL, " +
+                        "product_id TEXT NOT NULL, " +
+                        "purchase_time INTEGER NOT NULL, " +
+                        "sponsor_since INTEGER NOT NULL, " +
+                        "consumed INTEGER NOT NULL DEFAULT 1, " +
+                        "contribution_count INTEGER NOT NULL DEFAULT 1, " +
+                        "last_contribution_time INTEGER NOT NULL DEFAULT 0)"
+                )
+                Logger.i(LOG_TAG_APP_DB, "created Sponsor table")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_APP_DB, "failed to create Sponsor table", e)
+                throw e
+            }
+        }
         private val MIGRATION_31_32: Migration =
             object : Migration(31, 32) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    db.execSQL(
-                        "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
-                    )
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE AppInfo ADD COLUMN notes TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_31_32: added AppInfo.notes")
+                    } catch (e: Exception) {
+                        if (!e.message.orEmpty().contains("duplicate column name: notes", ignoreCase = true)) {
+                            Logger.e(LOG_TAG_APP_DB, "MIGRATION_31_32: failed to add notes column", e)
+                            throw e
+                        }
+                        Logger.i(
+                            LOG_TAG_APP_DB,
+                            "MIGRATION_31_32: notes column already exists in AppInfo, skip"
+                        )
+                    }
 
                     createAppInfoNotesLengthTriggers(db)
 
@@ -1350,6 +1409,170 @@ abstract class AppDatabase : RoomDatabase() {
                         LOG_TAG_APP_DB,
                         "MIGRATION_31_32: added AppInfo.notes and enforced max length"
                     )
+                }
+            }
+
+        private val MIGRATION_32_33: Migration =
+            object : Migration(32, 33) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    if (!doesColumnExistInTable(db, "DoHEndpoint", "dohIp")) {
+                        try {
+                            db.execSQL("ALTER TABLE DoHEndpoint ADD COLUMN dohIp TEXT")
+                            Logger.i(
+                                LOG_TAG_APP_DB,
+                                "MIGRATION_32_33: added dohIp column to DoHEndpoint"
+                            )
+                        } catch (e: Exception) {
+                            Logger.e(
+                                LOG_TAG_APP_DB,
+                                "MIGRATION_32_33: failed to add dohIp column",
+                                e
+                            )
+                            throw e
+                        }
+                    } else {
+                        Logger.i(
+                            LOG_TAG_APP_DB,
+                            "MIGRATION_32_33: dohIp column already exists in DoHEndpoint"
+                        )
+                    }
+                }
+            }
+
+        private val MIGRATION_33_34: Migration =
+            object : Migration(33, 34) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    createSmartDnsTable(db)
+                    addSmartDnsEndpoints(db)
+                }
+
+                private fun createSmartDnsTable(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS 'SmartDnsEndpoint' " +
+                                "('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                                "'dnsName' TEXT NOT NULL, " +
+                                "'dnsMode' INTEGER NOT NULL, " +
+                                "'dnsExplanation' TEXT NOT NULL, " +
+                                "'isSelected' INTEGER NOT NULL, " +
+                                "'modifiedDataTime' INTEGER NOT NULL, " +
+                                "'latency' INTEGER NOT NULL)"
+                    )
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: created SmartDnsEndpoint table")
+                }
+
+                // add the three smart dns options; none is selected until the user
+                // explicitly picks one from the smart dns list screen
+                private fun addSmartDnsEndpoints(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (1, 'Unfiltered', 0, 'Prefers any of the default DNS resolvers without applying any filtering.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (2, 'Security', 1, 'Prefers resolvers blocking malware, ransomware, phishers, and other threats.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (3, 'Privacy', 2, 'Prefers resolvers blocking attentionware, spyware, scareware.', 0, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO SmartDnsEndpoint" +
+                                    "(id, dnsName, dnsMode, dnsExplanation, isSelected, modifiedDataTime, latency) " +
+                                    "VALUES (4, 'Family', 3, 'Prefers resolvers blocking adult and pirated content.', 0, 0, 0)"
+                        )
+                    }
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_33_34: seeded SmartDnsEndpoint rows")
+                }
+            }
+
+        // migration part of v057:
+        // 1. replace Mullvad DoT endpoints with Control-D in-place, preserving the
+        //    user's selection (an in-place update that does not touch isSelected
+        //    carries it over automatically)
+        // 2. add ControlD Security (DoH, p1) as a default (non-deletable) endpoint
+        // 3. add DNS4U Extended (DoT) and DNS4U Privacy (DoH) as default endpoints
+        // 4. refresh Quad9 DNSCrypt stamps as per upstream dnscrypt-resolvers list
+        // ref: github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/public-resolvers.md
+        private val MIGRATION_34_35: Migration =
+            object : Migration(34, 35) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    replaceMullvadWithControlD(db)
+                    addControlDDefaultDoHEndpoint(db)
+                    updateQuad9DnsCryptStamps(db)
+                }
+
+                private fun replaceMullvadWithControlD(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "UPDATE DoTEndpoint SET name = 'ControlD Privacy', " +
+                                    "url = 'tls://p2.freedns.controld.com', " +
+                                    "desc = 'Blocks spyware and tracking domains.', isCustom = 0 " +
+                                    "WHERE id = 3 AND url = 'tls://adblock.dns.mullvad.net'"
+                        )
+                        execSQL(
+                            "UPDATE DoTEndpoint SET name = 'ControlD Extended', " +
+                                    "url = 'tls://p3.freedns.controld.com', " +
+                                    "desc = 'Blocks malware, spyware, social media and tracking " +
+                                    "domains.', isCustom = 0 " +
+                                    "WHERE id = 4 AND url = 'tls://extended.dns.mullvad.net'"
+                        )
+                        // remove any stray mullvad rows not covered by the in-place update
+                        execSQL(
+                            "DELETE FROM DoTEndpoint WHERE url IN " +
+                                    "('tls://adblock.dns.mullvad.net', 'tls://extended.dns.mullvad.net')"
+                        )
+                        // seed the defaults if the mullvad rows were already absent;
+                        // isCustom = 0 makes them non-deletable from the ui
+                        execSQL(
+                            "INSERT OR IGNORE INTO DoTEndpoint(id, name, url, desc, isSelected, " +
+                                    "isCustom, isSecure, latency, modifiedDataTime) " +
+                                    "VALUES(3, 'ControlD Privacy', 'tls://p2.freedns.controld.com', " +
+                                    "'Blocks spyware and tracking domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                        execSQL(
+                            "INSERT OR IGNORE INTO DoTEndpoint(id, name, url, desc, isSelected, " +
+                                    "isCustom, isSecure, latency, modifiedDataTime) " +
+                                    "VALUES(4, 'ControlD Extended', 'tls://p3.freedns.controld.com', " +
+                                    "'Blocks malware, spyware, social media, and tracking domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                    }
+                }
+
+                // control-d security (doh, p1) as a default endpoint; no explicit id,
+                // mirroring how default doh entries are seeded in MIGRATION_11_12
+                private fun addControlDDefaultDoHEndpoint(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "INSERT INTO DoHEndpoint(dohName, dohURL, dohExplanation, isSelected, " +
+                                    "isCustom, isSecure, modifiedDataTime, latency) " +
+                                    "VALUES('ControlD Security', 'https://freedns.controld.com/p1', " +
+                                    "'Blocks malware and malicious domains.', " +
+                                    "0, 0, 1, 0, 0)"
+                        )
+                    }
+                }
+
+
+                // update quad9 dns crypt stamps as per the upstream public-resolvers list
+                private fun updateQuad9DnsCryptStamps(db: SupportSQLiteDatabase) {
+                    with(db) {
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint SET dnsCryptURL = " +
+                                    "'sdns://AQMAAAAAAAAADDkuOS45Ljk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0' " +
+                                    "WHERE id = 4 AND dnsCryptName = 'Quad9 Security'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint SET dnsCryptURL = " +
+                                    "'sdns://AQcAAAAAAAAADTkuOS45LjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA' " +
+                                    "WHERE id = 5 AND dnsCryptName = 'Quad9'"
+                        )
+                    }
                 }
             }
 
@@ -1426,11 +1649,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun countryConfigDAO(): CountryConfigDAO
 
+    abstract fun smartDnsEndpointDao(): SmartDnsEndpointDAO
+
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
 
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
 
     fun countryConfigRepository() = CountryConfigRepository(countryConfigDAO())
+
+    fun smartDnsEndpointRepository() = SmartDnsEndpointRepository(smartDnsEndpointDao())
 
     fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
 

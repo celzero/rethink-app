@@ -197,7 +197,6 @@
     <string name="pause_desc" translatable="true">குறிப்பு: %1$s தடுக்கப்பட்ட பயன்பாடுகள் தொடர்ந்து ஃபயர்வால் செய்யப்படும்.</string>
     <string name="other_dns_list_tab1" translatable="true">தோ</string>
     <string name="other_dns_list_tab3" translatable="true">டி.என்.எச் பதிலாள்</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s ரீதிங்கின் டிஎன்எச் உடன் மட்டுமே வேலை செய்கின்றன</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">மிகவும் அனுமதிக்கப்பட்ட பயன்பாடுகள்</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">பெரும்பாலான தடுக்கப்பட்ட பயன்பாடுகள்</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">பெரும்பாலான தொடர்பு கொண்ட களங்கள்</string>
@@ -826,7 +825,6 @@
     <string name="ada_app_status_block_md" translatable="true">மீட்டர் (மொபைல்) நெட்வொர்க்குகளில் தடுக்கப்பட்டுள்ளது</string>
     <string name="exclude_apps_from_proxy_failure_toast">இந்த பயன்பாடு ப்ராக்சிகளை புறக்கணிக்கிறது</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">இந்த பயன்பாடு தொடர்பான அனைத்து பதிவுகளையும் அழிக்கவும்.</string>
-    <string name="bsdl_block_desc" translatable="true">தொகுதி, நம்புங்கள் &lt;u&gt; இந்த டொமைன் &lt;/u&gt;</string>
     <string name="network_dns" translatable="true">கணினி டி.என்.எச்</string>
     <string name="notif_download_content_title" translatable="true">ஆன்-டெவிச் பிளாக்லிச்ட் பதிவிறக்கம்</string>
     <string name="notif_download_content_text" translatable="true">பதிவிறக்கம் முன்னேற்றத்தில்…</string>

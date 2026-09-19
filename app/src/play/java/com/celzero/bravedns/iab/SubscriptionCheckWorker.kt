@@ -47,6 +47,7 @@ class SubscriptionCheckWorker(
         private const val TAG = "SubscriptionCheckWorker"
         const val WORK_NAME = "SubscriptionCheckWorker"
         private const val REGISTRATION_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000 //  1 day once
+        private const val FORCED_RECONCILE_INTERVAL_MS = 30L * 24 * 60 * 60 * 1000 // 30 days once
     }
 
     override suspend fun doWork(): Result {
@@ -67,6 +68,9 @@ class SubscriptionCheckWorker(
                 // reconcile purchase based on entitlement and windscribe expiry
                 reconcilePurchase()
 
+                // unconditional entitlement refresh, once every 30 days
+                maybeForceReconcile()
+
                 Result.success()
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG; doWork failed: ${e.message}", e)
@@ -81,11 +85,33 @@ class SubscriptionCheckWorker(
         InAppBillingHandler.reconcilePurchase()
     }
 
+    private suspend fun maybeForceReconcile() {
+        val mname = "maybeForceReconcile"
+        val now = System.currentTimeMillis()
+        val last = persistentState.lastForcedReconcileTimestamp
+        if (last == 0L) {
+            persistentState.lastForcedReconcileTimestamp = now
+            Logger.d(LOG_IAB, "$TAG; $mname: anchor initialized")
+            return
+        }
+        if (now - last < FORCED_RECONCILE_INTERVAL_MS) return
+        // failed attempt will attempt in next interval
+        persistentState.lastForcedReconcileTimestamp = now
+        Logger.i(LOG_IAB, "$TAG; $mname: running forced reconcile")
+        val ok = InAppBillingHandler.reconcilePurchase(force = true)
+        Logger.i(LOG_IAB, "$TAG; $mname: forced reconcile ok=$ok")
+    }
+
     /**
      * Verifies the device is registered with the server (accountId + deviceId).
      */
     private suspend fun checkAndRegisterDeviceIfNeeded() {
         val name = "checkAndRegisterDeviceIfNeeded"
+        // Single-flight: RpnProxyUpdateWorker runs its own copy of this check and also
+        // enqueues this worker in the same doWork() pass. Coalesce overlapping runs so
+        // concurrent reconciles cannot race into minting duplicate DIDs
+        // (two POST /d/reg at the same second).
+        if (!DeviceRegistrationGuard.tryBegin(name)) return
         try {
             val storedAccountId = billingBackendClient.getAccountId()
             val storedDeviceId = billingBackendClient.getDeviceId()
@@ -155,6 +181,8 @@ class SubscriptionCheckWorker(
 
         } catch (e: Exception) {
             Logger.w(LOG_IAB, "$TAG; $name: error reg dev: ${e.message}")
+        } finally {
+            DeviceRegistrationGuard.end(name)
         }
     }
 

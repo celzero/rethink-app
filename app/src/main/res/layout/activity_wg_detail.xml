@@ -28,7 +28,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
                 app:strokeWidth="0dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -357,7 +356,6 @@
                 app:layout_constraintTop_toBottomOf="@id/interface_detail_card"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -518,7 +516,6 @@
                 app:layout_constraintTop_toBottomOf="@id/actions_card"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -652,7 +649,6 @@
                 app:layout_constraintTop_toBottomOf="@id/other_settings_card"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="4dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout

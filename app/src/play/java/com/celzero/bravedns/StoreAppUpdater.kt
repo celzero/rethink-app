@@ -21,6 +21,7 @@ import android.content.IntentSender
 import android.util.Log
 import com.celzero.bravedns.service.AppUpdater
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
@@ -28,69 +29,142 @@ import com.google.android.play.core.install.model.UpdateAvailability
 
 class StoreAppUpdater(context: Context) : AppUpdater {
     private val LOG_TAG = "StoreAppUpdater"
-    private val listenerMapping = mutableMapOf<AppUpdater.InstallStateListener, InstallStateUpdatedListener>()
-    private val appUpdateManager by lazy {
-        AppUpdateManagerFactory.create(context)
-    }
+    private val listenerMapping =
+        mutableMapOf<AppUpdater.InstallStateListener, InstallStateUpdatedListener>()
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(context) }
 
     companion object {
         private const val APP_UPDATE_REQUEST_CODE = 20023
     }
 
-    override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
-                                   listener: AppUpdater.InstallStateListener) {
+    override fun checkForAppUpdate(
+        isInteractive: AppUpdater.UserPresent,
+        activity: Activity,
+        listener: AppUpdater.InstallStateListener
+    ) {
         Log.i(LOG_TAG, "Beginning update check.")
         val playListener = InstallStateUpdatedListener { state ->
-            val mappedStatus = when (state.installStatus()) {
-                InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
-                InstallStatus.CANCELED -> AppUpdater.InstallStatus.CANCELED
-                InstallStatus.DOWNLOADING -> AppUpdater.InstallStatus.DOWNLOADING
-                InstallStatus.FAILED -> AppUpdater.InstallStatus.FAILED
-                InstallStatus.INSTALLED -> AppUpdater.InstallStatus.INSTALLED
-                InstallStatus.INSTALLING -> AppUpdater.InstallStatus.INSTALLING
-                InstallStatus.PENDING -> AppUpdater.InstallStatus.PENDING
-                else -> AppUpdater.InstallStatus.UNKNOWN
-            }
+            val status = state.installStatus()
+            Log.i(LOG_TAG, "InstallStateUpdatedListener: status: $status")
+            val mappedStatus =
+                when (status) {
+                    InstallStatus.DOWNLOADED -> AppUpdater.InstallStatus.DOWNLOADED
+                    InstallStatus.CANCELED -> AppUpdater.InstallStatus.CANCELED
+                    InstallStatus.DOWNLOADING -> AppUpdater.InstallStatus.DOWNLOADING
+                    InstallStatus.FAILED -> AppUpdater.InstallStatus.FAILED
+                    InstallStatus.INSTALLED -> AppUpdater.InstallStatus.INSTALLED
+                    InstallStatus.INSTALLING -> AppUpdater.InstallStatus.INSTALLING
+                    InstallStatus.PENDING -> AppUpdater.InstallStatus.PENDING
+                    else -> AppUpdater.InstallStatus.UNKNOWN
+                }
             listener.onStateUpdate(AppUpdater.InstallState(mappedStatus))
         }
         listenerMapping[listener] = playListener
         appUpdateManager.registerListener(playListener)
 
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
-                    AppUpdateType.FLEXIBLE)) {
-                Log.i(LOG_TAG, "Update available, starting flexible update")
-                try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE,
-                                                              activity, APP_UPDATE_REQUEST_CODE)
-                } catch (e: IntentSender.SendIntentException) {
-                    unregisterListener(listener)
-                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
+        appUpdateManager.appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                val availability = appUpdateInfo.updateAvailability()
+                val installStatus = appUpdateInfo.installStatus()
+                val versionCode = appUpdateInfo.availableVersionCode()
+
+                Log.i(
+                    LOG_TAG,
+                    "Update info success. Availability: $availability, Status: $installStatus, Version: $versionCode"
+                )
+
+                if (installStatus == InstallStatus.DOWNLOADED) {
+                    Log.i(LOG_TAG, "Update already downloaded, notifying listener")
+                    listener.onStateUpdate(
+                        AppUpdater.InstallState(AppUpdater.InstallStatus.DOWNLOADED)
+                    )
                 }
-            } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
-                    AppUpdateType.IMMEDIATE)) {
-                Log.i(LOG_TAG, "Update available, starting immediate update")
-                try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo,
-                                                              AppUpdateType.IMMEDIATE, activity, APP_UPDATE_REQUEST_CODE)
-                } catch (e: IntentSender.SendIntentException) {
+
+                if (availability == UpdateAvailability.UPDATE_AVAILABLE) {
+                    val priority = appUpdateInfo.updatePriority()
+                    Log.i(LOG_TAG, "Update available with priority: $priority")
+
+                    // Decide update type based on priority or availability
+                    // Priority 4-5: Immediate, others: Flexible if allowed
+                    val canDoImmediate = appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                    val canDoFlexible = appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+
+                    if (canDoFlexible) {
+                        Log.i(LOG_TAG, "Starting flexible update flow")
+                        startUpdateFlow(
+                            activity,
+                            appUpdateInfo,
+                            AppUpdateType.FLEXIBLE,
+                            listener
+                        )
+                    } else if (canDoImmediate) {
+                        Log.i(LOG_TAG, "Starting immediate update flow")
+                        startUpdateFlow(
+                            activity,
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            listener
+                        )
+                    } else {
+                        Log.w(LOG_TAG, "Update available but no allowed update types")
+                        listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
+                    }
+                } else if (availability == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                    Log.i(LOG_TAG, "Update already in progress, attempting to resume")
+                    // Resume immediate update if it was in progress
+                    if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                        startUpdateFlow(
+                            activity,
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            listener
+                        )
+                    }
+                } else if (availability == UpdateAvailability.UPDATE_NOT_AVAILABLE) {
+                    Log.i(LOG_TAG, "No update available for Play Store flavor")
                     unregisterListener(listener)
-                    Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
+                    listener.onUpToDate(AppUpdater.InstallSource.STORE, isInteractive)
+                } else {
+                    Log.i(LOG_TAG, "Update check result: $availability (unhandled)")
+                    unregisterListener(listener)
                 }
-            } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
-                listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
-            } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_NOT_AVAILABLE) {
-                unregisterListener(listener)
-                Log.e(LOG_TAG, "no update")
-                listener.onUpToDate(AppUpdater.InstallSource.STORE, isInteractive)
             }
-        }
-        appUpdateManager.appUpdateInfo.addOnFailureListener { e ->
-            Log.e(LOG_TAG, "Update check failed", e)
+            .addOnFailureListener { e ->
+                Log.e(LOG_TAG, "Update info request failed: ${e.message}", e)
+                unregisterListener(listener)
+                listener.onUpdateCheckFailed(AppUpdater.InstallSource.STORE, isInteractive)
+            }
+    }
+
+    private fun startUpdateFlow(
+        activity: Activity,
+        appUpdateInfo: com.google.android.play.core.appupdate.AppUpdateInfo,
+        @AppUpdateType type: Int,
+        listener: AppUpdater.InstallStateListener
+    ) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            Log.w(LOG_TAG, "Activity is finishing or destroyed, skipping update flow")
             unregisterListener(listener)
-            listener.onUpdateCheckFailed(AppUpdater.InstallSource.STORE, isInteractive)
+            return
+        }
+
+        try {
+            val options = AppUpdateOptions.newBuilder(type).build()
+            appUpdateManager.startUpdateFlowForResult(
+                appUpdateInfo,
+                activity,
+                options,
+                APP_UPDATE_REQUEST_CODE
+            )
+        } catch (e: IntentSender.SendIntentException) {
+            Log.e(LOG_TAG, "SendIntentException while starting update flow: ${e.message}", e)
+            unregisterListener(listener)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Exception while starting update flow: ${e.message}", e)
+            unregisterListener(listener)
         }
     }
+
 
     override fun completeUpdate() {
         appUpdateManager.completeUpdate()

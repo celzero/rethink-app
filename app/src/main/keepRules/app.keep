@@ -1,0 +1,65 @@
+# Project-specific R8 keep rules.
+#
+# Migrated from app/proguard-rules.pro as part of the AGP 9.3 migration to the
+# `optimization { enable = true }` DSL: with the new DSL, keep rules must live
+# in src/<variant>/keepRules/*.keep (this source set is also honored by the
+# legacy DSL). The two stale `-printmapping` lines from the old file were
+# dropped — AGP already writes mapping.txt under
+# build/outputs/mapping/<variant>/mapping.txt.
+#
+# ref: developer.android.com/topic/performance/app-optimization/enable-app-optimization
+
+# Dont obfuscate (deliberate: reflection-heavy code paths — Gson models, Koin,
+# the firestack JNI Bridge — have not been audited for renamed identifiers).
+# ref: github.com/celzero/rethink-app/issues/875-era decision. Revisit only
+# after auditing all reflective access paths.
+-dontobfuscate
+
+# https://github.com/celzero/rethink-app/issues/875
+# Keep generic signature of Call, Response (R8 full mode strips signatures from non-kept items).
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+# With R8 full mode generic signatures are stripped for classes that are not
+# kept. Suspend functions are wrapped in continuations where the type argument
+# is used.
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+# Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
+
+# JSR 305 annotations are for embedding nullability information.
+-dontwarn javax.annotation.**
+
+# A resource is loaded with a relative path so the package of this class must be preserved.
+# ref: github.com/square/okhttp/issues/8154#issuecomment-1868462895
+# issue: https://github.com/celzero/rethink-app/issues/1495
+# square.github.io/okhttp/features/r8_proguard/
+-keeppackagenames okhttp3.internal.publicsuffix.*
+-adaptresourcefilenames okhttp3/internal/publicsuffix/PublicSuffixDatabase.gz
+
+# Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.
+-dontwarn org.codehaus.mojo.animal_sniffer.*
+
+# OkHttp platform used only on JVM and when Conscrypt and other security providers are available.
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+
+# Guava: LocalCache uses reflection and Unsafe to access some of its members,
+# which can lead to AssertionError in R8 full mode if not kept properly.
+-keep class com.google.common.cache.LocalCache$Segment { *; }
+-keep class com.google.common.cache.LocalCache$LocalManualCache { *; }
+-keep class com.google.common.cache.LocalCache$LocalLoadingCache { *; }
+-keep class com.google.common.base.Preconditions { *; }
+
+# Keep Gson classes and attributes for JSON serialization/deserialization
+# FileTag class uses Gson with custom deserializer (FileTagDeserializer) to handle
+# dynamic JSON formats where "url" field can be either a string or JsonArray
+# Without these rules, obfuscation would break the reflection-based JSON parsing
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-keep class com.celzero.bravedns.data.FileTag { *; }

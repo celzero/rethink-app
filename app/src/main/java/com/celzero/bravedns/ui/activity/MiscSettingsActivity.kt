@@ -41,7 +41,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
@@ -89,6 +89,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -196,18 +197,21 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
     private fun initView() {
 
+        // Firebase error reporting is available in the play flavour only.
+        if (isPlayStoreFlavour()) {
+            b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
+            b.dividerAutoStart.visibility = View.VISIBLE
+            b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
+        } else {
+            // Hide Firebase error reporting for website and F-Droid variants
+            b.settingsFirebaseErrorReportingRl.visibility = View.GONE
+            b.dividerAutoStart.visibility = View.GONE
+        }
+
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
             b.dividerCheckUpdate.visibility = View.GONE
-            // Hide Firebase error reporting for F-Droid variant
-            b.settingsFirebaseErrorReportingRl.visibility = View.GONE
-            b.dividerAutoStart.visibility = View.GONE
         } else {
-            // Show Firebase error reporting for play and website variants
-            b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
-            b.dividerAutoStart.visibility = View.VISIBLE
-            // Firebase error reporting
-            b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
             b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
             b.dividerCheckUpdate.visibility = View.VISIBLE
             // check for app updates
@@ -1037,10 +1041,9 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
               if (persistentState.appTriggerPackages.isNotEmpty()) {
                   setText(persistentState.appTriggerPackages)
               }
-              setPadding(50, 40, 50, 40)
-              gravity = Gravity.TOP or Gravity.START
-              android.R.style.Widget_Material_EditText
-          }
+            setPadding(50, 40, 50, 40)
+            gravity = Gravity.TOP or Gravity.START
+        }
 
           val selectableTextView = AppCompatTextView(context).apply {
               text = context.getString(R.string.adv_tasker_dialog_msg)
@@ -1070,7 +1073,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
               addView(linearLayout)
           }
 
-          AlertDialog.Builder(context)
+          MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
               .setTitle(context.getString(R.string.adv_taster_title))
               .setView(scrollView)
               .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->

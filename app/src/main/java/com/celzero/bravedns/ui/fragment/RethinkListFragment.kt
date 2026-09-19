@@ -201,9 +201,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun updateMaxSwitchUi() {
-        ui {
-            var endpointUrl: String? = null
-            ioCtx { endpointUrl = appConfig.getRethinkPlusEndpoint()?.url }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val endpointUrl = withContext(Dispatchers.IO) { appConfig.getRethinkPlusEndpoint()?.url }
             updateRethinkRadioUi(isMax = endpointUrl?.contains(MAX_ENDPOINT) == true)
         }
     }
@@ -409,15 +408,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
-    }
-
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
-
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+        withContext(Dispatchers.Main) {
+            if (isAdded && view != null) {
+                f()
+            }
+        }
     }
 }

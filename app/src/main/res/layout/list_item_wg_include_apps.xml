@@ -1,83 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/wg_include_card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
+    app:cardBackgroundColor="?attr/background"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardUseCompatPadding="true"
+    app:strokeColor="?attr/divider"
+    app:strokeWidth="1dp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/wg_include_card"
+    <RelativeLayout
+        android:id="@+id/wg_include_app_list_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="2dp"
-        app:cardUseCompatPadding="true">
+        android:minHeight="68dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="10dp">
 
-        <RelativeLayout
-            android:id="@+id/wg_include_app_list_container"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/wg_include_app_list_apk_icon_iv"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/bg_app_icon_circle"
+            android:padding="7dp"
+            tools:src="@drawable/ic_app_info_accent" />
+
+        <LinearLayout
+            android:id="@+id/wg_include_app_list_text_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="14dp"
+            android:layout_toStartOf="@id/wg_include_app_list_checkbox"
+            android:layout_toEndOf="@id/wg_include_app_list_apk_icon_iv"
+            android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/wg_include_app_list_apk_icon_iv"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:maxWidth="40dp"
-                android:maxHeight="40dp"
-                tools:src="?attr/primaryTextColor" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/wg_include_app_list_apk_label_tv"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                android:layout_toStartOf="@id/wg_include_app_list_checkbox"
-                android:layout_toEndOf="@id/wg_include_app_list_apk_icon_iv"
-                android:orientation="vertical">
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.01"
+                android:maxLines="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp"
+                tools:text="Dummy Label" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/wg_include_app_list_apk_label_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Dummy Label"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/wg_include_app_app_desc_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:alpha="0.5"
-                    android:ellipsize="end"
-                    android:visibility="gone"
-                    android:textColor="?attr/accentBad"
-                    android:textSize="@dimen/default_font_text_view" />
-
-            </LinearLayout>
-
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/wg_include_app_list_checkbox"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/wg_include_app_app_desc_tv"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerInParent="true"
-                android:layout_margin="10dp"
-                android:buttonTint="?attr/accentGood"
-                android:foregroundTint="?attr/accentGood" />
+                android:layout_marginTop="3dp"
+                android:alpha="0.75"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.02"
+                android:maxLines="1"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="metadata.example.app"
+                tools:visibility="gone" />
 
-        </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-</RelativeLayout>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/wg_include_app_list_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood"
+            android:minWidth="44dp"
+            android:minHeight="44dp" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

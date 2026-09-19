@@ -28,6 +28,7 @@ object ViewModelModule {
         viewModel { DnsLogViewModel(get()) }
         viewModel { DnsProxyEndpointViewModel(get()) }
         viewModel { DoHEndpointViewModel(get()) }
+        viewModel { SmartDnsEndpointViewModel(get()) }
         viewModel { AppInfoViewModel(get()) }
         viewModel { CustomDomainViewModel(get()) }
         viewModel { CustomIpViewModel(get()) }

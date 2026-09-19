@@ -17,27 +17,24 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import com.celzero.bravedns.R
+import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.databinding.BottomsheetDeviceAuthErrorBinding
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 /**
  * Bottom sheet shown when a `/g/acc` or `/reg` API call returns HTTP 401.
  */
-class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
+class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var _binding: BottomsheetDeviceAuthErrorBinding? = null
     private val binding
@@ -52,9 +49,6 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
         private const val ARG_ACCOUNT_ID = "account_id"
         private const val ARG_DEVICE_ID_PREFIX = "device_id_prefix"
         private const val ARG_OPERATION = "operation"
-
-        private const val SUPPORT_EMAIL = "hello@celzero.com"
-        private const val EMAIL_SUBJECT = "Device Authorization Issue - RPN"
 
         /**
          * All data is passed via [Bundle] args so the fragment survives
@@ -139,7 +133,7 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
 
     private fun setupButtons(accountId: String, deviceIdPrefix: String) {
         binding.btnEmailSupport.setOnClickListener {
-            openEmailClient(accountId, deviceIdPrefix)
+            openCustomerSupport(accountId, deviceIdPrefix)
         }
 
         binding.btnDismiss.setOnClickListener {
@@ -148,40 +142,16 @@ class DeviceAuthErrorBottomSheet : BottomSheetDialogFragment() {
     }
 
     /**
-     * Opens the device's email client pre-filled with the support address,
-     * subject, and a body that includes the account/device IDs so the customer
-     * does not have to type them manually.
+     * Routes the user to [CustomerSupportActivity], where the support email is
+     * composed with a list of optional diagnostic attachments (subscription
+     * status, state history, entitlement stats, wirelogs, etc.). The account
+     * and device IDs are passed along so the description is pre-filled.
      */
-    private fun openEmailClient(accountId: String, deviceIdPrefix: String) {
+    private fun openCustomerSupport(accountId: String, deviceIdPrefix: String) {
         try {
-            val body = buildString {
-                appendLine(getString(R.string.device_auth_error_email_body_greeting))
-                appendLine()
-                appendLine(getString(R.string.device_auth_error_email_body_details))
-                appendLine("  • ${getString(R.string.device_auth_error_account_id_label)}: $accountId")
-                appendLine("  • ${getString(R.string.device_auth_error_device_id_label)}: $deviceIdPrefix")
-                appendLine()
-                appendLine(getString(R.string.device_auth_error_email_body_closing))
-            }
-
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = "mailto:".toUri()
-                putExtra(Intent.EXTRA_EMAIL,   arrayOf(SUPPORT_EMAIL))
-                putExtra(Intent.EXTRA_SUBJECT, EMAIL_SUBJECT)
-                putExtra(Intent.EXTRA_TEXT,    body)
-            }
-
-            if (intent.resolveActivity(requireContext().packageManager) != null) {
-                startActivity(intent)
-            } else {
-                // Fallback: open mail URI directly so Android can prompt the user
-                // to choose or install an email app.
-                val fallback = Intent(Intent.ACTION_VIEW,
-                    "mailto:$SUPPORT_EMAIL?subject=${Uri.encode(EMAIL_SUBJECT)}".toUri())
-                startActivity(fallback)
-            }
+            CustomerSupportActivity.start(requireContext(), accountId, deviceIdPrefix)
         } catch (e: Exception) {
-            Logger.e(LOG_IAB, "$TAG: failed to open email client: ${e.message}", e)
+            Logger.e(LOG_IAB, "$TAG: failed to open customer support: ${e.message}", e)
         }
     }
 

@@ -37,6 +37,8 @@ class Constants {
         // base url for ipinfo download
         const val IP_INFO_BASE_URL = "https://dl.rethinkdns.com/ip/"
 
+        // https://dl.rethinkdns.com/host/<host-name> - always send host name - get query
+
         const val FILE_TAG = "filetag.json"
 
         const val ALPHA_UPDATE_CHECK_URL = "https://github.com/celzero/rethink-app/actions/workflows/nightly.yml"

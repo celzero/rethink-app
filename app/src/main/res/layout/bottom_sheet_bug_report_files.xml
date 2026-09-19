@@ -51,6 +51,40 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
+        android:id="@+id/brbs_proc_info_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/brbs_desc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/brbs_proc_info_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood"
+            android:checked="true" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/brbs_proc_info_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/bug_report_include_proc_info"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/brbs_select_all_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -61,7 +95,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/brbs_desc"
+        app:layout_constraintTop_toBottomOf="@id/brbs_proc_info_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" >
 

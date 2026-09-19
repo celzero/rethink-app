@@ -131,6 +131,7 @@ import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSOpts
 import com.celzero.firestack.backend.DNSSummary
 import com.celzero.firestack.backend.DNSTransport
+import com.celzero.firestack.backend.DomainOpts
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
@@ -153,7 +154,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -284,6 +287,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private val persistentState by inject<PersistentState>()
     private val rdb by inject<RefreshDatabase>()
     private val netLogTracker by inject<NetLogTracker>()
+    private val logActivityAggregator by inject<LogActivityAggregator>()
 
     @Volatile
     private var isAccessibilityServiceFunctional: Boolean = false
@@ -422,7 +426,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             // belongs to, else bind to the available network
             val net = if (KnownPorts.isDns(destPort)) curnet?.dnsServers?.get(destAddr) else null
             if (net != null) {
-                val ok = bindToNw(net, pfd, fid)
+                val ok = bindToNw(net, pfd, fid, addrPort)
                 if (!ok) {
                     Logger.e(LOG_TAG_VPN, "bind failed, who: $who, addr: $addrPort, fd: $fid, handle: ${net.networkHandle}, netid:${netid(net.networkHandle)}")
                 } else {
@@ -440,7 +444,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
 
             nws.forEach {
-                val ok = bindToNw(it.network, pfd, fid)
+                val ok = bindToNw(it.network, pfd, fid, addrPort)
                 Logger.vv(LOG_TAG_VPN, "bindAny: bindToNw handle: ${it.network.networkHandle}")
                 if (ok) {
                     logd("bind: nw, who: $who, addr: $addrPort, fd: $fid, handle: ${it.network.networkHandle}, netid:${netid(it.network.networkHandle)}")
@@ -466,7 +470,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         var pfd: ParcelFileDescriptor? = null
         try {
             pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-            return bindToNw(nw, pfd, fid)
+            return bindToNw(nw, pfd, fid, "conn-checks")
         } catch (e: Exception) {
             Logger.i(LOG_TAG_VPN, "err bindToNwForConnectivityChecks, ${e.message}")
         } finally {
@@ -488,15 +492,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getPlusTransportById(transportId)
     }
 
-    private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long): Boolean {
+    private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long, addrPort: String): Boolean {
         val res = try {
             net.bindSocket(pfd.fileDescriptor)
             true
         } catch (e: IOException) {
-            Logger.e(LOG_TAG_VPN, "err bindToNw(nw: ${net.networkHandle}, netid: ${netid(net.networkHandle)}, fid: $fid, ${e.message}, $e")
+            Logger.e(LOG_TAG_VPN, "err bindToNw(nw: ${net.networkHandle}, addrPort: $addrPort, netid: ${netid(net.networkHandle)}, fid: $fid, ${e.message}, $e")
             false
         }
-        Logger.vv(LOG_TAG_VPN, "bindToNw: nw: ${net.networkHandle}, fid: $fid, success: $res")
+        Logger.vv(LOG_TAG_VPN, "bindToNw: addrPort: $addrPort, nw: ${net.networkHandle}, fid: $fid, success: $res")
         return res
     }
 
@@ -735,6 +739,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             Log.d(LOG_BATCH_LOGGER, "vpn: restart $vpnScope")
             netLogTracker.restart(vpnScope)
         }
+
+        // Warm the activity-wall cache (trailing 24 hours of 10-minute
+        // buckets) from the databases so the heatmap is ready immediately
+        // at VPN start.
+        io("logActivityHistory") {
+            try {
+                logActivityAggregator.restoreFromDatabase()
+            } catch (e: Exception) {
+                // cache warm is best-effort; the heatmap repopulates later
+                Logger.w(LOG_TAG_VPN, "logActivityHistory warm failed: ${e.message}")
+            }
+        }
+
 
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
@@ -1140,34 +1157,38 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         VpnController.onConnectionStateChanged(State.NEW)
 
-        ui {
-            // Initialize the value whenever the vpn is started.
-            accessibilityHearbeatTimestamp = INIT_TIME_MS
+        // Initialize the value whenever the vpn is started.
+        accessibilityHearbeatTimestamp = INIT_TIME_MS
 
-            // startForeground should always be called within 5 secs of onStartCommand invocation
-            // https://developer.android.com/guide/components/fg-service-types
-            // to log the exception type, wrap the call in different methods based on the API level
-            // TODO: can remove multiple startForegroundService calls if we decide to remove
-            // multiple catch blocks for API 31 and above
-            if (isAtleastU()) {
-                var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
-                    ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
-                }
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
-                    signalStopService("startFg1", userInitiated = false) // notify and stop
-                    return@ui
-                }
-            } else {
-                val ok = startForegroundService()
-                if (!ok) {
-                    Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
-                    signalStopService("startFg2", userInitiated = false) // notify and stop
-                    return@ui
-                }
+        // startForeground should always be called within 5 secs of onStartCommand invocation
+        // https://developer.android.com/guide/components/fg-service-types
+        // Call startForeground synchronously (NOT via ui{}): the system validates the foreground
+        // notification asynchronously after startForeground() returns, and crashes the process
+        // with CannotPostForegroundServiceNotificationException ("Bad notification for
+        // startForeground") if validation fails.
+        // TODO: can remove multiple startForegroundService calls if we decide to remove
+        // multiple catch blocks for API 31 and above
+        if (isAtleastU()) {
+            var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
+                ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
             }
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
+                signalStopService("startFg1", userInitiated = false) // notify and stop
+                return START_STICKY
+            }
+        } else {
+            val ok = startForegroundService()
+            if (!ok) {
+                Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
+                signalStopService("startFg2", userInitiated = false) // notify and stop
+                return START_STICKY
+            }
+        }
+
+        ui {
             // this should always be set before ConnectionMonitor is init-d
             // see restartVpn and updateTun which expect this to be the case
             persistentState.setVpnEnabled(true)
@@ -1553,9 +1574,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                         }
 
                         AppConfig.DnsType.SMART_DNS -> {
-                            // no need to add multiple DoH as smart dns as it is expected to be
-                            // added by the vpn adapter while starting, but add it if it is missing
-                            if(getDnsStatus(Backend.Plus) == null) addTransport()
+                            vpnAdapter?.setPlusStrategy()
                         }
 
                         AppConfig.DnsType.DOT -> {
@@ -3004,6 +3023,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // conn-tracking state so the next VPN session doesn't inherit stale
         // active connections / closable cids / rx-traffic timer from this one
         TunFlowManager.clear()
+        // same for TunDnsManager's fid -> dns-filter-decision cache
+        TunDnsManager.clearTrackedDnsFilterReasons()
 
         unobserveOrbotStartStatus()
         unobserveAppInfos()
@@ -3698,6 +3719,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyAdded: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             refreshOrPauseOrResumeOrReAddProxies()
         }
@@ -3740,6 +3762,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyUpdated: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             // pause/resume option is not handled here as firestack is taking care of maintaining
             // the state of the proxies
@@ -3759,6 +3782,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     override fun onDNSStopped() {
         // no-op
         Logger.v(LOG_TAG_VPN, "onDNSStopped")
+    }
+
+    override fun onPrequery(p0: String, p1: String, p2: String, p3: Long): DomainOpts? {
+        return null
     }
 
     override fun onSvcComplete(p0: ServerSummary) {
@@ -3843,6 +3870,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     // requires go2kt if there any calls to go functions
     override fun flowing(m: Mark?) {
         TunFlowManager.handleFlowing(m)
+    }
+
+    // call this method everytime when there is a proxy added or updated
+    private suspend fun updateSplitProxyInfo(pid: String) {
+        val supportedIpVersion = VpnController.getSupportedIpVersion(pid)
+        val splitProxyInfo = vpnAdapter?.isSplitTunnelProxy(pid, supportedIpVersion) ?: false
+        // update the info to the wireguard cache, so it can be used during flow requests
+        WireguardManager.updateSplitProxyInfo(pid, splitProxyInfo)
     }
 
     private fun isLockdown(): Boolean {
@@ -4666,24 +4701,44 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     @RequiresApi(VERSION_CODES.Q)
     private fun initializeBubble() {
-        try {
-            // Request bubble. Bubbles are always backed by a notification, but we suppress the
-            // shade entry via BubbleMetadata#setSuppressNotification(true).
-            val eligible = BubbleHelper.showBubble(this, persistentState)
-            Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
+        io("bubbleInit") {
+            try {
+                // ShortcutManagerCompat / NotificationManager calls inside showBubble() are
+                // synchronous binder IPC to system_server and can stall for seconds when it
+                // is busy; run them off the main thread to avoid ANRs during onCreate().
+                // Request bubble. Bubbles are always backed by a notification, but we suppress the
+                // shade entry via BubbleMetadata#setSuppressNotification(true).
+                val eligible = BubbleHelper.showBubble(this@BraveVPNService, persistentState)
+                Logger.i(TAG, "Bubble notification posted (eligible=$eligible)")
 
-            // If not eligible, do not install observers / update loops.
-            // Do not post any fallback notification (bubble-only UX).
-            if (!eligible) {
-                unobserveBubbleBlockedConns()
-                return
+                // If the coroutine was cancelled while showBubble() was executing (e.g. VPN
+                // stopped), dismiss the just-posted bubble and rethrow; do not install
+                // observers on a torn-down service.
+                currentCoroutineContext().ensureActive()
+
+                withContext(Dispatchers.Main) {
+                    // If not eligible, do not install observers / update loops.
+                    // Do not post any fallback notification (bubble-only UX).
+                    if (!eligible) {
+                        unobserveBubbleBlockedConns()
+                        return@withContext
+                    }
+
+                    blockedConnsObserver = makeFirewallBlockedConnsObserver()
+                    connTrackRepository.getBlockedConnectionsCountLiveData()
+                        .observeForever(blockedConnsObserver)
+                }
+            } catch (e: CancellationException) {
+                Logger.w(TAG, "Bubble init cancelled; dismissing bubble: ${e.message}")
+                try {
+                    BubbleHelper.dismissBubble(this@BraveVPNService)
+                } catch (ex: Exception) {
+                    Logger.w(TAG, "err dismissing bubble: ${ex.message}")
+                }
+                throw e
+            } catch (e: Exception) {
+                Logger.e(TAG, "Bubble init failed: ${e.message}", e)
             }
-
-            blockedConnsObserver = makeFirewallBlockedConnsObserver()
-            connTrackRepository.getBlockedConnectionsCountLiveData().observeForever(blockedConnsObserver)
-        } catch (e: Exception) {
-            Logger.e(TAG, "Bubble init failed: ${e.message}", e)
-            stopSelf()
         }
     }
     private var lastBlockedCount = -1

@@ -129,7 +129,9 @@ class RpnWinProxyDetailsActivity: BaseActivity(R.layout.activity_rpn_win_proxy_d
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
-            f()
+            if (!isFinishing && !isDestroyed) {
+                f()
+            }
         }
     }
 

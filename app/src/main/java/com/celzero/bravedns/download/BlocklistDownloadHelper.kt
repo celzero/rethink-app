@@ -29,6 +29,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.util.concurrent.CancellationException
 
 class BlocklistDownloadHelper {
 
@@ -177,6 +178,9 @@ class BlocklistDownloadHelper {
                     val r = response.body()?.toString()?.let { JSONObject(it) }
                     return processCheckDownloadResponse(r)
                 }
+            } catch (ex: CancellationException) {
+                // never swallow cooperative cancellation
+                throw ex
             } catch (ex: Exception) {
                 logw("exception in checkBlocklistUpdate: ${ex.message}", ex)
             }

@@ -43,39 +43,45 @@ class BraveTileService : TileService(), KoinComponent {
     // generate a new function-reference object per `::` expression — meaning
     // removeObserver(this::updateTile) does NOT find the observer previously
     // registered with observeForever(this::updateTile), and the observer leaks.
-    private val tileObserver = Observer<Boolean> { enabled -> updateTile(enabled) }
+    private val tileObserver = Observer<Boolean> { updateTile() }
 
     override fun onCreate() {
         super.onCreate()
+        Logger.v(Logger.LOG_TAG_VPN, "Tile: on create")
+    }
+
+    // The tile is only bound between onStartListening() and onStopListening()
+    override fun onStartListening() {
+        super.onStartListening()
         try {
             persistentState.vpnEnabledLiveData.observeForever(tileObserver)
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_UI, "Tile: err in observing VPN state", e)
         }
+        updateTile()
     }
 
-    private fun updateTile(enabled: Boolean) {
-        qsTile?.apply {
-            state = if (enabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-            updateTile()
-        }
-    }
-
-    override fun onStartListening() {
-        super.onStartListening()
-        // Just seed the current value; the observer is already attached in onCreate
-        // and will fire on subsequent changes. Re-registering here would either
-        // stack a second observer (leak) or be a no-op duplicate.
-        updateTile(persistentState.getVpnEnabled())
-    }
-
-    override fun onDestroy() {
+    override fun onStopListening() {
         try {
             persistentState.vpnEnabledLiveData.removeObserver(tileObserver)
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_UI, "Tile: err in removing observer", e)
         }
-        super.onDestroy()
+        super.onStopListening()
+    }
+
+    // get the tile state from the actual vpn state, not from the persistent state alone
+    private fun isVpnActive(): Boolean {
+        val state = VpnController.state()
+        return state.activationRequested && (state.on || state.connectionState != null)
+    }
+
+    private fun updateTile() {
+        val enabled = isVpnActive()
+        qsTile?.apply {
+            state = if (enabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            updateTile()
+        }
     }
 
     private fun isAppRunningOnTv(): Boolean {
@@ -96,35 +102,63 @@ class BraveTileService : TileService(), KoinComponent {
         }
     }
 
+    private fun isVpnPrepared(): Boolean {
+        return try {
+            VpnService.prepare(this) == null
+        } catch (e: NullPointerException) {
+            Logger.w(Logger.LOG_TAG_VPN, "Tile: device does not support system-wide VPN mode", e)
+            false
+        } catch (e: IllegalStateException) {
+            // VpnService.prepare() throws IllegalStateException("Unavailable in lockdown mode")
+            // when another VPN app is set as Always-on VPN with "Block connections without VPN"
+            // enabled. See ConnectivityService.throwIfLockdownEnabled(). Fall through to the
+            // else-branch (opens the app) so the user can resolve it there.
+            Logger.w(Logger.LOG_TAG_VPN, "Tile: vpn unavailable, in lockdown mode", e)
+            false
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_VPN, "Tile: err while preparing vpn service", e)
+            false
+        }
+    }
+
     override fun onClick() {
         super.onClick()
         // do not start or stop VPN if app lock is enabled
         if (VpnController.state().activationRequested && !isAppLockEnabled()) {
-            VpnController.stop("tile",this)
-        } else if (VpnService.prepare(this) == null && !isAppLockEnabled()) {
+            if (VpnController.isAlwaysOn(this)) {
+                Logger.i(Logger.LOG_TAG_VPN, "Tile: vpn is always-on, opening app instead of stop")
+                openApp()
+            } else {
+                VpnController.stop("tile", this)
+            }
+        } else if (isVpnPrepared() && !isAppLockEnabled()) {
             // Start VPN service when VPN permission has been granted
             VpnController.start(this)
         } else {
             // open the app to handle the VPN start or stop
-            val intent = Intent(this, AppLockActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            try {
-                if (Utilities.isAtleastU()) {
-                    startActivityAndCollapse(pendingIntent)
-                } else {
-                    // For older versions, convert PendingIntent to Intent and start the activity
-                    val newIntent = Intent(intent).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(newIntent)
-                }
-            } catch (e: UnsupportedOperationException) {
-                // starting activity from TileService using an Intent is not allowed
-                // use PendingIntent instead
-                Logger.w(Logger.LOG_TAG_UI, "Tile: unsupported operation, use send()", e)
-                pendingIntent.send()
-            } catch (e: Exception) {
-                Logger.w(Logger.LOG_TAG_UI, "Tile: err in starting activity", e)
+            openApp()
+        }
+    }
+
+    private fun openApp() {
+        val intent = Intent(this, AppLockActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        try {
+            if (Utilities.isAtleastU()) {
+                startActivityAndCollapse(pendingIntent)
+            } else {
+                // For older versions, convert PendingIntent to Intent and start the activity
+                val newIntent = Intent(intent).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(newIntent)
             }
+        } catch (e: UnsupportedOperationException) {
+            // starting activity from TileService using an Intent is not allowed
+            // use PendingIntent instead
+            Logger.w(Logger.LOG_TAG_UI, "Tile: unsupported operation, use send()", e)
+            pendingIntent.send()
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_UI, "Tile: err in starting activity", e)
         }
     }
 }

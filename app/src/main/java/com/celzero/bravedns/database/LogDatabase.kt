@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -41,6 +41,11 @@ abstract class LogDatabase : RoomDatabase() {
     companion object {
         const val LOGS_DATABASE_NAME = "rethink_logs.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
+        // cap the WAL file size (32MB). This is the high-volume database (connection and
+        // DNS logs); without a limit, the -wal file stays at its high-water mark forever
+        // after a large transaction (e.g. a bulk log purge), since SQLite reuses WAL
+        // space after a checkpoint but never shrinks the file on its own.
+        private const val JOURNAL_SIZE_LIMIT_BYTES = 32 * 1024 * 1024
         private const val TABLE_NAME_DNS_LOGS = "DnsLogs"
         // previous table name for dns logs
         private const val TABLE_NAME_PREVIOUS_DNS = "DNSLogs"
@@ -78,6 +83,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
+                .addMigrations(MIGRATION_15_16)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -92,7 +98,27 @@ abstract class LogDatabase : RoomDatabase() {
                     if (db.version > 5) return
                     populateDatabase(db)
                 }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    setJournalSizeLimit(db)
+                }
             }
+
+        // PRAGMA journal_size_limit sets *and* returns the new limit, i.e. it is a
+        // result-returning pragma; SQLiteDatabase.execSQL() rejects such statements
+        // ("Queries can be performed using SQLiteDatabase query or rawQuery methods
+        // only"), so it must run through the query path with the cursor drained.
+        private fun setJournalSizeLimit(db: SupportSQLiteDatabase) {
+            try {
+                db.query(
+                    SimpleSQLiteQuery("PRAGMA journal_size_limit = $JOURNAL_SIZE_LIMIT_BYTES")
+                ).use { it.moveToFirst() }
+            } catch (e: Exception) {
+                // non-fatal: without the limit the WAL simply keeps its high-water mark
+                Logger.w(LOG_TAG_APP_DB, "err setting journal_size_limit: ${e.message}", e)
+            }
+        }
 
         private fun populateDatabase(db: SupportSQLiteDatabase) {
             try {
@@ -359,7 +385,6 @@ abstract class LogDatabase : RoomDatabase() {
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_eventType ON Events(eventType)")
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_severity ON Events(severity)")
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_Events_source ON Events(source)")
-                    db.execSQL("ALTER TABLE DnsLogs ADD COLUMN blockedTarget TEXT NOT NULL DEFAULT ''")
 
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_12_13: created Events table with indices")
                 } catch (e: Exception) {
@@ -399,6 +424,20 @@ abstract class LogDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_14_15: added timeStamp index on RethinkLog")
                     } catch (e: Exception) {
                         Logger.e(LOG_TAG_APP_DB, "MIGRATION_14_15: index may already exist: ${e.message}", e)
+                    }
+                }
+            }
+
+        private val MIGRATION_15_16: Migration =
+            object : Migration(15, 16) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE DnsLogs ADD COLUMN blockedReason TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_15_16: added blockedReason to DnsLogs")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_15_16: blockedReason already exists, ignore", e)
                     }
                 }
             }
