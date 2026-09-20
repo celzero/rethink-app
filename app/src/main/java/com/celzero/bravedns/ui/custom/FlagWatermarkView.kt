@@ -168,7 +168,10 @@ class FlagWatermarkView @JvmOverloads constructor(
         if (flagText == null && flagDrawable == null) return
         flagText = null
         flagDrawable = null
-        peakAlphaOverride = null
+        if (peakAlphaOverride != null) {
+            peakAlphaOverride = null
+            maskShader = null
+        }
         refresh()
     }
 
