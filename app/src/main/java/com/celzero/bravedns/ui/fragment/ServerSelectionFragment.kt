@@ -1605,7 +1605,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val filled = selectedServers.count { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
             .coerceIn(0, MAX_SELECTIONS)
         if (!isLoading && !isProxyStopped) {
-            animateSectionIn(b.locationCapacityIndicator)
+            if (!b.locationCapacityIndicator.isVisible) {
+                animateSectionIn(b.locationCapacityIndicator, forceShow = true)
+            }
         } else {
             b.locationCapacityIndicator.isVisible = false
         }
