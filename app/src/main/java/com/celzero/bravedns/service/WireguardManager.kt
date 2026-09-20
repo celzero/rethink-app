@@ -387,6 +387,40 @@ object WireguardManager : KoinComponent {
         return appConfig.canEnableProxy()
     }
 
+    fun canEnableProxy(id: Int): Boolean {
+        if (!canEnableProxy()) return false
+
+        val config = getConfigById(id) ?: return false
+        val wgInterface = config.getInterface()
+        val peers = config.getPeers()
+
+        try {
+            val privateKey = wgInterface?.getKeyPair()?.getPrivateKey()?.base64()
+            val peerKeys = peers?.map { it.getPublicKey().base64() }?.toSet() ?: emptySet()
+
+            val duplicate = getActiveConfigs().any { active ->
+                if (active.getId() == id) return@any false
+                val activePrivateKey =
+                    active.getInterface()?.getKeyPair()?.getPrivateKey()?.base64()
+                if (privateKey != null && activePrivateKey == privateKey) return@any true
+                val activePeerKeys =
+                    active.getPeers()?.map { it.getPublicKey().base64() }?.toSet() ?: emptySet()
+                peerKeys.any { it in activePeerKeys }
+            }
+            if (duplicate) {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "cannot enable wg: keys overlap with an active config, id: $id"
+                )
+                return false
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "canEnableProxy: err while comparing keys, id: $id", e)
+            return false
+        }
+        return true
+    }
+
     fun isValidConfig(id: Int): Boolean {
         val config = configs.find { it.getId() == id }
         if (config == null) {

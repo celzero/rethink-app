@@ -20,6 +20,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -30,6 +31,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -42,19 +44,30 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.AppWiseCountriesAdapter
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
+import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
+import com.celzero.bravedns.databinding.ViewInsightsRankRowBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
@@ -63,11 +76,19 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.custom.DonutChartView
+import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
+import com.celzero.bravedns.ui.stats.CountryInsightsMapper
+import com.celzero.bravedns.ui.stats.StatsInsightsMath
+import com.celzero.bravedns.ui.stats.StatsViewMode
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
@@ -78,6 +99,9 @@ import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.celzero.firestack.backend.Backend
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -91,6 +115,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
+    private val appConfig by inject<AppConfig>()
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
@@ -110,6 +135,45 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var notesDialog: AlertDialog? = null
     private var notesEditText: EditText? = null
 
+    // current presentation mode of the network-log sections; mirrors the stats
+    // screen's persisted preference so both surfaces stay in sync
+    private var statsViewMode: StatsViewMode = StatsViewMode.LIST
+
+    // latest snapshot per insights section, kept in sync with the list
+    // adapters so switching to Insights renders instantly without refetching
+    private val insightsSnapshots = mutableMapOf<AppInsightsSection, List<AppConnection>>()
+
+    // (adapter, observer) pairs registered for snapshot mirroring; unregistered
+    // in onDestroy so no observer outlives the activity's view hierarchy
+    private val insightsObservers =
+        mutableListOf<Pair<PagingDataAdapter<AppConnection, *>, RecyclerView.AdapterDataObserver>>()
+
+    // theme-resolved insights colors; refreshed on every full render
+    private var allowedColor: Int = 0
+    private var blockedColor: Int = 0
+    private var trackColor: Int = 0
+    private var centerTextColor: Int = 0
+
+    // true when the ASN section was actually wired up (setting enabled and
+    // app is not Rethink itself); gates the insights ASN section
+    private var isAsnInsightsAvailable: Boolean = false
+
+    // network-log sections rendered in the insights view; both the Rethink and
+    // non-Rethink data sources map onto these same sections. declaration order
+    // mirrors the on-screen section order (App -> Country -> Provider ->
+    // Blocklist -> Domain -> IP), same as the stats screen
+    private enum class AppInsightsSection {
+        ACTIVE_CONNS,
+        COUNTRIES,
+        ASN,
+        BLOCKED_ASN,
+        BLOCKLISTS,
+        DOMAINS,
+        BLOCKED_DOMAINS,
+        IPS,
+        BLOCKED_IPS
+    }
+
     private val warningBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             finish()
@@ -121,6 +185,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         const val INTENT_PACKAGE_NAME = "PACKAGE_NAME"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
+        const val INTENT_COUNTRY = "COUNTRY"
+        const val INTENT_IS_BLOCKED = "IS_BLOCKED"
         private const val TAG = "AppInfoActivity"
 
         // Temp allow duration constants
@@ -132,6 +198,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val MAX_NOTE_LENGTH = 500
         private const val NOTES_DRAFT = "NOTES_DRAFT"
         private const val IS_NOTES_DIALOG_OPEN = "IS_NOTES_DIALOG_OPEN"
+
+        // insights UI constants
+        private const val PERCENTAGE_MULTIPLIER = 100
+
+        // donut slices / ranking rows: top items only, one hue stepped by intensity
+        private const val TOP_SLICES = 5
+        private val SLICE_ALPHAS = intArrayOf(255, 190, 140, 100, 70)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,6 +258,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
+        initStatsViewMode()
         init()
         observeAppRules()
         observeNotesEvents()
@@ -294,6 +368,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     setActiveConnsAdapter(true)
                     setRethinkDomainLogsAdapter()
                     setRethinkIpLogsAdapter()
+                    setRethinkCountriesAdapter()
                 } else {
                     updateFirewallStatusUi(appStatus, connStatus)
                     setActiveConnsAdapter(false)
@@ -302,7 +377,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                     }
                     setDomainsAdapter()
                     setIpAdapter()
+                    setCountriesAdapter()
                 }
+                setBlocklistAdapter()
 
                 // disable exclude app option for apps with no package name
                 if (FirewallManager.isUnknownPackage(uid)) {
@@ -314,18 +391,50 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 }
 
                 restoreNotesDialogIfNeeded()
+
+                // first insights render now that the adapters (and their
+                // snapshot observers) are wired; later renders are data-driven
+                if (statsViewMode == StatsViewMode.INSIGHTS) renderInsights()
             }
         }
     }
 
     private fun displayProxyStatus() {
-        val proxy = ProxyManager.getProxyIdForApp(uid)
-        if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
-            b.aadProxyDetails.visibility = View.GONE
-            return
+        io {
+            val proxy = ProxyManager.getProxyIdForApp(uid)
+            val proxyNames = fetchProxyNames(proxy)
+            uiCtx {
+                if (proxyNames.isEmpty() || (proxyNames.size == 1 && proxyNames[0] == ID_NONE)) {
+                    b.aadProxyDetails.visibility = View.GONE
+                    return@uiCtx
+                }
+                b.aadProxyDetails.visibility = View.VISIBLE
+                b.aadProxyDetails.text =
+                    getString(
+                        R.string.wireguard_apps_proxy_map_desc,
+                        proxyNames.filter { it != ID_NONE })
+            }
         }
-        b.aadProxyDetails.visibility = View.VISIBLE
-        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy.filter { it != ID_NONE })
+    }
+
+    private suspend fun fetchProxyNames(proxy: List<String>): List<String> {
+        val names: MutableList<String> = mutableListOf()
+        // in case of RPN show the name else return the same
+        proxy.forEach {
+            if (it.startsWith(Backend.RpnWin)) {
+                val k = it.substring(Backend.RpnWin.length)
+                var name = RpnProxyManager.getCountryConfigByKey(k)?.name ?: it
+                if (name == RpnProxyManager.AUTO_SERVER_ID) {
+                    name = getString(R.string.rpn_title) + " " + getString(R.string.server_settings_config_mode_auto)
+                } else {
+                    name = getString(R.string.rpn_title) + " " + name
+                }
+                names.add(name)
+            } else {
+                names.add(it)
+            }
+        }
+        return names
     }
 
     private fun openCustomIpScreen() {
@@ -357,6 +466,469 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
         val downloadBytes = getString(R.string.symbol_download, d)
         b.aadDataUsageStatus.text = getString(R.string.two_argument, uploadBytes, downloadBytes)
+    }
+
+    /**
+     * Restores the persisted presentation mode, styles the toggle and attaches
+     * its listener. Must run before data observation begins so the first
+     * landing on either presentation is consistent.
+     */
+    private fun initStatsViewMode() {
+        // restore the persisted mode before the listener attaches (setting
+        // checkedButton here does not fire the toggle listener)
+        statsViewMode = StatsViewMode.fromId(persistentState.statsViewMode)
+        val modeBtn = b.aadViewModeToggleGroup.findViewById<MaterialButton>(
+            if (statsViewMode == StatsViewMode.INSIGHTS) {
+                b.aadViewModeInsightsBtn.id
+            } else {
+                b.aadViewModeListBtn.id
+            }
+        )
+        modeBtn.isChecked = true
+        refreshViewModeToggleUi()
+        b.aadViewModeToggleGroup.addOnButtonCheckedListener(viewModeToggleListener)
+        setupInsightsClickListeners()
+        applyViewModeUi()
+    }
+
+    /**
+     * View-mode switch: persists the mode and flips the presentation only.
+     * Both views share the same adapters/state, so switching never refetches.
+     */
+    private val viewModeToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, _, isChecked ->
+            // restyle on BOTH events (checked + unchecked): the group emits the
+            // unchecked callback for the old button after (or before) the checked
+            // callback for the new one, so each event re-syncs the visuals
+            refreshViewModeToggleUi()
+            if (!isChecked) return@OnButtonCheckedListener
+            val newMode =
+                if (b.aadViewModeInsightsBtn.id == b.aadViewModeToggleGroup.checkedButtonId) {
+                    StatsViewMode.INSIGHTS
+                } else {
+                    StatsViewMode.LIST
+                }
+            if (newMode == statsViewMode) return@OnButtonCheckedListener
+            statsViewMode = newMode
+            persistentState.statsViewMode = newMode.id
+            applyViewModeUi()
+        }
+
+    /** Applies the selected/unselected styling to both view-mode buttons. */
+    private fun refreshViewModeToggleUi() {
+        styleViewModeBtn(b.aadViewModeListBtn)
+        styleViewModeBtn(b.aadViewModeInsightsBtn)
+    }
+
+    private fun styleViewModeBtn(mb: MaterialButton) {
+        // derive selection from statsViewMode (not isChecked): the group fires
+        // the checked/unchecked pair in quick succession and isChecked can be
+        // mid-transition, which would leave both buttons looking selected
+        val selected =
+            (mb.id == b.aadViewModeInsightsBtn.id) == (statsViewMode == StatsViewMode.INSIGHTS)
+        if (selected) {
+            mb.backgroundTintList =
+                ColorStateList.valueOf(
+                    UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                )
+            mb.iconTint =
+                ColorStateList.valueOf(
+                    UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor)
+                )
+        } else {
+            mb.backgroundTintList =
+                ColorStateList.valueOf(
+                    UIUtils.fetchToggleBtnColors(this, R.color.defaultToggleBtnBg)
+                )
+            mb.iconTint =
+                ColorStateList.valueOf(
+                    UIUtils.fetchColor(this, R.attr.defaultToggleBtnTxt)
+                )
+        }
+    }
+
+    /** Flips the two presentation containers; does not touch any data state. */
+    private fun applyViewModeUi() {
+        val insights = statsViewMode == StatsViewMode.INSIGHTS
+        b.aadListContainer.visibility = if (insights) View.GONE else View.VISIBLE
+        b.aadInsightsContainer.visibility = if (insights) View.VISIBLE else View.GONE
+        refreshViewModeToggleUi()
+        refreshLogToggleVisibility()
+        if (insights) {
+            renderInsights()
+        }
+    }
+
+    /**
+     * The list/insights toggle only makes sense when at least one log section
+     * has content. Sections stay hidden until their data arrives (and are
+     * hidden again when a feature or dataset is unavailable), so the toggle's
+     * visibility can simply mirror the section containers themselves.
+     */
+    private fun refreshLogToggleVisibility() {
+        val anySectionVisible = listOf(
+            b.aadActiveConnsRl,
+            b.aadMostContactedCountriesRl,
+            b.aadAsnRl,
+            b.aadBlockedAsnRl,
+            b.aadBlocklistRl,
+            b.aadMostContactedDomainRl,
+            b.aadBlockedDomainsRl,
+            b.aadMostContactedIpsRl,
+            b.aadBlockedIpsRl
+        ).any { it.visibility == View.VISIBLE }
+        b.aadViewModeToggleGroup.visibility =
+            if (anySectionVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun setupInsightsClickListeners() {
+        b.aadIaActiveConnsChip.setOnClickListener { openAppWiseDomainLogsActivity(activeConns = true) }
+        b.aadIaDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity(isBlocked = false) }
+        b.aadIaIpsChip.setOnClickListener { openAppWiseIpLogsActivity(isBlocked = false) }
+        b.aadIaCountriesChip.setOnClickListener { openAppWiseIpLogsActivity(country = true) }
+        b.aadIaAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true, isBlocked = false) }
+        // blocked domains drill into the same detail screen the stats screen
+        // uses; blocklists keep the per-blocklist drill-down
+        b.aadIaBlockedDomainsChip.setOnClickListener { openBlockedDomainsUi() }
+        b.aadIaBlockedIpsChip.setOnClickListener { openAppWiseIpLogsActivity(isBlocked = true) }
+        b.aadIaBlockedAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true, isBlocked = true) }
+        b.aadIaBlocklistChip.setOnClickListener { openDetailedBlocklistsUi() }
+    }
+
+    /**
+     * Opens the same per-type drill-down the stats screen uses, scoped to
+     * this app's uid; the detail screen recomputes for the 7-day window.
+     */
+    private fun openDetailedStatsUi(type: SummaryStatisticsFragment.SummaryStatisticsType) {
+        val intent = Intent(this, DetailedStatisticsActivity::class.java)
+        intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
+        intent.putExtra(
+            DetailedStatisticsActivity.INTENT_TIME_CATEGORY,
+            SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS.value
+        )
+        intent.putExtra(DetailedStatisticsActivity.INTENT_UID, uid)
+        startActivity(intent)
+    }
+
+    private fun openDetailedBlocklistsUi() {
+        openDetailedStatsUi(SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS)
+    }
+
+    /**
+     * Blocked domains drill down into the per-type detail screen like the
+     * stats screen does. Rethink's own blocked domains live in RethinkLog,
+     * which the detail screen does not read, so they stay on the app-scoped
+     * domain log list.
+     */
+    private fun openBlockedDomainsUi() {
+        if (android.os.Process.myUid() == uid) {
+            openAppWiseDomainLogsActivity(isBlocked = true)
+        } else {
+            openDetailedStatsUi(SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS)
+        }
+    }
+
+    /**
+     * Wires a blocked-activity section for BOTH presentations: the RecyclerView
+     * backs the list view (title + rows hidden when the section is empty) while
+     * the snapshot hook feeds the matching insights section.
+     */
+    private fun setupBlockedSection(
+        containerView: View,
+        recyclerView: RecyclerView,
+        section: AppInsightsSection,
+        data: LiveData<PagingData<AppConnection>>,
+        adapter: PagingDataAdapter<AppConnection, *>
+    ) {
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        // wrap_content height: data changes resize the view, so fixed-size must
+        // stay off and animations disabled to avoid flicker on updates
+        recyclerView.setHasFixedSize(false)
+        recyclerView.itemAnimator = null
+        hookInsightsSnapshot(section, adapter)
+        data.observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        recyclerView.adapter = adapter
+
+        // hide both the title and the list when the section has no entries
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                containerView.visibility =
+                    if (adapter.itemCount >= 1) View.VISIBLE else View.GONE
+                refreshLogToggleVisibility()
+            }
+        }
+    }
+
+    /**
+     * Mirrors adapter list changes into [insightsSnapshots] and re-renders the
+     * matching Insights section (only when the Insights view is visible).
+     */
+    private fun hookInsightsSnapshot(
+        section: AppInsightsSection,
+        adapter: PagingDataAdapter<AppConnection, *>
+    ) {
+        val observer = object : RecyclerView.AdapterDataObserver() {
+            private fun cacheAndRender() {
+                insightsSnapshots[section] = adapter.snapshot().items
+                if (statsViewMode == StatsViewMode.INSIGHTS && !isFinishing && !isDestroyed) {
+                    renderInsightsSection(section)
+                }
+            }
+
+            override fun onChanged() = cacheAndRender()
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = cacheAndRender()
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) =
+                cacheAndRender()
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = cacheAndRender()
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = cacheAndRender()
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) =
+                cacheAndRender()
+        }
+        adapter.registerAdapterDataObserver(observer)
+        insightsObservers.add(adapter to observer)
+    }
+
+    /** Re-renders every insights section from the cached snapshots. */
+    private fun renderInsights() {
+        applyInsightsTheme()
+        AppInsightsSection.entries.forEach { renderInsightsSection(it) }
+        applyInsightsSectionGating()
+    }
+
+    private fun isBlockedSection(section: AppInsightsSection): Boolean {
+        return section == AppInsightsSection.BLOCKED_ASN ||
+            section == AppInsightsSection.BLOCKED_DOMAINS ||
+            section == AppInsightsSection.BLOCKED_IPS ||
+            section == AppInsightsSection.BLOCKLISTS
+    }
+
+    /** Hides insights sections whose list-view counterparts are unavailable. */
+    private fun applyInsightsSectionGating() {
+        // ASN lookups are an optional (downloaded) dataset and Rethink's own
+        // screen never wires the ASN adapter; when available, visibility is
+        // driven by the snapshot inside renderRanking (hidden until data exists)
+        if (!isAsnInsightsAvailable) {
+            b.aadIaAsnLl.visibility = View.GONE
+            b.aadIaBlockedAsnLl.visibility = View.GONE
+        }
+    }
+
+    /** Resolves every insights color from the active theme; no hardcoded colors. */
+    private fun applyInsightsTheme() {
+        allowedColor = UIUtils.fetchColor(this, R.attr.accentGood)
+        blockedColor = UIUtils.fetchColor(this, R.attr.accentBad)
+        trackColor = UIUtils.fetchColor(this, R.attr.colorSurfaceContainerHighest)
+        centerTextColor = UIUtils.fetchColor(this, R.attr.primaryTextColor)
+        val subtle = UIUtils.fetchColor(this, R.attr.secondaryTextColor)
+        b.aadIaCountriesMap.setColors(trackColor, allowedColor, subtle)
+        allInsightsDonuts().forEach { donut ->
+            donut.setTrackColor(trackColor)
+            donut.setCenterTextColor(centerTextColor)
+        }
+    }
+
+    private fun allInsightsDonuts(): List<DonutChartView> {
+        return listOf(
+            b.aadIaActiveConnsDonut,
+            b.aadIaAsnDonut,
+            b.aadIaDomainsDonut,
+            b.aadIaIpsDonut,
+            b.aadIaBlockedAsnDonut,
+            b.aadIaBlockedDomainsDonut,
+            b.aadIaBlockedIpsDonut,
+            b.aadIaBlocklistDonut
+        )
+    }
+
+    private fun renderInsightsSection(section: AppInsightsSection) {
+        val items = insightsSnapshots[section].orEmpty()
+        when (section) {
+            AppInsightsSection.ACTIVE_CONNS ->
+                renderRanking(
+                    section, b.aadIaActiveConnsLl, b.aadIaActiveConnsRows,
+                    b.aadIaActiveConnsDonut, items
+                )
+            AppInsightsSection.ASN ->
+                renderRanking(
+                    section, b.aadIaAsnLl, b.aadIaAsnRows,
+                    b.aadIaAsnDonut, items
+                )
+            AppInsightsSection.COUNTRIES -> {
+                renderRanking(
+                    section, b.aadIaCountriesLl, b.aadIaCountriesRows,
+                    null, items
+                )
+                updateCountryMap(items)
+            }
+            AppInsightsSection.DOMAINS ->
+                renderRanking(
+                    section, b.aadIaDomainsLl, b.aadIaDomainsRows,
+                    b.aadIaDomainsDonut, items
+                )
+            AppInsightsSection.IPS ->
+                renderRanking(
+                    section, b.aadIaIpsLl, b.aadIaIpsRows,
+                    b.aadIaIpsDonut, items
+                )
+            AppInsightsSection.BLOCKED_ASN ->
+                renderRanking(
+                    section, b.aadIaBlockedAsnLl, b.aadIaBlockedAsnRows,
+                    b.aadIaBlockedAsnDonut, items
+                )
+            AppInsightsSection.BLOCKED_DOMAINS ->
+                renderRanking(
+                    section, b.aadIaBlockedDomainsLl, b.aadIaBlockedDomainsRows,
+                    b.aadIaBlockedDomainsDonut, items
+                )
+            AppInsightsSection.BLOCKED_IPS ->
+                renderRanking(
+                    section, b.aadIaBlockedIpsLl, b.aadIaBlockedIpsRows,
+                    b.aadIaBlockedIpsDonut, items
+                )
+            AppInsightsSection.BLOCKLISTS -> {
+                // blocklist blocking only exists when dns is active; the
+                // section disappears until a blocklist has blocked something
+                if (appConfig.getBraveMode().isDnsActive()) {
+                    renderRanking(
+                        section, b.aadIaBlocklistLl, b.aadIaBlocklistRows,
+                        b.aadIaBlocklistDonut, items
+                    )
+                } else {
+                    b.aadIaBlocklistLl.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    /**
+     * Renders a section as a donut chart (top slices, single hue stepped by
+     * intensity) plus normalized ranking rows (bar length = value / maxValue,
+     * the longest item at ~100%). The whole section — heading, action chip
+     * and chart — is hidden when there is nothing to show; no separate
+     * empty-state message is displayed. Blocked sections use the negative
+     * accent hue throughout.
+     */
+    private fun renderRanking(
+        section: AppInsightsSection,
+        containerView: View,
+        rowsContainer: LinearLayout,
+        donut: DonutChartView?,
+        items: List<AppConnection>
+    ) {
+        val blocked = isBlockedSection(section)
+        containerView.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+        if (items.isEmpty()) {
+            rowsContainer.removeAllViews()
+            donut?.visibility = View.GONE
+            return
+        }
+        donut?.visibility = View.VISIBLE
+        val fractions = StatsInsightsMath.normalizeFractions(items.map { it.count.toLong() })
+        renderDonut(donut, fractions, items, blocked)
+        val inflater = LayoutInflater.from(this)
+        val barColor = if (blocked) blockedColor else allowedColor
+        rowsContainer.removeAllViews()
+        // rows are capped to the donut's top-slice count: the full ranked list
+        // stays one tap away on the "see more" screen
+        val rows = minOf(TOP_SLICES, items.size)
+        items.take(rows).forEachIndexed { index, item ->
+            val rowBinding = ViewInsightsRankRowBinding.inflate(inflater, rowsContainer, false)
+            val label = rowLabel(item, section)
+            val metric = item.count.toString()
+            rowBinding.irName.text = label
+            rowBinding.irCount.text = metric
+            rowBinding.irBar.max = PERCENTAGE_MULTIPLIER
+            rowBinding.irBar.progress = (fractions[index] * PERCENTAGE_MULTIPLIER).toInt()
+            rowBinding.irBar.setIndicatorColor(
+                if (!blocked && item.blocked) blockedColor else barColor
+            )
+            rowBinding.root.contentDescription = getString(R.string.ci_desc, label, metric)
+            rowsContainer.addView(rowBinding.root)
+        }
+    }
+
+    /**
+     * Donut slices: the top [TOP_SLICES] items, one hue (green for
+     * allowed/contacted sections, red for blocked sections) at stepped
+     * intensities; the remainder stays visible as the neutral track ring.
+     * The center carries the section total.
+     */
+    private fun renderDonut(
+        donut: DonutChartView?,
+        fractions: List<Float>,
+        items: List<AppConnection>,
+        blocked: Boolean
+    ) {
+        donut ?: return
+        val base = if (blocked) blockedColor else allowedColor
+        val top = minOf(TOP_SLICES, fractions.size)
+        val slices = (0 until top).map { i ->
+            DonutChartView.Slice(fractions[i], ColorUtils.setAlphaComponent(base, SLICE_ALPHAS[i]))
+        }
+        donut.setData(slices)
+        donut.setCenterText(items.sumOf { it.count.toLong() }.toString())
+    }
+
+    private fun rowLabel(item: AppConnection, section: AppInsightsSection): String {
+        return when (section) {
+            AppInsightsSection.ACTIVE_CONNS,
+            AppInsightsSection.IPS,
+            AppInsightsSection.BLOCKED_IPS ->
+                item.ipAddress
+            AppInsightsSection.DOMAINS,
+            AppInsightsSection.BLOCKED_DOMAINS ->
+                item.appOrDnsName?.dropLastWhile { it == '.' }.orEmpty()
+            AppInsightsSection.COUNTRIES -> {
+                // country-name lookups fail with a dash placeholder, never a
+                // real name; such rows render as "Unknown <flag>"
+                val name = getCountryNameFromFlag(item.flag)
+                if (name.isNotEmpty() && !name.all { it == '-' }) {
+                    name
+                } else {
+                    getString(
+                        R.string.two_argument_space,
+                        getString(R.string.network_log_app_name_unknown),
+                        item.flag
+                    )
+                }
+            }
+            AppInsightsSection.ASN,
+            AppInsightsSection.BLOCKED_ASN ->
+                getString(R.string.two_argument_space, item.flag, item.appOrDnsName.orEmpty())
+            AppInsightsSection.BLOCKLISTS -> item.appOrDnsName.orEmpty()
+        }
+    }
+
+    /** Feeds the offline map: emoji flag -> ISO code -> connection count. */
+    private fun updateCountryMap(items: List<AppConnection>) {
+        val stats = items.mapNotNull { item ->
+            CountryInsightsMapper.toCountryCode(item.flag)?.let { it to item.count }
+        }.toMap()
+        b.aadIaCountriesMap.setCountryCounts(stats)
+        // accessibility summary: top few countries, list holds exact numbers
+        val summary = stats.entries.take(3).joinToString(", ") {
+            getString(R.string.ci_desc, it.key, it.value.toString())
+        }
+        b.aadIaCountriesMap.contentDescription =
+            if (summary.isEmpty()) {
+                getString(R.string.cd_stats_country_map)
+            } else {
+                getString(R.string.two_argument_colon, getString(R.string.cd_stats_country_map), summary)
+            }
+    }
+
+    override fun onDestroy() {
+        // detach snapshot observers before the view tree goes away so nothing
+        // holds a reference to the (dying) adapters or row containers
+        insightsObservers.forEach { (adapter, observer) ->
+            runCatching { adapter.unregisterAdapterDataObserver(observer) }
+        }
+        insightsObservers.clear()
+        insightsSnapshots.clear()
+        super.onDestroy()
     }
 
     private fun updateFirewallStatusUi(
@@ -445,6 +1017,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
+        TooltipCompat.setTooltipText(b.aadAppInfoIcon, getString(R.string.about_settings_app_info))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
@@ -581,13 +1154,23 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
         b.aadDomainBlockCard.setOnClickListener { openCustomDomainScreen() }
 
-        b.aadIpsChip.setOnClickListener { openAppWiseIpLogsActivity() }
+        b.aadIpsChip.setOnClickListener { openAppWiseIpLogsActivity(isBlocked = false) }
 
-        b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity() }
+        b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity(isBlocked = false) }
+
+        b.aadBlockedAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true, isBlocked = true) }
+
+        b.aadBlockedDomainsChip.setOnClickListener { openBlockedDomainsUi() }
+
+        b.aadBlockedIpsChip.setOnClickListener { openAppWiseIpLogsActivity(isBlocked = true) }
+
+        b.aadBlocklistChip.setOnClickListener { openDetailedBlocklistsUi() }
 
         b.aadActiveConnsChip.setOnClickListener { openAppWiseDomainLogsActivity(activeConns = true) }
 
-        b.aadAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true) }
+        b.aadAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true, isBlocked = false) }
+
+        b.aadCountriesChip.setOnClickListener { openAppWiseIpLogsActivity(country = true) }
 
         b.excludeProxySwitch.setOnCheckedChangeListener { _, isChecked ->
             updateExcludeProxyStatus(isChecked)
@@ -690,17 +1273,27 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
     }
 
-    private fun openAppWiseDomainLogsActivity(activeConns: Boolean = false) {
+    private fun openAppWiseDomainLogsActivity(
+        activeConns: Boolean = false,
+        isBlocked: Boolean? = null
+    ) {
         val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
         intent.putExtra(INTENT_UID, uid)
         intent.putExtra(INTENT_ACTIVE_CONNS, activeConns)
+        isBlocked?.let { intent.putExtra(INTENT_IS_BLOCKED, it) }
         startActivity(intent)
     }
 
-    private fun openAppWiseIpLogsActivity(asn: Boolean = false) {
+    private fun openAppWiseIpLogsActivity(
+        asn: Boolean = false,
+        country: Boolean = false,
+        isBlocked: Boolean? = null
+    ) {
         val intent = Intent(this, AppWiseIpLogsActivity::class.java)
         intent.putExtra(INTENT_UID, uid)
         intent.putExtra(INTENT_ASN, asn)
+        intent.putExtra(INTENT_COUNTRY, country)
+        isBlocked?.let { intent.putExtra(INTENT_IS_BLOCKED, it) }
         startActivity(intent)
     }
 
@@ -708,6 +1301,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadActiveConnsRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid, isActiveConn = true)
+        hookInsightsSnapshot(AppInsightsSection.ACTIVE_CONNS, adapter)
         val uptime = VpnController.uptimeMs()
         Logger.i(LOG_TAG_UI, "app-info-act, active conns, uptime: $uptime ms")
         if (isRethink) {
@@ -728,6 +1322,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadActiveConnsRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
             }
         }
     }
@@ -736,6 +1331,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadAsnRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid,  isAsn = true)
+        isAsnInsightsAvailable = true
+        hookInsightsSnapshot(AppInsightsSection.ASN, adapter)
+        // blocked providers: same list+insights wiring as the allowed section,
+        // rendered ASN-style (no per-IP bottom sheet)
+        setupBlockedSection(
+            b.aadBlockedAsnRl,
+            b.aadBlockedAsnRv,
+            AppInsightsSection.BLOCKED_ASN,
+            networkLogsViewModel.getBlockedAsnLogsLimited(uid),
+            AppWiseIpsAdapter(this, this, uid, isAsn = true)
+        )
         networkLogsViewModel.getAsnLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -748,6 +1354,76 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadAsnRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
+            }
+        }
+    }
+
+    private fun setCountriesAdapter() {
+        setupCountriesAdapter(networkLogsViewModel.getMostContactedCountriesLimited(uid))
+    }
+
+    private fun setRethinkCountriesAdapter() {
+        // rethink's own logs are stored in RethinkLog, so countries are read
+        // from there instead of the uid-filtered ConnectionTracker query
+        setupCountriesAdapter(networkLogsViewModel.getRethinkCountriesLimited())
+    }
+
+    /**
+     * Wires the most-blocked-blocklists section. Unlike the other sections,
+     * the data is aggregated in memory (the blocklist CSV cannot be grouped in
+     * SQL), so it arrives as a static list converted into static PagingData;
+     * visibility is driven by the list itself. Blocklist blocking only exists
+     * when dns is active, so the section stays hidden otherwise.
+     */
+    private fun setBlocklistAdapter() {
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.aadBlocklistRl.visibility = View.GONE
+            refreshLogToggleVisibility()
+            return
+        }
+        val adapter = SummaryStatisticsAdapter(
+            this,
+            persistentState,
+            appConfig,
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS
+        )
+        // scope row-click drill-downs to this app: without it, tapping a
+        // blocklist opens the device-wide list instead of this app's domains
+        adapter.setUid(uid)
+        adapter.setTimeCategory(SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS)
+        hookInsightsSnapshot(AppInsightsSection.BLOCKLISTS, adapter)
+        networkLogsViewModel.mostBlockedBlocklists.observe(this) { items ->
+            adapter.submitData(this.lifecycle, PagingData.from(items))
+            b.aadBlocklistRl.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+            refreshLogToggleVisibility()
+        }
+        b.aadBlocklistRv.layoutManager = LinearLayoutManager(this)
+        b.aadBlocklistRv.setHasFixedSize(false)
+        b.aadBlocklistRv.itemAnimator = null
+        b.aadBlocklistRv.adapter = adapter
+    }
+
+    private fun setupCountriesAdapter(data: LiveData<PagingData<AppConnection>>) {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedCountriesRv.layoutManager = layoutManager
+        // wrap_content height: data changes resize the view, so fixed-size must
+        // stay off and animations disabled to avoid flicker on updates
+        b.aadMostContactedCountriesRv.setHasFixedSize(false)
+        b.aadMostContactedCountriesRv.itemAnimator = null
+        val adapter = AppWiseCountriesAdapter(this, this)
+        hookInsightsSnapshot(AppInsightsSection.COUNTRIES, adapter)
+        data.observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedCountriesRv.adapter = adapter
+
+        // hide both the title and the list when this app has no country entries
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                b.aadMostContactedCountriesRl.visibility =
+                    if (adapter.itemCount >= 1) View.VISIBLE else View.GONE
+                refreshLogToggleVisibility()
             }
         }
     }
@@ -756,6 +1432,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid)
+        hookInsightsSnapshot(AppInsightsSection.DOMAINS, adapter)
+        setupBlockedSection(
+            b.aadBlockedDomainsRl,
+            b.aadBlockedDomainsRv,
+            AppInsightsSection.BLOCKED_DOMAINS,
+            networkLogsViewModel.getBlockedDomainLogsLimited(uid),
+            AppWiseDomainsAdapter(this, this, uid)
+        )
         networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -768,6 +1452,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
             }
         }
     }
@@ -776,6 +1461,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid)
+        hookInsightsSnapshot(AppInsightsSection.DOMAINS, adapter)
+        setupBlockedSection(
+            b.aadBlockedDomainsRl,
+            b.aadBlockedDomainsRv,
+            AppInsightsSection.BLOCKED_DOMAINS,
+            networkLogsViewModel.getRethinkBlockedDomainLogsLimited(),
+            AppWiseDomainsAdapter(this, this, uid)
+        )
         networkLogsViewModel.getRethinkDomainLogsLimited().observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -788,6 +1481,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
             }
         }
     }
@@ -796,6 +1490,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid)
+        hookInsightsSnapshot(AppInsightsSection.IPS, adapter)
+        setupBlockedSection(
+            b.aadBlockedIpsRl,
+            b.aadBlockedIpsRv,
+            AppInsightsSection.BLOCKED_IPS,
+            networkLogsViewModel.getRethinkBlockedIpLogsLimited(),
+            AppWiseIpsAdapter(this, this, uid)
+        )
         networkLogsViewModel.getRethinkIpLogsLimited().observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -808,6 +1510,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
             }
         }
     }
@@ -817,6 +1520,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid)
+        hookInsightsSnapshot(AppInsightsSection.IPS, adapter)
+        setupBlockedSection(
+            b.aadBlockedIpsRl,
+            b.aadBlockedIpsRv,
+            AppInsightsSection.BLOCKED_IPS,
+            networkLogsViewModel.getBlockedIpLogsLimited(uid),
+            AppWiseIpsAdapter(this, this, uid)
+        )
         networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -829,6 +1540,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.GONE
                 }
+                refreshLogToggleVisibility()
             }
         }
     }

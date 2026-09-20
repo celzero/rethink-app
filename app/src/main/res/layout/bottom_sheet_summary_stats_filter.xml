@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="24dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="14dp"
+        android:background="?attr/border" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@null"
+            app:srcCompat="@drawable/ic_filter" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ssv_filter_heading"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ssfc_select_all"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="@string/lbl_select_all"
+            android:textAllCaps="false"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/default_font_text_view" />
+
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/ssfc_chip_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="4dp"
+            app:selectionRequired="true"
+            app:singleLine="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_apps_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/apps_info_title"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_countries_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/ssv_filter_countries"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_providers_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/ssv_filter_providers"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_blocklist_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/ssv_filter_blocklist"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_domains_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/ssv_filter_domains"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/fss_filter_ips_chip"
+                style="@style/ThinnerChip.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:padding="2dp"
+                android:checkable="true"
+                android:checked="true"
+                android:text="@string/ssv_filter_ips"
+                android:textAlignment="center"
+                android:textSize="@dimen/default_font_text_view"
+                app:checkedIconVisible="false"
+                app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ssfc_apply"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded_corners_button_accent"
+        android:maxHeight="40dp"
+        android:minHeight="40dp"
+        android:text="@string/lbl_apply"
+        android:textColor="?attr/chipTextColor"
+        android:textSize="@dimen/default_font_text_view" />
+
+</LinearLayout>

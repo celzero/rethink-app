@@ -149,6 +149,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
         // allow apps to bypass the tunnel
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
+        b.settingsActivityAllowBypassProgress.visibility = View.GONE
         // show ping ips
         b.settingsActivityPingIpsBtn.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
         // exclude apps in proxy
@@ -208,8 +209,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         
         // If Fixed policy is selected, disable jumbo packets and IP version settings
         if (persistentState.vpnBuilderPolicy == POLICY_FIXED) {
-            b.settingsUseMaxMtuRl.isEnabled = false
-            b.settingsUseMaxMtuSwitch.isEnabled = false
+            disableBandwidthBoosterUi()
             b.settingsActivityIpRl.isEnabled = false
         }
     }
@@ -388,12 +388,21 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
 
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            checked: Boolean ->
+                _: CompoundButton,
+                checked: Boolean ->
             persistentState.allowBypass = checked
+            b.settingsActivityAllowBypassSwitch.isEnabled = false
+            b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
+            b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
+
+            Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
+                b.settingsActivityAllowBypassSwitch.isEnabled = true
+                b.settingsActivityAllowBypassProgress.visibility = View.GONE
+                b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
+            }
             logEvent(
                 "allow bypass",
-                "Allow apps to bypass the tunnel: $checked"
+                "Allow bypass VPN: $checked"
             )
         }
 
@@ -798,16 +807,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             persistentState.internetProtocolType = InternetProtocol.ALWAYSv46.id
 
             // Disable both settings (jumbo packets and IP version)
-            b.settingsUseMaxMtuRl.isEnabled = false
-            b.settingsUseMaxMtuSwitch.isEnabled = false
+            disableBandwidthBoosterUi()
             b.settingsActivityIpRl.isEnabled = false
 
             // Update UI
             displayInternetProtocolUi()
         } else {
             // Enable both settings for other policies
-            b.settingsUseMaxMtuRl.isEnabled = true
-            b.settingsUseMaxMtuSwitch.isEnabled = true
+            enableBandwidthBoosterUi()
             b.settingsActivityIpRl.isEnabled = true
         }
         logEvent(
@@ -1397,21 +1404,42 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
                 b.settingsActivityExcludeProxyAppsSwitch.isEnabled = false
                 b.settingsActivityExcludeProxyAppsRl.isEnabled = false
+
+                b.settingsActivityAllowBypassRl.alpha = ALPHA_DISABLED
+                b.settingsActivityAllowBypassSwitch.isEnabled = false
+                b.settingsActivityAllowBypassRl.isEnabled = false
+
+                b.settingsActivityLanTrafficRl.alpha = ALPHA_DISABLED
+                b.settingsActivityLanTrafficSwitch.isEnabled = false
+                b.settingsActivityLanTrafficRl.isEnabled = false
             }
             isProxyLockdown -> {
                 b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
                 b.settingsActivityExcludeProxyAppsSwitch.isEnabled = false
                 b.settingsActivityExcludeProxyAppsRl.isEnabled = true
+
+                b.settingsActivityAllowBypassRl.alpha = ALPHA_ENABLED
+                b.settingsActivityAllowBypassSwitch.isEnabled = true
+                b.settingsActivityAllowBypassRl.isEnabled = true
+
+                b.settingsActivityLanTrafficRl.alpha = ALPHA_ENABLED
+                b.settingsActivityLanTrafficSwitch.isEnabled = true
+                b.settingsActivityLanTrafficRl.isEnabled = true
             }
             else -> {
                 b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
                 b.settingsActivityExcludeProxyAppsSwitch.isEnabled = true
                 b.settingsActivityExcludeProxyAppsRl.isEnabled = true
+
+                b.settingsActivityAllowBypassRl.alpha = ALPHA_ENABLED
+                b.settingsActivityAllowBypassSwitch.isEnabled = true
+                b.settingsActivityAllowBypassRl.isEnabled = true
+
+                b.settingsActivityLanTrafficRl.alpha = ALPHA_ENABLED
+                b.settingsActivityLanTrafficSwitch.isEnabled = true
+                b.settingsActivityLanTrafficRl.isEnabled = true
             }
         }
-
-        b.settingsActivityLanTrafficRl.isEnabled = !isSystemLockdown
-        b.settingsActivityLanTrafficSwitch.isEnabled = !isSystemLockdown
     }
 
     private fun logEvent(msg: String, details: String) {

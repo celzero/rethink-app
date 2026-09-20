@@ -208,9 +208,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var httpProxyHostAddress by
         stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
-    // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    // default: false
-    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(false)
+    // whether the apps can bypass the tunnel on-demand
+    // default: true for play store flavor
+    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
@@ -879,6 +879,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
      * mirroring the withDefault{} values of the respective properties.
      */
     fun restoreTunnelSettingsDefaults() {
+        allowBypass = Utilities.isPlayStoreFlavour()
         useMultipleNetworks = false
         // flavour dependent: on by default only on play-store builds
         privateIps = Utilities.isPlayStoreFlavour()

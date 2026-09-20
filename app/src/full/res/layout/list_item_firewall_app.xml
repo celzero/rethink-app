@@ -53,9 +53,13 @@
                     android:id="@+id/firewall_app_label_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
+                    android:ellipsize="marquee"
                     android:maxLines="1"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:focusable="true"
                     android:textColor="?attr/colorOnSurface"
                     tools:text="App Name" />
 
@@ -63,16 +67,16 @@
                     android:id="@+id/firewall_app_toggle_other"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textSize="@dimen/small_font_subheading_text"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textStyle="italic"
-                    tools:text="Firewall status" />
+                    tools:text="Firewall status 🗝" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/firewall_app_data_usage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textSize="@dimen/small_font_subheading_text"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="10 MB 🔺 / 20 MB 🔻" />
 

@@ -698,6 +698,21 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 return
             }
 
+            // checks if the config's keys are already in use by another active config
+            if (!WireguardManager.canEnableProxy(cfg.id)) {
+                Logger.i(LOG_TAG_PROXY, "$TAG wg keys overlap with an active config: ${cfg.id}")
+                uiCtx {
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.wireguard_duplicate_keys_conflict),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
             WireguardManager.enableConfig(cfg)
             logEvent("Wireguard enable", "Enabled WireGuard config: ${cfg.name} (id: ${cfg.id})")
             uiCtx { listener.onDnsStatusChanged() }

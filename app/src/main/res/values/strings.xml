@@ -188,7 +188,7 @@
     <string name="symbol_currency" translatable="false">💲</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
     <string name="symbol_red_circle" translatable="false">🔴</string>
-    <string name="symbol_key" translatable="false">🗝️</string>
+    <string name="symbol_key" translatable="false">🗝</string>
     <string name="symbol_global" translatable="false">🌐</string>
     <string name="symbol_clock" translatable="false">🕒</string>
     <string name="symbol_rocket" translatable="false">🚀</string>
@@ -853,7 +853,6 @@
     <string name="logs_card_apps_legend_mobile" translatable="true">Mobile</string>
     <string name="logs_card_pager_desc" translatable="true">Swipe to switch between activity and top apps</string>
     <string name="logs_card_disabled_logs_hint" translatable="true">Enable logs to see your recent activity</string>
-    <string name="logs_card_disabled_vpn_hint" translatable="true">Start the VPN to see your recent activity</string>
 
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules.\n\nWi-Fi-based proxy automation requires Location permission to identify the connected Wi-Fi network (SSID). This permission is requested only when you enable the feature.\n\nRethink does not collect any information or spy on you in any way.</string>
@@ -1556,7 +1555,11 @@
 
     <string name="ada_firewall_title" translatable="true">Firewall rules for this app</string>
 
-    <string name="ada_network_log_title" translatable="true">Network log for this app</string>
+    <string name="ada_network_log_title" translatable="true">Network stats for this app</string>
+
+    <string name="ada_insights_uploaded" description="Label for the total upload volume of a single app in the app info insights view." translatable="true">Uploaded</string>
+
+    <string name="ada_insights_downloaded" description="Label for the total download volume of a single app in the app info insights view." translatable="true">Downloaded</string>
 
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Metered</string>
@@ -1723,6 +1726,14 @@
     <string name="ssv_see_more" translatable="true">Show All</string>
     <string name="ssv_insights_no_active_conns" description="Shown in the insights view when there are no active connections." translatable="true">No active connections</string>
     <string name="ssv_insights_no_data" description="Shown in the insights view when a stats section has no data for the selected period." translatable="true">No data yet</string>
+    <string name="ssv_blocklists_heading" description="This label will appear on the stats screen as a header for the domains blocked per blocklist." translatable="true">Most Blocked by Blocklists</string>
+    <string name="ssv_blocklist_summary" description="Shows a blocklist name with the number of its tag sets that blocked domains, e.g. 'ads.example · 3 lists'." translatable="true">%1$s · %2$d lists</string>
+    <string name="ssv_filter_heading" description="Accessibility label for the stats filter chip row that toggles which sections are shown." translatable="true">Filter sections</string>
+    <string name="ssv_filter_providers" description="Filter chip label on the stats screen to show or hide the ASN/provider sections." translatable="true">Providers</string>
+    <string name="ssv_filter_countries" description="Filter chip label on the stats screen to show or hide the country sections." translatable="true">Countries</string>
+    <string name="ssv_filter_domains" description="Filter chip label on the stats screen to show or hide the domain sections." translatable="true">Domains</string>
+    <string name="ssv_filter_blocklist" description="Filter chip label on the stats screen to show or hide the blocklist section." translatable="true">Blocklists</string>
+    <string name="ssv_filter_ips" description="Filter chip label on the stats screen to show or hide the IP sections." translatable="true">IPs</string>
     <string name="ssv_insights_no_country_data" description="Shown in the insights view when there is no country information for the selected period." translatable="true">No country data yet</string>
     <string name="cd_stats_switch_to_insights" description="Content description for the button that switches the stats screen to the insights view." translatable="true">Switch to Insights view</string>
     <string name="cd_stats_switch_to_list" description="Content description for the button that switches the stats screen to the list view." translatable="true">Switch to List view</string>
@@ -1808,6 +1819,7 @@
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard cannot be enabled in DNS-only mode. Switch to Firewall or DNS+Firewall mode.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">An active One-WireGuard configuration is in use. Disable it first to use individual WireGuard configurations.</string>
+    <string name="wireguard_duplicate_keys_conflict" translatable="true">Cannot enable this WireGuard. Its keys are already in use by another active WireGuard.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Invalid WireGuard configuration</string>
     <string name="wireguard_invalid_config_message" translatable="true">The selected WireGuard configuration is invalid or missing. Edit or re-import the configuration and try again.</string>
     <string name="wireguard_replaced_active_config" translatable="true">Replaced the previously active WireGuard configuration</string>
@@ -2546,7 +2558,7 @@
     <string name="server_settings_open" translatable="false">Open server settings</string>
     <string name="server_settings_split_dns_disabled" translatable="false">Split DNS is disabled. Enable it to use DNS filtering on your VPN servers.</string>
     <string name="server_settings_enable_split_dns" translatable="false">Enable Split DNS</string>
-    <string name="server_settings_proxy_stopped" translatable="false">Proxy Stopped</string>
+    <string name="server_settings_proxy_stopped" translatable="false">Stopped</string>
 
     <!-- Auto Exclude Countries bottom sheet -->
     <string name="auto_exclude_cc_title" translatable="false">Exclude Countries</string>

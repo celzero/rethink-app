@@ -18,6 +18,7 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -26,11 +27,14 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.data.BlocklistStatsAggregator
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AppConnectionsViewModel(
     private val nwlogDao: ConnectionTrackerDAO,
@@ -41,8 +45,15 @@ class AppConnectionsViewModel(
     private val domainFilter: MutableLiveData<String> = MutableLiveData()
     private val asnFilter: MutableLiveData<String> = MutableLiveData()
     private val activeConnsFilter: MutableLiveData<String> = MutableLiveData()
+    private val countryFilter: MutableLiveData<String> = MutableLiveData()
+    private val blocklists: MutableLiveData<Long> = MutableLiveData()
 
     private var uid: Int = Constants.INVALID_UID
+
+    // when non-null, the ip/asn/domain log screens show only allowed (false)
+    // or blocked (true) entries; null keeps the unfiltered behavior. set once
+    // by the show-all screens before their adapters start observing
+    private var blockedFilter: Boolean? = null
     private val pagingConfig: PagingConfig
     private var timeCategory: TimeCategory = TimeCategory.SEVEN_DAYS
     private val startTime: MutableLiveData<Long> = MutableLiveData()
@@ -69,6 +80,9 @@ class AppConnectionsViewModel(
         domainFilter.value = ""
         asnFilter.value = ""
         activeConnsFilter.value = ""
+        countryFilter.value = ""
+        // fixed 7-day window, matching the other "Limited" section queries
+        blocklists.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
         pagingConfig =
             PagingConfig(
                 enablePlaceholders = true,
@@ -103,6 +117,7 @@ class AppConnectionsViewModel(
         } else {
             ipFilter.value = ""
             asnFilter.value = ""
+            countryFilter.value = ""
         }
     }
 
@@ -120,6 +135,10 @@ class AppConnectionsViewModel(
     val asnLogs = asnFilter.switchMap { input ->
         fetchAllAsnLogs(uid, input)
     }
+
+    val countryLogs = countryFilter.switchMap { _ ->
+        fetchAllCountriesLogs(uid)
+    }
     val activeConnections = activeConnsFilter.switchMap { input ->
         fetchAllActiveConnections(uid, input)
     }
@@ -129,10 +148,10 @@ class AppConnectionsViewModel(
 
     private fun fetchRinrIpLogs(input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
-        return if (input.isEmpty()) {
+        return if (input.isEmpty() && blockedFilter == null) {
             Pager(pagingConfig) { rinrDao.getIpLogs(to) }
         } else {
-            Pager(pagingConfig) { rinrDao.getIpLogsFiltered(to, "%$input%") }
+            Pager(pagingConfig) { rinrDao.getIpLogsFiltered(to, "%$input%", blockedFilter) }
         }
             .liveData
             .cachedIn(viewModelScope)
@@ -140,10 +159,10 @@ class AppConnectionsViewModel(
 
     private fun fetchRinrDomainLogs(input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
-        return if (input.isEmpty()) {
+        return if (input.isEmpty() && blockedFilter == null) {
             Pager(pagingConfig) { rinrDao.getDomainLogs(to) }
         } else {
-            Pager(pagingConfig) { rinrDao.getDomainLogsFiltered(to, "%$input%") }
+            Pager(pagingConfig) { rinrDao.getDomainLogsFiltered(to, "%$input%", blockedFilter) }
         }
             .liveData
             .cachedIn(viewModelScope)
@@ -151,10 +170,10 @@ class AppConnectionsViewModel(
 
     private fun fetchIpLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
-        return if (input.isEmpty()) {
+        return if (input.isEmpty() && blockedFilter == null) {
             Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid, to) }
         } else {
-            Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, to, "%$input%") }
+            Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, to, "%$input%", blockedFilter) }
         }
             .liveData
             .cachedIn(viewModelScope)
@@ -162,11 +181,18 @@ class AppConnectionsViewModel(
 
     private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
+        val query = "%$input%"
         return Pager(pagingConfig) {
-            if (input.isEmpty()) {
-                statsDao.getAllDomainsByUid(uid, to)
-            } else {
-                statsDao.getAllDomainsByUid(uid, to, "%$input%")
+            when (blockedFilter) {
+                null -> {
+                    if (input.isEmpty()) {
+                        statsDao.getAllDomainsByUid(uid, to)
+                    } else {
+                        statsDao.getAllDomainsByUid(uid, to, query)
+                    }
+                }
+                false -> statsDao.getAllowedDomainsByUid(uid, to, query)
+                true -> statsDao.getBlockedDomainsByUidFiltered(uid, to, query)
             }
         }
             .liveData
@@ -191,7 +217,24 @@ class AppConnectionsViewModel(
     private fun fetchAllAsnLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
         val query = "%$input%"
-        return Pager(pagingConfig) { statsDao.getAllAsnLogs(uid, to, query) }
+        return Pager(pagingConfig) { statsDao.getAllAsnLogs(uid, to, query, blockedFilter) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    private fun fetchAllCountriesLogs(uid: Int): LiveData<PagingData<AppConnection>> {
+        // fixed 7-day window: must match getMostContactedCountriesLimited so
+        // the top-3 section and the "see all" screen always agree (the screen's
+        // time toggle must not shrink this window)
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        // rethink's own logs live in RethinkLog, not ConnectionTracker
+        return Pager(pagingConfig) {
+            if (android.os.Process.myUid() == uid) {
+                rinrDao.getAllCountryLogs(to)
+            } else {
+                statsDao.getAllContactedCountriesByUid(uid, to)
+            }
+        }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -261,11 +304,80 @@ class AppConnectionsViewModel(
             .cachedIn(viewModelScope)
     }
 
+    fun getMostContactedCountriesLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { statsDao.getMostContactedCountriesByUid(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getRethinkCountriesLimited(): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { rinrDao.getCountryLogsLimited(to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
     fun getIpLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
         return Pager(pagingConfig) { nwlogDao.getAppIpLogsLimited(uid, to) }
             .liveData
             .cachedIn(viewModelScope)
+    }
+
+    fun getBlockedDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { statsDao.getBlockedDomainsByUid(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getRethinkBlockedDomainLogsLimited(): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { rinrDao.getBlockedDomainLogsLimited(to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getBlockedIpLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { nwlogDao.getBlockedAppIpLogsLimited(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getRethinkBlockedIpLogsLimited(): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { rinrDao.getBlockedIpLogsLimited(to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getBlockedAsnLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { statsDao.getBlockedAsnByUid(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    /**
+     * Per-blocklist blocked totals for this uid over a fixed 7-day window. The
+     * CSV token split happens in [BlocklistStatsAggregator], so this section is
+     * a static list instead of a Room-paged flow.
+     */
+    val mostBlockedBlocklists: LiveData<List<AppConnection>> =
+        blocklists.switchMap { to ->
+            liveData { emit(fetchBlockedBlocklists(to)) }
+        }
+
+    private suspend fun fetchBlockedBlocklists(to: Long): List<AppConnection> {
+        return withContext(Dispatchers.IO) {
+            // DnsLogs is the single source of truth for DNS-level blocks;
+            // ConnectionTracker rows echo the same block and would double-count
+            BlocklistStatsAggregator.toAppConnections(
+                BlocklistStatsAggregator.aggregate(statsDao.getBlockedBlocklistCombosByUid(uid, to))
+            )
+        }
     }
 
     fun setFilter(input: String, filterType: FilterType) {
@@ -291,5 +403,9 @@ class AppConnectionsViewModel(
 
     fun setUid(uid: Int) {
         this.uid = uid
+    }
+
+    fun setBlockedFilter(isBlocked: Boolean?) {
+        this.blockedFilter = isBlocked
     }
 }

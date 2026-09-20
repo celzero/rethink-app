@@ -3,7 +3,7 @@
     android:id="@+id/add_server_tile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="132dp"
+    android:minHeight="80dp"
     android:layout_margin="6dp"
     android:background="@drawable/bg_vpn_server_add_tile"
     android:clickable="true"

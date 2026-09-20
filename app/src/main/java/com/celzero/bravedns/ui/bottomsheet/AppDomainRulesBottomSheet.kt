@@ -28,7 +28,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -60,9 +59,8 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
 
-    // listener to inform dataset change to the adapter
+    // listener to inform dataset change to the caller on dismiss
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
-    private var adapter: AppWiseDomainsAdapter? = null
     private var position: Int = -1
 
     override fun getTheme(): Int =
@@ -88,8 +86,8 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
         fun notifyDataset(position: Int)
     }
 
-    fun dismissListener(aca: AppWiseDomainsAdapter?, pos: Int) {
-        adapter = aca
+    fun dismissListener(listener: OnBottomSheetDialogFragmentDismiss?, pos: Int) {
+        dismissListener = listener
         position = pos
     }
 
@@ -115,8 +113,6 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
 
         uid = arguments?.getInt(UID) ?: INVALID_UID
         domain = arguments?.getString(DOMAIN) ?: ""
-
-        dismissListener = adapter
 
         init()
         initializeClickListeners()

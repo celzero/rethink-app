@@ -130,20 +130,24 @@ abstract class AppDatabase : RoomDatabase() {
                 newBuilder(appContext).also { it.openHelper.writableDatabase }
             } catch (e: IllegalStateException) {
                 val message = e.message.orEmpty()
-                if ("Room cannot verify" !in message && "data integrity" !in message) {
-                    throw e
-                }
                 Logger.w(LOG_TAG_APP_DB, "Schema mismatch; recreating database: $message")
                 appContext.deleteDatabase(DATABASE_NAME)
                 newBuilder(appContext)
             }
         }
 
-        private fun newBuilder(context: Context): AppDatabase =
+        // RestoreAgent checks if backup file is usable by opening a throwaway
+        // copy of it through the app's real migration chain before the live database
+        // is touched. Same builder as production; the only difference is the database
+        // name, which points at the probe copy
+        internal fun restoreProbeBuilder(context: Context, name: String): AppDatabase =
+            newBuilder(context, name)
+
+        private fun newBuilder(context: Context, name: String = DATABASE_NAME): AppDatabase =
             Room.databaseBuilder(
                 context,
                 AppDatabase::class.java,
-                DATABASE_NAME
+                name
             )
                 .createFromAsset(DATABASE_PATH)
                 .addCallback(roomCallback)
@@ -1594,9 +1598,10 @@ abstract class AppDatabase : RoomDatabase() {
     // fixme: revisit the links to remove the pragma for each table
     // https://stackoverflow.com/questions/49030258/how-to-vacuum-roomdatabase
     // https://stackoverflow.com/questions/50987119/backup-room-databas
+    // vacuum must run BEFORE the checkpoint
     fun checkPoint() {
-        appDatabaseRawQueries().checkpoint(SimpleSQLiteQuery(PRAGMA))
         appDatabaseRawQueries().vacuum(SimpleSQLiteQuery("VACUUM"))
+        appDatabaseRawQueries().checkpoint(SimpleSQLiteQuery(PRAGMA))
     }
 
     abstract fun appInfoDAO(): AppInfoDAO

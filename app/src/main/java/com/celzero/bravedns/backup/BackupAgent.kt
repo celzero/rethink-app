@@ -23,6 +23,8 @@ import android.net.Uri
 import android.os.SystemClock
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
@@ -35,7 +37,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_ZIP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
 import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
-import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.database.AppDatabase
@@ -70,6 +71,9 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     companion object {
         const val TAG = "BackupExport"
+
+        // buffer size for zipping backup files
+        private const val BUFFER_SIZE = 80000
     }
 
     override fun doWork(): Result {
@@ -86,16 +90,21 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             LOG_TAG_BACKUP_RESTORE,
             "completed backup process, is backup successful? $isBackupSucceed"
         )
-        if (isBackupSucceed) {
-            startVpn(context)
-            return Result.success()
+        // the vpn was never stopped and the databases were never closed during the
+        // backup, so there is no state to restore here
+        startVpn(context)
+        return if (isBackupSucceed) {
+            Result.success()
+        } else {
+            Result.failure()
         }
-        return Result.failure()
     }
 
     private fun startBackupProcess(backupFileUri: Uri): Boolean {
         var processCompleted: Boolean
         try {
+            // note: the vpn is NOT stopped and the Room instances are NOT closed for a
+            // backup; snapshotDatabase() takes a consistent copy of the live databases.
             val tempDir = getTempDir(context)
 
             val prefsBackupFile = File(tempDir, SHARED_PREFS_BACKUP_FILE_NAME)
@@ -115,12 +124,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 )
                 return false
             }
-
-            // checkpoint databases to flush WAL entries into the main database file
-            // so the backup includes all committed data, not just what's in the db file
-            appDatabase.checkPoint()
-            logDatabase.checkPoint()
-            Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint completed before backup")
 
             processCompleted = saveDatabasesToFile(tempDir.path)
 
@@ -278,31 +281,79 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun saveDatabasesToFile(path: String): Boolean {
-        val files = getRethinkDatabase(context)?.listFiles() ?: return false
-
-        for (f in files) {
-            Logger.d(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "file ${f.name} found in database dir (${f.absolutePath})"
-                )
-            // looks like the journal, shm and wal files are needed for proper restore, so
-            // commenting out the below code. still testing it out.
-            // TODO: check if the journal files are needed for restore
-            // skip journal files, they are not needed for restore
-            /*if (f.path.endsWith("-journal") || f.path.endsWith("-shm") || f.path.endsWith("-wal")) {
-                continue
-            }*/
-            val databaseFile =
-                backUpFile(f.absolutePath, constructDbFileName(path, f.name)) ?: return false
-            Logger.i(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
-            filesPathToZip.add(databaseFile.absolutePath)
-        }
-
+        // snapshot the live databases without ever closing them
+        if (!snapshotDatabase(appDatabase, AppDatabase.DATABASE_NAME, File(path))) return false
+        if (!snapshotDatabase(logDatabase, LogDatabase.LOGS_DATABASE_NAME, File(path))) return false
         return true
     }
 
-    private fun constructDbFileName(path: String, fileName: String): String {
-        return path + File.separator + fileName
+    // VACUUM INTO (sqlite >= 3.27, first shipped in Android 10 / API 29) writes a
+    // consistent, fully checkpointed snapshot of the live database to a new file
+    private fun snapshotDatabase(db: RoomDatabase, dbName: String, tempDir: File): Boolean {
+        val dest = File(tempDir, dbName)
+        if (dest.exists() && !dest.delete()) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to delete stale snapshot: ${dest.path}")
+            return false
+        }
+        try {
+            db.openHelper.writableDatabase.execSQL("VACUUM INTO ?", arrayOf(dest.path))
+            Logger.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "$dbName snapshotted via VACUUM INTO, size: ${dest.length()}"
+            )
+            filesPathToZip.add(dest.absolutePath)
+            return true
+        } catch (e: Exception) {
+            Logger.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "VACUUM INTO failed for $dbName, falling back to checkpoint+copy: ${e.message}",
+                e
+            )
+        }
+        return try {
+            db.openHelper.writableDatabase
+                .query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(TRUNCATE)"))
+                .use { it.moveToFirst() }
+            if (!Utilities.copy(context.getDatabasePath(dbName).path, dest.path)) {
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to copy $dbName after checkpoint")
+                false
+            } else {
+                Logger.i(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "$dbName snapshotted via checkpoint+copy, size: ${dest.length()}"
+                )
+                filesPathToZip.add(dest.absolutePath)
+                true
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "checkpoint+copy failed for $dbName: ${e.message}", e)
+            false
+        }
+    }
+
+    private fun zip(files: List<String>, zipDirectory: String): Boolean {
+        val outputFileName = zipDirectory + File.separator + TEMP_ZIP_FILE_NAME
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "files: $files, output: $outputFileName")
+        return try {
+            ZipOutputStream(BufferedOutputStream(FileOutputStream(outputFileName))).use { out ->
+                val buffer = ByteArray(BUFFER_SIZE)
+                for (file in files) {
+                    BufferedInputStream(FileInputStream(file), BUFFER_SIZE).use { origin ->
+                        out.putNextEntry(ZipEntry(getFileNameFromPath(file)))
+                        var count: Int
+                        while (origin.read(buffer).also { count = it } != -1) {
+                            out.write(buffer, 0, count)
+                        }
+                    }
+                    Logger.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip")
+                }
+            }
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "zipped ${files.size} files to $outputFileName")
+            true
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_BACKUP_RESTORE, "error while adding files to zip dir, ${e.message}", e)
+            false
+        }
     }
 
     private fun saveSharedPreferencesToFile(context: Context, prefFile: File): Boolean {
@@ -330,50 +381,5 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         }
         filesPathToZip.add(prefFile.absolutePath)
         return true
-    }
-
-    private fun backUpFile(backupFilePath: String?, destFilePath: String?): File? {
-        if (backupFilePath == null || destFilePath == null) {
-            Logger.w(
-                LOG_TAG_BACKUP_RESTORE,
-                "invalid backup info during db backup, file: $backupFilePath, destination: $destFilePath"
-            )
-            return null
-        }
-        val isCopySuccess = Utilities.copy(backupFilePath, destFilePath)
-        if (isCopySuccess) return File(destFilePath)
-
-        return null
-    }
-
-    private fun zip(files: List<String>, zipDirectory: String): Boolean {
-        val outputFileName = zipDirectory + File.separator + TEMP_ZIP_FILE_NAME
-        Logger.d(LOG_TAG_BACKUP_RESTORE, "files: $files, output: $outputFileName")
-        return try {
-            val dest = FileOutputStream(outputFileName)
-            val out = ZipOutputStream(BufferedOutputStream(dest))
-            val bufferSize = 80000
-            var origin: BufferedInputStream
-            val data = ByteArray(bufferSize)
-            for (file in files) {
-                val fi = FileInputStream(file)
-                origin = BufferedInputStream(fi, bufferSize)
-                val entry = ZipEntry(getFileNameFromPath(file))
-                out.putNextEntry(entry)
-                var count: Int
-                while (origin.read(data, 0, bufferSize).also { count = it } != -1) {
-                    out.write(data, 0, count)
-                }
-                origin.close()
-                Logger.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: $file")
-            }
-            out.close()
-            out.close()
-            Logger.i(LOG_TAG_BACKUP_RESTORE, "$files added to zip")
-            true
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BACKUP_RESTORE, "error while adding files to zip dir, ${e.message}", e)
-            false
-        }
     }
 }

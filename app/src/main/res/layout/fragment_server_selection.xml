@@ -234,7 +234,7 @@
                                             android:gravity="start"
                                             android:letterSpacing="0.05"
                                             android:maxLines="1"
-                                            android:text="24"
+                                            android:text="-24H"
                                             android:textColor="?attr/primaryLightColorText"
                                             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -247,7 +247,7 @@
                                             android:gravity="center"
                                             android:letterSpacing="0.05"
                                             android:maxLines="1"
-                                            android:text="12"
+                                            android:text="-12H"
                                             android:textColor="?attr/primaryLightColorText"
                                             android:textSize="@dimen/extra_small_font_text_view" />
 
@@ -396,15 +396,22 @@
                         app:trackColor="@android:color/transparent"
                         app:trackThickness="3dp" />
 
-                    <LinearLayout
+                    <HorizontalScrollView
                         android:id="@+id/quick_settings_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:baselineAligned="false"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal">
+                        android:layout_marginBottom="10dp"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/quick_settings_pills"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
 
                         <LinearLayout
                             android:id="@+id/qs_relay_tile"
@@ -484,52 +491,51 @@
 
                         </LinearLayout>
 
+                        <LinearLayout
+                            android:id="@+id/qs_stats_tile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_qs_action_pill"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="11dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="11dp"
+                            android:paddingBottom="8dp">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/qs_stats_icon"
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/ic_statistics"
+                                android:tint="?attr/primaryLightColorText" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.TileLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/title_statistics" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/qs_stats_state"
+                                style="@style/RethinkPlus.TileValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                tools:text="2.4K" />
+
+                        </LinearLayout>
+
                     </LinearLayout>
+
+                    </HorizontalScrollView>
 
                 </LinearLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/activity_feed_card"
-                    style="@style/RethinkPlus.ContentCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="50dp"
-                    android:layout_marginBottom="4dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:visibility="gone"
-                    tools:visibility="gone">
-
-                    <LinearLayout
-                        android:id="@+id/activity_feed_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="8dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="8dp">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/activity_feed_pager"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:overScrollMode="never"
-                            tools:listitem="@layout/list_item_shimmer_card" />
-
-                        <LinearLayout
-                            android:id="@+id/activity_feed_dots"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="horizontal" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_selected_servers"

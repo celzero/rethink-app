@@ -209,9 +209,19 @@ interface ConnectionTrackerDAO {
     fun getAppIpLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query GROUP BY  uid, ipAddress, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 1 as blocked, '' as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and isBlocked = 1 GROUP BY uid, ipAddress, port ORDER BY count DESC LIMIT 3"
     )
-    fun getAppIpLogsFiltered(uid: Int, to: Long, query: String): PagingSource<Int, AppConnection>
+    fun getBlockedAppIpLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, MAX(isBlocked) as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName, SUM(downloadBytes) as downloadBytes, SUM(uploadBytes) as uploadBytes, SUM(downloadBytes + uploadBytes) as totalBytes FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query and (:isBlocked IS NULL OR isBlocked = :isBlocked) GROUP BY  uid, ipAddress, port ORDER BY count DESC"
+    )
+    fun getAppIpLogsFiltered(
+        uid: Int,
+        to: Long,
+        query: String,
+        isBlocked: Boolean?
+    ): PagingSource<Int, AppConnection>
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc"
