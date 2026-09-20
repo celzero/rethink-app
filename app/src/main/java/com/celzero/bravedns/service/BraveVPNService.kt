@@ -603,9 +603,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             logd("builder: set metered: ${persistentState.setVpnBuilderToMetered}")
         }
 
-        // let apps that explicitly request it (ex: Android Auto's wireless transport)
-        // bypass the tunnel; ignored in lockdown mode as the platform disallows bypass
-        // (VpnService.isLockdownEnabled)
         if (!vpnLockdown && persistentState.allowBypass) {
             builder.allowBypass()
             logd("builder: allow bypass: true")
