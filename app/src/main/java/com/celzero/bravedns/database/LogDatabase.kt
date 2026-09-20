@@ -62,12 +62,37 @@ abstract class LogDatabase : RoomDatabase() {
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)
+            val appContext = context.applicationContext
 
-            return Room.databaseBuilder(
-                    context.applicationContext,
-                    LogDatabase::class.java,
-                    LOGS_DATABASE_NAME
-                )
+            return try {
+                newBuilder(appContext).also { it.openHelper.writableDatabase }
+            } catch (e: IllegalStateException) {
+                val message = e.message.orEmpty()
+                Logger.w(LOG_TAG_APP_DB, "Schema mismatch; recreating log database: $message")
+                // deleteDatabase() also removes the wal/shm/journal files
+                appContext.deleteDatabase(LOGS_DATABASE_NAME)
+                newBuilder(appContext).also { it.openHelper.writableDatabase }
+            }
+        }
+
+        private fun newBuilder(context: Context): LogDatabase =
+            baseBuilder(context, LOGS_DATABASE_NAME)
+                .fallbackToDestructiveMigration(false) // recreate the database if no migration is found
+                .build()
+
+        // see AppDatabase#restoreProbeBuilder()
+        internal fun restoreProbeBuilder(context: Context, name: String): LogDatabase =
+            baseBuilder(context, name).build()
+
+        private fun baseBuilder(
+            context: Context,
+            name: String
+        ): RoomDatabase.Builder<LogDatabase> =
+            Room.databaseBuilder(
+                context,
+                LogDatabase::class.java,
+                name
+            )
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addCallback(roomCallback)
                 .addMigrations(MIGRATION_2_3)
@@ -84,9 +109,6 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
-                .fallbackToDestructiveMigration() // recreate the database if no migration is found
-                .build()
-        }
 
         private val roomCallback: Callback =
             object : Callback() {
@@ -444,9 +466,10 @@ abstract class LogDatabase : RoomDatabase() {
 
     }
 
+    // vacuum must run BEFORE the checkpoint
     fun checkPoint() {
-        logsDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
         logsDao().vacuum(SimpleSQLiteQuery("VACUUM"))
+        logsDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
     }
 
     abstract fun connectionTrackerDAO(): ConnectionTrackerDAO
