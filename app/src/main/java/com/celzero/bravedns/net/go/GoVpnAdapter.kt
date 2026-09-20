@@ -383,7 +383,7 @@ class GoVpnAdapter : KoinComponent {
             }
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
-            Intra.addDoHTransport(tunnel, id, url, ips)
+            Intra.addDoHTransport(tunnel, id, url, "" /* ip-url */, ips)
             Logger.i(LOG_TAG_VPN, "$TAG new doh: $id (${doh.dohName}), url: $url, ips: $ips")
             logEvent(
                 Severity.LOW,
@@ -603,7 +603,7 @@ class GoVpnAdapter : KoinComponent {
             val ips: String = getIpString(context, url)
             val convertedUrl = getRdnsUrl(url) ?: return
             if (url.contains(RETHINK_BASE_URL_SKY) || !useDot) {
-                Intra.addDoHTransport(tunnel, id, convertedUrl, ips)
+                Intra.addDoHTransport(tunnel, id, convertedUrl, "" /* ip-url */, ips)
                 Logger.i(LOG_TAG_VPN, "$TAG new doh (rdns): $id, url: $convertedUrl, ips: $ips")
             } else {
                 Intra.addDoTTransport(tunnel, id, convertedUrl, ips)
@@ -3611,7 +3611,7 @@ class GoVpnAdapter : KoinComponent {
                     url = if (canReplaceHostWithIp) replaceHostWithIp(url, ips) else url
                     // add replaces the existing transport with the same id if successful
                     // so no need to remove the transport before adding
-                    Intra.addDoHTransport(tunnel, id, url, ips)
+                    Intra.addDoHTransport(tunnel, id, url, "" /* ip-url */, ips)
                     Logger.i(
                         LOG_TAG_VPN, "$TAG smart-dns; new doh: $id (${doh.dohName}), url: $url, ips: $ips"
                     )
