@@ -412,6 +412,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         setupNavigationButtons()
         setupSearchBar()
+        applyTunnelGatedVisibility()
         updateFilterButtonState()
         setupHeaderUI()
         setupRpnState()
@@ -1221,13 +1222,24 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun setupHeaderUI() {
-        statusUpdateJob = lifecycleScope.launch {
+        statusUpdateJob?.cancel()
+        statusUpdateJob = viewLifecycleOwner.lifecycleScope.launch {
             while (true) {
                 delay(3_000.milliseconds)
-                if (isAdded && !isLoading) {
-                    updateConnectionStatusOnly()
-                    updateConnectionDuration()
+                if (isAdded && view != null) {
+                    runCatching {
+                        updateConnectionStatusOnly()
+                        if (!isLoading) updateConnectionDuration()
+                    }.onFailure {
+                        Logger.w(LOG_TAG_UI, "$TAG.setupHeaderUI: status poll failed: ${it.message}")
+                    }
                 }
+            }
+        }
+        VpnController.connectionStatus.observe(viewLifecycleOwner) {
+            if (isAdded && view != null) {
+                runCatching { updateConnectionStatusOnly() }
+                    .onFailure { Logger.w(LOG_TAG_UI, "$TAG: status observer failed: ${it.message}") }
             }
         }
     }
@@ -1246,12 +1258,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         val vpnState = VpnController.state()
         return when {
-            // Fully connected tunnel
             vpnState.on -> ConnectionUiState.CONNECTED
-            // VPN start has been requested but tunnel not yet up
-            vpnState.activationRequested && !vpnState.on -> ConnectionUiState.CONNECTING
-            // NEW state = tunnel was just created, still handshaking
             vpnState.connectionState == BraveVPNService.State.NEW -> ConnectionUiState.CONNECTING
+            vpnState.activationRequested && vpnState.connectionState != null && !vpnState.on ->
+                ConnectionUiState.CONNECTING
             else -> ConnectionUiState.DISCONNECTED
         }
     }
@@ -1303,8 +1313,19 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
+    /**
+     * Shows or hides tunnel-dependent controls based on the live tunnel state.
+     */
+    private fun applyTunnelGatedVisibility() {
+        if (!isAdded) return
+        val tunnelUp = VpnController.hasTunnel()
+        b.quickSettingsRow.isVisible = tunnelUp
+        b.searchCard.isVisible = tunnelUp
+    }
+
     private fun updateConnectionStatus(uiState: ConnectionUiState) {
         if (!isAdded) return
+        applyTunnelGatedVisibility()
         when (uiState) {
             ConnectionUiState.CONNECTED -> {
                 b.tvConnectionStatus.text = getString(R.string.lbl_active)
