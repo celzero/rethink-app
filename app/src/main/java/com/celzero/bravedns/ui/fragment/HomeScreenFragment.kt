@@ -1375,12 +1375,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsLogsPager.visibility = View.GONE
         updateLogsDotsVisibility()
         val showEnableChip = !persistentState.logsEnabled
-        b.fhsLogsDisabledTxt.text =
-            getString(
-                if (showEnableChip) R.string.logs_card_disabled_logs_hint
-                else R.string.logs_card_disabled_vpn_hint
-            )
-        b.fhsLogsDisabledRow.visibility = View.VISIBLE
+        b.fhsCardLogsLl.visibility = View.GONE
         b.fhsLogsEnableChip.visibility =
             if (showEnableChip) View.VISIBLE else View.GONE
     }
@@ -2223,8 +2218,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // subtle, low-emphasis hint instead of the oversized legacy label
         b.fhsCardDnsConnectedDns.text = getString(R.string.hsf_dns_mode_off_indicator)
         b.fhsCardDnsConnectedDns.alpha = 0.75f
-        b.fhsCardDnsLatency.text = getString(R.string.lbl_disabled).lowercase()
-        b.fhsCardDnsLatency.isSelected = true
+        b.fhsCardDnsLatency.visibility = View.GONE
     }
 
     private fun disableAppsCard() {
@@ -2269,6 +2263,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             uiCtx {
                 lastDnsP50 = p50
                 renderDnsHeadline()
+                b.fhsCardDnsLatency.visibility = View.VISIBLE
                 b.fhsCardDnsLatency.isSelected = true
                 startDnsStatePolling()
             }
@@ -2323,6 +2318,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
 
         val parts = listOfNotNull(status, latency)
+        b.fhsCardDnsLatency.visibility = View.VISIBLE
         b.fhsCardDnsLatency.text =
             if (parts.isEmpty()) b.fhsCardDnsLatency.context.getString(R.string.lbl_inactive)
             else parts.joinToString(" · ")
@@ -2396,6 +2392,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * nothing is observed from the log databases here.
      */
     private fun observeLogsCount(animateTransition: Boolean = true) {
+        b.fhsCardLogsLl.visibility = View.VISIBLE
         logsPage.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_allowed)
         logsPage.fhsCardAllowedLogsLabel.visibility = View.VISIBLE
         logsPage.fhsCardAllowedLogsCount.visibility = View.VISIBLE

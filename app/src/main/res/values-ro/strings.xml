@@ -1285,7 +1285,6 @@
     <string name="logs_card_apps_legend_mobile" translatable="true">Date mobile</string>
     <string name="logs_card_pager_desc" translatable="true">Swipe pentru a comuta inte activitate și top aplicații</string>
     <string name="logs_card_disabled_logs_hint" translatable="true">Activează jurnalele pentru a vedea activitatea recentă</string>
-    <string name="logs_card_disabled_vpn_hint" translatable="true">Pornește VPN pentru a vedea activitatea recentă</string>
     <string name="dns_btm_blocked" translatable="true">blocate %1$s</string>
     <string name="dns_btm_resolved_anonymously" translatable="true">rezolvate anonim %1$s</string>
     <string name="dns_btm_info_via" translatable="true">%1$s via %2$s</string>

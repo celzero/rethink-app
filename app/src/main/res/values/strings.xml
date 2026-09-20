@@ -853,7 +853,6 @@
     <string name="logs_card_apps_legend_mobile" translatable="true">Mobile</string>
     <string name="logs_card_pager_desc" translatable="true">Swipe to switch between activity and top apps</string>
     <string name="logs_card_disabled_logs_hint" translatable="true">Enable logs to see your recent activity</string>
-    <string name="logs_card_disabled_vpn_hint" translatable="true">Start the VPN to see your recent activity</string>
 
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules.\n\nWi-Fi-based proxy automation requires Location permission to identify the connected Wi-Fi network (SSID). This permission is requested only when you enable the feature.\n\nRethink does not collect any information or spy on you in any way.</string>

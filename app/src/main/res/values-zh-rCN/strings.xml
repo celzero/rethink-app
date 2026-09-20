@@ -1314,7 +1314,6 @@
     <string name="logs_card_apps_legend_mobile" translatable="true">蜂窝网络</string>
     <string name="logs_card_pager_desc" translatable="true">滑动切换活动和 top 应用</string>
     <string name="logs_card_disabled_logs_hint" translatable="true">启用日志查看近期活动</string>
-    <string name="logs_card_disabled_vpn_hint" translatable="true">启动 VPN 查看近期活动</string>
     <string name="dns_btm_blocked" translatable="true">已拦截 %1$s</string>
     <string name="dns_btm_resolved_anonymously" translatable="true">匿名解析了 %1$s</string>
     <string name="dns_btm_info_via" translatable="true">%1$s via %2$s</string>
