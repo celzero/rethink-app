@@ -859,13 +859,9 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     }
 
 
-    private fun fadeThroughOptions(popUpTo: Int, inclusive: Boolean): NavOptions =
+    private fun bottomNavNavOptions(popUpTo: Int, inclusive: Boolean): NavOptions =
         NavOptions.Builder()
             .setPopUpTo(popUpTo, inclusive)
-            .setEnterAnim(R.anim.fade_through_in)
-            .setExitAnim(R.anim.fade_through_out)
-            .setPopEnterAnim(R.anim.fade_through_in)
-            .setPopExitAnim(R.anim.fade_through_out)
             .build()
 
     /** Cached subscription state; same check the purchase screen redirects on. */
@@ -943,13 +939,13 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                             navController.navigate(
                                 R.id.rethinkPlusDashboardFragment,
                                 null,
-                                fadeThroughOptions(homeId, false)
+                                bottomNavNavOptions(homeId, false)
                             )
                         } else {
                             navController.navigate(
                                 R.id.rethinkPlus,
                                 null,
-                                fadeThroughOptions(homeId, false)
+                                bottomNavNavOptions(homeId, false)
                             )
                         }
                     }
@@ -958,7 +954,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                         navController.navigate(
                             homeId,
                             null,
-                            fadeThroughOptions(homeId, true)
+                            bottomNavNavOptions(homeId, true)
                         )
                     }
 
@@ -966,7 +962,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                         navController.navigate(
                             item.itemId,
                             null,
-                            fadeThroughOptions(homeId, false)
+                            bottomNavNavOptions(homeId, false)
                         )
                     }
                 }
