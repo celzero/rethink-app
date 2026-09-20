@@ -1417,6 +1417,14 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_DISABLED
                 b.settingsActivityExcludeProxyAppsSwitch.isEnabled = false
                 b.settingsActivityExcludeProxyAppsRl.isEnabled = true
+
+                b.settingsActivityAllowBypassRl.alpha = ALPHA_ENABLED
+                b.settingsActivityAllowBypassSwitch.isEnabled = true
+                b.settingsActivityAllowBypassRl.isEnabled = true
+
+                b.settingsActivityLanTrafficRl.alpha = ALPHA_ENABLED
+                b.settingsActivityLanTrafficSwitch.isEnabled = true
+                b.settingsActivityLanTrafficRl.isEnabled = true
             }
             else -> {
                 b.settingsActivityExcludeProxyAppsRl.alpha = ALPHA_ENABLED
