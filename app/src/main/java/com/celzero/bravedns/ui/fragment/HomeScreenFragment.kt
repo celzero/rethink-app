@@ -2615,7 +2615,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardAllowedApps.text = allowedApps.toString()
                         b.fhsCardAllowedApps.isSelected = true
                         b.fhsAppsLabel.visibility = View.VISIBLE
-                        b.fhsCardAppsAllApps.text = getString(R.string.two_argument_space, getString(R.string.symbol_slash), allApps.toString())
+                        b.fhsCardAppsAllApps.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_slash), allApps.toString())
                         b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
                         b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
                         b.fhsCardAppsBypassedCount.text = getString(R.string.two_argument_space, bypassCount.toString(), getString(R.string.fapps_firewall_filter_bypass_universal).lowercase())

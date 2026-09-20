@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.adapter
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -28,8 +26,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -48,12 +48,17 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_COUNTRY_CODE
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.custom.FlagWatermarkView
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
+import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.LAST_ROUTED_APP_POLL_MS
+import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.MAX_LOCATION_TILES
+import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.ROUTED_APP_STACK_SIZE
+import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.SERVER_INFO_POLL_MS
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -70,6 +75,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -96,6 +102,22 @@ class VpnServerAdapter(
      * (VpnController.getWinByKey returned null immediately after startProxy).
      */
     private val loadingTunnelKeys = mutableSetOf<String>()
+
+    /** Per-key async-rendered details, replayed on rebind to avoid flicker. */
+    private class DetailCache {
+        var statusPair: Pair<Int?, String>? = null
+        var ipText: String? = null
+        var appsText: String? = null
+        var relayText: String? = null
+        var relayPositive: Boolean = false
+        var relayGone: Boolean = false
+        var routedApps: List<Pair<ConnectionTracker, Drawable?>>? = null
+    }
+
+    private val detailCache = mutableMapOf<String, DetailCache>()
+
+    private fun cacheFor(key: String): DetailCache =
+        detailCache.getOrPut(key) { DetailCache() }
 
     /**
      * Replaces the entire set of "tunnel not yet ready" keys and notifies all items
@@ -262,9 +284,19 @@ class VpnServerAdapter(
             override fun getOldListSize() = old.size
             override fun getNewListSize() = newGroups.size
             override fun areItemsTheSame(o: Int, n: Int) = old[o].key == newGroups[n].key
-            override fun areContentsTheSame(o: Int, n: Int) = old[o] == newGroups[n]
+            // Diff only rendered fields; volatile load/link stats would rebind every card.
+            override fun areContentsTheSame(o: Int, n: Int): Boolean {
+                val a = old[o]
+                val b = newGroups[n]
+                return a.serverCount == b.serverCount &&
+                    a.cityName == b.cityName &&
+                    a.flagEmoji == b.flagEmoji &&
+                    a.countryCode == b.countryCode &&
+                    a.isActive == b.isActive
+            }
         })
         serverGroups = newGroups.toList()
+        detailCache.keys.retainAll(newGroups.map { it.key }.toSet())
         // The add tile is not represented in DiffUtil's lists.
         if (oldHadAddTile != hasAddTile()) {
             notifyDataSetChanged()
@@ -306,6 +338,9 @@ class VpnServerAdapter(
         private var lastRoutedAppJob: Job? = null
         private var serverInfoJob: Job? = null
 
+        /** Rotation spin running on [b.refreshStopIcon] after an AUTO reconnect tap. */
+        private var refreshIconAnimator: ObjectAnimator? = null
+
         /** Latest known exit IPv4 for this item (null while unknown). */
         private var currentIpText: String? = null
 
@@ -323,6 +358,42 @@ class VpnServerAdapter(
         }
 
         fun bind(group: ServerGroup) {
+            // Stop a reconnect spin inherited from a recycled AUTO binding.
+            refreshIconAnimator?.cancel()
+            refreshIconAnimator = null
+            b.refreshStopIcon.rotation = 0f
+
+            // AUTO stacks the routed-apps chip under the Apps chip; other
+            // proxies place it to the right.
+            val isAuto = group.key.equals(AUTO_SERVER_ID, ignoreCase = true)
+            b.chipsRow.orientation =
+                if (isAuto) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
+            val routedLp = b.lastRoutedAppContainer.layoutParams as LinearLayout.LayoutParams
+            val gap = (6f * context.resources.displayMetrics.density).roundToInt()
+            if (isAuto) {
+                routedLp.topMargin = gap
+                routedLp.marginStart = 0
+            } else {
+                routedLp.topMargin = 0
+                routedLp.marginStart = (10f * context.resources.displayMetrics.density).roundToInt()
+            }
+            b.lastRoutedAppContainer.layoutParams = routedLp
+
+            // Bottom anchor: non-AUTO cards hang the relay chip off the card
+            // bottom (its bottom margin then sizes the card); for AUTO the
+            // relay is GONE, so chips_row takes the bottom anchor instead.
+            val chipsLp = b.chipsRow.layoutParams as ConstraintLayout.LayoutParams
+            val relayClLp = b.relayActionContainer.layoutParams as ConstraintLayout.LayoutParams
+            if (isAuto) {
+                chipsLp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                relayClLp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+            } else {
+                chipsLp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                relayClLp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            }
+            b.chipsRow.layoutParams = chipsLp
+            b.relayActionContainer.layoutParams = relayClLp
+
             b.tvServerIp.visibility = View.GONE
             b.lastRoutedAppContainer.visibility = View.INVISIBLE
             currentIpText = null
@@ -333,14 +404,12 @@ class VpnServerAdapter(
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
                 b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_refresh))
                 b.refreshStopIcon.visibility = View.VISIBLE
-                // AUTO carries no country flag; fall back to the globe glyph as the watermark.
+                // Monochrome glyph reads stronger than emoji flags; embed deeper.
                 b.flagWatermark.setFlagDrawable(
                     AppCompatResources.getDrawable(context, R.drawable.ic_rpn_auto),
-                    R.attr.primaryTextColor
+                    R.attr.primaryTextColor,
+                    peakAlpha = 0.25f
                 )
-                // AUTO's config carries no city; resolve the actual exit city from the
-                // backend (mirrors RpnConfigDetailActivity#showServerInfo for tvHeroCity).
-                resolveAutoCity(group)
             } else {
                 b.refreshStopIcon.visibility = View.VISIBLE
                 b.refreshStopIcon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_cross))
@@ -390,7 +459,6 @@ class VpnServerAdapter(
                 statsJob = pollStatsLoop(group)
                 lastRoutedAppJob = pollLastRoutedAppLoop(group)
                 serverInfoJob = pollServerInfoLoop(group)
-                handleIpView(group)
             } else {
                 b.refreshStopIcon.setOnClickListener {
                     handleRefreshClick(group)
@@ -402,33 +470,53 @@ class VpnServerAdapter(
                 b.relayActionContainer.setOnClickListener { toggleRelay(group) }
                 b.lastRoutedAppContainer.setOnClickListener { openRoutedAppLogs(group) }
 
-                // Show "Checking…" immediately so the item is never left stranded
-                showCheckingStatus()
+                // Replay cached details; placeholder only when nothing is cached yet.
+                val hasCachedStatus = applyCachedDetails(group)
+                if (!hasCachedStatus) showCheckingStatus()
                 statsJob = pollStatsLoop(group)
                 lastRoutedAppJob = pollLastRoutedAppLoop(group)
                 serverInfoJob = pollServerInfoLoop(group)
-                handleIpView(group)
             }
         }
 
-        private fun handleIpView(group: ServerGroup) {
-            io {
-                // Fetch IP metadata for this server
-                val ip4 = fetchIpForGroup(group)
-                uiCtx {
-                    if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyIp(ip4)
-                }
+        /** Re-applies cached details; true when a cached status was rendered. */
+        private fun applyCachedDetails(group: ServerGroup): Boolean {
+            val cached = detailCache[group.key] ?: return false
+            cached.ipText?.let {
+                currentIpText = it
+                b.tvServerIp.text = it
+                b.tvServerIp.visibility = View.VISIBLE
             }
+            cached.routedApps?.let { applyLastRoutedApps(group.key, it) }
+            cached.appsText?.let {
+                b.appsActionContainer.visibility = View.VISIBLE
+                b.appsAction.text = it
+            }
+            if (cached.relayGone) {
+                b.relayActionContainer.visibility = View.GONE
+            } else cached.relayText?.let { text ->
+                b.relayActionContainer.visibility = View.VISIBLE
+                b.relayAction.text = text
+                b.relayAction.setTextColor(fetchColor(ctx, R.attr.serverChipTextColor))
+                b.relayActionContainer.setBackgroundResource(
+                    if (cached.relayPositive) R.drawable.bg_vpn_server_chip_positive
+                    else R.drawable.bg_vpn_server_chip
+                )
+                b.relayIcon.visibility = if (cached.relayPositive) View.VISIBLE else View.INVISIBLE
+            }
+            val pair = cached.statusPair ?: return false
+            renderStatus(pair)
+            return true
         }
 
         /**
          * Applies fetched IP metadata to the IP row and re-renders the status accordingly.
          */
-        private fun applyIp(ip4: IPMetadata?) {
+        private fun applyIp(group: ServerGroup, ip4: IPMetadata?) {
             // Show the actual IP label when available, hide it otherwise.
             val ipText = ip4?.ip?.takeIf { it.isNotEmpty() }
             currentIpText = ipText
+            cacheFor(group.key).ipText = ipText
             if (ipText != null) {
                 b.tvServerIp.text = ipText
                 b.tvServerIp.visibility = View.VISIBLE
@@ -442,14 +530,14 @@ class VpnServerAdapter(
             if (group.key.equals(AUTO_SERVER_ID, ignoreCase = true)) {
                 io {
                     val startTime = System.currentTimeMillis()
-                    var animator: ObjectAnimator? = null
                     uiCtx {
-                        animator = ObjectAnimator.ofFloat(b.refreshStopIcon, "rotation", 0f, 360f).apply {
-                            duration = 600L
-                            repeatCount = ValueAnimator.INFINITE
-                            interpolator = LinearInterpolator()
-                            start()
-                        }
+                        refreshIconAnimator =
+                            ObjectAnimator.ofFloat(b.refreshStopIcon, "rotation", 0f, 360f).apply {
+                                duration = 600L
+                                repeatCount = ValueAnimator.INFINITE
+                                interpolator = LinearInterpolator()
+                                start()
+                            }
                     }
                     try {
                         VpnController.reconnectRpnProxy("")
@@ -459,7 +547,8 @@ class VpnServerAdapter(
                             delay((MIN_REFRESH_ANIM_MS - elapsed).milliseconds)
                         }
                         uiCtx {
-                            animator?.cancel()
+                            refreshIconAnimator?.cancel()
+                            refreshIconAnimator = null
                             b.refreshStopIcon.rotation = 0f
                         }
                     }
@@ -564,7 +653,7 @@ class VpnServerAdapter(
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
 
-                    applyStats(config, statusPair)
+                    applyStats(group.key, config, statusPair)
                 }
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyStats[${group.key}]: ${t.message}")
@@ -616,9 +705,9 @@ class VpnServerAdapter(
                 Logger.d(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyLastRoutedApp for id: ${group.proxyId()}, config: $config, apps: $apps, key: ${group.key}")
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyLastRoutedApps(iconEntries)
-                    applyAppsAction(config, apps)
-                    applyRelayAction(config)
+                    applyLastRoutedApps(group.key, iconEntries)
+                    applyAppsAction(group.key, config, apps)
+                    applyRelayAction(group.key, config)
                 }
             } catch (t: Throwable) {
                 Logger.w(LOG_TAG_UI, "VpnServerAdapter fetchAndApplyLastRoutedApp[${group.key}]: ${t.message}")
@@ -650,7 +739,7 @@ class VpnServerAdapter(
                 } else ""
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyIp(ip4)
+                    applyIp(group, ip4)
                     if (isAuto && city.isNotEmpty()) {
                         b.tvCountryName.text = context.getString(
                             R.string.two_argument_dot,
@@ -672,7 +761,8 @@ class VpnServerAdapter(
          * plus the most recent app name (marquee, single line). Hidden entirely
          * when no connection has been routed through this server.
          */
-        private fun applyLastRoutedApps(entries: List<Pair<ConnectionTracker, Drawable?>>) {
+        private fun applyLastRoutedApps(key: String, entries: List<Pair<ConnectionTracker, Drawable?>>) {
+            cacheFor(key).routedApps = entries
             val firstName = entries.firstOrNull()?.first?.appName?.trim().orEmpty()
             if (firstName.isEmpty()) {
                 b.lastRoutedAppContainer.visibility = View.INVISIBLE
@@ -749,45 +839,30 @@ class VpnServerAdapter(
          * reflected when the user comes back to this list.
          */
         private fun showAppsCount(group: ServerGroup) {
-            b.appsActionContainer.visibility = View.GONE
+            b.appsActionContainer.visibility = View.INVISIBLE
             io {
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
                 val apps = ProxyManager.getAppCountForProxy(Backend.RpnWin + group.key)
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyAppsAction(config, apps)
+                    applyAppsAction(group.key, config, apps)
                 }
             }
         }
 
-        private fun applyAppsAction(config: CountryConfig?, apps: Int) {
+        private fun applyAppsAction(key: String, config: CountryConfig?, apps: Int) {
             if (config == null) {
-                b.appsActionContainer.visibility = View.GONE
+                b.appsActionContainer.visibility = View.INVISIBLE
                 return
             }
-            b.appsActionContainer.visibility = View.VISIBLE
-            b.appsAction.text = if (config.catchAll) {
+            val text = if (config.catchAll) {
                 ctx.getString(R.string.server_item_apps_all)
             } else {
                 ctx.getString(R.string.server_item_apps_count, apps)
             }
-        }
-
-        /**
-         * Resolves the actual exit city for the AUTO server from the backend's
-         * additional-info (same source as RpnConfigDetailActivity#showServerInfo).
-         * Only the city is shown — no country code and no capitalisation applied.
-         */
-        private fun resolveAutoCity(group: ServerGroup) {
-            io {
-                val addl = runCatching { VpnController.getRpnAddlInfo(group.key) }.getOrNull()
-                val city = addl?.city?.trim().orEmpty()
-                if (city.isEmpty()) return@io
-                uiCtx {
-                    if (!b.root.isAttachedToWindow) return@uiCtx
-                    b.tvCountryName.text = context.getString(R.string.two_argument_dot, city.capitalizeWords(), AUTO_COUNTRY_CODE.capitalizeWords())
-                }
-            }
+            cacheFor(key).appsText = text
+            b.appsActionContainer.visibility = View.VISIBLE
+            b.appsAction.text = text
         }
 
         /**
@@ -805,7 +880,7 @@ class VpnServerAdapter(
                 val config = RpnProxyManager.getCountryConfigByKey(group.key)
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyRelayAction(config)
+                    applyRelayAction(group.key, config)
                 }
             }
         }
@@ -816,20 +891,31 @@ class VpnServerAdapter(
          * The states are switched by swapping the background drawable — tinting
          * the base chip composites two translucent layers into near-invisibility.
          */
-        private fun applyRelayAction(config: CountryConfig?) {
-            if (config == null || config.id.equals(AUTO_SERVER_ID, true)) {
+        private fun applyRelayAction(key: String, config: CountryConfig?) {
+            if (config == null) {
                 b.relayActionContainer.visibility = View.INVISIBLE
                 return
             }
+            if (config.id.equals(AUTO_SERVER_ID, true)) {
+                // AUTO carries no relay chip of its own; collapse the line
+                // entirely instead of reserving an empty row under the card.
+                cacheFor(key).relayGone = true
+                b.relayActionContainer.visibility = View.GONE
+                return
+            }
+            cacheFor(key).relayGone = false
             b.relayActionContainer.visibility = View.VISIBLE
             val relayLabel = ctx.getString(R.string.cd_dns_crypt_relay_heading) + " · " +
                 ctx.getString(if (config.hopEnabled) R.string.lbl_on else R.string.lbl_off)
             if (config.hopEnabled) {
-                b.relayAction.text = ctx.getString(
+                val text = ctx.getString(
                     R.string.two_argument_space,
                     ctx.getString(R.string.symbol_bunny),
                     relayLabel
                 )
+                cacheFor(key).relayText = text
+                cacheFor(key).relayPositive = true
+                b.relayAction.text = text
                 b.relayAction.setTextColor(fetchColor(ctx, R.attr.serverChipTextColor))
                 b.relayActionContainer.setBackgroundResource(R.drawable.bg_vpn_server_chip_positive)
                 // INVISIBLE (not GONE): the icon's slot stays reserved so the
@@ -837,6 +923,8 @@ class VpnServerAdapter(
                 // mid-interaction when Relay toggles.
                 b.relayIcon.visibility = View.VISIBLE
             } else {
+                cacheFor(key).relayText = relayLabel
+                cacheFor(key).relayPositive = false
                 b.relayAction.text = relayLabel
                 b.relayAction.setTextColor(fetchColor(ctx, R.attr.serverChipTextColor))
                 b.relayActionContainer.setBackgroundResource(R.drawable.bg_vpn_server_chip)
@@ -890,7 +978,7 @@ class VpnServerAdapter(
                 val updated = RpnProxyManager.getCountryConfigByKey(group.key)
                 uiCtx {
                     if (!b.root.isAttachedToWindow) return@uiCtx
-                    applyRelayAction(updated)
+                    applyRelayAction(group.key, updated)
                     Utilities.showToastUiCentered(
                         ctx,
                         ctx.getString(R.string.cd_dns_crypt_relay_heading) + " " +
@@ -906,6 +994,7 @@ class VpnServerAdapter(
         }
 
         private fun applyStats(
+            key: String,
             config: CountryConfig?,
             statusPair: Pair<Int?, String>
         ) {
@@ -913,6 +1002,12 @@ class VpnServerAdapter(
                 hideStats()
                 return
             }
+            cacheFor(key).statusPair = statusPair
+            renderStatus(statusPair)
+        }
+
+        /** Renders a connection status pair (cached or freshly polled). */
+        private fun renderStatus(statusPair: Pair<Int?, String>) {
             // Stop any loading-pulse animation that may be running from showTunnelLoadingStatus().
             b.tvServerStatus.animate().cancel()
             b.tvServerStatus.alpha = 1f
@@ -933,13 +1028,6 @@ class VpnServerAdapter(
         }
 
         private fun getStatusColor(status: UIUtils.ProxyStatus?): Int {
-            // For RPN proxies, trust the status enum directly.  The since/lastOK heuristic
-            // (lastOK == 0 && since > WG_UPTIME_THRESHOLD → "Failing") is designed for
-            // WireGuard where lastOK is the handshake timestamp.  For RPN, lastOK tracks
-            // routed-traffic time; it is 0 on a healthy just-connected proxy that hasn't
-            // yet forwarded a packet.  Applying the heuristic causes the card to oscillate
-            // between green (Connected) during the brief startup window (< 5 s) and red
-            // (Failing) once that window expires – even though the backend reports TOK.
             return when (status) {
                 UIUtils.ProxyStatus.TOK -> R.attr.primaryLightColorText
                 UIUtils.ProxyStatus.TUP,

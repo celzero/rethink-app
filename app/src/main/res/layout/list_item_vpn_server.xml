@@ -13,296 +13,301 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="12dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="10dp">
+        android:clipChildren="false">
 
-    <com.celzero.bravedns.ui.custom.FlagWatermarkView
-        android:id="@+id/flag_watermark"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:importantForAccessibility="no"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/refresh_stop_icon"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginTop="2dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_remove"
-        android:padding="7dp"
-        android:src="@drawable/ic_cross"
-        android:tint="?attr/primaryLightColorText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_country_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:letterSpacing="0.01"
-        android:maxLines="1"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Singapore" />
-
-    <LinearLayout
-        android:id="@+id/status_row"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_country_name">
+        <com.celzero.bravedns.ui.custom.FlagWatermarkView
+            android:id="@+id/flag_watermark"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/iv_status_check"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_check_circle"
-            android:alpha="0.75"
-            android:layout_gravity="center_vertical"
-            android:foregroundGravity="center_vertical"
+            android:id="@+id/refresh_stop_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_remove"
+            android:padding="7dp"
+            android:src="@drawable/ic_cross"
+            android:tint="?attr/primaryLightColorText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_country_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginEnd="4dp"
-            android:tint="?attr/chipBgColorPositive"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_server_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:layout_marginEnd="4dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view"
-            tools:text="Connected" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_server_ip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.02"
-            android:maxLines="1"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view"
-            android:visibility="gone"
-            tools:text="82.102.25.218"
-            tools:visibility="visible" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/chips_row"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/status_row">
-
-    <LinearLayout
-        android:id="@+id/apps_action_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_vpn_server_chip"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="9dp"
-        android:paddingBottom="6dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/apps_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:duplicateParentState="true"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.02"
+            android:letterSpacing="0.01"
             android:maxLines="1"
-            android:textColor="?attr/serverChipTextColor"
-            android:textSize="@dimen/small_font_text_view"
-            tools:text="Apps · 12" />
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/refresh_stop_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Singapore" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="11dp"
-            android:layout_height="11dp"
-            android:layout_marginStart="4dp"
-            android:duplicateParentState="true"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_right_arrow_small"
-            android:tint="?attr/serverChipTextColor" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/relay_action_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_vpn_server_chip"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="9dp"
-        android:paddingBottom="6dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/relay_action"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/status_row"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:duplicateParentState="true"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:letterSpacing="0.02"
-            android:maxLines="1"
-            android:textColor="?attr/serverChipTextColor"
-            android:textSize="@dimen/small_font_text_view"
-            tools:text="Relay · On" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/relay_icon"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_marginStart="4dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_check_circle"
-            android:tint="?attr/serverChipTextColor"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-    </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/last_routed_app_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_vpn_server_chip"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="6dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chips_row">
-
-        <FrameLayout
-            android:id="@+id/last_routed_app_icon_stack"
-            android:layout_width="36dp"
-            android:layout_height="16dp"
-            android:duplicateParentState="true">
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_country_name">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/routed_app_icon_2"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="start|center_vertical"
-                android:background="@drawable/bg_server_avatar_circle"
-                android:duplicateParentState="true"
+                android:id="@+id/iv_status_check"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"
+                android:alpha="0.75"
+                android:foregroundGravity="center_vertical"
                 android:importantForAccessibility="no"
-                android:padding="1dp"
-                android:scaleType="fitCenter"
+                android:src="@drawable/ic_check_circle"
+                android:tint="?attr/chipBgColorPositive"
                 android:visibility="gone"
-                tools:src="@mipmap/ic_launcher"
                 tools:visibility="visible" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/routed_app_icon_1"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="start|center_vertical"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_server_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view"
+                tools:text="Connected" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_server_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.02"
+                android:maxLines="1"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view"
+                android:visibility="gone"
+                tools:text="82.102.25.218"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chips_row"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/status_row">
+
+            <LinearLayout
+                android:id="@+id/apps_action_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_vpn_server_chip"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="9dp"
+                android:paddingBottom="6dp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/apps_action"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:duplicateParentState="true"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.02"
+                    android:maxLines="1"
+                    android:textColor="?attr/serverChipTextColor"
+                    android:textSize="@dimen/small_font_text_view"
+                    tools:text="Apps · 12" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:layout_marginStart="4dp"
+                    android:duplicateParentState="true"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_right_arrow_small"
+                    android:tint="?attr/serverChipTextColor" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/last_routed_app_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_vpn_server_chip"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/bg_server_avatar_circle"
-                android:duplicateParentState="true"
-                android:importantForAccessibility="no"
-                android:padding="1dp"
-                android:scaleType="fitCenter"
-                android:visibility="gone"
-                tools:src="@mipmap/ic_launcher"
-                tools:visibility="visible" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="6dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="3dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/routed_app_icon_0"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="20dp"
-                android:background="@drawable/bg_server_avatar_circle"
-                android:duplicateParentState="true"
-                android:importantForAccessibility="no"
-                android:padding="1dp"
-                android:scaleType="fitCenter"
-                tools:src="@mipmap/ic_launcher" />
+                <FrameLayout
+                    android:id="@+id/last_routed_app_icon_stack"
+                    android:layout_width="36dp"
+                    android:layout_height="20dp"
+                    android:duplicateParentState="true">
 
-        </FrameLayout>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/routed_app_icon_2"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/bg_server_avatar_circle"
+                        android:duplicateParentState="true"
+                        android:importantForAccessibility="no"
+                        android:padding="1dp"
+                        android:scaleType="fitCenter"
+                        android:visibility="gone"
+                        tools:src="@mipmap/ic_launcher"
+                        tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/last_routed_app_fallback_icon"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:duplicateParentState="true"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_timer"
-            android:tint="?attr/colorPrimary"
-            android:visibility="gone" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/routed_app_icon_1"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_server_avatar_circle"
+                        android:duplicateParentState="true"
+                        android:importantForAccessibility="no"
+                        android:padding="1dp"
+                        android:scaleType="fitCenter"
+                        android:visibility="gone"
+                        tools:src="@mipmap/ic_launcher"
+                        tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/last_routed_app_action"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/routed_app_icon_0"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginStart="20dp"
+                        android:background="@drawable/bg_server_avatar_circle"
+                        android:duplicateParentState="true"
+                        android:importantForAccessibility="no"
+                        android:padding="1dp"
+                        android:scaleType="fitCenter"
+                        tools:src="@mipmap/ic_launcher" />
+
+                </FrameLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/last_routed_app_fallback_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:duplicateParentState="true"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_timer"
+                    android:tint="?attr/colorPrimary"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/last_routed_app_action"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:duplicateParentState="true"
+                    android:ellipsize="marquee"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.02"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    tools:text="Chrome"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/relay_action_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:duplicateParentState="true"
-            android:ellipsize="marquee"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.02"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:maxWidth="72dp"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="10sp"
-            android:visibility="gone"
-            tools:text="Chrome"
-            tools:visibility="visible" />
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_vpn_server_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="9dp"
+            android:paddingBottom="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chips_row">
 
-    </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/relay_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:duplicateParentState="true"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02"
+                android:maxLines="1"
+                android:textColor="?attr/serverChipTextColor"
+                android:textSize="@dimen/small_font_text_view"
+                tools:text="Relay · On" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/relay_icon"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="4dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_check_circle"
+                android:tint="?attr/serverChipTextColor"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

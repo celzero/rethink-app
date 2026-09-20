@@ -57,6 +57,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.database.AppDatabase
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.SmartDnsEndpoint
@@ -836,35 +837,20 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val navHostFragment =
-                        supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
-                    val navController = navHostFragment?.navController
-                    val currentId = navController?.currentDestination?.id
+                    val currentId =
+                        (supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment)
+                            ?.navController?.currentDestination?.id
                     val homeId = R.id.homeScreenFragment
 
                     when {
                         currentId == homeId -> {
                             finish()
                         }
-                        currentId == R.id.rethinkPlusDashboardFragment -> {
-                            val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
-                            btmNavView.selectedItemId = homeId
-                            navController?.navigate(
-                                homeId,
-                                null,
-                                NavOptions.Builder().setPopUpTo(homeId, true).build()
-                            )
-                        }
                         else -> {
-                            // Any other non-home top-level destination (statistics, configure,
-                            // about, rethinkPlus), navigate to home and clear the back stack.
+                            // Navigate home via the item-selected listener; an
+                            // extra navigate here would replace the fragment twice.
                             val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
                             btmNavView.selectedItemId = homeId
-                            navController?.navigate(
-                                homeId,
-                                null,
-                                NavOptions.Builder().setPopUpTo(homeId, true).build()
-                            )
                         }
                     }
                 }
@@ -872,6 +858,24 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         )
     }
 
+
+    private fun fadeThroughOptions(popUpTo: Int, inclusive: Boolean): NavOptions =
+        NavOptions.Builder()
+            .setPopUpTo(popUpTo, inclusive)
+            .setEnterAnim(R.anim.fade_through_in)
+            .setExitAnim(R.anim.fade_through_out)
+            .setPopEnterAnim(R.anim.fade_through_in)
+            .setPopExitAnim(R.anim.fade_through_out)
+            .build()
+
+    /** Cached subscription state; same check the purchase screen redirects on. */
+    private fun isRpnEntitled(): Boolean =
+        try {
+            RpnProxyManager.hasValidSubscription()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "isRpnEntitled: subscription check failed: ${e.message}", e)
+            false
+        }
 
     private fun setupNavigationItemSelectedListener() {
         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view) ?: run {
@@ -920,49 +924,54 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             }
             if (alreadyThere) return@setOnItemSelectedListener false
 
-            when (item.itemId) {
-                R.id.rethinkPlus -> {
-                    // RPN is not available in alpha builds; show a "coming soon"
-                    // toast and stay on the current destination.
-                    if (Utilities.isAlphaBuild()) {
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.coming_soon_toast),
-                            Toast.LENGTH_SHORT
-                        )
-                        return@setOnItemSelectedListener false
+            // Defer so the selector animation renders before fragment inflation.
+            btmNavView.post {
+                when (item.itemId) {
+                    R.id.rethinkPlus -> {
+                        // RPN is not available in alpha builds; show a "coming soon"
+                        // toast and stay on the current destination.
+                        if (Utilities.isAlphaBuild()) {
+                            showToastUiCentered(
+                                this,
+                                getString(R.string.coming_soon_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            return@post
+                        }
+                        // Entitled users skip the purchase screen entirely.
+                        if (isRpnEntitled()) {
+                            navController.navigate(
+                                R.id.rethinkPlusDashboardFragment,
+                                null,
+                                fadeThroughOptions(homeId, false)
+                            )
+                        } else {
+                            navController.navigate(
+                                R.id.rethinkPlus,
+                                null,
+                                fadeThroughOptions(homeId, false)
+                            )
+                        }
                     }
-                    // Navigate to rethinkPlus (start destination of the nested nav graph).
-                    // popUpTo homeId with inclusive=false keeps home in the back stack so
-                    // that back from rethinkPlus returns to home, not to a prior tab.
-                    navController.navigate(
-                        R.id.rethinkPlus,
-                        null,
-                        NavOptions.Builder()
-                            .setPopUpTo(homeId, false)
-                            .build()
-                    )
-                    true
-                }
 
-                homeId -> {
-                    navController.navigate(
-                        homeId,
-                        null,
-                        NavOptions.Builder().setPopUpTo(homeId, true).build()
-                    )
-                    true
-                }
+                    homeId -> {
+                        navController.navigate(
+                            homeId,
+                            null,
+                            fadeThroughOptions(homeId, true)
+                        )
+                    }
 
-                else -> {
-                    navController.navigate(
-                        item.itemId,
-                        null,
-                        NavOptions.Builder().setPopUpTo(homeId, false).build()
-                    )
-                    true
+                    else -> {
+                        navController.navigate(
+                            item.itemId,
+                            null,
+                            fadeThroughOptions(homeId, false)
+                        )
+                    }
                 }
             }
+            true
         }
 
         // Tapping an already-selected tab is a no-op (don't re-navigate or recreate).

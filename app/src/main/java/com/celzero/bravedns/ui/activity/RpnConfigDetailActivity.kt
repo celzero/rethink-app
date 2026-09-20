@@ -453,7 +453,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // update load if available
                     buildLoadSpeedText(addlInfo.load, addlInfo.link)
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc.capitalizeWords()
+                        b.tvHeroCity.text = addlInfo.city.capitalizeWords()
                         // Keep the collapsing toolbar title in sync with the hero city.
                         b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
                     }

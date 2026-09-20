@@ -266,14 +266,12 @@
 
     </LinearLayout>
 
-    <!-- pinned outside the scrolling container: the appbar behavior offsets the
-         container below the screen while the hero is expanded, which would hide
-         the signature entirely -->
     <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
         android:id="@+id/dolphin_signature"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:alpha="0.8"
         android:layout_marginBottom="12dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
