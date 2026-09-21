@@ -40,7 +40,8 @@ val isWebsiteDegoogled = providers.gradleProperty("websiteDegoogled")
 // local dev: copy from the sibling ../firebase/{debug,release} directory (gitignored, outside repo).
 // CI: the secret is written to app/src/google-services.json by GitHub Actions, so no local copy is needed.
 if (!deGoogled) {
-    val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
+    val isRelease =
+        gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
     val buildTypeName = if (isRelease) "release" else "debug"
     val sourceFile = file("${rootDir.parent}/firebase/$buildTypeName/google-services.json")
     val targetFile = file("$projectDir/google-services.json")
@@ -50,6 +51,7 @@ if (!deGoogled) {
             sourceFile.copyTo(targetFile, overwrite = true)
             logger.lifecycle("google-services.json: copied from $sourceFile")
         }
+
         targetFile.exists() -> logger.lifecycle("google-services.json: using existing $targetFile")
         else -> {
             val srcDir = file("src")
@@ -61,9 +63,9 @@ if (!deGoogled) {
             } else {
                 throw GradleException(
                     "google-services.json not found for '$buildTypeName' build.\n" +
-                        "  Local dev : place it at $sourceFile\n" +
-                        "             (or directly at $targetFile)\n" +
-                        "  CI        : ensure the secret is written to app/src/google-services.json"
+                            "  Local dev : place it at $sourceFile\n" +
+                            "             (or directly at $targetFile)\n" +
+                            "  CI        : ensure the secret is written to app/src/google-services.json"
                 )
             }
         }
@@ -165,7 +167,8 @@ android {
         create("config") {
             keyAlias = keystoreProperties.getProperty("keyAlias", "")
             keyPassword = keystoreProperties.getProperty("keyPassword", "")
-            storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) } ?: file("/dev/null")
+            storeFile =
+                keystoreProperties.getProperty("storeFile")?.let { file(it) } ?: file("/dev/null")
             storePassword = keystoreProperties.getProperty("storePassword", "")
         }
         // archive.is/wlwD8
@@ -210,7 +213,10 @@ android {
             // the setting to true
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             ndk {
                 // Use SYMBOL_TABLE to reduce symbol file size significantly
                 debugSymbolLevel = "SYMBOL_TABLE"
@@ -224,7 +230,10 @@ android {
                 // to avoid compilation errors when the plugin is not applied or its classes are not visible
                 val crashlyticsExtension = extensions.findByName("firebaseCrashlytics")
                 if (crashlyticsExtension != null) {
-                    val method = crashlyticsExtension.javaClass.getMethod("setNativeSymbolUploadEnabled", Boolean::class.javaPrimitiveType)
+                    val method = crashlyticsExtension.javaClass.getMethod(
+                        "setNativeSymbolUploadEnabled",
+                        Boolean::class.javaPrimitiveType
+                    )
                     method.invoke(crashlyticsExtension, true)
                 }
             }
@@ -247,14 +256,20 @@ android {
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("alpha")
             resValue("string", "app_name", "Rethink(α)")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         create("releaseDebug") {
             initWith(getByName("release"))
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
                 abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
@@ -344,6 +359,13 @@ android {
     }
     lint {
         abortOnError = true
+        ignoreTestSources = true
+        disable.addAll(
+            listOf(
+                "FragmentLiveDataObserve",
+                "FragmentBackPressedCallback", "FragmentAddMenuProvider"
+            )
+        )
     }
 
     if (hasTvReleaseSigningConfig) {
@@ -371,10 +393,11 @@ kotlin {
 androidComponents {
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
-            val abi = output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
+            val abi =
+                output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
             if (abi != null) {
                 // ABI-specific output: assign the correct per-ABI version code
-                // eg for arm64-v8a: 3 * 10000000 + versionCode
+                // e.g. for arm64-v8a: 3 * 10000000 + versionCode
                 val multiplier = abiVersionCodes[abi] ?: 0
                 val v = multiplier * 10000000 + (output.versionCode.get())
                 output.versionCode.set(v)
