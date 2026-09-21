@@ -4,7 +4,7 @@
 
   This file mirrors `app/src/full/AndroidManifest.xml` because the `tv`
   flavor inherits the entire `app/src/full/java` source set (see
-  `sourceSets.tv` in `app/build.gradle`). Every activity / receiver /
+  `sourceSets.tv` in `app/build.gradle.kts`). Every activity / receiver /
   service that upstream's Kotlin code references must be declared, or
   startActivity / PackageManager calls from the inherited classes will
   crash at runtime with ActivityNotFoundException / NameNotFoundException.
