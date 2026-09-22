@@ -22,10 +22,13 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.time.Duration.Companion.milliseconds
 
 // should this be replaced with developer.android.com/reference/android/os/CountDownTimer?
 object PauseTimer {
@@ -37,24 +40,30 @@ object PauseTimer {
     private val pauseCountDownTimer: MutableLiveData<Long> = MutableLiveData()
     private const val COUNT_DOWN_INTERVAL = 1000L
 
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private var countdownJob: Job? = null
+
     // increment/decrement value to pause vpn
     val PAUSE_VPN_EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
     fun start(durationMs: Long) {
         Logger.d(LOG_TAG_UI, "timer started, duration: $durationMs")
-        io {
+        countdownJob?.cancel()
+        countdownJob = scope.launch {
             try {
                 setCountdown(durationMs)
-                while (countdownMs.get() > 0L) {
-                    delay(COUNT_DOWN_INTERVAL)
+                while (isActive && countdownMs.get() > 0L) {
+                    delay(COUNT_DOWN_INTERVAL.milliseconds)
                     addCountdown(-COUNT_DOWN_INTERVAL)
                 }
             } finally {
-                Logger.d(LOG_TAG_VPN, "pause timer complete")
-                if (VpnController.isAppPaused()) {
-                    VpnController.resumeApp()
+                if (isActive) {
+                    Logger.d(LOG_TAG_VPN, "pause timer complete")
+                    if (VpnController.isAppPaused()) {
+                        VpnController.resumeApp()
+                    }
+                    setCountdown(INIT_TIME_MS)
                 }
-                setCountdown(INIT_TIME_MS)
             }
         }
     }
@@ -86,6 +95,4 @@ object PauseTimer {
     fun getPauseCountDownObserver(): MutableLiveData<Long> {
         return pauseCountDownTimer
     }
-
-    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch { f() }
 }

@@ -223,13 +223,19 @@ interface StatsSummaryDao {
                 AND conn.timeStamp > :to
                 AND conn.uid = :uid
                 AND ipInfo.asName LIKE :input
+                AND (:isBlocked IS NULL OR conn.isBlocked = :isBlocked)
             GROUP BY 
                 ipInfo.asName
             ORDER BY 
                 count DESC
            """
     )
-    fun getAllAsnLogs(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
+    fun getAllAsnLogs(
+        uid: Int,
+        to: Long,
+        input: String,
+        isBlocked: Boolean?
+    ): PagingSource<Int, AppConnection>
 
     @Query(
         """
@@ -665,6 +671,56 @@ interface StatsSummaryDao {
     )
     fun getAllBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
+    /**
+     * Per-app variant of getAllBlockedDomains: same DNS-level firewall blocks
+     * (Rule #2G) plus blocklist blocks, restricted to one uid. Backs the
+     * blocked-domains drill-down opened from the App Info screen.
+     */
+    @Query(
+        """
+            SELECT :uid AS uid,
+              '' AS ipAddress,
+              0 AS port,
+              SUM(count) AS count,
+              flag,
+              1 AS blocked,
+              appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
+            FROM
+              (
+                -- From DnsLogs
+                SELECT RTRIM(queryStr, '.') AS appOrDnsName,
+                  COUNT(id) AS count,
+                  flag
+                FROM DnsLogs
+                WHERE isBlocked = 1
+                  AND time > :to
+                  AND queryStr != ''
+                  AND uid = :uid
+                GROUP BY RTRIM(queryStr, '.')
+
+                UNION ALL
+
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName,
+                  COUNT(id) AS count,
+                  flag
+                FROM ConnectionTracker
+                WHERE isBlocked = 1
+                  AND timeStamp > :to
+                  AND dnsQuery != ''
+                  AND blockedByRule LIKE 'Rule #2G%'
+                  AND uid = :uid
+                GROUP BY dnsQuery
+              ) AS combined
+            GROUP BY appOrDnsName
+            ORDER BY count DESC
+        """
+    )
+    fun getAllBlockedDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
     @Query(
         """
             SELECT 0 AS uid, 
@@ -786,16 +842,114 @@ interface StatsSummaryDao {
               AND flag != ''
             GROUP BY flag
           ) AS combined
-        -- keep only valid flag emojis (U+1F1E6..U+1F1FF pairs, e.g. 'AA'..'ZZ'
-        -- in regional indicators). Excludes placeholders written by log trackers:
-        -- '?', warning sign and the invalid pair derived from CountryMap's "--" unknown marker.
-        WHERE flag BETWEEN char(127462, 127462) AND char(127487, 127487)
+        WHERE LENGTH(flag) = 2
+            AND unicode(flag) BETWEEN 127462 AND 127487
+            AND flag NOT LIKE '-%'
+            AND flag NOT LIKE '🇿🇿'
         GROUP BY flag
         ORDER BY count DESC
         LIMIT 7
         """
     )
     fun getMostContactedCountries(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT 0 AS uid,
+              '' AS ipAddress,
+              0 AS port,
+              SUM(count) AS count,
+              flag,
+              0 AS blocked,
+              '' as appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
+            FROM
+              (
+                -- From DnsLogs
+                SELECT COUNT(id) AS count,
+                  flag
+                FROM DnsLogs
+                WHERE isBlocked = 0
+                  AND status = 'COMPLETE'
+                  AND queryStr != ''
+                  AND time > :to
+                  AND flag != ''
+                  AND uid = :uid
+                GROUP BY flag
+
+                UNION ALL
+
+                -- From ConnectionTracker
+                SELECT COUNT(id) AS count,
+                  flag
+                FROM ConnectionTracker
+                WHERE isBlocked = 0
+                  AND timeStamp > :to
+                  AND flag != ''
+                  AND uid = :uid
+                GROUP BY flag
+              ) AS combined
+            WHERE LENGTH(flag) = 2
+                AND unicode(flag) BETWEEN 127462 AND 127487
+                AND flag NOT LIKE '-%'
+                AND flag NOT LIKE '🇿🇿'
+            GROUP BY flag
+            ORDER BY count DESC
+            LIMIT 3
+        """
+    )
+    fun getMostContactedCountriesByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT 0 AS uid,
+              '' AS ipAddress,
+              0 AS port,
+              SUM(count) AS count,
+              flag,
+              0 AS blocked,
+              '' as appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
+            FROM
+              (
+                -- From DnsLogs
+                SELECT COUNT(id) AS count,
+                  flag
+                FROM DnsLogs
+                WHERE isBlocked = 0
+                  AND status = 'COMPLETE'
+                  AND queryStr != ''
+                  AND time > :to
+                  AND flag != ''
+                  AND flag NOT LIKE '-%'
+                  AND uid = :uid
+                GROUP BY flag
+
+                UNION ALL
+
+                -- From ConnectionTracker
+                SELECT COUNT(id) AS count,
+                  flag
+                FROM ConnectionTracker
+                WHERE isBlocked = 0
+                  AND timeStamp > :to
+                  AND flag != ''
+                  AND uid = :uid
+                GROUP BY flag
+              ) AS combined
+            WHERE LENGTH(flag) = 2
+                AND unicode(flag) BETWEEN 127462 AND 127487
+                AND flag NOT LIKE '-%'
+                AND flag NOT LIKE '🇿🇿'
+            GROUP BY flag
+            ORDER BY count DESC
+        """
+    )
+    fun getAllContactedCountriesByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
@@ -830,7 +984,15 @@ interface StatsSummaryDao {
                   AND timeStamp > :to 
                   AND flag != ''
                 GROUP BY flag
-              ) AS combined 
+              ) AS combined
+            -- real flag emoji only: exactly 2 regional-indicator code points
+            -- with the first in U+1F1E6..U+1F1FF. drops empty flags, dash
+            -- placeholders ('--', '---'), DnsLogs status glyphs ('❔','⚠',
+            -- '✅','▶') and legacy tofu. ZZ is DB-IP's unknown marker.
+            WHERE LENGTH(flag) = 2
+                AND unicode(flag) BETWEEN 127462 AND 127487
+                AND flag NOT LIKE '-%'
+                AND flag NOT LIKE '🇿🇿'
             GROUP BY flag 
             ORDER BY count DESC 
         """
@@ -983,6 +1145,85 @@ interface StatsSummaryDao {
 
     @Query(
         """
+        SELECT :uid AS uid,
+            '' AS ipAddress,
+            0 AS port,
+            SUM(count) AS count,
+            flag AS flag,
+            1 AS blocked,
+            appOrDnsName,
+            0 AS uploadBytes,
+            0 AS downloadBytes,
+            0 AS totalBytes
+        FROM
+            (
+                -- From ConnectionTracker (DNS-level blocks recorded by the firewall)
+                SELECT dnsQuery AS appOrDnsName,
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker
+                WHERE dnsQuery != ''
+                    AND timeStamp > :to
+                    AND uid = :uid
+                    AND isBlocked = 1
+                    AND blockedByRule LIKE 'Rule #2G%'
+                GROUP BY dnsQuery
+
+                UNION ALL
+
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName,
+                    COUNT(queryStr) AS count,
+                    flag as flag
+                FROM DnsLogs
+                WHERE uid = :uid
+                    AND time > :to
+                    AND isBlocked = 1
+                    AND queryStr != ''
+                GROUP BY queryStr
+            ) AS combined
+        GROUP BY appOrDnsName
+        ORDER BY count DESC
+        LIMIT 3
+        """
+    )
+    fun getBlockedDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT
+                conn.uid AS uid,
+                GROUP_CONCAT(DISTINCT conn.ipAddress) AS ipAddress,
+                0 AS port,
+                COUNT(*) AS count,
+                1 AS blocked,
+                ipInfo.countryCode AS flag,
+                ipInfo.asName AS appOrDnsName,
+                0 AS downloadBytes,
+                0 AS uploadBytes,
+                0 AS totalBytes
+            FROM
+                ConnectionTracker AS conn
+            INNER JOIN
+                IpInfo AS ipInfo
+            ON
+                conn.ipAddress = ipInfo.ip
+            WHERE
+                ipInfo.asName != ''
+                AND conn.timeStamp > :to
+                AND conn.uid = :uid
+                AND conn.isBlocked = 1
+            GROUP BY
+                ipInfo.asName
+            ORDER BY
+                count DESC
+            LIMIT 3
+        """
+    )
+    fun getBlockedAsnByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
         SELECT :uid AS uid, 
             '' AS ipAddress, 
             0 AS port, 
@@ -1065,6 +1306,111 @@ interface StatsSummaryDao {
     )
     fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
+    /**
+     * Allowed (contacted) domains for one uid with a search filter: only
+     * non-blocked entries from both ConnectionTracker and DnsLogs.
+     */
+    @Query(
+        """
+        SELECT :uid AS uid,
+            '' AS ipAddress,
+            0 AS port,
+            SUM(count) AS count,
+            flag AS flag,
+            0 AS blocked,
+            appOrDnsName,
+            0 AS uploadBytes,
+            0 AS downloadBytes,
+            0 AS totalBytes
+        FROM
+            (
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName,
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker
+                WHERE dnsQuery != ''
+                    AND timeStamp > :to
+                    AND uid = :uid
+                    AND isBlocked = 0
+                    AND dnsQuery LIKE :input
+                GROUP BY dnsQuery
+                UNION ALL
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName,
+                    COUNT(queryStr) AS count,
+                    flag as flag
+                FROM DnsLogs
+                WHERE uid = :uid
+                    AND time > :to
+                    AND status = 'COMPLETE'
+                    AND isBlocked = 0
+                    AND queryStr != ''
+                    AND queryStr LIKE :input
+                GROUP BY queryStr
+            ) AS combined
+        GROUP BY appOrDnsName
+        ORDER BY count DESC
+        """
+    )
+    fun getAllowedDomainsByUid(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
+
+    /**
+     * Blocked domains for one uid with a search filter, unlimited: mirrors
+     * getBlockedDomainsByUid (DNS-level firewall blocks + blocklist blocks)
+     * without its top-3 cap.
+     */
+    @Query(
+        """
+        SELECT :uid AS uid,
+            '' AS ipAddress,
+            0 AS port,
+            SUM(count) AS count,
+            flag AS flag,
+            1 AS blocked,
+            appOrDnsName,
+            0 AS uploadBytes,
+            0 AS downloadBytes,
+            0 AS totalBytes
+        FROM
+            (
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName,
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker
+                WHERE dnsQuery != ''
+                    AND timeStamp > :to
+                    AND uid = :uid
+                    AND isBlocked = 1
+                    AND blockedByRule LIKE 'Rule #2G%'
+                    AND dnsQuery LIKE :input
+                GROUP BY dnsQuery
+
+                UNION ALL
+
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName,
+                    COUNT(queryStr) AS count,
+                    flag as flag
+                FROM DnsLogs
+                WHERE uid = :uid
+                    AND time > :to
+                    AND isBlocked = 1
+                    AND queryStr != ''
+                    AND queryStr LIKE :input
+                GROUP BY queryStr
+            ) AS combined
+        GROUP BY appOrDnsName
+        ORDER BY count DESC
+        """
+    )
+    fun getBlockedDomainsByUidFiltered(
+        uid: Int,
+        to: Long,
+        input: String
+    ): PagingSource<Int, AppConnection>
+
     @Query(
         """
             SELECT uid AS uid, 
@@ -1086,4 +1432,55 @@ interface StatsSummaryDao {
         """
     )
     fun getIpDetails(ip: String, to: Long, isBlocked: Boolean): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+        SELECT blockLists AS combo, COUNT(id) AS count
+        FROM DnsLogs
+        WHERE isBlocked = 1
+            AND blockLists != ''
+            AND time > :to
+        GROUP BY blockLists
+        """
+    )
+    suspend fun getBlockedBlocklistCombos(to: Long): List<BlocklistComboCount>
+
+    @Query(
+        """
+        SELECT blockLists AS combo, COUNT(id) AS count
+        FROM DnsLogs
+        WHERE isBlocked = 1
+            AND blockLists != ''
+            AND time > :to
+            AND uid = :uid
+        GROUP BY blockLists
+        """
+    )
+    suspend fun getBlockedBlocklistCombosByUid(uid: Int, to: Long): List<BlocklistComboCount>
+
+    @Query(
+        """
+        SELECT DISTINCT blockLists
+        FROM DnsLogs
+        WHERE isBlocked = 1
+            AND blockLists != ''
+            AND time > :to
+            AND (:uid IS NULL OR uid = :uid)
+            AND (',' || blockLists || ',') LIKE '%,' || :name || ':%' ESCAPE '\'
+        """
+    )
+    suspend fun getBlocklistTagCombos(name: String, uid: Int?, to: Long): List<String>
+
+    @Query(
+        """
+        SELECT uid, appName, queryStr, blockLists
+        FROM DnsLogs
+        WHERE isBlocked = 1
+            AND blockLists != ''
+            AND time > :to
+            AND (:uid IS NULL OR uid = :uid)
+            AND (',' || blockLists || ',') LIKE '%,' || :name || ':%' ESCAPE '\'
+        """
+    )
+    suspend fun getBlocklistAttributions(name: String, uid: Int?, to: Long): List<BlocklistAttribution>
 }

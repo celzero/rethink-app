@@ -33,12 +33,17 @@ object EmbeddedDolphinContent {
     /** A dolphin artwork paired with a quote to render beneath it. */
     data class Signature(@DrawableRes val image: Int, @StringRes val quote: Int)
 
-    // --- the five dolphins (extracted from the sprite sheet) ---
-    // dolphin_waves  : riding a wave line
-    // dolphin_relay  : passing a curling wave
-    // dolphin_dive   : steep nose-down descent
-    // dolphin_free   : arched, playful leap
-    // dolphin_secure : clean glide with spray
+    // --- the ten regular dolphins (extracted from sprite sheets) ---
+    // dolphin_waves        : riding a wave line
+    // dolphin_relay        : passing a curling wave
+    // dolphin_dive         : steep nose-down descent
+    // dolphin_free         : arched, playful leap
+    // dolphin_secure       : clean glide with spray
+    // dolphin_happy_waves  : waving fin
+    // dolphin_happy_relay  : relaying along
+    // dolphin_happy_shield : shielded glide
+    // dolphin_happy_globe  : circling the globe
+    // dolphin_happy_swirl  : swimming in a swirl
 
     /** The full dolphin pool. */
     val DOLPHINS: List<Int> = listOf(
@@ -46,8 +51,59 @@ object EmbeddedDolphinContent {
         R.drawable.dolphin_relay,
         R.drawable.dolphin_dive,
         R.drawable.dolphin_free,
-        R.drawable.dolphin_secure
+        R.drawable.dolphin_secure,
+        R.drawable.dolphin_happy_waves,
+        R.drawable.dolphin_happy_relay,
+        R.drawable.dolphin_happy_shield,
+        R.drawable.dolphin_happy_globe,
+        R.drawable.dolphin_happy_swirl
     )
+
+    // --- the four sad dolphins (extracted from a separate sprite sheet) ---
+    // Reserved for failure states only; deliberately kept out of [DOLPHINS]
+    // so they never surface through [random].
+    // dolphin_sad_1 : caught in the rain (generic failure)
+    // dolphin_sad_2 : confused, question overhead
+    // dolphin_sad_3 : no internet
+    // dolphin_sad_4 : server error
+
+    /**
+     * The sad-dolphin pool; the failure-state marker for
+     * [EmbeddedDolphinSignature.setContentForFailure].
+     */
+    val SAD_DOLPHINS: List<Int> = listOf(
+        R.drawable.dolphin_sad_1,
+        R.drawable.dolphin_sad_2,
+        R.drawable.dolphin_sad_3,
+        R.drawable.dolphin_sad_4
+    )
+
+    /**
+     * Semantic flavours for failure artwork, so call sites pick a sad
+     * dolphin whose mood matches the actual failure instead of a random one
+     * (e.g. a "no internet" dolphin for a stopped VPN would mislead).
+     */
+    enum class FailureFlavor {
+        /** Generic failure with no more specific cause. */
+        GENERIC,
+
+        /** Nothing found (empty result, not an error). */
+        CONFUSED,
+
+        /** Connectivity loss: VPN/tunnel down or network unreachable. */
+        OFFLINE,
+
+        /** The remote side failed: fetch, server, or API error. */
+        SERVER
+    }
+
+    /** The sad dolphin whose mood matches [flavor]. */
+    fun failureDrawable(flavor: FailureFlavor): Int = when (flavor) {
+        FailureFlavor.GENERIC -> R.drawable.dolphin_sad_1
+        FailureFlavor.CONFUSED -> R.drawable.dolphin_sad_2
+        FailureFlavor.OFFLINE -> R.drawable.dolphin_sad_3
+        FailureFlavor.SERVER -> R.drawable.dolphin_sad_4
+    }
 
     /** The full quote pool; any dolphin can be paired with any of these. */
     val QUOTES: List<Int> = listOf(
@@ -99,6 +155,12 @@ object EmbeddedDolphinContent {
 
     /** A random dolphin paired with a random quote; different on every call. */
     fun random(): Signature = Signature(DOLPHINS.random(), QUOTES.random())
+
+    /**
+     * A random sad dolphin paired with a random quote; use for failure
+     * states via [EmbeddedDolphinSignature.setContentForFailure].
+     */
+    fun randomFailure(): Signature = Signature(SAD_DOLPHINS.random(), QUOTES.random())
 
     /**
      * The tap-to-cycle successor of [s]: next dolphin (cyclic) paired with

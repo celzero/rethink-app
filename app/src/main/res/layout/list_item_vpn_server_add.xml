@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_server_tile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="80dp"
+    android:layout_margin="6dp"
+    android:background="@drawable/bg_vpn_server_add_tile"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:alpha="0.8"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_add"
+            android:tint="?attr/primaryLightColorText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:alpha="0.8"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:text="@string/server_selection_add_tile"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+</FrameLayout>

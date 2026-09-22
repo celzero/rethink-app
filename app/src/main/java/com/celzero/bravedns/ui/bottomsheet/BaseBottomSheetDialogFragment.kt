@@ -17,6 +17,10 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import android.app.Dialog
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import com.celzero.bravedns.util.useTransparentNoDimBackground
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -29,6 +33,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  * `center_horizontal` gravity to the sheet, so a max width is all that is needed for
  * centering. Narrow windows (regular phones) are unaffected since the cap never kicks in.
  *
+ * Sheets open fully expanded with the frame sized to its content ([bottomSheetHeight]
+ * defaults to wrap-content): with the behavior's fit-to-contents measurement, the
+ * expanded offset resolves to the full content height, so long sheets are never left
+ * cut off behind a half-expanded state on large screens. Dragging down dismisses
+ * directly (skip-collapsed) instead of snapping to a peek height. Sheets that need a
+ * different frame height (e.g. a full-height scrollable list) can override
+ * [bottomSheetHeight].
+ *
  * All bottom sheets must extend this class instead of [BottomSheetDialogFragment] directly.
  */
 abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
@@ -39,6 +51,30 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         dialog.behavior.maxWidth = (MAX_WIDTH_DP * density).toInt()
         return dialog
     }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
+
+        val sheetDialog = dialog as? BottomSheetDialog ?: return
+        val bottomSheet =
+            sheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                ?: return
+
+        bottomSheet.layoutParams.height = bottomSheetHeight
+        bottomSheet.requestLayout()
+
+        sheetDialog.behavior.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            skipCollapsed = true
+        }
+    }
+
+    /**
+     * Height applied to the Material sheet frame in [onStart]. Defaults to wrap-content
+     * so the sheet always sizes to (and therefore fully shows) its content.
+     */
+    protected open val bottomSheetHeight: Int = ViewGroup.LayoutParams.WRAP_CONTENT
 
     companion object {
         private const val MAX_WIDTH_DP = 600

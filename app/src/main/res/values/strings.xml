@@ -32,10 +32,12 @@
     <string name="lbl_on" translatable="true">On</string>
     <string name="lbl_off" translatable="true">Off</string>
     <string name="log_activity_conn_count" translatable="true">%1$d connections</string>
+    <string name="log_activity_domain_recent" translatable="false">🕘 %1$s</string>
     <string name="log_activity_interval_range" translatable="false">%1$s - %2$s</string>
     <string name="log_activity_interval_empty" translatable="true">No activity recorded in this period</string>
     <string name="logs_card_grid_desc" translatable="true">Activity grid, tap to view details</string>
     <string name="lbl_disabled" translatable="true">Disabled</string>
+    <string name="lbl_enable" translatable="true">Enable</string>
     <string name="lbl_domain" translatable="true">Domain</string>
     <string name="lbl_wildcard" translatable="true">Wildcard</string>
     <string name="lbl_action_required" translatable="true">Action Required</string>
@@ -68,6 +70,7 @@
     <string name="lbl_applications" translatable="true">Applications</string>
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
+    <string name="lbl_app_rules" translatable="true">App rules</string>
     <string name="lbl_notes" translatable="true">Notes</string>
     <string name="hint_notes" translatable="true">Add notes about this app</string>
     <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
@@ -185,7 +188,7 @@
     <string name="symbol_currency" translatable="false">💲</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
     <string name="symbol_red_circle" translatable="false">🔴</string>
-    <string name="symbol_key" translatable="false">🗝️</string>
+    <string name="symbol_key" translatable="false">🗝</string>
     <string name="symbol_global" translatable="false">🌐</string>
     <string name="symbol_clock" translatable="false">🕒</string>
     <string name="symbol_rocket" translatable="false">🚀</string>
@@ -213,6 +216,7 @@
     <string name="symbol_lock" translatable="false">🔒</string>
     <string name="symbol_unlock" translatable="false">🔓</string>
     <string name="symbol_seal" translatable="false">🦭</string>
+    <string name="symbol_infinity" translatable="false">♾️</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -384,6 +388,9 @@
     <string name="dns_query_clear_logs_message" translatable="true">This deletes on-device DNS logs. This operation is not reversible. Do you want to proceed?</string>
 
     <string name="bsct_app_info" translatable="true">App Info</string>
+    <string name="bsct_meta_destination" translatable="true">Destination</string>
+    <string name="bsct_meta_activity" translatable="true">Activity</string>
+    <string name="bsct_meta_info" translatable="true">Info</string>
     <string name="bsct_block_ip" translatable="true">Block, trust &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
     <string name="bsct_block_domain" translatable="true">Block, trust &lt;u>domain(s)&lt;/u> for &lt;u>this app&lt;/u></string>
     <string name="bsct_block" translatable="true">Block, bypass, exclude, isolate &lt;u>this app&lt;/u></string>
@@ -812,6 +819,12 @@
     <string name="hsf_firewall_mode_off_indicator" translatable="true">Firewall · off</string>
     <string name="hsf_proxy_off_indicator" translatable="true">Proxy Inactive</string>
 
+    <!-- Home screen: swipeable rules card (one page per universal rule type) -->
+    <string name="hsf_rules_univ_label" translatable="true">universal firewall rules</string>
+    <string name="hsf_rules_ip_label" translatable="true">universal IP rules</string>
+    <string name="hsf_rules_dom_label" translatable="true">universal domain rules</string>
+    <string name="hsf_rules_pager_desc" translatable="true">Swipe to see universal firewall, IP, and domain rules</string>
+
     <string name="firewall_card_universal_rules" translatable="true">%1$s universal rule(s)</string>
     <string name="rules_card_domain_count" translatable="true">%1$s domain rule(s)</string>
     <string name="apps_card_ips_count" translatable="true">%1$s IP &amp; Port rule(s)</string>
@@ -828,6 +841,18 @@
     <string name="logs_card_duration" translatable="true">since %1$s</string>
 
     <string name="logs_card_heatmap_window" translatable="true">last 24 hours</string>
+
+    <!-- top-apps histogram page of the home-screen logs card -->
+    <string name="logs_card_apps_hint_allowed" translatable="true">Data used by your most active apps · last 24 hours</string>
+    <string name="logs_card_apps_hint_blocked" translatable="true">Apps with the most blocked attempts · last 24 hours</string>
+    <string name="logs_card_apps_count_label_allowed" translatable="true">data used</string>
+    <string name="logs_card_apps_count_label_blocked" translatable="true">blocked</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s Wi-Fi · %2$s mobile</string>
+    <string name="logs_card_apps_empty" translatable="true">Nothing to show yet</string>
+    <string name="logs_card_apps_legend_wifi" translatable="true">Wi-Fi</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">Mobile</string>
+    <string name="logs_card_pager_desc" translatable="true">Swipe to switch between activity and top apps</string>
+    <string name="logs_card_disabled_logs_hint" translatable="true">Enable logs to see your recent activity</string>
 
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules.\n\nWi-Fi-based proxy automation requires Location permission to identify the connected Wi-Fi network (SSID). This permission is requested only when you enable the feature.\n\nRethink does not collect any information or spy on you in any way.</string>
@@ -1145,6 +1170,14 @@
     <string name="dns_btm_resolved_crypt" translatable="true">resolved &lt;u&gt;anonymously&lt;/u&gt; %1$s by %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">resolved %1$s by %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">resolved %1$s</string>
+
+    <!-- verdict line of the dns log bottom sheet; resolver/proxy details move to the info section -->
+    <string name="dns_btm_blocked" translatable="true">blocked %1$s</string>
+    <string name="dns_btm_resolved_anonymously" translatable="true">resolved anonymously %1$s</string>
+    <string name="dns_btm_info_via" translatable="true">%1$s via %2$s</string>
+    <string name="dns_btm_info_on_device" translatable="true">on device</string>
+    <string name="bsdl_meta_resolver" translatable="true">Resolver</string>
+    <string name="bsdl_meta_query_type" translatable="true">Query type</string>
 
     <string name="dns_btm_latency_ms" translatable="true">%1$ss</string>
 
@@ -1522,7 +1555,11 @@
 
     <string name="ada_firewall_title" translatable="true">Firewall rules for this app</string>
 
-    <string name="ada_network_log_title" translatable="true">Network log for this app</string>
+    <string name="ada_network_log_title" translatable="true">Network stats for this app</string>
+
+    <string name="ada_insights_uploaded" description="Label for the total upload volume of a single app in the app info insights view." translatable="true">Uploaded</string>
+
+    <string name="ada_insights_downloaded" description="Label for the total download volume of a single app in the app info insights view." translatable="true">Downloaded</string>
 
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Metered</string>
@@ -1550,9 +1587,18 @@
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
 
     <!-- DNS logs bottom sheet -->
-    <string name="bsdl_block_desc" translatable="true">Block, trust &lt;u>this domain&lt;/u></string>
-    <string name="bsdl_app_block_desc" translatable="true">Block, trust &lt;u>this domain&lt;/u> for this app</string>
     <string name="bsdl_blocked_desc" translatable="true">blocked %1$s by %2$s</string>
+    <string name="bsdl_open_domain_connections" translatable="true">Open domain connections</string>
+    <string name="bsdl_meta_app" translatable="true">App</string>
+    <string name="bsdl_meta_response" translatable="true">Response</string>
+    <string name="bsdl_meta_alias" translatable="true">Alias</string>
+    <string name="bsdl_meta_region" translatable="true">Region</string>
+    <string name="bsdl_rule_scope_app_title" translatable="true">For this app</string>
+    <string name="bsdl_rule_scope_app_title_fmt" translatable="true">For %1$s</string>
+    <string name="bsdl_rule_scope_global_title" translatable="true">For all apps</string>
+    <string name="bsdl_rule_status_none" translatable="true">No rule</string>
+    <string name="bsdl_rule_status_blocked" translatable="true">Blocked</string>
+    <string name="bsdl_rule_status_trusted" translatable="true">Trusted</string>
 
     <!-- app config -->
     <string name="network_dns" translatable="true">System DNS</string>
@@ -1676,10 +1722,18 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Most Contacted IPs</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Most Blocked IPs</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Most Blocked Countries</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Start Rethink to proceed</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Start Rethink</string>
     <string name="ssv_see_more" translatable="true">Show All</string>
     <string name="ssv_insights_no_active_conns" description="Shown in the insights view when there are no active connections." translatable="true">No active connections</string>
     <string name="ssv_insights_no_data" description="Shown in the insights view when a stats section has no data for the selected period." translatable="true">No data yet</string>
+    <string name="ssv_blocklists_heading" description="This label will appear on the stats screen as a header for the domains blocked per blocklist." translatable="true">Most Blocked by Blocklists</string>
+    <string name="ssv_blocklist_summary" description="Shows a blocklist name with the number of its tag sets that blocked domains, e.g. 'ads.example · 3 lists'." translatable="true">%1$s · %2$d lists</string>
+    <string name="ssv_filter_heading" description="Accessibility label for the stats filter chip row that toggles which sections are shown." translatable="true">Filter sections</string>
+    <string name="ssv_filter_providers" description="Filter chip label on the stats screen to show or hide the ASN/provider sections." translatable="true">Providers</string>
+    <string name="ssv_filter_countries" description="Filter chip label on the stats screen to show or hide the country sections." translatable="true">Countries</string>
+    <string name="ssv_filter_domains" description="Filter chip label on the stats screen to show or hide the domain sections." translatable="true">Domains</string>
+    <string name="ssv_filter_blocklist" description="Filter chip label on the stats screen to show or hide the blocklist section." translatable="true">Blocklists</string>
+    <string name="ssv_filter_ips" description="Filter chip label on the stats screen to show or hide the IP sections." translatable="true">IPs</string>
     <string name="ssv_insights_no_country_data" description="Shown in the insights view when there is no country information for the selected period." translatable="true">No country data yet</string>
     <string name="cd_stats_switch_to_insights" description="Content description for the button that switches the stats screen to the insights view." translatable="true">Switch to Insights view</string>
     <string name="cd_stats_switch_to_list" description="Content description for the button that switches the stats screen to the list view." translatable="true">Switch to List view</string>
@@ -1765,6 +1819,7 @@
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard cannot be enabled in DNS-only mode. Switch to Firewall or DNS+Firewall mode.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">An active One-WireGuard configuration is in use. Disable it first to use individual WireGuard configurations.</string>
+    <string name="wireguard_duplicate_keys_conflict" translatable="true">Cannot enable this WireGuard. Its keys are already in use by another active WireGuard.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Invalid WireGuard configuration</string>
     <string name="wireguard_invalid_config_message" translatable="true">The selected WireGuard configuration is invalid or missing. Edit or re-import the configuration and try again.</string>
     <string name="wireguard_replaced_active_config" translatable="true">Replaced the previously active WireGuard configuration</string>
@@ -1949,7 +2004,7 @@
     <string name="processing_dialog_title" translatable="true">Processing</string>
     <string name="processing_dialog_desc" translatable="true">Please wait while we process your request.</string>
 
-    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> randomly uses any among these DNS resolvers:</string>
+    <string name="smart_dns_desc" translatable="true">Automatically chooses the right DNS based on your selected filters</string>
 
     <string name="custom_rules_proxy_title" translatable="false">Proxy rules</string>
     <string name="custom_rules_proxy_desc" translatable="false">Select a proxy to use for this rule.</string>
@@ -2220,23 +2275,21 @@
     <string name="rpn_title" translatable="false">RPN</string>
 
     <string name="rpn_overhauled_purchased_date_label" translatable="false">Purchased %1$s</string>
-    <string name="rpn_overhauled_manage_purchase_desc" translatable="false">Plan, orders, entitlement, cancel</string>
+    <string name="rpn_overhauled_manage_purchase_desc" translatable="false">Plan, orders, cancel.</string>
     <string name="rpn_overhauled_plan_details_header" translatable="false">Plan details</string>
     <string name="rpn_overhauled_ending_plan_header" translatable="false">Ending your plan</string>
     <string name="rpn_overhauled_request_refund_title" translatable="false">Request refund</string>
-    <string name="rpn_overhauled_request_refund_desc" translatable="false">Ends the plan now and refunds this purchase</string>
+    <string name="rpn_overhauled_request_refund_desc" translatable="false">Ends the plan now and refunds this purchase.</string>
     <string name="rpn_overhauled_manage_google_play_title" translatable="false">Manage on Google Play</string>
-    <string name="rpn_overhauled_manage_google_play_desc" translatable="false">Payment method, receipts, renewal</string>
-    <string name="rpn_overhauled_report_billing_issue_desc" translatable="false">Wrong charge, missing plan, refunds</string>
+    <string name="rpn_overhauled_manage_google_play_desc" translatable="false">Payment method, receipts, renewal.</string>
     <string name="rpn_overhauled_current_plan_header" translatable="false">Current plan</string>
-    <string name="rpn_overhauled_cancel_purchase_desc" translatable="false">Cancels renewal. Access continues until the end of the current period</string>
+    <string name="rpn_overhauled_cancel_purchase_desc" translatable="false">Cancels renewal. Access continues until the end of the current period.</string>
 
     <string name="rpn_troubleshoot_title" translatable="false">troubleshoot</string>
 
     <string name="rpn_perform_test" translatable="false">Run test</string>
     <string name="rpn_test_desc" translatable="false">Test your connection to RPN proxies.</string>
 
-    <string name="rpn_report_issue" translatable="false">Report issue</string>
     <string name="rpn_report_desc" translatable="false">Report an issue with RPN.</string>
 
     <string name="payment_history_title" translatable="false">Device Order History</string>
@@ -2358,6 +2411,11 @@
     <string name="server_selection_filter_by_speed" translatable="false">Speed</string>
     <string name="server_selection_filter_active_desc" translatable="false">Active filter: %1$s</string>
     <string name="server_selection_filter_clear_desc" translatable="false">Tap to clear filters</string>
+    <string name="server_selection_add_tile" translatable="false">Add location</string>
+    <string name="server_selection_pulse_connections" translatable="false">connections · past hour</string>
+    <string name="server_selection_pulse_blocked" translatable="false">blocked · past hour</string>
+    <string name="server_selection_pulse_data" translatable="false">data · past hour</string>
+    <string name="server_selection_pulse_apps" translatable="false">apps · past hour</string>
     <string name="server_selection_max_info" translatable="false">Select up to 5 locations</string>
     <string name="server_selection_max_reached" translatable="false">Maximum %1$d locations can be selected</string>
     <string name="server_selection_no_servers" translatable="false">No locations found</string>
@@ -2365,6 +2423,8 @@
     <string name="server_selection_error_title" translatable="false">Error fetching locations</string>
     <string name="server_selection_error_hint" translatable="false">Check your connection or try again in a moment.</string>
     <string name="server_selection_error_retry" translatable="false">Try Again</string>
+    <string name="server_selection_vpn_stopped_title" translatable="false">Rethink is stopped</string>
+    <string name="server_selection_vpn_stopped_hint" translatable="false">Start Rethink to proceed.</string>
     <string name="server_selection_proxy_unavailable" translatable="false">Could not load locations. Proxy may not be ready yet.</string>
 
     <!-- RPN reset progress dialog (dialog_server_loading layout) -->
@@ -2454,15 +2514,13 @@
     <string name="support_category_connectivity" translatable="false">Connectivity</string>
     <string name="support_category_refund" translatable="false">Refund</string>
     <string name="support_description_hint" translatable="false">Describe the issue you\'re experiencing…</string>
-    <string name="support_attachments_desc" translatable="false">The following data will be included as an attachment. Toggle off anything you don\'t want to share.</string>
+    <string name="support_attachments_desc" translatable="false">Includes the following data in the attachment.</string>
     <string name="support_attach_sub_status" translatable="false">Purchase Status</string>
-    <string name="support_attach_sub_status_desc" translatable="false">All purchase records</string>
-    <string name="support_attach_history" translatable="false">State History</string>
-    <string name="support_attach_history_desc" translatable="false">The last 50 purchase state transitions.</string>
-    <string name="support_attach_vpn_stats" translatable="false">VPN / Proxy Stats</string>
-    <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy connection statistics</string>
-    <string name="support_attach_proc_info" translatable="false">Process / Memory / Threads</string>
-    <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state.</string>
+    <string name="support_attach_sub_status_desc" translatable="false">Recent purchase records</string>
+    <string name="support_attach_vpn_stats" translatable="false">Proxy Stats</string>
+    <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy statistics</string>
+    <string name="support_attach_proc_info" translatable="false">System State</string>
+    <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
     <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
@@ -2500,7 +2558,7 @@
     <string name="server_settings_open" translatable="false">Open server settings</string>
     <string name="server_settings_split_dns_disabled" translatable="false">Split DNS is disabled. Enable it to use DNS filtering on your VPN servers.</string>
     <string name="server_settings_enable_split_dns" translatable="false">Enable Split DNS</string>
-    <string name="server_settings_proxy_stopped" translatable="false">Proxy Stopped</string>
+    <string name="server_settings_proxy_stopped" translatable="false">Stopped</string>
 
     <!-- Auto Exclude Countries bottom sheet -->
     <string name="auto_exclude_cc_title" translatable="false">Exclude Countries</string>
@@ -2556,8 +2614,6 @@
     <!-- Generic plan duration labels (no billing-type qualifier) -->
     <string name="plan_2yr" translatable="false">2-Year</string>
     <string name="plan_5yr" translatable="false">5-Year</string>
-    <string name="revoke_subscription_note" translatable="false">Revokes the purchase and issues a full refund to the original payment method.</string>
-    <string name="cancel_subscription_note_future" translatable="false">Cancels renewal. Access continues until the end of the current period</string>
 
     <!-- Ping Test Activity -->
     <string name="ping_ready_desc" translatable="false">Enter domains below and tap Run Test.</string>
@@ -2572,7 +2628,7 @@
     <string name="ping_no_proxy_title" translatable="false">No Active Proxy</string>
     <string name="ping_status_failed" translatable="false">Failed</string>
     <string name="ping_test_again" translatable="false">Run Again</string>
-    <string name="ping_reach_hint" translatable="false">Auto (default probes) — or domains/IPs, comma-separated</string>
+    <string name="ping_reach_hint" translatable="false">Auto (default probes) or domains/IPs, comma-separated</string>
     <string name="ping_vpn_inactive_note" translatable="false">RPN is not active. Custom domain checks are unavailable; Run Test uses default probes.</string>
     <string name="ping_reach_reachable" translatable="false">Reachable</string>
     <string name="ping_reach_rpn_disabled" translatable="false">Enable RPN to run this test.</string>
@@ -2602,7 +2658,7 @@
     <string name="server_order_expires_fmt" translatable="false">Until %1$s</string>
     <string name="server_order_auto_renew" translatable="false">Renews %1$s</string>
     <string name="server_order_id_fmt" translatable="false">Order: %1$s</string>
-    <string name="server_order_desc" translatable="false">View orders fetched from server</string>
+    <string name="server_order_desc" translatable="false">View historical orders.</string>
     <string name="server_order_open_error" translatable="false">Could not open order history</string>
 
     <string name="rpn_desc_one" translatable="true">Unlimited bandwidth • 100+ cities</string>
@@ -2772,7 +2828,7 @@
 
     <!-- Step 6: Universal / Per-App Rules -->
     <string name="tour_step_rules_title" translatable="false">Universal &amp; Per-App Rules</string>
-    <string name="tour_step_rules_desc" translatable="false">Create rules using domains or IP addresses and apply them everywhere or only to selected apps. Combine multiple rules to customize how your traffic is handled.</string>
+    <string name="tour_step_rules_desc" translatable="false">Swipe the rules card to see your universal firewall, IP, and domain rules. Create rules using domains or IP addresses and apply them everywhere or only to selected apps.</string>
 
     <!-- Duration labels for one-time purchase plan cards -->
     <plurals name="duration_years" translatable="false">
@@ -2790,7 +2846,7 @@
     <string name="rpn_tour_welcome_desc" translatable="false">Your traffic now exits through private, encrypted servers, keeping your real IP hidden. Here\'s a quick tour of what your subscription unlocks.</string>
     <string name="rpn_tour_add_location_title" translatable="false">Connect through up to 5 locations</string>
     <string name="rpn_tour_add_location_desc" translatable="false">Tap + to add up to 5 countries. Choose where each app connects from, or let RPN choose for you.</string>
-    <string name="rpn_tour_relay_title" translatable="false">Add an extra relay hop</string>
+    <string name="rpn_tour_relay_title" translatable="false">Add an extra relay</string>
     <string name="rpn_tour_relay_desc" translatable="false">Relay sends your connection through an Auto server first, then your chosen country, adding an extra hop between you and the internet.</string>
     <string name="rpn_tour_bypass_title" translatable="false">Bypass apps that need direct access</string>
     <string name="rpn_tour_bypass_desc" translatable="false">Some banking, gaming, or streaming apps may not work with proxies. Exclude them here to send their traffic directly while everything else stays protected.</string>
@@ -2863,11 +2919,9 @@
     <string name="qs_relay_no_locations_toast" translatable="true">Select a location to enable relay</string>
     <string name="qs_relay_failure_toast" translatable="true">Failed to update relay for %1$d location(s)</string>
 
-    <string name="qs_relay_automation_dialog_title" translatable="true">Automation enabled</string>
-    <string name="qs_relay_automation_dialog_message" translatable="true">Automation is enabled for the Auto location, which will affect this location as well. Do you want to proceed?</string>
     <!-- Shown before enabling automation (mobile-only / SSID) on AUTO when relay is on -->
-    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay enabled</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">Relay is enabled for one or more locations. Enabling automation on the Auto location will pause those locations as well. Do you want to proceed?</string>
+    <string name="qs_relay_automation_dialog_title" translatable="true">Automation warning</string>
+    <string name="qs_relay_automation_dialog_message" translatable="true">Since all other active locations will be relayed through Auto, its automation will be applied to all other locations. Do you want to proceed?</string>
 
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>

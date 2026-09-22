@@ -35,7 +35,6 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -83,11 +82,6 @@ class CustomDomainRulesBtmSheet :
     ): View {
         _binding = BottomSheetCustomDomainsBinding.inflate(inflater, container, false)
         return b.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {

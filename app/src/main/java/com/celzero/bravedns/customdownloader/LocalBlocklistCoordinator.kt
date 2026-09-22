@@ -50,6 +50,7 @@ import okhttp3.ResponseBody
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.BufferedInputStream
+import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -291,9 +292,6 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         totalFiles: Int,
         retryCount: Int = 0
     ): Boolean {
-        // enable the OkHttp's logging only in debug mode for testing
-        if (DEBUG) OkHttpDebugLogging.enableHttp2()
-        if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
         try {
             // create okhttp client with base url

@@ -203,6 +203,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
             if (!VpnController.hasTunnel()) {
                 Logger.w(LOG_TAG_UI, "$TAG: reset tapped but no VPN tunnel, showing hint")
                 if (isAdded) {
+                    binding.dolphinSignature.setContentForFailure()
                     Utilities.showToastUiCentered(
                         requireContext(),
                         getString(R.string.ssv_toast_start_rethink),
@@ -357,6 +358,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         if (!VpnController.hasTunnel()) {
             Logger.w(LOG_TAG_UI, "$TAG.doRefreshServers: no VPN tunnel, showing hint")
             if (isAdded) {
+                binding.dolphinSignature.setContentForFailure()
                 Utilities.showToastUiCentered(
                     requireContext(),
                     getString(R.string.ssv_toast_start_rethink),

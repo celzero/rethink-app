@@ -21,6 +21,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
@@ -88,6 +89,8 @@ object RpnProxyManager : KoinComponent {
     private val db: RpnProxyRepository by inject()
     private val countryConfigRepo: CountryConfigRepository by inject()
     private val persistentState by inject<PersistentState>()
+
+    private val appConfig by inject<AppConfig>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val subscriptionStatusRepository: SubscriptionStatusRepository by inject()
 
@@ -441,6 +444,9 @@ object RpnProxyManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG; startProxy: proxy already running (mode=${rpnMode()})")
             VpnController.handleRpnProxies()
             return
+        }
+        if (!appConfig.getBraveMode().isDnsFirewallMode()) {
+            appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode)
         }
         setRpnMode(RpnMode.ANTI_CENSORSHIP)
         setRpnState(RpnState.ENABLED)
@@ -2497,6 +2503,9 @@ object RpnProxyManager : KoinComponent {
                 countryConfigRepo.update(config)
                 // Record the selection for frequent-country tracking and refresh chips.
                 countryConfigRepo.incrementSelectionCount(config.key)
+                winCacheMutex.withLock {
+                    winServersCache.filter { it.key == key }.forEach { it.selectionCount += 1 }
+                }
                 Logger.i(LOG_TAG_PROXY, "$TAG; enableWinServer: enabled rpn: $key")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; enableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -3055,6 +3064,7 @@ object RpnProxyManager : KoinComponent {
 
         if (isAnyProxyLockdown(proxyIds)) {
             Logger.i(LOG_TAG_PROXY, "$TAG lockdown rpn for app($uid) => return $proxyIds")
+            moveAutoServerIdToEnd(proxyIds)
             return proxyIds
         }
 
@@ -3095,8 +3105,20 @@ object RpnProxyManager : KoinComponent {
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
         // the go-tun will check the routing based on the order of the list
+        moveAutoServerIdToEnd(proxyIds)
         Logger.i(LOG_TAG_PROXY, "$TAG returning proxy ids for $uid, $ip, $port, $domain: $proxyIds")
         return proxyIds
+    }
+
+    // the auto server id is always evaluated last, so any specific cc config present in the list
+    // takes priority over it
+    private suspend fun moveAutoServerIdToEnd(proxyIds: MutableList<String>) {
+        val autoId = VpnController.getWinByKey("")?.id() ?: return
+        // true if any element was removed from this collection, or false when no
+        // elements were removed
+        if (proxyIds.removeAll { it == autoId }) {
+            proxyIds.add(autoId)
+        }
     }
 
     private suspend fun isEligibleForNetwork(id: String, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {

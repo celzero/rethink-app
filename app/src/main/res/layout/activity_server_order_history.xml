@@ -123,7 +123,6 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="100dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
             app:strokeWidth="0dp"
             app:cardBackgroundColor="?attr/background">
 

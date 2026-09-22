@@ -637,8 +637,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
         return when (status) {
             UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-            else -> R.attr.chipTextNegative // TKO, TEND
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative // TKO, TEND, TNT
         }
     }
 
@@ -954,7 +954,6 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 return@io
             }
 
-
             val config = WireguardManager.getConfigFilesById(configId)
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
@@ -962,6 +961,24 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                     // reset the check box
                     b.catchAllCheck.isChecked = false
                     showInvalidConfigInfoDialog()
+                }
+                return@io
+            }
+
+            // checks if the config's keys are already in use by another active config
+            if (enabled && !WireguardManager.canEnableProxy(configId)) {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "wg keys overlap with an active config, cannot enable, id: $configId"
+                )
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        getString(R.string.wireguard_duplicate_keys_conflict),
+                        Toast.LENGTH_LONG
+                    )
                 }
                 return@io
             }

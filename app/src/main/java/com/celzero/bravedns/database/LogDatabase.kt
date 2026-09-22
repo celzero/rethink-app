@@ -32,7 +32,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class, Event::class],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -62,12 +62,37 @@ abstract class LogDatabase : RoomDatabase() {
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)
+            val appContext = context.applicationContext
 
-            return Room.databaseBuilder(
-                    context.applicationContext,
-                    LogDatabase::class.java,
-                    LOGS_DATABASE_NAME
-                )
+            return try {
+                newBuilder(appContext).also { it.openHelper.writableDatabase }
+            } catch (e: IllegalStateException) {
+                val message = e.message.orEmpty()
+                Logger.w(LOG_TAG_APP_DB, "Schema mismatch; recreating log database: $message")
+                // deleteDatabase() also removes the wal/shm/journal files
+                appContext.deleteDatabase(LOGS_DATABASE_NAME)
+                newBuilder(appContext).also { it.openHelper.writableDatabase }
+            }
+        }
+
+        private fun newBuilder(context: Context): LogDatabase =
+            baseBuilder(context, LOGS_DATABASE_NAME)
+                .fallbackToDestructiveMigration(false) // recreate the database if no migration is found
+                .build()
+
+        // see AppDatabase#restoreProbeBuilder()
+        internal fun restoreProbeBuilder(context: Context, name: String): LogDatabase =
+            baseBuilder(context, name).build()
+
+        private fun baseBuilder(
+            context: Context,
+            name: String
+        ): RoomDatabase.Builder<LogDatabase> =
+            Room.databaseBuilder(
+                context,
+                LogDatabase::class.java,
+                name
+            )
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addCallback(roomCallback)
                 .addMigrations(MIGRATION_2_3)
@@ -83,9 +108,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
-                .fallbackToDestructiveMigration() // recreate the database if no migration is found
-                .build()
-        }
+                .addMigrations(MIGRATION_15_16)
 
         private val roomCallback: Callback =
             object : Callback() {
@@ -427,11 +450,26 @@ abstract class LogDatabase : RoomDatabase() {
                 }
             }
 
+        private val MIGRATION_15_16: Migration =
+            object : Migration(15, 16) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE DnsLogs ADD COLUMN blockedReason TEXT NOT NULL DEFAULT ''"
+                        )
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_15_16: added blockedReason to DnsLogs")
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_APP_DB, "MIGRATION_15_16: blockedReason already exists, ignore", e)
+                    }
+                }
+            }
+
     }
 
+    // vacuum must run BEFORE the checkpoint
     fun checkPoint() {
-        logsDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
         logsDao().vacuum(SimpleSQLiteQuery("VACUUM"))
+        logsDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
     }
 
     abstract fun connectionTrackerDAO(): ConnectionTrackerDAO

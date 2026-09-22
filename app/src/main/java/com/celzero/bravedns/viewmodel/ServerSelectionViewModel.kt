@@ -123,6 +123,16 @@ class ServerSelectionViewModel : ViewModel() {
         }
     }
 
+    /** Last rendered dashboard state, for instant repaint on revisit. */
+    data class DashboardSnapshot(
+        val servers: List<CountryConfig>,
+        val selected: Set<CountryConfig>,
+        val isWinRegistered: Boolean
+    )
+
+    @Volatile
+    var dashboardSnapshot: DashboardSnapshot? = null
+
     /**
      * Must be called by the Fragment **after** it has handled a [RefreshState.Done] or
      * [RefreshState.NeedsLoading] result. Resets the state to [RefreshState.Idle] so

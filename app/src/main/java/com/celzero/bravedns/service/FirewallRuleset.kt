@@ -340,6 +340,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 rule.id == RULE8.id || rule.id == RULE9B.id
         }
 
+        fun isDnsBypassRule(rule: FirewallRuleset): Boolean {
+            // checks for both global and app-specific rules
+            return rule.id == RULE2B.id || rule.id == RULE2C.id || rule.id == RULE2F.id ||
+                    rule.id == RULE2I.id || rule.id == RULE1H.id
+        }
+
         fun isProxied(rule: FirewallRuleset): Boolean {
             return rule.id == RULE12.id
         }

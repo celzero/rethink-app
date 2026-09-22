@@ -88,6 +88,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
         const val USE_MAX_MTU = "use_max_mtu"
         const val SET_VPN_BUILDER_TO_METERED = "set_vpn_builder_to_metered"
+        const val ALLOW_BYPASS = "allow_bypass"
 
         // SE Proxy for Anti-Censorship
         const val AUTO_PROXY_ENABLED = "auto_proxy_enabled"
@@ -207,9 +208,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var httpProxyHostAddress by
         stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
-    // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    // default: false
-    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(false)
+    // whether the apps can bypass the tunnel on-demand
+    // default: true for play store flavor
+    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
@@ -804,6 +805,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // timestamp of the last successful /g/device registration call.
     var deviceRegistrationTimestamp by longPref("device_registration_timestamp").withDefault<Long>(0L)
 
+    // monthly entitlement reconcile
+    var lastForcedReconcileTimestamp by longPref("last_forced_reconcile_timestamp").withDefault<Long>(0L)
+
     // whether the guided tour has been completed; false = show the tour
     var guidedTourCompleted by booleanPref("guided_tour_completed").withDefault<Boolean>(false)
 
@@ -875,6 +879,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
      * mirroring the withDefault{} values of the respective properties.
      */
     fun restoreTunnelSettingsDefaults() {
+        allowBypass = Utilities.isPlayStoreFlavour()
         useMultipleNetworks = false
         // flavour dependent: on by default only on play-store builds
         privateIps = Utilities.isPlayStoreFlavour()

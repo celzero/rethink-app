@@ -60,6 +60,10 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
     companion object {
         const val INTENT_TYPE = "STATISTICS_TYPE"
         const val INTENT_TIME_CATEGORY = "TIME_CATEGORY"
+
+        // optional: when present, the blocklists screen is scoped to this uid
+        // (sent by the per-app screen); absent means all apps
+        const val INTENT_UID = "UID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,8 +86,17 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
             SummaryStatisticsViewModel.TimeCategory.fromValue(tc)
                 ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
         val statType = SummaryStatisticsFragment.SummaryStatisticsType.getType(type)
+        // per-app scope is only sent by the App Info screen; the stats screen
+        // omits it so the drill-down stays device-wide there
+        val uid = intent.getIntExtra(
+            INTENT_UID,
+            com.celzero.bravedns.util.Constants.INVALID_UID
+        )
+        if (uid != com.celzero.bravedns.util.Constants.INVALID_UID) {
+            viewModel.setUid(uid)
+        }
         setSubTitle(statType, timeCategory)
-        setRecyclerView(statType, timeCategory)
+        setRecyclerView(statType, timeCategory, uid)
     }
 
     private fun setSubTitle(type: SummaryStatisticsFragment.SummaryStatisticsType, timeCategory: SummaryStatisticsViewModel.TimeCategory) {
@@ -123,7 +136,8 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
 
     private fun setRecyclerView(
         type: SummaryStatisticsFragment.SummaryStatisticsType,
-        timeCategory: SummaryStatisticsViewModel.TimeCategory
+        timeCategory: SummaryStatisticsViewModel.TimeCategory,
+        uid: Int
     ) {
 
         b.dsaRecycler.setHasFixedSize(true)
@@ -132,6 +146,9 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
         b.dsaRecycler.itemAnimator = null
 
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)
+        // propagate the per-app scope to the adapter: row-click drill-downs
+        // (e.g. blocklists) read it from here, not from the ViewModel
+        recyclerAdapter.setUid(uid)
         recyclerAdapter.stateRestorationPolicy =
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         recyclerAdapter.setTimeCategory(timeCategory)
@@ -213,6 +230,10 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                 b.dsaTitle.text = getString(R.string.ssv_most_contacted_countries_heading)
                 viewModel.getAllContactedCountries
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> {
+                b.dsaTitle.text = getString(R.string.ssv_blocklists_heading)
+                viewModel.getAllBlockedBlocklists
             }
         }
     }

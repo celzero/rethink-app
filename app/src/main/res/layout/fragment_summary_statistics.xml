@@ -24,7 +24,7 @@
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
                 android:paddingTop="15dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="12dp"
                 android:paddingBottom="10dp">
 
                 <LinearLayout
@@ -94,6 +94,52 @@
                         app:iconTint="?attr/defaultToggleBtnTxt" />
 
                 </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <FrameLayout
+                    android:id="@+id/fss_filter_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/ssv_filter_heading">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fss_filter_btn"
+                        style="@style/toggleButtonNoStyle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/ssv_filter_heading"
+                        android:insetLeft="4dp"
+                        android:insetTop="4dp"
+                        android:insetRight="4dp"
+                        android:insetBottom="4dp"
+                        android:minWidth="0dp"
+                        android:textAllCaps="false"
+                        app:backgroundTint="?attr/colorSurfaceContainerHighest"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_filter"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconTint="?attr/primaryTextColor" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fss_filter_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:background="@drawable/bg_filter_badge"
+                        android:gravity="center"
+                        android:minWidth="16dp"
+                        android:minHeight="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="9sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -274,6 +320,12 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_grp_apps_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fss_app_allowed_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -369,6 +421,71 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_grp_countries_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_countries_allowed_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="12dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ssv_most_contacted_countries_heading"
+                        android:textColor="?attr/colorOnBackground" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_countries_logs_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/default_font_text_view"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_contacted_countries_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_grp_asn_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fss_asn_allowed_ll"
                 android:layout_width="match_parent"
@@ -463,6 +580,71 @@
                     android:overScrollMode="never" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_grp_blocklist_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_blocklist_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="12dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="4dp"
+                        android:text="@string/ssv_blocklists_heading"
+                        android:textColor="?attr/colorOnBackground" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/fss_blocklist_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        android:textSize="@dimen/default_font_text_view"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fss_blocklist_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fss_grp_domains_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fss_domain_allowed_ll"
@@ -562,54 +744,13 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/fss_countries_allowed_ll"
+                android:id="@+id/fss_grp_ips_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="12dp"
-                android:layout_marginTop="10dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:paddingVertical="4dp"
-                        android:text="@string/ssv_most_contacted_countries_heading"
-                        android:textColor="?attr/colorOnBackground" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/fss_countries_logs_chip"
-                        style="@style/ThinnerChip.Action"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/ssv_see_more"
-                        android:textColor="?attr/chipTextPositive"
-                        android:textSize="@dimen/default_font_text_view"
-                        app:chipBackgroundColor="?attr/chipBgColorPositive"
-                        app:chipSurfaceColor="@null" />
-
-                </LinearLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/fss_contacted_countries_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fss_ip_allowed_ll"
@@ -706,6 +847,8 @@
                     android:layout_marginTop="2dp"
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -891,17 +1034,6 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_active_conns_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_active_conns"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -926,6 +1058,12 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_grp_apps_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/fss_ia_allowed_apps_ll"
@@ -963,17 +1101,6 @@
                             app:chipSurfaceColor="@null" />
 
                     </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_allowed_apps_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1037,17 +1164,6 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_blocked_apps_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1072,6 +1188,75 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_grp_countries_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_countries_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_contacted_countries_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/fss_ia_countries_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <com.celzero.bravedns.ui.custom.CountryMapView
+                        android:id="@+id/fss_ia_countries_map"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:contentDescription="@string/cd_stats_country_map" />
+
+                    <LinearLayout
+                        android:id="@+id/fss_ia_countries_rows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_grp_asn_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/fss_ia_asn_allowed_ll"
@@ -1109,17 +1294,6 @@
                             app:chipSurfaceColor="@null" />
 
                     </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_asn_allowed_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1183,17 +1357,6 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_asn_blocked_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1219,8 +1382,16 @@
 
                 </LinearLayout>
 
+                </LinearLayout>
+
                 <LinearLayout
-                    android:id="@+id/fss_ia_countries_ll"
+                    android:id="@+id/fss_ia_grp_blocklist_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_blocklists_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -1240,11 +1411,11 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:paddingVertical="4dp"
-                            android:text="@string/ssv_most_contacted_countries_heading"
+                            android:text="@string/ssv_blocklists_heading"
                             android:textColor="?attr/colorOnBackground" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/fss_ia_countries_chip"
+                            android:id="@+id/fss_ia_blocklists_chip"
                             style="@style/ThinnerChip.Action"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1256,32 +1427,38 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_countries_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_country_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                    <com.celzero.bravedns.ui.custom.CountryMapView
-                        android:id="@+id/fss_ia_countries_map"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:contentDescription="@string/cd_stats_country_map" />
-
                     <LinearLayout
-                        android:id="@+id/fss_ia_countries_rows"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:orientation="vertical" />
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.celzero.bravedns.ui.custom.DonutChartView
+                            android:id="@+id/fss_ia_blocklists_donut"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:contentDescription="@string/ssv_blocklists_heading" />
+
+                        <LinearLayout
+                            android:id="@+id/fss_ia_blocklists_rows"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_grp_domains_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/fss_ia_domains_allowed_ll"
@@ -1319,17 +1496,6 @@
                             app:chipSurfaceColor="@null" />
 
                     </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_domains_allowed_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1393,17 +1559,6 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_domains_blocked_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1428,6 +1583,14 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fss_ia_grp_ips_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/fss_ia_ips_allowed_ll"
@@ -1466,17 +1629,6 @@
                             app:chipSurfaceColor="@null" />
 
                     </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_ips_allowed_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1541,17 +1693,6 @@
 
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fss_ia_ips_blocked_empty"
-                        style="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:alpha="0.7"
-                        android:text="@string/ssv_insights_no_data"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1574,6 +1715,8 @@
                             android:orientation="vertical" />
 
                     </LinearLayout>
+
+                </LinearLayout>
 
                 </LinearLayout>
 

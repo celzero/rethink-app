@@ -444,7 +444,7 @@ object ProxyManager : KoinComponent {
                 pid.startsWith(ID_ORBOT_BASE) ||
                 pid.startsWith(ID_S5_BASE) ||
                 pid.startsWith(ID_HTTP_BASE) ||
-                pid.startsWith(Backend.RPN)
+                pid.startsWith(Backend.RpnWin)
     }
 
     fun isRpnProxy(ipnProxyId: String): Boolean {
@@ -453,7 +453,7 @@ object ProxyManager : KoinComponent {
         val pid = if (ipnProxyId.startsWith(Backend.CT)) ipnProxyId.substringAfter(Backend.CT) else ipnProxyId
         // check if the proxy id is not the base, block, exit, auto or ingress
         // all these are special cases and should not be considered as proxied traffic
-        return pid.startsWith(Backend.RPN) || pid == Backend.Auto
+        return pid.startsWith(Backend.RpnWin) || pid == Backend.Auto
     }
 
     data class ProxyStats(val routerStats: RouterStats?, val ip4: Boolean?, val ip6: Boolean?, val addr: String?)

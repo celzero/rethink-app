@@ -9,7 +9,7 @@
     <dimen name="max_size">1000dp</dimen>
     <dimen name="max_btn_size">340dp</dimen>
 
-    <dimen name="extra_small_font_text_view">6sp</dimen>
+    <dimen name="extra_small_font_text_view">8sp</dimen>
     <dimen name="mini_font_text_view">8sp</dimen>
     <dimen name="small_font_text_view">10sp</dimen>
     <dimen name="small_font_subheading_text">11sp</dimen>
@@ -32,6 +32,10 @@
     <dimen name="selection_orbital_stroke">2dp</dimen>
     <dimen name="selection_switch_knob_size">12dp</dimen>
     <dimen name="selection_switch_knob_inset">2dp</dimen>
+
+    <!-- Rule-state switch on connection-tracker rule rows -->
+    <dimen name="rule_state_switch_width">42dp</dimen>
+    <dimen name="rule_state_switch_height">24dp</dimen>
 
     <!-- Snackbar styling -->
     <dimen name="snackbar_elevation">8dp</dimen>

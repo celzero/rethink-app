@@ -61,7 +61,7 @@ data class CountryConfig(
 
     val lastModified: Long = System.currentTimeMillis(), // Last update timestamp
 
-    val selectionCount: Int = 0, // Number of times this country has been selected by the user
+    var selectionCount: Int = 0, // Number of times this country has been selected by the user
 
     var isFavourite: Boolean = false, // Whether this country is marked as a favourite by the user
     var hopEnabled: Boolean = false // Whether to always hop

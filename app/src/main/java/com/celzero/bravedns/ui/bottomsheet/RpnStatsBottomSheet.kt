@@ -73,13 +73,20 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
     private var loadJob: Job? = null
 
+    /** Aggregation window; callers may narrow it (e.g. the pulse card's 1h). */
+    private var timeWindowMs: Long = TIME_WINDOW_MS
+
     companion object {
         const val TAG = "RpnStatsBtmSheet"
 
         private const val TIME_WINDOW_MS = 24L * 60 * 60 * 1000
+        private const val TIME_WINDOW_MS_ARG = "timeWindowMs"
         private const val TOP_APPS_LIMIT = 10
 
-        fun newInstance(): RpnStatsBottomSheet = RpnStatsBottomSheet()
+        fun newInstance(timeWindowMs: Long = TIME_WINDOW_MS): RpnStatsBottomSheet =
+            RpnStatsBottomSheet().apply {
+                arguments = Bundle().apply { putLong(TIME_WINDOW_MS_ARG, timeWindowMs) }
+            }
     }
 
     private fun isDarkThemeOn(): Boolean =
@@ -92,6 +99,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCancelable = true
+        timeWindowMs = arguments?.getLong(TIME_WINDOW_MS_ARG, TIME_WINDOW_MS) ?: TIME_WINDOW_MS
     }
 
     override fun onCreateView(
@@ -149,7 +157,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
             if (!isAdded) return@launch
 
-            val since = System.currentTimeMillis() - TIME_WINDOW_MS
+            val since = System.currentTimeMillis() - timeWindowMs
             val summary = withContext(Dispatchers.IO) {
                 try {
                     connectionTrackerDAO.getRpnConnStats(proxyId, since)
@@ -217,6 +225,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         if (!isAdded) return
         val proxyId = Backend.RpnWin
         if (proxyId.isBlank()) {
+            b.dolphinSignature.setContentForFailure()
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.rpn_stats_no_active_proxy),

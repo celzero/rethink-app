@@ -16,19 +16,32 @@
 package com.celzero.bravedns.ui.adapter
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.icu.text.CompactDecimalFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppActivityRow
 import com.celzero.bravedns.databinding.ItemLogActivityAppBinding
 import com.celzero.bravedns.databinding.ItemLogActivityConnBinding
+import com.celzero.bravedns.glide.FavIconDownloader
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import java.util.Locale
 
 /**
  * Summary for one app within the selected activity window; children are loaded
@@ -42,12 +55,18 @@ data class AppActivitySummary(
     val blocked: Long
 )
 
-/** One connection/dns-log row rendered under an expanded app group. */
+/**
+ * One aggregated domain rendered under an expanded app group: counts are
+ * cumulative for the whole selected window (allowed/blocked), [lastSeenMs]
+ * is the most recent connection time for the domain and [flag] is the
+ * region emoji recorded on that latest row.
+ */
 data class AppActivityEntry(
     val label: String,
-    val timeLabel: String,
-    val blocked: Boolean,
-    val timestampMs: Long
+    val allowed: Long,
+    val blocked: Long,
+    val lastSeenMs: Long,
+    val flag: String
 )
 
 /**
@@ -57,6 +76,8 @@ data class AppActivityEntry(
  * [onExpandRequested]; collapsing needs no data access.
  */
 class AppActivityAdapter(
+    private val favIconEnabled: Boolean,
+    private val showBlockedCount: Boolean = true,
     private val onExpandRequested: (AppActivitySummary) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -86,17 +107,6 @@ class AppActivityAdapter(
         allSummaries = summaries
         expandedUids.clear()
         childrenByUid.clear()
-        rebuildRows()
-    }
-
-    /**
-     * Toggles the list between all apps and blocked-only apps. Collapses any
-     * expanded group so the filtered list starts from a clean, predictable
-     * state.
-     */
-    fun setBlockedOnly(blockedOnly: Boolean) {
-        if (this.blockedOnly == blockedOnly) return
-        this.blockedOnly = blockedOnly
         rebuildRows()
     }
 
@@ -145,9 +155,22 @@ class AppActivityAdapter(
         }
     }
 
+    // compact count rendering shared by the app headers and the child rows;
+    // mirrors HomeScreenFragment's fhs card counts (1.5K instead of 999+)
+    private fun formatCount(n: Long): String {
+        return if (Utilities.isAtleastN()) {
+            CompactDecimalFormat.getInstance(
+                Locale.US,
+                CompactDecimalFormat.CompactStyle.SHORT
+            ).format(n)
+        } else {
+            n.toString()
+        }
+    }
+
     private fun visibleEntries(uid: Int): List<AppActivityEntry> {
         val entries = childrenByUid[uid] ?: return emptyList()
-        return if (blockedOnly) entries.filter { it.blocked } else entries
+        return if (blockedOnly) entries.filter { it.blocked > 0 } else entries
     }
 
     private fun insertChildRows(uid: Int, entries: List<AppActivityEntry>) {
@@ -156,7 +179,7 @@ class AppActivityAdapter(
         // defensive: drop any stale child rows already present after the header
         removeStaleChildRows(headerPos)
 
-        val toInsert = if (blockedOnly) entries.filter { it.blocked } else entries
+        val toInsert = if (blockedOnly) entries.filter { it.blocked > 0 } else entries
         if (toInsert.isEmpty()) {
             notifyItemChanged(headerPos) // chevron state only
             return
@@ -231,7 +254,7 @@ class AppActivityAdapter(
             b.laaAllowedCount.text = formatCount(summary.allowed)
             b.laaBlockedCount.text = formatCount(summary.blocked)
             b.laaBlockedCount.visibility =
-                if (summary.blocked > 0) View.VISIBLE else View.GONE
+                if (showBlockedCount && summary.blocked > 0) View.VISIBLE else View.GONE
             b.laaAllowedCount.visibility =
                 if (summary.allowed > 0) View.VISIBLE else View.GONE
 
@@ -269,10 +292,6 @@ class AppActivityAdapter(
             }
         }
 
-        private fun formatCount(n: Long): String {
-            return if (n > 999) "999+" else n.toString()
-        }
-
         /**
          * Resolves the app icon for a uid: first package of the uid, then its
          * cached icon via [Utilities.getIcon]; falls back to the system
@@ -294,13 +313,133 @@ class AppActivityAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun bind(entry: AppActivityEntry) {
-            // resolve accents through the theme (accentBad/accentGood map to
-            // per-theme error/primary colors, e.g. burnt orange in White)
-            val attr = if (entry.blocked) R.attr.accentBad else R.attr.accentGood
-            b.lacStatusDot.backgroundTintList =
-                ColorStateList.valueOf(UIUtils.fetchColor(b.root.context, attr))
             b.lacLabel.text = entry.label
-            b.lacTime.text = entry.timeLabel
+            // counts are separate colored views like the app headers above
+            b.lacAllowedCount.text = formatCount(entry.allowed)
+            b.lacAllowedCount.visibility =
+                if (entry.allowed > 0) View.VISIBLE else View.GONE
+            b.lacBlockedCount.text = formatCount(entry.blocked)
+            b.lacBlockedCount.visibility =
+                if (showBlockedCount && entry.blocked > 0) View.VISIBLE else View.GONE
+            b.lacRecent.text = b.root.context.getString(
+                R.string.log_activity_domain_recent,
+                Utilities.convertLongToTime(entry.lastSeenMs, TIME_FORMAT_1)
+            )
+            displayIcon(entry)
+        }
+
+        private fun displayIcon(entry: AppActivityEntry) {
+            b.lacFlag.text = entry.flag
+            b.lacFlag.visibility = View.VISIBLE
+            b.lacIcon.visibility = View.GONE
+            b.lacIcon.setImageDrawable(null)
+            if (!favIconEnabled || entry.label.isBlank()) {
+                clearFavIcon()
+                return
+            }
+
+            // skip the glide cache lookup for domains known to have no icon
+            val domain = entry.label.dropLastWhile { it == '.' }
+            if (FavIconDownloader.isUrlAvailableInFailedCache(domain) != null) {
+                return
+            }
+            displayNextDnsFavIcon(domain)
+        }
+
+        private fun displayNextDnsFavIcon(domain: String) {
+            // url to check if the icon is cached from nextdns
+            val nextDnsUrl = FavIconDownloader.constructFavIcoUrlNextDns(domain)
+            // url to check if the icon is cached from duckduckgo
+            val duckDuckGoUrl = FavIconDownloader.constructFavUrlDuckDuckGo(domain)
+            // subdomain to check if the icon is cached from duckduckgo
+            val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(domain)
+            try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                var request = Glide.with(b.root.context.applicationContext)
+                    .load(nextDnsUrl)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .transition(withCrossFade(factory))
+
+                val errorRequest = displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
+                if (errorRequest != null) {
+                    request = request.error(errorRequest)
+                }
+
+                request.into(iconTarget())
+            } catch (_: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
+                displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)?.into(iconTarget())
+            }
+        }
+
+        /**
+         * Loads the fav icons from the glide cache (populated by
+         * FavIconDownloader at log time). On failure, keeps the flag visible.
+         */
+        private fun displayDuckduckgoFavIcon(
+            url: String,
+            subDomainURL: String
+        ): RequestBuilder<Drawable>? {
+            return try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                Glide.with(b.root.context.applicationContext)
+                    .load(url)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .error(
+                        Glide.with(b.root.context.applicationContext)
+                            .load(subDomainURL)
+                            .onlyRetrieveFromCache(true)
+                    )
+                    .transition(withCrossFade(factory))
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        private fun iconTarget(): CustomViewTarget<ImageView, Drawable> {
+            return object : CustomViewTarget<ImageView, Drawable>(b.lacIcon) {
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        showFlag()
+                        hideFavIcon()
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        transition: Transition<in Drawable>?
+                    ) {
+                        hideFlag()
+                        showFavIcon(resource)
+                    }
+
+                    override fun onResourceCleared(placeholder: Drawable?) {
+                        hideFavIcon()
+                        showFlag()
+                    }
+                }
+        }
+
+        private fun clearFavIcon() {
+            Glide.with(b.root.context.applicationContext).clear(b.lacIcon)
+        }
+
+        private fun showFavIcon(drawable: Drawable) {
+            b.lacIcon.visibility = View.VISIBLE
+            b.lacIcon.setImageDrawable(drawable)
+        }
+
+        private fun hideFavIcon() {
+            b.lacIcon.visibility = View.GONE
+            b.lacIcon.setImageDrawable(null)
+        }
+
+        private fun showFlag() {
+            b.lacFlag.visibility = View.VISIBLE
+        }
+
+        private fun hideFlag() {
+            b.lacFlag.visibility = View.GONE
         }
     }
 }

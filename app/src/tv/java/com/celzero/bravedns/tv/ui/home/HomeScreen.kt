@@ -134,7 +134,9 @@ fun HomeScreen() {
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            VpnController.start(context, true)
+            // user-initiated: autoAttempt=true would drop the start request
+            // when the service is alive without a tunnel
+            VpnController.start(context)
         }
     }
 
@@ -413,7 +415,9 @@ private fun onToggleVpnClicked(
         return
     }
     if (consentIntent == null) {
-        VpnController.start(context, true)
+        // user-initiated: autoAttempt=true would drop the start request
+        // when the service is alive without a tunnel
+        VpnController.start(context)
     } else {
         onNeedsConsent(consentIntent)
     }

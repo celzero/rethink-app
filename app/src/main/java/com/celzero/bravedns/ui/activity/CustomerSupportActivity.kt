@@ -138,15 +138,24 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         b.etDescription.setText(sb.toString().trimEnd())
     }
 
+    /**
+     * Pads the scroll view's bottom by the runtime height of the bottom bar so
+     * the send button bar never covers the last content.
+     */
     private fun applyScrollPadding() {
-        b.nestedScroll.post {
-            b.nestedScroll.setPadding(
-                b.nestedScroll.paddingLeft,
-                0,
-                b.nestedScroll.paddingRight,
-                b.nestedScroll.paddingBottom
-            )
+        b.layoutBottomBar.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateScrollPadding()
         }
+        b.nestedScroll.post { updateScrollPadding() }
+    }
+
+    private fun updateScrollPadding() {
+        b.nestedScroll.setPadding(
+            b.nestedScroll.paddingLeft,
+            b.nestedScroll.paddingTop,
+            b.nestedScroll.paddingRight,
+            b.layoutBottomBar.height
+        )
     }
 
     private fun setupToolbar() {
@@ -244,7 +253,6 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     private fun collectAndSend(description: String, category: String?) {
         setLoading(true)
         val includeStatus = b.switchAttachStatus.isChecked
-        val includeHistory = b.switchAttachHistory.isChecked
         val includeStats = b.switchAttachStats.isChecked
         val includeProcInfo = b.switchAttachProcInfo.isChecked
 
@@ -255,7 +263,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     runCatching { subscriptionStatusDao.getAllSubscriptions() }.getOrElse { emptyList() }
                 } else emptyList()
 
-                val recentHistory = if (includeHistory) {
+                val recentHistory = if (includeStatus) {
                     runCatching {
                         subscriptionStateHistoryDao.getRecentHistory(MAX_HISTORY_ENTRIES)
                     }.getOrElse { emptyList() }
@@ -382,6 +390,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 sb.append("  orderId          : ${s.orderId.ifEmpty { "N/A" }}\n")
                 // accountId: max 12 chars visible, rest redacted
                 sb.append("  accountId        : ${redactId(s.accountId)}\n")
+                sb.append("  deviceId         : ${redactDid(s.deviceId)}\n")
                 sb.append("  purchaseTime     : ${formatTs(s.purchaseTime)}\n")
                 sb.append("  billingExpiry    : ${formatTs(s.billingExpiry)}\n")
                 sb.append("  accountExpiry    : ${formatTs(s.accountExpiry)}\n")
@@ -671,6 +680,11 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         return if (id.length > 12) "${id.take(12)}***" else id
     }
 
+    private fun redactDid(id: String): String {
+        if (id.isEmpty()) return "N/A"
+        return if (id.length > 4) "${id.take(4)}***" else id
+    }
+
     private fun setLoading(loading: Boolean) {
         b.btnSendEmail.isEnabled = !loading
         b.btnSendEmail.text = if (loading)
@@ -678,6 +692,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         else
             getString(R.string.about_bug_report_dialog_positive_btn)
         b.layoutLoading.isVisible = loading
+        // the bar's height changes with the loading row; refresh after re-layout
+        b.nestedScroll.post { updateScrollPadding() }
     }
 
     private fun hideKeyboard() {

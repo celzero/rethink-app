@@ -96,6 +96,9 @@ class TunDnsManagerTest {
                 single { appConfig }
                 single { netLogTracker }
                 single { rdb }
+                // WireguardManager.db resolves this lazily; unstubbed WireguardManager
+                // calls fall through to the original and would otherwise throw
+                single { mockk<com.celzero.bravedns.database.WgConfigFilesRepository>(relaxed = true) }
             })
         }
         // gomobile's DNSOpts() constructor NPEs under Robolectric (native seq, not interceptable

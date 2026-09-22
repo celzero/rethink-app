@@ -51,7 +51,6 @@
                 android:id="@+id/fs_apps_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -124,7 +123,6 @@
                 android:id="@+id/fs_dns_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -197,7 +195,6 @@
                 android:id="@+id/fs_firewall_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -270,7 +267,6 @@
                 android:id="@+id/fs_proxy_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -343,7 +339,6 @@
                 android:id="@+id/fs_network_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -416,7 +411,6 @@
                 android:id="@+id/fs_others_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -489,7 +483,6 @@
                 android:id="@+id/fs_logs_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -562,7 +555,6 @@
                 android:id="@+id/fs_anti_censorship_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 
@@ -635,7 +627,6 @@
                 android:id="@+id/fs_advanced_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="4dp"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="8dp">
 

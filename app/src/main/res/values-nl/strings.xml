@@ -885,7 +885,6 @@
     <string name="exclude_apps_from_proxy">App vrijstellen van alle proxy\'s</string>
     <string name="exclude_apps_from_proxy_failure_toast">Deze app omzeilt proxy\'s</string>
     <string name="bsac_title_desc" translatable="true">De regels gelden alleen voor deze app.</string>
-    <string name="bsdl_block_desc" translatable="true">Blokkeer, vertrouw &lt;u&gt;dit domein&lt;/u&gt;</string>
     <string name="lbl_saving" translatable="true">Opslaan…</string>
     <string name="lbl_plan" translatable="true">Abonnement</string>
     <string name="lbl_expires_on" translatable="true">Geldig tot</string>
@@ -910,7 +909,6 @@
     <string name="wireguard_desc" translatable="true">Versleutel je internetverkeer met WireGuard. Kies verschillende routes voor verschillende apps.</string>
     <string name="firewall_title" translatable="true">Bescherm je Android met Firewall</string>
     <string name="build__flavor_play_store" translatable="true">Afspelen</string>
-    <string name="bsdl_app_block_desc" translatable="true">Blokkeren, deze website vertrouwen voor deze app</string>
     <string name="bsdl_blocked_desc" translatable="true">Geblokkeerd door %2$s: %1$s</string>
     <string name="network_dns" translatable="true">Systeem DNS</string>
     <string name="notif_download_content_title" translatable="true">On-Device Blocklist download</string>

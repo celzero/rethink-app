@@ -705,7 +705,6 @@
     <string name="brbs_restore_title" translatable="true">بازیابی</string>
     <string name="brbs_title" translatable="true">پشتیبان‌گیری و بازیابی</string>
     <string name="bsac_title_desc" translatable="true">قوانین فقط برای این برنامه اعمال می‌شود.</string>
-    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به &lt;u&gt;این دامنه&lt;/u&gt;</string>
     <string name="bsrf_clear_filter" translatable="true">پاک کردن</string>
     <string name="build__flavor_website" translatable="true">وب‌سایت</string>
     <string name="bsrf_sub_group_heading" translatable="true">زیرگروه</string>
@@ -780,9 +779,9 @@
     <string name="firewall_rule_block_http" translatable="true">HTTP نا‌امن</string>
     <string name="firewall_rule_global_lockdown" translatable="true">قفل</string>
     <string name="rules_load_failure_heading" translatable="true">­تنظیمات سیو شود</string>
-    <string name="dns_record_types_auto_mode_status" translatable="true">Auto (All types)</string>
-    <string name="pause_desc" translatable="true">Love</string>
-    <string name="other_dns_list_tab3" translatable="true">پروکسی دی ان اس</string>
+    <string name="dns_record_types_auto_mode_status" translatable="true">خودکار (انواع مختلف)</string>
+    <string name="pause_desc" translatable="true">توجه: برنامه‌های مسدودشده (%1$s) همچنان تحت محافظت دیوار‌آتش باقی خواهند ماند.</string>
+    <string name="other_dns_list_tab3" translatable="true">پراکسی دی‌ان‌اس</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">امکان تغییر حالت‌ها زمانی که VPN در <i>Lockdown</i> است وجود ندارد. برای &lt;u&gt;ویرایش تنظیمات VPN&lt;/u&gt; ضربه بزنید.</string>
     <string name="lockdown_download_message" translatable="true">&lt;/i&gt;</string>
     <string name="lbl_notes" translatable="true">یادداشت‌ها</string>
@@ -832,4 +831,40 @@
     <string name="dc_global_heading" translatable="true">سراسری</string>
     <string name="dc_block_unknown_heading" translatable="true">مسدود کردن DNS از منبع ناشناخته</string>
     <string name="dc_block_unknown_desc" translatable="true">تمام درخواست‌های DNS که از برنامه‌های ناشناخته سرچشمه می‌گیرند را مسدود کنید.</string>
+    <string name="lbl_unknown" translatable="true">ناشناخته</string>
+    <string name="lbl_on" translatable="true">روشن</string>
+    <string name="lbl_off" translatable="true">خاموش</string>
+    <string name="log_activity_conn_count" translatable="true">%1$d اتصال</string>
+    <string name="log_activity_interval_empty" translatable="true">هیچ فعالیتی در این دوره ثبت نشده است</string>
+    <string name="logs_card_grid_desc" translatable="true">جدول فعالیت‌ها؛ برای مشاهده جزئیات، ضربه بزنید</string>
+    <string name="restore_defaults_dialog_title" translatable="true">بازگردانی به تنظیمات پیش‌فرض؟</string>
+    <string name="restore_defaults_dialog_message" translatable="true">تمام تنظیمات این صفحه به مقادیر پیش‌فرض بازگردانده خواهند شد. این عمل قابل بازگشت نیست.</string>
+    <string name="restore_defaults_success_toast" translatable="true">تنظیمات به حالت پیش‌فرض بازگردانده شدند</string>
+    <string name="lbl_unselect_all" translatable="true">لغو انتخاب همه</string>
+    <string name="hsf_dns_mode_off_indicator" translatable="true">دی‌ان‌اس · خاموش</string>
+    <string name="hsf_firewall_mode_off_indicator" translatable="true">دیوار آتش · خاموش</string>
+    <string name="hsf_proxy_off_indicator" translatable="true">پراکسی غیرفعال</string>
+    <string name="logs_card_heatmap_window" translatable="true">۲۴ ساعت گذشته</string>
+    <string name="hsf_vpn_lockdown_prepare_failure" translatable="true">برنامه Rethink نمی‌تواند اجرا شود، زیرا برنامه دیگری به‌عنوان VPN همیشه فعال همراه با قابلیت «مسدودسازی اتصالات بدون VPN» (قرنطینه) تنظیم شده است. برای ادامه، تنظیمات VPN را ویرایش کنید.</string>
+    <string name="cd_doh_dialog_resolver_ip" translatable="true">آدرس IP حل‌کننده (اختیاری)</string>
+    <string name="fapps_filter_sort_heading" translatable="true">مرتب بر‌اساس</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">دامنه (برنامه) مورد اعتماد</string>
+    <string name="firewall_rule_block_domain" translatable="true">دامنه (برنامه)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS مسدود شد</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">دامنه(عمومی)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">دامنه امن (عمومی)</string>
+    <string name="firewall_rule_proxied" translatable="true">پراکسی شده</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS خصوصی</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">دور زدن پراکسی</string>
+    <string name="firewall_rule_paused_app" translatable="true">برنامه متوقف شد</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">پراکسی قرنطینه</string>
+    <string name="firewall_rule_proxy_error" translatable="true">خطای پراکسی</string>
+    <string name="bsct_allow_reason" translatable="true">%1$s</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">هیچ قانون دیوار آتشی با این اتصال مطابقت ندارد.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[یک قانون دیوار‌آتش توسط کاربر تنظیم شده، این <i>برنامه</i> را مسدود کرد.<br><br> برای تغییر آن، به زبانه <i>همه برنامه‌ها</i> بروید.]]></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[این برنامه برای <i>اولین</i> بار متصل شد.<br><br> برای تغییر، به زبانه <i>کلی</i> بروید.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[یک قانون دیوار‌آتش که توسط کاربر تنظیم شده، مانع از اتصال این <i>برنامه</i> در شبکه <i>بدون محدودیت حجم</i> شد.<br><br> برای تغییر آن، به زبانه <i>همه برنامه‌ها</i> بروید.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[یک قانون دیوار‌آتش که توسط کاربر تنظیم شده، مانع از اتصال این <i>برنامه</i> در شبکه <i>محدود</i> شد.<br><br> برای تغییر آن، به زبانه <i>همه برنامه‌ها</i> بروید.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[یک قانون سراسری دیوار‌آتش که توسط کاربر تنظیم شده است، مانع از اتصال این <i>برنامه</i> در شبکه دارای <i>محدودیت</i> مصرف (تلفن همراه) شد.<br><br> برای تغییر آن، به زبانه <i>سراسری</i> بروید.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[یک قانون دیوار‌آتش که توسط کاربر تنظیم شده است، مانع از اتصال این <i>برنامه</i> به مقاصدی غیر از <i>آی‌پی‌های مستثنی‌شده</i> شده است.<br><br> برای تغییر این وضعیت، به زبانه <i>همه برنامه‌ها</i> بروید.]]></string>
 </resources>

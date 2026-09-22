@@ -42,6 +42,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.dialog.DnsCryptRelaysDialog
 import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.DnsCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DnsCryptRelayEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -176,6 +177,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         // remain visible on smaller screens (instead of panning the window)
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val radioServer = dialogBinding.dialogDnsCryptRadioServer
         val radioRelay = dialogBinding.dialogDnsCryptRadioRelay

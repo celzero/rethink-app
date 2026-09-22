@@ -18,7 +18,9 @@
     <locale android:name="it" /> <!-- Italian -->
     <locale android:name="ja" /> <!-- Japanese -->
     <locale android:name="ko" /> <!-- Korean -->
+    <locale android:name="lo" /> <!-- Lao -->
     <locale android:name="lt" /> <!-- Lithuanian -->
+    <locale android:name="fa" /> <!-- Persian -->
     <locale android:name="pl" /> <!-- Polish -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
@@ -26,6 +28,7 @@
     <locale android:name="ru" /> <!-- Russian -->
     <locale android:name="sr" /> <!-- Serbian (Cyrillic) -->
     <locale android:name="es" /> <!-- Spanish (Spain) -->
+    <locale android:name="sv" /> <!-- Swedish -->
     <locale android:name="ta" /> <!-- Tamil -->
     <locale android:name="th" /> <!-- Thai -->
     <locale android:name="tr" /> <!-- Turkish -->

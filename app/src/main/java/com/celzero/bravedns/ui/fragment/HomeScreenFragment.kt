@@ -26,6 +26,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
@@ -41,12 +42,16 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import android.transition.TransitionManager
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.GridLayout
 import android.widget.LinearLayout
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -60,14 +65,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
+import com.celzero.bravedns.databinding.ItemHomeFirewallRulesPageBinding
+import com.celzero.bravedns.databinding.ViewHomeLogsActivityBinding
+import com.celzero.bravedns.databinding.ViewHomeLogsAppsBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
@@ -101,6 +114,7 @@ import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LogActivityIntervalBottomSheet
+import com.celzero.bravedns.ui.custom.AppHistogramView
 import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
@@ -140,7 +154,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import android.graphics.drawable.Drawable
+import java.util.Calendar
 import java.util.Locale
+import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
 import kotlin.time.Duration.Companion.milliseconds
@@ -153,6 +170,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val workScheduler by inject<WorkScheduler>()
     private val eventLogger by inject<EventLogger>()
     private val activityAggregator by inject<LogActivityAggregator>()
+    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
+    private val dnsLogRepository by inject<DnsLogRepository>()
 
     private var isVpnActivated: Boolean = false
 
@@ -179,6 +198,49 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private var lastGridTouchX = 0f
     private var lastGridTouchY = 0f
 
+    // pre-inflated pages of the logs card pager; created once per view and
+    // (re)attached by LogsPagesAdapter on bind
+    private lateinit var logsPage: ViewHomeLogsActivityBinding
+    private lateinit var topAppsPage: ViewHomeLogsAppsBinding
+
+    // top-apps histogram state: blocked mode re-ranks by blocked attempts
+    // (dns-log + connection-tracker rows), allowed mode by total data usage
+    // (connection-tracker rows only)
+    private var topAppsBlockedMode = false
+    private var topAppsEntries: List<AppHistogramView.Entry> = emptyList()
+    private var topAppsRequestGen = 0
+    private var lastTopAppsFetchAt = 0L
+
+    // page-change callback kept so it can be unregistered in onDestroyView()
+    private var logsPagerCallback: ViewPager2.OnPageChangeCallback? = null
+
+    // scheduled fade-out of the logs-card page dots; cancelled/restarted on
+    // every page selection and in onDestroyView()
+    private var logsDotsHideJob: Job? = null
+
+    // page-change callback for the swipeable rules card; unregistered in
+    // onDestroyView() for the same reason as [logsPagerCallback]
+    private var rulesPagerCallback: ViewPager2.OnPageChangeCallback? = null
+
+    // whether the logs card is showing its live content (VPN on + logging
+    // on); drives the dots visibility alongside the brave mode
+    private var logsCardActive = false
+
+    // pending revert of the header back to window totals after a bar tap
+    private var topAppsHeaderRevertJob: Job? = null
+
+    // swipeable rules card: one page per universal rule type (firewall, IP,
+    // domain); counts are pushed in by the rule-count LiveData observers
+    private val rulesPagesAdapter by lazy {
+        FirewallRulesPagesAdapter(
+            listOf(
+                getString(R.string.hsf_rules_univ_label),
+                getString(R.string.hsf_rules_ip_label),
+                getString(R.string.hsf_rules_dom_label)
+            )
+        )
+    }
+
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
@@ -195,9 +257,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val TAG = "HSFragment"
         private const val MAX_RULE_BADGE_CHARS = 3
 
+        // swipeable rules card page indices
+        private const val RULES_PAGE_UNIVERSAL = 0
+        private const val RULES_PAGE_IP = 1
+        private const val RULES_PAGE_DOMAIN = 2
+
         // animated border ring around the start button (VPN-off call-to-action)
         private const val BORDER_STROKE_WIDTH_DP = 2.5f
-        private const val BORDER_ROTATION_DURATION_MS = 2000L
+        // duration of one full swing across the contrast color band; the ring
+        // spins fast until the first swing completes, then settles slower
+        private const val BORDER_HUE_CYCLE_MS = 3000L
+        // half-width of the hue band around the complementary hue, so the
+        // highlight stays on the contrasting side of the wheel
+        private const val BORDER_HUE_SWING_DEG = 30f
+        private const val BORDER_FAST_ROTATION_MS = 1200L
+        private const val BORDER_SLOW_ROTATION_MS = 3000L
 
         // UI interaction delays (milliseconds)
         private const val UI_DELAY_MS = 500L
@@ -259,7 +333,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val HEATMAP_INTENSITY_LEVELS = 5
 
         private const val HEATMAP_GRID_ROWS = 6
-        private const val HEATMAP_GRID_HEIGHT_DP = 56
+        private const val HEATMAP_GRID_HEIGHT_DP = 60
 
         private const val HEATMAP_CELL_OVAL_RATIO = 2f
 
@@ -269,6 +343,31 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // alpha of the unselected allowed/blocked header block; the block
         // matching the active toggle mode renders at full opacity
         private const val LOGS_HEADER_UNSELECTED_ALPHA = 0.7f
+
+        // top-apps histogram page of the logs card
+        private const val TOP_APPS_COUNT = 20
+        // re-querying on every swipe-to-page would hammer the log databases;
+        // this throttle keeps page switches cheap while the data stays fresh
+        private const val TOP_APPS_REFRESH_MIN_INTERVAL_MS = 15_000L
+
+        // page-dot indicator: unselected dots render dimmed; the selected dot
+        // fills to full opacity
+        private const val DOT_UNSELECTED_ALPHA = 0.35f
+
+        // how long the logs-card page dots stay visible before auto-hiding;
+        // every page selection restarts the dwell
+        private const val LOGS_DOTS_VISIBLE_MS = 3000L
+
+        // how long a tapped app's values stay in the header before reverting
+        // to the window totals
+        private const val TOP_APPS_HEADER_REVERT_MS = 5_000L
+
+        // in-memory logs-card view state: survives fragment/view recreation
+        // (navigation, tab switches, config changes) until the process is
+        // killed; deliberately not persisted to disk
+        private var savedLogsPagePosition = 0
+        private var savedTopAppsBlockedMode = false
+        private var savedLogsDisplayMode = ActivityDisplayMode.ALLOWED
     }
 
     enum class ScreenType {
@@ -298,23 +397,24 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         super.onViewCreated(view, savedInstanceState)
         Logger.v(LOG_TAG_UI, "$TAG: init view in home screen fragment")
         initializeValues()
+        setupLogsPager()
         initializeClickListeners()
         isVpnActivated = VpnController.state().activationRequested
         captureActiveEmphasis()
         updateMainButtonUi()
         updateCardsUi()
-        updateLogsToggleUi(displayMode == ActivityDisplayMode.BLOCKED)
+        updateLogsToggleUi(savedLogsDisplayMode == ActivityDisplayMode.BLOCKED)
         observeLogActivity()
         // one listener on the grid container itself: every tap anywhere inside
-        b.fhsLogsGrid.isClickable = true
-        b.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
+        logsPage.fhsLogsGrid.isClickable = true
+        logsPage.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
         // record tap position; returning false lets the click event fire
-        b.fhsLogsGrid.setOnTouchListener { _, event ->
+        logsPage.fhsLogsGrid.setOnTouchListener { _, event ->
             lastGridTouchX = event.x
             lastGridTouchY = event.y
             false
         }
-        b.fhsLogsGrid.setOnClickListener { openIntervalDetails(it) }
+        logsPage.fhsLogsGrid.setOnClickListener { openIntervalDetails(it) }
         // the activity wall is reconciled with the databases when
         // BraveVPNService is created, not on every home-screen resume
         syncDnsStatus()
@@ -363,43 +463,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun initializeClickListeners() {
-        b.fhsCardFirewallUnivCard.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on universal firewall card")
-            startActivity(Intent(requireContext(), UniversalFirewallSettingsActivity::class.java))
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Universal firewall card clicked",
-                "Navigating to UniversalFirewallSettingsActivity from HomeScreenFragment"
-            )
-        }
-
-        b.fhsCardFirewallIpCard.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on ip rules card")
-            val intent = Intent(requireContext(), CustomRulesActivity::class.java)
-            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
-            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
-            intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
-            startActivity(intent)
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: IP rules card clicked",
-                "Navigating to CustomRulesActivity (IP tab) from HomeScreenFragment"
-            )
-        }
-
-        b.fhsCardFirewallDomCard.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on domain rules card")
-            val intent = Intent(requireContext(), CustomRulesActivity::class.java)
-            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
-            intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
-            intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
-            startActivity(intent)
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Domain rules card clicked",
-                "Navigating to CustomRulesActivity (domain tab) from HomeScreenFragment"
-            )
-        }
+        setupFirewallRulesCard()
 
         b.fhsCardAppsCv.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on apps card")
@@ -474,21 +538,29 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.v(LOG_TAG_UI, "$TAG: brave mode changed to $it")
             updateCardsUi()
             syncDnsStatus()
+            // the top-apps page is firewall-only; rebuild the pager pages so
+            // DNS-only mode shows a single (activity wall) page
+            refreshLogsPagerMode()
         }
 
-        b.fhsCardLogsLl.setOnClickListener {
-            Logger.v(LOG_TAG_UI, "$TAG: click event on logs card")
-            startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
-            logEvent(
-                EventType.UI_NAVIGATION,
-                "HomeScreen: Logs card clicked",
-                "Navigating to NetworkLogsActivity from HomeScreenFragment"
-            )
-        }
+        b.fhsCardLogsLl.setOnClickListener { openNetworkLogs() }
 
-        b.fhsLogsToggleGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+        logsPage.fhsLogsToggleGroup.setOnCheckedStateChangeListener { _, checkedIds ->
             val isBlocked = checkedIds.contains(R.id.fhs_logs_blocked_chip)
             toggleLogsView(if (isBlocked) ActivityDisplayMode.BLOCKED else ActivityDisplayMode.ALLOWED)
+        }
+
+        b.fhsLogsEnableChip.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: enable logs chip clicked")
+            persistentState.logsEnabled = true
+            if (isVpnActivated) {
+                // preference stored and vpn running: bring the full card back
+                observeLogsCount()
+            } else {
+                // vpn is off: the preference is stored, but the card stays in
+                // its disabled state, now without the enable chip
+                disableLogsCard()
+            }
         }
 
         b.fhsCardProxyLl.setOnClickListener {
@@ -655,15 +727,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Animates a thin gradient ring around the start button. Runs only while
-     * the VPN is stopped to draw attention to the call-to-action. The ring is
-     * a stroke-only pill drawable whose sweep-gradient highlight rotates via
-     * its shader matrix, so only the border moves — never the shape.
+     * Animates a thin ring around the start button. Runs only while the VPN is
+     * stopped to draw attention to the call-to-action. The ring is a stroke-only
+     * pill drawable whose sweep-gradient highlight rotates via its shader
+     * matrix, so only the border moves — never the shape.
      *
-     * The highlight uses [R.attr.invertedPrimaryTextColor] — the same contrast
-     * color as the button's own text — because the ring sits directly on the
-     * button edge and the button fill is accentGood while stopped; an
-     * accent-colored ring would be invisible against it.
+     * The highlight color stays inside the complementary band of the button's
+     * own accent (accentGood), resolved from the active theme: hues near the
+     * fill color would blend into the button, while the opposite side of the
+     * wheel always contrasts. The hue swings smoothly across that band while
+     * the ring spins fast; once the first color swing completes, the rotation
+     * settles to a slower, calmer pace.
      */
     private fun startBorderAnimation() {
         val ctx = context ?: return
@@ -675,23 +749,51 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 ?: RotatingBorderDrawable().also {
                     it.configure(
                         UIUtils.fetchColor(ctx, R.attr.invertedPrimaryTextColor),
-                        BORDER_STROKE_WIDTH_DP * resources.displayMetrics.density
+                        BORDER_STROKE_WIDTH_DP * resources.displayMetrics.density,
+                        rainbow = true
                     )
                     borderView.background = it
                 }
 
         if (rotationAnimator?.isRunning == true) return
-        rotationAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = BORDER_ROTATION_DURATION_MS
+        // center of the contrast band: the hue directly opposite the fill
+        val hsv = FloatArray(3)
+        Color.colorToHSV(UIUtils.fetchColor(ctx, R.attr.accentGood), hsv)
+        val contrastHue = (hsv[0] + 180f) % 360f
+        val startElapsedMs = SystemClock.elapsedRealtime()
+        // the animator itself is only a frame tick; hue and rotation are both
+        // derived from elapsed time so they stay in sync without drift
+        rotationAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = BORDER_HUE_CYCLE_MS
             interpolator = LinearInterpolator()
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener { anim ->
-                drawable.rotation = anim.animatedValue as Float
+                val elapsed = SystemClock.elapsedRealtime() - startElapsedMs
+                // triangle wave: sweep to one edge of the band and back
+                val frac =
+                    (elapsed % BORDER_HUE_CYCLE_MS).toFloat() / BORDER_HUE_CYCLE_MS
+                val swing = if (frac <= 0.5f) frac * 2f else 2f - frac * 2f
+                drawable.setHighlightHue(contrastHue + swing * BORDER_HUE_SWING_DEG)
+                // negated so the highlight travels counterclockwise
+                drawable.rotation = -borderRotationFor(elapsed)
                 borderView.invalidate()
             }
             start()
         }
         Logger.v(LOG_TAG_UI, "$TAG: start button border animation started")
+    }
+
+    /**
+     * Ring rotation for a given elapsed time: one turn per [BORDER_FAST_ROTATION_MS]
+     * during the first hue cycle, then one turn per [BORDER_SLOW_ROTATION_MS].
+     */
+    private fun borderRotationFor(elapsedMs: Long): Float {
+        val fastTurns = BORDER_HUE_CYCLE_MS.toFloat() / BORDER_FAST_ROTATION_MS
+        if (elapsedMs <= BORDER_HUE_CYCLE_MS) {
+            return (elapsedMs.toFloat() / BORDER_FAST_ROTATION_MS) * 360f
+        }
+        val slowMs = elapsedMs - BORDER_HUE_CYCLE_MS
+        return (fastTurns + slowMs.toFloat() / BORDER_SLOW_ROTATION_MS) * 360f
     }
 
     private fun stopBorderAnimation() {
@@ -705,7 +807,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         disabledDnsCard()
         disableAppsCard()
         disableProxyCard()
-        disableLogsCard()
+        disableLogsCard(animateTransition = false)
     }
 
     private fun showActiveCards() {
@@ -774,10 +876,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun enableLogsCardIfNeeded() {
-        if (isVpnActivated) {
-            observeLogsCount()
+        if (isVpnActivated && persistentState.logsEnabled) {
+            observeLogsCount(animateTransition = false)
         } else {
-            disableLogsCard()
+            disableLogsCard(animateTransition = false)
         }
     }
 
@@ -1212,13 +1314,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         failing++
                     }
                 }
-                UIUtils.ProxyStatus.TNT -> {
-                    // Waiting / not-yet-started
-                    idle++
-                }
                 // UIUtils.ProxyStatus.TPU handled above
                 else -> {
-                    // Explicitly bad states (TKO, END, unknown)
+                    // Explicitly bad states (TKO, END, TNT, unknown)
                     failing++
                 }
             }
@@ -1254,14 +1352,32 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         proxyStateListenerJob = null
     }
 
-    private fun disableLogsCard() {
+    private fun disableLogsCard(animateTransition: Boolean = true) {
         if (view == null || !isAdded) return
 
-        b.fhsCardAllowedLogsCount.visibility = View.GONE
-        b.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_disabled)
-        b.fhsCardBlockedLogsCount.visibility = View.GONE
-        b.fhsCardBlockedLogsLabel.visibility = View.GONE
-        b.fhsCardLogsDuration.visibility = View.GONE
+        logsPage.fhsCardAllowedLogsCount.visibility = View.GONE
+        logsPage.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_disabled)
+        logsPage.fhsCardBlockedLogsCount.visibility = View.GONE
+        logsPage.fhsCardBlockedLogsLabel.visibility = View.GONE
+        logsPage.fhsCardLogsDuration.visibility = View.GONE
+        // heatmap (grid + its hour axis and legend) carries no data when
+        // logging is off
+        logsPage.fhsLogsHourAxis.visibility = View.GONE
+        logsPage.fhsLogsGrid.visibility = View.GONE
+        logsPage.fhsLogsLegend.visibility = View.GONE
+        // allowed/blocked chips only make sense on an active card; when the
+        // logging preference is off they give way to an inline enable chip
+        logsPage.fhsLogsToggleGroup.visibility = View.GONE
+        // collapse the pager, but keep a hint so the card never reads as
+        // empty; the transition animates the collapse smoothly
+        animateLogsCardTransition(animateTransition)
+        logsCardActive = false
+        b.fhsLogsPager.visibility = View.GONE
+        updateLogsDotsVisibility()
+        val showEnableChip = !persistentState.logsEnabled
+        b.fhsCardLogsLl.visibility = View.GONE
+        b.fhsLogsEnableChip.visibility =
+            if (showEnableChip) View.VISIBLE else View.GONE
     }
 
     /**
@@ -1403,6 +1519,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun toggleLogsView(mode: ActivityDisplayMode) {
         if (displayMode == mode) return
         displayMode = mode
+        savedLogsDisplayMode = mode
         updateLogsHeaderEmphasis(mode == ActivityDisplayMode.BLOCKED)
 
         // re-render from the cached aggregate only; the toggle must not
@@ -1419,20 +1536,454 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun updateLogsHeaderEmphasis(blocked: Boolean) {
         if (view == null || !isAdded) return
 
-        b.fhsLogsAllowedHeader.alpha =
+        logsPage.fhsLogsAllowedHeader.alpha =
             if (blocked) LOGS_HEADER_UNSELECTED_ALPHA else 1f
-        b.fhsLogsBlockedHeader.alpha =
+        logsPage.fhsLogsBlockedHeader.alpha =
             if (blocked) 1f else LOGS_HEADER_UNSELECTED_ALPHA
     }
 
     private fun updateLogsToggleUi(blocked: Boolean) {
         displayMode = if (blocked) ActivityDisplayMode.BLOCKED else ActivityDisplayMode.ALLOWED
         if (blocked) {
-            b.fhsLogsBlockedChip.isChecked = true
+            logsPage.fhsLogsBlockedChip.isChecked = true
         } else {
-            b.fhsLogsAllowedChip.isChecked = true
+            logsPage.fhsLogsAllowedChip.isChecked = true
         }
         updateLogsHeaderEmphasis(blocked)
+    }
+
+    /**
+     * Builds the two-page swipeable logs card. Page 1 is the activity wall
+     * with the heatmap grid (the card's default view); the top-apps
+     * histogram sits on page 2, one swipe to the right. The histogram page
+     * exists only when the active brave mode enforces the firewall —
+     * DNS-only mode shows a single page (the activity wall) with no page
+     * dots.
+     */
+    private fun setupLogsPager() {
+        logsPage = ViewHomeLogsActivityBinding.inflate(layoutInflater)
+        topAppsPage = ViewHomeLogsAppsBinding.inflate(layoutInflater)
+
+        // restore the histogram chip selection before wiring listeners so the
+        // initial check state matches without triggering a redundant reload
+        topAppsBlockedMode = savedTopAppsBlockedMode
+        if (topAppsBlockedMode) topAppsPage.fhsTopAppsBlockedChip.isChecked = true
+
+        b.fhsLogsPager.adapter = LogsPagesAdapter(pageViews())
+        b.fhsLogsPager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
+
+        b.fhsLogsDots.visibility =
+            if (pagerPageCount() > 1) View.VISIBLE else View.GONE
+        updatePagerDots(0)
+        b.fhsLogsDot0.setOnClickListener { b.fhsLogsPager.setCurrentItem(0, true) }
+        b.fhsLogsDot1.setOnClickListener { b.fhsLogsPager.setCurrentItem(1, true) }
+
+        logsPagerCallback = object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updatePagerDots(position)
+                // a swipe (or dot tap) re-reveals the dots for another dwell
+                showLogsDotsTemporarily()
+                savedLogsPagePosition = position
+                // load/refresh the histogram lazily: it sits at position 1
+                // (only when the two-page layout applies; DNS-only mode has
+                // no histogram page)
+                if (position == 1 && pagerPageCount() > 1) refreshTopAppsHistogram()
+            }
+        }
+        b.fhsLogsPager.registerOnPageChangeCallback(logsPagerCallback!!)
+
+        // restore the page the user last viewed (in-memory until the
+        // process dies); the callback above syncs the dots for the jump
+        if (pagerPageCount() > 1 && savedLogsPagePosition == 1) {
+            b.fhsLogsPager.setCurrentItem(1, false)
+        }
+        updateLogsDotsVisibility()
+
+        // the pager pages consume touches, so the card-level click listener
+        // never fires over them; delegate the same navigation from each
+        // page's open areas (the heatmap grid and histogram bars keep their
+        // own interactions)
+        logsPage.root.setOnClickListener { openNetworkLogs() }
+        topAppsPage.root.setOnClickListener { openNetworkLogs() }
+
+        topAppsPage.fhsTopAppsHistogram.setLightTheme(isLightTheme())
+        applyTopAppsLegendColors()
+        topAppsPage.fhsTopAppsHistogram.onEntrySelected = { entry ->
+            showTopAppsEntry(entry)
+        }
+
+        topAppsPage.fhsTopAppsToggleGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val blocked = checkedIds.contains(R.id.fhs_top_apps_blocked_chip)
+            if (blocked == topAppsBlockedMode) return@setOnCheckedStateChangeListener
+            topAppsBlockedMode = blocked
+            savedTopAppsBlockedMode = blocked
+            // re-rank from the database; a cached re-render would show the
+            // wrong ordering for the newly selected mode
+            refreshTopAppsHistogram(force = true)
+        }
+
+        renderTopAppsHeader(null)
+        // the histogram is the card's trailing page; prime it so it is ready
+        // on the first swipe
+        refreshTopAppsHistogram()
+    }
+
+    /** Re-applies the firewall-only page rule after a brave-mode change. */
+    private fun refreshLogsPagerMode() {
+        if (!this::logsPage.isInitialized || !this::topAppsPage.isInitialized) return
+        val twoPages = pagerPageCount() > 1
+        // re-assigning the adapter rebuilds the page list; position 0 is the
+        // activity wall (heatmap) in both layouts, the histogram trails at
+        // position 1 in the two-page layout.
+        // The user's last page is restored when it still exists.
+        b.fhsLogsPager.adapter = LogsPagesAdapter(pageViews())
+        updateLogsDotsVisibility()
+        if (twoPages && savedLogsPagePosition == 1) {
+            b.fhsLogsPager.setCurrentItem(1, false)
+        }
+        updatePagerDots(b.fhsLogsPager.currentItem)
+    }
+
+    /**
+     * The dots exist only when the card is showing content AND the two-page
+     * layout applies — and even then only transiently: they show for a short
+     * dwell, then auto-hide until the next page change. Centralized here so
+     * a brave-mode change running after disableLogsCard() cannot re-show the
+     * dots on a collapsed card.
+     */
+    private fun updateLogsDotsVisibility() {
+        if (view == null || !isAdded) return
+
+        if (logsCardActive && pagerPageCount() > 1) {
+            showLogsDotsTemporarily()
+        } else {
+            logsDotsHideJob?.cancel()
+            logsDotsHideJob = null
+            b.fhsLogsDots.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Reveals the page dots and schedules them to hide after a short dwell
+     * so they never permanently occupy the card. Every page selection
+     * restarts the timer; the job is scoped to the view lifecycle so it
+     * cannot fire against a destroyed view.
+     */
+    private fun showLogsDotsTemporarily() {
+        if (view == null || !isAdded) return
+
+        b.fhsLogsDots.visibility = View.VISIBLE
+        logsDotsHideJob?.cancel()
+        logsDotsHideJob = viewLifecycleOwner.lifecycleScope.launch {
+            kotlinx.coroutines.delay(LOGS_DOTS_VISIBLE_MS)
+            if (isAdded && view != null) b.fhsLogsDots.visibility = View.GONE
+        }
+    }
+
+    private fun pagerPageCount(): Int {
+        return if (appConfig.getBraveMode().isFirewallActive()) 2 else 1
+    }
+
+    private fun pageViews(): List<View> {
+        return if (pagerPageCount() > 1) {
+            // heatmap (activity wall) first, histogram one swipe to the right
+            listOf(logsPage.root, topAppsPage.root)
+        } else {
+            listOf(logsPage.root)
+        }
+    }
+
+    private fun updatePagerDots(position: Int) {
+        if (view == null || !isAdded) return
+
+        // the dot keeps its circular shape at all times; selection is shown
+        // purely by filling the color (full opacity vs dimmed)
+        listOf(b.fhsLogsDot0, b.fhsLogsDot1).forEachIndexed { index, dot ->
+            dot.alpha = if (index == position) 1f else DOT_UNSELECTED_ALPHA
+        }
+    }
+
+    /** Opens the network logs screen; shared by the card and its pages. */
+    private fun openNetworkLogs() {
+        Logger.v(LOG_TAG_UI, "$TAG: click event on logs card")
+        startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
+        logEvent(
+            EventType.UI_NAVIGATION,
+            "HomeScreen: Logs card clicked",
+            "Navigating to NetworkLogsActivity from HomeScreenFragment"
+        )
+    }
+
+    /**
+     * Fetches the top-apps histogram data for the trailing 24-hour window.
+     * Allowed mode ranks by total bytes (connection-tracker only); blocked
+     * mode ranks by blocked-attempt count summed across connection-tracker
+     * and dns-log rows — the two tables hold distinct event kinds, and the
+     * merge key (uid, appName) collapses them into a single entry per app so
+     * nothing is listed or counted twice. Unknown apps are excluded in both
+     * modes. Membership in the top-20 is rank-based, but the returned order
+     * is by most recent activity so the bar layout shifts as apps connect.
+     */
+    private fun refreshTopAppsHistogram(force: Boolean = false) {
+        if (!appConfig.getBraveMode().isFirewallActive()) return
+
+        val now = SystemClock.elapsedRealtime()
+        if (!force && now - lastTopAppsFetchAt < TOP_APPS_REFRESH_MIN_INTERVAL_MS) return
+        lastTopAppsFetchAt = now
+
+        val gen = ++topAppsRequestGen
+        val blocked = topAppsBlockedMode
+        io {
+            val entries = loadTopAppsEntries(blocked)
+            uiCtx {
+                if (gen != topAppsRequestGen) return@uiCtx
+                topAppsEntries = entries
+                // a data refresh invalidates any tapped-app header swap
+                topAppsHeaderRevertJob?.cancel()
+                topAppsHeaderRevertJob = null
+                topAppsPage.fhsTopAppsHistogram.submit(entries, blocked)
+                applyTopAppsLegendColors()
+                topAppsPage.fhsTopAppsEmpty.isVisible = entries.isEmpty()
+                topAppsPage.fhsTopAppsHistogram.isVisible = entries.isNotEmpty()
+                renderTopAppsHeader(null)
+            }
+        }
+    }
+
+    private suspend fun loadTopAppsEntries(blocked: Boolean): List<AppHistogramView.Entry> {
+        val ctx = context ?: return emptyList()
+        val end = System.currentTimeMillis()
+        val start = end - LogActivityAggregator.HOURS_IN_WINDOW * LogActivityAggregator.HOUR_MS
+        return try {
+            if (blocked) {
+                val conn = connectionTrackerRepository.getTopBlockedApps(start, end, TOP_APPS_COUNT)
+                val dns = dnsLogRepository.getTopBlockedApps(start, end, TOP_APPS_COUNT)
+                // value = (blocked count, most recent activity); the count
+                // picks the top-20 members, the timestamp orders their display
+                val merged = LinkedHashMap<Pair<Int, String>, Pair<Long, Long>>()
+                for (row in conn + dns) {
+                    if (isUnknownAppName(row.appName)) continue
+                    val key = row.uid to row.appName
+                    val prev = merged[key]
+                    merged[key] =
+                        (prev?.first ?: 0L) + row.blocked to maxOf(prev?.second ?: 0L, row.lastSeen)
+                }
+                merged.entries
+                    .sortedByDescending { it.value.first }
+                    .take(TOP_APPS_COUNT)
+                    // stable sort: apps last active in the same millisecond
+                    // keep their blocked-count rank as the tie-breaker
+                    .sortedByDescending { it.value.second }
+                    .map {
+                        AppHistogramView.Entry(
+                            it.key.first, it.key.second, 0L, 0L, it.value.first,
+                            iconForUid(ctx, it.key.first)
+                        )
+                    }
+            } else {
+                // the query still picks the top-20 by bytes; display order is
+                // by last activity, with rank as the tie-breaker (stable sort)
+                connectionTrackerRepository.getTopAppsByUsage(start, end, TOP_APPS_COUNT)
+                    .filter { !isUnknownAppName(it.appName) }
+                    .sortedByDescending { it.lastSeen }
+                    .map {
+                        AppHistogramView.Entry(
+                            it.uid, it.appName,
+                            it.unmeteredTotalBytes(), it.meteredTotalBytes(), 0L,
+                            iconForUid(ctx, it.uid)
+                        )
+                    }
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG: failed to load top apps: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    // the "Unknown" entry is a catch-all for uids that carry no resolvable
+    // app; it is noise in a per-app ranking, so it is dropped
+    private fun isUnknownAppName(appName: String): Boolean {
+        return appName.isBlank() ||
+                appName == Constants.UNKNOWN_APP ||
+                appName == getString(R.string.network_log_app_name_unknown)
+    }
+
+    private fun iconForUid(ctx: Context, uid: Int): Drawable? {
+        return try {
+            ctx.packageManager.getPackagesForUid(uid)?.firstOrNull()?.let {
+                Utilities.getIcon(ctx, it)
+            } ?: Utilities.getDefaultIcon(ctx)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Updates the header blocks above the histogram, mirroring the activity
+     * wall's header: two value-over-label stacks (Wi-Fi, Mobile data) in
+     * allowed mode, a single total stack in blocked mode. With no selection
+     * the values are the window totals; a tapped slot temporarily swaps in
+     * that app's values and names it in the window caption below.
+     */
+    private fun renderTopAppsHeader(entry: AppHistogramView.Entry?) {
+        if (view == null || !isAdded) return
+
+        val wifiValue = topAppsPage.fhsTopAppsWifiValue
+        val wifiLabel = topAppsPage.fhsTopAppsWifiLabel
+        val mobileHeader = topAppsPage.fhsTopAppsMobileHeader
+        val mobileValue = topAppsPage.fhsTopAppsMobileValue
+
+        // the tapped app is named in the window caption for as long as its
+        // values are shown; otherwise the caption carries the window text
+        val windowCaption = topAppsPage.fhsTopAppsWindow
+        windowCaption.text =
+            if (entry == null) getString(R.string.logs_card_heatmap_window)
+            else entry.appName
+
+        if (topAppsBlockedMode) {
+            // blocked has no connection-type split: one total, one block
+            mobileHeader.isVisible = false
+            wifiValue.text =
+                formatDecimal(entry?.blockedCount ?: topAppsEntries.sumOf { it.blockedCount })
+            wifiLabel.setText(R.string.logs_card_apps_count_label_blocked)
+            return
+        }
+
+        mobileHeader.isVisible = true
+        wifiValue.text = formatBytesCompact(
+            entry?.unmeteredBytes ?: topAppsEntries.sumOf { it.unmeteredBytes }
+        )
+        mobileValue.text = formatBytesCompact(
+            entry?.meteredBytes ?: topAppsEntries.sumOf { it.meteredBytes }
+        )
+        wifiLabel.setText(R.string.logs_card_apps_legend_wifi)
+    }
+
+    /**
+     * Tapping a bar swaps the header totals for that app's values for a few
+     * seconds, then reverts; tapping the selected bar again reverts at once.
+     * The header blocks themselves stay in place — only the numbers (and the
+     * window caption, naming the app) change, so nothing jumps.
+     */
+    private fun showTopAppsEntry(entry: AppHistogramView.Entry?) {
+        if (view == null || !isAdded) return
+
+        topAppsHeaderRevertJob?.cancel()
+        topAppsHeaderRevertJob = null
+        renderTopAppsHeader(entry)
+        if (entry == null) return
+
+        topAppsHeaderRevertJob = lifecycleScope.launch {
+            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS)
+            if (isAdded && view != null) renderTopAppsHeader(null)
+        }
+    }
+
+    // compact data label for the histogram header: whole numbers below GB
+    // ("234 MB"), a single decimal from GB up ("1.5 GB")
+    private fun formatBytesCompact(bytes: Long): String {
+        val unit = getCommonUnit(bytes, 0)
+        val v = when (unit) {
+            "TB" -> bytes / BYTES_PER_TB
+            "GB" -> bytes / BYTES_PER_GB
+            "MB" -> bytes / BYTES_PER_MB
+            "KB" -> bytes / BYTES_PER_KB
+            else -> bytes.toDouble()
+        }
+        val text =
+            if (unit == "GB" || unit == "TB") String.format(Locale.ROOT, "%.1f", v)
+            else String.format(Locale.ROOT, "%.0f", v)
+        return getString(R.string.two_argument_no_space, text, unit)
+    }
+
+    /**
+     * Tints the Wi-Fi / mobile-data legend glyphs with the exact segment
+     * colors the histogram draws, so the color key always matches the bars.
+     */
+    private fun applyTopAppsLegendColors() {
+        if (view == null || !isAdded) return
+
+        val histogram = topAppsPage.fhsTopAppsHistogram
+        topAppsPage.fhsTopAppsSwatchWifi.imageTintList =
+            ColorStateList.valueOf(histogram.unmeteredColor())
+        topAppsPage.fhsTopAppsSwatchMobile.imageTintList =
+            ColorStateList.valueOf(histogram.meteredColor())
+    }
+
+    /**
+     * Pager adapter over pre-inflated page views. RecyclerView detaches and
+     * re-attaches pages as the user swipes, so each bind re-parents the page
+     * into the holder's container.
+     */
+    private inner class LogsPageViewHolder(val container: FrameLayout) :
+        RecyclerView.ViewHolder(container)
+
+    private inner class LogsPagesAdapter(private val pages: List<View>) :
+        RecyclerView.Adapter<LogsPageViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogsPageViewHolder {
+            val container = FrameLayout(parent.context)
+            container.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            return LogsPageViewHolder(container)
+        }
+
+        override fun getItemCount(): Int = pages.size
+
+        override fun onBindViewHolder(holder: LogsPageViewHolder, position: Int) {
+            val page = pages[position]
+            (page.parent as? ViewGroup)?.removeView(page)
+            holder.container.addView(
+                page,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+    }
+
+    private inner class FirewallRulesPageViewHolder(
+        val itemBinding: ItemHomeFirewallRulesPageBinding
+    ) : RecyclerView.ViewHolder(itemBinding.root)
+
+    /**
+     * Pages for the swipeable rules card. Each page pairs a live count with a
+     * human-readable rule-type label so the card explains itself; the count is
+     * re-published by the rule-count observers via [updateCount].
+     */
+    private inner class FirewallRulesPagesAdapter(private val labels: List<String>) :
+        RecyclerView.Adapter<FirewallRulesPageViewHolder>() {
+
+        private val counts = mutableListOf("0", "0", "0")
+        var onRulePageTapped: ((Int) -> Unit)? = null
+
+        fun updateCount(page: Int, count: String) {
+            if (counts[page] == count) return
+            counts[page] = count
+            notifyItemChanged(page)
+        }
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): FirewallRulesPageViewHolder {
+            val itemBinding = ItemHomeFirewallRulesPageBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+            return FirewallRulesPageViewHolder(itemBinding)
+        }
+
+        override fun getItemCount(): Int = labels.size
+
+        override fun onBindViewHolder(holder: FirewallRulesPageViewHolder, position: Int) {
+            holder.itemBinding.itemRulesPageCount.text = counts[position]
+            holder.itemBinding.itemRulesPageLabel.text =
+                labels[position].replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
+            holder.itemBinding.root.setOnClickListener { onRulePageTapped?.invoke(position) }
+        }
     }
 
     /**
@@ -1452,11 +2003,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
+    private fun renderLogsHourAxisLabels() {
+        val startHour =
+            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        val labels = listOf(0, 6, 12, 18).map { offset ->
+            "%02d".format(Locale.getDefault(), (startHour + offset) % 24)
+        }
+
+        logsPage.fhsLogsHourStart.text = labels[0]
+        logsPage.fhsLogsHourStartPlus6.text = labels[1]
+        logsPage.fhsLogsHourStartPlus12.text = labels[2]
+        logsPage.fhsLogsHourStartPlus18.text = labels[3]
+    }
+
     /**
      * Renders the blocked/allowed activity wall: 24 columns (one per hour
      * over the trailing 24 hours, oldest left, latest right) x 6 rows (one
      * per 10-minute bucket within each hour, :00 at top, :50 at bottom). The
-        * newest bucket (now) is the bottom-right cell. Cell intensity is a
+     * newest bucket (now) is the bottom-right cell. Cell intensity is a
         * deterministic logarithmic level of the real aggregated count; a count
         * of zero renders a negligible placeholder dot (far smaller and fainter
         * than the lowest real level) while the cell itself stays reserved so
@@ -1467,7 +2032,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         state: LogActivityState,
         mode: ActivityDisplayMode = displayMode
     ) {
-        val grid = b.fhsLogsGrid
+        renderLogsHourAxisLabels()
+        val grid = logsPage.fhsLogsGrid
         grid.removeAllViews()
 
         val ctx = context ?: return
@@ -1529,10 +2095,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         val swatches =
             listOf(
-                b.fhsLogsSwatch0,
-                b.fhsLogsSwatch1,
-                b.fhsLogsSwatch2,
-                b.fhsLogsSwatch3
+                logsPage.fhsLogsSwatch0,
+                logsPage.fhsLogsSwatch1,
+                logsPage.fhsLogsSwatch2,
+                logsPage.fhsLogsSwatch3
             )
         val legendLevels = intArrayOf(0, 2, 3, 4)
         val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
@@ -1564,12 +2130,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             allowed += interval.allowed
             blocked += interval.blocked
         }
-        b.fhsCardAllowedLogsCount.text = formatDecimal(allowed)
-        b.fhsCardAllowedLogsCount.isSelected = true
-        b.fhsCardBlockedLogsCount.text = formatDecimal(blocked)
-        b.fhsCardBlockedLogsCount.isSelected = true
+        logsPage.fhsCardAllowedLogsCount.text = formatDecimal(allowed)
+        logsPage.fhsCardAllowedLogsCount.isSelected = true
+        logsPage.fhsCardBlockedLogsCount.text = formatDecimal(blocked)
+        logsPage.fhsCardBlockedLogsCount.isSelected = true
 
-        b.fhsCardLogsDuration.visibility = View.VISIBLE
+        logsPage.fhsCardLogsDuration.visibility = View.VISIBLE
     }
 
     /**
@@ -1584,8 +2150,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val state = lastActivityState ?: return null
         if (state.intervals.size < LogActivityAggregator.TOTAL_SLOTS) return null
         if (grid.width <= 0 || grid.height <= 0) return null
+        // handle layout RTL
+        val x =
+            if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                grid.width - lastGridTouchX
+            } else {
+                lastGridTouchX
+            }
         val col =
-            ((lastGridTouchX / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+            ((x / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
                 .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
         val row =
             ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
@@ -1633,9 +2206,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disableFirewallCard() {
         if (view == null || !isAdded) return
 
-        b.fhsCardFirewallUnivRulesCount.text = "0"
-        b.fhsCardIpRulesCount.text = "0"
-        b.fhsCardDomainRulesCount.text = "0"
+        updateRulesPageCounts(RULES_PAGE_UNIVERSAL, 0)
+        updateRulesPageCounts(RULES_PAGE_IP, 0)
+        updateRulesPageCounts(RULES_PAGE_DOMAIN, 0)
         b.fhsFirewallBadgesRow.alpha = INACTIVE_ELEMENT_ALPHA
     }
 
@@ -1645,8 +2218,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // subtle, low-emphasis hint instead of the oversized legacy label
         b.fhsCardDnsConnectedDns.text = getString(R.string.hsf_dns_mode_off_indicator)
         b.fhsCardDnsConnectedDns.alpha = 0.75f
-        b.fhsCardDnsLatency.text = getString(R.string.lbl_disabled).lowercase()
-        b.fhsCardDnsLatency.isSelected = true
+        b.fhsCardDnsLatency.visibility = View.GONE
     }
 
     private fun disableAppsCard() {
@@ -1691,6 +2263,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             uiCtx {
                 lastDnsP50 = p50
                 renderDnsHeadline()
+                b.fhsCardDnsLatency.visibility = View.VISIBLE
                 b.fhsCardDnsLatency.isSelected = true
                 startDnsStatePolling()
             }
@@ -1745,6 +2318,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
 
         val parts = listOfNotNull(status, latency)
+        b.fhsCardDnsLatency.visibility = View.VISIBLE
         b.fhsCardDnsLatency.text =
             if (parts.isEmpty()) b.fhsCardDnsLatency.context.getString(R.string.lbl_inactive)
             else parts.joinToString(" · ")
@@ -1817,17 +2391,41 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * state (the same source as the heatmap) inside [buildLogsHeatmap];
      * nothing is observed from the log databases here.
      */
-    private fun observeLogsCount() {
-        b.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_allowed)
-        b.fhsCardAllowedLogsLabel.visibility = View.VISIBLE
-        b.fhsCardAllowedLogsCount.visibility = View.VISIBLE
-        b.fhsCardBlockedLogsCount.visibility = View.VISIBLE
-        b.fhsCardBlockedLogsLabel.visibility = View.VISIBLE
-        b.fhsCardLogsDuration.visibility = View.VISIBLE
+    private fun observeLogsCount(animateTransition: Boolean = true) {
+        b.fhsCardLogsLl.visibility = View.VISIBLE
+        logsPage.fhsCardAllowedLogsLabel.text = getString(R.string.lbl_allowed)
+        logsPage.fhsCardAllowedLogsLabel.visibility = View.VISIBLE
+        logsPage.fhsCardAllowedLogsCount.visibility = View.VISIBLE
+        logsPage.fhsCardBlockedLogsCount.visibility = View.VISIBLE
+        logsPage.fhsCardBlockedLogsLabel.visibility = View.VISIBLE
+        logsPage.fhsCardLogsDuration.visibility = View.VISIBLE
+        logsPage.fhsLogsGrid.visibility = View.VISIBLE
+        logsPage.fhsLogsHourAxis.visibility = View.VISIBLE
+        logsPage.fhsLogsLegend.visibility = View.VISIBLE
+        logsPage.fhsLogsToggleGroup.visibility = View.VISIBLE
+        // expand the pager back; the transition grows the card smoothly so
+        animateLogsCardTransition(animateTransition)
+        logsCardActive = true
+        b.fhsLogsPager.visibility = View.VISIBLE
+        updateLogsDotsVisibility()
+        b.fhsLogsDisabledRow.visibility = View.GONE
+        b.fhsLogsEnableChip.visibility = View.GONE
 
         // render immediately from the cached aggregate so the header counts
         // are not blank until the next aggregator emission
         lastActivityState?.let { buildLogsHeatmap(it, displayMode) }
+    }
+
+    /**
+     * Wraps the card's enable/disable visibility changes in a transition so
+     * the collapse/expand of the pager animates instead of snapping the card
+     * and everything below it into a new size.
+     */
+    private fun animateLogsCardTransition(animate: Boolean = true) {
+        if (!animate) return
+        (b.fhsCardLogsLl.parent as? ViewGroup)?.let { parent ->
+            TransitionManager.beginDelayedTransition(parent)
+        }
     }
 
     private fun formatDecimal(i: Long?): String {
@@ -1870,9 +2468,83 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val univ = persistentState.getUniversalRulesCount()
         val ips = IpRulesManager.getCustomIpsLiveData().value ?: 0
         val doms = DomainRulesManager.getUniversalCustomDomainCount().value ?: 0
-        b.fhsCardFirewallUnivRulesCount.text = compactRuleCount(univ)
-        b.fhsCardIpRulesCount.text = compactRuleCount(ips)
-        b.fhsCardDomainRulesCount.text = compactRuleCount(doms)
+        updateRulesPageCounts(RULES_PAGE_UNIVERSAL, univ)
+        updateRulesPageCounts(RULES_PAGE_IP, ips)
+        updateRulesPageCounts(RULES_PAGE_DOMAIN, doms)
+    }
+
+    /**
+     * Wires the swipeable rules card: pages carry the per-type rule counts as
+     * plain text ("24 · universal IP rules") so a new user can tell what the
+     * numbers mean at a glance, and a tap on the visible page opens the
+     * matching rules screen. Swiping moves between the three rule types; the
+     * dots below the pager mirror the selected page.
+     */
+    private fun setupFirewallRulesCard() {
+        rulesPagesAdapter.onRulePageTapped = { position -> openRulesScreen(position) }
+        b.fhsFirewallRulesPager.adapter = rulesPagesAdapter
+        b.fhsFirewallRulesPager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
+        rulesPagerCallback = object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateRulesDots(position)
+            }
+        }
+        b.fhsFirewallRulesPager.registerOnPageChangeCallback(rulesPagerCallback!!)
+        updateRulesDots(b.fhsFirewallRulesPager.currentItem)
+    }
+
+    private fun updateRulesPageCounts(page: Int, count: Int) {
+        rulesPagesAdapter.updateCount(page, compactRuleCount(count))
+    }
+
+    /** Dims the inactive dots; the selected dot stays fully opaque. */
+    private fun updateRulesDots(position: Int) {
+        if (view == null || !isAdded) return
+
+        listOf(b.fhsRulesDot0, b.fhsRulesDot1, b.fhsRulesDot2).forEachIndexed { index, dot ->
+            dot.alpha = if (index == position) 1f else DOT_UNSELECTED_ALPHA
+        }
+    }
+
+    /** Opens the rules screen that matches the page the user tapped. */
+    private fun openRulesScreen(position: Int) {
+        when (position) {
+            RULES_PAGE_UNIVERSAL -> {
+                Logger.v(LOG_TAG_UI, "$TAG: tap on universal firewall rules page")
+                startActivity(Intent(requireContext(), UniversalFirewallSettingsActivity::class.java))
+                logEvent(
+                    EventType.UI_NAVIGATION,
+                    "HomeScreen: Universal firewall page tapped",
+                    "Navigating to UniversalFirewallSettingsActivity from HomeScreenFragment"
+                )
+            }
+            RULES_PAGE_IP -> {
+                Logger.v(LOG_TAG_UI, "$TAG: tap on universal IP rules page")
+                val intent = Intent(requireContext(), CustomRulesActivity::class.java)
+                intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
+                intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
+                intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
+                startActivity(intent)
+                logEvent(
+                    EventType.UI_NAVIGATION,
+                    "HomeScreen: IP rules page tapped",
+                    "Navigating to CustomRulesActivity (IP tab) from HomeScreenFragment"
+                )
+            }
+            RULES_PAGE_DOMAIN -> {
+                Logger.v(LOG_TAG_UI, "$TAG: tap on universal domain rules page")
+                val intent = Intent(requireContext(), CustomRulesActivity::class.java)
+                intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
+                intent.putExtra(CustomRulesActivity.INTENT_RULES, CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type)
+                intent.putExtra(Constants.INTENT_UID, Constants.UID_EVERYBODY)
+                startActivity(intent)
+                logEvent(
+                    EventType.UI_NAVIGATION,
+                    "HomeScreen: Domain rules page tapped",
+                    "Navigating to CustomRulesActivity (domain tab) from HomeScreenFragment"
+                )
+            }
+        }
     }
 
     private fun compactRuleCount(count: Int): String {
@@ -1940,7 +2612,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsCardAllowedApps.text = allowedApps.toString()
                         b.fhsCardAllowedApps.isSelected = true
                         b.fhsAppsLabel.visibility = View.VISIBLE
-                        b.fhsCardAppsAllApps.text = getString(R.string.two_argument_space, getString(R.string.symbol_slash), allApps.toString())
+                        b.fhsCardAppsAllApps.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_slash), allApps.toString())
                         b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
                         b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
                         b.fhsCardAppsBypassedCount.text = getString(R.string.two_argument_space, bypassCount.toString(), getString(R.string.fapps_firewall_filter_bypass_universal).lowercase())
@@ -2392,6 +3064,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         proxyStatusLiveData = null
         dnsObserverActive = false
         stopBorderAnimation()
+        // ViewPager2 keeps a global reference to its callback; unregistering
+        // here prevents it from outliving the (recreated) view
+        logsPagerCallback?.let { b.fhsLogsPager.unregisterOnPageChangeCallback(it) }
+        logsPagerCallback = null
+        logsDotsHideJob?.cancel()
+        logsDotsHideJob = null
+        topAppsHeaderRevertJob?.cancel()
+        topAppsHeaderRevertJob = null
+        rulesPagerCallback?.let { b.fhsFirewallRulesPager.unregisterOnPageChangeCallback(it) }
+        rulesPagerCallback = null
+        // RecyclerView unregisters its AdapterDataObserver only on adapter
+        // swap; the lazy rulesPagesAdapter outlives the view, so detach it
+        b.fhsFirewallRulesPager.adapter = null
+        b.fhsLogsPager.adapter = null
         super.onDestroyView()
     }
 
@@ -2523,7 +3209,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
         // runtime permission for notification (Android 13)
         getNotificationPermissionIfNeeded()
-        VpnController.start(requireContext(), true)
+        // user-initiated start must always reach the service: autoAttempt=true
+        // would silently drop the request when the service instance is alive
+        // but the tunnel is down, leaving the button stuck on START
+        VpnController.start(requireContext())
     }
 
     private fun getNotificationPermissionIfNeeded() {

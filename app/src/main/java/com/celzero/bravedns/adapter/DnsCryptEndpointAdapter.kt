@@ -56,6 +56,9 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
     ) {
     var lifecycleOwner: LifecycleOwner? = null
 
+    // RecyclerView callbacks run on the main thread, so no synchronization is needed.
+    private val activeHolders = mutableSetOf<DnsCryptEndpointViewHolder>()
+
     companion object {
         private const val ONE_SEC = 1000L
         private val DIFF_CALLBACK =
@@ -87,10 +90,22 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
                 false
             )
         lifecycleOwner = parent.findViewTreeLifecycleOwner()
-        return DnsCryptEndpointViewHolder(itemBinding)
+        return DnsCryptEndpointViewHolder(itemBinding).also { activeHolders.add(it) }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        // cancel polling jobs before dropping the lifecycle owner, otherwise the
+        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
+        activeHolders.forEach { it.cancelStatusCheckIfAny() }
+        activeHolders.clear()
+        lifecycleOwner = null
     }
 
     override fun onBindViewHolder(holder: DnsCryptEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val dnsCryptEndpoint: DnsCryptEndpoint = getItem(position) ?: return
         holder.update(dnsCryptEndpoint)
     }
@@ -107,6 +122,10 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
         fun update(endpoint: DnsCryptEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
+        }
+
+        fun cancelStatusCheckIfAny() {
+            statusCheckJob?.cancel()
         }
 
         private fun setupClickListeners(endpoint: DnsCryptEndpoint) {

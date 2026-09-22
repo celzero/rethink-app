@@ -768,7 +768,6 @@
     <string name="lbl_action_required" translatable="true">Diperlukan Tindakan</string>
     <string name="lbl_ip_rules" translatable="true">Aturan IP</string>
     <string name="lbl_domain_rules" translatable="true">Aturan Domain</string>
-    <string name="bsdl_block_desc" translatable="true">Blokir, percayai &lt;u&gt;domain ini&lt;/u&gt;</string>
     <string name="lbl_rules" translatable="true">aturan</string>
     <string name="lbl_configure" translatable="true">Konfigurasikan</string>
     <string name="lbl_logs" translatable="true">Log</string>
@@ -1240,7 +1239,6 @@
     <string name="fapps_filter_sort_name" translatable="true">Nama</string>
     <string name="fapps_filter_sort_package" translatable="true">Nama paket</string>
     <string name="fapps_filter_sort_uid" translatable="true">UID</string>
-    <string name="bsdl_app_block_desc" translatable="true">Blokir, percayai &lt;u&gt;domain ini&lt;/u&gt; untuk aplikasi ini</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard tidak dapat diaktifkan dalam mode hanya-DNS. Beralih ke mode Firewall atau DNS+Firewall.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">Konfigurasi One-WireGuard yang aktif sedang digunakan. Nonaktifkan terlebih dahulu untuk menggunakan konfigurasi WireGuard individual.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Konfigurasi WireGuard tidak valid</string>
@@ -1309,6 +1307,4 @@
     <string name="rpn_stats_empty" translatable="true">Tidak ada koneksi yang melalui server terpilih dalam 24 jam terakhir.</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Mulai Rethink untuk melihat statistik proksi</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s koneksi</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">Relay diaktifkan</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">Relay diaktifkan untuk satu atau beberapa lokasi. Mengaktifkan otomatisasi pada lokasi Auto juga akan menjeda lokasi-lokasi tersebut. Apakah Anda ingin melanjutkan?</string>
 </resources>

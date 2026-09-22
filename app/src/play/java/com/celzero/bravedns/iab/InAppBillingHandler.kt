@@ -385,7 +385,7 @@ object InAppBillingHandler : KoinComponent {
                     isInitialized.set(false)
                     loge(mname, "failed to initialize state machine: ${e.message}", e)
                     withContext(Dispatchers.Main) {
-                        billingListener?.onConnectionResult(false, "State machine initialization failed: ${e.message}")
+                        this@InAppBillingHandler.billingListener?.onConnectionResult(false, "State machine initialization failed: ${e.message}")
                     }
                     return@launch
                 }
@@ -400,7 +400,7 @@ object InAppBillingHandler : KoinComponent {
                 } else {
                     loge(mname, "billing connection failed: $message")
                 }
-                billingListener?.onConnectionResult(isSuccess, message)
+                this@InAppBillingHandler.billingListener?.onConnectionResult(isSuccess, message)
             }
         }
     }
@@ -409,6 +409,16 @@ object InAppBillingHandler : KoinComponent {
         val mname = this::registerListener.name
         this.billingListener = billingListener
         log(mname, "listener registered")
+    }
+
+    fun unregisterListener(billingListener: BillingListener?) {
+        val mname = this::unregisterListener.name
+        if (this.billingListener == billingListener) {
+            this.billingListener = null
+            log(mname, "listener unregistered")
+        } else {
+            logd(mname, "unregisterListener: listener mismatch or already null")
+        }
     }
 
     private fun setupBillingClient(context: Context) {
@@ -1299,7 +1309,7 @@ object InAppBillingHandler : KoinComponent {
         }
     }
 
-    suspend fun reconcilePurchase() {
+    suspend fun reconcilePurchase(force: Boolean = false): Boolean {
         val mname = this::reconcilePurchase.name
         val thresholdToCheckWinExpiryTs: Long = TimeUnit.DAYS.toMillis(10) // 10 days in ms
         // time when the entitlement reconciliation should be considered CONST
@@ -1311,67 +1321,74 @@ object InAppBillingHandler : KoinComponent {
         val entitlement = getEntitlementDetails()
         val entitlementExpiry = entitlement?.expiry()
 
-        if (activePurchase.isEmpty()) return
-
-        if (entitlementExpiry == null) {
-            logd(mname, "missing entitlement expiry, skipping reconcile")
-            return
+        if (activePurchase.isEmpty()) {
+            logd(mname, "no active purchase, skipping reconcile")
+            return false
         }
 
-        val windscribeExpiry = VpnController.getWinExpiryTs()
+        if (!force) {
+            if (entitlementExpiry == null) {
+                logd(mname, "missing entitlement expiry, skipping reconcile")
+                return false
+            }
 
-        if (windscribeExpiry == null) {
-            logd(mname, "missing entitlement or win expiry, skipping reconcile")
-            return
-        }
+            val windscribeExpiry = VpnController.getWinExpiryTs()
 
-        if (windscribeExpiry > entitlementExpiry) {
-            logd(mname, "win expiry is ahead of entitlement expiry, skipping reconcile")
-            return
-        }
+            if (windscribeExpiry == null) {
+                logd(mname, "missing entitlement or win expiry, skipping reconcile")
+                return false
+            }
 
-        // if the value of the win expiry is less than 30 days then start checking
-        val now = System.currentTimeMillis()
-        if (windscribeExpiry - now > expiryDifferenceTs) {
-            logd(mname, "win expiry is beyond threshold, skipping reconcile")
-            return
-        }
+            if (windscribeExpiry > entitlementExpiry) {
+                logd(mname, "win expiry is ahead of entitlement expiry, skipping reconcile")
+                return false
+            }
 
-        if (entitlementExpiry - windscribeExpiry < thresholdToCheckWinExpiryTs) {
-            logd(mname, "expiry gap is below reconciliation threshold, skipping reconcile")
-            return
+            // if the value of the win expiry is less than 30 days then start checking
+            val now = System.currentTimeMillis()
+            if (windscribeExpiry - now > expiryDifferenceTs) {
+                logd(mname, "win expiry is beyond threshold, skipping reconcile")
+                return false
+            }
+
+            if (entitlementExpiry - windscribeExpiry < thresholdToCheckWinExpiryTs) {
+                logd(mname, "expiry gap is below reconciliation threshold, skipping reconcile")
+                return false
+            }
+        } else {
+            log(mname, "forced reconcile, bypassing threshold checks")
         }
 
         // fetch entitlement and reconcile with the purchase
         val purchaseDtl = subscriptionStateMachine.getSubscriptionData()?.purchaseDetail
         if (purchaseDtl == null) {
             loge(mname, "missing purchase detail, skipping reconcile")
-            return
+            return false
         }
 
         // windscribe entitlement can be less than what the expiry which user has purchased
         // (entitlement expiry), if the value of the win expiry is less than 30
         // [thresholdToCheckWinExpiryTs] days then start checking for the windscribe expiry
-        val newPurchaseDtl = queryEntitlementFromServer(getObfuscatedAccountId(), getObfuscatedDeviceId(), purchaseDtl)
-        try {
+        return try {
+            val newPurchaseDtl = queryEntitlementFromServer(getObfuscatedAccountId(), getObfuscatedDeviceId(), purchaseDtl)
             storeWinEntitlement(newPurchaseDtl.payload)
             log(mname, "new entitlement updated")
-        } catch (e: Exception) {
-            loge(mname, "storeWinEntitlement failed: ${e.message}", e)
-            return
-        }
 
-        // Update state machine with fresh payload (non-fatal)
-        try {
-            val subsData = subscriptionStateMachine.getSubscriptionData()
-            if (subsData != null) {
-                subsData.subscriptionStatus.developerPayload = newPurchaseDtl.payload
-                val updatedSubsData = subsData.copy(purchaseDetail = newPurchaseDtl)
-                subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
-                log(mname, "state machine payload updated")
+            try {
+                val subsData = subscriptionStateMachine.getSubscriptionData()
+                if (subsData != null) {
+                    subsData.subscriptionStatus.developerPayload = newPurchaseDtl.payload
+                    val updatedSubsData = subsData.copy(purchaseDetail = newPurchaseDtl)
+                    subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                    log(mname, "state machine payload updated")
+                }
+            } catch (e: Exception) {
+                loge(mname, "state machine update failed (non-fatal): ${e.message}")
             }
+            true
         } catch (e: Exception) {
-            loge(mname, "state machine update failed (non-fatal): ${e.message}")
+            loge(mname, "reconcile failed: ${e.message}", e)
+            false
         }
     }
 

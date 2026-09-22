@@ -1,8 +1,10 @@
 package com.celzero.bravedns.service
 
 import android.content.Intent
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.shadows.LenientResourcesShadow
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.bravedns.util.OrbotHelper
 import io.mockk.every
@@ -21,11 +23,15 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 
+// SDK pinned: hermetic sandbox (see app/src/test/resources/robolectric.properties).
+// LenientResourcesShadow: without merged app resources, notification-channel
+// setup in onCreate() would throw Resources.NotFoundException.
 @RunWith(RobolectricTestRunner::class)
-@Config(shadows = [ShadowBackend::class])
+@Config(shadows = [ShadowBackend::class, LenientResourcesShadow::class], sdk = [28])
 class BraveVPNServiceLifecycleTest : KoinTest {
 
     private lateinit var serviceController: ServiceController<BraveVPNService>
@@ -37,6 +43,10 @@ class BraveVPNServiceLifecycleTest : KoinTest {
 
     @Before
     fun setup() {
+        // The service enqueues a SubscriptionCheckWorker during startup;
+        // WorkManager must be initialized (the manifest initializer is not
+        // active under Robolectric) or WorkManager.getInstance() throws.
+        WorkManagerTestInitHelper.initializeTestWorkManager(RuntimeEnvironment.getApplication())
         mockkObject(IpRulesManager)
         startKoin {
             modules(module {

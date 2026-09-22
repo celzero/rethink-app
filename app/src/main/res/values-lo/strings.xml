@@ -916,8 +916,6 @@
     <string name="exclude_apps_from_proxy">ໃຫ້ແອັບຂ້າມພຣັອກຊີທັງໝົດ</string>
     <string name="exclude_apps_from_proxy_failure_toast">ແອັບນີ້ຂ້າມພຣັອກຊີ</string>
     <string name="bsac_title_desc" translatable="true">ກົດນຳໃຊ້ກັບແອັບນີ້ເທົ່ານັ້ນ.</string>
-    <string name="bsdl_block_desc" translatable="true">ບລັອກ, ເຊື່ອຖື &lt;u&gt;ໂດເມນນີ້&lt;/u&gt;</string>
-    <string name="bsdl_app_block_desc" translatable="true">ບລັອກ, ເຊື່ອຖື &lt;u&gt;ໂດເມນນີ້&lt;/u&gt; ສຳລັບແອັບນີ້</string>
     <string name="bsdl_blocked_desc" translatable="true">ບລັອກ %1$s ໂດຍ %2$s</string>
     <string name="network_dns" translatable="true">DNS ຂອງລະບົບ</string>
     <string name="notif_download_content_title" translatable="true">ດາວໂຫຼດລາຍຊື່ບລັອກໃນອຸປະກອນ</string>
@@ -1247,8 +1245,6 @@
     <string name="qs_relay_failure_toast" translatable="true">ອັບເດດການສົ່ງຕໍ່ສຳລັບ %1$d ສະຖານທີ່ລົ້ມເຫຼວ</string>
     <string name="qs_relay_automation_dialog_title" translatable="true">ເປີດໃຊ້ງານອັດຕະໂນມັດແລ້ວ</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">ເປີດໃຊ້ງານລະບົບອັດຕະໂນມັດສຳລັບສະຖານທີ່ອັດຕະໂນມັດແລ້ວ, ເຊິ່ງຈະມີຜົນຕໍ່ສະຖານທີ່ນີ້ເຊັ່ນກັນ. ທ່ານຕ້ອງການດຳເນີນການຕໍ່ບໍ່?</string>
-    <string name="rpn_automation_relay_dialog_title" translatable="true">ເປີດໃຊ້ການສົ່ງຕໍ່ແລ້ວ</string>
-    <string name="rpn_automation_relay_dialog_message" translatable="true">ເປີດໃຊ້ການສົ່ງຕໍ່ສຳລັບໜຶ່ງ ຫຼື ຫຼາຍສະຖານທີ່ແລ້ວ. ການເປີດໃຊ້ງານລະບົບອັດຕະໂນມັດໃນສະຖານທີ່ອັດຕະໂນມັດ ຈະເຮັດໃຫ້ສະຖານທີ່ເຫຼົ່ານັ້ນຖືກຢຸດຊົ່ວຄາວເຊັ່ນກັນ. ທ່ານຕ້ອງການດຳເນີນການຕໍ່ບໍ່?</string>
     <string name="rpn_bypass_apps_count" translatable="true">ຂ້າມ %1$d ແອັບ</string>
     <string name="rpn_bypass_apps_none" translatable="true">ບໍ່ມີແອັບທີ່ຖືກຂ້າມ</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">ຕ້ອງການຂ້າມແອັບທັງໝົດບໍ່?</string>

@@ -16,14 +16,13 @@
 package com.celzero.bravedns.customdownloader
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_OKHTTP
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Daemons
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_OKHTTP
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,22 +31,15 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
-import retrofit2.Retrofit
 import org.koin.core.context.GlobalContext
+import retrofit2.Retrofit
 import java.net.InetAddress
 import java.net.Proxy
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import kotlin.enums.enumEntries
-import androidx.core.net.toUri
 
 class RetrofitManager {
-
-    init {
-        // enable the OkHttp's logging only in debug mode for testing
-        if (DEBUG) OkHttpDebugLogging.enableHttp2()
-        if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
-    }
 
     companion object {
         private const val CONNECT_TIMEOUT_MINUTES = 1L

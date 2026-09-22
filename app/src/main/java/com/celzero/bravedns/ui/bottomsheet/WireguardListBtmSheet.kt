@@ -27,7 +27,6 @@ import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -86,11 +85,6 @@ class WireguardListBtmSheet :
         DOMAIN (0),
         IP (1),
         APP (2)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun getTheme(): Int =

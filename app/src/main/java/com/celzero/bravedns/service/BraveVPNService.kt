@@ -131,6 +131,7 @@ import com.celzero.firestack.backend.Client
 import com.celzero.firestack.backend.DNSOpts
 import com.celzero.firestack.backend.DNSSummary
 import com.celzero.firestack.backend.DNSTransport
+import com.celzero.firestack.backend.DomainOpts
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxy
 import com.celzero.firestack.backend.RDNS
@@ -574,6 +575,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         this.protect(fd.toInt())
     }
 
+    /**
+     * Builds the [Builder] for the VPN interface from the current persistent state:
+     * underlying networks, meteredness, app exclusions, and the allow-bypass flag
+     * (skipped in lockdown mode as the platform disallows bypass then). The caller
+     * ([establishVpn]) chains routes, DNS, and addresses onto this before
+     * [Builder.establish].
+     */
     private suspend fun newBuilder(): Builder {
         val builder = Builder()
         val underlyingNws = getUnderlays()
@@ -593,6 +601,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         if (isAtleastQ()) {
             builder.setMetered(persistentState.setVpnBuilderToMetered)
             logd("builder: set metered: ${persistentState.setVpnBuilderToMetered}")
+        }
+
+        if (!vpnLockdown && persistentState.allowBypass) {
+            builder.allowBypass()
+            logd("builder: allow bypass: true")
         }
 
         // route rethink traffic in rethink based on the user selection
@@ -728,7 +741,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // buckets) from the databases so the heatmap is ready immediately
         // at VPN start.
         io("logActivityHistory") {
-            logActivityAggregator.restoreFromDatabase()
+            try {
+                logActivityAggregator.restoreFromDatabase()
+            } catch (e: Exception) {
+                // cache warm is best-effort; the heatmap repopulates later
+                Logger.w(LOG_TAG_VPN, "logActivityHistory warm failed: ${e.message}")
+            }
         }
 
 
@@ -1469,6 +1487,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         notifyConnectionStateChangeIfNeeded()
     }
 
+    /**
+     * Reacts to [PersistentState] changes: builder-affecting preferences (ex:
+     * [PersistentState.PRIVATE_IPS], [PersistentState.ALLOW_BYPASS]) request a
+     * debounced tunnel restart so the new builder takes effect; others update
+     * DNS, firewall, or notification state in place.
+     */
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         /* TODO Check on the Persistent State variable
         Check on updating the values for Package change and for mode change.
@@ -1618,6 +1642,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             PersistentState.PRIVATE_IPS -> {
                 // restart vpn to enable/disable route lan traffic
                 val reason = "routeLanTraffic: ${persistentState.privateIps}"
+                vpnRestartTrigger.value = reason
+            }
+
+            PersistentState.ALLOW_BYPASS -> {
+                // restart vpn to allow/disallow apps to bypass the tunnel
+                val reason = "allowBypass: ${persistentState.allowBypass}"
                 vpnRestartTrigger.value = reason
             }
 
@@ -2990,6 +3020,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // conn-tracking state so the next VPN session doesn't inherit stale
         // active connections / closable cids / rx-traffic timer from this one
         TunFlowManager.clear()
+        // same for TunDnsManager's fid -> dns-filter-decision cache
+        TunDnsManager.clearTrackedDnsFilterReasons()
 
         unobserveOrbotStartStatus()
         unobserveAppInfos()
@@ -3684,6 +3716,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyAdded: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             refreshOrPauseOrResumeOrReAddProxies()
         }
@@ -3726,6 +3759,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             } else if (pid.contains(ID_WG_BASE, true)) {
                 logd("onProxyUpdated: wg proxy added $pid, handle post addition logics")
                 vpnAdapter?.handleOnWgAdded(pid)
+                updateSplitProxyInfo(pid)
             }
             // pause/resume option is not handled here as firestack is taking care of maintaining
             // the state of the proxies
@@ -3745,6 +3779,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     override fun onDNSStopped() {
         // no-op
         Logger.v(LOG_TAG_VPN, "onDNSStopped")
+    }
+
+    override fun onPrequery(p0: String, p1: String, p2: String, p3: Long): DomainOpts? {
+        return null
     }
 
     override fun onSvcComplete(p0: ServerSummary) {
@@ -3829,6 +3867,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     // requires go2kt if there any calls to go functions
     override fun flowing(m: Mark?) {
         TunFlowManager.handleFlowing(m)
+    }
+
+    // call this method everytime when there is a proxy added or updated
+    private suspend fun updateSplitProxyInfo(pid: String) {
+        val supportedIpVersion = VpnController.getSupportedIpVersion(pid)
+        val splitProxyInfo = vpnAdapter?.isSplitTunnelProxy(pid, supportedIpVersion) ?: false
+        // update the info to the wireguard cache, so it can be used during flow requests
+        WireguardManager.updateSplitProxyInfo(pid, splitProxyInfo)
     }
 
     private fun isLockdown(): Boolean {
