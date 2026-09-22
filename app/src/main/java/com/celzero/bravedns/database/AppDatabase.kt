@@ -1348,7 +1348,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-        val MIGRATION_30_31: Migration =
+        internal val MIGRATION_30_31: Migration =
             object : Migration(30, 31) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     if (!doesColumnExistInTable(db, "AppInfo", "notes")) {
