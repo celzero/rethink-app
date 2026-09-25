@@ -421,7 +421,7 @@ androidComponents {
     }
 }
 
-val download by configurations.creating {
+val download = configurations.create("download") {
     isTransitive = false
 }
 
