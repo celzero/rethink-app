@@ -339,7 +339,7 @@ android {
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
             // for build type alpha, versionCode is set in env overriding gradle.properties
-            versionCode = getVersionCode()
+            versionCode = appVersionCode
             versionName = gitVersion
             buildConfigField("int", "BASE_VERSION_CODE", appVersionCode.toString())
             vectorDrawables.useSupportLibrary = true
@@ -347,7 +347,7 @@ android {
         create("tv") {
             dimension = "releaseType"
             applicationIdSuffix = ".tv"
-            versionCode = getVersionCode()
+            versionCode = appVersionCode
             versionName = gitVersion
             buildConfigField("int", "BASE_VERSION_CODE", appVersionCode.toString())
             vectorDrawables.useSupportLibrary = true
