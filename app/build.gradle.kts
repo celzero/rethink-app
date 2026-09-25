@@ -125,7 +125,7 @@ fun getVersionCode(): Int {
         logger.info("missing env version code: ${ex.message}")
     }
     if (code == 0) {
-        code = project.properties["VERSION_CODE"]?.toString()?.toIntOrNull() ?: 0
+        code = project.providers.gradleProperty("VERSION_CODE").get().toIntOrNull() ?: 0
         logger.info("project properties version code: $code")
     }
     return code
