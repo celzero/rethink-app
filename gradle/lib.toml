@@ -1,4 +1,7 @@
 [versions]
+android-compileSdk = "37"
+android-minSdk = "23"
+android-targetSdk = "37"
 agp = "9.4.0"
 kotlin = "2.4.10"
 googleServices = "4.4.4"
