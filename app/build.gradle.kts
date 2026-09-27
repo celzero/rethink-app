@@ -90,7 +90,7 @@ logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 if (!deGoogled) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
-    logger.info("app firebase plugins applied")
+    logger.warn("app firebase plugins applied")
 } else {
     logger.info("app firebase plugins SKIPPED (non-play build)")
 }
@@ -199,10 +199,10 @@ android {
     splits {
         abi {
             if (!shouldSplit) {
-                logger.info("universal apk only (splits disabled)")
+                logger.warn("universal apk only (splits disabled)")
                 isEnable = false
             } else {
-                logger.info("split apks and universal apk (splits enabled)")
+                logger.warn("split apks and universal apk (splits enabled)")
                 isEnable = true
                 reset()
                 // comma-separated list of ABIs to generate apks for
@@ -246,10 +246,10 @@ android {
                 }
             }
             signingConfig = if (isWebsiteDegoogled) {
-                logger.info("IzzyOnDroid build: using izzyondroid signing config")
+                logger.warn("IzzyOnDroid build: using izzyondroid signing config")
                 signingConfigs.getByName("izzyondroid")
             } else {
-                logger.info("Normal build: using config signing config")
+                logger.warn("Normal build: using config signing config")
                 signingConfigs.getByName("config")
             }
             // IzzyOnDroid builds ship as com.celzero.bravedns.izzy
@@ -380,9 +380,9 @@ android {
             storePassword = tvKsStorePassphrase
         }
         buildTypes.getByName("release").signingConfig = tvRelease
-        println("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
+        logger.warn("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
     } else {
-        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; using the configured release signing config")
+        logger.warn("rethink-tv: TV_RELEASE_KS_* env vars NOT set; using the configured release signing config")
     }
 }
 
