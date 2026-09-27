@@ -5,12 +5,12 @@ import java.util.Properties
 import java.lang.reflect.Method
 
 plugins {
-    id("com.android.application")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.ksp)
     // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
     // Compose-for-TV UI. Safe to apply project-wide — phone variants
     // contain no @Composable and the plugin then no-ops.
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.kotlinCompose)
     // To generate a BOM in CycloneDX format:
     // ./gradlew cyclonedxBom
     // id("org.cyclonedx.bom") version "3.2.4"

@@ -63,9 +63,6 @@ uiautomator = "2.3.0"
 ksp = "2.3.9"
 
 [libraries]
-androidToolsBuildGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
-jetbrainsKotlinKotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-jetbrainsKotlinComposeCompilerGradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 googleGmsGoogleServices = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 googleFirebaseFirebaseCrashlyticsGradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
 googleGuavaGuava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -161,4 +158,8 @@ androidxBenchmarkBenchmarkMacroJunit4 = { module = "androidx.benchmark:benchmark
 androidxTestUiautomatorUiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 
 [plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidTest = { id = "com.android.test", version.ref = "agp" }
+# Required by the TV flavor's Compose UI.
+kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
