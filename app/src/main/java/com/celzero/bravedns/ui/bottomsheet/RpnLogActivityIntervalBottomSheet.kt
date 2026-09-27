@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.WindowCountRow
@@ -33,6 +32,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.adapter.AppActivityAdapter
 import com.celzero.bravedns.ui.adapter.AppActivityEntry
 import com.celzero.bravedns.ui.adapter.AppActivitySummary
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.convertLongToTime
@@ -41,8 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-
-import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 
 /**
  * RPN-scoped variant of [LogActivityIntervalBottomSheet]: identical list

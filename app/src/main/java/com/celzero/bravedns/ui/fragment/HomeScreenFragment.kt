@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
@@ -49,9 +50,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.widget.FrameLayout
 import android.widget.GridLayout
 import android.widget.LinearLayout
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -65,10 +66,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
@@ -115,6 +114,8 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.custom.AppHistogramView
+import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_FAST_ROTATION_MS
+import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_SLOW_ROTATION_MS
 import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
@@ -146,6 +147,7 @@ import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -154,7 +156,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import android.graphics.drawable.Drawable
 import java.util.Calendar
 import java.util.Locale
 import java.util.Locale.getDefault

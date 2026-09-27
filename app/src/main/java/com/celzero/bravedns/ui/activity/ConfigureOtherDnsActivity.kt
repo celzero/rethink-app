@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityConfigureOtherDnsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -32,6 +31,7 @@ import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
 class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other_dns) {

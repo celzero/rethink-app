@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -35,14 +33,13 @@ import androidx.appcompat.widget.AppCompatRadioButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -52,6 +49,8 @@ import com.celzero.bravedns.ui.bottomsheet.RethinkInRethinkWarningBottomSheet
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -60,6 +59,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

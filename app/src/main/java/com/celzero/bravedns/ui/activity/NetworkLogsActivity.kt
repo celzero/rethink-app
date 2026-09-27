@@ -23,7 +23,6 @@ import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
@@ -43,6 +42,7 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.tabs.TabLayoutMediator
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
 class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {

@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
@@ -34,6 +33,7 @@ import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
 import com.celzero.bravedns.util.Utilities
+import dev.androidbroadcast.vbpd.viewBinding
 
 class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 

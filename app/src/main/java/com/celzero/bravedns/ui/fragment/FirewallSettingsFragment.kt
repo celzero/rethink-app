@@ -19,7 +19,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentFirewallSettingsBinding
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
@@ -27,6 +26,7 @@ import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.core.component.KoinComponent
 
 class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), KoinComponent {

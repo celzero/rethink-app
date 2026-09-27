@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -24,7 +22,7 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
+import androidx.core.view.isVisible
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -33,14 +31,16 @@ import com.celzero.bravedns.databinding.ActivityAntiCensorshipBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.settings.Settings
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
-import androidx.core.view.isVisible
 
 class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     val b by viewBinding(ActivityAntiCensorshipBinding::bind)

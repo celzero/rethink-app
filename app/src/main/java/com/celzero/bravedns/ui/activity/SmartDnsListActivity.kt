@@ -20,7 +20,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivitySmartDnsListBinding
 import com.celzero.bravedns.service.PersistentState
@@ -29,6 +28,7 @@ import com.celzero.bravedns.ui.fragment.SmartDnsListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
 class SmartDnsListActivity : BaseActivity(R.layout.activity_smart_dns_list) {

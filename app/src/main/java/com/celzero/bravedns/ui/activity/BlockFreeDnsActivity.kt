@@ -15,15 +15,12 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.BlockFreeDnsAdapter
 import com.celzero.bravedns.data.BlockFreeDnsItem
@@ -31,10 +28,13 @@ import com.celzero.bravedns.data.BlockFreeDnsType
 import com.celzero.bravedns.databinding.ActivityBlockFreeDnsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.BlockFreeDnsViewModel
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
