@@ -113,24 +113,24 @@ val gitVersion = providers.exec {
 }.standardOutput.asText.get().trim()
 
 fun getVersionCode(): Int {
-    var code = 0
-    try {
-        val envCode = System.getenv("VERSION_CODE")
-        if (!envCode.isNullOrEmpty()) {
-            code = envCode.toInt()
-            logger.info("env version code: $code")
-        }
-    } catch (ex: NumberFormatException) {
-        logger.info("missing env version code: ${ex.message}")
+    val envVersionCode = System.getenv("VERSION_CODE")
+    if (envVersionCode == null) {
+        logger.info("missing env version code")
     }
-    if (code == 0) {
-        code = project.providers.gradleProperty("VERSION_CODE").get().toIntOrNull() ?: 0
-        logger.info("project properties version code: $code")
-    }
-    return code
+    val versionCodeValue = envVersionCode
+        ?: project.providers.gradleProperty("VERSION_CODE").orNull
+        ?: throw GradleException(
+            "VERSION_CODE is missing. Set it in the environment or as a Gradle property; it must be a positive integer."
+        )
+
+    return versionCodeValue.toIntOrNull()?.takeIf { it > 0 }
+        ?: throw GradleException(
+            "Invalid VERSION_CODE '$versionCodeValue': expected a positive integer greater than zero."
+        )
 }
 
 val appVersionCode = getVersionCode()
+logger.info("version code: $appVersionCode")
 
 try {
     if (keystorePropertiesFile.exists()) {
