@@ -391,7 +391,6 @@ kotlin {
         languageVersion.set(
             KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast("."))
         )
-        jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll("-Xwarning-level=SENSELESS_COMPARISON:disabled")
     }
 }
