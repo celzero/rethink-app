@@ -111,4 +111,20 @@ class RpnPurchaseAckServerResponseTest {
         assertTrue(result is RpnPurchaseAckServerResponse.Ok)
         assertFalse((result as RpnPurchaseAckServerResponse.Ok).payload.isCancelled)
     }
+
+    @Test
+    fun `2xx without a body is not ok`() {
+        val result = RpnPurchaseAckServerResponse.from(null, 200)
+
+        assertTrue(result is RpnPurchaseAckServerResponse.Err)
+        assertEquals(200, (result as RpnPurchaseAckServerResponse.Err).payload.httpCode)
+    }
+
+    @Test
+    fun `non-json 2xx body from a proxy is not ok`() {
+        val result = RpnPurchaseAckServerResponse.from("<html>Login required</html>", 200)
+
+        assertTrue(result is RpnPurchaseAckServerResponse.Err)
+        assertFalse((result as RpnPurchaseAckServerResponse.Err).payload.isPurchaseCancelled)
+    }
 }
