@@ -25,6 +25,7 @@ import android.graphics.RectF
 import android.graphics.SweepGradient
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.ColorUtils
+import kotlin.math.roundToInt
 
 /**
  * Pill-shaped border whose color is a sweep gradient that rotates, so a
@@ -178,7 +179,7 @@ class RotatingBorderDrawable : Drawable() {
         val table = baseColors ?: return
         // shift the base table by the rotation, expressed in table steps
         val shift =
-            Math.round(rotationDegrees / 360f * COLOR_TABLE_SIZE).toInt() % COLOR_TABLE_SIZE
+            (rotationDegrees / 360f * COLOR_TABLE_SIZE).roundToInt() % COLOR_TABLE_SIZE
         val colors = IntArray(COLOR_TABLE_SIZE) { i -> table[(i + shift) % COLOR_TABLE_SIZE] }
         val positions = FloatArray(COLOR_TABLE_SIZE) { i -> i / (COLOR_TABLE_SIZE - 1f) }
         paint.shader = SweepGradient(rect.centerX(), rect.centerY(), colors, positions)
@@ -209,7 +210,7 @@ class RotatingBorderDrawable : Drawable() {
 
     companion object {
         // resolution of the sweep pattern; 5deg steps are visually smooth at
-        // the animation speed used (one full turn every ~3s)
+        // the animation speed used (one full turn every few seconds)
         private const val COLOR_TABLE_SIZE = 72
 
         // saturation/brightness of the rainbow highlight; slightly softened
