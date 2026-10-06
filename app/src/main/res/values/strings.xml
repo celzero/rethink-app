@@ -773,6 +773,16 @@
     <string name="settings_pcap_dialog_option_3" translatable="true">Output to the Downloads folder</string>
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
+    <string name="pcap_mode_section_title" translatable="true">Capture mode</string>
+    <string name="pcap_files_section_title" translatable="true">Captured files</string>
+    <string name="pcap_empty_state" translatable="true">No pcap files yet. Files written by packet capture appear here.</string>
+    <string name="pcap_delete_file_confirmation" translatable="true">Delete %1$s?</string>
+    <string name="pcap_delete_all_confirmation" translatable="true">Delete all captured pcap files? The active capture, if any, will be stopped.</string>
+    <string name="pcap_file_delete_failed_toast" translatable="true">Could not delete %1$s</string>
+    <string name="pcap_active_file_label" translatable="true">Active capture</string>
+    <string name="pcap_view_file_desc" translatable="true">View pcap file</string>
+    <string name="pcap_open_failed_toast" translatable="true">Could not open</string>
+    <string name="pcap_open_folder" translatable="true">Open folder</string>
 
     <string name="settings_biometric_dialog_heading" translatable="true">Biometric Authentication</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">None</string>

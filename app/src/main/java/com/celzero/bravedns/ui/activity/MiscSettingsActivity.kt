@@ -15,10 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
-import com.celzero.bravedns.util.Logger.updateConfigLevel
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
@@ -30,21 +26,15 @@ import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.provider.Settings
-import android.text.InputType
-import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -70,6 +60,7 @@ import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.PcapFilesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.TaskerAutomationBottomSheet
 import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.Constants
@@ -77,6 +68,10 @@ import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.LogLifespan
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.updateConfigLevel
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.SnackbarHelper
@@ -107,7 +102,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
+class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
+    PcapFilesBottomSheet.PcapModeSelectListener {
     private val b by viewBinding(ActivityMiscSettingsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -447,43 +443,27 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
-        val items =
-            arrayOf(
-                getString(R.string.settings_pcap_dialog_option_1),
-                getString(R.string.settings_pcap_dialog_option_2),
-                getString(R.string.settings_pcap_dialog_option_3),
-            )
-        val checkedItem = persistentState.pcapMode
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            dialog.dismiss()
-            if (persistentState.pcapMode == which) {
-                return@setSingleChoiceItems
+        val sheet = PcapFilesBottomSheet()
+        sheet.modeSelectListener = this
+        sheet.show(supportFragmentManager, PcapFilesBottomSheet::class.java.simpleName)
+    }
+
+    override fun onPcapModeSelected(mode: PcapMode) {
+        when (mode) {
+            PcapMode.NONE -> {
+                appConfig.setPcap(PcapMode.NONE.id)
             }
 
-            when (PcapMode.getPcapType(which)) {
-                PcapMode.NONE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_1)
-                    appConfig.setPcap(PcapMode.NONE.id)
-                }
-
-                PcapMode.LOGCAT -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_2)
-                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
-                }
-
-                PcapMode.EXTERNAL_FILE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_3)
-                    createAndSetPcapFile()
-                }
+            PcapMode.LOGCAT -> {
+                appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
             }
-            logEvent("PCAP mode set to ${PcapMode.getPcapType(which)}")
+
+            PcapMode.EXTERNAL_FILE -> {
+                createAndSetPcapFile()
+            }
         }
-        alertBuilder.create().show()
+        logEvent("PCAP mode set to $mode")
+        displayPcapUi()
     }
 
     private fun displayAppThemeUi() {
@@ -811,7 +791,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             workScheduler.schedulePurgeConnectionsLog()
             val selectedItem = items[which]
             b.genSettingsLogLifespanDesc.text = selectedItem
-            logEvent("Log lifespan set to ${selectedItem}")
+            logEvent("Log lifespan set to $selectedItem")
 
         }
 
