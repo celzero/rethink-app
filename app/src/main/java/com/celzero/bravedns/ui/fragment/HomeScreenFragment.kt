@@ -269,14 +269,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // animated border ring around the start button (VPN-off call-to-action)
         private const val BORDER_STROKE_WIDTH_DP = 2.5f
-        // duration of one full swing across the contrast color band; the ring
-        // spins fast until the first swing completes, then settles slower
+        // duration of one full 360° sweep of the rainbow hue wheel
         private const val BORDER_HUE_CYCLE_MS = 3000L
-        // half-width of the hue band around the complementary hue, so the
-        // highlight stays on the contrasting side of the wheel
-        private const val BORDER_HUE_SWING_DEG = 30f
-        private const val BORDER_FAST_ROTATION_MS = 1200L
-        private const val BORDER_SLOW_ROTATION_MS = 3000L
+        // duration of one full ring turn; rotation runs at this constant pace
+        // for the lifetime of the animation (no fast/slow phases)
+        private const val BORDER_ROTATION_MS = 4000L
 
         // UI interaction delays (milliseconds)
         private const val UI_DELAY_MS = 500L
@@ -738,12 +735,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * pill drawable whose sweep-gradient highlight rotates via its shader
      * matrix, so only the border moves — never the shape.
      *
-     * The highlight color stays inside the complementary band of the button's
-     * own accent (accentGood), resolved from the active theme: hues near the
-     * fill color would blend into the button, while the opposite side of the
-     * wheel always contrasts. The hue swings smoothly across that band while
-     * the ring spins fast; once the first color swing completes, the rotation
-     * settles to a slower, calmer pace.
+     * The highlight traverses the entire hue wheel at a constant rate,
+     * producing a rainbow cycle; it starts from the hue opposite the button's
+     * fill color (accentGood) so the first frame always contrasts. The ring
+     * itself rotates at one fixed speed for the animation's lifetime — there
+     * are no fast or slow phases.
      */
     private fun startBorderAnimation() {
         val ctx = context ?: return
@@ -764,7 +760,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
 
         if (rotationAnimator?.isRunning == true) return
-        // center of the contrast band: the hue directly opposite the fill
+        // rainbow starts opposite the fill color so the first frame contrasts
         val hsv = FloatArray(3)
         Color.colorToHSV(UIUtils.fetchColor(ctx, R.attr.accentGood), hsv)
         val contrastHue = (hsv[0] + 180f) % 360f
@@ -777,15 +773,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener { anim ->
                 val elapsed = SystemClock.elapsedRealtime() - startElapsedMs
-                // triangle wave: sweep to one edge of the band and back
+                // linear sweep across the full hue wheel per cycle
                 val frac =
                     (elapsed % BORDER_HUE_CYCLE_MS).toFloat() / BORDER_HUE_CYCLE_MS
-                val swing = if (frac <= 0.5f) frac * 2f else 2f - frac * 2f
                 // single combined update: one color-table/shader rebuild and
                 // one invalidation per frame instead of one per property
                 // (negated so the highlight travels counterclockwise)
                 drawable.setHighlightHueAndRotation(
-                    contrastHue + swing * BORDER_HUE_SWING_DEG,
+                    contrastHue + frac * 360f,
                     -borderRotationFor(elapsed)
                 )
             }
@@ -795,17 +790,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Ring rotation for a given elapsed time: one turn per [BORDER_FAST_ROTATION_MS]
-     * during the first hue cycle, then one turn per [BORDER_SLOW_ROTATION_MS].
+     * Ring rotation for a given elapsed time: one turn per [BORDER_ROTATION_MS],
+     * at a constant pace for the animation's lifetime.
      */
-    private fun borderRotationFor(elapsedMs: Long): Float {
-        val fastTurns = BORDER_HUE_CYCLE_MS.toFloat() / BORDER_FAST_ROTATION_MS
-        if (elapsedMs <= BORDER_HUE_CYCLE_MS) {
-            return (elapsedMs.toFloat() / BORDER_FAST_ROTATION_MS) * 360f
-        }
-        val slowMs = elapsedMs - BORDER_HUE_CYCLE_MS
-        return (fastTurns + slowMs.toFloat() / BORDER_SLOW_ROTATION_MS) * 360f
-    }
+    private fun borderRotationFor(elapsedMs: Long): Float =
+        (elapsedMs.toFloat() / BORDER_ROTATION_MS) * 360f
 
     private fun stopBorderAnimation() {
         rotationAnimator?.cancel()
@@ -2668,9 +2657,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsAppsLabel.visibility = View.VISIBLE
                         b.fhsCardAppsAllApps.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_slash), allApps.toString())
                         b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
+                        b.fhsCardAppsBlockedCount.isSelected = true
                         b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
+                        b.fhsCardAppsIsolatedCount.isSelected = true
                         b.fhsCardAppsBypassedCount.text = getString(R.string.two_argument_space, bypassCount.toString(), getString(R.string.fapps_firewall_filter_bypass_universal).lowercase())
+                        b.fhsCardAppsBypassedCount.isSelected = true
                         b.fhsCardAppsExcludedCount.text = getString(R.string.two_argument_space, excludedCount.toString(), getString(R.string.fapps_firewall_filter_excluded).lowercase())
+                        b.fhsCardAppsExcludedCount.isSelected = true
                     }
                 } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                     Logger.e(
