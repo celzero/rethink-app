@@ -1197,7 +1197,7 @@ class GoVpnAdapter : KoinComponent {
                 status
             } else {
                 val status = getProxies()?.getProxy(id)?.status()
-                Logger.d(LOG_TAG_VPN, "$TAG proxy status($id): $status")
+                Logger.vv(LOG_TAG_VPN, "$TAG proxy status($id): $status")
                 Pair(status, "")
             }
         } catch (ex: Exception) {
@@ -1686,7 +1686,7 @@ class GoVpnAdapter : KoinComponent {
             if (id == Backend.RpnWin || id.startsWith(Backend.RpnWin)) {
                 val win = getWinByKey(id)
                 val stats = win?.router()?.stat()
-                Logger.d(LOG_TAG_VPN, "$TAG rpn-win proxy status: $stats")
+                Logger.vv(LOG_TAG_VPN, "$TAG rpn-win proxy status: $stats")
                 stats
             } else {
                 val stats = getProxies()?.getProxy(id)?.router()?.stat()
