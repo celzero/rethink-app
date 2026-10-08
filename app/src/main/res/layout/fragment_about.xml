@@ -835,11 +835,6 @@
 
         </LinearLayout>
 
-        <!-- Sponsor coda: the end of the About page dissolves into a faint, full-width
-             tonal wash that peaks behind the sponsor logos and the version footer, then
-             fades back into the page. No card, border, or solid background — the wash
-             (about_sponsor_blend) is drawn by a separate non-interactive view so only
-             the background is softened, never the logos or text. -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -876,11 +871,6 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/small_font_text_view" />
 
-                <!-- Logos: all three render inside identical 80x24dp bounds so the row
-                     reads as one evenly-sized composition; fitCenter preserves each
-                     asset's own aspect ratio inside the box (letterboxing is invisible
-                     on the transparent wash). To scale the whole row, change the box
-                     size on all three images together. -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -925,9 +915,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
-                    android:alpha="0.75"
+                    android:alpha="0.6"
                     android:gravity="center"
-                    android:lineSpacingExtra="4dp"
+                    android:lineSpacingExtra="3dp"
                     android:textColor="?attr/primaryLightColorText"
                     android:textIsSelectable="true"
                     android:textSize="@dimen/small_font_text_view"
@@ -937,10 +927,10 @@
                     android:id="@+id/token_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:alpha="0.75"
+                    android:alpha="0.6"
                     android:ellipsize="end"
                     android:gravity="center"
-                    android:lineSpacingExtra="4dp"
+                    android:lineSpacingExtra="3dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:textColor="?attr/primaryLightColorText"
@@ -957,7 +947,8 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="24dp"
                     android:gravity="center"
-                    android:alpha="0.75"
+                    android:alpha="0.6"
+                    android:lineSpacingExtra="3dp"
                     android:paddingBottom="40dp"
                     android:text="@string/about_license"
                     android:textColor="?attr/primaryLightColorText"
