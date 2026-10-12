@@ -432,20 +432,20 @@ interface ConnectionTrackerDAO {
     // last app routed through a proxy (RPN/WG). proxyDetails holds the proxy id
     // (e.g. Backend.RpnWin + configKey); the wildcard match mirrors the filter used
     // by ConnectionTrackerFragment when navigated from the RPN detail screen.
-    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 1")
+    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName not like '%Unknown%' order by timeStamp desc limit 1")
     suspend fun getLastRoutedConnectionForProxy(proxyId: String): ConnectionTracker?
 
-    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 24")
+    @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName not like '%Unknown%' order by timeStamp desc limit 24")
     suspend fun getRecentRoutedConnectionsForProxy(proxyId: String): List<ConnectionTracker>
 
     // most recently routed apps for a single rpn proxy with connection count
-    @Query("select uid as uid, appName as appName, packageName as packageName, count(*) as count from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' group by uid order by max(timeStamp) desc limit :limit")
+    @Query("select uid as uid, appName as appName, packageName as packageName, count(*) as count from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName not like '%Unknown%' group by uid order by max(timeStamp) desc limit :limit")
     suspend fun getRecentRoutedAppsWithCount(proxyId: String, limit: Int): List<RecentRoutedAppRow>
 
     // Cumulative recent activity across every RPN proxy: [prefix] is matched as a
     // prefix of proxyDetails (all win-proxy ids share the Backend.RpnWin prefix).
     // Blocked rows are kept so the feed's status dot can distinguish them.
-    @Query("select * from ConnectionTracker where proxyDetails like :prefix || '%' and appName != '%Unknown%' order by timeStamp desc limit :limit")
+    @Query("select * from ConnectionTracker where proxyDetails like :prefix || '%' and appName not like '%Unknown%' order by timeStamp desc limit :limit")
     suspend fun getRecentConnectionsByProxyPrefix(prefix: String, limit: Int): List<ConnectionTracker>
 
     // Time-windowed aggregates for the network-pulse summary. Counting/summing
