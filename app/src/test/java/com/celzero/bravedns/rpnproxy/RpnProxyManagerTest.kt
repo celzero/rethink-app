@@ -25,7 +25,6 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.iab.BillingBackendClient
-import com.celzero.bravedns.iab.DidResult
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.QueryEntitlementResult
@@ -105,6 +104,8 @@ class RpnProxyManagerTest : KoinTest {
 
         mockkObject(VpnController)
         mockkObject(InAppBillingHandler)
+        // The real handler posts UI on the main dispatcher, which never runs under runTest.
+        coEvery { InAppBillingHandler.handleUnauthorized401(any(), any(), any()) } just Runs
         mockkObject(EncryptedFileManager)
         mockkObject(ProxyManager)
         mockkObject(IpRulesManager)
@@ -367,7 +368,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns updatedPurchase
         coEvery { mockSubscriptionStatusDb.updateDeveloperPayload(any(), any(), any()) } returns 1
         every { mockStateMachine.getSubscriptionData() } returns null
@@ -416,7 +417,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } throws RuntimeException("Server error")
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { token() } returns "db-token"
@@ -449,7 +450,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns updatedPurchase
         every { mockStateMachine.getSubscriptionData() } returns subData
         coEvery { mockSubscriptionStatusDb.updateDeveloperPayload(any(), any(), any()) } returns 1
@@ -978,7 +979,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { expiry() } returns futureIso
         }
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
 
         val expiry = RpnProxyManager.getExpiryFromPayload(payload)
         assertNotNull(expiry)
@@ -1227,7 +1228,7 @@ class RpnProxyManagerTest : KoinTest {
             lastUpdated = System.currentTimeMillis()
         )
         every { mockStateMachine.getSubscriptionData() } returns subData
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         every { mockPersistentState.appTestMode } returns false
 
         RpnProxyManager.consumePurchaseIfTest()
@@ -1418,35 +1419,34 @@ class RpnProxyManagerTest : KoinTest {
     }
 
     /**
-     * R11a: when identity reconciliation under the purchase accountId fails with 401
-     * (the recvCid/storedCid "did verification failed" loop), Restore Defaults must
-     * fail fast with an authorization-specific reason and must NOT proceed to the
-     * entitlement query with a broken DID.
+     * R11a: when no DID is bound to the purchase cid, Restore Defaults must fail fast
+     * with a device-registration reason and must NOT proceed to the entitlement query
+     * with a missing DID (identity reconciliation happens at purchase time, not here).
      */
     @Test
-    fun `resetAndRefetchRpn identity reconciliation 401 fails fast with auth reason`() = runTest {
+    fun `resetAndRefetchRpn missing bound DID fails fast without entitlement query`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.reconcileDidForCid(any()) } returns DidResult.error(401)
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns ""
 
         val result = RpnProxyManager.resetAndRefetchRpn()
 
         assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
         val reason = (result as RpnProxyManager.ResetResult.Failure).reason
-        assertTrue("reason should mention authorization: $reason", reason.contains("authorization", ignoreCase = true))
-        // Must not query entitlement with an unreconciled DID
+        assertTrue("reason should mention device registration: $reason", reason.contains("device registration", ignoreCase = true))
+        // Must not query entitlement without a DID
         coVerify(exactly = 0) { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) }
     }
 
     /**
-     * R11b: identity reconciles (fresh DID persisted by BillingBackendClient) but the
-     * entitlement query still returns 401 — Restore Defaults must surface an
-     * authorization failure instead of queryEntitlementFromServer's silent
-     * "return the original purchase" (which produced a stale-payload fake success).
+     * R11b: a DID is bound to the purchase cid but the entitlement query still returns
+     * 401 — Restore Defaults must surface an authorization failure instead of
+     * queryEntitlementFromServer's silent "return the original purchase" (which
+     * produced a stale-payload fake success).
      */
     @Test
     fun `resetAndRefetchRpn entitlement 401 surfaces auth failure not fake success`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.reconcileDidForCid(any()) } returns DidResult("did-fresh-123")
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Unauthorized("acc-reset-1234", "did-fresh-123")
 
@@ -1459,16 +1459,20 @@ class RpnProxyManagerTest : KoinTest {
         coVerify(exactly = 0) {
             InAppBillingHandler.queryEntitlementFromServer(any(), any(), any())
         }
+        // The 401 must reach the shared auth-error funnel (UI surfacing + identity recovery)
+        coVerify(exactly = 1) {
+            InAppBillingHandler.handleUnauthorized401(any(), any(), any())
+        }
     }
 
     /**
-     * R11c: identity OK, entitlement Success but an empty payload — the explicit
+     * R11c: DID bound, entitlement Success but an empty payload — the explicit
      * payload guard still fails the reset (no empty-entitlement WIN registration).
      */
     @Test
     fun `resetAndRefetchRpn empty payload fails explicitly`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.reconcileDidForCid(any()) } returns DidResult("did-fresh-123")
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = ""))
 

@@ -26,5 +26,17 @@ class ShadowGoSeq {
         fun __staticInitializer__() {
             // no-op: prevent native library loading
         }
+
+        @Implementation
+        @JvmStatic
+        fun trackGoRef(refnum: Int, ref: go.Seq.GoObject?) {
+            // no-op: real impl tracks refs in a queue initialized by the skipped static init
+        }
+
+        @Implementation
+        @JvmStatic
+        fun incGoRef(refnum: Int, ref: go.Seq.GoObject?) {
+            // no-op: real impl is backed by the native library
+        }
     }
 }

@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -77,6 +78,11 @@ class InAppBillingHandlerTest : KoinTest {
 
     private lateinit var context: Context
     private val mockPersistentState: PersistentState = mockk(relaxed = true)
+
+    // Backing state for the persisted empty-SUBS window (see setup): the production
+    // timestamp lives in PersistentState, so the tests simulate the SharedPreferences
+    // read/write pair on the relaxed mock.
+    private var firstSeenTsState: Long = 0L
     private val mockBillingBackendClient: BillingBackendClient = mockk(relaxed = true)
     private val mockSecureIdentityStore: SecureIdentityStore = mockk(relaxed = true)
     private val mockEventLogger: EventLogger = mockk(relaxed = true)
@@ -135,11 +141,13 @@ class InAppBillingHandlerTest : KoinTest {
         every { mockStateMachine.currentState } returns stateFlow
         every { mockBillingClient.isReady } returns true
 
-        // Reset private counters and state
-        setPrivateField(InAppBillingHandler, "consecutiveEmptySubsQueries", 0)
+        // Reset state. The SUBS empty-window timestamp is persisted in PersistentState,
+        // so back the property with test-local state.
+        firstSeenTsState = 0L
+        every { mockPersistentState.iabEmptySubsFirstSeenTs } answers { firstSeenTsState }
+        every { mockPersistentState.iabEmptySubsFirstSeenTs = any() } answers { firstSeenTsState = firstArg() }
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 0)
-        setPrivateField(InAppBillingHandler, "lastEmptySubsStrikeTs", 0L)
         // isInitialized is an AtomicBoolean; reset its value rather than replacing the field.
         @Suppress("UNCHECKED_CAST")
         val initFlag = getPrivateField<java.util.concurrent.atomic.AtomicBoolean>(InAppBillingHandler, "isInitialized")
@@ -166,16 +174,13 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     /**
-     * Rewinds the empty-SUBS strike time-gate so the NEXT strike counts as a new
-     * one (simulates [InAppBillingHandler.EMPTY_QUERY_MIN_SPAN_MS] wall-clock time
-     * having passed since the previous counted strike).
+     * Marks the empty-SUBS window as fully elapsed (simulates
+     * [InAppBillingHandler.EMPTY_QUERY_WINDOW_MS] of wall-clock time having passed
+     * since the first empty snapshot), so the NEXT empty snapshot arms the expiry path.
      */
-    private fun rewindEmptySubsTimeGate() {
-        setPrivateField(
-            InAppBillingHandler,
-            "lastEmptySubsStrikeTs",
-            System.currentTimeMillis() - InAppBillingHandler.EMPTY_QUERY_MIN_SPAN_MS - 1000L
-        )
+    private fun expireEmptySubsWindow() {
+        firstSeenTsState =
+            System.currentTimeMillis() - InAppBillingHandler.EMPTY_QUERY_WINDOW_MS - 1000L
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -307,13 +312,15 @@ class InAppBillingHandlerTest : KoinTest {
     @Test
     fun `getObfuscatedAccountId returns blank on 401 and posts auth error`() = runTest {
         coEvery { mockSecureIdentityStore.get(any()) } returns Pair("", "")
-        coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Unauthorized
+        coEvery { mockBillingBackendClient.resolveIdentity() } returns
+            RefreshIdentityResult.Unauthorized("cid-rejected-401")
 
         val accountId = InAppBillingHandler.getObfuscatedAccountId()
 
         assertEquals("", accountId)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
+        assertEquals("cid-rejected-401", (err as ServerApiError.Unauthorized401).accountId)
     }
 
     @Test
@@ -349,19 +356,37 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     @Test
-    fun `resolveDeviceId returns null when device id is blank`() = runTest {
-        coEvery { mockSecureIdentityStore.get(any()) } returns Pair("cid-1", "")
-        coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Success("cid-1", "")
+    fun `did mint failure alerts only for definitive server errors`() {
+        // Transport blanks and 5xx are transient: silent retry, no user alert.
+        assertFalse(InAppBillingHandler.isDefinitiveDidFailure(-1))
+        assertFalse(InAppBillingHandler.isDefinitiveDidFailure(500))
+        assertFalse(InAppBillingHandler.isDefinitiveDidFailure(503))
+        // 4xx and a refused rebind cannot succeed on retry: surface device-not-registered.
+        assertTrue(InAppBillingHandler.isDefinitiveDidFailure(400))
+        assertTrue(InAppBillingHandler.isDefinitiveDidFailure(401))
+        assertTrue(InAppBillingHandler.isDefinitiveDidFailure(499))
+        assertTrue(InAppBillingHandler.isDefinitiveDidFailure(BillingBackendClient.DID_REBIND_REFUSED))
+    }
 
-        // resolveDeviceId is a private suspend fun: reflection needs the Continuation
-        // parameter added by the compiler; it completes synchronously on a stubbed
-        // mock so a null continuation is safe.
-        val result = InAppBillingHandler::class.java
-            .getDeclaredMethod("resolveDeviceId", String::class.java, Continuation::class.java)
-            .apply { isAccessible = true }
-            .invoke(InAppBillingHandler, "testCaller", null)
+    @Test
+    fun `did mint transient failure retries silently while definitive failure alerts`() = runTest {
+        if (InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.DeviceNotRegistered) {
+            // Pre-existing sticky alert from another test; skip rather than false-fail.
+            return@runTest
+        }
 
-        assertNull(result)
+        // 503 on the mint endpoint is transient: silent retry, no device-not-registered alert.
+        InAppBillingHandler.scheduleAckRetryAndAlert(
+            "cid-abc", alert = InAppBillingHandler.isDefinitiveDidFailure(503))
+        assertTrue(InAppBillingHandler.serverApiErrorLiveData.value !is ServerApiError.DeviceNotRegistered)
+
+        // 403 is definitive: the device-not-registered error is posted.
+        InAppBillingHandler.scheduleAckRetryAndAlert(
+            "cid-abc", alert = InAppBillingHandler.isDefinitiveDidFailure(403))
+        awaitUntil { InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.DeviceNotRegistered }
+        val posted = InAppBillingHandler.serverApiErrorLiveData.value
+        assertTrue(posted is ServerApiError.DeviceNotRegistered)
+        assertEquals("cid-abc", (posted as ServerApiError.DeviceNotRegistered).entitlementCid)
     }
 
     // =========================================================================
@@ -437,7 +462,7 @@ class InAppBillingHandlerTest : KoinTest {
     // =========================================================================
 
     @Test
-    fun `handlePurchase triggers SUBS reconcile only after threshold is reached`() = runTest {
+    fun `handlePurchase triggers SUBS reconcile only after the empty window elapses`() = runTest {
         val listenerSlot = slot<PurchasesResponseListener>()
         every { mockBillingClient.queryPurchasesAsync(any<QueryPurchasesParams>(), capture(listenerSlot)) } just Runs
 
@@ -447,15 +472,16 @@ class InAppBillingHandlerTest : KoinTest {
 
         // fetchPurchases launches on billingScope — wait for the listener to be captured
         awaitUntil { listenerSlot.isCaptured }
-        // Process each response sequentially: counter increments are async and would race.
-        // Each strike must be time-gated apart (EMPTY_QUERY_MIN_SPAN_MS) or the
-        // queryPurchases fan-out would trip the threshold within one second.
+        // First empty snapshot: opens the window, expiry path must NOT run.
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
-        rewindEmptySubsTimeGate()
-        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
-        rewindEmptySubsTimeGate()
+        awaitUntil { firstSeenTsState != 0L }
+        coVerify(exactly = 0) {
+            mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
+        }
+
+        // Simulate the window having fully elapsed; the next empty snapshot arms the
+        // expiry path exactly once.
+        expireEmptySubsWindow()
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
 
         coVerify(timeout = 10000, exactly = 1) {
@@ -464,7 +490,7 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     @Test
-    fun `handlePurchase does NOT trigger SUBS reconcile below threshold`() = runTest {
+    fun `handlePurchase does NOT trigger SUBS reconcile while the window is open`() = runTest {
         val listenerSlot = slot<PurchasesResponseListener>()
         every { mockBillingClient.queryPurchasesAsync(any<QueryPurchasesParams>(), capture(listenerSlot)) } just Runs
 
@@ -474,11 +500,10 @@ class InAppBillingHandlerTest : KoinTest {
 
         awaitUntil { listenerSlot.isCaptured }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        rewindEmptySubsTimeGate()
+        awaitUntil { firstSeenTsState != 0L }
+        // A second empty while the window is open must not arm the expiry path.
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        // Only 2 counted empty queries, threshold is 3 — reconcile should NOT fire yet.
-        // Wait until processing of both responses has actually run.
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
+        Thread.sleep(500)
 
         coVerify(exactly = 0) {
             mockStateMachine.reconcileWithPlayBilling(emptyList(), any(), any(), BillingClient.ProductType.SUBS)
@@ -514,15 +539,12 @@ class InAppBillingHandlerTest : KoinTest {
 
         val okResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
 
-        // Fire SUBS empty 3 times (sequentially, time-gated) - should trigger reconcile
+        // Fire SUBS empties: open the window, let it elapse, then arm the expiry path.
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
         awaitUntil { listenerSlot.isCaptured }
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
-        rewindEmptySubsTimeGate()
-        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
-        rewindEmptySubsTimeGate()
+        awaitUntil { firstSeenTsState != 0L }
+        expireEmptySubsWindow()
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
 
         coVerify(timeout = 10000, exactly = 1) {
@@ -542,7 +564,7 @@ class InAppBillingHandlerTest : KoinTest {
     }
 
     @Test
-    fun `non-empty SUBS response resets SUBS empty counter`() = runTest {
+    fun `non-empty SUBS response resets SUBS empty window`() = runTest {
         val listenerSlot = slot<PurchasesResponseListener>()
         every { mockBillingClient.queryPurchasesAsync(any<QueryPurchasesParams>(), capture(listenerSlot)) } just Runs
 
@@ -552,29 +574,26 @@ class InAppBillingHandlerTest : KoinTest {
         InAppBillingHandler.fetchPurchases(listOf(BillingClient.ProductType.SUBS))
 
         // Each listener call spawns async processing on billingScope — processing order
-        // is not guaranteed unless each step waits for the counter to reflect it.
+        // is not guaranteed unless each step waits for the window state to reflect it.
         awaitUntil { listenerSlot.isCaptured }
 
-        // Fire 2 counted empty queries (time-gated apart)
+        // Fire one empty (opens the window)
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
-        rewindEmptySubsTimeGate()
-        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 2 }
+        awaitUntil { firstSeenTsState != 0L }
 
-        // Fire non-empty (resets counter)
+        // Fire non-empty (resets the window)
         listenerSlot.captured.onQueryPurchasesResponse(okResult, listOf(purchase))
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 0 }
+        awaitUntil { firstSeenTsState == 0L }
 
-        // Fire 1 more empty — should NOT trigger reconcile (counter was reset)
+        // Fire 1 more empty — re-opens a FRESH window; the expiry path must NOT run.
         listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
-        awaitUntil { getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries") == 1 }
+        awaitUntil { firstSeenTsState != 0L }
 
-        // The counter was reset by the non-empty response and incremented once by the
-        // final empty response — reconcile must not have been triggered by the threshold.
+        // The window was reset by the non-empty response and re-opened by the final
+        // empty response — reconcile must not have been triggered by the expiry path.
         // (reconcileWithPlayBilling may legitimately fire from handlePurchase itself for
         // the non-empty purchase, so the raw mock is not verified here.)
-        assertEquals(1, getPrivateField<Int>(InAppBillingHandler, "consecutiveEmptySubsQueries"))
+        assertTrue(firstSeenTsState != 0L)
     }
 
     // =========================================================================
@@ -583,93 +602,145 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `cancelPlaySubscription success path`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(true, "OK")
-        coEvery { mockStateMachine.userCancelled(any(), any()) } returns Unit
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Success("OK")
+        // The terminal event fires exactly once, inside updateCancelledSubscription
+        // (which also verifies the DB row reached a terminal state); the handler must
+        // not fire a second userCancelled itself.
+        coEvery { RpnProxyManager.updateCancelledSubscription(any(), any()) } returns true
 
-        // Mock RpnProxyManager.updateCancelledSubscription — not explicitly mocked,
-        // so the real impl runs. The real impl calls subscriptionStateMachine.userCancelled()
-        // which is mocked via relaxed mockk, so it returns Unit.
         val result = InAppBillingHandler.cancelPlaySubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertTrue(result.first)
-        assertEquals("Subscription cancelled successfully", result.second)
+        assertTrue(result.isSuccess)
+        assertEquals("Subscription cancelled successfully", result.text)
         coVerify { mockBillingBackendClient.cancelPurchase("acc-1", "did-1", InAppBillingHandler.STD_PRODUCT_ID, "tok-1") }
-        // Cancel flows are token-strict: the purchase token must be forwarded so
-        // handleUserCancelled stamps exactly that row.
-        coVerify(atLeast = 1) { mockStateMachine.userCancelled("tok-1", any()) }
+        coVerify(exactly = 1) { RpnProxyManager.updateCancelledSubscription("acc-1", "tok-1") }
+        // The handler itself must NOT apply a second terminal event.
+        coVerify(exactly = 0) { mockStateMachine.userCancelled(any(), any()) }
     }
 
     @Test
     fun `cancelPlaySubscription returns false on server failure`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(false, "Server error")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Failure("Server error")
 
         val result = InAppBillingHandler.cancelPlaySubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
-        assertEquals("Server error", result.second)
+        assertFalse(result.isSuccess)
+        assertEquals("Server error", result.text)
     }
 
     @Test
     fun `cancelPlaySubscription handles 401 unauthorized`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(false, "Unauthorized")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Unauthorized("Unauthorized")
 
         val result = InAppBillingHandler.cancelPlaySubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
+        assertFalse(result.isSuccess)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
     }
 
     @Test
     fun `cancelPlaySubscription handles 409 conflict`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(false, "Conflict")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Conflict("Conflict")
 
         val result = InAppBillingHandler.cancelPlaySubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
-        assertTrue(result.second.contains("Conflict"))
+        assertFalse(result.isSuccess)
+        assertTrue(result.text.contains("Conflict"))
     }
 
     @Test
     fun `revokeSubscription success path`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(true, "OK")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Success("OK")
+        // The real updateRevokedSubscription verifies the DB row was flipped to REVOKED;
+        // the injected repository mock is not resolvable here, so stub the boundary.
+        coEvery { RpnProxyManager.updateRevokedSubscription(any(), any()) } returns true
 
         val result = InAppBillingHandler.revokeSubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertTrue(result.first)
-        assertEquals("Subscription revoked successfully", result.second)
+        assertTrue(result.isSuccess)
+        assertEquals("Subscription revoked successfully", result.text)
         coVerify { mockBillingBackendClient.revokePurchase("acc-1", "did-1", InAppBillingHandler.STD_PRODUCT_ID, "tok-1") }
     }
 
     @Test
     fun `revokeSubscription returns false on server failure`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(false, "Server error")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Failure("Server error")
 
         val result = InAppBillingHandler.revokeSubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
-        assertEquals("Server error", result.second)
+        assertFalse(result.isSuccess)
+        assertEquals("Server error", result.text)
     }
 
     @Test
     fun `revokeSubscription handles 401 unauthorized`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(false, "Unauthorized")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Unauthorized("Unauthorized")
 
         val result = InAppBillingHandler.revokeSubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
+        assertFalse(result.isSuccess)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
     }
 
     @Test
     fun `revokeSubscription handles 409 conflict`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(false, "Conflict")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Conflict("Conflict")
 
         val result = InAppBillingHandler.revokeSubscription("acc-1", "did-1", "tok-1", InAppBillingHandler.STD_PRODUCT_ID)
 
-        assertFalse(result.first)
-        assertTrue(result.second.contains("Conflict"))
+        assertFalse(result.isSuccess)
+        assertTrue(result.text.contains("Conflict"))
+    }
+
+    // =========================================================================
+    // 5b. Awaitable Purchase Refresh (post-failure reconcile)
+    // =========================================================================
+
+    @Test
+    fun `refreshPurchasesAwait returns false when billing client is not ready`() = runTest {
+        every { mockBillingClient.isReady } returns false
+
+        val result = InAppBillingHandler.refreshPurchasesAwait(
+            listOf(BillingClient.ProductType.SUBS, BillingClient.ProductType.INAPP)
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `refreshPurchasesAwait returns false for invalid product types`() = runTest {
+        val result = InAppBillingHandler.refreshPurchasesAwait(listOf("bogus"))
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `refreshPurchasesAwait completes once purchase processing finishes`() = runTest {
+        val listenerSlot = slot<PurchasesResponseListener>()
+        every { mockBillingClient.queryPurchasesAsync(any<QueryPurchasesParams>(), capture(listenerSlot)) } just Runs
+        val okResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build()
+
+        var result: Boolean? = null
+        val job = launch(Dispatchers.IO) {
+            result = InAppBillingHandler.refreshPurchasesAwait(
+                listOf(BillingClient.ProductType.INAPP, BillingClient.ProductType.SUBS)
+            )
+        }
+
+        // INAPP query fires first; an empty snapshot is a no-op for INAPP but chains
+        // the SUBS query, whose listener replaces the captured one. Responding to it
+        // is the terminal step of the refresh pipeline.
+        awaitUntil { listenerSlot.isCaptured }
+        val inappListener = listenerSlot.captured
+        inappListener.onQueryPurchasesResponse(okResult, emptyList())
+        awaitUntil { listenerSlot.captured !== inappListener }
+        listenerSlot.captured.onQueryPurchasesResponse(okResult, emptyList())
+
+        awaitUntil { result != null }
+        assertTrue(job.isCompleted)
+        assertEquals(true, result)
     }
 
     // =========================================================================
@@ -678,82 +749,83 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `cancelOneTimePurchase success path`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(true, "OK")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Success("OK")
+        // Real impl verifies the DB row reached a terminal state; stub the boundary.
+        coEvery { RpnProxyManager.updateCancelledSubscription(any(), any()) } returns true
 
         val result = InAppBillingHandler.cancelOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertTrue(result.first)
+        assertTrue(result.isSuccess)
         coVerify { mockBillingBackendClient.cancelPurchase("acc-1", "did-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS, "tok-1") }
     }
 
     @Test
     fun `cancelOneTimePurchase handles 401 unauthorized`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(false, "Unauthorized")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Unauthorized("Unauthorized")
 
         val result = InAppBillingHandler.cancelOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertFalse(result.first)
+        assertFalse(result.isSuccess)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
     }
 
     @Test
     fun `cancelOneTimePurchase handles 409 conflict`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(false, "Conflict")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Conflict("Conflict")
 
         val result = InAppBillingHandler.cancelOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertFalse(result.first)
-        assertTrue(result.second.contains("Conflict"))
+        assertFalse(result.isSuccess)
+        assertTrue(result.text.contains("Conflict"))
     }
 
     @Test
     fun `cancelOneTimePurchase server success but local state update fails`() = runTest {
-        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns Pair(true, "OK")
+        coEvery { mockBillingBackendClient.cancelPurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Success("OK")
 
-        // Force local state update to fail:
-        // RpnProxyManager.updateCancelledSubscription is not explicitly mocked (runs real impl).
-        // The real impl calls subscriptionStateMachine.userCancelled(token) which is relaxed-mock.
-        // To simulate failure, stub userCancelled for ANY token (flows are token-strict now).
-        // But since we called mockkObject(RpnProxyManager) without relaxed=true,
-        // un-mocked methods run real impl. We MUST mock it here explicitly.
-        coEvery { mockStateMachine.userCancelled(any(), any()) } throws RuntimeException("State machine error")
+        // Force local state update to fail: the real updateCancelledSubscription cannot
+        // confirm a terminal DB row (the injected repository mock is not resolvable
+        // here), so the handler must report the local failure, not a server success.
+        coEvery { RpnProxyManager.updateCancelledSubscription(any(), any()) } returns false
 
         val result = InAppBillingHandler.cancelOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertFalse(result.first)
-        assertTrue(result.second.contains("Revoked on server") || result.second.contains("Cancelled on server"))
+        assertFalse(result.isSuccess)
+        assertTrue("unexpected message: ${result.text}", result.text.contains("Local state update failed"))
     }
 
     @Test
     fun `revokeOneTimePurchase success path`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(true, "OK")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Success("OK")
+        // Real impl verifies the DB row reached a terminal state; stub the boundary.
+        coEvery { RpnProxyManager.updateRevokedSubscription(any(), any()) } returns true
 
         val result = InAppBillingHandler.revokeOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertTrue(result.first)
+        assertTrue(result.isSuccess)
         coVerify { mockBillingBackendClient.revokePurchase("acc-1", "did-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS, "tok-1") }
     }
 
     @Test
     fun `revokeOneTimePurchase handles 401 unauthorized`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(false, "Unauthorized")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Unauthorized("Unauthorized")
 
         val result = InAppBillingHandler.revokeOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertFalse(result.first)
+        assertFalse(result.isSuccess)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
     }
 
     @Test
     fun `revokeOneTimePurchase handles 409 conflict`() = runTest {
-        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns Pair(false, "Conflict")
+        coEvery { mockBillingBackendClient.revokePurchase(any(), any(), any(), any()) } returns PurchaseMutationResult.Conflict("Conflict")
 
         val result = InAppBillingHandler.revokeOneTimePurchase("acc-1", "did-1", "tok-1", InAppBillingHandler.ONE_TIME_PRODUCT_2YRS)
 
-        assertFalse(result.first)
-        assertTrue(result.second.contains("Conflict"))
+        assertFalse(result.isSuccess)
+        assertTrue(result.text.contains("Conflict"))
     }
 
     // =========================================================================
@@ -869,7 +941,8 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `acknowledgePurchaseFromServer posts auth error on 401`() = runTest {
-        coEvery { mockBillingBackendClient.acknowledgePurchase(any(), any(), any(), any()) } returns Pair(false, "Unauthorized")
+        coEvery { mockBillingBackendClient.acknowledgePurchase(any(), any(), any(), any()) } returns
+            Pair(false, BillingBackendClient.ACK_MARKER_UNAUTHORIZED)
 
         val (success, msg) = InAppBillingHandler.acknowledgePurchaseFromServer("acc-1", "did-1", "tok-1", BillingClient.ProductType.SUBS)
 
@@ -880,7 +953,8 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `acknowledgePurchaseFromServer posts conflict error on 409`() = runTest {
-        coEvery { mockBillingBackendClient.acknowledgePurchase(any(), any(), any(), any()) } returns Pair(false, "Conflict")
+        coEvery { mockBillingBackendClient.acknowledgePurchase(any(), any(), any(), any()) } returns
+            Pair(false, BillingBackendClient.ACK_MARKER_CONFLICT)
 
         val (success, msg) = InAppBillingHandler.acknowledgePurchaseFromServer("acc-1", "did-1", "tok-1", BillingClient.ProductType.SUBS)
 
@@ -1062,8 +1136,8 @@ class InAppBillingHandlerTest : KoinTest {
 
     /**
      * R5 (Bug 2 / report 2): USER_CANCELED (user backed out of the Play purchase
-     * sheet) must NOT cancel an existing valid subscription. Expected to FAIL
-     * against current code (userCancelled() is called unconditionally).
+     * sheet) must NOT cancel an existing valid subscription; only the history-only
+     * purchaseFlowCancelled is recorded.
      */
     @Test
     fun `purchasesUpdatedListener user cancellation with active subscription does not cancel subscription`() = runTest {
@@ -1182,7 +1256,7 @@ class InAppBillingHandlerTest : KoinTest {
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 2)
         every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Initial
         coEvery { mockStateMachine.getActiveInAppPurchase() } returns listOf(row)
-        coEvery { mockBillingBackendClient.getDeviceId(any()) } returns ""
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns ""
 
         callPrivateSuspendListStringArg(
             "handlePurchase",
@@ -1218,7 +1292,7 @@ class InAppBillingHandlerTest : KoinTest {
         setPrivateField(InAppBillingHandler, "consecutiveEmptyInAppQueries", 2)
         every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Initial
         coEvery { mockStateMachine.getActiveInAppPurchase() } returns listOf(row)
-        coEvery { mockBillingBackendClient.getDeviceId(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Transient(purchase)
 
@@ -1253,7 +1327,8 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `empty SUBS validation skips reconcile after active-row database read failure`() = runTest {
-        setPrivateField(InAppBillingHandler, "consecutiveEmptySubsQueries", 2)
+        firstSeenTsState =
+            System.currentTimeMillis() - InAppBillingHandler.EMPTY_QUERY_WINDOW_MS - 1000L
         every { mockStateMachine.currentMachineState() } returns SubscriptionStateMachineV2.SubscriptionState.Initial
         coEvery { mockStateMachine.getActiveSubsPurchase() } throws IllegalStateException("db read failed")
 
@@ -1339,13 +1414,13 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `launchFlow resolves the selected environment identity without purchase snapshot cid`() = runTest {
-        coEvery { mockBillingBackendClient.resolveIdentity(any()) } returns RefreshIdentityResult.Failure
+        coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Failure
 
         val activity = mockk<Activity>(relaxed = true)
         val productDetails = mockk<ProductDetails>(relaxed = true)
         callPrivateLaunchFlow(activity, productDetails)
 
-        coVerify(exactly = 1) { mockBillingBackendClient.resolveIdentity("") }
+        coVerify(exactly = 1) { mockBillingBackendClient.resolveIdentity() }
         verify(exactly = 0) { mockStateMachine.getSubscriptionData() }
         verify(exactly = 0) { mockBillingClient.launchBillingFlow(any(), any()) }
     }
@@ -1599,23 +1674,25 @@ class InAppBillingHandlerTest : KoinTest {
 
     @Test
     fun `fetchOrEnsureCustomerIds returns blank on 401`() = runTest {
-        coEvery { mockBillingBackendClient.resolveIdentity(any()) } returns RefreshIdentityResult.Unauthorized
+        coEvery { mockBillingBackendClient.resolveIdentity() } returns
+            RefreshIdentityResult.Unauthorized("cid-rejected-401")
 
         @Suppress("UNCHECKED_CAST")
-        val result = callPrivateSuspendStringArg("fetchOrEnsureCustomerIds", "") as Pair<String, String>
+        val result = callPrivateSuspendNoArgs("fetchOrEnsureCustomerIds") as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)
         val err = InAppBillingHandler.serverApiErrorLiveData.value
         assertTrue(err is ServerApiError.Unauthorized401)
+        assertEquals("cid-rejected-401", (err as ServerApiError.Unauthorized401).accountId)
     }
 
     @Test
     fun `fetchOrEnsureCustomerIds returns blank on 409`() = runTest {
-        coEvery { mockBillingBackendClient.resolveIdentity(any()) } returns RefreshIdentityResult.Conflict
+        coEvery { mockBillingBackendClient.resolveIdentity() } returns RefreshIdentityResult.Conflict
 
         @Suppress("UNCHECKED_CAST")
-        val result = callPrivateSuspendStringArg("fetchOrEnsureCustomerIds", "") as Pair<String, String>
+        val result = callPrivateSuspendNoArgs("fetchOrEnsureCustomerIds") as Pair<String, String>
 
         assertEquals("", result.first)
         assertEquals("", result.second)
@@ -1747,7 +1824,7 @@ class InAppBillingHandlerTest : KoinTest {
             lastUpdatedTs = now - 48 * 3600_000L
         }
         coEvery { mockStateMachine.getActiveSubsPurchase() } returns listOf(row)
-        coEvery { mockBillingBackendClient.getDeviceId(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } answers {
             QueryEntitlementResult.Success(
                 arg<PurchaseDetail>(2).copy(payload = "", expiryTime = 0L)
@@ -1767,7 +1844,7 @@ class InAppBillingHandlerTest : KoinTest {
      * everything).
      */
     @Test
-    fun `validateSubs preserves SUBS unless server returns typed expired result`() = runTest {
+    fun `validateSubs preserves SUBS on future server expiry and expires on past`() = runTest {
         val now = System.currentTimeMillis()
         val row = SubscriptionStatus().apply {
             id = 12
@@ -1777,13 +1854,16 @@ class InAppBillingHandlerTest : KoinTest {
             planId = InAppBillingHandler.STD_PRODUCT_ID
             productTitle = "Test Product"
             status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
-            billingExpiry = now - 48 * 3600_000L
+            // Frozen auto-renew estimate: a future-looking local window must NOT keep
+            // the row alive once the server answers with a past expiry and no tunnel
+            // access (that would preserve rows forever).
+            billingExpiry = now + 48 * 3600_000L
             lastUpdatedTs = now - 48 * 3600_000L
         }
         coEvery { mockStateMachine.getActiveSubsPurchase() } returns listOf(row)
-        coEvery { mockBillingBackendClient.getDeviceId(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } answers {
-            // Server ANSWERS: past expiry, no payload.
+            // Server ANSWERS (Success): past expiry, no payload, no tunnel access.
             QueryEntitlementResult.Success(
                 arg<PurchaseDetail>(2).copy(payload = "", expiryTime = now - 1000L)
             )
@@ -1791,10 +1871,39 @@ class InAppBillingHandlerTest : KoinTest {
 
         val validation = callPrivateSuspendNoArgs("validateSubsWithServerBeforeExpiry")!!
         @Suppress("UNCHECKED_CAST")
+        val expiredRows = readResultField(validation, "expiredRowIds") as Set<Int>
+
+        assertEquals("a Success with a past expiry and no tunnel access must expire the row",
+            setOf(row.id), expiredRows)
+    }
+
+    @Test
+    fun `validateSubs preserves SUBS when the server answers with a future expiry`() = runTest {
+        val now = System.currentTimeMillis()
+        val row = SubscriptionStatus().apply {
+            id = 14
+            productId = InAppBillingHandler.STD_PRODUCT_ID
+            purchaseToken = "tok-future"
+            accountId = "cid-1"
+            planId = InAppBillingHandler.STD_PRODUCT_ID
+            productTitle = "Test Product"
+            status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+            billingExpiry = 0L
+            lastUpdatedTs = now - 48 * 3600_000L
+        }
+        coEvery { mockStateMachine.getActiveSubsPurchase() } returns listOf(row)
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } answers {
+            QueryEntitlementResult.Success(
+                arg<PurchaseDetail>(2).copy(payload = "", expiryTime = now + 86400_000L)
+            )
+        }
+
+        val validation = callPrivateSuspendNoArgs("validateSubsWithServerBeforeExpiry")!!
+        @Suppress("UNCHECKED_CAST")
         val preserved = readResultField(validation, "tokens") as Set<String>
 
-        assertTrue("a success-shaped response is not a typed expiry result",
-            preserved.contains("tok-dead"))
+        assertTrue("a future server expiry must preserve the row", preserved.contains("tok-future"))
     }
 
     @Test
@@ -1807,7 +1916,7 @@ class InAppBillingHandlerTest : KoinTest {
             status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
         }
         coEvery { mockStateMachine.getActiveSubsPurchase() } returns listOf(row)
-        coEvery { mockBillingBackendClient.getDeviceId(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Expired(makePurchaseDetail(InAppBillingHandler.STD_PRODUCT_ID))
 

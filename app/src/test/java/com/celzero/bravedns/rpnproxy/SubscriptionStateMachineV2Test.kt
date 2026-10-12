@@ -118,7 +118,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coEvery { mockRepository.getCurrentSubscription() }          returns null
         coEvery { mockRepository.getByPurchaseToken(any()) }         returns null
         coEvery { mockRepository.getSubscriptionsByStates(any()) }   returns emptyList()
-        coEvery { mockRepository.getSubscriptionsByStatesOrThrow(any()) } returns emptyList()
+        coEvery { mockRepository.getSubscriptionsByStatesRaw(any()) } returns emptyList()
 
         // RpnProxyManager is a Kotlin object, must be mocked with mockkObject.
         mockkObject(RpnProxyManager)
@@ -557,7 +557,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
     @Test
     fun `active purchase snapshot propagates database read failures`() = runBlocking {
         val machine = createMachine()
-        coEvery { mockRepository.getSubscriptionsByStatesOrThrow(any()) } throws
+        coEvery { mockRepository.getSubscriptionsByStatesRaw(any()) } throws
             IllegalStateException("database read failed")
 
         val error = runCatching { machine.getActiveSubsPurchase() }.exceptionOrNull()
@@ -1752,6 +1752,49 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coEvery { mockRepository.getByPurchaseToken("tok-later") } returns laterRow
         assertFalse(machine.refreshBillingExpiryFromServer("tok-later", future))
         coVerify(exactly = 0) { mockRepository.updateBillingExpiry(2, future, any()) }
+    }
+
+    // =========================================================================
+    // refreshPayloadForToken
+    // =========================================================================
+
+    /**
+     * Regression: the reset path used to update only the in-memory machine data,
+     * so after a restart the stale DB payload overwrote a fresh server entitlement.
+     * refreshPayloadForToken must persist BOTH.
+     */
+    @Test
+    fun `refreshPayloadForToken persists the payload to the DB row and the machine data`() = runBlocking {
+        val machine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-refresh")
+        transitionToActiveWithData(machine, sub)
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        val refreshed = machine.refreshPayloadForToken("tok-refresh", "payload-fresh")
+
+        assertTrue(refreshed)
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-refresh" && it.developerPayload == "payload-fresh"
+            })
+        }
+        assertEquals("payload-fresh", machine.getSubscriptionData()?.subscriptionStatus?.developerPayload)
+    }
+
+    @Test
+    fun `refreshPayloadForToken returns false for a foreign token and writes nothing`() = runBlocking {
+        val machine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-current")
+        transitionToActiveWithData(machine, sub)
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        val refreshed = machine.refreshPayloadForToken("tok-other", "payload-x")
+
+        assertFalse(refreshed)
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+        assertEquals("tok-current", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
     }
 
     // =========================================================================
