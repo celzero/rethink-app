@@ -40,7 +40,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_check_update_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -104,7 +104,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_import_export_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -167,7 +167,7 @@
 
                 <RelativeLayout
                     android:id="@+id/tombstone_app_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -230,7 +230,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_firewall_bubble_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -294,7 +294,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_ip_info_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -379,7 +379,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_pcap_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -444,7 +444,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_enable_logs_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -507,7 +507,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_go_log_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -572,7 +572,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_console_log_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -637,7 +637,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_log_lifespan_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -724,7 +724,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_notification_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -790,7 +790,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_app_notification_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -853,7 +853,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_app_notification_persistent_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -939,7 +939,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_theme_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1001,7 +1001,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_locale_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1066,7 +1066,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_biometric_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1133,7 +1133,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_tasker_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1199,7 +1199,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_auto_start_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1262,7 +1262,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_firebase_error_reporting_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"

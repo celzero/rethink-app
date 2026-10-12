@@ -118,6 +118,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coEvery { mockRepository.getCurrentSubscription() }          returns null
         coEvery { mockRepository.getByPurchaseToken(any()) }         returns null
         coEvery { mockRepository.getSubscriptionsByStates(any()) }   returns emptyList()
+        coEvery { mockRepository.getSubscriptionsByStatesRaw(any()) } returns emptyList()
 
         // RpnProxyManager is a Kotlin object, must be mocked with mockkObject.
         mockkObject(RpnProxyManager)
@@ -166,6 +167,9 @@ class SubscriptionStateMachineV2Test : KoinTest {
     @Test fun `Revoked canMakePurchase is true`()  { assertTrue(SubscriptionStateMachineV2.SubscriptionState.Revoked.canMakePurchase) }
     @Test fun `Active canMakePurchase is false`()  { assertFalse(SubscriptionStateMachineV2.SubscriptionState.Active.canMakePurchase) }
     @Test fun `Grace canMakePurchase is false`()   { assertFalse(SubscriptionStateMachineV2.SubscriptionState.Grace.canMakePurchase) }
+    @Test fun `PurchaseInitiated canMakePurchase is false`() {
+        assertFalse(SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated.canMakePurchase)
+    }
 
     @Test fun `Cancelled isCancelled is true`()    { assertTrue(SubscriptionStateMachineV2.SubscriptionState.Cancelled.isCancelled) }
     @Test fun `Active isCancelled is false`()      { assertFalse(SubscriptionStateMachineV2.SubscriptionState.Active.isCancelled) }
@@ -177,6 +181,18 @@ class SubscriptionStateMachineV2Test : KoinTest {
     // =========================================================================
     // 2. Machine initialization / handleSystemCheckAndDatabaseRestoration
     // =========================================================================
+
+    @Test
+    fun `startPurchase enters PurchaseInitiated from PurchasePending and rejects duplicate starts`() = runBlocking {
+        val machine = createMachine()
+        machine.completePurchase(makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-start-purchase"))
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
+
+        assertTrue(machine.startPurchase())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated, machine.currentMachineState())
+        assertFalse(machine.startPurchase())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchaseInitiated, machine.currentMachineState())
+    }
 
     @Test
     fun `machine is Initial after init when DB is empty`() {
@@ -228,8 +244,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `init with Cancelled DB state and future billingExpiry restores Active in memory`() {
-        // Cancelled but still in billing period → user keeps access in memory.
+    fun `init with Cancelled SUBS DB state and future expiry restores Cancelled in memory`() {
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
             it.billingExpiry = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000L
@@ -240,15 +255,14 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        // Cancelled + billingExpiry in the future → Active in memory
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.currentMachineState())
         // DB status must NOT be overwritten during memory-only restoration
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 
     @Test
-    fun `init with Cancelled DB state and past billingExpiry transitions to Expired`() {
-        // billing period has ended → subscription is expired
+    fun `init with Cancelled SUBS DB state and past billingExpiry remains Cancelled`() {
+        // A local SUBS estimate cannot override Play's entitlement state.
         val sub = makeActiveSub().also {
             it.status       = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
             it.billingExpiry = System.currentTimeMillis() - 1_000L
@@ -259,10 +273,8 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         val machine = createMachine()
 
-        // Cancelled + billingExpiry in the past → Expired
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
-        // handleSubscriptionExpiredWithData writes EXPIRED to DB
-        coVerify(atLeast = 1) { mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id }) }
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.currentMachineState())
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
     }
 
     @Test
@@ -467,6 +479,19 @@ class SubscriptionStateMachineV2Test : KoinTest {
         coVerify { RpnProxyManager.processRpnPurchase(any(), any()) }
     }
 
+    @Test
+    fun `paymentSuccessful leaves state unchanged when purchase row cannot be persisted`() = runBlocking {
+        val machine = createMachine()
+        coEvery { mockRepository.getByPurchaseToken(any()) } returns null
+        coEvery { mockRepository.getCurrentSubscription() } returns null
+        coEvery { mockRepository.upsert(any()) } returns 0L
+
+        machine.paymentSuccessful(makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-write-fails"))
+        delay(100)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
+    }
+
     // =========================================================================
     // 4. reconcileWithPlayBilling — SUBS
     // =========================================================================
@@ -491,7 +516,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `reconcile empty SUBS snapshot expires even recently-active rows`() = runBlocking {
+    fun `reconcile empty SUBS snapshot preserves recently-active rows`() = runBlocking {
         val machine    = createMachine()
         val recentSub  = makeActiveSub(purchaseToken = "tok-recent", productId = STD_PRODUCT).also {
             it.lastUpdatedTs = System.currentTimeMillis() - 10 * 60 * 1000L
@@ -502,12 +527,18 @@ class SubscriptionStateMachineV2Test : KoinTest {
             purchases = emptyList(),
             queriedProductType = BillingClient.ProductType.SUBS
         )
+        delay(100)
 
-        // No guard window: Play is the authority, row is expired
-        coVerify {
+        // Fresh-row guard: a row updated within 24h (paid minutes ago) must not be
+        // expired by a transient empty Play snapshot (field bug: paid 22:38,
+        // expired 22:56).
+        coVerify(exactly = 0) {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
         }
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Expired, machine.currentMachineState())
+        assertEquals(
+            SubscriptionStateMachineV2.SubscriptionState.Active,
+            machine.currentMachineState()
+        )
     }
 
     @Test
@@ -521,6 +552,17 @@ class SubscriptionStateMachineV2Test : KoinTest {
 
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
         assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
+    }
+
+    @Test
+    fun `active purchase snapshot propagates database read failures`() = runBlocking {
+        val machine = createMachine()
+        coEvery { mockRepository.getSubscriptionsByStatesRaw(any()) } throws
+            IllegalStateException("database read failed")
+
+        val error = runCatching { machine.getActiveSubsPurchase() }.exceptionOrNull()
+
+        assertTrue(error is IllegalStateException)
     }
 
     @Test
@@ -551,7 +593,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
-    fun `reconcile SUBS with isAutoRenewing=false fires PaymentSuccessful then writes CANCELLED to DB`() = runBlocking {
+    fun `reconcile SUBS with isAutoRenewing=false retains Cancelled machine and DB state`() = runBlocking {
         val machine = createMachine()
         val token   = "tok-cancelled-subs"
         val expiry  = System.currentTimeMillis() + 10 * 24 * 60 * 60 * 1000L
@@ -575,8 +617,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
         )
         delay(100)
 
-        // Machine → Active (user still has access during cancelled billing period)
-        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, machine.currentMachineState())
         // DB row updated to CANCELLED
         coVerify {
             mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id })
@@ -684,8 +725,12 @@ class SubscriptionStateMachineV2Test : KoinTest {
         val orphanTok = "tok-orphan"
         val newTok    = "tok-new"
 
-        // DB has an ACTIVE SUBS row with orphanTok — NOT in the Play snapshot
-        val orphanSub = makeActiveSub(purchaseToken = orphanTok, productId = STD_PRODUCT)
+        // DB has an ACTIVE SUBS row with orphanTok — NOT in the Play snapshot.
+        // lastUpdatedTs is set beyond the fresh-row guard window so the orphaned
+        // expiry is not itself suppressed by the guard under test below.
+        val orphanSub = makeActiveSub(purchaseToken = orphanTok, productId = STD_PRODUCT).also {
+            it.lastUpdatedTs = System.currentTimeMillis() - 25 * 60 * 60 * 1000L // 25h ago
+        }
         coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(orphanSub)
         coEvery { mockRepository.getByPurchaseToken(newTok) }      returns null
         coEvery { mockRepository.getCurrentSubscription() }        returns null
@@ -713,6 +758,50 @@ class SubscriptionStateMachineV2Test : KoinTest {
             })
         }
     }
+
+    /**
+     * Same fresh-row protection as R6, but for the orphaned-token path (a non-empty
+     * Play snapshot that simply omits this row's token) rather than the empty-snapshot
+     * path: a row that changed state less than 24h ago must not be expired just
+     * because a momentarily incomplete/partial Play response omitted its token.
+     */
+    @Test
+    fun `reconcile SUBS orphaned token freshly-updated row does not expire`() = runBlocking {
+        val machine   = createMachine()
+        val expiry    = System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L
+        val orphanTok = "tok-orphan-fresh"
+        val newTok    = "tok-new"
+
+        val orphanSub = makeActiveSub(purchaseToken = orphanTok, productId = STD_PRODUCT).also {
+            it.lastUpdatedTs = System.currentTimeMillis() - 10 * 60 * 1000L // 10 min ago
+        }
+        coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(orphanSub)
+        coEvery { mockRepository.getByPurchaseToken(newTok) }      returns null
+        coEvery { mockRepository.getCurrentSubscription() }        returns null
+
+        val purchase = makeMockPurchase(
+            productId      = STD_PRODUCT,
+            purchaseToken  = newTok,
+            purchaseState  = Purchase.PurchaseState.PURCHASED,
+            isAcknowledged = true,
+            isAutoRenewing = true
+        )
+
+        machine.reconcileWithPlayBilling(
+            purchases         = listOf(purchase),
+            purchaseExpiryMap = mapOf(newTok to expiry),
+            queriedProductType = BillingClient.ProductType.SUBS
+        )
+        delay(100)
+
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match {
+                it.purchaseToken == orphanTok &&
+                it.status        == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            })
+        }
+    }
+
 
     // =========================================================================
     // 5. reconcileWithPlayBilling — INAPP
@@ -869,6 +958,7 @@ class SubscriptionStateMachineV2Test : KoinTest {
             it.billingExpiry = now + 365 * 24 * 60 * 60 * 1000L  // still future — was superseded, not expired
         }
         val newSub = makeActiveSub(purchaseToken = "tok-new-active", productId = INAPP_2YRS).also {
+            it.id = 2
             it.billingExpiry = now + 2 * 365 * 24 * 60 * 60 * 1000L  // further-future new purchase
         }
         // DB returns both rows as active
@@ -1008,6 +1098,117 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     @Test
+    fun `terminal event for non-current purchase updates only its row`() = runBlocking {
+        val machine = createMachine()
+        val current = makeActiveSub(purchaseToken = "tok-current", productId = STD_PRODUCT)
+        val expired = makeActiveSub(purchaseToken = "tok-expired-inapp", productId = INAPP_2YRS)
+        transitionToActiveWithData(machine, current)
+        coEvery { mockRepository.getByPurchaseToken("tok-expired-inapp") } returns expired
+        coEvery { mockRepository.getCurrentSubscription() } returns current
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        machine.subscriptionExpired("tok-expired-inapp")
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
+        assertEquals("tok-current", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-expired-inapp" &&
+                    it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            })
+        }
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-current" &&
+                    it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            })
+        }
+    }
+
+    @Test
+    fun `same revoked token cannot be reactivated by stale Play payment`() = runBlocking {
+        val machine = createMachine()
+        val revoked = makeActiveSub(purchaseToken = "tok-revoked", productId = STD_PRODUCT)
+        transitionToActiveWithData(machine, revoked)
+        coEvery { mockRepository.getByPurchaseToken("tok-revoked") } returns revoked
+        coEvery { mockRepository.getCurrentSubscription() } returns revoked
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        machine.subscriptionRevoked("tok-revoked")
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
+
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.getByPurchaseToken("tok-revoked") } returns revoked
+        machine.paymentSuccessful(makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-revoked"))
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+    }
+
+    @Test
+    fun `failed revoke write keeps in-memory token revoked and blocks stale Play payment`() = runBlocking {
+        val machine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-revoke-write-fails", productId = STD_PRODUCT)
+        transitionToActiveWithData(machine, sub)
+        clearMocks(RpnProxyManager, answers = false)
+        coEvery { mockRepository.getByPurchaseToken(sub.purchaseToken) } returns sub
+        coEvery { mockRepository.getCurrentSubscription() } returns sub
+        coEvery { mockRepository.upsert(any()) } returns 0L
+
+        machine.subscriptionRevoked(sub.purchaseToken)
+        machine.paymentSuccessful(makePurchaseDetail(STD_PRODUCT, purchaseToken = sub.purchaseToken))
+        delay(SIDE_EFFECT_WAIT_MS)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
+        assertFalse(machine.hasValidSubscription())
+        assertEquals(
+            SubscriptionStatus.SubscriptionState.STATE_REVOKED.id,
+            machine.getSubscriptionData()?.subscriptionStatus?.status
+        )
+        coVerify(exactly = 0) { RpnProxyManager.processRpnPurchase(any(), any()) }
+        coVerify(atLeast = 1) { RpnProxyManager.deactivateRpn("revoked") }
+    }
+
+    @Test
+    fun `restoring a revoked token cannot move Initial to Active`() = runBlocking {
+        val machine = createMachine()
+        val revoked = makeActiveSub(purchaseToken = "tok-revoked-restore", productId = STD_PRODUCT).also {
+            it.status = SubscriptionStatus.SubscriptionState.STATE_REVOKED.id
+        }
+        coEvery { mockRepository.getByPurchaseToken(revoked.purchaseToken) } returns revoked
+
+        machine.restoreSubscription(makePurchaseDetail(STD_PRODUCT, purchaseToken = revoked.purchaseToken))
+        delay(SIDE_EFFECT_WAIT_MS)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Revoked, machine.currentMachineState())
+        assertFalse(machine.hasValidSubscription())
+        coVerify(exactly = 0) { RpnProxyManager.activateRpn(any()) }
+        coVerify(atLeast = 1) { RpnProxyManager.deactivateRpn("revoked") }
+    }
+
+    @Test
+    fun `token-scoped cancellation does not change current machine purchase`() = runBlocking {
+        val machine = createMachine()
+        val current = makeActiveSub(purchaseToken = "tok-current", productId = STD_PRODUCT)
+        val target = makeActiveSub(purchaseToken = "tok-other", productId = STD_PRODUCT)
+        transitionToActiveWithData(machine, current)
+        coEvery { mockRepository.getByPurchaseToken("tok-other") } returns target
+        coEvery { mockRepository.getCurrentSubscription() } returns current
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        machine.userCancelled("tok-other", "test")
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
+        assertEquals("tok-current", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-other" &&
+                    it.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+            })
+        }
+    }
+
+    @Test
     fun `subscriptionExpired launches deactivateRpn with 'expired' reason`() = runBlocking {
         val machine = createMachine()
         val sub     = makeActiveSub()
@@ -1035,6 +1236,33 @@ class SubscriptionStateMachineV2Test : KoinTest {
         Thread.sleep(SIDE_EFFECT_WAIT_MS)
 
         coVerify { RpnProxyManager.deactivateRpn("revoked") }
+    }
+
+    @Test
+    fun `SystemCheck preserves cancelled and pending machine states`() = runBlocking {
+        val cancelledMachine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-cancelled", productId = STD_PRODUCT)
+        transitionToActiveWithData(cancelledMachine, sub)
+        cancelledMachine.userCancelled(sub.purchaseToken, "test")
+        cancelledMachine.systemCheck()
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Cancelled, cancelledMachine.currentMachineState())
+
+        val pendingMachine = createMachine()
+        pendingMachine.completePurchase(makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-pending"))
+        pendingMachine.systemCheck()
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, pendingMachine.currentMachineState())
+    }
+
+    @Test
+    fun `ServerAckPending accepts repeated completion without leaving ack-pending state`() = runBlocking {
+        val machine = createMachine()
+        val detail = makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-ack-pending")
+
+        machine.completePurchase(detail)
+        machine.serverAckFailed("first failure")
+        machine.completePurchase(detail)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.ServerAckPending, machine.currentMachineState())
     }
 
     @Test
@@ -1311,6 +1539,265 @@ class SubscriptionStateMachineV2Test : KoinTest {
     }
 
     // =========================================================================
+    // Regression tests (R6, R8, R9, R10) for production edge cases from support reports.
+    // =========================================================================
+
+    /**
+     * R6 (Bug 3 / report 3): a row that became ACTIVE less than 24h ago must never
+     * be expired via the empty-SUBS-snapshot path. Report 3 shows a row paid at
+     * 22:38 being expired at 22:56 by "Play returned empty SUBS snapshot".
+     */
+    @Test
+    fun `R6 reconcile empty SUBS snapshot with freshly-paid row does not expire`() = runBlocking {
+        val machine   = createMachine()
+        val recentSub = makeActiveSub(purchaseToken = "tok-fresh", productId = STD_PRODUCT).also {
+            it.lastUpdatedTs = System.currentTimeMillis() - 10 * 60 * 1000L  // 10 min ago
+        }
+        coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(recentSub)
+
+        machine.reconcileWithPlayBilling(
+            purchases = emptyList(),
+            queriedProductType = BillingClient.ProductType.SUBS
+        )
+        delay(100)
+
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id })
+        }
+        assertEquals(
+            "freshly-paid row must not transition the machine to Expired",
+            SubscriptionStateMachineV2.SubscriptionState.Active,
+            machine.currentMachineState()
+        )
+    }
+
+    /**
+     * R8 (flaw 5/15 / report 3): firing UserCancelled when the only DB row is
+     * EXPIRED must NOT stamp it CANCELLED with "User cancelled subscription".
+     * This is the exact writer of report 3's `EXPIRED -> CANCELLED` entry.
+     */
+    @Test
+    fun `R8 userCancelled with only an expired row does not write cancelled`() = runBlocking {
+        val machine = createMachine()
+        val expiredRow = makeActiveSub(purchaseToken = "tok-expired").also {
+            it.status        = SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            it.billingExpiry = System.currentTimeMillis() - 60_000L
+            it.accountExpiry = it.billingExpiry
+        }
+        coEvery { mockRepository.getCurrentSubscription() } returns expiredRow
+
+        machine.userCancelled()
+        delay(100)
+
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match { it.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id })
+        }
+        coVerify(exactly = 0) {
+            mockDbSyncService.recordHistoryOnly(any(), any(), any(), any())
+        }
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Initial, machine.currentMachineState())
+        assertFalse(machine.hasValidSubscription())
+    }
+
+    /**
+     * R9 (flaw 12): an empty SUBS snapshot must not fire SubscriptionExpired (and
+     * deactivate RPN) when a still-valid INAPP row coexists with the stale SUBS row.
+     */
+    @Test
+    fun `R9 empty SUBS snapshot with coexisting valid INAPP keeps machine active`() = runBlocking {
+        val machine = createMachine()
+        val staleSubs = makeActiveSub(purchaseToken = "tok-subs", productId = STD_PRODUCT).also {
+            it.lastUpdatedTs = System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000L
+        }
+        val validInapp = makeActiveSub(purchaseToken = "tok-inapp", productId = INAPP_2YRS).also {
+            it.id = 2  // distinct primary key from staleSubs (makeActiveSub defaults id=1)
+        }
+        coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(staleSubs, validInapp)
+        transitionToActiveWithData(machine, validInapp)
+
+        machine.reconcileWithPlayBilling(
+            purchases = emptyList(),
+            queriedProductType = BillingClient.ProductType.SUBS
+        )
+        delay(SIDE_EFFECT_WAIT_MS)
+
+        assertEquals(
+            "machine must stay Active on the still-valid INAPP row",
+            SubscriptionStateMachineV2.SubscriptionState.Active,
+            machine.currentMachineState()
+        )
+        coVerify(exactly = 0) { RpnProxyManager.deactivateRpn(any()) }
+    }
+
+    /**
+     * R10 (flaw 14): reconcile maps a Play-Expired INAPP token to a data-less
+     * SubscriptionExpired event; the handler then acts on the machine's CURRENT
+     * row (a different, active SUBS) instead of the reconciled token.
+     */
+    @Test
+    fun `R10 reconcile expired INAPP token does not expire the current active SUBS row`() = runBlocking {
+        val machine = createMachine()
+        val currentRow = makeActiveSub(purchaseToken = "tok-current-subs", productId = STD_PRODUCT)
+        coEvery { mockRepository.getSubscriptionsByStates(any()) } returns listOf(currentRow)
+        transitionToActiveWithData(machine, currentRow)
+
+        val expiredInapp = makeMockPurchase(
+            productId      = INAPP_2YRS,
+            purchaseToken  = "tok-old-inapp",
+            purchaseState  = Purchase.PurchaseState.PURCHASED,
+            isAcknowledged = true,
+            isAutoRenewing = false
+        )
+        machine.reconcileWithPlayBilling(
+            purchases          = listOf(expiredInapp),
+            purchaseExpiryMap  = mapOf("tok-old-inapp" to System.currentTimeMillis() - 24 * 60 * 60 * 1000L),
+            queriedProductType = BillingClient.ProductType.INAPP
+        )
+        delay(100)
+
+        coVerify(exactly = 0) {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-current-subs" &&
+                it.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id
+            })
+        }
+        assertEquals(
+            "machine must stay Active on the current SUBS row",
+            SubscriptionStateMachineV2.SubscriptionState.Active,
+            machine.currentMachineState()
+        )
+    }
+
+    // =========================================================================
+    // Case21: stale-expiry inheritance + server expiry write-back
+    // =========================================================================
+
+    /**
+     * A NEW purchase token must never inherit the previous row's (stale/clamped)
+     * billingExpiry when Play's own estimate is unknown (offerDetails not loaded —
+     * cold start). Field case21: paid 22:38, the fresh row got the old row's
+     * past window and was expired 17 minutes later.
+     */
+    @Test
+    fun `reconcile new token with unknown play expiry does not inherit stale db expiry`() = runBlocking {
+        val machine = createMachine()
+        val staleExpiry = System.currentTimeMillis() - 2 * 24 * 3600_000L // 2 days past
+        val oldRow = makeActiveSub(purchaseToken = "tok-old").also {
+            it.billingExpiry = staleExpiry
+            it.lastUpdatedTs = System.currentTimeMillis() - 2 * 24 * 3600_000L
+        }
+        // Seed the machine's current data with the OLD row (as after a wrongful expiry).
+        machine.stateMachine.updateData(
+            SubscriptionStateMachineV2.SubscriptionData(
+                subscriptionStatus = oldRow,
+                purchaseDetail = makePurchaseDetail(STD_PRODUCT, "tok-old", expiryTime = staleExpiry)
+            )
+        )
+
+        val newPurchase = makeMockPurchase(
+            STD_PRODUCT, "tok-new",
+            Purchase.PurchaseState.PURCHASED, isAcknowledged = true, isAutoRenewing = true
+        )
+        coEvery { mockRepository.getByPurchaseToken("tok-new") } returns null
+        coEvery { mockRepository.getCurrentSubscription() } returns oldRow
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        machine.reconcileWithPlayBilling(
+            purchases          = listOf(newPurchase),
+            purchaseExpiryMap  = mapOf("tok-new" to Long.MAX_VALUE), // offerDetails unavailable
+            queriedProductType = BillingClient.ProductType.SUBS
+        )
+        delay(200)
+
+        coVerify {
+            mockRepository.upsert(match { row ->
+                row.purchaseToken == "tok-new" &&
+                    // MAX_VALUE is normalised to 0 (unknown) by handlePaymentSuccessful;
+                    // either way the STALE window must not be stamped onto the new row.
+                    (row.billingExpiry == 0L || row.billingExpiry == Long.MAX_VALUE) &&
+                    row.billingExpiry != staleExpiry
+            })
+        }
+    }
+
+    /** refreshBillingExpiryFromServer is token-strict, extend-only and future-only. */
+    @Test
+    fun `refreshBillingExpiryFromServer writes only forward future moves for the exact token`() = runBlocking {
+        val machine = createMachine()
+        val now = System.currentTimeMillis()
+        val past = now - 1000L
+        val future = now + 30 * 24 * 3600_000L
+
+        val row = makeActiveSub(purchaseToken = "tok-r").also { it.billingExpiry = past }
+        coEvery { mockRepository.getByPurchaseToken("tok-r") } returns row
+        coEvery { mockRepository.updateBillingExpiry(1, any(), any()) } returns 1
+
+        // past server expiry → no-op
+        assertFalse(machine.refreshBillingExpiryFromServer("tok-r", now - 1L))
+        // MAX (unknown) → no-op
+        assertFalse(machine.refreshBillingExpiryFromServer("tok-r", Long.MAX_VALUE))
+        // unknown token (no row) → no-op, no fallback lookup
+        coEvery { mockRepository.getByPurchaseToken("tok-x") } returns null
+        assertFalse(machine.refreshBillingExpiryFromServer("tok-x", future))
+
+        // future, greater than row → written
+        assertTrue(machine.refreshBillingExpiryFromServer("tok-r", future))
+        coVerify { mockRepository.updateBillingExpiry(1, future, any()) }
+
+        // extend-only: a row already holding a later window is not shrunk
+        val laterRow = makeActiveSub(purchaseToken = "tok-later").also {
+            it.id = 2
+            it.billingExpiry = future + 1000L
+        }
+        coEvery { mockRepository.getByPurchaseToken("tok-later") } returns laterRow
+        assertFalse(machine.refreshBillingExpiryFromServer("tok-later", future))
+        coVerify(exactly = 0) { mockRepository.updateBillingExpiry(2, future, any()) }
+    }
+
+    // =========================================================================
+    // refreshPayloadForToken
+    // =========================================================================
+
+    /**
+     * Regression: the reset path used to update only the in-memory machine data,
+     * so after a restart the stale DB payload overwrote a fresh server entitlement.
+     * refreshPayloadForToken must persist BOTH.
+     */
+    @Test
+    fun `refreshPayloadForToken persists the payload to the DB row and the machine data`() = runBlocking {
+        val machine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-refresh")
+        transitionToActiveWithData(machine, sub)
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        val refreshed = machine.refreshPayloadForToken("tok-refresh", "payload-fresh")
+
+        assertTrue(refreshed)
+        coVerify {
+            mockRepository.upsert(match {
+                it.purchaseToken == "tok-refresh" && it.developerPayload == "payload-fresh"
+            })
+        }
+        assertEquals("payload-fresh", machine.getSubscriptionData()?.subscriptionStatus?.developerPayload)
+    }
+
+    @Test
+    fun `refreshPayloadForToken returns false for a foreign token and writes nothing`() = runBlocking {
+        val machine = createMachine()
+        val sub = makeActiveSub(purchaseToken = "tok-current")
+        transitionToActiveWithData(machine, sub)
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        val refreshed = machine.refreshPayloadForToken("tok-other", "payload-x")
+
+        assertFalse(refreshed)
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+        assertEquals("tok-current", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+    }
+
+    // =========================================================================
     // Helpers
     // =========================================================================
 
@@ -1434,12 +1921,3 @@ class SubscriptionStateMachineV2Test : KoinTest {
         sub.status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
     }
 }
-
-
-
-
-
-
-
-
-

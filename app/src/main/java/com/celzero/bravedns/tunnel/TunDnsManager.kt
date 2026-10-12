@@ -47,7 +47,7 @@ import java.time.Duration
 
 object TunDnsManager: KoinComponent {
     private const val TAG = "TunDnsManager"
-    data class DnsParams(val origin: String, val uidStr: String?, val fqdn: String, val qtype: Long, val isLockdown: Boolean, val ssid: String?, val isIfaceCellular: Boolean)
+    data class DnsParams(val origin: String, val uidStr: String?, val fqdn: String, val qtype: Long, val isLockdown: Boolean, val ssid: String?, val isIfaceCellular: Boolean, val isCaptivePortal: Boolean = false)
 
     data class UpstreamAnswerParams(
         val scope: CoroutineScope,
@@ -65,7 +65,8 @@ object TunDnsManager: KoinComponent {
         val isConnectionMetered: (String) -> Boolean,
         val determineProxyDetails: suspend (ConnTrackerMetaData, Boolean, Boolean) -> Mark,
         val onDeviceLocked: (() -> Unit)?,
-        val onAccessibilityFailure: (() -> Unit)?
+        val onAccessibilityFailure: (() -> Unit)?,
+        val isCaptivePortal: Boolean
     )
 
     private val persistentState by inject<PersistentState>()
@@ -152,6 +153,18 @@ object TunDnsManager: KoinComponent {
         val uid = getUid(uidStr)
         val rinr = persistentState.routeRethinkInRethink
         val appMode = appConfig.getBraveMode()
+
+        // when the active network is behind a captive portal, route every query to the system
+        // dns and bypass local blocklists so the portal's sign-in flow can resolve; the mode
+        // ends once the network is validated (captive-portal capability cleared), at which
+        // point queries resume on the user-configured transport. firewall and qtype rules
+        // continue to apply (see checkUserAllowedDnsQtypes below)
+        if (d.isCaptivePortal) {
+            logw("onQuery: captive portal active, routing ${d.fqdn} to system dns")
+            val r = makeNsOpts(uid, Pair(Backend.System, ""), d.fqdn, true, d.isIfaceCellular, d.ssid)
+            return checkUserAllowedDnsQtypes(r, uid, d.fqdn, d.qtype, d.isIfaceCellular, d.ssid)
+        }
+
         logd("onQuery: appConfig.getBraveMode for ${d.fqdn}")
         if (appMode.isDnsMode()) {
             result = getTransportIdForDnsMode(uid, d.fqdn, rinr, d.isLockdown, d.isIfaceCellular, d.ssid)
@@ -873,6 +886,13 @@ object TunDnsManager: KoinComponent {
             return dnsOptsFactory()
         }
 
+        // keep the previous DNS options for captive portals, using Dnsx.System and noBlock is
+        // set to true
+        if (params.isCaptivePortal) {
+            Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: captive portal, returning prev DNSOpts()")
+            return dnsOptsFactory()
+        }
+
         val isAnyPortRule = IpRulesManager.isPortRuleSetForIp(params.ipcsv, uid) ||
             IpRulesManager.isPortRuleSetForIp(params.ipcsv, UID_EVERYBODY)
         if (isAnyPortRule) {
@@ -1008,7 +1028,12 @@ object TunDnsManager: KoinComponent {
                 val tidPair = getTransportIdToBypass(id, params.isLockdown)
                 if (tidPair == id) {
                     logd("onUpstreamAnswer: no bypass transport needed, rule: $rule")
-                    return dnsOptsFactory()
+                    val r = dnsOptsFactory().apply {
+                        tidcsv = tidPair.first
+                        tidseccsv = tidPair.second
+                        noblock = true
+                    }
+                    return r
                 }
                 val tid = tidPair.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
                 val tidSec = if (tidPair.second.isEmpty()) "" else tidPair.second.split(",")

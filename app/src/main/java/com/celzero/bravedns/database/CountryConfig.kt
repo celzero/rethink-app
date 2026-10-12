@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -64,7 +65,11 @@ data class CountryConfig(
     var selectionCount: Int = 0, // Number of times this country has been selected by the user
 
     var isFavourite: Boolean = false, // Whether this country is marked as a favourite by the user
-    var hopEnabled: Boolean = false // Whether to always hop
+    var hopEnabled: Boolean = false, // Whether to always hop
+    @ColumnInfo(defaultValue = "0")
+    val ipv4: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val ipv6: Boolean = false
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -88,6 +93,8 @@ data class CountryConfig(
         parcel.readString() ?: "",
         parcel.readLong(),
         parcel.readInt(),
+        parcel.readByte() != 0.toByte(),
+        parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte()
     )
@@ -115,6 +122,8 @@ data class CountryConfig(
         parcel.writeInt(selectionCount)
         parcel.writeByte(if (isFavourite) 1 else 0)
         parcel.writeByte(if (hopEnabled) 1 else 0)
+        parcel.writeByte(if (ipv4) 1 else 0)
+        parcel.writeByte(if (ipv6) 1 else 0)
     }
 
     override fun describeContents(): Int = 0

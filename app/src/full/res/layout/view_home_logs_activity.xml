@@ -7,10 +7,13 @@
 
     <LinearLayout
         android:id="@+id/fhs_logs_header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="bottom"
         android:orientation="horizontal"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/fhs_logs_toggle_group"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -18,15 +21,22 @@
             android:id="@+id/fhs_logs_allowed_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_card_allowed_logs_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:fontFamily="monospace"
+                android:maxLines="1"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/rethink_sub_header_text"
+                app:autoSizeMaxTextSize="@dimen/rethink_sub_header_text"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeStepGranularity="1sp"
+                app:autoSizeTextType="uniform"
                 tools:text="62K" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -34,7 +44,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.8"
+                android:ellipsize="end"
                 android:letterSpacing="0.15"
+                android:maxLines="1"
                 android:text="@string/lbl_allowed"
                 android:textAllCaps="true"
                 android:textColor="?attr/primaryLightColorText"
@@ -45,16 +57,22 @@
             android:id="@+id/fhs_logs_blocked_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_card_blocked_logs_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:fontFamily="monospace"
+                android:maxLines="1"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/rethink_header_text"
+                app:autoSizeMaxTextSize="@dimen/rethink_header_text"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeStepGranularity="1sp"
+                app:autoSizeTextType="uniform"
                 tools:text="65K" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -62,7 +80,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.8"
+                android:ellipsize="end"
                 android:letterSpacing="0.15"
+                android:maxLines="1"
                 android:text="@string/lbl_blocked"
                 android:textAllCaps="true"
                 android:textColor="?attr/primaryLightColorText"
@@ -211,16 +231,20 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fhs_card_logs_duration"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:alpha="0.8"
+        android:ellipsize="end"
         android:letterSpacing="0.08"
+        android:maxLines="1"
         android:text="@string/logs_card_heatmap_window"
         android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
         android:textAllCaps="true"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_text_view"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fhs_logs_legend"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="last 24 hours" />
 

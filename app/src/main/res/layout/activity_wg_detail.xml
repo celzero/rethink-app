@@ -668,6 +668,18 @@
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor" />
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/ms_wg_tasker_managed_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="4dp"
+                        android:text="@string/wg_automation_tasker_managed"
+                        android:textColor="?attr/accentGood"
+                        android:textSize="@dimen/default_font_text_view"
+                        android:visibility="gone" />
+
                     <RelativeLayout
                         android:id="@+id/use_mobile_rl"
                         android:layout_width="wrap_content"

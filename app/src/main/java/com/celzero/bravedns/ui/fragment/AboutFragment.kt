@@ -585,17 +585,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         lastTapTime = currentTime
 
         if (tapCount == REQUIRED_TAPS) {
-            enableTestMode()
+            toggleTestMode()
             tapCount = 0
         }
     }
 
-    private fun enableTestMode() {
-        persistentState.appTestMode = true
+    private fun toggleTestMode() {
+        val enabling = !persistentState.appTestMode
+        persistentState.appTestMode = enabling
         val ctx = context ?: return
-        showToastUiCentered(ctx, "Test mode enabled", Toast.LENGTH_SHORT)
-        Logger.i(LOG_TAG_UI, "Test mode enabled")
-        logEvent(EventType.UI_TOGGLE, "Test mode enabled", "User enabled test mode")
+        val label = if (enabling) "Test mode enabled" else "Test mode disabled"
+        showToastUiCentered(ctx, label, Toast.LENGTH_SHORT)
+        Logger.i(LOG_TAG_UI, label)
+        logEvent(EventType.UI_TOGGLE, label, "User toggled test mode")
     }
 
     private fun openStackTraceDialog() {

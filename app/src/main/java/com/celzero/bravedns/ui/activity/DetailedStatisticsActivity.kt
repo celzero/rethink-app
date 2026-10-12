@@ -60,6 +60,7 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
     companion object {
         const val INTENT_TYPE = "STATISTICS_TYPE"
         const val INTENT_TIME_CATEGORY = "TIME_CATEGORY"
+        const val INTENT_START_TIME = "START_TIME"
 
         // optional: when present, the blocklists screen is scoped to this uid
         // (sent by the per-app screen); absent means all apps
@@ -92,11 +93,17 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
             INTENT_UID,
             com.celzero.bravedns.util.Constants.INVALID_UID
         )
+        val startTime =
+            if (intent.hasExtra(INTENT_START_TIME)) {
+                intent.getLongExtra(INTENT_START_TIME, 0L)
+            } else {
+                null
+            }
         if (uid != com.celzero.bravedns.util.Constants.INVALID_UID) {
             viewModel.setUid(uid)
         }
         setSubTitle(statType, timeCategory)
-        setRecyclerView(statType, timeCategory, uid)
+        setRecyclerView(statType, timeCategory, uid, startTime)
     }
 
     private fun setSubTitle(type: SummaryStatisticsFragment.SummaryStatisticsType, timeCategory: SummaryStatisticsViewModel.TimeCategory) {
@@ -137,7 +144,8 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
     private fun setRecyclerView(
         type: SummaryStatisticsFragment.SummaryStatisticsType,
         timeCategory: SummaryStatisticsViewModel.TimeCategory,
-        uid: Int
+        uid: Int,
+        startTime: Long?
     ) {
 
         b.dsaRecycler.setHasFixedSize(true)
@@ -153,7 +161,7 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         recyclerAdapter.setTimeCategory(timeCategory)
 
-        viewModel.timeCategoryChanged(timeCategory)
+        viewModel.timeCategoryChanged(timeCategory, startTime)
         handleStatType(type).observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
             b.dsaRecycler.post {

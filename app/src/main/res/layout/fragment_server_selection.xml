@@ -640,61 +640,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
-                    android:id="@+id/location_capacity_indicator"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="2dp"
-                    android:gravity="end"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:id="@+id/capacity_dot_one"
-                        android:layout_width="32dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
-
-                    <View
-                        android:id="@+id/capacity_dot_two"
-                        android:layout_width="32dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
-
-                    <View
-                        android:id="@+id/capacity_dot_three"
-                        android:layout_width="32dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/accentGood" />
-
-                    <View
-                        android:id="@+id/capacity_dot_four"
-                        android:layout_width="32dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:alpha="0.25"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/primaryLightColorText" />
-
-                    <View
-                        android:id="@+id/capacity_dot_five"
-                        android:layout_width="32dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
-                        android:alpha="0.25"
-                        android:background="@drawable/bg_capacity_pill"
-                        android:backgroundTint="?attr/primaryLightColorText" />
-
-                </LinearLayout>
-
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/search_card"
                     style="@style/RethinkPlus.ContentCard"

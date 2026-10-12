@@ -61,9 +61,6 @@ object InAppBillingHandler {
     // LiveData shared by NotificationHandlerActivity / ManagePurchaseFragment
     val serverApiErrorLiveData: MutableLiveData<ServerApiError?> = MutableLiveData(null)
 
-    // LiveData shared by the dashboard: account-mismatch warning.
-    val accountMismatchLiveData: MutableLiveData<Unit> = MutableLiveData(null)
-
     /**
      * Sticky, process-wide record of the last unresolved acknowledgement / verification failure
      * Always empty on the F-Droid build (no billing client); the dashboard
@@ -89,10 +86,18 @@ object InAppBillingHandler {
     @Suppress("UNUSED_PARAMETER")
     fun fetchPurchases(productType: List<String>) { /* no-op */ }
 
+    /** Returns false: F-Droid build has no billing client to refresh purchases from. */
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun refreshPurchasesAwait(productType: List<String>, timeoutMs: Long = 45_000): Boolean = false
+
     /** Convenience overload: fetches all purchase types. No-op in this build. */
     fun fetchAllPurchases() { /* no-op */ }
 
     suspend fun getObfuscatedDeviceId(): String = ""
+
+    /** Stub: no billing server in this build; a did can never be linked to a cid. */
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun getObfuscatedDeviceId(accountId: String): String = ""
 
     fun getRemainingDaysForInApp(): Long? = null
 
@@ -104,7 +109,7 @@ object InAppBillingHandler {
         deviceId: String,
         purchaseToken: String,
         productId: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
     suspend fun cancelPlaySubscription(
@@ -112,7 +117,7 @@ object InAppBillingHandler {
         deviceId: String,
         purchaseToken: String,
         productId: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
     suspend fun revokeOneTimePurchase(
@@ -120,7 +125,7 @@ object InAppBillingHandler {
         deviceId: String,
         purchaseToken: String,
         productId: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
     suspend fun revokeSubscription(
@@ -128,7 +133,7 @@ object InAppBillingHandler {
         deviceId: String,
         purchaseToken: String,
         productId: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in this build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in this build")
 
     @Suppress("UNUSED_PARAMETER")
     suspend fun purchaseSubs(
@@ -161,6 +166,17 @@ object InAppBillingHandler {
         deviceId: String
     ) { /* no-op */ }
 
+    /** No-op: F-Droid build stores no billing identity to reset. */
+    suspend fun resetIdentityForRebind(@Suppress("UNUSED_PARAMETER") entitlementCid: String): Boolean =
+        false
+
+    /** Returns blank: F-Droid build has no purchases to own an identity. */
+    suspend fun primaryPurchaseCid(): String = ""
+
+    /** No-op: F-Droid build has no billing server to resolve DIDs against. */
+    @Suppress("UNUSED_PARAMETER")
+    fun postDeviceNotRegisteredError(entitlementCid: String, didErrorCode: Int) { /* no-op */ }
+
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
     @Suppress("UNUSED_PARAMETER")
     suspend fun queryEntitlementFromServer(
@@ -176,7 +192,6 @@ object InAppBillingHandler {
     /** Returns an empty byte array: F-Droid build has no test purchase payload. */
     fun getTestPurchasePayloadBytes(): ByteArray = ByteArray(0)
 }
-
 
 
 

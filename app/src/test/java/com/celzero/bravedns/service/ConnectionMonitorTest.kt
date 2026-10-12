@@ -19,6 +19,7 @@ import android.net.TransportInfo
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.util.InternetProtocol
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -26,8 +27,10 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -308,6 +311,18 @@ class ConnectionMonitorTest {
 
         val unknown = monitor.getNetworkSSID(network, wifiCap)
         assertNull(unknown)
+    }
+
+    @Test
+    fun `ssid permission notification is skipped when enabled configs include only all-ssid rules`() {
+        val cfg = mockk<WgConfigFilesImmutable>()
+        every { cfg.ssids } returns "[]"
+        mockkObject(WireguardManager)
+        every { WireguardManager.getActiveSsidEnabledConfigs() } returns listOf(cfg)
+
+        invokePrivate(newMonitor(), "showNotificationIfNeeded", emptyArray())
+
+        verify(exactly = 0) { context.getSystemService(Context.NOTIFICATION_SERVICE) }
     }
 
     @Test

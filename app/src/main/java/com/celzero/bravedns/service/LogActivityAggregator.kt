@@ -21,10 +21,15 @@ import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -32,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 
 data class LogActivityEvent(
     val timestampMs: Long,
@@ -111,7 +117,9 @@ data class LogActivityState(
  *
  * Threading: producers run concurrently on arbitrary Go-bridge threads, so all
  * mutations are serialized behind [mutex] and published as immutable snapshots
- * on a StateFlow. Consumers must only read [activity].
+ * on a StateFlow. Event changes are coalesced for up to ten seconds while
+ * pending; database restores publish immediately. Consumers must only read
+ * [activity].
  */
 class LogActivityAggregator(
     private val dnsLogRepository: DnsLogRepository,
@@ -135,6 +143,16 @@ class LogActivityAggregator(
 
         // convenience for callers that reason in whole hours
         const val HOUR_MS = BUCKET_MS * BUCKETS_PER_HOUR
+
+        // Event updates use a one-shot delay; no timer is active while idle.
+        internal const val SNAPSHOT_PUBLISH_INTERVAL_MS = 10_000L
+
+        // arrival queue backlog; on overflow the oldest queued event is dropped (counts are
+        // approximate: out-of-window events are dropped today as well)
+        internal const val ARRIVAL_QUEUE_CAPACITY = 4096
+
+        // events applied per consumer wakeup; bounds mutex hold time per batch
+        internal const val ARRIVAL_MAX_BATCH = 256
 
         private const val TAG = "LogActivityAggregator;"
         // dedupe window for network events (connId based); bounded to keep
@@ -161,7 +179,7 @@ class LogActivityAggregator(
             val bucket = bucketFloor(timestampMs) / BUCKET_MS
             val current = currentBucketStart / BUCKET_MS
             val ageBuckets = current - bucket
-            if (ageBuckets < 0 || ageBuckets >= TOTAL_SLOTS) return -1L
+            if (ageBuckets !in 0..<TOTAL_SLOTS) return -1L
             return TOTAL_SLOTS - 1 - ageBuckets
         }
 
@@ -206,6 +224,14 @@ class LogActivityAggregator(
     private val nwBlocked = LongArray(TOTAL_SLOTS)
     private val nwAllowed = LongArray(TOTAL_SLOTS)
 
+    private val publishedDnsBlocked = LongArray(TOTAL_SLOTS)
+    private val publishedDnsAllowed = LongArray(TOTAL_SLOTS)
+    private val publishedNwBlocked = LongArray(TOTAL_SLOTS)
+    private val publishedNwAllowed = LongArray(TOTAL_SLOTS)
+    private var publishedBucketStart: Long = currentBucketStart
+    private var snapshotPending = false
+    private var snapshotPublishJob: Job? = null
+
     // connId-based dedupe; insertion-order preserving with bounded capacity
     private val seenNetworkKeys = object : LinkedHashMap<String, Boolean>(
         DEDUPE_CAPACITY, 0.75f, false
@@ -220,13 +246,21 @@ class LogActivityAggregator(
     )
     val activity: StateFlow<LogActivityState> = _activity.asStateFlow()
 
+    // arrival queue: producers enqueue without launching per-event coroutines; a single
+    // batched consumer applies events (see consumeArrivals). DROP_OLDEST keeps memory flat
+    // and lets recent activity win under burst.
+    private val arrivals = Channel<LogActivityEvent>(
+        ARRIVAL_QUEUE_CAPACITY, BufferOverflow.DROP_OLDEST
+    )
+
     init {
+        arrivalScope.launch { consumeArrivals() }
         publishSnapshot()
     }
 
     /**
      * Non-suspend, non-blocking arrival hook for log-producing callers.
-     * Applies the event on [arrivalScope] and returns immediately; counts are
+     * Enqueues the event for the batched consumer and returns immediately; counts are
      * commutative so cross-event ordering is irrelevant. See [record] for
      * slide/dedupe semantics.
      */
@@ -234,21 +268,43 @@ class LogActivityAggregator(
         // flag synchronously: a queued-but-not-yet-applied arrival must make
         // the next restore treat the wall as live (see restoreFromDatabase)
         hasRecordedSinceRestore = true
-        arrivalScope.launch { record(listOf(event)) }
+        arrivals.trySend(event)
     }
 
-    suspend fun record(events: List<LogActivityEvent>) {
+    private suspend fun consumeArrivals() {
+        val batch = ArrayList<LogActivityEvent>(ARRIVAL_MAX_BATCH)
+        while (true) {
+            batch.clear()
+            batch.add(arrivals.receive())
+            while (batch.size < ARRIVAL_MAX_BATCH) {
+                batch.add(arrivals.tryReceive().getOrNull() ?: break)
+            }
+            try {
+                record(batch)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG arrival batch failed: ${e.message}", e)
+            }
+        }
+    }
+
+    suspend fun record(events: List<LogActivityEvent>) = recordInternal(events)
+
+    private suspend fun recordInternal(events: List<LogActivityEvent>) {
         mutex.withLock {
-            var mutated = false
+            var recorded = false
+            var snapshotChanged = false
             for (event in events) {
                 if (!shouldRecord(event)) continue
-                slideWindowIfNeeded(event.timestampMs)
-                applyEvent(event, +1)
-                mutated = true
+                recorded = true
+                val anchorChanged = slideWindowIfNeeded(event.timestampMs)
+                val countsChanged = applyEvent(event, +1)
+                snapshotChanged = snapshotChanged || anchorChanged || countsChanged
             }
-            if (mutated) {
+            if (recorded) {
                 hasRecordedSinceRestore = true
-                publishSnapshot()
+                if (snapshotChanged) markSnapshotPending()
             }
         }
     }
@@ -261,13 +317,17 @@ class LogActivityAggregator(
     suspend fun reclassify(previous: LogActivityEvent?, new: LogActivityEvent?) {
         if (previous == null && new == null) return
         mutex.withLock {
-            if (previous != null) applyEvent(previous, -1)
+            var snapshotChanged = false
+            if (previous != null) {
+                snapshotChanged = applyEvent(previous, -1)
+            }
             if (new != null) {
-                slideWindowIfNeeded(new.timestampMs)
-                applyEvent(new, +1)
+                val anchorChanged = slideWindowIfNeeded(new.timestampMs)
+                val countsChanged = applyEvent(new, +1)
+                snapshotChanged = snapshotChanged || anchorChanged || countsChanged
             }
             hasRecordedSinceRestore = true
-            publishSnapshot()
+            if (snapshotChanged) markSnapshotPending()
         }
     }
 
@@ -289,15 +349,16 @@ class LogActivityAggregator(
     suspend fun restoreFromDatabase() {
         try {
             mutex.withLock {
-                if (restoredForBucketStart == currentBucketStart && loaded) return
+                val targetBucketStart = bucketFloor(clock.millis())
+                if (restoredForBucketStart == targetBucketStart && loaded) return
                 val previousBucketStart = currentBucketStart
-                currentBucketStart = bucketFloor(clock.millis())
+                currentBucketStart = targetBucketStart
 
                 if (hasRecordedSinceRestore) {
                     slide(((currentBucketStart - previousBucketStart) / BUCKET_MS).coerceAtLeast(0).toInt())
                     loaded = true
                     restoredForBucketStart = currentBucketStart
-                    publishSnapshot()
+                    publishSnapshotImmediately()
                     return
                 }
 
@@ -322,7 +383,7 @@ class LogActivityAggregator(
                 loaded = true
                 restoredForBucketStart = currentBucketStart
                 hasRecordedSinceRestore = false
-                publishSnapshot()
+                publishSnapshotImmediately()
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG restore failed: ${e.message}", e)
@@ -335,6 +396,17 @@ class LogActivityAggregator(
      */
     fun isStale(): Boolean {
         return restoredForBucketStart != bucketFloor(clock.millis())
+    }
+
+    /**
+     * Rebuilds the wall from the databases regardless of the wall is live
+     */
+    suspend fun forceRestoreFromDatabase() {
+        mutex.withLock {
+            hasRecordedSinceRestore = false
+            restoredForBucketStart = Long.MIN_VALUE
+        }
+        restoreFromDatabase()
     }
 
     private var loaded: Boolean = false
@@ -352,9 +424,9 @@ class LogActivityAggregator(
      * window backward (late events simply land in their existing slot or get
      * dropped when older than the window).
      */
-    private fun slideWindowIfNeeded(timestampMs: Long) {
+    private fun slideWindowIfNeeded(timestampMs: Long): Boolean {
         val bucket = bucketFloor(timestampMs)
-        if (bucket <= currentBucketStart) return
+        if (bucket <= currentBucketStart) return false
         val delta = ((bucket - currentBucketStart) / BUCKET_MS).toInt()
         Logger.v(
             LOG_TAG_VPN,
@@ -362,6 +434,7 @@ class LogActivityAggregator(
         )
         slide(delta)
         currentBucketStart = bucket
+        return true
     }
 
     private fun slide(deltaBuckets: Int) {
@@ -382,9 +455,9 @@ class LogActivityAggregator(
         arr.fill(0, arr.size - shift, arr.size)
     }
 
-    private fun applyEvent(event: LogActivityEvent, sign: Int) {
+    private fun applyEvent(event: LogActivityEvent, sign: Int): Boolean {
         val idx = slotIndex(event.timestampMs, currentBucketStart)
-        if (idx < 0) return // outside the wall window
+        if (idx < 0) return false // outside the wall window
         val i = idx.toInt() // arrays are bounded to TOTAL_SLOTS; idx fits Int
         val magnitude = if (sign > 0) 1L else -1L
         when (event.source) {
@@ -397,6 +470,7 @@ class LogActivityAggregator(
                 else nwAllowed[i] += magnitude
             }
         }
+        return true
     }
 
     private fun mergeInto(rows: List<ActivityBucketRow>, blocked: LongArray, allowed: LongArray) {
@@ -408,6 +482,40 @@ class LogActivityAggregator(
                 allowed[idx] += row.total
             }
         }
+    }
+
+    // Called while holding mutex. One delayed job coalesces all mutations in
+    // this window; no ticker or polling runs while the wall is idle.
+    private fun markSnapshotPending() {
+        if (snapshotPending) return
+        snapshotPending = true
+        snapshotPublishJob =
+            arrivalScope.launch {
+                delay(SNAPSHOT_PUBLISH_INTERVAL_MS.milliseconds)
+                mutex.withLock {
+                    snapshotPublishJob = null
+                    snapshotPending = false
+                    publishSnapshotIfChanged()
+                }
+            }
+    }
+
+    // Database restore is infrequent and should populate the wall immediately.
+    private fun publishSnapshotImmediately() {
+        snapshotPublishJob?.cancel()
+        snapshotPublishJob = null
+        snapshotPending = false
+        publishSnapshotIfChanged()
+    }
+
+    private fun publishSnapshotIfChanged() {
+        val countsChanged =
+            !dnsBlocked.contentEquals(publishedDnsBlocked) ||
+                !dnsAllowed.contentEquals(publishedDnsAllowed) ||
+                !nwBlocked.contentEquals(publishedNwBlocked) ||
+                !nwAllowed.contentEquals(publishedNwAllowed)
+        if (currentBucketStart == publishedBucketStart && !countsChanged) return
+        publishSnapshot()
     }
 
     private fun publishSnapshot() {
@@ -423,5 +531,10 @@ class LogActivityAggregator(
             )
         }
         _activity.value = LogActivityState(currentBucketStart + BUCKET_MS, intervals)
+        dnsBlocked.copyInto(publishedDnsBlocked)
+        dnsAllowed.copyInto(publishedDnsAllowed)
+        nwBlocked.copyInto(publishedNwBlocked)
+        nwAllowed.copyInto(publishedNwAllowed)
+        publishedBucketStart = currentBucketStart
     }
 }

@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -99,6 +100,7 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         applyMaxContentWidth()
+        TextSelectionGuard.apply(findViewById(android.R.id.content))
     }
 
     /**

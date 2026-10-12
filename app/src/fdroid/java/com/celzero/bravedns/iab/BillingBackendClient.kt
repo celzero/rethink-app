@@ -35,7 +35,45 @@ class BillingBackendClient(
 
     suspend fun getAccountId(): String = ""
 
-    suspend fun getDeviceId(@Suppress("UNUSED_PARAMETER") recvCid: String = ""): String = ""
+    suspend fun getDeviceIdForCid(@Suppress("UNUSED_PARAMETER") cid: String): String = ""
+
+    /** Stub: F-Droid has no billing server; no DID is ever available. */
+    suspend fun storedIdentityDidForCurrentEnv(): String = ""
+
+    /** Stub: F-Droid stores no billing identity, so there is no DID to peek. */
+    suspend fun peekStoredDid(): String = ""
+
+    /**
+     * Stub mirroring the play/website signature; F-Droid performs no
+     * device registration.
+     */
+    suspend fun ensureDeviceRegistration(
+        @Suppress("UNUSED_PARAMETER") primaryPurchase: PurchaseDetail?,
+        @Suppress("UNUSED_PARAMETER") refreshIntervalMs: Long,
+        @Suppress("UNUSED_PARAMETER") onDeviceNotRegistered: suspend (String) -> Unit,
+        @Suppress("UNUSED_PARAMETER") register: suspend (String, String, PurchaseDetail?) -> Unit
+    ) { /* no-op */ }
+
+    /** Stub: F-Droid has no billing server; identity can never be resolved. */
+    suspend fun resolveIdentity():
+        RefreshIdentityResult = RefreshIdentityResult.Failure
+
+    /** Stub: F-Droid has no billing server; no DID can ever be bound to a cid. */
+    suspend fun didForCid(
+        @Suppress("UNUSED_PARAMETER") cid: String,
+        @Suppress("UNUSED_PARAMETER") mintIfMissing: Boolean
+    ): DidResult = DidResult.error(501)
+
+    /** Stub: F-Droid has no billing server; identity can never be reconciled. */
+    suspend fun reconcileDidForCid(@Suppress("UNUSED_PARAMETER") cid: String): DidResult =
+        DidResult.error(501)
+
+    /** Stub: F-Droid has no billing server; there is no stored identity to recover. */
+    suspend fun recoverIdentityAfterAuthFailure(@Suppress("UNUSED_PARAMETER") accountId: String): IdentityRecoveryOutcome =
+        IdentityRecoveryOutcome.SKIPPED
+
+    /** Stub: F-Droid stores no billing identity, so no cid can ever block a rebind. */
+    suspend fun peekStoredCid(): String = ""
 
     suspend fun registerDevice(
         @Suppress("UNUSED_PARAMETER") accountId: String,
@@ -60,14 +98,14 @@ class BillingBackendClient(
         @Suppress("UNUSED_PARAMETER") deviceId: String,
         @Suppress("UNUSED_PARAMETER") sku: String,
         @Suppress("UNUSED_PARAMETER") purchaseToken: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in F-Droid build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in F-Droid build")
 
     suspend fun revokePurchase(
         @Suppress("UNUSED_PARAMETER") accountId: String,
         @Suppress("UNUSED_PARAMETER") deviceId: String,
         @Suppress("UNUSED_PARAMETER") sku: String,
         @Suppress("UNUSED_PARAMETER") purchaseToken: String
-    ): Pair<Boolean, String> = Pair(false, "Not supported in F-Droid build")
+    ): PurchaseMutationResult = PurchaseMutationResult.Failure("Not supported in F-Droid build")
 
     suspend fun consumePurchase(
         @Suppress("UNUSED_PARAMETER") accountId: String,

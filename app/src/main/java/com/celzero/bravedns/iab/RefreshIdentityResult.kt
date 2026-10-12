@@ -39,7 +39,7 @@ sealed class RefreshIdentityResult {
      * The server actively rejected the credentials — retrying will not help.
      * Callers should surface [ServerApiError.Unauthorized401] to the UI.
      */
-    object Unauthorized : RefreshIdentityResult()
+    data class Unauthorized(val accountId: String = "") : RefreshIdentityResult()
 
     /**
      * HTTP 409 Conflict from `/d/acc` or `/d/reg`.

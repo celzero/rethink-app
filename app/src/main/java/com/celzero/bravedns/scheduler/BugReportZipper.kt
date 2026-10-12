@@ -23,8 +23,8 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogRepository
+import com.celzero.bravedns.database.RpnLogRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.intra.Intra
@@ -60,9 +60,10 @@ object BugReportZipper {
     // File size limits (10MB in bytes, keep below common email attachment limits)
     const val MAX_ZIP_SIZE_BYTES = 10L * 1024L * 1024L
 
-    // Console log export limits
+    // Log export limits
     private const val MAX_CONSOLE_LOG_LINES = 10_000
-    private const val CONSOLE_LOG_ENTRY_NAME = "console_logs.txt"
+    const val CONSOLE_LOG_ENTRY_NAME = "console_logs.txt"
+    const val RPN_LOG_ENTRY_NAME = "rpn_logs.txt"
 
     // Flight recorder constants
     const val FLIGHT_RECORDER_DIR_NAME = "flight_recorder"
@@ -283,19 +284,64 @@ object BugReportZipper {
         file: File,
         maxBytes: Long = MAX_ZIP_SIZE_BYTES,
     ): Boolean {
+        return dumpLogRows(
+            file = file,
+            maxBytes = maxBytes,
+            label = "console",
+            totalLogs = { logDb.getLogCount() },
+            fetchChunk = { lastId, limit, offset ->
+                logDb.getLogsChunked(lastId, limit, offset).map {
+                    LogRow(it.id, it.timestamp, it.level, it.message)
+                }
+            }
+        )
+    }
+
+    suspend fun dumpRpnLogs(
+        logDb: RpnLogRepository,
+        file: File,
+        maxBytes: Long = MAX_ZIP_SIZE_BYTES,
+    ): Boolean {
+        return dumpLogRows(
+            file = file,
+            maxBytes = maxBytes,
+            label = "rpn log",
+            totalLogs = { logDb.getLogCount() },
+            fetchChunk = { lastId, limit, offset ->
+                logDb.getLogsChunked(lastId, limit, offset).map {
+                    LogRow(it.id, it.timestamp, it.level, it.message)
+                }
+            }
+        )
+    }
+
+    private data class LogRow(val id: Int, val timestamp: Long, val level: Long, val message: String)
+
+    /**
+     * Shared chunked export used by [dumpConsoleLogs] and [dumpRpnLogs]: fetches up to
+     * [MAX_CONSOLE_LOG_LINES] newest rows, then serializes them as
+     * `timestamp,level,message` lines (newest first), keeping only what fits [maxBytes].
+     */
+    private suspend fun dumpLogRows(
+        file: File,
+        maxBytes: Long,
+        label: String,
+        totalLogs: suspend () -> Int,
+        fetchChunk: suspend (lastId: Int, limit: Int, offset: Int) -> List<LogRow>,
+    ): Boolean {
         return try {
-            val totalLogs = logDb.getLogCount()
-            if (totalLogs <= 0) {
-                Logger.i(LOG_TAG_BUG_REPORT, "no console logs to export")
+            val total = totalLogs()
+            if (total <= 0) {
+                Logger.i(LOG_TAG_BUG_REPORT, "no $label logs to export")
                 return false
             }
 
-            val startOffset = (totalLogs - MAX_CONSOLE_LOG_LINES).coerceAtLeast(0)
-            val logs = mutableListOf<ConsoleLog>()
+            val startOffset = (total - MAX_CONSOLE_LOG_LINES).coerceAtLeast(0)
+            val logs = mutableListOf<LogRow>()
             var offset = startOffset
             var lastId = 0
-            while (offset < totalLogs) {
-                val chunk = logDb.getLogsChunked(lastId, MAX_CONSOLE_LOG_LINES, offset)
+            while (offset < total) {
+                val chunk = fetchChunk(lastId, MAX_CONSOLE_LOG_LINES, offset)
                 lastId = chunk.lastOrNull()?.id ?: lastId
                 if (chunk.isEmpty()) break
                 logs.addAll(chunk)
@@ -303,7 +349,7 @@ object BugReportZipper {
             }
 
             if (logs.isEmpty()) {
-                Logger.i(LOG_TAG_BUG_REPORT, "console log export returned no rows")
+                Logger.i(LOG_TAG_BUG_REPORT, "$label log export returned no rows")
                 return false
             }
 
@@ -312,11 +358,11 @@ object BugReportZipper {
                 "${log.timestamp},${log.level},$safeMessage"
             }
 
-            val header = "# Console logs (last ${logs.size} of $totalLogs)"
+            val header = "# ${label.replaceFirstChar(Char::uppercase)} logs (last ${logs.size} of $total)"
             val selectedLines = mutableListOf<String>()
             var usedBytes = header.toByteArray(Charsets.UTF_8).size.toLong() + 1L
             if (usedBytes > maxBytes) {
-                Logger.w(LOG_TAG_BUG_REPORT, "console log budget too small for header")
+                Logger.w(LOG_TAG_BUG_REPORT, "$label log budget too small for header")
                 return false
             }
 
@@ -328,7 +374,7 @@ object BugReportZipper {
             }
 
             if (selectedLines.isEmpty()) {
-                Logger.i(LOG_TAG_BUG_REPORT, "console log export did not fit")
+                Logger.i(LOG_TAG_BUG_REPORT, "$label log export did not fit")
                 return false
             }
 
@@ -339,11 +385,11 @@ object BugReportZipper {
 
             Logger.i(
                 LOG_TAG_BUG_REPORT,
-                "exported ${selectedLines.size} console logs to ${file.absolutePath} within $maxBytes bytes"
+                "exported ${selectedLines.size} $label logs to ${file.absolutePath} within $maxBytes bytes"
             )
             true
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping console logs, ${e.message}", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while dumping $label logs, ${e.message}", e)
             false
         }
     }

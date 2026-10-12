@@ -117,7 +117,9 @@ class NetLogBatcher<T, V>(
         if (DEBUG) Log.d(LOG_BATCH_LOGGER, "$tag; $msg")
     }
 
-    private suspend fun txswap(reason: String) {
+    private suspend fun txswap(reason: String) = txswapInternal(reason)
+
+    private suspend fun txswapInternal(reason: String) {
         if (closed.get()) {
             logd("txswap skip, closed; reason: $reason")
             return

@@ -247,39 +247,51 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/bs_conn_conn_duration"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view"
                             tools:text="⏱ 4m" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/bs_conn_conn_upload"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view"
                             tools:text="⬆ 12 kB" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/bs_conn_conn_download"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view"
                             tools:text="⬇ 86 kB" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/bs_conn_conn_type"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view"
                             tools:text="🌐" />

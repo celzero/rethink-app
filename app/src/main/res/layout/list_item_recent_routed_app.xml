@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="20dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="8dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/recent_routed_app_icon"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        tools:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/recent_routed_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="14sp"
+            tools:text="Firefox" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/recent_routed_app_conn_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/serverChipTextColor"
+            android:textSize="@dimen/small_font_text_view"
+            tools:text="128 connections" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/recent_routed_app_exclude"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:contentDescription="@string/exclude"
+        android:ellipsize="none"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:letterSpacing="0.01"
+        android:minWidth="0dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true"
+        android:text="@string/exclude"
+        android:textSize="11sp"
+        app:cornerRadius="15dp"
+        app:iconGravity="textStart"
+        app:iconPadding="4dp"
+        app:strokeWidth="1dp"
+        tools:text="@string/exclude" />
+
+</LinearLayout>

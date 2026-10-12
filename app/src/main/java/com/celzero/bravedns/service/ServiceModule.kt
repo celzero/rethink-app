@@ -25,7 +25,7 @@ object ServiceModule {
         single { PersistentState(androidContext()) }
         single { EventLogger(get()) }
         single { LogActivityAggregator(get(), get(), get()) }
-        single { NetLogTracker(androidContext(), get(), get(), get(), get(), get()) }
+        single { NetLogTracker(androidContext(), get(), get(), get(), get(), get(), get()) }
         single { RefreshDatabase(androidContext(), get(), get(), get(), get(), get()) }
         // SecureIdentityStore: encrypted file-backed store for accountId + deviceId.
         // Registered here (main) so both PipKeyManager (main) and BillingServerRepository

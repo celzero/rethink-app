@@ -49,7 +49,7 @@ class SummaryStatsFilterBottomSheet : BaseBottomSheetDialogFragment() {
     private val persistentState by inject<PersistentState>()
 
     /** Stats sections that can be shown/hidden, mapped to their filter chip. */
-    enum class SectionFilter(val tid: Int, @IdRes val chipId: Int) {
+    enum class SectionFilter(val tid: Int, @param:IdRes val chipId: Int) {
         APPS(0, R.id.fss_filter_apps_chip),
         COUNTRIES(1, R.id.fss_filter_countries_chip),
         PROVIDERS(2, R.id.fss_filter_providers_chip),

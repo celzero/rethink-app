@@ -45,6 +45,62 @@ class ShadowDNSOpts {
         @JvmStatic
         fun __New(): Int = 0
     }
+
+    // gomobile binds fields via native getters/setters; back them with a plain map so tests
+    // can construct real DNSOpts instances and assert on their values
+    private val props = mutableMapOf<String, Any?>()
+
+    @Implementation
+    fun getUID(): String = props["uid"] as? String ?: ""
+
+    @Implementation
+    fun setUID(uid: String?) {
+        props["uid"] = uid
+    }
+
+    @Implementation
+    fun getIPCSV(): String = props["ipcsv"] as? String ?: ""
+
+    @Implementation
+    fun setIPCSV(ipcsv: String?) {
+        props["ipcsv"] = ipcsv
+    }
+
+    @Implementation
+    fun getTIDCSV(): String = props["tidcsv"] as? String ?: ""
+
+    @Implementation
+    fun setTIDCSV(tidcsv: String?) {
+        props["tidcsv"] = tidcsv
+    }
+
+    @Implementation
+    fun getTIDSECCSV(): String = props["tidseccsv"] as? String ?: ""
+
+    @Implementation
+    fun setTIDSECCSV(tidseccsv: String?) {
+        props["tidseccsv"] = tidseccsv
+    }
+
+    @Implementation
+    fun getNOBLOCK(): Boolean = props["noblock"] as? Boolean ?: false
+
+    @Implementation
+    fun setNOBLOCK(noblock: Boolean) {
+        props["noblock"] = noblock
+    }
+
+    @Implementation
+    fun incRefnum(): Int = 0
+
+    @Implementation
+    override fun toString(): String = "DNSOpts{$props}"
+
+    @Implementation
+    override fun hashCode(): Int = props.hashCode()
+
+    @Implementation
+    override fun equals(other: Any?): Boolean = other is ShadowDNSOpts && other.props == props
 }
 
 @Implements(Mark::class)

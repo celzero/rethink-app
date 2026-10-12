@@ -18,11 +18,13 @@ package com.celzero.bravedns.util
 import android.app.Application
 import android.util.Log
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
@@ -223,7 +225,8 @@ object Logger : KoinComponent {
         dbWrite(LOG_GO_LOGGER_V2, message, type)
     }
 
-    fun goLog3(message: String, type: LoggerLevel): ConsoleLog? {
+    fun makeGoConsoleLog(message: String, type: LoggerLevel, isRpn: Boolean): ConsoleLog? {
+        if (isRpn) return null
         // uiLogLevel is user selected log level to display in the UI, so if the log
         // level is less than the user selected log level, do not write to the database.
         if (uiLogLevel > type.id) return null
@@ -233,10 +236,20 @@ object Logger : KoinComponent {
         return ConsoleLog(0, formattedMsg, type.id, now)
     }
 
+    fun makeGoRpnLog(message: String, type: LoggerLevel, isRpn: Boolean): RpnLog? {
+        if (!isRpn) return null
+        // uiLogLevel gate applies to RPN logs as well.
+        if (uiLogLevel > type.id) return null
+
+        val now = System.currentTimeMillis()
+        val formattedMsg = "${levelChar(type)} $LOG_GO_LOGGER: $message"
+        return RpnLog(0, formattedMsg, type.id, now)
+    }
+
     /**
      * Single-character prefix for a log line, matching the level chars written by the
      * Go runtime (see [LoggerLevel.fromChar]). Centralised so [dbWrite] and the
-     * batch-oriented [makeGoLog] never drift apart.
+     * batch-oriented [makeGoConsoleLog]/[makeGoRpnLog] never drift apart.
      */
     private fun levelChar(level: LoggerLevel): String = when (level) {
         LoggerLevel.VERY_VERBOSE -> "Y"
@@ -247,6 +260,75 @@ object Logger : KoinComponent {
         LoggerLevel.ERROR -> "E"
         LoggerLevel.STACKTRACE -> "F"
         else -> "V"
+    }
+
+    // classify each unique tag once and reuse the verdict for every subsequent log line carrying it
+    private val tagIsRpnCache = ConcurrentHashMap<String, Boolean>()
+
+    private fun isRpnTag(tag: String): Boolean =
+        tagIsRpnCache.getOrPut(tag) { tag.contains("rpn", ignoreCase = true) }
+
+    private fun isGoLogTag(tag: String): Boolean =
+        tag == LOG_GO_LOGGER || tag == LOG_GO_LOGGER_V1 || tag == LOG_GO_LOGGER_V2
+
+    /**
+     * Single-pass, case-insensitive scan of a [String] for the "rpn" needle. Unlike
+     * two `String.contains`. Comparisons are ASCII-only so it is locale-stable.
+     */
+    private fun isRpnText(message: String): Boolean {
+        for (i in message.indices) {
+            if (message[i] == 'r' || message[i] == 'R') {
+                if (matchesIgnoreCaseAt(message, i, "rpn")) return true
+            }
+        }
+        return false
+    }
+
+    private fun matchesIgnoreCaseAt(message: String, start: Int, needle: String): Boolean {
+        if (start + needle.length > message.length) return false
+        for (j in needle.indices) {
+            val a = message[start + j].code
+            val b = needle[j].code
+            // needle chars are ASCII letters, so `a xor b == 0x20` is exactly the
+            // ASCII upper/lower case pair; no locale-dependent folding needed
+            if (a != b && (a xor b) != 0x20) return false
+        }
+        return true
+    }
+
+    /**
+     * Case-insensitive scan of `buffer[start, end)` for the "rpn" needle, matching
+     * [isRpnText] semantics on raw bytes. Single pass with first-char-triggered
+     * lookahead; ASCII-only case folding means UTF-8 multibyte sequences
+     * (bytes >= 0x80) can never match.
+     */
+    fun isRpnPayload(buffer: ByteArray, start: Int, end: Int): Boolean {
+        var i = start
+        while (i < end) {
+            val b = buffer[i].toInt() and 0xFF
+            if (b == 'r'.code || b == 'R'.code) {
+                if (matchesIgnoreCaseAt(buffer, i, end, "rpn")) return true
+            }
+            i++
+        }
+        return false
+    }
+
+    private fun matchesIgnoreCaseAt(buffer: ByteArray, start: Int, end: Int, needle: String): Boolean {
+        if (start + needle.length > end) return false
+        for (j in needle.indices) {
+            val a = buffer[start + j].toInt() and 0xFF
+            val b = needle[j].code
+            if (a != b && (a xor b) != 0x20) return false
+        }
+        return true
+    }
+
+    fun isRpnLog(tag: String, message: String): Boolean {
+        return isRpnTag(tag) ||
+            tag == LOG_IAB ||
+            tag == LOG_TAG_PROXY ||
+            (isGoLogTag(tag) && isRpnText(message))
     }
 
     suspend fun wireLog(message: String) {
@@ -299,11 +381,14 @@ object Logger : KoinComponent {
             }
         }
 
-        // write to the database
+        // RPN-related logs at any level are written to their own in-memory database,
+        // everything else goes to the console log database
         try {
-            val c = ConsoleLog(0, formattedMsg, level.id, now)
-            VpnController.writeConsoleLog(c)
+            if (isRpnLog(tag, msg)) {
+                VpnController.writeRpnLog(RpnLog(0, formattedMsg, level.id, now))
+            } else {
+                VpnController.writeConsoleLog(ConsoleLog(0, formattedMsg, level.id, now))
+            }
         } catch (_: Exception) { }
     }
 }
-

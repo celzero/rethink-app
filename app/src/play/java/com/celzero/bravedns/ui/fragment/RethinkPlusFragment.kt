@@ -37,13 +37,18 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
+import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.iab.PurchaseConflictNotifier
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.PurchaseProcessingBottomSheet
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.util.Logger
@@ -412,17 +417,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             cancelProcessingTimeout()
             dismissProcessingBottomSheet()
             when (error) {
-                is ServerApiError.Unauthorized401 -> {
-                    showTransactionError(getString(R.string.subscription_action_failed))
-                }
-
-                is ServerApiError.Conflict409 -> {
-                    showTransactionError(getString(R.string.subscription_action_failed))
-                }
-
-                else -> {
-                    /* GenericError / NetworkError / DeviceNotRegistered handled elsewhere or via toast */
-                }
+                is ServerApiError.Conflict409 -> showConflictBottomSheet(error)
+                is ServerApiError.Unauthorized401 -> showDeviceAuthErrorBottomSheet(error)
+                is ServerApiError.DeviceNotRegistered -> showDeviceNotRegisteredBottomSheet(error)
+                is ServerApiError.GenericError -> showTransactionError(error.message)
+                is ServerApiError.NetworkError -> showTransactionError(
+                    error.message ?: getString(R.string.subscription_action_failed)
+                )
+                is ServerApiError.None -> Unit
             }
         }
         // Google Play services interrupted / fatal billing error. Surface a
@@ -436,6 +438,41 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                 }
             }
         }
+    }
+
+    private fun showDeviceNotRegisteredBottomSheet(error: ServerApiError.DeviceNotRegistered) {
+        if (!isAdded) return
+        if (isStateSaved) {
+            showTransactionError(getString(R.string.subscription_action_failed))
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceNotRegistered") != null) return
+        DeviceNotRegisteredNotifier.cancel(requireContext())
+        DeviceNotRegisteredBottomSheet.newInstance(error)
+            .show(childFragmentManager, "deviceNotRegistered")
+    }
+
+    private fun showDeviceAuthErrorBottomSheet(error: ServerApiError.Unauthorized401) {
+        if (!isAdded) return
+        if (isStateSaved) {
+            showTransactionError(getString(R.string.subscription_action_failed))
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceAuthError401") != null) return
+        DeviceAuthErrorBottomSheet.newInstance(error)
+            .show(childFragmentManager, "deviceAuthError401")
+    }
+
+    private fun showConflictBottomSheet(error: ServerApiError.Conflict409) {
+        if (!isAdded) return
+        if (isStateSaved) {
+            showTransactionError(getString(R.string.subscription_action_failed))
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("conflict409") != null) return
+        PurchaseConflictNotifier.cancel(requireContext())
+        PurchaseConflictBottomSheet.newInstance(error)
+            .show(childFragmentManager, "conflict409")
     }
 
     private fun handleUiState(state: SubscriptionUiState) {
@@ -752,8 +789,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
      * Initiate a purchase for the currently selected plan.
      */
     private fun purchaseSubscription() {
+        purchaseInFlight = true
         val selection = viewModel.selectedProduct.value
         if (selection == null) {
+            purchaseInFlight = false
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.select_plan_first),
@@ -765,6 +804,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         // check connectivity before launching the purchase flow so the
         // user gets a clear "No internet" message instead of a spinner-then-generic-error.
         if (!isOnline()) {
+            purchaseInFlight = false
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.no_internet_purchase_msg),
@@ -963,6 +1003,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
     override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>) {
         // handled by state machine via InAppBillingHandler.
+    }
+
+    override fun purchaseRejected() {
+        Logger.d(Logger.LOG_IAB, "$TAG: purchase rejected by state machine")
+        purchaseInFlight = false
+        cancelProcessingTimeout()
     }
 
     override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {

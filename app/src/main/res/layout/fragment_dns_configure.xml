@@ -240,7 +240,7 @@
 
                     <LinearLayout
                         android:id="@+id/dc_local_blocklist_container"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_local_blocklist_img"
@@ -315,7 +315,7 @@
                         android:src="@drawable/ic_update" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_downloader_switch"
@@ -379,7 +379,7 @@
                         android:src="@drawable/ic_blocklist_update_check" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_check_update_switch"
@@ -468,7 +468,7 @@
                         android:src="@drawable/ic_adv_dns_filter" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_alg_switch"
@@ -533,7 +533,7 @@
                         android:src="@drawable/ic_split_dns" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_split_dns_switch"
@@ -600,7 +600,7 @@
                         android:src="@drawable/ic_allow_dns_records" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_allowed_record_types_count"
@@ -691,7 +691,7 @@
                         android:src="@drawable/ic_fav_icon" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_favicon_switch"
@@ -755,7 +755,7 @@
                         android:src="@drawable/ic_auto_start" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_enable_cache_switch"
@@ -819,7 +819,7 @@
                         android:src="@drawable/ic_prevent_dns_proxy" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_proxy_dns_switch"
@@ -882,7 +882,7 @@
                         android:src="@drawable/ic_prevent_dns_leaks" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_prevent_dns_leaks_switch"
@@ -947,7 +947,7 @@
                         android:src="@drawable/ic_block_unknown_dns" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_unknown_switch"
@@ -1020,7 +1020,7 @@
                         android:src="@drawable/ic_undelegated_domain" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_undelegated_domains_switch"
@@ -1064,6 +1064,71 @@
                     android:layout_marginBottom="5dp" />
 
                 <RelativeLayout
+                    android:id="@+id/dc_captive_portal_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_captive_portal_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:alpha="0.5"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_captive_portal_setting" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/dc_captive_portal_switch"
+                        android:layout_toEndOf="@id/dc_captive_portal_img"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/dc_captive_portal_heading"
+                            style="@style/TextAppearance.Material3.BodyLarge.Emphasized"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dc_use_sys_dns_captive_heading" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="3dp"
+                            android:text="@string/dc_use_sys_dns_captive_desc"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/dc_captive_portal_switch"
+                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="56dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp" />
+
+                <RelativeLayout
                     android:id="@+id/dc_block_free_dns_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1085,7 +1150,7 @@
                         android:src="@drawable/ic_use_fallback_bypass" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/dc_block_free_dns_arrow"

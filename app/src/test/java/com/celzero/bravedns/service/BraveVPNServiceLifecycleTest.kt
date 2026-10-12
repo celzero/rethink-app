@@ -40,6 +40,7 @@ class BraveVPNServiceLifecycleTest : KoinTest {
     private val persistentState = mockk<PersistentState>(relaxed = true)
     private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    private val eventLogger = mockk<EventLogger>(relaxed = true)
 
     @Before
     fun setup() {
@@ -55,6 +56,7 @@ class BraveVPNServiceLifecycleTest : KoinTest {
                 single { persistentState }
                 single { rdb }
                 single { netLogTracker }
+                single { eventLogger }
             })
         }
         mockkObject(VpnController)
@@ -83,11 +85,26 @@ class BraveVPNServiceLifecycleTest : KoinTest {
     @Test
     fun `onStartCommand with stop action should signal stop service`() {
         val service = serviceController.create().get()
+        // signalStopService() logs on Dispatchers.IO; the coroutine can outlive this
+        // test and run after tearDown() stops Koin. Pre-resolve the `by inject()`
+        // lazy here (while Koin is up) so the leaked coroutine uses the cached mock
+        // instead of throwing "KoinApplication has not been started" on an IO thread
+        // — which coroutines-test would attach to the *next* runTest in the suite.
+        preResolveEventLogger(service)
         val intent = Intent(service, BraveVPNService::class.java).apply {
             action = BraveVPNService.NOTIF_ACTION_MODE_STOP.toString()
         }
-        
+
         service.onStartCommand(intent, 0, 1)
+    }
+
+    private fun preResolveEventLogger(service: BraveVPNService) {
+        try {
+            val field = BraveVPNService::class.java.getDeclaredField("eventLogger\$delegate")
+            field.isAccessible = true
+            (field.get(service) as Lazy<*>).value
+        } catch (_: Exception) {
+        }
     }
 
     @Test

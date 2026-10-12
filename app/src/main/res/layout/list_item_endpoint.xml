@@ -9,7 +9,7 @@
     android:focusable="true"
     app:cardCornerRadius="12dp">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/endpoint_list_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,11 +20,12 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/endpoint_info_img"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/endpoint_info_img"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/endpoint_flag_text"
@@ -72,22 +73,24 @@
             android:alpha="0.55"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_centerVertical="true"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@id/endpoint_selection_indicator"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@null"
             android:tint="?attr/primaryTextColor"
             android:padding="12dp"
-            android:src="@drawable/ic_info" />
+            android:src="@drawable/ic_info"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/endpoint_selection_indicator"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/endpoint_selection_indicator"
             android:layout_width="32dp"
             android:layout_height="18dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="12dp">
+            android:layout_marginEnd="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <View
                 android:id="@+id/endpoint_selection_orbital"
@@ -109,6 +112,6 @@
 
         </FrameLayout>
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

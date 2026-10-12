@@ -116,6 +116,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
+    private var pendingSsidEditor = false
+    private var waitingForLocationSettings = false
 
 
     private var suppressHopListener: Boolean = false
@@ -166,11 +168,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
                 }
             } else {
-                ui { refreshSsidSection() }
+                ui { continuePendingSsidEditor() }
             }
         }
         override fun onPermissionsDenied() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions denied")
+            pendingSsidEditor = false
             ui { showPermissionDeniedDialog() }
         }
         override fun onPermissionsRationale() {
@@ -233,6 +236,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     override fun onResume() {
         super.onResume()
         init()
+        if (waitingForLocationSettings) {
+            waitingForLocationSettings = false
+            if (pendingSsidEditor && SsidPermissionManager.isLocationEnabled(this)) {
+                continuePendingSsidEditor()
+            } else {
+                pendingSsidEditor = false
+                refreshSsidSection()
+            }
+        }
     }
 
     override fun onPause() {
@@ -1414,8 +1426,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // section refresh.
         setSsidCheckSilently(enabled)
 
-        if (enabled && hasPermissions && isLocationEnabled) {
-            // SSID enabled and all permissions/location available — show current values
+        if (enabled) {
+            // Saved SSID rules can be displayed without reading the current SSID.
             if (ssidItems.isEmpty()) {
                 val allTxt = getString(
                     R.string.single_argument_parenthesis,
@@ -1434,7 +1446,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             LOG_TAG_UI,
             "setupSsidSectionUI: hasPermissions=$hasPermissions, locationEnabled=$isLocationEnabled, checked=${sw.isChecked}"
         )
-        updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
+        updateErrorLayouts(
+            hasPermissions,
+            isLocationEnabled,
+            ssidItems.isNotEmpty(),
+            permissionErrorLayout,
+            locationErrorLayout
+        )
 
         sw.setOnCheckedChangeListener { _, isChecked ->
             // Guard: skip the echo of a programmatic update (section refresh,
@@ -1444,31 +1462,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 lastProgrammaticSsidState = null
                 return@setOnCheckedChangeListener
             }
-            val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
-            val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
-
-            if (isChecked) {
-                if (!hasForeground) {
-                    showLocationDisclosureDialog {
-                        SsidPermissionManager.requestSsidPermissions(this@RpnConfigDetailActivity)
-                    }
-                    Logger.d(LOG_TAG_UI, "SSID foreground permissions not granted, requesting...")
-                    return@setOnCheckedChangeListener
-                } else if (isAtleastQ() && !hasBackground) {
-                    showLocationDisclosureDialog {
-                        SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
-                    }
-                    Logger.d(LOG_TAG_UI, "SSID background permissions not granted, requesting...")
-                    return@setOnCheckedChangeListener
-                }
-            }
-
-            if (isChecked && !currentLocationEnabled) {
-                showLocationEnableDialog()
-                Logger.d(LOG_TAG_UI, "Location services not enabled, prompting user...")
-                return@setOnCheckedChangeListener
-            }
 
             val persistSsid: (Boolean) -> Unit = { checked ->
                 // Sync the switch: on the dialog-proceed path it was reverted
@@ -1477,7 +1471,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 // Persist the new state
                 io { RpnProxyManager.updateSsidBased(configKey, checked) }
 
-                if (checked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
+                if (checked) {
                     if (persistentState.enableStabilityDependentSettings()) {
                         SnackbarHelper.showStabilityProgram(b.root, persistentState)
                     }
@@ -1504,7 +1498,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
                 }
 
-                updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+                updateErrorLayouts(
+                    SsidPermissionManager.hasRequiredPermissions(this),
+                    currentLocationEnabled,
+                    ssidItems.isNotEmpty(),
+                    permissionErrorLayout,
+                    locationErrorLayout
+                )
             }
 
             if (!isChecked) {
@@ -1540,7 +1540,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         layout.setOnClickListener { sw.performClick() }
 
-        editBtn.setOnClickListener { openSsidDialog() }
+        editBtn.setOnClickListener { requestSsidEditor() }
 
         setupSsidErrorActionListeners()
     }
@@ -1559,19 +1559,19 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun updateErrorLayouts(
         hasPermissions: Boolean,
         isLocationEnabled: Boolean,
+        hasConfiguredSsids: Boolean,
         permissionErrorLayout: LinearLayout,
         locationErrorLayout: LinearLayout
     ) {
         val sw = b.ssidCheck
-        // Show permission error only when SSID is enabled but permissions are missing
-        if (sw.isChecked && !hasPermissions) {
+        // Location access is only needed when a configured SSID list must be evaluated.
+        if (sw.isChecked && hasConfiguredSsids && !hasPermissions) {
             Logger.vv(LOG_TAG_UI, "Showing SSID permission error layout")
             permissionErrorLayout.visibility = View.VISIBLE
         } else {
             permissionErrorLayout.visibility = View.GONE
         }
-        // Show location error only when SSID is enabled, permissions ok, but location is off
-        if (sw.isChecked && hasPermissions && !isLocationEnabled) {
+        if (sw.isChecked && hasConfiguredSsids && hasPermissions && !isLocationEnabled) {
             Logger.vv(LOG_TAG_UI, "Showing SSID location error layout")
             locationErrorLayout.visibility = View.VISIBLE
         } else {
@@ -1596,10 +1596,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             .setPositiveButton(getString(R.string.ssid_permission_error_action)) { _, _ ->
                 SsidPermissionManager.openAppSettings(this)
             }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-                b.ssidCheck.isChecked = false
-                io { RpnProxyManager.updateSsidBased(configKey, false) }
-            }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
             .create().show()
     }
 
@@ -1636,6 +1633,35 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         dlg.show()
     }
 
+    private fun requestSsidEditor() {
+        pendingSsidEditor = true
+        when {
+            !SsidPermissionManager.hasForegroundPermissions(this) ->
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestSsidPermissions(this)
+                }
+            isAtleastQ() && !SsidPermissionManager.hasBackgroundLocationPermission(this) ->
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestBackgroundLocationPermission(this)
+                }
+            else -> continuePendingSsidEditor()
+        }
+    }
+
+    private fun continuePendingSsidEditor() {
+        if (!pendingSsidEditor || isFinishing || isDestroyed) return
+        if (!SsidPermissionManager.hasRequiredPermissions(this)) {
+            pendingSsidEditor = false
+            return
+        }
+        if (!SsidPermissionManager.isLocationEnabled(this)) {
+            showLocationEnableDialog()
+            return
+        }
+        pendingSsidEditor = false
+        openSsidDialog()
+    }
+
     private fun showLocationDisclosureDialog(onContinue: () -> Unit) {
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.location_disclosure_title))
@@ -1646,9 +1672,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             dialog.dismiss()
         }
         builder.setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
-            b.ssidCheck.isChecked = false
-            io { RpnProxyManager.updateSsidBased(configKey, false) }
+            pendingSsidEditor = false
         }
+        builder.setOnCancelListener { pendingSsidEditor = false }
         builder.create().show()
     }
 
@@ -1658,14 +1684,14 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             .setMessage(getString(R.string.location_disclosure_message))
             .setCancelable(true)
             .setPositiveButton(getString(R.string.location_disclosure_positive)) { dlg, _ ->
-                SsidPermissionManager.requestLocationEnable(this); dlg.dismiss()
+                waitingForLocationSettings = true
+                SsidPermissionManager.requestLocationEnable(this)
+                dlg.dismiss()
             }
             .setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
-                b.ssidCheck.isChecked = false
-                io {
-                    RpnProxyManager.updateSsidBased(configKey, false)
-                }
+                pendingSsidEditor = false
             }
+            .setOnCancelListener { pendingSsidEditor = false }
             .create().show()
     }
 
@@ -1698,4 +1724,3 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 }
-

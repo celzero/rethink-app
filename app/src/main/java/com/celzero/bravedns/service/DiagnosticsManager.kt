@@ -27,6 +27,7 @@ import androidx.annotation.RequiresApi
 import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
@@ -50,6 +51,10 @@ class DiagnosticsManager(
     }
 
     private var cdm: ConnectivityDiagnosticsManager? = null
+
+    // single-threaded dispatcher backing the cdm callback; created lazily once per instance
+    // and shut down in unregister() so VPN restarts don't leak an idle executor thread each
+    private val dispatcher: ExecutorCoroutineDispatcher by lazy { Daemons.make("conndiag") }
 
     // clear-cap ref: github.com/celzero/rethink-app/issues/347
     private val diagRequest: NetworkRequest = NetworkRequest.Builder().clearCapabilities()
@@ -136,8 +141,7 @@ class DiagnosticsManager(
 
         try {
             cdm = context.getSystemService("connectivity_diagnostics") as ConnectivityDiagnosticsManager
-            val executor = Daemons.make("conndiag").executor
-            cdm?.registerConnectivityDiagnosticsCallback(diagRequest, executor, this)
+            cdm?.registerConnectivityDiagnosticsCallback(diagRequest, dispatcher.executor, this)
             logd("$TAG; nw diags mgr registered")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "$TAG; err reg diagnostics mgr", e)
@@ -149,6 +153,10 @@ class DiagnosticsManager(
 
         try {
             cdm?.unregisterConnectivityDiagnosticsCallback(this)
+            // release the callback executor thread; a new instance is created on the next
+            // register (ConnectionMonitor.registerDiags) so a fresh dispatcher is used then
+            (dispatcher.executor as? java.util.concurrent.ExecutorService)?.shutdown()
+            cdm = null
             logd("$TAG; nw diags mgr unregistered")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "$TAG; err unreg diagnostics mgr", e)

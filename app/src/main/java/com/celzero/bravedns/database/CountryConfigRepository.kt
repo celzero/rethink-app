@@ -91,7 +91,19 @@ class CountryConfigRepository(private val countryConfigDAO: CountryConfigDAO) {
             if (idsToUpdate.isNotEmpty()) {
                 val toUpdate = newServers.filter { idsToUpdate.contains(it.id) }
                 toUpdate.forEach {
-                    countryConfigDAO.updateServer(it.id, it.name, it.address, it.city, it.key, it.load, it.link, it.count, it.isActive)
+                    countryConfigDAO.updateServer(
+                        it.id,
+                        it.name,
+                        it.address,
+                        it.city,
+                        it.key,
+                        it.load,
+                        it.link,
+                        it.count,
+                        it.isActive,
+                        it.ipv4,
+                        it.ipv6
+                    )
                     Logger.i(LOG_TAG_PROXY, "$TAG.syncServers: updating server ${it.id}")
                 }
             }

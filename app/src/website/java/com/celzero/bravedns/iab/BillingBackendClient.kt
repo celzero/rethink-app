@@ -25,12 +25,12 @@ import com.celzero.bravedns.customdownloader.IBillingServerApiTest
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.customdownloader.SafeResponseConverterFactory
 import com.celzero.bravedns.iab.BillingBackendClient.Companion.DB_SESSION_UNCONSTRAINED
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -47,6 +47,7 @@ import java.net.SocketTimeoutException
 import java.net.URLEncoder
 import java.net.UnknownHostException
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -68,7 +69,18 @@ class BillingBackendClient(
 
     private val persistentState by inject<PersistentState>()
 
+    private val subscriptionDb by inject<com.celzero.bravedns.database.SubscriptionStatusRepository>()
+
+
     companion object {
+        /** Error code for a refused identity rebind. */
+        internal const val DID_REBIND_REFUSED = -2
+        internal const val ACK_MARKER_UNAUTHORIZED = "Unauthorized: 401"
+        internal const val ACK_MARKER_CONFLICT = "Conflict: 409"
+
+        /** Minimum interval between identity recovery attempts. */
+        internal const val IDENTITY_RECOVERY_BACKOFF_MS = 60 * 1000L
+
         private const val TAG = "BillingBackendClient"
 
         /**
@@ -102,11 +114,11 @@ class BillingBackendClient(
     /** Latest session bookmark received from the test server. */
     @Volatile private var dbSessionTestBookmark: String? = null
 
-    /** Latest DID token received from the server; echoed on every subsequent request. */
-    @Volatile private var didToken: String? = null
+    /** Latest DID token received from each backend; never shared across environments. */
+    @Volatile private var didTokenProd: String? = null
+    @Volatile private var didTokenTest: String? = null
 
-    /** Serializes [refreshIdentity] and [getAccountId]/[getDeviceId]/[resolveIdentity] calls
-     * so that concurrent callers never race to create competing CID/DID pairs. */
+    /** Serializes identity writes and network operations to prevent concurrent CID/DID updates. */
     private val identityMutex = Mutex()
 
     /**
@@ -123,139 +135,292 @@ class BillingBackendClient(
         if (persistentState.appTestMode) SecureIdentityStore.Env.TEST
         else SecureIdentityStore.Env.PROD
 
+    private fun otherEnv(env: SecureIdentityStore.Env): SecureIdentityStore.Env =
+        if (env == SecureIdentityStore.Env.TEST) SecureIdentityStore.Env.PROD
+        else SecureIdentityStore.Env.TEST
+
+    /** Tracks whether the one-time legacy identity migration has completed. */
+    private val identityMigrationDone = AtomicBoolean(false)
+
     /**
-     * Returns a server-driven **account** identifier (CID).
-     *
-     * Resolution order:
-     * 1. [SecureIdentityStore] (AES-256-GCM encrypted file, env-scoped via [currentEnv])
-     * 2. [refreshIdentity] - calls `POST /d/acc` and `POST /d/reg` to obtain and persist
-     *    both CID and DID atomically; the CID is returned on success.
-     *
-     * Returns an empty string if all sources fail. Callers must treat a blank return
-     * as "IDs not yet available" and abort or retry rather than proceeding with empty IDs.
+     * Runs the one-time legacy identity migration outside the store lock.
      */
-    suspend fun getAccountId(): String {
-        val mname = this::getAccountId.name
-        val env = currentEnv()
-        val (storedAcc, _) = identityStore.get(env)
-        if (!storedAcc.isNullOrBlank()) {
-            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (len=${storedAcc.length})")
-            return storedAcc
+    private suspend fun ensureIdentityMigrated() {
+        if (identityMigrationDone.get()) return
+        if (!identityStore.hasLegacyIdentity()) {
+            identityMigrationDone.set(true)
+            return
         }
-        return when (val result = refreshIdentity()) {
-            is RefreshIdentityResult.Success -> {
-                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received from server (len=${result.cid.length})")
-                result.cid
+        try {
+            val (legacyCid, legacyDid) = identityStore.readLegacy()
+            val migrated = if (legacyCid.isNullOrBlank() || legacyDid.isNullOrBlank()) {
+                // Nothing usable in the legacy file — migrateFromLegacy deletes it.
+                Logger.w(LOG_IAB, "$TAG ensureIdentityMigrated: legacy identity blank/corrupt; deleting without migration")
+                identityStore.migrateFromLegacy(currentEnv())
+            } else {
+                identityStore.migrateFromLegacy(determineLegacyMigrationEnv(legacyDid))
             }
-            is RefreshIdentityResult.Unauthorized -> {
-                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized; cid unavailable")
-                ""
+            if (migrated) {
+                identityMigrationDone.set(true)
+            } else {
+                Logger.w(LOG_IAB, "$TAG ensureIdentityMigrated: env write failed; legacy identity kept, will retry on next identity access")
             }
-            is RefreshIdentityResult.Conflict -> {
-                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict; cid unavailable")
-                ""
-            }
-            is RefreshIdentityResult.Failure -> {
-                Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: cid unavailable (transient)")
-                ""
-            }
+        } catch (e: Exception) {
+            Logger.e(LOG_IAB, "$TAG ensureIdentityMigrated: migration failed (${e.message}); will retry on next identity access", e)
         }
     }
 
-    /**
-     * Returns a server-driven **device** identifier (DID).
-     *
-     * Resolution order:
-     * 1. CID reconciliation: if [recvCid] is provided and differs from the stored CID,
-     *    a fresh DID is obtained via [createOrRegisterDid] for the recvCid.
-     * 2. [SecureIdentityStore]: returned directly when no reconciliation is needed.
-     * 3. [refreshIdentity]: obtains and persists both CID and DID from the server.
-     *
-     * Returns an empty string if all sources fail. Callers must treat a blank return
-     * as "IDs not yet available" and abort or retry rather than proceeding with empty IDs.
-     */
-    suspend fun getDeviceId(recvCid: String = ""): String = identityMutex.withLock {
-        val mname = this@BillingBackendClient::getDeviceId.name
+    suspend fun storedIdentityDidForCurrentEnv(): String = when (val result = resolveIdentity()) {
+        is RefreshIdentityResult.Success -> result.did
+        else -> ""
+    }
+
+    /** The stored DID for the active environment, **without** any network fallback. */
+    suspend fun peekStoredDid(): String {
+        ensureIdentityMigrated()
         val env = currentEnv()
-        val (storedCid, storedDid) = identityStore.get(env)
-
-        if (recvCid.isNotEmpty() && storedCid != recvCid) {
-            Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: recvCid differs from storedCid; re-registering device under new cid, recvCid=${recvCid.take(8)}, storedCid=${storedCid?.take(8) ?: "null"}, storedDid=${storedDid?.length ?: "null"}")
-            // Re-bind first: send the stored DID (when present) so the server re-associates
-            // the existing device with recvCid instead of minting a second token seed.
-            // A blank DID header is sent only when nothing is stored (legitimate first mint).
-            val didResult = createOrRegisterDid(recvCid, storedDid ?: "")
-            if (didResult.isSuccess) {
-                identityStore.save(env, recvCid, didResult.deviceId)
-                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: re-registered device (didLen=${didResult.deviceId.length})")
-                return@withLock didResult.deviceId
-            }
-            // Log specific error code so callers using createOrRegisterDid() directly can surface it.
-            when (didResult.errorCode) {
-                401  -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
-                409  -> Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict on re-registration for recvCid=${recvCid.take(8)}; falling through to store")
-                else -> Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: re-registration failed (code=${didResult.errorCode}); falling through to store")
-            }
-        }
-
-        if (!storedDid.isNullOrBlank()) {
-            Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: loaded from SecureIdentityStore (len=${storedDid.length})")
-            return@withLock storedDid
-        }
-
-        // No usable DID in store; perform a full identity refresh so both CID and DID
-        // are resolved and persisted atomically.
-        return@withLock when (val result = refreshIdentityLocked()) {
-            is RefreshIdentityResult.Success -> {
-                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: received from server (len=${result.did.length})")
-                result.did
-            }
-            is RefreshIdentityResult.Unauthorized -> {
-                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 unauthorized; did unavailable")
-                ""
-            }
-            is RefreshIdentityResult.Conflict -> {
-                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 conflict; did unavailable")
-                ""
-            }
-            is RefreshIdentityResult.Failure -> {
-                Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: did unavailable (transient)")
-                ""
-            }
-        }
+        val (_, did) = identityStore.get(env)
+        return did.orEmpty()
     }
 
     /**
-     * Atomically resolves a DID for [cid] under the identity mutex.
-     *
-     * If the store already contains a DID for [cid] it is returned immediately
-     * (no server call).  Otherwise [createOrRegisterDid] is called and the
-     * result is persisted on success.
-     *
-     * This is the **only** safe way for external callers (e.g. [reconcileCidDidFromPurchase])
-     * to obtain a DID for a specific CID without racing against a concurrent
-     * [refreshIdentity] call.
-     *
-     * @return [DidResult] with the resolved DID on success, or the appropriate error.
+     * Mints a new DID for [cid] (blank did header) and replaces the stored pair for [env].
+     * A DID is bound to its cid, so an old DID is never sent. Caller MUST hold [identityMutex].
      */
-    suspend fun reconcileDidForCid(cid: String): DidResult = identityMutex.withLock {
-        val env = currentEnv()
+    private suspend fun mintDidLocked(env: SecureIdentityStore.Env, cid: String): DidResult {
+        // clear the cached DID session token for this environment.
+        if (env == SecureIdentityStore.Env.PROD) didTokenProd = null else didTokenTest = null
+        val result = createOrRegisterDid(cid, "", env)
+        if (result.isSuccess) {
+            val saved = identityStore.save(env, cid, result.deviceId)
+            if (saved) {
+                Logger.i(LOG_IAB, "$TAG mintDid [${env.label}]: did minted under cid=${cid.take(8)} (didLen=${result.deviceId.length})")
+            } else {
+                Logger.e(LOG_IAB, "$TAG mintDid [${env.label}]: did minted but PERSIST FAILED for cid=${cid.take(8)}; the DID will be re-minted on next resolve")
+            }
+        } else {
+            Logger.e(LOG_IAB, "$TAG mintDid [${env.label}]: failed for cid=${cid.take(8)} (code=${result.errorCode})")
+        }
+        return result
+    }
+
+    /**
+     * Resolves the DID for [cid], using the purchase's environment when known.
+     * Reuses the stored identity when it matches; otherwise mints a new DID.
+     * Caller must hold [identityMutex].
+     */
+    private suspend fun adoptCidLocked(cid: String): DidResult {
+        val env = storedEnvironmentForCid(cid) ?: currentEnv()
         val (storedCid, storedDid) = identityStore.get(env)
         if (storedCid == cid && !storedDid.isNullOrBlank()) {
-            Logger.d(LOG_IAB, "$TAG reconcileDidForCid [${env.label}]: did already present (len=${storedDid.length})")
-            return@withLock DidResult(storedDid)
+            Logger.d(LOG_IAB, "$TAG adoptCid [${env.label}]: did already present (len=${storedDid.length})")
+            return DidResult(storedDid)
         }
-        // Re-bind first: always send the stored DID (when present) so the server
-        // re-associates the existing device with [cid] rather than minting a fresh
-        // token seed for every CID mismatch. Blank header only when nothing is stored.
-        val existing = storedDid ?: ""
-        val didResult = createOrRegisterDid(cid, existing)
-        if (didResult.isSuccess) {
-            identityStore.save(env, cid, didResult.deviceId)
-            Logger.i(LOG_IAB, "$TAG reconcileDidForCid [${env.label}]: obtained and persisted did (len=${didResult.deviceId.length})")
-        }
-        didResult
+        Logger.i(LOG_IAB, "$TAG adoptCid [${env.label}]: stored cid=${storedCid?.take(8)} != cid=${cid.take(8)} or did missing; minting new did")
+        return mintDidLocked(env, cid)
     }
+
+    /** Resolves the DID bound to [cid]. */
+    suspend fun didForCid(cid: String, mintIfMissing: Boolean): DidResult {
+        if (cid.isBlank()) {
+            Logger.w(LOG_IAB, "$TAG didForCid: blank cid (mint=$mintIfMissing)")
+            return DidResult.error(-1)
+        }
+        ensureIdentityMigrated()
+        val env = storedEnvironmentForCid(cid)
+        if (env != null) {
+            val (storedCid, storedDid) = identityStore.get(env)
+            if (storedCid == cid && !storedDid.isNullOrBlank()) return DidResult(storedDid)
+        }
+        if (!mintIfMissing) {
+            Logger.w(LOG_IAB, "$TAG didForCid: no did bound to cid=${cid.take(8)} (read-only)")
+            return DidResult.EMPTY
+        }
+        return identityMutex.withLock {
+            val envLocked = storedEnvironmentForCid(cid)
+            if (envLocked != null) {
+                val (_, didLocked) = identityStore.get(envLocked)
+                if (!didLocked.isNullOrBlank()) return@withLock DidResult(didLocked)
+            }
+            // only an empty store or the existing CID may claim the identity.
+            if (envLocked == null) {
+                val (prodCid, testCid) = Pair(
+                    identityStore.get(SecureIdentityStore.Env.PROD).first,
+                    identityStore.get(SecureIdentityStore.Env.TEST).first
+                )
+                if (!prodCid.isNullOrBlank() || !testCid.isNullOrBlank()) {
+                    Logger.e(LOG_IAB, "$TAG didForCid: refusing to rebind stored identity " +
+                        "(prod=${prodCid?.take(8)}, test=${testCid?.take(8)}) to foreign cid=${cid.take(8)}")
+                    return@withLock DidResult.error(DID_REBIND_REFUSED)
+                }
+            }
+            adoptCidLocked(cid)
+        }
+    }
+
+    /** Read-only alias for [didForCid]: the stored DID bound to [cid], or blank. */
+    suspend fun getDeviceIdForCid(cid: String): String = didForCid(cid, false).deviceId
+
+    /** Returns true when the DID failure is definitive and should be surfaced to the user. */
+    private fun isDefinitiveDidFailure(errorCode: Int): Boolean =
+        errorCode in 400..499 || errorCode == DID_REBIND_REFUSED
+
+    /**
+     * Re-mints the stored DID after the server rejects the stored (cid, did) pair.
+     * Only recovers when [accountId] matches the stored CID; failed mints preserve
+     * the existing identity.
+     */
+    suspend fun recoverIdentityAfterAuthFailure(accountId: String): IdentityRecoveryOutcome {
+        if (accountId.isBlank()) return IdentityRecoveryOutcome.SKIPPED
+        return identityMutex.withLock {
+            val env = storedEnvironmentForCid(accountId) ?: currentEnv()
+            val (storedCid, storedDid) = identityStore.get(env)
+            if (storedCid != accountId || storedDid.isNullOrBlank()) {
+                Logger.d(LOG_IAB, "$TAG recoverIdentity: stored identity does not match failing " +
+                    "cid=${accountId.take(8)}; keeping it")
+                return@withLock IdentityRecoveryOutcome.SKIPPED
+            }
+            val now = System.currentTimeMillis()
+            if (now - persistentState.identityRecoveryAttemptTs < IDENTITY_RECOVERY_BACKOFF_MS) {
+                Logger.d(LOG_IAB, "$TAG recoverIdentity: backoff window active for cid=${accountId.take(8)}")
+                return@withLock IdentityRecoveryOutcome.BACKOFF
+            }
+            persistentState.identityRecoveryAttemptTs = now
+            Logger.w(LOG_IAB, "$TAG recoverIdentity: server rejected the stored pair for " +
+                "cid=${accountId.take(8)}; re-minting the did")
+            val result = mintDidLocked(env, accountId)
+            when {
+                result.isSuccess -> IdentityRecoveryOutcome.RECOVERED
+                result.errorCode == 401 -> {
+                    Logger.e(LOG_IAB, "$TAG recoverIdentity: cid=${accountId.take(8)} rejected " +
+                        "by the server (mint 401); only an identity reset can recover")
+                    IdentityRecoveryOutcome.CID_REJECTED
+                }
+                else -> IdentityRecoveryOutcome.FAILED
+            }
+        }
+    }
+
+    /**
+     * Clears all stored identities and claims the store for [entitlementCid].
+     * Restores the previous identities if the claim fails.
+     */
+    suspend fun resetAndClaimIdentity(entitlementCid: String): Boolean {
+        return identityMutex.withLock {
+            withContext(NonCancellable) {
+                val previous = SecureIdentityStore.Env.entries.associateWith { env ->
+                    identityStore.get(env)
+                }
+                identityStore.clearAll()
+                didTokenProd = null
+                didTokenTest = null
+                if (entitlementCid.isBlank()) {
+                    Logger.e(LOG_IAB, "$TAG resetAndClaim: blank entitlement cid; restoring previous identity")
+                    if (!restoreLocked(previous)) {
+                        Logger.e(LOG_IAB, "$TAG resetAndClaim: previous identity NOT restored after blank cid")
+                    }
+                    return@withContext false
+                }
+                val claimed = adoptCidLocked(entitlementCid)
+                if (claimed.isSuccess) {
+                    Logger.i(LOG_IAB, "$TAG resetAndClaim: store re-claimed for cid=${entitlementCid.take(8)}")
+                    true
+                } else {
+                    Logger.e(LOG_IAB, "$TAG resetAndClaim: claim failed (code=${claimed.errorCode}) for " +
+                        "cid=${entitlementCid.take(8)}; restoring previous identity")
+                    if (!restoreLocked(previous)) {
+                        Logger.e(LOG_IAB, "$TAG resetAndClaim: previous identity NOT restored after " +
+                            "failed claim (code=${claimed.errorCode}) for cid=${entitlementCid.take(8)}")
+                    }
+                    false
+                }
+            }
+        }
+    }
+
+    /**
+     * Restores previously stored identities after a failed reset. Caller must hold [identityMutex].
+     * Returns false when any save failed, so callers do not report a successful restoration.
+     */
+    private suspend fun restoreLocked(previous: Map<SecureIdentityStore.Env, Pair<String?, String?>>): Boolean {
+        var restored = true
+        previous.forEach { (env, pair) ->
+            val (cid, did) = pair
+            if (!cid.isNullOrBlank() && !did.isNullOrBlank()) {
+                val saved = identityStore.save(env, cid, did)
+                if (!saved) {
+                    restored = false
+                    Logger.e(LOG_IAB, "$TAG restoreLocked: save failed [${env.label}] for cid=${cid.take(8)}; previous identity not restored")
+                }
+            }
+        }
+        return restored
+    }
+
+    /**
+     * Returns the stored CID from either environment, or blank when unavailable.
+     */
+    suspend fun peekStoredCid(): String {
+        val (prodCid, _) = identityStore.get(SecureIdentityStore.Env.PROD)
+        val (testCid, _) = identityStore.get(SecureIdentityStore.Env.TEST)
+        return prodCid?.takeIf { it.isNotBlank() } ?: testCid.orEmpty()
+    }
+
+    /**
+     * Ensures the device is registered using the primary purchase identity when available.
+     * Falls back to the stored identity when there is no purchase and skips registration
+     * when the existing registration is still within [refreshIntervalMs].
+     */
+    suspend fun ensureDeviceRegistration(
+        primaryPurchase: PurchaseDetail?,
+        refreshIntervalMs: Long,
+        onDeviceNotRegistered: suspend (entitlementCid: String) -> Unit,
+        register: suspend (accountId: String, deviceId: String, purchase: PurchaseDetail?) -> Unit
+    ) {
+        val mname = "ensureDeviceRegistration"
+        val purchaseCid = primaryPurchase?.accountId?.takeIf { it.isNotBlank() }
+
+        val accountId: String
+        val deviceId: String
+        if (purchaseCid != null) {
+            val didResult = didForCid(purchaseCid, mintIfMissing = true)
+            if (!didResult.isSuccess) {
+                if (isDefinitiveDidFailure(didResult.errorCode)) {
+                    Logger.e(LOG_IAB, "$TAG $mname: no did bound to primary cid=${purchaseCid.take(8)} " +
+                        "(code=${didResult.errorCode}); surfacing device-not-registered, skipping registration")
+                    onDeviceNotRegistered(purchaseCid)
+                } else {
+                    // retry on the next worker pass without notifying the user.
+                    Logger.w(LOG_IAB, "$TAG $mname: transient did failure for cid=${purchaseCid.take(8)} " +
+                        "(code=${didResult.errorCode}); skipping registration silently")
+                }
+                return
+            }
+            accountId = purchaseCid
+            deviceId = didResult.deviceId
+        } else {
+            val identity = resolveIdentity()
+            if (identity !is RefreshIdentityResult.Success) {
+                Logger.w(LOG_IAB, "$TAG $mname: identity unavailable, skipping registration")
+                return
+            }
+            accountId = identity.cid
+            deviceId = identity.did
+        }
+
+        val isStale = (System.currentTimeMillis() - persistentState.deviceRegistrationTimestamp) >
+            refreshIntervalMs
+        if (!isStale) {
+            Logger.d(LOG_IAB, "$TAG $mname: device already registered within window, skipping")
+            return
+        }
+        register(accountId, deviceId, primaryPurchase)
+    }
+
+    /**
+     * Binds the stored identity to the Play purchase [cid], minting a DID if needed.
+     */
+    suspend fun reconcileDidForCid(cid: String): DidResult = didForCid(cid, true)
 
     /**
      * Returns the current (accountId, deviceId) pair.
@@ -270,6 +435,7 @@ class BillingBackendClient(
      * and abort rather than proceeding with an empty identity.
      */
     suspend fun resolveIdentity(): RefreshIdentityResult {
+        ensureIdentityMigrated()
         val mname = this::resolveIdentity.name
         val env = currentEnv()
         // Encrypted file: both IDs present → no server call needed.
@@ -302,11 +468,12 @@ class BillingBackendClient(
      * - 409 → conflict; account already exists in an incompatible state
      * - other → HTTP error from server
      *
-     * @param existingCid Previously known account ID, or blank for new registrations.
      */
-    suspend fun createOrRegisterCid(existingCid: String = ""): CidResult = withContext(Dispatchers.IO) {
+    suspend fun createOrRegisterCid(
+        existingCid: String = "",
+        env: SecureIdentityStore.Env = currentEnv()
+    ): CidResult = withContext(Dispatchers.IO) {
         val mname = "createOrRegisterCid"
-        val env = currentEnv()
         try {
             val meta = buildCustomerMeta()
             // Pass null when blank so Retrofit omits the header entirely, letting the server
@@ -314,7 +481,7 @@ class BillingBackendClient(
             val cidHeader = existingCid.takeIf { it.isNotBlank() }
             val vcode = persistentState.appVersion.toString()
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/acc, cidHeader=${if (cidHeader != null) "present(len=${cidHeader.length})" else "absent"}")
-            val response = if (persistentState.appTestMode) {
+            val response = if (env == SecureIdentityStore.Env.TEST) {
                 buildTestApi().registerCustomer(cidHeader, "",  vcode, test = "", meta)
             } else {
                 buildProductionApi().registerCustomer(cidHeader, "", vcode, meta)
@@ -379,13 +546,15 @@ class BillingBackendClient(
      *
      * @param accountId The account (CID) this device belongs to.  Must be non-blank.
      * @param existingDeviceId Previously known device ID, or blank for new device registrations.
+     * @param env Backend environment; pass the captured identity environment for paired
+     *        CID/DID bootstrap operations.
      */
     suspend fun createOrRegisterDid(
         accountId: String,
-        existingDeviceId: String = ""
+        existingDeviceId: String = "",
+        env: SecureIdentityStore.Env = currentEnv()
     ): DidResult = withContext(Dispatchers.IO) {
         val mname = "createOrRegisterDid"
-        val env = currentEnv()
         if (accountId.isBlank()) {
             Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: blank accountId; cannot register device without account")
             return@withContext DidResult.error(-1)
@@ -397,7 +566,7 @@ class BillingBackendClient(
             val didHeader = existingDeviceId.takeIf { it.isNotBlank() }
             val vcode = persistentState.appVersion.toString()
             Logger.v(LOG_IAB, "$TAG $mname [${env.label}]: calling /d/reg, cidLen=${accountId.length}, didHeader=${if (didHeader != null) "present(len=${didHeader.length})" else "absent"}")
-            val response = if (persistentState.appTestMode) {
+            val response = if (env == SecureIdentityStore.Env.TEST) {
                 buildTestApi().registerDevice(accountId, didHeader, vcode, test = "", meta = meta)
             } else {
                 buildProductionApi().registerDevice(accountId, didHeader, vcode, meta = meta)
@@ -446,14 +615,7 @@ class BillingBackendClient(
     }
 
     /**
-     * One-time migration for users upgrading from a build that stored the identity in the
-     * legacy unscoped `identity.json` file.
-     *
-     * ### Why this is needed
-     * Previous builds used a single `pip/identity.json` file for both test and production
-     * identities.  The new env-scoped design uses `identity_prod.json` / `identity_test.json`.
-     * Without migration those users would lose their CID/DID and trigger a new server
-     * registration on every restart, unnecessarily creating duplicate accounts.
+     * Resolves the environment the legacy `identity.json` belongs to.
      *
      * ### Env determination strategy
      * 1. **VPN tunnel active**: call [VpnController.getEntitlementDetails] with the legacy
@@ -463,43 +625,26 @@ class BillingBackendClient(
      *    [PersistentState.appTestMode], which historically controlled which server
      *    ([com.celzero.bravedns.util.Constants.RPN_BASE_URL] vs fallback) was called when
      *    the CID/DID were originally obtained — so it is the best static proxy.
-     *
-     * This function is **idempotent**: once the legacy file is gone,
-     * [SecureIdentityStore.hasLegacyIdentity] returns false immediately and subsequent
-     * calls are no-ops.
      */
-    private suspend fun migrateIdentityIfNeeded() = withContext(Dispatchers.IO) {
-        if (!identityStore.hasLegacyIdentity()) return@withContext
-
-        val (legacyCid, legacyDid) = identityStore.readLegacy()
-        if (legacyCid.isNullOrBlank() || legacyDid.isNullOrBlank()) {
-            // Nothing usable in the legacy file — let migrateFromLegacy clean it up.
-            Logger.w(LOG_IAB, "$TAG migrateIdentityIfNeeded: legacy identity blank/corrupt; deleting without migration")
-            identityStore.migrateFromLegacy(currentEnv())
-            return@withContext
-        }
-
-        // Determine the correct env from the live entitlement (authoritative) or appTestMode (fallback).
-        val env = try {
+    private suspend fun determineLegacyMigrationEnv(legacyDid: String): SecureIdentityStore.Env {
+        return try {
             val entitlement = VpnController.getEntitlementDetails(null, legacyDid)
             if (entitlement != null) {
                 val isTest = entitlement.test()
-                Logger.i(LOG_IAB, "$TAG migrateIdentityIfNeeded: entitlement resolved, isTest=$isTest " +
-                    "(cidLen=${legacyCid.length}, didLen=${legacyDid.length})")
+                Logger.i(LOG_IAB, "$TAG legacyMigrationEnv: entitlement resolved, isTest=$isTest " +
+                    "(didLen=${legacyDid.length})")
                 if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
             } else {
                 val isTest = persistentState.appTestMode
-                Logger.i(LOG_IAB, "$TAG migrateIdentityIfNeeded: tunnel unavailable, using appTestMode=$isTest as env " +
-                    "(cidLen=${legacyCid.length}, didLen=${legacyDid.length})")
+                Logger.i(LOG_IAB, "$TAG legacyMigrationEnv: tunnel unavailable, using appTestMode=$isTest as env " +
+                    "(didLen=${legacyDid.length})")
                 if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
             }
         } catch (e: Exception) {
             val isTest = persistentState.appTestMode
-            Logger.w(LOG_IAB, "$TAG migrateIdentityIfNeeded: entitlement lookup failed (${e.message}); falling back to appTestMode=$isTest")
+            Logger.w(LOG_IAB, "$TAG legacyMigrationEnv: entitlement lookup failed (${e.message}); falling back to appTestMode=$isTest")
             if (isTest) SecureIdentityStore.Env.TEST else SecureIdentityStore.Env.PROD
         }
-
-        identityStore.migrateFromLegacy(env)
     }
 
     /**
@@ -528,27 +673,42 @@ class BillingBackendClient(
      *   [RefreshIdentityResult.Failure] for all other failures (transient, network, etc.).
      *   Callers must treat non-[RefreshIdentityResult.Success] as "identity not ready".
      */
-    suspend fun refreshIdentity(): RefreshIdentityResult = identityMutex.withLock { refreshIdentityLocked() }
+    suspend fun refreshIdentity(): RefreshIdentityResult =
+        identityMutex.withLock { refreshIdentityLocked() }
 
     /**
      * Lock-free implementation of [refreshIdentity]. The caller MUST already hold
-     * [identityMutex] (or invoke the public [refreshIdentity] wrapper that acquires it).
-     *
-     * Extracted so that [getDeviceId] — which already holds [identityMutex] — can perform
-     * a full identity refresh without re-acquiring the non-reentrant mutex and self-deadlocking.
+     * [identityMutex] (or invoke the public [refreshIdentity] wrapper that acquires it);
+     * the split exists so other mutex-holding paths can refresh without re-acquiring
+     * the non-reentrant mutex and self-deadlocking.
      */
     private suspend fun refreshIdentityLocked(): RefreshIdentityResult {
         val mname = "refreshIdentity"
-        // One-time migration: move legacy identity.json into the correct env-scoped file
-        // before any read, so the migrated data is found by identityStore.get(env) below.
-        migrateIdentityIfNeeded()
         val env = currentEnv()
         val (storedCid, storedDid) = identityStore.get(env)
 
         var cid = storedCid ?: ""
         var cidWasAbsent = false
         if (cid.isBlank()) {
-            val cidResult = createOrRegisterCid()
+            val purchaseCid = try {
+                subscriptionDb.getCurrentSubscription()?.accountId
+            } catch (e: Exception) {
+                Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: could not read purchase-bound cid: ${e.message}")
+                null
+            }
+            if (!purchaseCid.isNullOrBlank()) {
+                val owner = storedEnvironmentForCid(purchaseCid)
+                if (owner == null || owner == env) {
+                    cid = purchaseCid
+                    Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: binding fresh identity to the " +
+                            "purchase-bound cid (len=${cid.length}) instead of minting a new one")
+                } else {
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: purchase cid belongs to ${owner.label}; not adopting")
+                }
+            }
+        }
+        if (cid.isBlank()) {
+            val cidResult = createOrRegisterCid(env = env)
             when {
                 cidResult.isSuccess -> {
                     cid = cidResult.accountId
@@ -557,7 +717,7 @@ class BillingBackendClient(
                 }
                 cidResult.errorCode == 401 -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 on cid step; cannot resolve identity")
-                    return RefreshIdentityResult.Unauthorized
+                    return RefreshIdentityResult.Unauthorized("")
                 }
                 cidResult.errorCode == 409 -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 on cid step; cannot resolve identity")
@@ -572,11 +732,9 @@ class BillingBackendClient(
             Logger.d(LOG_IAB, "$TAG $mname [${env.label}]: cid loaded from store (len=${cid.length})")
         }
 
-        // Reuse the stored DID only when the CID hasn't changed; a new CID means
-        // the old DID belong to a different account and must not be re-used.
         var did = if (!cidWasAbsent && !storedDid.isNullOrBlank()) storedDid else ""
         if (did.isBlank()) {
-            val didResult = createOrRegisterDid(cid, storedDid ?: "")
+            val didResult = mintDidLocked(env, cid)
             when {
                 didResult.isSuccess -> {
                     did = didResult.deviceId
@@ -584,7 +742,7 @@ class BillingBackendClient(
                 }
                 didResult.errorCode == 401 -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 401 on did step; cannot resolve identity")
-                    return RefreshIdentityResult.Unauthorized
+                    return RefreshIdentityResult.Unauthorized(cid)
                 }
                 didResult.errorCode == 409 -> {
                     Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: 409 on did step; cannot resolve identity")
@@ -628,7 +786,7 @@ class BillingBackendClient(
         }
         val meta = m ?: buildCustomerMeta()
         try {
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.registerDevice(accountId, deviceId, vcode = persistentState.appVersion.toString(), meta = meta)
                 is ApiHandle.Test -> handle.api.registerDevice(accountId, deviceId, vcode = persistentState.appVersion.toString(), test = "", meta = meta)
@@ -691,12 +849,16 @@ class BillingBackendClient(
         productType: String
     ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
         val mname = "acknowledgePurchase"
+        if (accountId.isBlank() || deviceId.isBlank()) {
+            Logger.e(LOG_IAB, "$TAG $mname: blank accountId or deviceId; refusing server acknowledgement")
+            return@withContext Pair(false, "accountId/deviceId unavailable")
+        }
         Logger.d(LOG_IAB, "$TAG $mname [${currentEnv().label}]: accLen=${accountId.length}, type=$productType")
 
         val pt  = URLEncoder.encode(purchaseToken, "UTF-8")
         val sku = skuForType(productType)
 
-        executeAckWithRetry(mname) { handle ->
+        executeAckWithRetry(mname, accountId) { handle ->
             val vcode = persistentState.appVersion.toString()
             when (handle) {
                 is ApiHandle.Production -> handle.api.acknowledgePurchase(accountId, deviceId, sku, pt, vcode)
@@ -726,10 +888,11 @@ class BillingBackendClient(
      */
     private suspend fun executeAckWithRetry(
         caller: String,
+        accountId: String,
         attempt: suspend (ApiHandle) -> Response<JsonObject?>?
     ): Pair<Boolean, String> {
         // Resolve the test/production split once, stable across all retries.
-        val handle = resolveApi()
+        val handle = resolveApi(accountId)
 
         // Back-off delays in ms.  The first attempt is immediate (no leading delay).
         // After attempt N fails transiently, wait ACK_RETRY_DELAYS[N] before attempt N+1.
@@ -763,12 +926,12 @@ class BillingBackendClient(
 
                 if (httpCode == 401) {
                     Logger.e(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 401 unauthorized, not retrying; $errorBody")
-                    return Pair(false, "Unauthorized: 401")
+                    return Pair(false, ACK_MARKER_UNAUTHORIZED)
                 }
 
                 if (httpCode == 409) {
                     Logger.w(LOG_IAB, "$TAG $caller [${handle.envLabel}]: 409 conflict, not retrying; $errorBody")
-                    return Pair(false, "Conflict: 409")
+                    return Pair(false, ACK_MARKER_CONFLICT)
                 }
 
                 if (httpCode == 429) {
@@ -844,15 +1007,15 @@ class BillingBackendClient(
         purchaseToken: String
     ): QueryEntitlementResult = withContext(Dispatchers.IO) {
         val mname = "queryEntitlement"
-        if (accountId.isEmpty()) {
-            Logger.e(LOG_IAB, "$TAG $mname: empty accountId skipping")
+        if (accountId.isBlank() || deviceId.isBlank()) {
+            Logger.e(LOG_IAB, "$TAG $mname: empty accountId or deviceId skipping")
             // Treat missing accountId as a transient/infrastructure problem, not a business error.
             return@withContext QueryEntitlementResult.Transient(purchase)
         }
         try {
             val encodedPt = URLEncoder.encode(purchaseToken, "UTF-8")
             val sku = skuForType(purchase.productType)
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.queryEntitlement(accountId, deviceId, sku, encodedPt, vcode)
@@ -925,95 +1088,101 @@ class BillingBackendClient(
     /**
      * Calls `POST /g/stop` to cancel a subscription or one-time purchase.
      *
-     * @return Pair(success, message). On 409 returns (false, "Conflict: 409").
+     * @return [PurchaseMutationResult.Success] on HTTP 2xx,
+     *         [PurchaseMutationResult.Unauthorized] on 401,
+     *         [PurchaseMutationResult.Conflict] on 409,
+     *         [PurchaseMutationResult.Failure] otherwise.
      */
     suspend fun cancelPurchase(
         accountId: String,
         deviceId: String,
         sku: String,
         purchaseToken: String
-    ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
+    ): PurchaseMutationResult = withContext(Dispatchers.IO) {
         val mname = "cancelPurchase"
         try {
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val vcode = persistentState.appVersion.toString()
             Logger.d(LOG_IAB, "$TAG $mname [${handle.envLabel}]: accLen=${accountId.length}, devLen=${deviceId.length}, sku=$sku")
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.cancelPurchase(accountId, deviceId, sku, purchaseToken, vcode)
                 is ApiHandle.Test -> handle.api.cancelSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
-            } ?: return@withContext Pair(false, "No response")
+            } ?: return@withContext PurchaseMutationResult.Failure("No response")
             val bodyStr = response.body()?.toString()
             val errorBody = response.errorBody()?.string()
             val rawForParsing = bodyStr?.takeIf { it.isNotBlank() } ?: errorBody
             return@withContext when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, response.code())) {
                 is RpnPurchaseAckServerResponse.Ok -> {
                     Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: cancelled sku=$sku")
-                    Pair(true, result.payload.message ?: "Cancelled")
+                    PurchaseMutationResult.Success(result.payload.message ?: "Cancelled")
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
                     when (result.payload.httpCode) {
                         401 -> {
                             Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${result.payload.error}")
-                            Pair(false, "Unauthorized: 401")
+                            PurchaseMutationResult.Unauthorized()
                         }
-                        409 -> Pair(false, "Conflict: 409")
+                        409 -> PurchaseMutationResult.Conflict()
                         else -> {
                             Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: error code=${result.payload.httpCode}, msg=${result.payload.error}")
-                            Pair(false, "Server error: ${result.payload.httpCode}")
+                            PurchaseMutationResult.Failure("Server error: ${result.payload.httpCode}")
                         }
                     }
                 }
             }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG $mname: err ${e.message}", e)
-            Pair(false, "Exception: ${e.message}")
+            PurchaseMutationResult.Failure("Exception: ${e.message}")
         }
     }
 
     /**
      * Calls `POST /g/refund` to revoke/refund a purchase.
      *
-     * @return Pair(success, message). On 409 returns (false, "Conflict: 409").
+     * @return [PurchaseMutationResult.Success] on HTTP 2xx,
+     *         [PurchaseMutationResult.Unauthorized] on 401,
+     *         [PurchaseMutationResult.Conflict] on 409,
+     *         [PurchaseMutationResult.Failure] otherwise.
      */
     suspend fun revokePurchase(
         accountId: String,
         deviceId: String,
         sku: String,
         purchaseToken: String
-    ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
+    ): PurchaseMutationResult = withContext(Dispatchers.IO) {
         val mname = "revokePurchase"
         try {
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode)
                 is ApiHandle.Test -> handle.api.revokeSubscription(accountId, deviceId, sku, purchaseToken, vcode, test = "")
-            } ?: return@withContext Pair(false, "No response")
+            } ?: return@withContext PurchaseMutationResult.Failure("No response")
             val bodyStr = response.body()?.toString()
             val errorBody = response.errorBody()?.string()
             val rawForParsing = bodyStr?.takeIf { it.isNotBlank() } ?: errorBody
             return@withContext when (val result = RpnPurchaseAckServerResponse.from(rawForParsing, response.code())) {
                 is RpnPurchaseAckServerResponse.Ok -> {
                     Logger.i(LOG_IAB, "$TAG $mname [${handle.envLabel}]: revoked sku=$sku")
-                    Pair(true, result.payload.message ?: "Revoked")
+                    PurchaseMutationResult.Success(result.payload.message ?: "Revoked")
                 }
                 is RpnPurchaseAckServerResponse.Err -> {
                     when (result.payload.httpCode) {
                         401 -> {
                             Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: 401 unauthorized; accLen=${accountId.length}, err=${result.payload.error}")
-                            Pair(false, "Unauthorized: 401")
+                            PurchaseMutationResult.Unauthorized()
                         }
-                        409 -> Pair(false, "Conflict: 409")
+                        409 -> PurchaseMutationResult.Conflict()
                         else -> {
                             Logger.e(LOG_IAB, "$TAG $mname [${handle.envLabel}]: err code=${result.payload.httpCode}, msg=${result.payload.error}")
-                            Pair(false, "server err: ${result.payload.httpCode}, ${result.payload.error}")
+                            PurchaseMutationResult.Failure("Server error: ${result.payload.httpCode}, ${result.payload.error}")
                         }
                     }
                 }
             }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG $mname: err ${e.message}", e)
-            Pair(false, "err: ${e.message}")
+            PurchaseMutationResult.Failure("Exception: ${e.message}")
         }
     }
 
@@ -1044,7 +1213,7 @@ class BillingBackendClient(
             return@withContext FetchOrdersRawResult.NoCredentials
         }
         try {
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.getPurchaseHistory(
@@ -1104,13 +1273,13 @@ class BillingBackendClient(
         purchaseToken: String
     ): Boolean = withContext(Dispatchers.IO) {
         val mname = "consumePurchase"
-        if (accountId.isBlank()) {
-            Logger.e(LOG_IAB, "$TAG $mname: blank accountId skipping")
+        if (accountId.isBlank() || deviceId.isBlank()) {
+            Logger.e(LOG_IAB, "$TAG $mname: blank accountId or deviceId skipping")
             return@withContext false
         }
         try {
             val encodedToken = URLEncoder.encode(purchaseToken, "UTF-8")
-            val handle = resolveApi()
+            val handle = resolveApi(accountId)
             val vcode = persistentState.appVersion.toString()
             val response = when (handle) {
                 is ApiHandle.Production -> handle.api.consumePurchase(accountId, deviceId, sku, encodedToken, vcode)
@@ -1171,7 +1340,7 @@ class BillingBackendClient(
      * ```json
      * {
      *   "model":      "Manufacturer Model",
-     *   "appVersion": <int>
+     *   "appVersion": "<int>"
      * }
      * ```
      */
@@ -1206,35 +1375,35 @@ class BillingBackendClient(
     }
 
     /**
-     * Resolves which Retrofit interface to use for the current request.
-     *
-     * Calls [RpnProxyManager.getIsTestEntitlement] **once** and returns:
-     * - [ApiHandle.Test]       when the entitlement is a test one (non-null value).
-     * - [ApiHandle.Production] when the entitlement is production (null value) or when
-     *   the lookup throws (fail-safe: always prefer production on error).
-     *
-     * The Retrofit instances are created fresh per-call, Retrofit interface creation
-     * is lightweight (no network I/O) and this avoids threading concerns around caching
-     * a potentially stale test/production split.
+     * Resolves the endpoint from the environment whose store owns [accountId],
+     * falling back to the app's active environment when no store matches (blank or
+     * foreign cid). A stored pair must only be sent to the backend that issued it:
+     * the other backend rejects the cid as unknown.
      */
-    private suspend fun resolveApi(): ApiHandle {
-        val testValue = try {
-            RpnProxyManager.getIsTestEntitlement()
-        } catch (e: Exception) {
-            Logger.w(LOG_IAB, "$TAG resolveApi: getIsTestEntitlement, ${e.message}")
-            // happens when there is server calls before entitlement
-            val test = persistentState.appTestMode
-            Logger.w(LOG_IAB, "$TAG resolveApi: using TEST interface (testValue=$test)")
-            test
-        }
-        return if (testValue) {
+    private suspend fun resolveApi(accountId: String): ApiHandle =
+        apiForEnvironment(storedEnvironmentForCid(accountId) ?: currentEnv())
+
+    /**
+     * Maps [cid] to the environment whose identity store issued it, or null when
+     * no store matches. Lock-free: pure store reads are safe without [identityMutex]
+     * because the store is internally synchronized and atomically written.
+     */
+    private suspend fun storedEnvironmentForCid(cid: String): SecureIdentityStore.Env? {
+        if (cid.isBlank()) return null
+        val env = currentEnv()
+        if (identityStore.get(env).first == cid) return env
+        val otherEnv = otherEnv(env)
+        return if (identityStore.get(otherEnv).first == cid) otherEnv else null
+    }
+
+    private fun apiForEnvironment(env: SecureIdentityStore.Env): ApiHandle =
+        if (env == SecureIdentityStore.Env.TEST) {
             Logger.d(LOG_IAB, "$TAG resolveApi: using TEST interface")
             ApiHandle.Test(buildTestApi(), true)
         } else {
             Logger.d(LOG_IAB, "$TAG resolveApi: using PROD interface")
             ApiHandle.Production(buildProductionApi())
         }
-    }
 
     /** Builds a Retrofit instance for the production billing API. */
     private fun buildProductionApi(): IBillingServerApi {
@@ -1248,7 +1417,8 @@ class BillingBackendClient(
             .addInterceptor(buildFallbackInterceptor(Constants.RPN_BASE_URL, Constants.RPN_FALLBACK_URL))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_HEADER, DB_SESSION_RESPONSE_HEADER,
-                { dbSessionBookmark }, { dbSessionBookmark = it }, "prod"
+                { dbSessionBookmark }, { dbSessionBookmark = it },
+                { didTokenProd }, { didTokenProd = it }, "prod"
             ))
             .build()
         return Retrofit.Builder()
@@ -1276,7 +1446,8 @@ class BillingBackendClient(
             ))
             .addInterceptor(buildSessionInterceptor(
                 DB_SESSION_TEST_HEADER, DB_SESSION_TEST_RESPONSE_HEADER,
-                { dbSessionTestBookmark }, { dbSessionTestBookmark = it }, "test"
+                { dbSessionTestBookmark }, { dbSessionTestBookmark = it },
+                { didTokenTest }, { didTokenTest = it }, "test"
             ))
             .build()
         return Retrofit.Builder()
@@ -1355,6 +1526,8 @@ class BillingBackendClient(
         respHeader: String,
         getBookmark: () -> String?,
         setBookmark: (String) -> Unit,
+        getDidToken: () -> String?,
+        setDidToken: (String) -> Unit,
         tag: String
     ): Interceptor = Interceptor { chain ->
         val original = chain.request()
@@ -1364,7 +1537,7 @@ class BillingBackendClient(
         if (sessionHdr == DB_SESSION_UNCONSTRAINED) {
             getBookmark()?.let { reqBuilder.header(reqHeader, it) }
         }
-        didToken?.let { reqBuilder.header(DID_TOKEN_HEADER, it) }
+        getDidToken()?.let { reqBuilder.header(DID_TOKEN_HEADER, it) }
 
         val response = chain.proceed(reqBuilder.build())
 
@@ -1373,7 +1546,7 @@ class BillingBackendClient(
             if (DEBUG) Logger.d(LOG_IAB, "$TAG interceptor($tag): bookmark updated (len=${it.length})")
         }
         response.header(DID_TOKEN_HEADER)?.takeIf { it.isNotBlank() }?.let {
-            didToken = it
+            setDidToken(it)
             if (DEBUG) Logger.d(LOG_IAB, "$TAG interceptor($tag): didToken updated (len=${it.length})")
         }
         response
@@ -1393,4 +1566,3 @@ class BillingBackendClient(
         }
     }
 }
-

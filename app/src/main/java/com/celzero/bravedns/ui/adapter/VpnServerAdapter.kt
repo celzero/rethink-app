@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
+import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -48,15 +50,13 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_COUNTRY_CODE
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
+import com.celzero.bravedns.ui.bottomsheet.RecentRoutedAppsBottomSheet
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.LAST_ROUTED_APP_POLL_MS
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.MAX_LOCATION_TILES
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.ROUTED_APP_STACK_SIZE
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.SERVER_INFO_POLL_MS
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -275,6 +275,96 @@ class VpnServerAdapter(
         if (holder is ServerViewHolder) holder.cancelStatsJob()
     }
 
+    // holders currently bound with live polling; main-thread confined. Three shared
+    // tickers (stats / routed-apps / server-info) poll all of them per tick instead of
+    // three while-loops per visible row.
+    private val polledHolders = mutableListOf<ServerViewHolder>()
+    private var statsTickerJob: Job? = null
+    private var routedAppTickerJob: Job? = null
+    private var serverInfoTickerJob: Job? = null
+
+    // launcher icons are immutable per package: decode once, reuse across 3s polls
+    private val routedAppIconCache = LruCache<String, Drawable>(128)
+
+    private fun registerForPolling(holder: ServerViewHolder) {
+        if (polledHolders.contains(holder)) return
+        polledHolders.add(holder)
+        ensurePollTickers()
+    }
+
+    private fun unregisterFromPolling(holder: ServerViewHolder) {
+        polledHolders.remove(holder)
+        if (polledHolders.isNotEmpty()) return
+        statsTickerJob?.cancel(); statsTickerJob = null
+        routedAppTickerJob?.cancel(); routedAppTickerJob = null
+        serverInfoTickerJob?.cancel(); serverInfoTickerJob = null
+    }
+
+    private fun ensurePollTickers() {
+        if (statsTickerJob?.isActive == true) return
+        val lco = lifecycleOwner ?: return
+        statsTickerJob = lco.lifecycleScope.launch {
+            lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    withContext(Dispatchers.Main) { tickPolledHolders(PollKind.STATS) }
+                    delay(STATS_POLL_MS.milliseconds)
+                }
+            }
+        }
+        routedAppTickerJob = lco.lifecycleScope.launch {
+            lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    withContext(Dispatchers.Main) { tickPolledHolders(PollKind.LAST_ROUTED_APP) }
+                    delay(LAST_ROUTED_APP_POLL_MS.milliseconds)
+                }
+            }
+        }
+        serverInfoTickerJob = lco.lifecycleScope.launch {
+            lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    withContext(Dispatchers.Main) { tickPolledHolders(PollKind.SERVER_INFO) }
+                    delay(SERVER_INFO_POLL_MS.milliseconds)
+                }
+            }
+        }
+    }
+
+    private enum class PollKind { STATS, LAST_ROUTED_APP, SERVER_INFO }
+
+    private suspend fun tickPolledHolders(kind: PollKind) {
+        val iterator = polledHolders.iterator()
+        val active = ArrayList<ServerViewHolder>()
+        while (iterator.hasNext()) {
+            val holder = iterator.next()
+            val lifecycleActive =
+                lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
+            if (!lifecycleActive || holder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                iterator.remove()
+                continue
+            }
+            active.add(holder)
+        }
+        if (active.isEmpty()) {
+            unregisterFromPollingAll()
+            return
+        }
+        withContext(Dispatchers.IO) {
+            active.forEach { holder ->
+                when (kind) {
+                    PollKind.STATS -> holder.pollStats()
+                    PollKind.LAST_ROUTED_APP -> holder.pollLastRoutedApp()
+                    PollKind.SERVER_INFO -> holder.pollServerInfo()
+                }
+            }
+        }
+    }
+
+    private fun unregisterFromPollingAll() {
+        statsTickerJob?.cancel(); statsTickerJob = null
+        routedAppTickerJob?.cancel(); routedAppTickerJob = null
+        serverInfoTickerJob?.cancel(); serverInfoTickerJob = null
+    }
+
     override fun getItemCount(): Int = serverGroups.size + if (hasAddTile()) 1 else 0
 
     fun updateServerGroups(newGroups: List<ServerGroup>) {
@@ -334,9 +424,8 @@ class VpnServerAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         private val ctx: Context = b.root.context
-        private var statsJob: Job? = null
-        private var lastRoutedAppJob: Job? = null
-        private var serverInfoJob: Job? = null
+        // group currently bound to this holder; polled by the shared tickers
+        private var boundGroup: ServerGroup? = null
 
         /** Rotation spin running on [b.refreshStopIcon] after an AUTO reconnect tap. */
         private var refreshIconAnimator: ObjectAnimator? = null
@@ -358,6 +447,7 @@ class VpnServerAdapter(
         }
 
         fun bind(group: ServerGroup) {
+            boundGroup = group
             // Stop a reconnect spin inherited from a recycled AUTO binding.
             refreshIconAnimator?.cancel()
             refreshIconAnimator = null
@@ -456,9 +546,7 @@ class VpnServerAdapter(
                 b.relayActionContainer.setOnClickListener { toggleRelay(group) }
                 b.lastRoutedAppContainer.setOnClickListener { openRoutedAppLogs(group) }
                 // Always start polling
-                statsJob = pollStatsLoop(group)
-                lastRoutedAppJob = pollLastRoutedAppLoop(group)
-                serverInfoJob = pollServerInfoLoop(group)
+                startPolling()
             } else {
                 b.refreshStopIcon.setOnClickListener {
                     handleRefreshClick(group)
@@ -473,10 +561,12 @@ class VpnServerAdapter(
                 // Replay cached details; placeholder only when nothing is cached yet.
                 val hasCachedStatus = applyCachedDetails(group)
                 if (!hasCachedStatus) showCheckingStatus()
-                statsJob = pollStatsLoop(group)
-                lastRoutedAppJob = pollLastRoutedAppLoop(group)
-                serverInfoJob = pollServerInfoLoop(group)
+                startPolling()
             }
+        }
+
+        private fun startPolling() {
+            registerForPolling(this)
         }
 
         /** Re-applies cached details; true when a cached status was rendered. */
@@ -621,26 +711,13 @@ class VpnServerAdapter(
         }
 
         fun cancelStatsJob() {
-            if (statsJob?.isActive == true) statsJob?.cancel()
-            statsJob = null
-            if (lastRoutedAppJob?.isActive == true) lastRoutedAppJob?.cancel()
-            lastRoutedAppJob = null
-            if (serverInfoJob?.isActive == true) serverInfoJob?.cancel()
-            serverInfoJob = null
+            unregisterFromPolling(this)
         }
 
-        private fun pollStatsLoop(group: ServerGroup): Job? {
-            val lco = lifecycleOwner ?: return null
-            // repeatOnLifecycle(STARTED) automatically suspends the inner block whenever
-            // the lifecycle drops below STARTED
-            return lco.lifecycleScope.launch {
-                lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    while (true) {
-                        ioCtx { fetchAndApplyStats(group) }
-                        delay(STATS_POLL_MS.milliseconds)
-                    }
-                }
-            }
+        // one iteration of the old per-row stats poll; invoked by the shared ticker
+        suspend fun pollStats() {
+            val group = boundGroup ?: return
+            fetchAndApplyStats(group)
         }
 
         private suspend fun fetchAndApplyStats(group: ServerGroup) {
@@ -662,25 +739,17 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Polls, every [LAST_ROUTED_APP_POLL_MS] ms, the last connection routed through this
-         * RPN server (matched on [ServerGroup.key], the same configKey sent to
-         * RpnConfigDetailActivity) and refreshes the apps chip so changes made inside
-         * RpnConfigDetailActivity / WgIncludeAppsActivity are reflected when the user
-         * returns without a rebind.
-         */
-        private fun pollLastRoutedAppLoop(group: ServerGroup): Job? {
-            val lco = lifecycleOwner ?: return null
-            // repeatOnLifecycle(STARTED) automatically suspends the inner block whenever
-            // the lifecycle drops below STARTED
-            return lco.lifecycleScope.launch {
-                lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    while (true) {
-                        ioCtx { fetchAndApplyLastRoutedApp(group) }
-                        delay(LAST_ROUTED_APP_POLL_MS.milliseconds)
-                    }
-                }
-            }
+        // one iteration of the old per-row routed-apps poll; invoked by the shared ticker
+        suspend fun pollLastRoutedApp() {
+            val group = boundGroup ?: return
+            fetchAndApplyLastRoutedApp(group)
+        }
+
+        private fun getIconCached(pkg: String, appName: String): Drawable? {
+            routedAppIconCache.get(pkg)?.let { return it }
+            val icon = runCatching { Utilities.getIcon(ctx, pkg, appName) }.getOrNull()
+            if (icon != null) routedAppIconCache.put(pkg, icon)
+            return icon
         }
 
         private suspend fun fetchAndApplyLastRoutedApp(group: ServerGroup) {
@@ -698,7 +767,7 @@ class VpnServerAdapter(
 
                 val iconEntries = recents.map { ct ->
                     val icon = ct.packageName.takeIf { it.isNotBlank() }?.let {
-                        runCatching { Utilities.getIcon(ctx, it, ct.appName) }.getOrNull()
+                        getIconCached(it, ct.appName)
                     }
                     ct to icon
                 }
@@ -714,19 +783,10 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Polls, every [SERVER_INFO_POLL_MS] ms
-         */
-        private fun pollServerInfoLoop(group: ServerGroup): Job? {
-            val lco = lifecycleOwner ?: return null
-            return lco.lifecycleScope.launch {
-                lco.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    while (true) {
-                        ioCtx { fetchAndApplyServerInfo(group) }
-                        delay(SERVER_INFO_POLL_MS.milliseconds)
-                    }
-                }
-            }
+        // one iteration of the old per-row server-info poll; invoked by the shared ticker
+        suspend fun pollServerInfo() {
+            val group = boundGroup ?: return
+            fetchAndApplyServerInfo(group)
         }
 
         private suspend fun fetchAndApplyServerInfo(group: ServerGroup) {
@@ -1091,7 +1151,7 @@ class VpnServerAdapter(
                     val proxyName = when {
                         group.key.equals(AUTO_SERVER_ID, ignoreCase = true) ->
                             AUTO_SERVER_ID.capitalizeWords()
-                        config != null && config.city.isNotBlank() -> "${config.cc} - ${config.city}"
+                        config != null && config.city.isNotBlank() -> "${config.city} - ${config.cc}"
                         config != null && config.name.isNotBlank() -> config.name
                         else -> group.key
                     }
@@ -1100,9 +1160,7 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Opens the network-logs screen pre-filtered for this server
-         */
+        /** opens the recent-routed-apps bottom sheet for this server */
         private fun openRoutedAppLogs(group: ServerGroup) {
             io {
                 val proxyId = if (group.key.equals(AUTO_SERVER_ID, true)) {
@@ -1110,14 +1168,22 @@ class VpnServerAdapter(
                 } else {
                     Backend.RpnWin + group.key
                 }
+                val config = RpnProxyManager.getCountryConfigByKey(group.key)
                 uiCtx {
                     if (proxyId.isBlank()) {
                         Logger.w(LOG_TAG_UI, "VpnServerAdapter openRoutedAppLogs[${group.key}]: win proxy id unavailable")
                         return@uiCtx
                     }
-                    val intent = Intent(ctx, NetworkLogsActivity::class.java)
-                    intent.putExtra(Constants.SEARCH_QUERY, RULES_SEARCH_ID_RPN + proxyId)
-                    ctx.startActivity(intent)
+                    val fm = (ctx as? FragmentActivity)?.supportFragmentManager ?: return@uiCtx
+                    val subtitle = when {
+                        group.key.equals(AUTO_SERVER_ID, ignoreCase = true) ->
+                            AUTO_SERVER_ID.capitalizeWords()
+                        config != null && config.city.isNotBlank() -> "${config.city} - ${config.cc}"
+                        config != null && config.name.isNotBlank() -> config.name
+                        else -> group.cityName
+                    }
+                    RecentRoutedAppsBottomSheet.newInstance(proxyId, subtitle)
+                        .show(fm, RecentRoutedAppsBottomSheet.TAG)
                 }
             }
         }

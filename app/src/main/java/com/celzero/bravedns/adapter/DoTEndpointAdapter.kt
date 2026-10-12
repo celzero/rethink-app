@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.SelectionIndicator
+import com.celzero.bravedns.util.StatusTicker
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoTEndpoint
@@ -47,7 +48,6 @@ import com.celzero.firestack.backend.Backend
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -55,6 +55,9 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
     PagingDataAdapter<DoTEndpoint, DoTEndpointAdapter.DoTEndpointViewHolder>(DIFF_CALLBACK) {
 
     var lifecycleOwner: LifecycleOwner? = null
+
+    private val statusHolders = mutableListOf<DoTEndpointViewHolder>()
+    private val statusTicker = StatusTicker()
 
     companion object {
         private const val ONE_SEC = 1000L
@@ -86,13 +89,76 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
     }
 
     override fun onBindViewHolder(holder: DoTEndpointViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val endpoint: DoTEndpoint = getItem(position) ?: return
         holder.update(endpoint)
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        statusTicker.cancel()
+        statusHolders.clear()
+        lifecycleOwner = null
+    }
+
+    private fun registerForStatusUpdates(holder: DoTEndpointViewHolder) {
+        if (statusHolders.contains(holder)) return
+        statusHolders.add(holder)
+        if (!ensureStatusTicker()) refreshSelectedStatuses()
+    }
+
+    private fun ensureStatusTicker(): Boolean {
+        val owner = lifecycleOwner ?: return false
+        return statusTicker.start(owner.lifecycleScope, ONE_SEC) { refreshSelectedStatuses() }
+    }
+
+    private fun refreshSelectedStatuses(): Boolean {
+        val iterator = statusHolders.iterator()
+        val active = ArrayList<DoTEndpointViewHolder>()
+        while (iterator.hasNext()) {
+            val holder = iterator.next()
+            val lifecycleActive =
+                lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
+            if (!lifecycleActive || holder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                iterator.remove()
+                continue
+            }
+            active.add(holder)
+        }
+        if (active.isEmpty()) {
+            statusTicker.cancel()
+            return false
+        }
+        io {
+            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val status = getDnsStatusStringRes(state)
+            uiCtx {
+                active.forEach { it.showStatus(status) }
+            }
+        }
+        return true
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        val owner = lifecycleOwner ?: return
+
+        withContext(Dispatchers.Main.immediate) {
+            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                return@withContext
+            }
+
+            f()
+        }
+    }
+
     inner class DoTEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
-        private var statusCheckJob: Job? = null
         private val selectionIndicator =
             SelectionIndicator(b.endpointSelectionOrbital, b.endpointSelectionPill)
 
@@ -100,6 +166,11 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
         fun update(endpoint: DoTEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
+        }
+
+        fun showStatus(statusRes: Int) {
+            b.endpointDesc.text = context.getString(statusRes).replaceFirstChar(Char::titlecase)
+            b.endpointDesc.visibility = View.VISIBLE
         }
 
         private fun setupClickListeners(endpoint: DoTEndpoint) {
@@ -127,11 +198,13 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
             selectionIndicator.update(endpoint.isSelected)
 
             if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
-                keepSelectedStatusUpdated()
+                registerForStatusUpdates(this)
             } else if (endpoint.isSelected) {
+                statusHolders.remove(this)
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)
                 b.endpointDesc.visibility = View.VISIBLE
             } else {
+                statusHolders.remove(this)
                 b.endpointDesc.text = ""
                 b.endpointDesc.visibility = View.GONE
             }
@@ -140,42 +213,6 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
             showIcon(endpoint)
 
             io { updateFlag(endpoint) }
-        }
-
-        private fun keepSelectedStatusUpdated() {
-            statusCheckJob = ui {
-                while (true) {
-                    updateSelectedStatus()
-                    delay(ONE_SEC)
-                }
-            }
-        }
-
-        private fun updateSelectedStatus() {
-            // if the view is not active then cancel the job
-            if (
-                lifecycleOwner
-                    ?.lifecycle
-                    ?.currentState
-                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
-                    bindingAdapterPosition == RecyclerView.NO_POSITION
-            ) {
-                statusCheckJob?.cancel()
-                return
-            }
-
-            updateDnsStatus()
-        }
-
-        private fun updateDnsStatus() {
-            io {
-                val state = VpnController.getDnsStatus(Backend.Preferred)
-                val status = getDnsStatusStringRes(state)
-                uiCtx {
-                    b.endpointDesc.text = context.getString(status).replaceFirstChar(Char::titlecase)
-                    b.endpointDesc.visibility = View.VISIBLE
-                }
-            }
         }
 
         private fun showIcon(endpoint: DoTEndpoint) {

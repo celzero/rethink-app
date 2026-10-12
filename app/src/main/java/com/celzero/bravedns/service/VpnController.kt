@@ -27,6 +27,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
@@ -351,6 +352,14 @@ object VpnController : KoinComponent {
         rvpn?.addWireGuardProxy(id, force)
     }
 
+    suspend fun pauseWireGuardProxy(id: String) {
+        rvpn?.pauseWireGuardProxy(id)
+    }
+
+    suspend fun resumeWireGuardProxy(id: String) {
+        rvpn?.resumeWireGuardProxy(id)
+    }
+
     suspend fun refreshOrPauseOrResumeOrReAddProxies() {
         rvpn?.refreshOrPauseOrResumeOrReAddProxies()
     }
@@ -405,6 +414,10 @@ object VpnController : KoinComponent {
 
     fun writeConsoleLog(log: ConsoleLog) {
         rvpn?.writeConsoleLog(log)
+    }
+
+    fun writeRpnLog(log: RpnLog) {
+        rvpn?.writeRpnLog(log)
     }
 
     suspend fun registerAndFetchWinConfig(entitlementBytes: ByteArray?, stateBytes: ByteArray?, deviceId: String): ByteArray? {

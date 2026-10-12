@@ -37,15 +37,33 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 @ExperimentalCoroutinesApi
 class LogActivityAggregatorTest {
+
+    private class MutableTestClock(
+        private var nowMs: Long,
+        private val zone: ZoneId = ZoneOffset.UTC
+    ) : Clock() {
+        fun setMillis(value: Long) {
+            nowMs = value
+        }
+
+        override fun getZone(): ZoneId = zone
+
+        override fun withZone(zone: ZoneId): Clock = MutableTestClock(nowMs, zone)
+
+        override fun instant(): Instant = Instant.ofEpochMilli(nowMs)
+    }
 
     private lateinit var dnsRepo: DnsLogRepository
     private lateinit var ctRepo: ConnectionTrackerRepository
@@ -120,6 +138,11 @@ class LogActivityAggregatorTest {
         return LogActivityAggregator(dnsRepo, ctRepo, rlRepo, clock, arrivalDispatcher)
     }
 
+    private suspend fun TestScope.flushPendingSnapshot() {
+        testScheduler.advanceTimeBy(LogActivityAggregator.SNAPSHOT_PUBLISH_INTERVAL_MS)
+        testScheduler.runCurrent()
+    }
+
     @Test
     fun `empty wall has 144 ten-minute slots spanning 24 hours`() = runTest {
         val agg = aggregator()
@@ -138,12 +161,97 @@ class LogActivityAggregatorTest {
     }
 
     @Test
+    fun `event changes are conflated into one snapshot after ten seconds`() = runTest {
+        val agg = aggregator()
+        val initial = agg.activity.value
+        val seen = mutableListOf<LogActivityState>()
+        val collector = launch(start = CoroutineStart.UNDISPATCHED) {
+            agg.activity.collect { seen.add(it) }
+        }
+        testScheduler.runCurrent()
+
+        agg.record(
+            listOf(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true))
+        )
+        agg.record(
+            listOf(LogActivityEvent(minutesAgoMs(4), LogActivitySource.DNS, blocked = false))
+        )
+        agg.record(
+            listOf(
+                LogActivityEvent(
+                    minutesAgoMs(3),
+                    LogActivitySource.NETWORK,
+                    blocked = true,
+                    key = "coalesced"
+                )
+            )
+        )
+
+        assertSame(initial, agg.activity.value)
+        testScheduler.advanceTimeBy(LogActivityAggregator.SNAPSHOT_PUBLISH_INTERVAL_MS - 1)
+        testScheduler.runCurrent()
+        assertSame(initial, agg.activity.value)
+        assertEquals(1, seen.size)
+
+        testScheduler.advanceTimeBy(1)
+        testScheduler.runCurrent()
+
+        val latest = agg.activity.value
+        assertEquals(2L, latest.intervals.sumOf { it.blocked })
+        assertEquals(1L, latest.intervals.sumOf { it.allowed })
+        assertEquals(2, seen.size)
+        collector.cancel()
+    }
+
+    @Test
+    fun `out of window event does not publish an unchanged snapshot`() = runTest {
+        val agg = aggregator()
+        val initial = agg.activity.value
+        agg.record(
+            listOf(
+                LogActivityEvent(
+                    minutesAgoMs(24 * 60 + 1),
+                    LogActivitySource.DNS,
+                    blocked = true
+                )
+            )
+        )
+
+        flushPendingSnapshot()
+
+        assertSame(initial, agg.activity.value)
+    }
+
+    @Test
+    fun `restore publishes a changed window anchor even when counters are unchanged`() = runTest {
+        val movingClock = MutableTestClock(nowMs)
+        val agg = LogActivityAggregator(
+            dnsRepo,
+            ctRepo,
+            rlRepo,
+            movingClock,
+            UnconfinedTestDispatcher(testScheduler)
+        )
+        agg.restoreFromDatabase()
+        val before = agg.activity.value
+
+        movingClock.setMillis(nowMs + BUCKET_MS)
+        agg.restoreFromDatabase()
+
+        val after = agg.activity.value
+        assertNotSame(before, after)
+        assertEquals(before.intervals.map { it.blocked }, after.intervals.map { it.blocked })
+        assertEquals(before.windowEndMs + BUCKET_MS, after.windowEndMs)
+    }
+
+    @Test
     fun `one blocked dns event lands in its ten-minute bucket`() = runTest {
         val agg = aggregator()
         // 3h05m ago -> floor lands in the 3h10m-ago bucket
         agg.record(
             listOf(LogActivityEvent(minutesAgoMs(185), LogActivitySource.DNS, blocked = true))
         )
+        flushPendingSnapshot()
 
         val s = agg.activity.value
         assertEquals(1L, at(s, 185).dnsBlocked)
@@ -165,6 +273,7 @@ class LogActivityAggregatorTest {
                 )
             )
         )
+        flushPendingSnapshot()
         val s = agg.activity.value
         assertEquals(1L, at(s, 582).networkAllowed)
         assertEquals(1L, at(s, 582).allowed)
@@ -180,6 +289,7 @@ class LogActivityAggregatorTest {
                 LogActivityEvent(minutesAgoMs(20), LogActivitySource.DNS, blocked = false)
             )
         )
+        flushPendingSnapshot()
         val s = agg.activity.value
         // :21 floors into the :30-ago bucket, :20 into the :20-ago bucket
         assertEquals(1L, at(s, 21).dnsBlocked)
@@ -196,6 +306,7 @@ class LogActivityAggregatorTest {
                 LogActivityEvent(minutesAgoMs(1), LogActivitySource.NETWORK, blocked = true, key = "x")
             )
         )
+        flushPendingSnapshot()
         val s = agg.activity.value
         assertEquals(0L, s.intervals.sumOf { it.dnsBlocked })
         assertEquals(1L, at(s, 1).networkBlocked)
@@ -206,9 +317,11 @@ class LogActivityAggregatorTest {
         val agg = aggregator()
         // an event one hour ago and one 30 minutes in the future
         agg.record(listOf(LogActivityEvent(minutesAgoMs(60), LogActivitySource.DNS, blocked = true)))
+        flushPendingSnapshot()
         assertEquals(1L, at(agg.activity.value, 60).blocked)
 
         agg.record(listOf(LogActivityEvent(minutesAgoMs(-30), LogActivitySource.DNS, blocked = true)))
+        flushPendingSnapshot()
 
         val s = agg.activity.value
         assertEquals(nowMs + 40 * 60_000L, s.windowEndMs)
@@ -297,6 +410,7 @@ class LogActivityAggregatorTest {
         // subsequent arrivals still land after the live restore; both events
         // floor into the same 11:50 bucket
         agg.record(listOf(LogActivityEvent(minutesAgoMs(3), LogActivitySource.NETWORK, blocked = true, key = "post")))
+        flushPendingSnapshot()
         assertEquals(1L, at(agg.activity.value, 3).networkBlocked)
         assertEquals(1L, at(agg.activity.value, 5).dnsBlocked)
     }
@@ -319,13 +433,73 @@ class LogActivityAggregatorTest {
     }
 
     @Test
+    fun `force restore rebuilds from the database even when the wall is live`() = runTest {
+        // log-deletion flow: after rows are removed the database is
+        // authoritative again, so the rebuild must bypass the "wall is live"
+        // guard that a plain restore uses to protect unflushed arrivals
+        val (rangeStart, rangeEnd) = restoreRange()
+        coEvery {
+            dnsRepo.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS)
+        } returns listOf(ActivityBucketRow(72L, 1, 5))
+
+        val agg = aggregator()
+        // applied (but unflushed) arrival keeps the wall live: a plain
+        // restore keeps the event instead of rebuilding
+        agg.record(listOf(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true)))
+        agg.restoreFromDatabase()
+        assertEquals(1L, at(agg.activity.value, 5).blocked)
+
+        agg.forceRestoreFromDatabase()
+
+        // snapshot is published immediately, without waiting for the
+        // coalescing window
+        val s = agg.activity.value
+        assertEquals(5L, s.intervals[72].dnsBlocked)
+        // documented trade-off: the unflushed arrival is wiped by the rebuild
+        // and will not re-record (dedupe)
+        assertEquals(0L, at(s, 5).blocked)
+        assertEquals(5L, s.intervals.sumOf { it.blocked })
+        org.junit.Assert.assertFalse(agg.isStale())
+    }
+
+    @Test
+    fun `force restore applies arrivals queued behind the rebuild exactly once`() = runTest {
+        val (rangeStart, rangeEnd) = restoreRange()
+        val agg = aggregator()
+
+        // enqueue an arrival from inside the rebuild's own db query: the
+        // consumer wakes up while the mutex is held by the forced restore, so
+        // it suspends and must be applied after the rebuild, not wiped by it
+        coEvery {
+            dnsRepo.getActivityBuckets(rangeStart, rangeEnd, BUCKET_MS)
+        } coAnswers {
+            agg.recordOnArrival(
+                LogActivityEvent(minutesAgoMs(5), LogActivitySource.NETWORK, blocked = true, key = "q")
+            )
+            listOf(ActivityBucketRow(72L, 1, 5))
+        }
+
+        agg.forceRestoreFromDatabase()
+        testScheduler.advanceUntilIdle()
+        flushPendingSnapshot()
+
+        val s = agg.activity.value
+        assertEquals(5L, s.intervals[72].dnsBlocked)
+        assertEquals(1L, at(s, 5).networkBlocked)
+        assertEquals(6L, s.intervals.sumOf { it.blocked })
+        org.junit.Assert.assertFalse(agg.isStale())
+    }
+
+    @Test
     fun `blocked to allowed reclassification moves the count`() = runTest {
         val agg = aggregator()
         val e = LogActivityEvent(minutesAgoMs(35), LogActivitySource.DNS, blocked = true)
         agg.record(listOf(e))
+        flushPendingSnapshot()
         assertEquals(1L, at(agg.activity.value, 35).blocked)
 
         agg.reclassify(previous = e, new = e.copy(blocked = false))
+        flushPendingSnapshot()
 
         val cell = at(agg.activity.value, 35)
         assertEquals(0L, cell.blocked)
@@ -338,8 +512,12 @@ class LogActivityAggregatorTest {
         // both timestamps floor into the same ten-minute bucket
         val e = LogActivityEvent(minutesAgoMs(54), LogActivitySource.DNS, blocked = true)
         agg.record(listOf(e))
+        flushPendingSnapshot()
+        val published = agg.activity.value
         agg.reclassify(previous = e, new = e.copy(timestampMs = minutesAgoMs(51)))
+        flushPendingSnapshot()
 
+        assertSame(published, agg.activity.value)
         assertEquals(1L, at(agg.activity.value, 51).dnsBlocked)
         assertEquals(1L, agg.activity.value.intervals.sumOf { it.blocked })
     }
@@ -350,6 +528,7 @@ class LogActivityAggregatorTest {
         // both timestamps floor into the same ten-minute bucket
         val e = LogActivityEvent(minutesAgoMs(29), LogActivitySource.NETWORK, blocked = true, key = "dup")
         agg.record(listOf(e, e.copy(timestampMs = minutesAgoMs(21))))
+        flushPendingSnapshot()
         assertEquals(1L, at(agg.activity.value, 29).networkBlocked)
     }
 
@@ -373,6 +552,7 @@ class LogActivityAggregatorTest {
             }.awaitAll()
         }
 
+        flushPendingSnapshot()
         val s = agg.activity.value
         assertEquals(100L, s.intervals.sumOf { it.blocked + it.allowed })
         assertEquals(34L, s.intervals.sumOf { it.blocked }) // multiples of 3 in 0..99
@@ -389,9 +569,9 @@ class LogActivityAggregatorTest {
                 LogActivityEvent(minutesAgoMs(1), LogActivitySource.NETWORK, blocked = true, key = "a")
             )
         )
+        flushPendingSnapshot()
         val seen = mutableListOf<LogActivityState>()
-        // UNDISPATCHED: the collector receives the current StateFlow value
-        // synchronously before suspending; no virtual-time advance needed
+        // UNDISPATCHED receives the latest StateFlow value before suspending.
         val job = launch(start = CoroutineStart.UNDISPATCHED) {
             agg.activity.collect { seen.add(it) }
         }
@@ -400,5 +580,118 @@ class LogActivityAggregatorTest {
         assertEquals(2L, at(latest, 1).blocked)
         assertEquals(1L, at(latest, 1).allowed)
         job.cancel()
+    }
+
+    // --- recordOnArrival (queued batched-consumer path) ---
+
+    @Test
+    fun `arrivals via recordOnArrival land in their buckets`() = runTest {
+        val agg = aggregator()
+        agg.recordOnArrival(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true))
+        agg.recordOnArrival(
+            LogActivityEvent(minutesAgoMs(2), LogActivitySource.NETWORK, blocked = false, key = "n1")
+        )
+
+        testScheduler.advanceUntilIdle()
+        flushPendingSnapshot()
+
+        val s = agg.activity.value
+        assertEquals(1L, at(s, 5).dnsBlocked)
+        assertEquals(1L, at(s, 2).networkAllowed)
+        assertEquals(1L, s.intervals.sumOf { it.blocked })
+        assertEquals(1L, s.intervals.sumOf { it.allowed })
+    }
+
+    @Test
+    fun `arrivals are coalesced into one snapshot publish`() = runTest {
+        val agg = aggregator()
+        val seen = mutableListOf<LogActivityState>()
+        val collector = launch(start = CoroutineStart.UNDISPATCHED) {
+            agg.activity.collect { seen.add(it) }
+        }
+        testScheduler.runCurrent()
+
+        repeat(10) { n ->
+            agg.recordOnArrival(
+                LogActivityEvent(minutesAgoMs((n % 50).toLong() + 1), LogActivitySource.DNS, blocked = true)
+            )
+        }
+        testScheduler.advanceUntilIdle()
+
+        // all 10 arrivals share the snapshot-pending window: one publish after 10 s
+        testScheduler.advanceTimeBy(LogActivityAggregator.SNAPSHOT_PUBLISH_INTERVAL_MS)
+        testScheduler.runCurrent()
+        assertEquals(2, seen.size)
+        assertEquals(10L, agg.activity.value.intervals.sumOf { it.blocked })
+        collector.cancel()
+    }
+
+    @Test
+    fun `restore does not wipe arrivals queued via recordOnArrival`() = runTest {
+        val agg = aggregator()
+        agg.recordOnArrival(LogActivityEvent(minutesAgoMs(5), LogActivitySource.DNS, blocked = true))
+        testScheduler.advanceUntilIdle()
+
+        agg.restoreFromDatabase()
+
+        assertEquals(1L, at(agg.activity.value, 5).blocked)
+        org.junit.Assert.assertFalse(agg.isStale())
+    }
+
+    @Test
+    fun `duplicate arrivals with the same key are not double counted`() = runTest {
+        val agg = aggregator()
+        repeat(3) {
+            agg.recordOnArrival(
+                LogActivityEvent(minutesAgoMs(29), LogActivitySource.NETWORK, blocked = true, key = "dup")
+            )
+        }
+        testScheduler.advanceUntilIdle()
+        flushPendingSnapshot()
+
+        assertEquals(1L, at(agg.activity.value, 29).networkBlocked)
+    }
+
+    @Test
+    fun `burst larger than the arrival queue capacity does not throw`() = runTest {
+        val agg = aggregator()
+        // 2x capacity + margin; under a paused/contending dispatcher the queue overflows and
+        // DROP_OLDEST discards queued (not applied) events, so counts must never exceed the
+        // number of sent events. With the eager Unconfined dispatcher the consumer drains
+        // inline, so all events may be counted — both outcomes are valid; the contract under
+        // test is "no crash, no over-counting".
+        val sent = LogActivityAggregator.ARRIVAL_QUEUE_CAPACITY * 2 + 64
+        repeat(sent) { n ->
+            agg.recordOnArrival(
+                LogActivityEvent(minutesAgoMs(((n % 60) + 1).toLong()), LogActivitySource.DNS, blocked = true)
+            )
+        }
+        testScheduler.advanceUntilIdle()
+        flushPendingSnapshot()
+
+        val total = agg.activity.value.intervals.sumOf { it.blocked }
+        assertTrue("expected events counted, got $total", total > 0L)
+        assertTrue("counted $total, sent $sent", total <= sent.toLong())
+    }
+
+    @Test
+    fun `arrivals batch larger than max batch size are all applied`() = runTest {
+        val agg = aggregator()
+        val count = LogActivityAggregator.ARRIVAL_MAX_BATCH * 2 + 1
+        // distinct keys to bypass dedupe; distinct buckets to keep every event countable
+        repeat(count) { n ->
+            agg.recordOnArrival(
+                LogActivityEvent(
+                    minutesAgoMs(((n % 1440) + 1).toLong()),
+                    LogActivitySource.NETWORK,
+                    blocked = true,
+                    key = "k-$n"
+                )
+            )
+        }
+        testScheduler.advanceUntilIdle()
+        flushPendingSnapshot()
+
+        assertEquals(count.toLong(), agg.activity.value.intervals.sumOf { it.networkBlocked })
     }
 }

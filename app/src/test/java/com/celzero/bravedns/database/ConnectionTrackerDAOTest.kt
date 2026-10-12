@@ -1,11 +1,14 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
+import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +58,35 @@ class ConnectionTrackerDAOTest {
         
         // We can check count
         // Note: logsCount returns LiveData. In tests we can use getValue() or observe.
+    }
+
+    @Test
+    fun `merged logs with matching timestamps and ids have deterministic order`() = runBlocking {
+        val timestamp = System.currentTimeMillis()
+        dao.insert(
+            ConnectionTracker().apply {
+                id = 1
+                appName = "Connection tracker"
+                timeStamp = timestamp
+            }
+        )
+        db.rethinkConnectionLogDAO().insert(
+            RethinkLog().apply {
+                id = 1
+                appName = "Rethink log"
+                timeStamp = timestamp
+            }
+        )
+
+        val result =
+            dao.getMergedConnectionTrackerByName()
+                .load(PagingSource.LoadParams.Refresh(null, 10, true))
+        if (result !is PagingSource.LoadResult.Page) {
+            fail("Expected merged page, received $result")
+            return@runBlocking
+        }
+
+        assertEquals(listOf("ct", "rethink"), result.data.map { it.source })
     }
 
     @Test

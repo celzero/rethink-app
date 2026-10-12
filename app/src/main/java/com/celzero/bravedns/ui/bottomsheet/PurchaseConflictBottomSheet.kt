@@ -28,13 +28,14 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetPurchaseConflictBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.iab.PurchaseMutationResult
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
-import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet.Companion.newInstance
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -199,14 +200,15 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
 
         setRefundInFlight(true)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId(accountId) }.getOrDefault("")
             if (deviceId.isBlank()) {
-                Logger.e(LOG_IAB, "$TAG: refund aborted, deviceId unavailable from SecureIdentityStore")
+                Logger.e(LOG_IAB, "$TAG: refund aborted, no did linked to accountId-len=${accountId.length}")
                 withContext(Dispatchers.Main) {
+                    val ctx = context ?: return@withContext
                     setRefundInFlight(false)
                     showToastUiCentered(
-                        requireContext(),
+                        ctx,
                         getString(R.string.subscription_action_failed),
                         Toast.LENGTH_SHORT
                     )
@@ -216,32 +218,39 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
             val result = try {
                 Logger.i(LOG_IAB, "$TAG: initiating refund for accountId-len=${accountId.length}, sku=$sku")
                 InAppBillingHandler.revokeSubscription(accountId, deviceId, purchaseToken, sku)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.e(LOG_IAB, "$TAG: refund exception: ${e.message}", e)
-                Pair(false, e.message ?: getString(R.string.subscription_action_failed))
+                PurchaseMutationResult.Failure(e.message ?: getString(R.string.subscription_action_failed))
             }
 
             withContext(Dispatchers.Main) {
+                val ctx = context ?: return@withContext
                 setRefundInFlight(false)
-                if (result.first) {
+                if (result is PurchaseMutationResult.Success) {
                     Logger.i(LOG_IAB, "$TAG: refund success")
                     showToastUiCentered(
-                        requireContext(),
+                        ctx,
                         getString(R.string.conflict_refund_success),
                         Toast.LENGTH_LONG
                     )
-                    onRefundResult?.invoke(true, result.second)
+                    onRefundResult?.invoke(true, result.message)
                     dismissAllowingStateLoss()
                 } else {
-                    Logger.w(LOG_IAB, "$TAG: refund failed: ${result.second}")
-                    // Update button to Retry and show the error inline
-                    binding.btnRefund.text = getString(R.string.conflict_btn_refund_retry)
+                    Logger.w(LOG_IAB, "$TAG: refund failed: ${result.text}")
+                    // 401/409 surface their own dedicated flows; keep the toast generic
+                    // instead of echoing the raw status text.
+                    val isRejected = result is PurchaseMutationResult.Unauthorized ||
+                        result is PurchaseMutationResult.Conflict
+                    if (!isRejected) binding.btnRefund.text = getString(R.string.conflict_btn_refund_retry)
                     showToastUiCentered(
-                        requireContext(),
-                        getString(R.string.conflict_refund_failed, result.second),
+                        ctx,
+                        if (isRejected) getString(R.string.subscription_action_failed)
+                        else getString(R.string.conflict_refund_failed, result.text),
                         Toast.LENGTH_LONG
                     )
-                    onRefundResult?.invoke(false, result.second)
+                    onRefundResult?.invoke(false, result.text)
                 }
             }
         }

@@ -289,8 +289,10 @@ object TunFlowManager : KoinComponent {
                 netLogTracker.updateIpSummary(connectionSummary)
             }
             removeTrackedCid(ctx.scope, connectionSummary.connId, key.uid)
-            io(ctx.scope, "dlIpInfo") {
-                IpInfoDownloader.fetchIpInfoIfRequired(s.target)
+            if (persistentState.downloadIpInfo) {
+                io(ctx.scope, "dlIpInfo") {
+                    IpInfoDownloader.fetchIpInfoIfRequired(s.target)
+                }
             }
         } catch (e: NumberFormatException) {
             Logger.e(LOG_TAG_VPN, "onSocketClosed: ${e.message}", e)
@@ -1092,11 +1094,14 @@ object TunFlowManager : KoinComponent {
                 "flow/inflow: returning mark: $mark for src(${cm.sourceIP}: ${cm.sourcePort}), dest(${cm.destIP}:${cm.destPort}, ${cm.query})"
             )
         }
-        io(ctx.scope, "handleSmartKeepAlive") {
-            if (persistentState.smartPersistentKeepalive) {
+        if (persistentState.smartPersistentKeepalive) {
+            io(ctx.scope, "handleSmartKeepAlive") {
                 proxyIds.split(",").forEach {
                     if (it.startsWith(ID_WG_BASE) || it.startsWith(Backend.RpnWin)) {
-                        Logger.vv(LOG_TAG_VPN, "rpnProxiesToPing: smart keepalive is enabled, curr used proxy: $it")
+                        Logger.vv(
+                            LOG_TAG_VPN,
+                            "rpnProxiesToPing: smart keepalive is enabled, curr used proxy: $it"
+                        )
                         ctx.handleWgOrRpnProxiesToPing(it)
                     }
                 }

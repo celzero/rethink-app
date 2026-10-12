@@ -61,6 +61,8 @@ class DetailedStatisticsViewModel(
         this.uid = uid
     }
 
+    fun getStartTime(): Long? = startTime.value
+
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
         private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
@@ -105,18 +107,22 @@ class DetailedStatisticsViewModel(
         }
     }
 
-    fun timeCategoryChanged(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
-        when (timeCategory) {
-            SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
+    fun timeCategoryChanged(
+        timeCategory: SummaryStatisticsViewModel.TimeCategory,
+        startTime: Long? = null
+    ) {
+        this.startTime.value =
+            startTime ?: when (timeCategory) {
+                SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
+                    System.currentTimeMillis() - ONE_HOUR_MILLIS
+                }
+                SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
+                    System.currentTimeMillis() - ONE_DAY_MILLIS
+                }
+                SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
+                    System.currentTimeMillis() - ONE_WEEK_MILLIS
+                }
             }
-            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
-                startTime.value = System.currentTimeMillis() - ONE_DAY_MILLIS
-            }
-            SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
-                startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
-            }
-        }
     }
 
     val getAllActiveConns =

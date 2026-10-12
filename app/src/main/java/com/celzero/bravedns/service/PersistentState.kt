@@ -64,6 +64,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DEFAULT_DNS_SERVER = "default_dns_query"
         const val PCAP_MODE = "pcap_mode"
         const val PCAP_FILE_PATH = "pcap_file_path"
+        const val PCAP_START_TIME = "pcap_start_time"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
@@ -350,6 +351,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // packet capture file path
     var pcapFilePath by stringPref("pcap_file_path").withDefault<String>("")
 
+    // epoch ms when packet capture to file was last enabled, 0 when not active
+    var pcapStartTime by longPref(PCAP_START_TIME).withDefault<Long>(0L)
+
     // dns caching in tunnel
     var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
 
@@ -415,6 +419,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // use system dns for undelegatedDomains
     var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
 
+    // route dns queries to system dns until the captive portal sign-in completes
+    var useSystemDnsOnCaptivePortal by booleanPref("use_system_dns_on_captive_portal").withDefault<Boolean>(true)
+
     // different modes the rpn proxy can function, see enum RpnMode
     var rpnMode by intPref("rpn_mode").withDefault<Int>(1)
 
@@ -435,6 +442,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user setting to allow only added packages can trigger the app
     var appTriggerPackages by stringPref("app_trigger_packages").withDefault<String>("")
+
+    // external automation for wireguard related actions (via broadcasts)
+    var wgTaskerAutomationEnabled by booleanPref("wg_tasker_automation_enabled").withDefault<Boolean>(false)
 
     // perform auto or manual network connectivity checks
     var performAutoNetworkConnectivityChecks by booleanPref("perform_auto_network_connectivity_checks").withDefault<Boolean>(true)
@@ -807,6 +817,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // monthly entitlement reconcile
     var lastForcedReconcileTimestamp by longPref("last_forced_reconcile_timestamp").withDefault<Long>(0L)
+
+    // timestamp of the first empty SUBS snapshot in the current window.
+    var iabEmptySubsFirstSeenTs by longPref("iab_empty_subs_first_seen_ts").withDefault<Long>(0L)
+
+    // timestamp of the last identity recovery attempt.
+    var identityRecoveryAttemptTs by longPref("identity_recovery_attempt_ts").withDefault<Long>(0L)
 
     // whether the guided tour has been completed; false = show the tour
     var guidedTourCompleted by booleanPref("guided_tour_completed").withDefault<Boolean>(false)

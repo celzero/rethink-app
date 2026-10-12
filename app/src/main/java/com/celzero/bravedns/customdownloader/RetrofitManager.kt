@@ -32,6 +32,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import org.koin.core.context.GlobalContext
+import retrofit2.Invocation
 import retrofit2.Retrofit
 import java.net.InetAddress
 import java.net.Proxy
@@ -68,13 +69,14 @@ class RetrofitManager {
         val rayIdInterceptor = Interceptor { chain ->
             val request = chain.request()
             val reqTime = System.currentTimeMillis()
+            val isBillingApiCall = isBillingApiCall(request)
 
             // Log request line asynchronously
             logScope.launch {
                 val ts = Utilities.convertLongToTime(reqTime, Constants.TIME_FORMAT_4)
                 val msg = "$ts --> ${request.method} ${request.url}"
                 Logger.d(LOG_OKHTTP, msg)
-                Logger.wireLog(msg)
+                if (isBillingApiCall) Logger.wireLog(msg)
             }
 
             val response = chain.proceed(request)
@@ -88,12 +90,18 @@ class RetrofitManager {
                     val prefix = "$ts <-- ${response.code} ${request.method} ${request.url}"
                     val msg = if (cfRay != null) "$prefix | cf-ray: $cfRay" else "$prefix | no-ray"
                     Logger.d(LOG_OKHTTP, msg)
-                    Logger.wireLog(msg)
+                    if (isBillingApiCall) Logger.wireLog(msg)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_OKHTTP, "err extracting ray-id from response: ${e.message}", e)
             }
             response
+        }
+
+        private fun isBillingApiCall(request: okhttp3.Request): Boolean {
+            val service = request.tag(Invocation::class.java)?.method()?.declaringClass
+            return service == IBillingServerApi::class.java ||
+                service == IBillingServerApiTest::class.java
         }
 
         fun getBlocklistBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {

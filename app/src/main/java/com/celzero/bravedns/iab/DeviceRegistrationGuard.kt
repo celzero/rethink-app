@@ -77,7 +77,12 @@ object DeviceRegistrationGuard {
     }
 
     /** Marks the end of a device-registration check. Call from a `finally` block. */
-    fun end(caller: String) {
-        Logger.v(LOG_IAB, "$TAG; $caller: device-registration check ended")
+    fun end(caller: String, success: Boolean = true) {
+        if (success) {
+            Logger.v(LOG_IAB, "$TAG; $caller: device-registration check ended")
+        } else {
+            lastRunStartMs.set(0L)
+            Logger.w(LOG_IAB, "$TAG; $caller: device-registration check failed; window released for retry")
+        }
     }
 }

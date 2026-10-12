@@ -438,7 +438,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
             accountId        = purchaseDetail.accountId
             // Store only the sentinel indicator
             // never holds a sensitive plain-text credential.  The real value lives in
-            // SecureIdentityStore and is obtained via BillingBackendClient.getDeviceId().
+            // SecureIdentityStore and is obtained via BillingBackendClient.getDeviceIdForCid(cid).
             deviceId         = if (purchaseDetail.deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else ""
             purchaseToken    = purchaseDetail.purchaseToken
             orderId          = purchaseDetail.orderId

@@ -90,6 +90,25 @@
             tools:visibility="visible"
             tools:text="1.2 Gbps" />
 
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_ip_version"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="?attr/homeScreenHeaderTextColor"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:chipBackgroundColor="?attr/chipColorBgNormal"
+            app:chipStrokeWidth="0dp"
+            app:chipMinHeight="24dp"
+            app:chipStartPadding="6dp"
+            app:chipEndPadding="6dp"
+            app:chipIconEnabled="false"
+            app:closeIconEnabled="false"
+            app:ensureMinTouchTargetSize="false"
+            tools:text="v46"
+            tools:visibility="visible" />
+
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/checkbox_server"
             android:layout_width="28dp"

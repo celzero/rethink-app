@@ -160,6 +160,7 @@
     <string name="lbl_connect" translatable="true">Connect</string>
     <string name="lbl_criteria" translatable="true">Criteria</string>
     <string name="lbl_all_apps" translatable="false">All Apps</string>
+    <string name="lbl_technique" translatable="false">Technique</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -643,7 +644,7 @@
     <string name="settings_check_update_desc" translatable="true">Automatically check for app updates once a week.</string>
 
     <string name="settings_custom_downloader_heading" translatable="true">Use in-app downloader</string>
-    <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used</string>
+    <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used.</string>
 
     <string name="settings_import_export_heading" translatable="true">Backup &amp; Restore</string>
     <string name="settings_import_export_desc" translatable="true">Manually back up or restore app data and settings.</string>
@@ -773,6 +774,17 @@
     <string name="settings_pcap_dialog_option_3" translatable="true">Output to the Downloads folder</string>
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
+    <string name="pcap_mode_section_title" translatable="true">Capture mode</string>
+    <string name="pcap_files_section_title" translatable="true">Captured files</string>
+    <string name="pcap_empty_state" translatable="true">No pcap files yet. Files written by packet capture appear here.</string>
+    <string name="pcap_delete_file_confirmation" translatable="true">Delete %1$s?</string>
+    <string name="pcap_delete_all_confirmation" translatable="true">Delete all captured pcap files? The active capture, if any, will be stopped.</string>
+    <string name="pcap_file_delete_failed_toast" translatable="true">Could not delete %1$s</string>
+    <string name="pcap_active_file_label" translatable="true">Active capture</string>
+    <string name="pcap_view_file_desc" translatable="true">View pcap file</string>
+    <string name="pcap_open_failed_toast" translatable="true">Could not open</string>
+    <string name="pcap_open_folder" translatable="true">Open folder</string>
+    <string name="pcap_files_desc" translatable="true">Packet capture remains active for a maximum of 3 hours, after which it is stopped and reverts to off.</string>
 
     <string name="settings_biometric_dialog_heading" translatable="true">Biometric Authentication</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">None</string>
@@ -912,13 +924,13 @@
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
 
     <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs</string>
-    <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
+    <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space.</string>
 
     <string name="dc_dns_leaks_heading" translatable="true">Prevent DNS leaks</string>
-    <string name="dc_dns_leaks_desc" translatable="true">When enabled, Rethink captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
+    <string name="dc_dns_leaks_desc" translatable="true">When enabled, Rethink captures all packets on port 53 and forwards it to a user-set DNS endpoint.</string>
 
     <string name="dc_check_update_heading" translatable="true">Prompt on blocklist updates</string>
-    <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days</string>
+    <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days.</string>
 
     <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
@@ -927,7 +939,10 @@
     <string name="dc_block_unknown_desc" translatable="true">Block all DNS requests originating from unknown applications.</string>
 
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
-    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelegated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
+
+    <string name="dc_use_sys_dns_captive_heading" translatable="true">Use System DNS on captive portals</string>
+    <string name="dc_use_sys_dns_captive_desc" translatable="true">Use System DNS to resolve domains until captive portal sign-in is complete.</string>
 
     <string name="dc_filtering_heading" translatable="true">Filtering</string>
 
@@ -1667,7 +1682,7 @@
     <string name="dc_dns_proxy" translatable="false">DNS Proxy</string>
 
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS booster</string>
-    <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling.</string>
 
     <string name="dc_refresh_toast" translatable="true">Refresh complete</string>
 
@@ -1819,7 +1834,8 @@
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">WireGuard cannot be enabled in DNS-only mode. Switch to Firewall or DNS+Firewall mode.</string>
     <string name="wireguard_one_wg_active_conflict" translatable="true">An active One-WireGuard configuration is in use. Disable it first to use individual WireGuard configurations.</string>
-    <string name="wireguard_duplicate_keys_conflict" translatable="true">Cannot enable this WireGuard. Its keys are already in use by another active WireGuard.</string>
+    <string name="wireguard_duplicate_keys_warning_title" translatable="true">Duplicate WireGuard keys</string>
+    <string name="wireguard_duplicate_keys_warning" translatable="true">This WireGuard\'s keys are already in use by another active WireGuard. Proceeding may cause connectivity issues for both configurations.</string>
     <string name="wireguard_invalid_config_title" translatable="true">Invalid WireGuard configuration</string>
     <string name="wireguard_invalid_config_message" translatable="true">The selected WireGuard configuration is invalid or missing. Edit or re-import the configuration and try again.</string>
     <string name="wireguard_replaced_active_config" translatable="true">Replaced the previously active WireGuard configuration</string>
@@ -1873,7 +1889,7 @@
 
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Logs</string>
-    <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
+    <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
@@ -1971,9 +1987,37 @@
 
         Supported actions:\n
         • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n
-        • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP
+        • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP\n\n
+
+        WireGuard actions (require the WireGuard automation toggle above;\n
+        extra key: "wg_ids" – comma separated WireGuard config ids, e.g. "1,3"):\n
+        • Start WireGuard – com.celzero.bravedns.intent.action.WG_START\n
+        • Stop WireGuard – com.celzero.bravedns.intent.action.WG_STOP\n
+        • Pause WireGuard – com.celzero.bravedns.intent.action.WG_PAUSE\n
+        • Resume WireGuard – com.celzero.bravedns.intent.action.WG_RESUME
     </string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Enter package name (example: net.dinglisch.android.taskerm)</string>
+
+    <string name="tasker_allowed_apps_title" translatable="true">Allowed apps</string>
+    <string name="tasker_intent_reference_title" translatable="true">Intent reference</string>
+    <string name="tasker_wg_automation_title" translatable="true">WireGuard automation</string>
+    <string name="tasker_wg_automation_desc" translatable="true">Allow trusted apps to start, stop, pause and resume WireGuard configs by id. While enabled, in-app WireGuard automation (mobile-only / SSID) is controlled by the external app instead.</string>
+    <string name="wg_automation_tasker_managed" translatable="true">Managed by an external app (e.g. Tasker). In-app automation is disabled for this config.</string>
+
+    <string name="notif_channel_wg_automation" translatable="true">WireGuard automation</string>
+    <string name="notif_channel_desc_wg_automation" translatable="true">Alerts when an external automation app could not start, stop, pause or resume WireGuard</string>
+    <string name="wg_automation_notif_title" translatable="true">WireGuard automation</string>
+    <plurals name="wg_automation_notif_summary">
+        <item quantity="one">Couldn\'t %1$s %2$d of %3$d WireGuard config</item>
+        <item quantity="other">Couldn\'t %1$s %2$d of %3$d WireGuard configs</item>
+    </plurals>
+    <string name="wg_automation_notif_item" translatable="true">Config #%1$d: %2$s</string>
+    <string name="wg_automation_notif_more" translatable="true">…and %1$d more</string>
+    <string name="wg_automation_action_start" translatable="true">start</string>
+    <string name="wg_automation_action_stop" translatable="true">stop</string>
+    <string name="wg_automation_action_pause" translatable="true">pause</string>
+    <string name="wg_automation_action_resume" translatable="true">resume</string>
+    <string name="wg_automation_action_failed" translatable="true">Action failed, try again</string>
 
     <string name="set_auto_dial_title" translatable="false">Set Auto Dial</string>
     <string name="set_auto_dial_desc" translatable="false">Use parallel dialing to connect to multiple servers at once.</string>
@@ -2371,10 +2415,6 @@
 
     <!-- Grace / OnHold banner -->
 
-    <!-- Account mismatch -->
-    <string name="account_mismatch_title" translatable="false">Different Google Account Detected</string>
-    <string name="account_mismatch_msg" translatable="false">You purchased with a different Google account. Please switch accounts in Google Play to restore your purchase.</string>
-
     <!-- User-friendly billing error messages -->
     <string name="billing_err_service_unavailable" translatable="false">Google Play is temporarily unavailable. Please try again in a few minutes.</string>
     <string name="billing_err_billing_unavailable" translatable="false">In-app purchases are not available on this device.</string>
@@ -2702,6 +2742,10 @@
     <string name="rpn_no_purchase_subtitle" translatable="false">You don\u2019t have a plan yet. Explore private network servers.</string>
     <string name="rpn_unavailable_without_plan" translatable="false">Available with an active plan</string>
 
+    <!-- Already-ended purchase (RethinkPlusManagePurchaseFragment cancel/revoke failure reconcile) -->
+    <string name="rpn_purchase_already_ended_title" translatable="false">Purchase is no longer active</string>
+    <string name="rpn_purchase_already_ended_message" translatable="false">This purchase has already expired or been canceled, so no further action is needed. If you believe this is incorrect, you can manage your purchase on Google Play or contact support for help.</string>
+
     <!-- RethinkPlusFragment connection info -->
     <string name="connection_location_with_colo" translatable="false">%1$s \u2022 %2$s</string>
     <string name="truncated_text" translatable="false">%1$s\u2026</string>
@@ -2778,6 +2822,17 @@
     <string name="device_auth_error_device_id_partial" translatable="false">partial</string>
     <string name="device_auth_error_id_unavailable" translatable="false">-</string>
     <string name="device_auth_error_btn_email" translatable="false">Contact Customer Support</string>
+    <string name="device_auth_error_btn_reset" translatable="false">Refresh Account</string>
+
+    <string name="manage_purchase_err_no_subscription" translatable="false">No active purchase found.</string>
+    <string name="manage_purchase_err_purchase_unavailable" translatable="false">Purchase detail unavailable. Please try again.</string>
+    <string name="manage_purchase_err_account_incomplete" translatable="false">Account information incomplete. Please try again.</string>
+    <string name="manage_purchase_err_device_identity" translatable="false">Device identity unavailable. Please try again.</string>
+    <string name="manage_purchase_err_auth" translatable="false">Device authorization failed. See the alert shown, then try again.</string>
+    <string name="manage_purchase_err_conflict" translatable="false">The server reported a conflict for this purchase. See the details shown.</string>
+    <string name="manage_purchase_err_generic" translatable="false">Something went wrong. Please try again.</string>
+    <string name="manage_purchase_cancel_success" translatable="false">Purchase cancelled successfully.</string>
+    <string name="manage_purchase_revoke_success" translatable="false">Purchase revoked. Refund will be processed within a few days.</string>
 
     <!-- Device Not Registered bottom sheet -->
     <string name="device_not_registered_title" translatable="false">Device Not Registered</string>
@@ -2789,6 +2844,9 @@
     <string name="device_not_registered_what_this_means_desc" translatable="false">Your subscription is active on Google Play but your device could not be linked to it on the Rethink server. This can happen after restoring from a backup or switching devices. Our support team can resolve this quickly once you provide the account details above.</string>
     <string name="device_not_registered_email_subject" translatable="false">Device Not Registered: Rethink DNS</string>
     <string name="device_not_registered_email_body_details" translatable="false">I have an active subscription but my device cannot be registered. The account details are:</string>
+    <string name="device_not_registered_reset_confirm_msg" translatable="false">This will refresh your account information and re-sync your subscription details.</string>
+    <string name="device_not_registered_reset_success" translatable="false">Identity refresh. Re-registering your device…</string>
+    <string name="device_not_registered_reset_failed" translatable="false">Could not refresh the identity. Please try again.</string>
 
     <!-- Device-not-registered system notification -->
     <string name="device_not_registered_notif_body" translatable="false">Your device could not be linked to your active subscription. Tap to review and contact support.</string>
@@ -2940,6 +2998,14 @@
     <string name="rpn_stats_top_apps" translatable="true">Top apps · last 24h</string>
     <string name="rpn_stats_view_logs" translatable="true">View connection logs</string>
     <string name="rpn_stats_empty" translatable="true">No connections have gone through selected servers in the last 24 hours.</string>
+
+    <string name="recent_routed_apps_title" translatable="true">Recently routed apps</string>
+    <string name="recent_routed_apps_empty" translatable="true">No apps have been routed through this server yet.</string>
+    <string name="recent_routed_conn_count" translatable="true">%1$s connections</string>
+    <string name="recent_routed_apps_hint" translatable="true">Excluded apps bypass all proxies</string>
+    <string name="recent_routed_app_excluded" translatable="true">Excluded %1$s from all proxies</string>
+    <string name="recent_routed_app_included" translatable="true">Routing %1$s through proxies again</string>
+    <string name="recent_routed_view_logs" translatable="true">View all logs</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Start Rethink to see proxy stats</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s conns</string>
 

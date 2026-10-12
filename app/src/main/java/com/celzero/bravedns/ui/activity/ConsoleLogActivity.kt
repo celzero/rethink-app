@@ -47,6 +47,7 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogRepository
+import com.celzero.bravedns.database.RpnLogRepository
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.BugReportZipper
@@ -85,6 +86,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
 
     private val viewModel by inject<ConsoleLogViewModel>()
     private val consoleLogRepository by inject<ConsoleLogRepository>()
+    private val rpnLogRepository by inject<RpnLogRepository>()
     private val workScheduler by inject<WorkScheduler>()
 
     companion object {
@@ -315,6 +317,8 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             io {
                 Logger.i(LOG_TAG_BUG_REPORT, "deleting all console logs")
                 consoleLogRepository.deleteAllLogs()
+                // the screen shows console + rpn logs, so clear both tables
+                rpnLogRepository.deleteAllLogs()
                 uiCtx {
                     showToastUiCentered(
                         this,

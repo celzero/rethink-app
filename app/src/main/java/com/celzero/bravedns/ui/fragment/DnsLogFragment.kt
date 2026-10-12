@@ -35,6 +35,7 @@ import com.celzero.bravedns.adapter.DnsLogAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
+import com.celzero.bravedns.service.LogActivityAggregator
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
@@ -69,6 +70,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private val dnsLogRepository by inject<DnsLogRepository>()
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val logActivityAggregator by inject<LogActivityAggregator>()
 
     companion object {
         private const val QUERY_TEXT_DELAY: Long = 1000
@@ -324,6 +326,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 io {
                     Glide.get(requireActivity()).clearDiskCache()
                     dnsLogRepository.clearAllData()
+                    // deletion committed; rebuild the home-screen activity
+                    // wall so its counts shed the deleted rows
+                    logActivityAggregator.forceRestoreFromDatabase()
                 }
             }
             .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }

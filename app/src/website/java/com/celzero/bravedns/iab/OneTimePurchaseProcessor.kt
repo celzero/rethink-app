@@ -55,16 +55,11 @@ internal class OneTimePurchaseProcessor(
     private val activateRpn: suspend (purchaseDetail: PurchaseDetail) -> Unit,
     /** Returns the product type string (ProductType.SUBS or INAPP) for a purchase. */
     private val getProductType: (Purchase) -> String,
-    /**
-     * Returns the stable per-device identifier.
-     * Invoked lazily from [buildPurchaseDetail] so the value is current at call time.
-     */
-    private val getDeviceId: suspend () -> String = { "" },
-    /**
-     * Called after a successful server acknowledgement, just before [activateRpn].
-     * Used to trigger registerDevice on every successful ack, including retries.
-     * Nullable, callers that do not need this hook pass null.
-     */
+    /** Returns the DID bound to the account, or blank if unavailable. */
+    private val getDeviceId: suspend (accountId: String) -> String = { "" },
+    /** Resolves and, if needed, mints the DID for the server-ack path. */
+    private val mintDeviceId: suspend (accountId: String) -> String = { "" },
+    /** Called after a successful server acknowledgement. */
     private val onAckSuccess: (suspend (purchase: Purchase) -> Unit)? = null,
     private val reconcileCidDid: suspend (accountId: String) -> Unit,
     private val validatePayloadAndFetchIfRequired: suspend (purchaseDtl: PurchaseDetail) -> PurchaseDetail
@@ -240,7 +235,7 @@ internal class OneTimePurchaseProcessor(
             isAutoRenewing = false,  // INAPP purchases never auto-renew
             accountId = accountId,
             // Never store the real device ID in PurchaseDetail; use sentinel only.
-            deviceId = if (getDeviceId().isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
+            deviceId = if (getDeviceId(accountId).isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
             payload = purchase.developerPayload,
             expiryTime = expiryTime,
             status = purchase.purchaseState.toSubscriptionStatusId(),
@@ -313,7 +308,7 @@ internal class OneTimePurchaseProcessor(
                 val pd = buildPurchaseDetail(purchase)
                 if (pd == null) {
                     logd(mname, "INAPP purchase access window expired; firing subscriptionExpired")
-                    subscriptionStateMachine.subscriptionExpired()
+                    subscriptionStateMachine.subscriptionExpired(purchase.purchaseToken)
                     return
                 }
                 // paymentSuccessful -> handlePaymentSuccessful handles DB upsert
@@ -338,7 +333,7 @@ internal class OneTimePurchaseProcessor(
                     subscriptionStateMachine.completePurchase(pd) // stays PurchasePending
                 } else {
                     logd(mname, "INAPP purchase access window expired before ack; firing subscriptionExpired")
-                    subscriptionStateMachine.subscriptionExpired()
+                    subscriptionStateMachine.subscriptionExpired(purchase.purchaseToken)
                 }
             } catch (e: Exception) {
                 loge(mname, "error recording pending INAPP state: ${e.message}", e)
@@ -350,21 +345,25 @@ internal class OneTimePurchaseProcessor(
         logd(mname, "INAPP token=${purchase.purchaseToken.take(8)} unacknowledged after " +
                 "threshold reached, calling server ack")
         val accountId = purchase.accountIdentifiers?.obfuscatedAccountId.orEmpty()
-        val deviceId = getDeviceId()
+        // resolve the DID only when a server acknowledgement is required.
+        val deviceId = if (purchase.developerPayload.isEmpty()) mintDeviceId(accountId) else ""
         if (accountId.isEmpty()) {
             loge(mname, "accountId empty, acknowledgement failed")
         }
 
-        val ackResult = if (purchase.developerPayload.isEmpty()) {
-            acknowledgeWithRetry(accountId, deviceId, purchase)
-        } else {
-            AckResult.Success(purchase.developerPayload)
+        val ackResult = when {
+            purchase.developerPayload.isNotEmpty() -> AckResult.Success(purchase.developerPayload)
+            accountId.isBlank() || deviceId.isBlank() -> {
+                loge(mname, "identity unavailable for server ack (accountId=${accountId.length}, deviceId=${deviceId.length}); keeping purchase pending")
+                AckResult.TransientFailure("Account/device identity unavailable")
+            }
+            else -> acknowledgeWithRetry(accountId, deviceId, purchase)
         }
 
         val pd = buildPurchaseDetail(purchase)
         if (pd == null) {
             logd(mname, "INAPP purchase access window expired during ack; marking expired")
-            subscriptionStateMachine.subscriptionExpired()
+            subscriptionStateMachine.subscriptionExpired(purchase.purchaseToken)
             return
         }
 

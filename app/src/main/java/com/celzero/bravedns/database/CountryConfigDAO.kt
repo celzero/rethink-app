@@ -44,8 +44,8 @@ interface CountryConfigDAO {
     suspend fun updateSsidBased(key: String, value: Boolean, timestamp: Long = System.currentTimeMillis())
 
 
-    @Query("UPDATE CountryConfig SET name = :name, address = :address, city = :city, `key` = :key, load = :load, link = :link, count = :count, isActive = :isActive, lastModified = :timestamp WHERE id = :id")
-    suspend fun updateServer(id: String, name: String, address: String, city: String, key: String, load: Int, link: Int, count: Int, isActive: Boolean, timestamp: Long = System.currentTimeMillis())
+    @Query("UPDATE CountryConfig SET name = :name, address = :address, city = :city, `key` = :key, load = :load, link = :link, count = :count, isActive = :isActive, ipv4 = :ipv4, ipv6 = :ipv6, lastModified = :timestamp WHERE id = :id")
+    suspend fun updateServer(id: String, name: String, address: String, city: String, key: String, load: Int, link: Int, count: Int, isActive: Boolean, ipv4: Boolean, ipv6: Boolean, timestamp: Long = System.currentTimeMillis())
 
     @Query("SELECT COUNT(*) FROM CountryConfig")
     suspend fun getCount(): Int
