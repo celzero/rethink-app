@@ -221,9 +221,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
 
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
-        // set log level name in the  description
+        // set log level name in the  description; usr is never shown, it is
+        // displayed as none (same mapping as the log level dialog)
+        val goLogLevel = persistentState.goLoggerLevel.toInt()
+        val goLogLevelDisplay =
+            if (goLogLevel == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else goLogLevel
         b.genSettingsGoLogDesc.text =
-            Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
+            Logger.LoggerLevel.fromId(goLogLevelDisplay)?.name?.lowercase()
                 ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
         // set log lifespan name in the description
         b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
