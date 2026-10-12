@@ -154,7 +154,7 @@ class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun loadPcapFiles() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val files = withContext(Dispatchers.IO) {
                     val dir = pcapDir()
@@ -298,7 +298,7 @@ class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun deletePcapFiles(files: List<File>) {
         if (files.isEmpty()) return
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val (failed, activeDeleted) = withContext(Dispatchers.IO) {
                 val failures = mutableListOf<File>()
                 files.forEach { f ->
