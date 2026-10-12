@@ -19,7 +19,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink"
@@ -27,9 +30,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:alpha="0.5"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp"
-                android:text="@string/app_name_small_case" />
+                android:text="@string/app_name_small_case"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="14sp"
+                app:autoSizeMaxTextSize="@dimen/rethink_header_text" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink_desc"
@@ -37,8 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:alpha="0.5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingTop="2dp"
                 android:text="@string/about_title_desc" />
 
         </LinearLayout>
