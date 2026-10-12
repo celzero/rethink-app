@@ -1043,7 +1043,8 @@ class TunDnsManagerTest {
         isConnectionMetered: (String) -> Boolean = { false },
         determineProxyDetails: suspend (ConnTrackerMetaData, Boolean, Boolean) -> Mark = { _, _, _ -> mockk(relaxed = true) },
         onDeviceLocked: (() -> Unit)? = null,
-        onAccessibilityFailure: (() -> Unit)? = null
+        onAccessibilityFailure: (() -> Unit)? = null,
+        isCaptivePortal: Boolean = false
     ): TunDnsManager.UpstreamAnswerParams {
         return TunDnsManager.UpstreamAnswerParams(
             scope = CoroutineScope(SupervisorJob()),
@@ -1061,7 +1062,8 @@ class TunDnsManagerTest {
             isConnectionMetered = isConnectionMetered,
             determineProxyDetails = determineProxyDetails,
             onDeviceLocked = onDeviceLocked,
-            onAccessibilityFailure = onAccessibilityFailure
+            onAccessibilityFailure = onAccessibilityFailure,
+            isCaptivePortal = isCaptivePortal
         )
     }
 
