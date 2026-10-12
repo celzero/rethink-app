@@ -60,7 +60,10 @@ class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
         fun onPcapModeSelected(mode: PcapMode)
     }
 
+    // The listener is set programmatically before show(); after FragmentManager restoration
+    // the field is null, so fall back to the host activity when it implements the callback.
     var modeSelectListener: PcapModeSelectListener? = null
+        get() = field ?: activity as? PcapModeSelectListener
 
     private var _binding: BottomSheetPcapFilesBinding? = null
     private val b
