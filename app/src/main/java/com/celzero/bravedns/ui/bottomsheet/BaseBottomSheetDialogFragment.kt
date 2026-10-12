@@ -19,6 +19,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -63,6 +64,10 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         bottomSheet.layoutParams.height = bottomSheetHeight
         bottomSheet.requestLayout()
+
+        // Dialog windows do not consult the activity's onWindowStartingActionMode, so
+        // selectable text inside sheets is disabled directly on affected installs.
+        TextSelectionGuard.apply(bottomSheet)
 
         sheetDialog.behavior.apply {
             state = BottomSheetBehavior.STATE_EXPANDED
