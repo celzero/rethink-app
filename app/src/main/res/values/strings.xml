@@ -160,7 +160,7 @@
     <string name="lbl_connect" translatable="true">Connect</string>
     <string name="lbl_criteria" translatable="true">Criteria</string>
     <string name="lbl_all_apps" translatable="false">All Apps</string>
-    <string name="lbl_technique" translatable="false">technique</string>
+    <string name="lbl_technique" translatable="false">Technique</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -784,6 +784,7 @@
     <string name="pcap_view_file_desc" translatable="true">View pcap file</string>
     <string name="pcap_open_failed_toast" translatable="true">Could not open</string>
     <string name="pcap_open_folder" translatable="true">Open folder</string>
+    <string name="pcap_files_desc" translatable="true">Packet capture remains active for a maximum of 3 hours, after which it is stopped and reverts to off.</string>
 
     <string name="settings_biometric_dialog_heading" translatable="true">Biometric Authentication</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">None</string>
@@ -1888,7 +1889,7 @@
 
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Logs</string>
-    <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
+    <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
