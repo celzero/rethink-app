@@ -87,8 +87,21 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
     private var lastConnectivityCheckState: ConnectivityCheckState? = null
 
+    // last captive-portal state observed in onCapabilitiesChanged
+    @Volatile
+    private var lastCaptiveState: Boolean? = null
+
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
+
+    /** Returns true when the active network's captive portal state changes. */
+    private fun isCaptivePortalTransition(network: Network, capabilities: NetworkCapabilities): Boolean {
+        val captive = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
+        val prev = lastCaptiveState
+        lastCaptiveState = captive
+        val isActive = cm.activeNetwork == null || isNetworkSame(network, cm.activeNetwork)
+        return prev != null && prev != captive && isActive
+    }
 
     /**
      * Checks if connectivity check should be performed based on event type and timing
@@ -155,7 +168,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -211,7 +224,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -261,7 +274,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -304,7 +317,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -892,7 +905,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         val activeSsid: String?, // may be updated by client listener
         var lastUpdated: Long, // may be updated by client listener
         val dnsServers: Map<InetAddress, Network>,
-        var vpnLockdown: Boolean = false // updated by client listener
+        var vpnLockdown: Boolean = false, // updated by client listener
+        val isActiveNetworkCaptive: Boolean = false // updated when active network is behind a captive portal
     )
 
     data class IpsAndUrlToProbe(
@@ -999,6 +1013,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // fetch from newNetworks set
                 activeSsid = newNetworks.firstOrNull { it.ssid != null }?.ssid
             }
+            val isCaptiveActive = newActiveNetwork != null && isCaptivePortal(newActiveNetwork)
 
             Logger.i(LOG_TAG_CONNECTION, "process message active nws, currNws: $newNetworks")
             Logger.i(
@@ -1006,13 +1021,13 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
                 }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, test? ${opPrefs.testReachability}," +
-                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged, activeSsid: $activeSsid"
+                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged, activeSsid: $activeSsid, captive? $isCaptiveActive"
             )
 
             currentNetworks = newNetworks
             repopulateTrackedNetworks(opPrefs, currentNetworks)
             // client code must call setUnderlyingNetworks() to invoke linkCapabilities for other uids
-            informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes)
+            informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes, isCaptiveActive)
         }
 
         private suspend fun hasNwDnsChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
@@ -1044,13 +1059,14 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // fetch from newNetworks set
                 activeSsid = newNetworks.firstOrNull { it.ssid != null }?.ssid
             }
+            val isCaptiveActive = newActiveNetwork != null && isCaptivePortal(newActiveNetwork)
 
             Logger.i(LOG_TAG_CONNECTION, "process message all nws, currNws: $newNetworks")
-            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid")
+            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid, captive? $isCaptiveActive")
 
             currentNetworks = newNetworks
             repopulateTrackedNetworks(opPrefs, currentNetworks)
-            informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes)
+            informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes, isCaptiveActive)
         }
 
         /**
@@ -1190,7 +1206,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             isActiveNetworkMetered: Boolean,
             isActiveNetworkCellular: Boolean,
             activeSsid: String?,
-            vpnRoutes: Pair<Boolean, Boolean>?
+            vpnRoutes: Pair<Boolean, Boolean>?,
+            isCaptiveActive: Boolean = false
         ) {
             // TODO: use currentNetworks instead of trackedIpv4Networks and trackedIpv6Networks
             // to determine whether to call onNetworkConnected or onNetworkDisconnected
@@ -1224,7 +1241,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         isActiveNetworkCellular,
                         activeSsid,
                         SystemClock.elapsedRealtimeNanos(),
-                        Collections.unmodifiableMap(dnsServers)
+                        Collections.unmodifiableMap(dnsServers),
+                        isActiveNetworkCaptive = isCaptiveActive
                     )
                 listener.onNetworkChange(underlyingNetworks)
             } else {

@@ -3665,9 +3665,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     override fun onQuery(origin: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
         return go2kt(dnsQueryDispatcher) {
-            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""))
+            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""), isCaptivePortal())
             TunDnsManager.handleOnQuery(d)
         }
+    }
+
+    private fun isCaptivePortal(): Boolean {
+        return underlyingNetworks?.isActiveNetworkCaptive == true &&
+                persistentState.useSystemDnsOnCaptivePortal
     }
 
     private fun getUnderlyingSsid(): String? {
@@ -3815,7 +3820,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     TunFlowManager.determineProxyDetails(buildFlowContext(), connTracker, rinr, forUpstreamAnswer)
                 },
                 onDeviceLocked = { TunFlowManager.closeTrackedConnsOnDeviceLock(buildFlowContext()) },
-                onAccessibilityFailure = ::handleAccessibilityFailure
+                onAccessibilityFailure = ::handleAccessibilityFailure,
+                isCaptivePortal = isCaptivePortal()
             )
             TunDnsManager.handleOnUpstreamAnswer(params)
         }

@@ -419,6 +419,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // use system dns for undelegatedDomains
     var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
 
+    // route dns queries to system dns until the captive portal sign-in completes
+    var useSystemDnsOnCaptivePortal by booleanPref("use_system_dns_on_captive_portal").withDefault<Boolean>(true)
+
     // different modes the rpn proxy can function, see enum RpnMode
     var rpnMode by intPref("rpn_mode").withDefault<Int>(1)
 
