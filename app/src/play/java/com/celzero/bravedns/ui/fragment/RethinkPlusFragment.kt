@@ -1005,6 +1005,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         // handled by state machine via InAppBillingHandler.
     }
 
+    override fun purchaseRejected() {
+        Logger.d(Logger.LOG_IAB, "$TAG: purchase rejected by state machine")
+        purchaseInFlight = false
+        cancelProcessingTimeout()
+    }
+
     override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {
         viewModel.onProductsFetched(isSuccess, productList, InAppBillingHandler.lastProductQueryResponseCode)
     }

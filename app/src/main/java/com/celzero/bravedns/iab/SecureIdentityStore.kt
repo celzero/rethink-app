@@ -154,23 +154,31 @@ class SecureIdentityStore(private val context: Context) {
      * - If the env-scoped file is absent or empty the legacy data is written into it.
      * - If the legacy file cannot be decrypted or is corrupt the legacy file is deleted
      *   with no env-scoped write so the next [refreshIdentity] fetches fresh IDs.
-     * - The legacy file is always deleted at the end, regardless of outcome, so this
-     *   method is safe to call multiple times (idempotent once the legacy file is gone).
+     * - The legacy file is deleted once migration succeeds or is deemed unnecessary, so
+     *   this method is safe to call multiple times (idempotent once the legacy file is
+     *   gone).  When the env-scoped write fails the legacy file is kept for retry and
+     *   the method returns `false`.
      *
      * @param env The environment ([Env.PROD] or [Env.TEST]) that the stored identity
      *            belongs to, determined by the caller from the live entitlement or
      *            [PersistentState.appTestMode] as a fallback.
+     * @return `true` when migration is complete or unnecessary (legacy file gone), or
+     *         `false` when the env-scoped write failed and the legacy file was kept so
+     *         the caller can retry later.
      */
-    suspend fun migrateFromLegacy(env: Env) = storeMutex.withLock {
+    suspend fun migrateFromLegacy(env: Env): Boolean = storeMutex.withLock {
         migrateFromLegacyLocked(env)
     }
 
     /**
      * Migration body for [migrateFromLegacy]. Caller MUST hold [storeMutex].
+     *
+     * @return `true` when migration is complete or unnecessary, `false` when the
+     *         env-scoped save failed and the legacy file was kept for retry.
      */
-    private suspend fun migrateFromLegacyLocked(env: Env) {
+    private suspend fun migrateFromLegacyLocked(env: Env): Boolean {
         val legacyFile = legacyIdentityFile()
-        if (!legacyFile.exists()) return  // already migrated or never existed
+        if (!legacyFile.exists()) return true  // already migrated or never existed
 
         val (legacyAcc, legacyDev) = readLegacy()
 
@@ -178,7 +186,7 @@ class SecureIdentityStore(private val context: Context) {
             // Legacy file is empty / corrupt — delete it, nothing to migrate.
             Logger.w(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy identity blank/corrupt; deleting legacy file")
             safeDeleteFile(legacyFile)
-            return
+            return true
         }
 
         // Only write to the env-scoped file if it does not already have valid data.
@@ -199,17 +207,20 @@ class SecureIdentityStore(private val context: Context) {
         }
 
         // The env-scoped identity is already valid, so the legacy copy can be removed.
-        if (alreadyPresent) {
+        return if (alreadyPresent) {
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: env-scoped file already has valid identity; legacy identity discarded")
             safeDeleteFile(legacyFile)
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy file deleted")
+            true
         } else if (saveLocked(env, legacyAcc, legacyDev)) {
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: migrated legacy identity " +
                 "(accLen=${legacyAcc.length}, devLen=${legacyDev.length})")
             safeDeleteFile(legacyFile)
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy file deleted")
+            true
         } else {
             Logger.w(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: env write failed; legacy identity kept for retry")
+            false
         }
     }
 

@@ -118,6 +118,8 @@ object InAppBillingHandler : KoinComponent {
             billingListeners.forEach { it.productResult(isSuccess, productList) }
         override fun purchaseInProgress() =
             billingListeners.forEach { it.purchaseInProgress() }
+        override fun purchaseRejected() =
+            billingListeners.forEach { it.purchaseRejected() }
     }
 
     // Application context stored during initiate() for use in background coroutines / ui updates
@@ -2596,7 +2598,7 @@ object InAppBillingHandler : KoinComponent {
                     billingListener?.purchaseInProgress()
                 } else {
                     loge(mname, "cannot make purchase, current state: ${currentState.name}")
-                    billingListener?.purchasesResult(false, emptyList())
+                    billingListener?.purchaseRejected()
                 }
                 return
             }
@@ -2609,13 +2611,13 @@ object InAppBillingHandler : KoinComponent {
                         billingListener?.purchaseInProgress()
                     } else {
                         loge(mname, "cannot make purchase, current state: ${currentState.name}")
-                        billingListener?.purchasesResult(false, emptyList())
+                        billingListener?.purchaseRejected()
                     }
                     return
                 }
             } catch (e: Exception) {
                 loge(mname, "err starting purchase in state machine: ${e.message}", e)
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
                 return
             }
         }
@@ -2690,7 +2692,7 @@ object InAppBillingHandler : KoinComponent {
                 billingListener?.purchaseInProgress()
             } else {
                 loge(mname, "cannot make one-time purchase in state: ${currentState.name}")
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
             }
             return
         }
@@ -2704,13 +2706,13 @@ object InAppBillingHandler : KoinComponent {
                         billingListener?.purchaseInProgress()
                     } else {
                         loge(mname, "cannot make one-time purchase in state: ${currentState.name}")
-                        billingListener?.purchasesResult(false, emptyList())
+                        billingListener?.purchaseRejected()
                     }
                     return
                 }
             } catch (e: Exception) {
                 loge(mname, "err starting one-time purchase in state machine: ${e.message}", e)
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
                 return
             }
         }
@@ -3643,10 +3645,6 @@ object InAppBillingHandler : KoinComponent {
                     purchaseToken, skuForType(productType), payload
                 )
             }
-            // Google Play auto-refunds unacknowledged purchases after 3 days. When
-            // the server-side ack keeps failing (e.g. a stuck identity), fall back
-            // to acknowledging directly with Play so the user does not lose the
-            // purchase while the server-side issue is being resolved.
             val failures = serverAckFailureCount.merge(purchaseToken, 1, Int::plus) ?: 1
             if (failures >= SERVER_ACK_PLAY_FALLBACK_THRESHOLD) {
                 acknowledgePurchaseWithPlay(purchaseToken, mname)

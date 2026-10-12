@@ -153,14 +153,18 @@ class BillingBackendClient(
         }
         try {
             val (legacyCid, legacyDid) = identityStore.readLegacy()
-            if (legacyCid.isNullOrBlank() || legacyDid.isNullOrBlank()) {
+            val migrated = if (legacyCid.isNullOrBlank() || legacyDid.isNullOrBlank()) {
                 // Nothing usable in the legacy file — migrateFromLegacy deletes it.
                 Logger.w(LOG_IAB, "$TAG ensureIdentityMigrated: legacy identity blank/corrupt; deleting without migration")
                 identityStore.migrateFromLegacy(currentEnv())
             } else {
                 identityStore.migrateFromLegacy(determineLegacyMigrationEnv(legacyDid))
             }
-            identityMigrationDone.set(true)
+            if (migrated) {
+                identityMigrationDone.set(true)
+            } else {
+                Logger.w(LOG_IAB, "$TAG ensureIdentityMigrated: env write failed; legacy identity kept, will retry on next identity access")
+            }
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG ensureIdentityMigrated: migration failed (${e.message}); will retry on next identity access", e)
         }
@@ -312,7 +316,9 @@ class BillingBackendClient(
                 didTokenTest = null
                 if (entitlementCid.isBlank()) {
                     Logger.e(LOG_IAB, "$TAG resetAndClaim: blank entitlement cid; restoring previous identity")
-                    restoreLocked(previous)
+                    if (!restoreLocked(previous)) {
+                        Logger.e(LOG_IAB, "$TAG resetAndClaim: previous identity NOT restored after blank cid")
+                    }
                     return@withContext false
                 }
                 val claimed = adoptCidLocked(entitlementCid)
@@ -322,21 +328,33 @@ class BillingBackendClient(
                 } else {
                     Logger.e(LOG_IAB, "$TAG resetAndClaim: claim failed (code=${claimed.errorCode}) for " +
                         "cid=${entitlementCid.take(8)}; restoring previous identity")
-                    restoreLocked(previous)
+                    if (!restoreLocked(previous)) {
+                        Logger.e(LOG_IAB, "$TAG resetAndClaim: previous identity NOT restored after " +
+                            "failed claim (code=${claimed.errorCode}) for cid=${entitlementCid.take(8)}")
+                    }
                     false
                 }
             }
         }
     }
 
-    /** Restores previously stored identities after a failed reset. Caller must hold [identityMutex]. */
-    private suspend fun restoreLocked(previous: Map<SecureIdentityStore.Env, Pair<String?, String?>>) {
+    /**
+     * Restores previously stored identities after a failed reset. Caller must hold [identityMutex].
+     * Returns false when any save failed, so callers do not report a successful restoration.
+     */
+    private suspend fun restoreLocked(previous: Map<SecureIdentityStore.Env, Pair<String?, String?>>): Boolean {
+        var restored = true
         previous.forEach { (env, pair) ->
             val (cid, did) = pair
             if (!cid.isNullOrBlank() && !did.isNullOrBlank()) {
-                identityStore.save(env, cid, did)
+                val saved = identityStore.save(env, cid, did)
+                if (!saved) {
+                    restored = false
+                    Logger.e(LOG_IAB, "$TAG restoreLocked: save failed [${env.label}] for cid=${cid.take(8)}; previous identity not restored")
+                }
             }
         }
+        return restored
     }
 
     /**
@@ -679,9 +697,14 @@ class BillingBackendClient(
                 null
             }
             if (!purchaseCid.isNullOrBlank()) {
-                cid = purchaseCid
-                Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: binding fresh identity to the " +
-                    "purchase-bound cid (len=${cid.length}) instead of minting a new one")
+                val owner = storedEnvironmentForCid(purchaseCid)
+                if (owner == null || owner == env) {
+                    cid = purchaseCid
+                    Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: binding fresh identity to the " +
+                            "purchase-bound cid (len=${cid.length}) instead of minting a new one")
+                } else {
+                    Logger.w(LOG_IAB, "$TAG $mname [${env.label}]: purchase cid belongs to ${owner.label}; not adopting")
+                }
             }
         }
         if (cid.isBlank()) {

@@ -107,6 +107,8 @@ object InAppBillingHandler : KoinComponent {
 
     private val billingListeners = java.util.concurrent.CopyOnWriteArraySet<BillingListener>()
 
+    // Fan-out proxy: every billingListener?.x() dispatch site reaches ALL registered
+    // listeners without further changes; an empty set is a no-op.
     private val billingListener: BillingListener = object : BillingListener {
         override fun onConnectionResult(isSuccess: Boolean, message: String) =
             billingListeners.forEach { it.onConnectionResult(isSuccess, message) }
@@ -116,6 +118,8 @@ object InAppBillingHandler : KoinComponent {
             billingListeners.forEach { it.productResult(isSuccess, productList) }
         override fun purchaseInProgress() =
             billingListeners.forEach { it.purchaseInProgress() }
+        override fun purchaseRejected() =
+            billingListeners.forEach { it.purchaseRejected() }
     }
 
     // Application context stored during initiate() for use in background coroutines / ui updates
@@ -2594,7 +2598,7 @@ object InAppBillingHandler : KoinComponent {
                     billingListener?.purchaseInProgress()
                 } else {
                     loge(mname, "cannot make purchase, current state: ${currentState.name}")
-                    billingListener?.purchasesResult(false, emptyList())
+                    billingListener?.purchaseRejected()
                 }
                 return
             }
@@ -2607,13 +2611,13 @@ object InAppBillingHandler : KoinComponent {
                         billingListener?.purchaseInProgress()
                     } else {
                         loge(mname, "cannot make purchase, current state: ${currentState.name}")
-                        billingListener?.purchasesResult(false, emptyList())
+                        billingListener?.purchaseRejected()
                     }
                     return
                 }
             } catch (e: Exception) {
                 loge(mname, "err starting purchase in state machine: ${e.message}", e)
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
                 return
             }
         }
@@ -2688,7 +2692,7 @@ object InAppBillingHandler : KoinComponent {
                 billingListener?.purchaseInProgress()
             } else {
                 loge(mname, "cannot make one-time purchase in state: ${currentState.name}")
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
             }
             return
         }
@@ -2702,13 +2706,13 @@ object InAppBillingHandler : KoinComponent {
                         billingListener?.purchaseInProgress()
                     } else {
                         loge(mname, "cannot make one-time purchase in state: ${currentState.name}")
-                        billingListener?.purchasesResult(false, emptyList())
+                        billingListener?.purchaseRejected()
                     }
                     return
                 }
             } catch (e: Exception) {
                 loge(mname, "err starting one-time purchase in state machine: ${e.message}", e)
-                billingListener?.purchasesResult(false, emptyList())
+                billingListener?.purchaseRejected()
                 return
             }
         }

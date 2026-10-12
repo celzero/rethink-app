@@ -20,4 +20,5 @@ interface BillingListener {
     fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>)
     fun productResult(isSuccess: Boolean,productList: List<ProductDetail>)
     fun purchaseInProgress() {}
+    fun purchaseRejected() {}
 }
