@@ -32,6 +32,15 @@
             android:textSize="@dimen/heading_font_text_view"
             android:textStyle="bold" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/pcap_btm_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/pcap_files_desc"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/pcap_mode_card"
             android:layout_width="match_parent"

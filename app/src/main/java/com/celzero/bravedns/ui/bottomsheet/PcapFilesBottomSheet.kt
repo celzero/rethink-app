@@ -54,13 +54,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Pcap management sheet: pick the capture mode (off / logcat / file) and view or
- * delete the pcap files collected under the app-specific external pcap folder.
- * Mode changes and capture-file lifecycle are owned by the listener (usually the
- * settings activity); this sheet only reports the requested mode and mirrors the
- * persisted state afterwards.
- */
 class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
 
     interface PcapModeSelectListener {
@@ -226,10 +219,6 @@ class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
     private fun openPcapFolder() {
         val dirUri = buildPcapFolderUri() ?: return
         try {
-            // IMPORTANT: no FLAG_GRANT_*_URI_PERMISSION here. Requesting a grant makes
-            // the system verify that this app may share the (Android/data) document uri,
-            // which the externalstorage provider denies for our uid. The handling
-            // documents ui resolves the uri with its own provider access instead.
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(dirUri, DocumentsContract.Document.MIME_TYPE_DIR)
             }
