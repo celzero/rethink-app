@@ -131,7 +131,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         updateDialStrategy(persistentState.dialStrategy)
         updateRetryStrategy(persistentState.retryStrategy)
 
-        b.settingsActivityVpnHeadingText.text = getString(R.string.anti_censorship_title).lowercase()
+        b.settingsActivityVpnHeadingText.text = getString(R.string.lbl_technique).lowercase()
     }
 
     private fun updateDialStrategy(selectedState: Int) {
