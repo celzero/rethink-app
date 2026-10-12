@@ -96,11 +96,12 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
     /** Returns true when the active network's captive portal state changes. */
     private fun isCaptivePortalTransition(network: Network, capabilities: NetworkCapabilities): Boolean {
+        val active = cm.activeNetwork
+        if (active == null || !isNetworkSame(network, active)) return false
         val captive = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
         val prev = lastCaptiveState
         lastCaptiveState = captive
-        val isActive = cm.activeNetwork == null || isNetworkSame(network, cm.activeNetwork)
-        return prev != null && prev != captive && isActive
+        return prev != null && prev != captive
     }
 
     /**
