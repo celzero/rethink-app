@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage
+import com.celzero.bravedns.data.RecentRoutedAppRow
 import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -104,6 +105,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getRecentRoutedConnectionsForProxy(proxyId)
             .filter { seen.add(it.appName) }
             .take(limit)
+    }
+
+    suspend fun getRecentRoutedAppsWithCount(proxyId: String, limit: Int = 10): List<RecentRoutedAppRow> {
+        return connectionTrackerDAO.getRecentRoutedAppsWithCount(proxyId, limit)
     }
 
     suspend fun getRecentConnectionsByProxyPrefix(prefix: String, limit: Int = 4): List<ConnectionTracker> {

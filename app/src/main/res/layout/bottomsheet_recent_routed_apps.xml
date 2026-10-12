@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical"
+    android:paddingBottom="18dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="10dp"
+        android:alpha="0.5"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recent_routed_apps_title"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:text="@string/recent_routed_apps_title"
+        android:textColor="?attr/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recent_routed_apps_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.7"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="12sp"
+        tools:text="DE - Frankfurt" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/recent_routed_apps_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:indeterminate="true"
+        app:indicatorColor="?attr/accentGood"
+        app:trackColor="@android:color/transparent"
+        app:trackThickness="3dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recent_routed_apps_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:overScrollMode="never"
+        android:visibility="gone"
+        tools:itemCount="4"
+        tools:listitem="@layout/list_item_recent_routed_app"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recent_routed_apps_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="20dp"
+        android:alpha="0.7"
+        android:text="@string/recent_routed_apps_empty"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/recent_routed_apps_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.55"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            app:srcCompat="@drawable/ic_block"
+            app:tint="?attr/primaryLightColorText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/recent_routed_apps_hint"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/recent_routed_view_logs"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.75"
+        android:letterSpacing="0.02"
+        android:text="@string/recent_routed_view_logs"
+        android:textColor="?attr/accentGood"
+        app:cornerRadius="24dp"
+        app:icon="@drawable/ic_logs"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="?attr/accentGood"
+        app:strokeWidth="1dp" />
+
+</LinearLayout>

@@ -27,6 +27,7 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.data.RpnConnStatsSummary
+import com.celzero.bravedns.data.RecentRoutedAppRow
 private const val CT_COLUMNS =
     "id, 'ct' as source, appName, uid, packageName, usrId, ipAddress, port, protocol, isBlocked, blockedByRule, blocklists, proxyDetails, flag, dnsQuery, timeStamp, connId, downloadBytes, uploadBytes, duration, synack, rpid, message, connType"
 private const val RLOG_COLUMNS =
@@ -436,6 +437,10 @@ interface ConnectionTrackerDAO {
 
     @Query("select * from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' order by timeStamp desc limit 24")
     suspend fun getRecentRoutedConnectionsForProxy(proxyId: String): List<ConnectionTracker>
+
+    // most recently routed apps for a single rpn proxy with connection count
+    @Query("select uid as uid, appName as appName, packageName as packageName, count(*) as count from ConnectionTracker where proxyDetails like '%' || :proxyId || '%' and isBlocked = 0 and appName != '%Unknown%' group by uid order by max(timeStamp) desc limit :limit")
+    suspend fun getRecentRoutedAppsWithCount(proxyId: String, limit: Int): List<RecentRoutedAppRow>
 
     // Cumulative recent activity across every RPN proxy: [prefix] is matched as a
     // prefix of proxyDetails (all win-proxy ids share the Backend.RpnWin prefix).

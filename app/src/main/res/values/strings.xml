@@ -644,7 +644,7 @@
     <string name="settings_check_update_desc" translatable="true">Automatically check for app updates once a week.</string>
 
     <string name="settings_custom_downloader_heading" translatable="true">Use in-app downloader</string>
-    <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used</string>
+    <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used.</string>
 
     <string name="settings_import_export_heading" translatable="true">Backup &amp; Restore</string>
     <string name="settings_import_export_desc" translatable="true">Manually back up or restore app data and settings.</string>
@@ -924,13 +924,13 @@
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
 
     <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs</string>
-    <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
+    <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space.</string>
 
     <string name="dc_dns_leaks_heading" translatable="true">Prevent DNS leaks</string>
-    <string name="dc_dns_leaks_desc" translatable="true">When enabled, Rethink captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
+    <string name="dc_dns_leaks_desc" translatable="true">When enabled, Rethink captures all packets on port 53 and forwards it to a user-set DNS endpoint.</string>
 
     <string name="dc_check_update_heading" translatable="true">Prompt on blocklist updates</string>
-    <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days</string>
+    <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days.</string>
 
     <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
@@ -939,10 +939,10 @@
     <string name="dc_block_unknown_desc" translatable="true">Block all DNS requests originating from unknown applications.</string>
 
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
-    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelegated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
 
     <string name="dc_use_sys_dns_captive_heading" translatable="true">Use System DNS on captive portals</string>
-    <string name="dc_use_sys_dns_captive_desc" translatable="true">Resolve DNS via the network DNS until the captive portal sign-in completes</string>
+    <string name="dc_use_sys_dns_captive_desc" translatable="true">Use System DNS to resolve domains until captive portal sign-in is complete.</string>
 
     <string name="dc_filtering_heading" translatable="true">Filtering</string>
 
@@ -1682,7 +1682,7 @@
     <string name="dc_dns_proxy" translatable="false">DNS Proxy</string>
 
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS booster</string>
-    <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling.</string>
 
     <string name="dc_refresh_toast" translatable="true">Refresh complete</string>
 
@@ -2998,6 +2998,14 @@
     <string name="rpn_stats_top_apps" translatable="true">Top apps · last 24h</string>
     <string name="rpn_stats_view_logs" translatable="true">View connection logs</string>
     <string name="rpn_stats_empty" translatable="true">No connections have gone through selected servers in the last 24 hours.</string>
+
+    <string name="recent_routed_apps_title" translatable="true">Recently routed apps</string>
+    <string name="recent_routed_apps_empty" translatable="true">No apps have been routed through this server yet.</string>
+    <string name="recent_routed_conn_count" translatable="true">%1$s connections</string>
+    <string name="recent_routed_apps_hint" translatable="true">Excluded apps bypass all proxies</string>
+    <string name="recent_routed_app_excluded" translatable="true">Excluded %1$s from all proxies</string>
+    <string name="recent_routed_app_included" translatable="true">Routing %1$s through proxies again</string>
+    <string name="recent_routed_view_logs" translatable="true">View all logs</string>
     <string name="rpn_stats_no_active_proxy" translatable="true">Start Rethink to see proxy stats</string>
     <string name="rpn_stats_conn_count" translatable="true">%1$s conns</string>
 

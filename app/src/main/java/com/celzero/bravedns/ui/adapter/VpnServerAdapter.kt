@@ -31,6 +31,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -49,15 +50,13 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_COUNTRY_CODE
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.RpnConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
+import com.celzero.bravedns.ui.bottomsheet.RecentRoutedAppsBottomSheet
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.LAST_ROUTED_APP_POLL_MS
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.MAX_LOCATION_TILES
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.ROUTED_APP_STACK_SIZE
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter.Companion.SERVER_INFO_POLL_MS
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -1152,7 +1151,7 @@ class VpnServerAdapter(
                     val proxyName = when {
                         group.key.equals(AUTO_SERVER_ID, ignoreCase = true) ->
                             AUTO_SERVER_ID.capitalizeWords()
-                        config != null && config.city.isNotBlank() -> "${config.cc} - ${config.city}"
+                        config != null && config.city.isNotBlank() -> "${config.city} - ${config.cc}"
                         config != null && config.name.isNotBlank() -> config.name
                         else -> group.key
                     }
@@ -1161,9 +1160,7 @@ class VpnServerAdapter(
             }
         }
 
-        /**
-         * Opens the network-logs screen pre-filtered for this server
-         */
+        /** opens the recent-routed-apps bottom sheet for this server */
         private fun openRoutedAppLogs(group: ServerGroup) {
             io {
                 val proxyId = if (group.key.equals(AUTO_SERVER_ID, true)) {
@@ -1171,14 +1168,22 @@ class VpnServerAdapter(
                 } else {
                     Backend.RpnWin + group.key
                 }
+                val config = RpnProxyManager.getCountryConfigByKey(group.key)
                 uiCtx {
                     if (proxyId.isBlank()) {
                         Logger.w(LOG_TAG_UI, "VpnServerAdapter openRoutedAppLogs[${group.key}]: win proxy id unavailable")
                         return@uiCtx
                     }
-                    val intent = Intent(ctx, NetworkLogsActivity::class.java)
-                    intent.putExtra(Constants.SEARCH_QUERY, RULES_SEARCH_ID_RPN + proxyId)
-                    ctx.startActivity(intent)
+                    val fm = (ctx as? FragmentActivity)?.supportFragmentManager ?: return@uiCtx
+                    val subtitle = when {
+                        group.key.equals(AUTO_SERVER_ID, ignoreCase = true) ->
+                            AUTO_SERVER_ID.capitalizeWords()
+                        config != null && config.city.isNotBlank() -> "${config.city} - ${config.cc}"
+                        config != null && config.name.isNotBlank() -> config.name
+                        else -> group.cityName
+                    }
+                    RecentRoutedAppsBottomSheet.newInstance(proxyId, subtitle)
+                        .show(fm, RecentRoutedAppsBottomSheet.TAG)
                 }
             }
         }
