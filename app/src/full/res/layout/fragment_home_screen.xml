@@ -171,7 +171,7 @@
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:gravity="center"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -183,13 +183,13 @@
                     <LinearLayout
                         android:id="@+id/fhs_firewall_badges_row"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/fhs_card_firewall_rules_card"
                             android:layout_width="match_parent"
-                            android:layout_height="84dp"
+                            android:layout_height="match_parent"
                             app:cardBackgroundColor="?attr/cardBackgroundColor"
                             app:cardCornerRadius="18dp"
                             app:cardElevation="0dp">
