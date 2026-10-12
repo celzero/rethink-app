@@ -415,6 +415,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         applyTunnelGatedVisibility()
         updateFilterButtonState()
         setupHeaderUI()
+        VpnController.connectionStatus.observe(viewLifecycleOwner) {
+            if (isAdded) {
+                runCatching { updateConnectionStatusOnly() }
+                    .onFailure { Logger.w(LOG_TAG_UI, "$TAG: status observer failed: ${it.message}") }
+            }
+        }
         setupRpnState()
         setupQuickSettings()
         setupStatsChip()
@@ -702,6 +708,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
             if (it.isVisible) it.startShimmer()
         }
+        setupHeaderUI()
     }
 
     override fun onStop() {
@@ -710,6 +717,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
             if (it.isVisible) it.stopShimmer()
         }
+        statusUpdateJob?.cancel()
+        statusUpdateJob = null
         super.onStop()
     }
 
@@ -1221,12 +1230,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
+    /**
+     * Starts the header status poll while the screen is visible.
+     */
     private fun setupHeaderUI() {
         statusUpdateJob?.cancel()
         statusUpdateJob = viewLifecycleOwner.lifecycleScope.launch {
             while (true) {
                 delay(3_000.milliseconds)
-                if (isAdded && view != null) {
+                if (viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                    && isAdded && view != null
+                ) {
                     runCatching {
                         updateConnectionStatusOnly()
                         if (!isLoading) updateConnectionDuration()
@@ -1234,12 +1248,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         Logger.w(LOG_TAG_UI, "$TAG.setupHeaderUI: status poll failed: ${it.message}")
                     }
                 }
-            }
-        }
-        VpnController.connectionStatus.observe(viewLifecycleOwner) {
-            if (isAdded && view != null) {
-                runCatching { updateConnectionStatusOnly() }
-                    .onFailure { Logger.w(LOG_TAG_UI, "$TAG: status observer failed: ${it.message}") }
             }
         }
     }

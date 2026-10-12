@@ -32,6 +32,7 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.databinding.FragmentRethinkPlusManagePurchaseBinding
 import com.celzero.bravedns.iab.AckFailureInfo
+import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
@@ -69,6 +70,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     private val b by viewBinding(FragmentRethinkPlusManagePurchaseBinding::bind)
 
     private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
+    private val persistentState by inject<com.celzero.bravedns.service.PersistentState>()
     private val viewModel: ManagePurchaseViewModel by viewModel()
 
     companion object {
@@ -373,6 +375,15 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             .show()
     }
 
+    private fun showPurchaseAlreadyEndedDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.rpn_purchase_already_ended_title))
+            .setMessage(getString(R.string.rpn_purchase_already_ended_message))
+            .setPositiveButton(android.R.string.ok, null)
+            .setCancelable(true)
+            .show()
+    }
+
     private fun observeOperationState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -382,13 +393,21 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
                         is OperationState.InProgress -> showProgressOverlay(state)
                         is OperationState.Success -> {
                             hideProgressOverlay()
-                            showToastUiCentered(requireContext(), state.message, Toast.LENGTH_SHORT)
+                            showToastUiCentered(requireContext(), getString(state.messageRes), Toast.LENGTH_SHORT)
+                            loadSubscriptionDetails()
+                            viewModel.resetOperationState()
+                        }
+                        is OperationState.AlreadyEnded -> {
+                            hideProgressOverlay()
+                            showPurchaseAlreadyEndedDialog()
                             loadSubscriptionDetails()
                             viewModel.resetOperationState()
                         }
                         is OperationState.Failure -> {
                             hideProgressOverlay()
-                            showToastUiCentered(requireContext(), state.message, Toast.LENGTH_LONG)
+                            val msg = state.serverMessage ?: getString(state.messageRes)
+                            showToastUiCentered(requireContext(), msg, Toast.LENGTH_LONG)
+                            loadSubscriptionDetails()
                             viewModel.resetOperationState()
                         }
                     }
@@ -494,18 +513,29 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     }
 
     private fun showDeviceNotRegisteredBottomSheet(error: ServerApiError.DeviceNotRegistered) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceNotRegistered") != null) return
         DeviceNotRegisteredNotifier.cancel(requireContext())
         DeviceNotRegisteredBottomSheet.newInstance(error).show(childFragmentManager, "deviceNotRegistered")
     }
 
     private fun showDeviceAuthErrorBottomSheet(error: ServerApiError.Unauthorized401) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceAuthError401") != null) return
         DeviceAuthErrorBottomSheet.newInstance(error).show(childFragmentManager, "deviceAuthError401")
     }
 
     private fun showConflictBottomSheet(error: ServerApiError.Conflict409) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
         if (childFragmentManager.findFragmentByTag("conflict409") != null) return
         PurchaseConflictNotifier.cancel(requireContext())
         val sheet = PurchaseConflictBottomSheet.newInstance(error)
@@ -515,6 +545,24 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             }
         }
         sheet.show(childFragmentManager, "conflict409")
+    }
+
+    /**
+     * Keeps the error available for the next observer and posts a system
+     * notification when the sheet cannot be shown.
+     */
+    private fun deferServerError(error: ServerApiError) {
+        InAppBillingHandler.serverApiErrorLiveData.value = error
+        val ctx = context?.applicationContext ?: return
+        when (error) {
+            is ServerApiError.Unauthorized401 ->
+                DeviceAuthErrorNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.DeviceNotRegistered ->
+                DeviceNotRegisteredNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.Conflict409 ->
+                PurchaseConflictNotifier.notify(ctx, error, persistentState.theme)
+            else -> Unit
+        }
     }
 
     private fun managePlayStoreSubs() {

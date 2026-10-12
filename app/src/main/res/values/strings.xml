@@ -160,6 +160,7 @@
     <string name="lbl_connect" translatable="true">Connect</string>
     <string name="lbl_criteria" translatable="true">Criteria</string>
     <string name="lbl_all_apps" translatable="false">All Apps</string>
+    <string name="lbl_technique" translatable="false">technique</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -938,6 +939,9 @@
 
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
+
+    <string name="dc_use_sys_dns_captive_heading" translatable="true">Use System DNS on captive portals</string>
+    <string name="dc_use_sys_dns_captive_desc" translatable="true">Resolve DNS via the network DNS until the captive portal sign-in completes</string>
 
     <string name="dc_filtering_heading" translatable="true">Filtering</string>
 
@@ -2817,6 +2821,17 @@
     <string name="device_auth_error_device_id_partial" translatable="false">partial</string>
     <string name="device_auth_error_id_unavailable" translatable="false">-</string>
     <string name="device_auth_error_btn_email" translatable="false">Contact Customer Support</string>
+    <string name="device_auth_error_btn_reset" translatable="false">Refresh Account</string>
+
+    <string name="manage_purchase_err_no_subscription" translatable="false">No active purchase found.</string>
+    <string name="manage_purchase_err_purchase_unavailable" translatable="false">Purchase detail unavailable. Please try again.</string>
+    <string name="manage_purchase_err_account_incomplete" translatable="false">Account information incomplete. Please try again.</string>
+    <string name="manage_purchase_err_device_identity" translatable="false">Device identity unavailable. Please try again.</string>
+    <string name="manage_purchase_err_auth" translatable="false">Device authorization failed. See the alert shown, then try again.</string>
+    <string name="manage_purchase_err_conflict" translatable="false">The server reported a conflict for this purchase. See the details shown.</string>
+    <string name="manage_purchase_err_generic" translatable="false">Something went wrong. Please try again.</string>
+    <string name="manage_purchase_cancel_success" translatable="false">Purchase cancelled successfully.</string>
+    <string name="manage_purchase_revoke_success" translatable="false">Purchase revoked. Refund will be processed within a few days.</string>
 
     <!-- Device Not Registered bottom sheet -->
     <string name="device_not_registered_title" translatable="false">Device Not Registered</string>
@@ -2828,6 +2843,9 @@
     <string name="device_not_registered_what_this_means_desc" translatable="false">Your subscription is active on Google Play but your device could not be linked to it on the Rethink server. This can happen after restoring from a backup or switching devices. Our support team can resolve this quickly once you provide the account details above.</string>
     <string name="device_not_registered_email_subject" translatable="false">Device Not Registered: Rethink DNS</string>
     <string name="device_not_registered_email_body_details" translatable="false">I have an active subscription but my device cannot be registered. The account details are:</string>
+    <string name="device_not_registered_reset_confirm_msg" translatable="false">This will refresh your account information and re-sync your subscription details.</string>
+    <string name="device_not_registered_reset_success" translatable="false">Identity refresh. Re-registering your device…</string>
+    <string name="device_not_registered_reset_failed" translatable="false">Could not refresh the identity. Please try again.</string>
 
     <!-- Device-not-registered system notification -->
     <string name="device_not_registered_notif_body" translatable="false">Your device could not be linked to your active subscription. Tap to review and contact support.</string>

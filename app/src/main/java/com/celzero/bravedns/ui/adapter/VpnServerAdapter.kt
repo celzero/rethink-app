@@ -383,8 +383,7 @@ class VpnServerAdapter(
                     a.cityName == b.cityName &&
                     a.flagEmoji == b.flagEmoji &&
                     a.countryCode == b.countryCode &&
-                    a.isActive == b.isActive &&
-                    serverIpVersionBadge(a.servers) == serverIpVersionBadge(b.servers)
+                    a.isActive == b.isActive
             }
         })
         serverGroups = newGroups.toList()
@@ -522,7 +521,6 @@ class VpnServerAdapter(
             b.tvCountryName.text = locationText
             showAppsCount(group)
             showRelayAction(group)
-            showIpVersionBadge(group)
 
             // Always cancel any running stats job before setting up the new state.
             cancelStatsJob()
@@ -946,12 +944,6 @@ class VpnServerAdapter(
                     applyRelayAction(group.key, config)
                 }
             }
-        }
-
-        private fun showIpVersionBadge(group: ServerGroup) {
-            val label = serverIpVersionBadge(group.servers)
-            b.chipIpVersion.visibility = if (label == null) View.GONE else View.VISIBLE
-            b.chipIpVersion.text = label.orEmpty()
         }
 
         /**

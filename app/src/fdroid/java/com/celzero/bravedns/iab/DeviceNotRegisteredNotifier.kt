@@ -25,5 +25,9 @@ object DeviceNotRegisteredNotifier {
 
     @Suppress("UNUSED_PARAMETER")
     fun cancel(context: Context) { /* no-op */ }
+
+    /** No-op stub matching the play/website signature; F-Droid posts no notification. */
+    @Suppress("UNUSED_PARAMETER")
+    fun notify(context: Context, error: ServerApiError.DeviceNotRegistered, theme: Int) { /* no-op */ }
 }
 

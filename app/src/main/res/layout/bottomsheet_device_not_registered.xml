@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/background"
     android:fillViewport="true">
 
@@ -59,8 +59,8 @@
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/accentWarning"
             app:layout_constraintTop_toBottomOf="@id/tv_title"
+            app:cardBackgroundColor="?attr/accentBad"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -145,7 +145,7 @@
                         app:cardCornerRadius="6dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp"
-                        app:cardBackgroundColor="?attr/accentWarning">
+                        app:cardBackgroundColor="?attr/chipBgColorPositive">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
@@ -155,9 +155,8 @@
                             android:paddingEnd="8dp"
                             android:paddingBottom="3dp"
                             android:text="@string/device_not_registered_master_badge"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="11sp" />
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -278,11 +277,24 @@
             app:icon="@drawable/ic_mail"
             app:iconPadding="10dp"
             app:iconGravity="textStart"
-            app:iconTint="?attr/primaryTextColor"
             app:cornerRadius="14dp"
-            android:textColor="?attr/primaryTextColor"
-            app:backgroundTint="?attr/accentWarning"
             app:layout_constraintTop_toBottomOf="@id/info_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reset_identity"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/server_selection_error_retry"
+            android:textAllCaps="false"
+            android:textSize="@dimen/default_font_text_view"
+            android:textColor="?attr/accentBad"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/btn_email_support"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -296,7 +308,7 @@
             android:textAllCaps="false"
             android:textSize="@dimen/default_font_text_view"
             android:textColor="?attr/primaryLightColorText"
-            app:layout_constraintTop_toBottomOf="@id/btn_email_support"
+            app:layout_constraintTop_toBottomOf="@id/btn_reset_identity"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

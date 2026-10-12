@@ -399,10 +399,6 @@ class CountryServerAdapter(
                         chipLinkSpeed.visibility = View.GONE
                     }
 
-                    val ipVersion = serverIpVersionBadge(group.servers)
-                    chipIpVersion.visibility = if (ipVersion == null) View.GONE else View.VISIBLE
-                    chipIpVersion.text = ipVersion.orEmpty()
-
                     if (group.avgLoad > 0) {
                         viewLoadDot.visibility = View.VISIBLE
                         tvLoad.visibility = View.VISIBLE

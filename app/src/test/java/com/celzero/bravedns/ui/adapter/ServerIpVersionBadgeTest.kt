@@ -26,15 +26,15 @@ class ServerIpVersionBadgeTest {
     fun `badge reflects supported ip versions across grouped servers`() {
         assertNull(serverIpVersionBadge(listOf(CountryConfig(id = "none", cc = "US"))))
         assertEquals(
-            "v4",
+            "IP4",
             serverIpVersionBadge(listOf(CountryConfig(id = "v4", cc = "US", ipv4 = true)))
         )
         assertEquals(
-            "v6",
+            "IP6",
             serverIpVersionBadge(listOf(CountryConfig(id = "v6", cc = "US", ipv6 = true)))
         )
         assertEquals(
-            "v46",
+            "IP46",
             serverIpVersionBadge(
                 listOf(
                     CountryConfig(id = "v4", cc = "US", ipv4 = true),

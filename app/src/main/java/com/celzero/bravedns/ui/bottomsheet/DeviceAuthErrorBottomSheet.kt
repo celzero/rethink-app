@@ -22,13 +22,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.databinding.BottomsheetDeviceAuthErrorBinding
+import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
+import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 /**
@@ -40,6 +49,10 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
     private val binding
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
+
+    private var entitlementCid: String = ""
+
+    private var resetInFlight: Boolean = false
 
     private val persistentState by inject<PersistentState>()
 
@@ -94,11 +107,12 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
         }
 
         val args = requireArguments()
-        val accountId = args.getString(ARG_ACCOUNT_ID, "")
+        entitlementCid = args.getString(ARG_ACCOUNT_ID, "")
         val deviceIdPrefix = args.getString(ARG_DEVICE_ID_PREFIX, "")
 
-        populateDetails(accountId, deviceIdPrefix)
-        setupButtons(accountId, deviceIdPrefix)
+        populateDetails(entitlementCid, deviceIdPrefix)
+        setupButtons(entitlementCid, deviceIdPrefix)
+        binding.btnResetIdentity.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {
@@ -136,8 +150,71 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
             openCustomerSupport(accountId, deviceIdPrefix)
         }
 
+        binding.btnResetIdentity.setOnClickListener {
+            confirmIdentityReset()
+        }
+
         binding.btnDismiss.setOnClickListener {
             dismissAllowingStateLoss()
+        }
+    }
+
+    private fun confirmIdentityReset() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.device_auth_error_btn_reset)
+            .setMessage(R.string.device_not_registered_reset_confirm_msg)
+            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
+                resetIdentity()
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
+    }
+
+    private fun resetIdentity() {
+        if (resetInFlight) return
+        resetInFlight = true
+        isCancelable = false
+        binding.btnResetIdentity.isEnabled = false
+        binding.btnEmailSupport.isEnabled = false
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val claimCid = try {
+                InAppBillingHandler.primaryPurchaseCid().ifBlank { entitlementCid }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG: primary purchase cid resolution failed: ${e.message}", e)
+                ""
+            }
+            val cleared = try {
+                if (claimCid.isBlank()) {
+                    Logger.w(LOG_IAB, "$TAG: no claimable cid available; skipping identity reset")
+                    false
+                } else {
+                    InAppBillingHandler.resetIdentityForRebind(claimCid)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG: identity reset failed: ${e.message}", e)
+                false
+            }
+            withContext(Dispatchers.Main) {
+                val ctx = context ?: return@withContext
+                if (cleared) {
+                    DeviceAuthErrorNotifier.cancel(ctx)
+                    InAppBillingHandler.serverApiErrorLiveData.value = null
+                    Toast.makeText(ctx, R.string.device_not_registered_reset_success,
+                        Toast.LENGTH_LONG).show()
+                    dismissAllowingStateLoss()
+                } else {
+                    resetInFlight = false
+                    isCancelable = true
+                    binding.btnResetIdentity.isEnabled = true
+                    binding.btnEmailSupport.isEnabled = true
+                    Toast.makeText(ctx, R.string.device_not_registered_reset_failed,
+                        Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 

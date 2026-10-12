@@ -815,6 +815,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // monthly entitlement reconcile
     var lastForcedReconcileTimestamp by longPref("last_forced_reconcile_timestamp").withDefault<Long>(0L)
 
+    // timestamp of the first empty SUBS snapshot in the current window.
+    var iabEmptySubsFirstSeenTs by longPref("iab_empty_subs_first_seen_ts").withDefault<Long>(0L)
+
+    // timestamp of the last identity recovery attempt.
+    var identityRecoveryAttemptTs by longPref("identity_recovery_attempt_ts").withDefault<Long>(0L)
+
     // whether the guided tour has been completed; false = show the tour
     var guidedTourCompleted by booleanPref("guided_tour_completed").withDefault<Boolean>(false)
 
