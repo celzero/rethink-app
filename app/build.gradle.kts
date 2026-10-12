@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.util.Properties
 import java.io.FileInputStream
+import java.lang.reflect.Method
 
 plugins {
     id("com.android.application")
@@ -35,6 +36,10 @@ val shouldSplit = !alphaBuild
 // Official F-Droid builds omit this flag and will be labeled as "fdroid".
 val isWebsiteDegoogled = providers.gradleProperty("websiteDegoogled")
     .orNull?.toBoolean() ?: false
+
+// file-level so the reflective lookup stays outside the buildTypes scope
+fun findMethodByName(receiver: Any, name: String): Method? =
+    receiver.javaClass.methods.firstOrNull { it.name == name }
 
 // Add google-services.json only for play/website builds.
 // local dev: copy from the sibling ../firebase/{debug,release} directory (gitignored, outside repo).
@@ -104,8 +109,6 @@ val gitVersion = providers.exec {
     commandLine("git", "describe", "--tags", "--always")
 }.standardOutput.asText.get().trim()
 
-// for GitHub builds, the version code is set in the GitHub action via env
-// for local builds, the version code is set in gradle.properties
 fun getVersionCode(): Int {
     var code = 0
     try {
@@ -118,7 +121,7 @@ fun getVersionCode(): Int {
         logger.info("missing env version code: ${ex.message}")
     }
     if (code == 0) {
-        code = project.properties["VERSION_CODE"]?.toString()?.toInt() ?: 0
+        code = project.properties["VERSION_CODE"]?.toString()?.toIntOrNull() ?: 0
         logger.info("project properties version code: $code")
     }
     return code
@@ -230,11 +233,12 @@ android {
                 // to avoid compilation errors when the plugin is not applied or its classes are not visible
                 val crashlyticsExtension = extensions.findByName("firebaseCrashlytics")
                 if (crashlyticsExtension != null) {
-                    val method = crashlyticsExtension.javaClass.getMethod(
-                        "setNativeSymbolUploadEnabled",
-                        Boolean::class.javaPrimitiveType
-                    )
-                    method.invoke(crashlyticsExtension, true)
+                    val setter = findMethodByName(crashlyticsExtension, "setNativeSymbolUploadEnabled")
+                    if (setter != null) {
+                        setter.invoke(crashlyticsExtension, true)
+                    } else {
+                        logger.warn("firebaseCrashlytics extension has no setNativeSymbolUploadEnabled; skipping native symbol upload setup")
+                    }
                 }
             }
             signingConfig = if (isWebsiteDegoogled) {
@@ -406,14 +410,7 @@ androidComponents {
                 // so installed universal APKs are not treated as a downgrade
                 // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
                 // the arm64-v8a multiplier (3) so versionCode arithmetic still works
-                val firstAbi = variant.outputs
-                    .firstOrNull { candidate ->
-                        candidate.filters.any { it.filterType == FilterConfiguration.FilterType.ABI }
-                    }
-                    ?.filters
-                    ?.firstOrNull { it.filterType == FilterConfiguration.FilterType.ABI }
-                    ?.identifier
-                val multiplier = if (firstAbi != null) abiVersionCodes[firstAbi] ?: 3 else 3
+                val multiplier = abiVersionCodes.getValue("arm64-v8a")
                 val v = multiplier * 10000000 + (output.versionCode.get())
                 output.versionCode.set(v)
             }
