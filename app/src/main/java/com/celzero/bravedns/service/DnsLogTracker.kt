@@ -50,7 +50,6 @@ internal constructor(
 ) {
 
     companion object {
-        const val DNS_LEAK_TEST = "dnsleaktest"
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
@@ -245,7 +244,9 @@ internal constructor(
         }
 
         if (persistentState.fetchFavIcon) {
-            io { fetchFavIcon(context, dnsLog) }
+            if (!dnsLog.groundedQuery()) {
+                io { fetchFavIcon(context, dnsLog) }
+            }
         }
 
         // fetch appName and packageName from uid
