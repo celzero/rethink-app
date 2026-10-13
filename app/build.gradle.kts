@@ -21,7 +21,7 @@ plugins {
 // strategy: For command-line builds, check task names. For IDE, always apply plugins,
 // but they'll only process play/website variants (Firebase deps are scoped to those variants)
 val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
-val apkBuild = taskNames.contains("full")
+val playBuild = taskNames.contains("play")
 val fdroidBuild = taskNames.contains("fdroid")
 // for alpha builds generate universal apk only
 val alphaBuild = taskNames.contains("alpha")
@@ -29,13 +29,17 @@ val alphaBuild = taskNames.contains("alpha")
 // check for fdroidserver value is set in system env
 val fdroidBuildServer: String? = System.getenv("fdroidserver")
 val isFdroidBuildServer = !fdroidBuildServer.isNullOrEmpty() && fdroidBuildServer != "null"
-val deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
+val deGoogled = !playBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 val shouldSplit = !alphaBuild
 
 // Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
 // Official F-Droid builds omit this flag and will be labeled as "fdroid".
-val isWebsiteDegoogled = providers.gradleProperty("websiteDegoogled")
+// IzzyOnDroid builds pass -Pizzyondroid=true instead (.github/workflows/izzyondroid.yml);
+// they are degoogled builds with our keys too, so the izzy flag implies websiteDegoogled.
+val isIzzyBuild = providers.gradleProperty("izzyondroid")
     .orNull?.toBoolean() ?: false
+val isWebsiteDegoogled = isIzzyBuild ||
+    (providers.gradleProperty("websiteDegoogled").orNull?.toBoolean() ?: false)
 
 // file-level so the reflective lookup stays outside the buildTypes scope
 fun findMethodByName(receiver: Any, name: String): Method? =
@@ -76,11 +80,11 @@ if (!deGoogled) {
         }
     }
 } else {
-    logger.info("skipping google-services.json for de-googled/F-Droid build")
+    logger.info("skipping google-services.json for non-play build")
 }
 
 logger.info("app-task names: '$taskNames'")
-logger.info("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+logger.info("gradle deGoogled? $deGoogled (playBuild: $playBuild, fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer)")
 logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 
 // don't apply firebase plugins for fdroid CLI builds
@@ -89,7 +93,7 @@ if (!deGoogled) {
     apply(plugin = "com.google.firebase.crashlytics")
     logger.info("app firebase plugins applied")
 } else {
-    logger.info("app firebase plugins SKIPPED")
+    logger.info("app firebase plugins SKIPPED (non-play build)")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -212,14 +216,15 @@ android {
 
     buildTypes {
         getByName("release") {
-            // modified as part of #352, now webview is removed from app, flipping back
-            // the setting to true
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // AGP 9.3 DSL: enables both code and resource optimization and
+            // includes the default Android keep rules (equivalent to
+            // proguard-android-optimize.txt, which the webview removal in #352
+            // allowed flipping back on). Project keep rules live in
+            // src/main/keepRules/*.keep (see developer.android.com/topic/
+            // performance/app-optimization/enable-app-optimization).
+            optimization {
+                enable = true // Enables code and resource optimizations.
+            }
             ndk {
                 // Use SYMBOL_TABLE to reduce symbol file size significantly
                 debugSymbolLevel = "SYMBOL_TABLE"
@@ -248,6 +253,10 @@ android {
                 logger.info("Normal build: using config signing config")
                 signingConfigs.getByName("config")
             }
+            // IzzyOnDroid builds ship as com.celzero.bravedns.izzy
+            if (isIzzyBuild) {
+                applicationIdSuffix = ".izzy"
+            }
         }
         create("leakCanary") {
             matchingFallbacks += listOf("debug")
@@ -256,24 +265,19 @@ android {
         create("alpha") {
             // archive.is/y8uCB
             applicationIdSuffix = ".alpha"
-            isMinifyEnabled = true
-            isShrinkResources = true
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig = signingConfigs.getByName("alpha")
             resValue("string", "app_name", "Rethink(α)")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
         create("releaseDebug") {
             initWith(getByName("release"))
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // set explicitly; initWith may not copy the optimization block
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
                 abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
@@ -316,9 +320,6 @@ android {
     }
 
     packaging {
-        jniLibs {
-            keepDebugSymbols.add("**/*.so")
-        }
         // required for Google Play developer api model classes
         resources {
             excludes.add("META-INF/INDEX.LIST")
@@ -332,7 +333,7 @@ android {
         }
         create("fdroid") {
             dimension = "releaseChannel"
-            // true only when built with -PwebsiteDegoogled=true (our own keys).
+            // true only when built with -PwebsiteDegoogled=true or -Pizzyondroid=true (our own keys).
             buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", isWebsiteDegoogled.toString())
         }
         create("website") {
@@ -472,7 +473,6 @@ dependencies {
 
     "fullImplementation"(libs.squareupOkhttp3Okhttp)
     "fullImplementation"(libs.squareupOkhttp3OkhttpDnsoverhttps)
-    "fullImplementation"(libs.squareupOkhttp3LoggingInterceptor)
 
     "fullImplementation"(libs.squareupRetrofit2Retrofit)
     "fullImplementation"(libs.squareupRetrofit2ConverterGson)
@@ -648,11 +648,7 @@ dependencies {
     // battery optimization permission helper
     implementation(libs.waseemsabirBetterypermissionhelper)
 
-    // Firebase dependencies for error reporting (website and play variants only)
-    "websiteImplementation"(platform(libs.googleFirebaseFirebaseBom))
-    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlytics)
-    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)
-
+    // Firebase dependencies for error reporting (play variants only)
     "playImplementation"(platform(libs.googleFirebaseFirebaseBom))
     "playImplementation"(libs.googleFirebaseFirebaseCrashlytics)
     "playImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)
