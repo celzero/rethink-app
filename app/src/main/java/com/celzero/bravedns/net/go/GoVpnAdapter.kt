@@ -1543,7 +1543,7 @@ class GoVpnAdapter : KoinComponent {
             val configuredSsids = files?.ssids.orEmpty()
             val ssidMatch = SsidItem.parseStorageList(configuredSsids).isEmpty() ||
                 (ssid.isNotEmpty() && WireguardManager.matchesSsidList(configuredSsids, ssid))
-            val canResumeSsidWg = useOnlyOnSsid && ssidMatch
+            val canResumeSsidWg = useOnlyOnSsid && ssidMatch && !isMobileActive
 
             val canResume = canResumeMobileWg || canResumeSsidWg
 
@@ -1577,7 +1577,7 @@ class GoVpnAdapter : KoinComponent {
                     "wireguard proxy paused",
                     "Wireguard proxy with id $id paused, reason: mobile data"
                 )
-            } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
+            } else if (useOnlyOnSsid && (isMobileActive || (!ssidMatch && !canResume))) {
                 // when the ssidEnabled is set and the ssid does not match
                 val res = pauseWireguard(id)
                 Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
@@ -2635,7 +2635,10 @@ class GoVpnAdapter : KoinComponent {
         try {
             val router = getProxies()?.router() ?: return BraveVPNService.OverlayNetworks()
             val has4 = router.iP4()
-            val has6 = router.iP6()
+            // TODO: adding as a place holder as RPN always reports ipv6 as active even though
+            // there is no IPv6 available, report ipv6 false till the connectivity checks are
+            // implemented for proxies.
+            val has6 = !RpnProxyManager.isRpnActive() && router.iP6()
             val failOpen = !router.iP4() && !router.iP6()
             val mtu = router.mtu().toInt()
             Logger.i(
