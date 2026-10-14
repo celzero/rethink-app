@@ -1694,7 +1694,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (reachabilityCount > maxReachabilityCount) return
 
                 val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
-                delay(delay)
+                delay(delay.milliseconds)
                 redrive()
             } else {
                 Logger.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
