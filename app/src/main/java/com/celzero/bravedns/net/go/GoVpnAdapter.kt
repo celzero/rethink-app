@@ -1577,7 +1577,7 @@ class GoVpnAdapter : KoinComponent {
                     "wireguard proxy paused",
                     "Wireguard proxy with id $id paused, reason: mobile data"
                 )
-            } else if (useOnlyOnSsid && (isMobileActive || (!ssidMatch && !canResume))) {
+            } else if (useOnlyOnSsid && !canResume && (isMobileActive || !ssidMatch)) {
                 // when the ssidEnabled is set and the ssid does not match
                 val res = pauseWireguard(id)
                 Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
