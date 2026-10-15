@@ -7,9 +7,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -21,15 +23,14 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class TcpProxyMainActivity : BaseActivity(R.layout.activity_tcp_proxy) {
-    private val b by viewBinding(ActivityTcpProxyBinding::bind)
+class TcpProxyMainActivity : BaseActivity() {
+    private val b by lazy { TcpUiState(this) }
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
@@ -48,7 +49,11 @@ class TcpProxyMainActivity : BaseActivity(R.layout.activity_tcp_proxy) {
         }
         init()
         setupClickListeners()
+        setContent { RethinkTheme { TcpScreen(b) } }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) { saveUtilityControls(outState, b.savedControls); super.onSaveInstanceState(outState) }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) { super.onRestoreInstanceState(savedInstanceState); restoreUtilityControls(savedInstanceState, b.savedControls) }
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
