@@ -67,9 +67,7 @@ import androidx.work.WorkManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.RpnLog
@@ -89,14 +87,12 @@ import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker
 import com.celzero.bravedns.scheduler.WgProxyPingController
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.service.ProxyManager.isAnyUserSetProxy
 import com.celzero.bravedns.tunnel.TunDnsManager
 
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
-import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.CoFactory
@@ -114,12 +110,10 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isNetworkSame
@@ -156,7 +150,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -173,7 +166,6 @@ import java.net.SocketException
 import java.net.UnknownHostException
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.cancellation.CancellationException
@@ -330,6 +322,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     @Volatile
     var overlayNetworks: OverlayNetworks = OverlayNetworks()
+
+    // avoids running multiple proxy checks at the same time.
+    private val overlayRefreshInProgress = AtomicBoolean(false)
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -2390,6 +2385,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 onNetworkDisconnected(networks, forceRestart)
             }
 
+            // underlying networks changed, re-run the proxy connectivity checks to
+            // refresh the overlay network state (routes/mtu) for the new underlay
+            refreshOverlayNetworks("nwChg")
+
             // Warn the user (once) when their selected IP protocol is unavailable on the
             // current underlying network(s); removes the notification when resolved.
             // Intentionally leaves onNetworkConnected/onNetworkDisconnected untouched.
@@ -3314,6 +3313,28 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         }
     }
 
+    /**
+     * Recomputes overlay-network state using live proxy connectivity checks.
+     * Runs off the serializer; state updates are handled by [onOverlayNetworkChanged].
+     */
+    private fun refreshOverlayNetworks(reason: String) {
+        if (!overlayRefreshInProgress.compareAndSet(false, true)) {
+            logd("refreshOverlayNetworks: already in flight, skip ($reason)")
+            return
+        }
+        io("proxyReach") {
+            try {
+                val nw = vpnAdapter?.proxyReaches() ?: OverlayNetworks()
+                logd("refreshOverlayNetworks ($reason): $nw")
+                onOverlayNetworkChanged(nw)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "$TAG err refreshing overlay networks ($reason): ${e.message}", e)
+            } finally {
+                overlayRefreshInProgress.set(false)
+            }
+        }
+    }
+
     private suspend fun onOverlayNetworkChanged(nw: OverlayNetworks) =
         withContext(CoroutineName("ovch") + serializer) {
             // compare the overlay network pair with the overlayNetworkIpStates to determine if the
@@ -3708,12 +3729,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             return@go2kt
         }
 
-        // new proxy added, refresh overlay network pair
-        io("nwChgOverlay") {
-            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-            logd("onProxyAdded for proxy $pid: $nw")
-            onOverlayNetworkChanged(nw ?: OverlayNetworks())
-        }
+        // new proxy added, refresh overlay network pair via connectivity checks
+        refreshOverlayNetworks("proxyAdded:$pid")
 
         io("proxyAdded") {
             if (pid.contains(Backend.RpnWin, true) && RpnProxyManager.isRpnActive()) {
@@ -3739,12 +3756,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             logd("onProxyRemoved: proxy removed $pid, not wg or rpn proxy, no-op for overlay network")
             return
         }
-        // proxy removed, refresh overlay network pair
-        io("rmvProxy") {
-            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-            logd("onProxyRemoved for proxy $pid: $nw")
-            onOverlayNetworkChanged(nw ?: OverlayNetworks())
-        }
+        // proxy removed, refresh overlay network pair via connectivity checks
+        refreshOverlayNetworks("proxyRemoved:$pid")
         io("rmvProxyDns") {
             val rmvd = vpnAdapter?.handleOnProxyRemoved(pid)
             Logger.i(LOG_TAG_VPN, "onProxyRemoved: handled proxy removed for $pid, success? $rmvd")

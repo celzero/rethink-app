@@ -18,6 +18,7 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.firestack.backend.DNSResolver
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.Proxies
@@ -28,9 +29,11 @@ import com.celzero.firestack.intra.Bridge
 import com.celzero.firestack.intra.Tunnel
 import io.mockk.Runs
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -68,6 +71,9 @@ class GoVpnAdapterTest : KoinTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val dispatcher = StandardTestDispatcher()
+
+    private val V4_PROBE_IPS = "216.239.32.27"
+    private val V6_PROBE_IPS = "2001:4860:4802:32::1b"
 
     private lateinit var context: Context
     private lateinit var persistentState: PersistentState
@@ -290,24 +296,140 @@ class GoVpnAdapterTest : KoinTest {
         assertEquals(Pair(true, false), pair)
     }
 
+    private fun stubWgAndRpnConfigs(wgIds: List<Int>, rpnActive: Boolean) {
+        val wgConfigs = wgIds.map { id ->
+            val config = mockk<com.celzero.bravedns.wireguard.Config>()
+            every { config.getId() } returns id
+            config
+        }
+        mockkObject(WireguardManager)
+        every { WireguardManager.getActiveConfigs() } returns wgConfigs
+        mockkObject(RpnProxyManager)
+        every { RpnProxyManager.isRpnActive() } returns rpnActive
+        coEvery { RpnProxyManager.getEnabledConfigs() } returns emptySet()
+    }
+
+    private fun stubWgRouter(proxies: Proxies, id: String, has4: Boolean, has6: Boolean): Router {
+        val proxy = mockk<Proxy>(relaxed = true)
+        val router = mockk<Router>(relaxed = true)
+        every { proxies.getProxy("wg$id") } returns proxy
+        every { proxy.router() } returns router
+        every { router.reaches(V4_PROBE_IPS) } returns has4
+        every { router.reaches(V6_PROBE_IPS) } returns has6
+        return router
+    }
+
     @Test
-    fun `getActiveProxiesIpAndMtu returns overlay network details`() = runTest {
+    fun `proxyReaches ands per-proxy reachability and sources mtu from the aggregate router`() =
+        runTest {
+            val tunnel = mockk<Tunnel>(relaxed = true)
+            every { tunnel.isConnected } returns true
+
+            val proxies = mockk<Proxies>(relaxed = true)
+            val aggRouter = mockk<Router>(relaxed = true)
+            every { tunnel.proxies } returns proxies
+            every { proxies.router() } returns aggRouter
+            every { aggRouter.mtu() } returns 1380L
+
+            stubWgRouter(proxies, "1", has4 = true, has6 = true)
+            stubWgRouter(proxies, "2", has4 = true, has6 = true)
+            stubWgAndRpnConfigs(listOf(1, 2), rpnActive = false)
+
+            every { persistentState.pingv4Ips } returns V4_PROBE_IPS
+            every { persistentState.pingv6Ips } returns V6_PROBE_IPS
+
+            val adapter = newAdapter(tunnel)
+
+            val net = adapter.proxyReaches()
+
+            assertEquals(BraveVPNService.OverlayNetworks(true, true, false, 1380), net)
+        }
+
+    @Test
+    fun `proxyReaches reports no ipv6 when one proxy lacks it`() = runTest {
         val tunnel = mockk<Tunnel>(relaxed = true)
         every { tunnel.isConnected } returns true
 
         val proxies = mockk<Proxies>(relaxed = true)
-        val router = mockk<Router>(relaxed = true)
+        val aggRouter = mockk<Router>(relaxed = true)
         every { tunnel.proxies } returns proxies
-        every { proxies.router() } returns router
-        every { router.iP4() } returns true
-        every { router.iP6() } returns true
-        every { router.mtu() } returns 1380L
+        every { proxies.router() } returns aggRouter
+        every { aggRouter.mtu() } returns 1380L
+
+        stubWgRouter(proxies, "1", has4 = true, has6 = true)
+        stubWgRouter(proxies, "2", has4 = true, has6 = false)
+        stubWgAndRpnConfigs(listOf(1, 2), rpnActive = false)
+
+        every { persistentState.pingv4Ips } returns V4_PROBE_IPS
+        every { persistentState.pingv6Ips } returns V6_PROBE_IPS
 
         val adapter = newAdapter(tunnel)
 
-        val net = adapter.getActiveProxiesIpAndMtu()
+        val net = adapter.proxyReaches()
 
-        assertEquals(BraveVPNService.OverlayNetworks(true, true, false, 1380), net)
+        assertEquals(BraveVPNService.OverlayNetworks(true, false, false, 1380), net)
+    }
+
+    @Test
+    fun `proxyReaches fails open when no wg or rpn proxies are active`() = runTest {
+        val tunnel = mockk<Tunnel>(relaxed = true)
+        every { tunnel.isConnected } returns true
+
+        val proxies = mockk<Proxies>(relaxed = true)
+        val aggRouter = mockk<Router>(relaxed = true)
+        every { tunnel.proxies } returns proxies
+        every { proxies.router() } returns aggRouter
+        every { aggRouter.mtu() } returns 1380L
+
+        stubWgAndRpnConfigs(emptyList(), rpnActive = false)
+
+        val adapter = newAdapter(tunnel)
+
+        val net = adapter.proxyReaches()
+
+        assertEquals(BraveVPNService.OverlayNetworks(false, false, true, 1380), net)
+    }
+
+    @Test
+    fun `proxyReaches treats probe errors and missing routers as unreachable`() = runTest {
+        val tunnel = mockk<Tunnel>(relaxed = true)
+        every { tunnel.isConnected } returns true
+
+        val proxies = mockk<Proxies>(relaxed = true)
+        val aggRouter = mockk<Router>(relaxed = true)
+        every { tunnel.proxies } returns proxies
+        every { proxies.router() } returns aggRouter
+        every { aggRouter.mtu() } returns 1380L
+
+        // proxy 1: router throws on every probe; proxy 2: missing from the tunnel
+        val proxy1 = mockk<Proxy>(relaxed = true)
+        val router1 = mockk<Router>(relaxed = true)
+        every { proxies.getProxy("wg1") } returns proxy1
+        every { proxy1.router() } returns router1
+        every { router1.reaches(any()) } throws RuntimeException("go err")
+        every { proxies.getProxy("wg2") } returns null
+        stubWgAndRpnConfigs(listOf(1, 2), rpnActive = false)
+
+        every { persistentState.pingv4Ips } returns V4_PROBE_IPS
+        every { persistentState.pingv6Ips } returns V6_PROBE_IPS
+
+        val adapter = newAdapter(tunnel)
+
+        val net = adapter.proxyReaches()
+
+        assertEquals(BraveVPNService.OverlayNetworks(false, false, true, 1380), net)
+    }
+
+    @Test
+    fun `proxyReaches skips checks when tunnel is disconnected`() = runTest {
+        val tunnel = mockk<Tunnel>(relaxed = true)
+        every { tunnel.isConnected } returns false
+
+        val adapter = newAdapter(tunnel)
+
+        val net = adapter.proxyReaches()
+
+        assertEquals(BraveVPNService.OverlayNetworks(), net)
     }
 
     @Test
@@ -410,6 +532,7 @@ class GoVpnAdapterTest : KoinTest {
         adapter.addMultipleDnsAsPlus()
         adapter.getPlusResolvers()
         adapter.getPlusTransportById("x")
+        adapter.proxyReaches()
 
         assertTrue(true)
     }
