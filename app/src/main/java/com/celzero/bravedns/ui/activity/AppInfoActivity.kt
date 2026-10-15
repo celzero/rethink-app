@@ -86,6 +86,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
@@ -95,6 +96,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
@@ -210,6 +212,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

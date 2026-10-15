@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.chip.Chip
@@ -88,6 +89,7 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

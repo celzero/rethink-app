@@ -112,16 +112,20 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     }
 
     private fun applyEdgeToEdge() {
+        // absolute padding from a captured base so repeated inset dispatches stay idempotent
+        val basePaddingBottom = b.recyclerOdoh.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(b.recyclerOdoh) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(
                 v.paddingLeft,
                 v.paddingTop,
                 v.paddingRight,
-                v.paddingBottom + systemBars.bottom
+                basePaddingBottom + systemBars.bottom
             )
             insets
         }
+        // some OEMs skip the initial inset dispatch on attach
+        ViewCompat.requestApplyInsets(b.recyclerOdoh)
     }
 
     private fun showAddDialog() {

@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -74,6 +75,7 @@ class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

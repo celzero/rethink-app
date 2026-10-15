@@ -29,6 +29,7 @@ import com.celzero.bravedns.ui.fragment.SmartDnsListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import org.koin.android.ext.android.inject
 
 class SmartDnsListActivity : BaseActivity(R.layout.activity_smart_dns_list) {
@@ -45,6 +46,7 @@ class SmartDnsListActivity : BaseActivity(R.layout.activity_smart_dns_list) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applyTopInsetOnly()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

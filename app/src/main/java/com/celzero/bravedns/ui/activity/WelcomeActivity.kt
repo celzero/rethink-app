@@ -77,6 +77,8 @@ class WelcomeActivity : BaseActivity(R.layout.activity_welcome) {
             }
             insets
         }
+        // some OEMs skip the initial inset dispatch on attach
+        ViewCompat.requestApplyInsets(b.root)
 
         // Initialize adapter and dots
         b.viewPager.adapter = WelcomePagerAdapter(layouts)

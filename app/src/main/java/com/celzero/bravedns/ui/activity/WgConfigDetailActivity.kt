@@ -73,6 +73,7 @@ import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -174,6 +175,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

@@ -51,6 +51,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
@@ -1138,5 +1139,40 @@ object SnackbarHelper {
             Color.WHITE
         }
     }
+
+    /** Pads the view on all four sides with the system-bar and display-cutout insets. */
+    fun View.applySystemBarEdgeInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
+    /** Pads only the view's top with the system-bar/cutout inset. */
+    fun View.applyTopInsetOnly() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.updatePadding(top = bars.top)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
+    /** Pads only the view's bottom with the system-bar inset. */
+    fun View.applyBottomInsetOnly() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
 }
 

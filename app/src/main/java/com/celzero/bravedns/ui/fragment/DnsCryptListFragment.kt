@@ -127,16 +127,20 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private fun applyEdgeToEdge() {
+        // absolute padding from a captured base so repeated inset dispatches stay idempotent
+        val basePaddingBottom = b.recyclerDnsCryptConnections.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDnsCryptConnections) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(
                 v.paddingLeft,
                 v.paddingTop,
                 v.paddingRight,
-                v.paddingBottom + systemBars.bottom
+                basePaddingBottom + systemBars.bottom
             )
             insets
         }
+        // some OEMs skip the initial inset dispatch on attach
+        ViewCompat.requestApplyInsets(b.recyclerDnsCryptConnections)
     }
 
     private fun openDnsCryptRelaysDialog() {

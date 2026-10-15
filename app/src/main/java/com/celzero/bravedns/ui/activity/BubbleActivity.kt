@@ -46,6 +46,7 @@ import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
 import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
 import kotlinx.coroutines.CancellationException
@@ -100,6 +101,7 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         Logger.d(TAG, "BubbleActivity onCreate, taskId: $taskId")
 
