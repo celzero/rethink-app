@@ -23,7 +23,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityOtherDnsListBinding
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dnssettings.*
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -34,14 +36,13 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.backend.Backend
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
-    private val b by viewBinding(ActivityOtherDnsListBinding::bind)
+class DnsListActivity : BaseActivity() {
+    private val b = DnsProtocolState()
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -64,18 +65,8 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             window.isNavigationBarContrastEnforced = false
         }
 
-        setupGridColumns()
+        setContent { RethinkTheme { DnsProtocolGrid(b) } }
         setupClickListeners()
-    }
-
-    /**
-     * Adapts the DNS card grid to the available width: phones stay at 2 columns,
-     * while unfolded foldables and tablets (>= 480dp) get 3 columns so all six
-     * square cards keep a consistent, unstretched size on every screen.
-     */
-    private fun setupGridColumns() {
-        val widthDp = resources.configuration.screenWidthDp
-        b.gridLayoutDnsCards.columnCount = if (widthDp >= GRID_WIDE_MIN_WIDTH_DP) 3 else 2
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -84,7 +75,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
     }
 
     private fun setupClickListeners() {
-        b.cardDnscrypt.setOnClickListener {
+        b.cardDnscrypt.onClick = {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -93,7 +84,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.cardDnsproxy.setOnClickListener {
+        b.cardDnsproxy.onClick = {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -102,7 +93,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.cardDoh.setOnClickListener {
+        b.cardDoh.onClick = {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -111,7 +102,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.cardDot.setOnClickListener {
+        b.cardDot.onClick = {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -120,7 +111,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.cardOdoh.setOnClickListener {
+        b.cardOdoh.onClick = {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -129,7 +120,7 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.cardRethinkDns.setOnClickListener { invokeRethinkActivity() }
+        b.cardRethinkDns.onClick = { invokeRethinkActivity() }
     }
 
     private fun invokeRethinkActivity() {
@@ -154,18 +145,18 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
         b.cardDot.strokeWidth = 0
         b.cardOdoh.strokeWidth = 0
         b.cardRethinkDns.strokeWidth = 0
-        b.initialDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrDnsproxy.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.initialDnscrypt.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrDnscrypt.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.initialDot.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrDot.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.initialOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.initialRethinkDns.setTextColor(fetchColor(this, R.attr.primaryTextColor))
-        b.abbrRethinkDns.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialDoh.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrDoh.color = fetchColor(this, R.attr.primaryTextColor)
+        b.initialDnsproxy.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrDnsproxy.color = fetchColor(this, R.attr.primaryTextColor)
+        b.initialDnscrypt.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrDnscrypt.color = fetchColor(this, R.attr.primaryTextColor)
+        b.initialDot.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrDot.color = fetchColor(this, R.attr.primaryTextColor)
+        b.initialOdoh.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrOdoh.color = fetchColor(this, R.attr.primaryTextColor)
+        b.initialRethinkDns.color = fetchColor(this, R.attr.primaryTextColor)
+        b.abbrRethinkDns.color = fetchColor(this, R.attr.primaryTextColor)
     }
 
     private fun updateSelectedStatus() {
@@ -211,38 +202,38 @@ class DnsListActivity : BaseActivity(R.layout.activity_other_dns_list) {
             AppConfig.DnsType.DOH -> {
                 b.cardDoh.strokeColor = strokeColor
                 b.cardDoh.strokeWidth = 2
-                b.initialDoh.setTextColor(textColor)
-                b.abbrDoh.setTextColor(textColor)
+                b.initialDoh.color = textColor
+                b.abbrDoh.color = textColor
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.cardDnsproxy.strokeColor = strokeColor
                 b.cardDnsproxy.strokeWidth = 2
-                b.initialDnsproxy.setTextColor(textColor)
-                b.abbrDnsproxy.setTextColor(textColor)
+                b.initialDnsproxy.color = textColor
+                b.abbrDnsproxy.color = textColor
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.cardDnscrypt.strokeColor = strokeColor
                 b.cardDnscrypt.strokeWidth = 2
-                b.initialDnscrypt.setTextColor(textColor)
-                b.abbrDnscrypt.setTextColor(textColor)
+                b.initialDnscrypt.color = textColor
+                b.abbrDnscrypt.color = textColor
             }
             AppConfig.DnsType.DOT -> {
                 b.cardDot.strokeColor = strokeColor
                 b.cardDot.strokeWidth = 2
-                b.initialDot.setTextColor(textColor)
-                b.abbrDot.setTextColor(textColor)
+                b.initialDot.color = textColor
+                b.abbrDot.color = textColor
             }
             AppConfig.DnsType.ODOH -> {
                 b.cardOdoh.strokeColor = strokeColor
                 b.cardOdoh.strokeWidth = 2
-                b.initialOdoh.setTextColor(textColor)
-                b.abbrOdoh.setTextColor(textColor)
+                b.initialOdoh.color = textColor
+                b.abbrOdoh.color = textColor
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 b.cardRethinkDns.strokeColor = strokeColor
                 b.cardRethinkDns.strokeWidth = 2
-                b.initialRethinkDns.setTextColor(textColor)
-                b.abbrRethinkDns.setTextColor(textColor)
+                b.initialRethinkDns.color = textColor
+                b.abbrRethinkDns.color = textColor
             }
             else -> {
                 // no-op
