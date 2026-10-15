@@ -1,103 +1,92 @@
-/*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/* Copyright 2026 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.ui.fragment
-
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.CompoundButton
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.ConnectionLogAdapter
-import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
-import com.celzero.bravedns.service.FirewallRuleset
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.adapter.*
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.*
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
-import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import com.celzero.bravedns.viewmodel.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.milliseconds
+import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 
-/** Captures network logs and stores in ConnectionTracker, a room database. */
-class ConnectionTrackerFragment :
-    Fragment(R.layout.fragment_connection_tracker), SearchView.OnQueryTextListener {
-    private val b by viewBinding(FragmentConnectionTrackerBinding::bind)
+class ConnectionTrackerFragment : Fragment() {
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
-    private var lastScrollHeaderUpdateMs = 0L
-
-    private var filterQuery: String = ""
+    private var filterQuery = ""
     private val filterCategories: MutableSet<String> = mutableSetOf()
-    private var filterType: TopLevelFilter = TopLevelFilter.ALL
+    private var filterType = TopLevelFilter.ALL
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val rethinkLogRepository by inject<RethinkLogRepository>()
     private val persistentState by inject<PersistentState>()
-
-    private var fromWireGuardScreen: Boolean = false
-    private var fromRpnScreen: Boolean = false
-    private var fromUniversalFirewallScreen: Boolean = false
-
+    private var fromWireGuardScreen = false
+    private var fromRpnScreen = false
+    private var fromUniversalFirewallScreen = false
+    private lateinit var state: LogScreenState
+    private var parentChip by mutableIntStateOf(TopLevelFilter.ALL.id)
+    private var childChips by mutableStateOf(emptySet<String>())
+    private var children by mutableStateOf(emptyList<FirewallRuleset>())
+    private var merged: ConnectionLogAdapter? = null
+    private var connections: ConnectionTrackerAdapter? = null
     companion object {
         private const val TAG = "ConnTrackFrag"
+        private const val QUERY_TEXT_DELAY = 1000L
         const val PROTOCOL_FILTER_PREFIX = "P:"
-        private const val QUERY_TEXT_DELAY: Long = 1000
-
-        /**
-         * When true, ConnectionTrackerFragment shows a unified list of both
-         * ConnectionTracker and RethinkLog rows. When false, only ConnectionTracker
-         * rows are shown (legacy behaviour).
-         */
         const val MERGE_RETHINK_LOGS = true
-
-        fun newInstance(param: String): ConnectionTrackerFragment {
-            val args = Bundle()
-            args.putString(Constants.SEARCH_QUERY, param)
-            val fragment = ConnectionTrackerFragment()
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(param: String) = ConnectionTrackerFragment().apply { arguments = Bundle().apply { putString(Constants.SEARCH_QUERY, param) } }
     }
+    private fun resetViewPresentation() { parentChip = TopLevelFilter.ALL.id; childChips = emptySet(); children = FirewallRuleset.getBlockedRules(); merged = null; connections = null }
 
+    private var viewSearchSnapshot: String? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        state = LogScreenState()
+        resetViewPresentation()
+        return ComposeView(requireContext()).apply { setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed) }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("traffic.search", if (::state.isInitialized) state.search.query else viewSearchSnapshot)
+    }
+    override fun onDestroyView() {
+        viewSearchSnapshot = state.search.query
+        super.onDestroyView()
+    }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        // TextView hierarchy restoration happens after arguments and listener installation.
+        (savedInstanceState?.getString("traffic.search") ?: viewSearchSnapshot)?.let { state.search.setQuery(it) }
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (arguments != null) {
@@ -124,242 +113,47 @@ class ConnectionTrackerFragment :
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 hideSearchLayout()
             } else {
-                b.connectionSearch.setQuery(query, true)
+                state.search.setQuery(query, true)
                 viewModel.setFilter(query, filterCategories, filterType)
                 setQueryFilter()
             }
         }
         initView()
+        (view as ComposeView).setContent { RethinkTheme { Surface(color = themeColor(R.attr.background), contentColor = themeColor(R.attr.primaryTextColor)) { Content() } } }
         Logger.v(LOG_TAG_UI, "$TAG, view created from univ? $fromUniversalFirewallScreen, from wg? $fromWireGuardScreen")
     }
 
     private fun initView() {
-        if (!persistentState.logsEnabled) {
-            b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-            b.connectionCardViewTop.visibility = View.GONE
-            return
-        }
-
-        b.connectionListLogsDisabledTv.visibility = View.GONE
-
-        if (fromWireGuardScreen || fromUniversalFirewallScreen) {
-            hideSearchLayout()
-        } else {
-            b.connectionCardViewTop.visibility = View.VISIBLE
-        }
-        b.connectionSearch.setOnQueryTextListener(this)
-
-        setupRecyclerView()
-
-        b.connectionSearch.setOnClickListener {
-            showParentChipsUi()
-            showChildChipsIfNeeded()
-            b.connectionSearch.requestFocus()
-            b.connectionSearch.onActionViewExpanded()
-        }
-
-        b.connectionFilterIcon.setOnClickListener { toggleParentChipsUi() }
-
-        b.connectionDeleteIcon.setOnClickListener { showDeleteDialog() }
-
-        remakeParentFilterChipsUi()
-        remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
-    }
-
-    private fun setupRecyclerView() {
-        b.recyclerConnection.setHasFixedSize(true)
-        b.recyclerConnection.setItemViewCacheSize(6)
-        layoutManager = LinearLayoutManager(requireContext())
-        layoutManager?.isItemPrefetchEnabled = true
-        b.recyclerConnection.layoutManager = layoutManager
-
+        if (!persistentState.logsEnabled) { state.message = getString(R.string.show_logs_disabled_network_message); state.showSearch = false; return }
+        state.showSearch = !(fromWireGuardScreen || fromUniversalFirewallScreen)
+        state.search.listener = { onQueryTextChange(it) }
+        state.search.submitListener = { onQueryTextSubmit(it) }
         if (MERGE_RETHINK_LOGS) {
-            setupMergedRecyclerView()
+            val adapter = ConnectionLogAdapter(requireContext()); merged = adapter
+            viewModel.connectionTrackerListMerged.observe(viewLifecycleOwner) { adapter.submitData(lifecycle, it) }
+            adapter.addLoadStateListener { updateLoadState(it, adapter.itemCount) { viewModel.connectionTrackerListMerged.removeObservers(this) } }
         } else {
-            setupConnectionTrackerRecyclerView()
-        }
-
-        b.recyclerConnection.layoutAnimation = null
-        setupRecyclerScrollListener()
-    }
-
-    private fun setupConnectionTrackerRecyclerView() {
-        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        b.recyclerConnection.adapter = recyclerAdapter
-
-        viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
-            recyclerAdapter.submitData(lifecycle, pagingData)
-        }
-
-        recyclerAdapter.addLoadStateListener { loadState ->
-            val isEmpty = recyclerAdapter.itemCount < 1
-
-            if (loadState.refresh is LoadState.Loading && isEmpty) {
-                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
-                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                b.recyclerConnection.visibility = View.GONE
-                return@addLoadStateListener
-            }
-
-            if (loadState.append.endOfPaginationReached && isEmpty) {
-                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
-                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
-                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                    b.connectionCardViewTop.visibility = View.GONE
-                } else {
-                    b.connectionListLogsDisabledTv.visibility = View.GONE
-                    b.connectionCardViewTop.visibility = View.VISIBLE
-                }
-                viewModel.connectionTrackerList.removeObservers(this)
-                b.recyclerConnection.visibility = View.GONE
-            } else {
-                b.connectionListLogsDisabledTv.visibility = View.GONE
-                if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
-                    b.connectionCardViewTop.visibility = View.GONE
-                } else {
-                    b.connectionCardViewTop.visibility = View.VISIBLE
-                }
-            }
-        }
-
-        b.recyclerConnection.post {
-            try {
-                if (recyclerAdapter.itemCount > 0) {
-                    recyclerAdapter.stateRestorationPolicy =
-                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                }
-            } catch (_: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
-            }
+            val adapter = ConnectionTrackerAdapter(requireContext()); connections = adapter
+            viewModel.connectionTrackerList.observe(viewLifecycleOwner) { adapter.submitData(lifecycle, it) }
+            adapter.addLoadStateListener { updateLoadState(it, adapter.itemCount) { viewModel.connectionTrackerList.removeObservers(this) } }
         }
     }
-
-    private fun setupMergedRecyclerView() {
-        val recyclerAdapter = ConnectionLogAdapter(requireContext())
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        b.recyclerConnection.adapter = recyclerAdapter
-
-        viewModel.connectionTrackerListMerged.observe(viewLifecycleOwner) { pagingData ->
-            recyclerAdapter.submitData(lifecycle, pagingData)
-        }
-
-        recyclerAdapter.addLoadStateListener { loadState ->
-            val isEmpty = recyclerAdapter.itemCount < 1
-
-            // Show loading indicator during initial load
-            if (loadState.refresh is LoadState.Loading && isEmpty) {
-                b.connectionListLogsDisabledTv.text = getString(R.string.loading)
-                b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                b.recyclerConnection.visibility = View.GONE
-                return@addLoadStateListener
-            }
-
-            if (loadState.append.endOfPaginationReached && isEmpty) {
-                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
-                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
-                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                    b.connectionCardViewTop.visibility = View.GONE
-                } else {
-                    b.connectionListLogsDisabledTv.visibility = View.GONE
-                    b.connectionCardViewTop.visibility = View.VISIBLE
-                }
-                viewModel.connectionTrackerListMerged.removeObservers(this)
-                b.recyclerConnection.visibility = View.GONE
-            } else {
-                b.connectionListLogsDisabledTv.visibility = View.GONE
-                if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                if (fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen) {
-                    b.connectionCardViewTop.visibility = View.GONE
-                } else {
-                    b.connectionCardViewTop.visibility = View.VISIBLE
-                }
-            }
-        }
-
-        b.recyclerConnection.post {
-            try {
-                if (recyclerAdapter.itemCount > 0) {
-                    recyclerAdapter.stateRestorationPolicy =
-                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                }
-            } catch (_: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
-            }
-        }
+    private fun updateLoadState(loadState: androidx.paging.CombinedLoadStates, count: Int, remove: () -> Unit) {
+        if (loadState.refresh is LoadState.Loading && count < 1) { state.message = getString(R.string.loading); state.showList = false; return }
+        val scoped = fromUniversalFirewallScreen || fromWireGuardScreen || fromRpnScreen
+        if (loadState.append.endOfPaginationReached && count < 1) {
+            state.message = if (scoped) getString(R.string.ada_ip_no_connection) else null
+            state.showSearch = !scoped; remove(); state.showList = false
+        } else { state.message = null; state.showList = true; state.showSearch = !scoped }
     }
-
-
-    private fun hideSearchLayout() {
-        b.connectionCardViewTop.visibility = View.GONE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // fix for #1939, OEM-specific bug, especially on heavily customized Android
-        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
-        // causing SearchView to stop receiving input events
-        // this is a workaround to restart the IME process
-        //b.connectionSearch.setQuery("", false)
-        b.connectionSearch.clearFocus()
-
-        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.connectionSearch)
-        b.connectionListRl.requestFocus()
-    }
-
-    private fun setupRecyclerScrollListener() {
-        val scrollListener =
-            object : RecyclerView.OnScrollListener() {
-
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val now = System.currentTimeMillis()
-                    if (now - lastScrollHeaderUpdateMs < 100L) return
-                    lastScrollHeaderUpdateMs = now
-
-                    val firstChild = recyclerView.getChildAt(0)
-                    if (firstChild == null) {
-                        Logger.v(LOG_TAG_UI, "$TAG; err; no child views found in recyclerView")
-                        return
-                    }
-
-                    val tag = firstChild.tag as? Long
-                    if (tag == null) {
-                        Logger.v(LOG_TAG_UI, "$TAG; err; tag is null for first child, rv")
-                        return
-                    }
-
-                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
-                    b.connectionListScrollHeader.visibility = View.VISIBLE
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.connectionListScrollHeader.visibility = View.GONE
-                    }
-                }
-            }
-        b.recyclerConnection.addOnScrollListener(scrollListener)
-    }
-
-    private fun toggleParentChipsUi() {
-        if (b.filterChipParentGroup.isVisible) {
-            hideParentChipsUi()
-            hideChildChipsUi()
-        } else {
-            showParentChipsUi()
-            showChildChipsIfNeeded()
-        }
-    }
-
+    override fun onResume() { super.onResume(); state.resumeGeneration++ }
+    private fun hideSearchLayout() { state.showSearch = false }
+    private fun toggleParentChipsUi() { if (state.showParentFilters) { hideParentChipsUi(); hideChildChipsUi() } else { showParentChipsUi(); showChildChipsIfNeeded() } }
+    private fun showParentChipsUi() { state.showParentFilters = true }
+    private fun hideParentChipsUi() { state.showParentFilters = false }
+    private fun showChildChipsUi() { state.showChildFilters = true }
+    private fun hideChildChipsUi() { state.showChildFilters = false }
+    private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) { children = categories; childChips = emptySet() }
     private fun showChildChipsIfNeeded() {
         when (filterType) {
             TopLevelFilter.ALL -> {
@@ -373,52 +167,6 @@ class ConnectionTrackerFragment :
             }
         }
     }
-
-    private fun remakeParentFilterChipsUi() {
-        b.filterChipParentGroup.removeAllViews()
-
-        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
-        val allowed =
-            makeParentChip(TopLevelFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
-        val blocked =
-            makeParentChip(TopLevelFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
-
-        b.filterChipParentGroup.addView(all)
-        b.filterChipParentGroup.addView(allowed)
-        b.filterChipParentGroup.addView(blocked)
-    }
-
-    private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) { // apply filter only when the CompoundButton is selected
-                applyParentFilter(button.tag)
-            } else { // actions need to be taken when the button is unselected
-                unselectParentsChipsUi(button.tag)
-            }
-        }
-
-        return chip
-    }
-
-    private fun makeChildChip(id: String, titleResId: Int): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.text = getString(titleResId)
-        chip.chipIcon =
-            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(id))
-        chip.isCheckedIconVisible = false
-        chip.tag = id
-
-        chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
-            applyChildFilter(compoundButton.tag, isSelected)
-        }
-        return chip
-    }
-
     private fun applyParentFilter(tag: Any) {
         when (tag) {
             TopLevelFilter.ALL.id -> {
@@ -442,7 +190,6 @@ class ConnectionTrackerFragment :
             }
         }
     }
-
     @OptIn(FlowPreview::class)
     private fun setQueryFilter() {
         lifecycleScope.launch {
@@ -455,24 +202,19 @@ class ConnectionTrackerFragment :
                 }
         }
     }
-
-    val searchQuery = MutableStateFlow("")
-
-    override fun onQueryTextSubmit(query: String): Boolean {
+    fun onQueryTextSubmit(query: String): Boolean {
         searchQuery.value = query
         return true
     }
-
-    override fun onQueryTextChange(query: String): Boolean {
+    fun onQueryTextChange(query: String): Boolean {
         searchQuery.value = query
         return true
     }
-
     private fun showDeleteDialog() {
         val rule = filterCategories.firstOrNull()
         if (fromUniversalFirewallScreen && rule != null) {
             // Rule-specific deletion for Universal Firewall Settings
-            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                 .setTitle(R.string.conn_track_clear_rule_logs_title)
                 .setMessage(R.string.conn_track_clear_rule_logs_message)
                 .setCancelable(true)
@@ -489,7 +231,7 @@ class ConnectionTrackerFragment :
                 .show()
         } else {
             // Default deletion behavior - delete all logs
-            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                 .setTitle(R.string.conn_track_clear_logs_title)
                 .setMessage(R.string.conn_track_clear_logs_message)
                 .setCancelable(true)
@@ -506,16 +248,6 @@ class ConnectionTrackerFragment :
                 .show()
         }
     }
-
-    private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
-        with(b.filterChipGroup) {
-            removeAllViews()
-            for (c in categories) {
-                addView(makeChildChip(c.id, c.title))
-            }
-        }
-    }
-
     private fun applyChildFilter(tag: Any, show: Boolean) {
         if (show) {
             filterCategories.add(tag.toString())
@@ -524,10 +256,6 @@ class ConnectionTrackerFragment :
         }
         viewModel.setFilter(filterQuery, filterCategories, filterType)
     }
-
-    // chips: all, allowed, blocked
-    // when any chip other than "all" is selected, show the child chips.
-    // ignore unselect events from allowed and blocked chip
     private fun unselectParentsChipsUi(tag: Any) {
         when (tag) {
             TopLevelFilter.ALL.id -> {
@@ -535,24 +263,32 @@ class ConnectionTrackerFragment :
             }
         }
     }
-
-    private fun showChildChipsUi() {
-        b.filterChipGroup.visibility = View.VISIBLE
-    }
-
-    private fun hideChildChipsUi() {
-        b.filterChipGroup.visibility = View.GONE
-    }
-
-    private fun showParentChipsUi() {
-        b.filterChipParentGroup.visibility = View.VISIBLE
-    }
-
-    private fun hideParentChipsUi() {
-        b.filterChipParentGroup.visibility = View.GONE
-    }
-
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    val searchQuery = MutableStateFlow("")
+    @Composable private fun Content() {
+        Column(Modifier.fillMaxSize().background(themeColor(R.attr.background))) {
+            LogSearchBar(state, stringResource(R.string.search_firewall_network_log), onSearchFocus = { showParentChipsUi(); showChildChipsIfNeeded(); state.search.expand() }, filters = {
+                if (state.showParentFilters) {
+                    val options = listOf(TopLevelFilter.ALL to R.string.lbl_all, TopLevelFilter.ALLOWED to R.string.lbl_allowed, TopLevelFilter.BLOCKED to R.string.lbl_blocked)
+                    LogFilterChips(options.map { LogFilterChip(it.first.id.toString(), stringResource(it.second), parentChip == it.first.id) }) {
+                        if (!it.selected) { val old = parentChip; parentChip = it.key.toInt(); unselectParentsChipsUi(old); applyParentFilter(parentChip) }
+                        else unselectParentsChipsUi(parentChip) // selectionRequired restores the internal check before the external listener.
+                    }
+                }
+                if (state.showChildFilters) LogFilterChips(children.map { LogFilterChip(it.id, stringResource(it.title), it.id in childChips, FirewallRuleset.getRulesIcon(it.id)) }, singleLine = true) {
+                    childChips = if (it.selected) childChips - it.key else childChips + it.key
+                    applyChildFilter(it.key, !it.selected)
+                }
+            }, actions = {
+                LogAction(R.drawable.ic_filter, stringResource(R.string.fapps_filter_filter_heading), ::toggleParentChipsUi)
+                LogAction(R.drawable.ic_delete, stringResource(R.string.lbl_delete), ::showDeleteDialog)
+            })
+            merged?.let { LogList(state, it, Modifier.weight(1f), timestamp = { row -> row.timeStamp }, headerThrottleMillis = 100) }
+            connections?.let { LogList(state, it, Modifier.weight(1f), timestamp = { row -> row.timeStamp }, headerThrottleMillis = 100) }
+            if (merged == null && connections == null) state.message?.let { Text(it) }
+        }
     }
 }

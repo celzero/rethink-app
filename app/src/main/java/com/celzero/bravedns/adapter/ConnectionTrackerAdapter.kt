@@ -16,27 +16,26 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import androidx.compose.runtime.*
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.databinding.ListItemConnTrackBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -58,10 +57,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class ConnectionTrackerAdapter(private val context: Context) :
-    PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
-        DIFF_CALLBACK
-    ) {
+class ConnectionTrackerAdapter(private val context: Context) : LogPagingPresenter<ConnectionTracker>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -84,29 +80,22 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private const val TAG = "ConnTrackAdapter"
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
-        val itemBinding =
-            ListItemConnTrackBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        return ConnectionTrackerViewHolder(itemBinding)
-    }
 
-    override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
-        val connTracker: ConnectionTracker? = getItem(position)
 
-        if (connTracker == null) {
-            holder.clear()
-            return
+
+
+    override fun itemKey(value: ConnectionTracker): Any = value.id
+    @Composable override fun Row(value: ConnectionTracker, generation: Int) {
+        val owner = LocalLifecycleOwner.current
+        val presentation = remember { Presentation(ConnectionRowState(context)) }
+        DisposableEffect(value) {
+            presentation.update(value)
+            onDispose { /* baseline Activity-scoped work is not cancelled on detach */ }
         }
-        holder.update(connTracker)
-        holder.setTag(connTracker)
+        ConnectionLogRow(presentation.b)
     }
 
-    inner class ConnectionTrackerViewHolder(private val b: ListItemConnTrackBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    private inner class Presentation(val b: ConnectionRowState) {
 
         fun clear() {
             b.connectionResponseTime.text = ""
@@ -414,7 +403,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                             )
                     }
 
-                    if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                    if (b.connectionDelay.text.isNullOrEmpty() && b.connectionDataUsage.text.isNullOrEmpty()) {
                         b.connectionSummaryLl.visibility = View.GONE
                     }
 
@@ -454,10 +443,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(getDefaultIcon(context))
-                .into(b.connectionAppIcon)
+            b.connectionAppIcon.setImageDrawable(drawable ?: getDefaultIcon(context))
         }
     }
 
