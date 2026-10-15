@@ -83,16 +83,20 @@ class SmartDnsListFragment : Fragment(R.layout.fragment_smart_dns_list) {
     }
 
     private fun applyEdgeToEdge() {
+        // absolute padding from a captured base so repeated inset dispatches stay idempotent
+        val basePaddingBottom = b.recyclerSmartDnsList.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(b.recyclerSmartDnsList) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(
                 v.paddingLeft,
                 v.paddingTop,
                 v.paddingRight,
-                v.paddingBottom + systemBars.bottom
+                basePaddingBottom + systemBars.bottom
             )
             insets
         }
+        // some OEMs skip the initial inset dispatch on attach
+        ViewCompat.requestApplyInsets(b.recyclerSmartDnsList)
     }
 
     private fun io(f: suspend () -> Unit) {

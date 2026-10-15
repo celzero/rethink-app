@@ -32,6 +32,7 @@ import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import org.koin.android.ext.android.inject
 
 class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other_dns) {
@@ -79,6 +80,7 @@ class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applyTopInsetOnly()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

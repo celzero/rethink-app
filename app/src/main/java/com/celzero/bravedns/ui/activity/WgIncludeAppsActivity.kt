@@ -41,6 +41,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -94,6 +95,7 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         proxyId = intent.getStringExtra(INTENT_EXTRA_PROXY_ID) ?: ""
         proxyName = intent.getStringExtra(INTENT_EXTRA_PROXY_NAME) ?: ""

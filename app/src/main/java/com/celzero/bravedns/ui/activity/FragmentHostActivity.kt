@@ -24,11 +24,13 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import android.view.View
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import org.koin.android.ext.android.inject
 
 class FragmentHostActivity : BaseActivity(R.layout.activity_fragment_host) {
@@ -69,6 +71,7 @@ class FragmentHostActivity : BaseActivity(R.layout.activity_fragment_host) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        findViewById<View>(R.id.fragment_container).applyTopInsetOnly()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

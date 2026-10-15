@@ -41,6 +41,7 @@ import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.settings.Settings
 import org.koin.android.ext.android.inject
 import androidx.core.view.isVisible
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 
 class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     val b by viewBinding(ActivityAntiCensorshipBinding::bind)
@@ -87,6 +88,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

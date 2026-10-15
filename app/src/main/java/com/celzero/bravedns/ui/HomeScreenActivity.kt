@@ -15,11 +15,6 @@
  */
 package com.celzero.bravedns.ui
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
-import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
-import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -56,12 +51,12 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.SmartDnsEndpoint
 import com.celzero.bravedns.database.SmartDnsEndpointRepository
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
@@ -80,8 +75,14 @@ import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -129,13 +130,18 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
         if (isAtleastO_MR1()) {
             Logger.vv(LOG_TAG_UI, "Setting up window insets for Android 27+")
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view)) { view, insets ->
+            val navView = findViewById<View>(R.id.nav_view)
+            ViewCompat.setOnApplyWindowInsetsListener(navView) { view, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
                 view.updatePadding(bottom = systemBars.bottom) // Add bottom padding to keep icons visible
-                insets
                 WindowInsetsCompat.CONSUMED
             }
+            // some OEMs skip the initial inset dispatch on attach
+            ViewCompat.requestApplyInsets(navView)
         }
+
+        // hosted fragments apply no top insets of their own
+        findViewById<View>(R.id.fragment_container).applyTopInsetOnly()
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
