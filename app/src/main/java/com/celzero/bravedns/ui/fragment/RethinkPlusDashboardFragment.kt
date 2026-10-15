@@ -15,11 +15,16 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import com.celzero.bravedns.ui.compose.rpn.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.View
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +32,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
-import com.celzero.bravedns.databinding.FragmentRethinkPlusDashboardBinding
 import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
@@ -52,9 +56,7 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,8 +69,17 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
-class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_dashboard) {
-    private val b by viewBinding(FragmentRethinkPlusDashboardBinding::bind)
+class RethinkPlusDashboardFragment : Fragment() {
+    private lateinit var ui: RpnAccountState
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        ui = RpnAccountState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_dash_root
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnAccountScreen(ui) } }
+        }
+    }
 
     private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
 
@@ -122,8 +133,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
 
     /** Dolphin signature: bottom overlay revealed at the end of the dashboard scroll. */
     private fun setDolphinSignature() {
-        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
-        b.dolphinSignature.revealAtScrollEndOf(b.dashboardContainer)
+        ui.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     override fun onResume() {
@@ -186,12 +196,12 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                 else -> getString(R.string.placeholder_dash) to colorDim
             }
         }
-        b.tvStatusText.text = statusText
-        b.tvStatusText.setTextColor(statusColor)
+        ui.tvStatusText.text = statusText
+        ui.tvStatusText.setTextColor(statusColor)
 
         // who
-        b.tvHeroWho.isVisible = who.isNotEmpty()
-        b.tvHeroWho.text = who
+        ui.tvHeroWho.isVisible = who.isNotEmpty()
+        ui.tvHeroWho.text = who
 
         when (model) {
             is PurchaseUiModel.Loading -> {
@@ -207,9 +217,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         // No-purchase guidance: CTA routes to the purchase screen; purchase surfaces are
         // hidden entirely on fdroid (no billing backend).
         val fdroid = Utilities.isFdroidFlavour()
-        b.cardGetPlus.isVisible = model is PurchaseUiModel.NoPurchase && !fdroid
-        b.cardManagePurchaseDashboard.isVisible = !fdroid
-        b.tvPlanDetailsHeader.isVisible = !fdroid
+        ui.cardGetPlus.isVisible = model is PurchaseUiModel.NoPurchase && !fdroid
+        ui.cardManagePurchaseDashboard.isVisible = !fdroid
+        ui.tvPlanDetailsHeader.isVisible = !fdroid
 
         if (!Utilities.isFdroidFlavour()) {
             updateAckFailureBanner(InAppBillingHandler.ackFailureFlow.value)
@@ -219,11 +229,11 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun renderNoPurchaseHero() {
         // Identical to RethinkPlusManagePurchaseFragment's NoPurchase hero: keep all
         // three lines visible, showing N/A placeholders instead of hiding the rows.
-        b.tvHeroPlanName.text = getString(R.string.rpn_no_active_plan_title)
-        b.tvHeroPurchasedDate.isVisible = true
-        b.tvHeroPurchasedDate.text = getString(R.string.lbl_not_available_short)
-        b.tvHeroIds.isVisible = true
-        b.tvHeroIds.text = getString(R.string.lbl_not_available_short)
+        ui.tvHeroPlanName.text = getString(R.string.rpn_no_active_plan_title)
+        ui.tvHeroPurchasedDate.isVisible = true
+        ui.tvHeroPurchasedDate.text = getString(R.string.lbl_not_available_short)
+        ui.tvHeroIds.isVisible = true
+        ui.tvHeroIds.text = getString(R.string.lbl_not_available_short)
     }
 
     private fun renderLapsedHero(model: PurchaseUiModel.Lapsed, realDeviceId: String, fmt: SimpleDateFormat, expiry: String) {
@@ -235,10 +245,10 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                 model.sub?.productTitle.orEmpty()
             )
         }
-        b.tvHeroPlanName.text = plan.ifBlank { getString(R.string.lbl_not_available_short) }
+        ui.tvHeroPlanName.text = plan.ifBlank { getString(R.string.lbl_not_available_short) }
 
-        b.tvHeroPurchasedDate.isVisible = true
-        b.tvHeroPurchasedDate.text = if (model.sub != null && model.sub.purchaseTime > 0) {
+        ui.tvHeroPurchasedDate.isVisible = true
+        ui.tvHeroPurchasedDate.text = if (model.sub != null && model.sub.purchaseTime > 0) {
             getString(R.string.rpn_overhauled_purchased_date_label, fmt.format(Date(model.sub.purchaseTime)))
         } else {
             getString(R.string.lbl_not_available_short)
@@ -254,7 +264,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         expiry: String
     ) {
         val subscriptionData = RpnProxyManager.getSubscriptionData()
-        b.tvHeroPlanName.text = resolvePlanName(subscriptionData).ifBlank {
+        ui.tvHeroPlanName.text = resolvePlanName(subscriptionData).ifBlank {
             resolvePlanName(
                 model.sub?.productId.orEmpty(),
                 model.sub?.planId.orEmpty(),
@@ -262,8 +272,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             )
         }.capitalizeWords()
 
-        b.tvHeroPurchasedDate.isVisible = true
-        b.tvHeroPurchasedDate.text = if (model.sub != null && model.sub.purchaseTime > 0) {
+        ui.tvHeroPurchasedDate.isVisible = true
+        ui.tvHeroPurchasedDate.text = if (model.sub != null && model.sub.purchaseTime > 0) {
             getString(R.string.rpn_overhauled_purchased_date_label, fmt.format(Date(model.sub.purchaseTime)))
         } else {
             getString(R.string.placeholder_dash)
@@ -278,8 +288,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
      */
     private fun renderHeroIds(token: String, accountId: String, deviceId: String, expiry: String) {
         val line = heroIdentityLine(token, accountId, deviceId, expiry)
-        b.tvHeroIds.isVisible = line.isNotEmpty()
-        b.tvHeroIds.text = line
+        ui.tvHeroIds.isVisible = line.isNotEmpty()
+        ui.tvHeroIds.text = line
     }
 
     private fun heroIdentityLine(token: String, accountId: String, deviceId: String, expiry: String): String {
@@ -291,19 +301,19 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     }
 
     private fun setupClickListeners() {
-        b.cardRunTest.setOnClickListener {
+        ui.cardRunTest.setOnClickListener {
             startActivity(Intent(requireContext(), PingTestActivity::class.java))
         }
-        b.rowManagePurchase.setOnClickListener { showManagePurchase() }
-        b.cardGetPlus.setOnClickListener { showPurchaseScreen() }
-        b.rowReportIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
-        b.rowRestoreDefaults.setOnClickListener { onRestoreDefaultsClicked() }
-        b.tvHeroWho.setOnClickListener { copyWhoToClipboard() }
+        ui.rowManagePurchase.setOnClickListener { showManagePurchase() }
+        ui.cardGetPlus.setOnClickListener { showPurchaseScreen() }
+        ui.rowReportIssue.setOnClickListener { CustomerSupportActivity.start(requireContext()) }
+        ui.rowRestoreDefaults.setOnClickListener { onRestoreDefaultsClicked() }
+        ui.tvHeroWho.setOnClickListener { copyWhoToClipboard() }
     }
 
     /** Copies the hero "who" line to the clipboard. */
     private fun copyWhoToClipboard() {
-        val text = b.tvHeroWho.text?.toString().orEmpty()
+        val text = ui.tvHeroWho.text?.toString().orEmpty()
         if (text.isBlank()) return
         val clipboard =
             requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
@@ -322,7 +332,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             showToastUiCentered(requireContext(), getString(R.string.ssv_toast_start_rethink), Toast.LENGTH_SHORT)
             return
         }
-        MaterialAlertDialogBuilder(requireContext())
+        WgAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.rpn_restore_confirm_title))
             .setMessage(getString(R.string.rpn_restore_confirm_message))
             .setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { dialog, _ ->
@@ -354,7 +364,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                                     Logger.i(LOG_TAG_UI, "$TAG.observeResetState: reset success")
                                     // Reset worked; recover the signature if a
                                     // previous failure flipped it to a sad dolphin.
-                                    b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+                                    ui.dolphinSignature.setContent(EmbeddedDolphinContent.random())
                                     showToastUiCentered(
                                         requireContext(),
                                         getString(R.string.rpn_restore_success),
@@ -363,7 +373,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                                 }
                                 is RpnProxyManager.ResetResult.Failure -> {
                                     Logger.w(LOG_TAG_UI, "$TAG.observeResetState: reset failed: ${state.result.reason}")
-                                    b.dolphinSignature.setContentForFailure()
+                                    ui.dolphinSignature.setContentForFailure()
                                     showToastUiCentered(
                                         requireContext(),
                                         getString(R.string.rpn_restore_failure, state.result.reason),
@@ -377,7 +387,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                         is ServerSelectionViewModel.ResetState.NoTunnel -> {
                             serverSelectionViewModel.onResetConsumed()
                             dismissRpnResetDialog()
-                            b.dolphinSignature.setContentForFailure()
+                            ui.dolphinSignature.setContentForFailure()
                             showToastUiCentered(
                                 requireContext(),
                                 getString(R.string.ssv_toast_start_rethink),
@@ -402,19 +412,16 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         dismissRpnResetDialog()
 
         val timeoutMs = ServerSelectionViewModel.RESET_TIMEOUT_MS
-        val dialogView = layoutInflater.inflate(R.layout.dialog_server_loading, null)
-        val tvStatus = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_status)
-        val tvHint = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_hint)
-        val timeoutBar = dialogView.findViewById<LinearProgressIndicator>(R.id.server_loading_timeout_bar)
+        val progress = RpnProgressState(requireContext())
+        val tvStatus = progress.status
+        val tvHint = progress.hint
+        val timeoutBar = progress.timeout
 
         tvHint.text = getString(R.string.rpn_restore_dialog_hint)
         timeoutBar.max = timeoutMs.toInt()
         timeoutBar.setProgressCompat(0, false)
 
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setView(dialogView)
-            .setCancelable(true)
-            .create()
+        val dialog = rpnProgressDialog(requireActivity(), progress)
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
         rpnResetDialog = dialog
@@ -515,7 +522,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                 is ServerApiError.DeviceNotRegistered -> showDeviceNotRegisteredBottomSheet(error)
                 is ServerApiError.GenericError -> showToastUiCentered(requireContext(), error.message, Toast.LENGTH_LONG)
                 is ServerApiError.NetworkError -> {
-                    b.dolphinSignature.setContentForFailure()
+                    ui.dolphinSignature.setContentForFailure()
                     showToastUiCentered(
                         requireContext(),
                         error.message ?: getString(R.string.subscription_action_failed),
