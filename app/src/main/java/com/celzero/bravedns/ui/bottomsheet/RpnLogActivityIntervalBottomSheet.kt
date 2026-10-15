@@ -20,13 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.home.LogIntervalPresentation
+import com.celzero.bravedns.ui.compose.home.LogIntervalContent
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.WindowCountRow
-import com.celzero.bravedns.databinding.BottomSheetLogActivityIntervalBinding
 import com.celzero.bravedns.service.LogActivityWindow
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.adapter.AppActivityAdapter
@@ -53,7 +55,7 @@ import org.koin.android.ext.android.inject
  */
 class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomSheetLogActivityIntervalBinding? = null
+    private var _binding: LogIntervalPresentation? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -119,8 +121,13 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetLogActivityIntervalBinding.inflate(inflater, container, false)
-        return b.root
+        val presentation = LogIntervalPresentation(inflater.context)
+        _binding = presentation
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_log_interval_compose
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { LogIntervalContent(presentation) } }
+        }
     }
 
     override fun onDestroyView() {
@@ -157,7 +164,6 @@ class RpnLogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         ) { summary ->
             viewLifecycleOwner.lifecycleScope.launch { onAppExpandRequested(summary) }
         }
-        b.bsLaiRecycler.layoutManager = LinearLayoutManager(requireContext())
         b.bsLaiRecycler.adapter = adapter
         setDolphinSignature()
 

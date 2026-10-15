@@ -15,8 +15,11 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.home.*
 import android.Manifest
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
@@ -28,7 +31,6 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -43,16 +45,10 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.transition.TransitionManager
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
-import android.widget.FrameLayout
-import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -60,14 +56,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
@@ -76,10 +69,6 @@ import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
-import com.celzero.bravedns.databinding.ItemHomeFirewallRulesPageBinding
-import com.celzero.bravedns.databinding.ViewHomeLogsActivityBinding
-import com.celzero.bravedns.databinding.ViewHomeLogsAppsBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
@@ -114,8 +103,6 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.custom.AppHistogramView
-import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_FAST_ROTATION_MS
-import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_SLOW_ROTATION_MS
 import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
@@ -124,7 +111,6 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
-import com.celzero.bravedns.util.RotatingBorderDrawable
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -144,10 +130,8 @@ import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.firestack.backend.Backend
 import com.facebook.shimmer.Shimmer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
+import com.celzero.bravedns.ui.compose.chrome.ComposeSnackbarPresenter
 import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -163,8 +147,16 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.log10
 import kotlin.time.Duration.Companion.milliseconds
 
-class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
-    private val b by viewBinding(FragmentHomeScreenBinding::bind)
+class HomeScreenFragment : Fragment() {
+    private lateinit var b: HomePresentation
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = HomePresentation(requireContext())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { HomeContent(b) } }
+        }
+    }
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -179,7 +171,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Rotating gradient border on the start button; runs only while the VPN
     // is stopped to draw attention to the call-to-action. Cleared in
     // onDestroyView().
-    private var rotationAnimator: ValueAnimator? = null
 
     // Active-state presentation captured once per view (in px / drawable)
     // before any state-dependent styling runs, so low-emphasis inactive
@@ -201,8 +192,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // pre-inflated pages of the logs card pager; created once per view and
     // (re)attached by LogsPagesAdapter on bind
-    private lateinit var logsPage: ViewHomeLogsActivityBinding
-    private lateinit var topAppsPage: ViewHomeLogsAppsBinding
+    private lateinit var logsPage: HomeLogsPage
+    private lateinit var topAppsPage: HomeTopAppsPage
 
     // top-apps histogram state: blocked mode re-ranks by blocked attempts
     // (dns-log + connection-tracker rows), allowed mode by total data usage
@@ -213,7 +204,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private var lastTopAppsFetchAt = 0L
 
     // page-change callback kept so it can be unregistered in onDestroyView()
-    private var logsPagerCallback: ViewPager2.OnPageChangeCallback? = null
+    private var logsPagerCallback: HomePagerCallback? = null
 
     // scheduled fade-out of the logs-card page dots; cancelled/restarted on
     // every page selection and in onDestroyView()
@@ -221,7 +212,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // page-change callback for the swipeable rules card; unregistered in
     // onDestroyView() for the same reason as [logsPagerCallback]
-    private var rulesPagerCallback: ViewPager2.OnPageChangeCallback? = null
+    private var rulesPagerCallback: HomePagerCallback? = null
 
     // whether the logs card is showing its live content (VPN on + logging
     // on); drives the dots visibility alongside the brave mode
@@ -233,7 +224,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // swipeable rules card: one page per universal rule type (firewall, IP,
     // domain); counts are pushed in by the rule-count LiveData observers
     private val rulesPagesAdapter by lazy {
-        FirewallRulesPagesAdapter(
+        HomeRulesPages(
             listOf(
                 getString(R.string.hsf_rules_univ_label),
                 getString(R.string.hsf_rules_ip_label),
@@ -410,11 +401,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsLogsGrid.isClickable = true
         logsPage.fhsLogsGrid.contentDescription = getString(R.string.logs_card_grid_desc)
         // record tap position; returning false lets the click event fire
-        logsPage.fhsLogsGrid.setOnTouchListener { _, event ->
-            lastGridTouchX = event.x
-            lastGridTouchY = event.y
-            false
+        logsPage.fhsLogsGrid.onTouch = { x, y ->
+            lastGridTouchX = x
+            lastGridTouchY = y
         }
+        logsPage.fhsLogsGrid.onKeyboardClick = { openIntervalDetails(null) }
         logsPage.fhsLogsGrid.setOnClickListener { openIntervalDetails(it) }
         // the activity wall is reconciled with the databases when
         // BraveVPNService is created, not on every home-screen resume
@@ -452,6 +443,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 TourOverlayController(
                     activity   = host,
                     steps      = GuidedTourManager.homeScreenSteps(),
+                    composeAnchor = HomeTourAnchors.forActivity(host)::find,
                     onComplete = {
                         GuidedTourManager.markCompleted(persistentState)
                         Logger.v(LOG_TAG_UI, "$TAG: guided tour completed")
@@ -741,47 +733,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * settles to a slower, calmer pace.
      */
     private fun startBorderAnimation() {
-        val ctx = context ?: return
-        val borderView = b.fhsAnimatedBorderView
-        borderView.isVisible = true
-
-        val drawable =
-            borderView.background as? RotatingBorderDrawable
-                ?: RotatingBorderDrawable().also {
-                    it.configure(
-                        UIUtils.fetchColor(ctx, R.attr.invertedPrimaryTextColor),
-                        BORDER_STROKE_WIDTH_DP * resources.displayMetrics.density,
-                        rainbow = true
-                    )
-                    borderView.background = it
-                }
-
-        if (rotationAnimator?.isRunning == true) return
-        // center of the contrast band: the hue directly opposite the fill
-        val hsv = FloatArray(3)
-        Color.colorToHSV(UIUtils.fetchColor(ctx, R.attr.accentGood), hsv)
-        val contrastHue = (hsv[0] + 180f) % 360f
-        val startElapsedMs = SystemClock.elapsedRealtime()
-        // the animator itself is only a frame tick; hue and rotation are both
-        // derived from elapsed time so they stay in sync without drift
-        rotationAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = BORDER_HUE_CYCLE_MS
-            interpolator = LinearInterpolator()
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { anim ->
-                val elapsed = SystemClock.elapsedRealtime() - startElapsedMs
-                // triangle wave: sweep to one edge of the band and back
-                val frac =
-                    (elapsed % BORDER_HUE_CYCLE_MS).toFloat() / BORDER_HUE_CYCLE_MS
-                val swing = if (frac <= 0.5f) frac * 2f else 2f - frac * 2f
-                drawable.setHighlightHue(contrastHue + swing * BORDER_HUE_SWING_DEG)
-                // negated so the highlight travels counterclockwise
-                drawable.rotation = -borderRotationFor(elapsed)
-                borderView.invalidate()
-            }
-            start()
-        }
-        Logger.v(LOG_TAG_UI, "$TAG: start button border animation started")
+        if (b.borderAnimating) return
+        b.fhsAnimatedBorderView.isVisible = true
+        b.borderStartedAt = SystemClock.elapsedRealtime()
+        b.borderAnimating = true
     }
 
     /**
@@ -798,8 +753,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopBorderAnimation() {
-        rotationAnimator?.cancel()
-        rotationAnimator = null
+        b.borderAnimating = false
         b.fhsAnimatedBorderView.isVisible = false
     }
 
@@ -1562,8 +1516,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * dots.
      */
     private fun setupLogsPager() {
-        logsPage = ViewHomeLogsActivityBinding.inflate(layoutInflater)
-        topAppsPage = ViewHomeLogsAppsBinding.inflate(layoutInflater)
+        logsPage = b.logsPage
+        topAppsPage = b.topAppsPage
 
         // restore the histogram chip selection before wiring listeners so the
         // initial check state matches without triggering a redundant reload
@@ -1571,7 +1525,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (topAppsBlockedMode) topAppsPage.fhsTopAppsBlockedChip.isChecked = true
 
         b.fhsLogsPager.adapter = LogsPagesAdapter(pageViews())
-        b.fhsLogsPager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
 
         b.fhsLogsDots.visibility =
             if (pagerPageCount() > 1) View.VISIBLE else View.GONE
@@ -1579,7 +1532,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsLogsDot0.setOnClickListener { b.fhsLogsPager.setCurrentItem(0, true) }
         b.fhsLogsDot1.setOnClickListener { b.fhsLogsPager.setCurrentItem(1, true) }
 
-        logsPagerCallback = object : ViewPager2.OnPageChangeCallback() {
+        logsPagerCallback = object : HomePagerCallback() {
             override fun onPageSelected(position: Int) {
                 updatePagerDots(position)
                 // a swipe (or dot tap) re-reveals the dots for another dwell
@@ -1685,7 +1638,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return if (appConfig.getBraveMode().isFirewallActive()) 2 else 1
     }
 
-    private fun pageViews(): List<View> {
+    private fun pageViews(): List<HomeNode> {
         return if (pagerPageCount() > 1) {
             // heatmap (activity wall) first, histogram one swipe to the right
             listOf(logsPage.root, topAppsPage.root)
@@ -1916,75 +1869,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * re-attaches pages as the user swipes, so each bind re-parents the page
      * into the holder's container.
      */
-    private inner class LogsPageViewHolder(val container: FrameLayout) :
-        RecyclerView.ViewHolder(container)
-
-    private inner class LogsPagesAdapter(private val pages: List<View>) :
-        RecyclerView.Adapter<LogsPageViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogsPageViewHolder {
-            val container = FrameLayout(parent.context)
-            container.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            return LogsPageViewHolder(container)
-        }
-
-        override fun getItemCount(): Int = pages.size
-
-        override fun onBindViewHolder(holder: LogsPageViewHolder, position: Int) {
-            val page = pages[position]
-            (page.parent as? ViewGroup)?.removeView(page)
-            holder.container.addView(
-                page,
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            )
-        }
-    }
-
-    private inner class FirewallRulesPageViewHolder(
-        val itemBinding: ItemHomeFirewallRulesPageBinding
-    ) : RecyclerView.ViewHolder(itemBinding.root)
-
-    /**
-     * Pages for the swipeable rules card. Each page pairs a live count with a
-     * human-readable rule-type label so the card explains itself; the count is
-     * re-published by the rule-count observers via [updateCount].
-     */
-    private inner class FirewallRulesPagesAdapter(private val labels: List<String>) :
-        RecyclerView.Adapter<FirewallRulesPageViewHolder>() {
-
-        private val counts = mutableListOf("0", "0", "0")
-        var onRulePageTapped: ((Int) -> Unit)? = null
-
-        fun updateCount(page: Int, count: String) {
-            if (counts[page] == count) return
-            counts[page] = count
-            notifyItemChanged(page)
-        }
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): FirewallRulesPageViewHolder {
-            val itemBinding = ItemHomeFirewallRulesPageBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-            return FirewallRulesPageViewHolder(itemBinding)
-        }
-
-        override fun getItemCount(): Int = labels.size
-
-        override fun onBindViewHolder(holder: FirewallRulesPageViewHolder, position: Int) {
-            holder.itemBinding.itemRulesPageCount.text = counts[position]
-            holder.itemBinding.itemRulesPageLabel.text =
-                labels[position].replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
-            holder.itemBinding.root.setOnClickListener { onRulePageTapped?.invoke(position) }
-        }
+    private class LogsPagesAdapter(private val pages: List<HomeNode>) : HomePages {
+        override val itemCount: Int get() = pages.size
     }
 
     /**
@@ -2034,90 +1920,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         mode: ActivityDisplayMode = displayMode
     ) {
         renderLogsHourAxisLabels()
-        val grid = logsPage.fhsLogsGrid
-        grid.removeAllViews()
-
-        val ctx = context ?: return
-        val blockedMode = mode == ActivityDisplayMode.BLOCKED
-        val base = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
-        val alphas =
-            if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
-            else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
-        val gap = (2f * resources.displayMetrics.density).toInt()
-        val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
-        val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
-
-        // iterate hour-major so each visual column holds one hour: cells are
-        // added bucket-by-bucket across the columns (GridLayout auto-places
-        // children row-major), giving column = hour index (oldest left,
-        // latest right) and row = 10-min bucket within the hour (:00 top,
-        // :50 bottom); the newest bucket (now) lands in the bottom-right cell
-        for (row in 0 until LogActivityAggregator.BUCKETS_PER_HOUR) {
-            for (col in 0 until LogActivityAggregator.HOURS_IN_WINDOW) {
-                val interval =
-                    state.intervals[col * LogActivityAggregator.BUCKETS_PER_HOUR + row]
-                val count = if (blockedMode) interval.blocked else interval.allowed
-                val lvl = intensityLevel(count)
-                // empty buckets render a negligible placeholder dot instead of
-                // the lowest real level: far smaller and fainter, so "no
-                // activity" reads as near-nothing without leaving the wall
-                // looking gappy
-                /*val frac =
-                    if (lvl == 0) HEATMAP_EMPTY_CELL_FRACTION
-                    else HEATMAP_CELL_SIZE_FRACTION[lvl]
-                val cellAlpha = if (lvl == 0) HEATMAP_EMPTY_CELL_ALPHA else alphas[lvl]*/
-                val frac = HEATMAP_CELL_SIZE_FRACTION[lvl]
-                val cellAlpha = alphas[lvl]
-                val cell = View(ctx)
-                cell.background =
-                    GradientDrawable().apply {
-                        shape = GradientDrawable.OVAL
-                        setColor(ColorUtils.setAlphaComponent(base, cellAlpha))
-                    }
-                cell.isClickable = false
-                cell.isFocusable = false
-                // alternative treatment: hide the circle entirely (keeps the
-                // cell slot reserved, but leaves visible gaps in the wall)
-                // if (lvl == 0) cell.visibility = View.GONE
-
-                val lp =
-                    GridLayout.LayoutParams().apply {
-                        width = (cellBaseHeight * frac).toInt()
-                        height = (cellBaseHeight * frac).toInt()
-                        columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                        rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                        setMargins(gap, gap, gap, gap)
-                        setGravity(Gravity.CENTER)
-                    }
-                cell.layoutParams = lp
-                grid.addView(cell)
-            }
-        }
-
-        val swatches =
-            listOf(
-                logsPage.fhsLogsSwatch0,
-                logsPage.fhsLogsSwatch1,
-                logsPage.fhsLogsSwatch2,
-                logsPage.fhsLogsSwatch3
-            )
-        val legendLevels = intArrayOf(0, 2, 3, 4)
-        val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
-        val legendBaseH = 3f * resources.displayMetrics.density
-        swatches.forEachIndexed { i, swatch ->
-            val frac = HEATMAP_CELL_SIZE_FRACTION[legendLevels[i]]
-            swatch.background =
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(ColorUtils.setAlphaComponent(base, legendAlphas[i]))
-                }
-            swatch.layoutParams =
-                LinearLayout.LayoutParams(
-                    (legendBaseH * HEATMAP_CELL_OVAL_RATIO * frac).toInt(),
-                    (legendBaseH * frac).toInt()
-                ).apply { gravity = Gravity.CENTER_VERTICAL }
-        }
-
+        logsPage.fhsLogsGrid.intervals = state.intervals
+        logsPage.fhsLogsGrid.blocked = mode == ActivityDisplayMode.BLOCKED
+        logsPage.fhsLogsGrid.light = isLightTheme()
         renderLogsHeaderCount(state)
     }
 
@@ -2147,7 +1952,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * without a touch (keyboard/accessibility), which falls back to the
      * latest window.
      */
-    private fun tappedInterval(grid: View): LogActivityInterval? {
+    private fun tappedInterval(grid: HomeNode): LogActivityInterval? {
         val state = lastActivityState ?: return null
         if (state.intervals.size < LogActivityAggregator.TOTAL_SLOTS) return null
         if (grid.width <= 0 || grid.height <= 0) return null
@@ -2175,7 +1980,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * sheet opens on that cell's exact 10-minute window; otherwise it builds
      * its own default (latest) window and renders its data asynchronously.
      */
-    private fun openIntervalDetails(grid: View?) {
+    private fun openIntervalDetails(grid: HomeNode?) {
         val interval = grid?.let { tappedInterval(it) }
         val sheet =
             if (interval != null) {
@@ -2423,10 +2228,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * and everything below it into a new size.
      */
     private fun animateLogsCardTransition(animate: Boolean = true) {
-        if (!animate) return
-        (b.fhsCardLogsLl.parent as? ViewGroup)?.let { parent ->
-            TransitionManager.beginDelayedTransition(parent)
-        }
+        b.animateLogs = animate
     }
 
     private fun formatDecimal(i: Long?): String {
@@ -2484,8 +2286,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun setupFirewallRulesCard() {
         rulesPagesAdapter.onRulePageTapped = { position -> openRulesScreen(position) }
         b.fhsFirewallRulesPager.adapter = rulesPagesAdapter
-        b.fhsFirewallRulesPager.getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
-        rulesPagerCallback = object : ViewPager2.OnPageChangeCallback() {
+        rulesPagerCallback = object : HomePagerCallback() {
             override fun onPageSelected(position: Int) {
                 updateRulesDots(position)
             }
@@ -2672,7 +2473,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun showBatteryOptimizationDialog() {
         if (!isAtleastN()) return
 
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
         val title =
             getString(
                 R.string.battery_optimization_dialog_heading,
@@ -2694,9 +2495,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op
         }
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     private fun isRestrictBackgroundActive(context: Context): Boolean {
@@ -2717,7 +2516,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showAlwaysOnStopDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
 
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (VpnController.isVpnLockdown()) {
@@ -2739,9 +2538,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             openVpnProfile(requireContext())
         }
 
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     private fun openBottomSheet() {
@@ -2765,7 +2562,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showAlwaysOnDisableDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
         builder.setTitle(R.string.always_on_dialog_heading)
         builder.setMessage(R.string.always_on_dialog)
         builder.setCancelable(false)
@@ -2777,9 +2574,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             // no-op
         }
 
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     override fun onResume() {
@@ -3104,7 +2899,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showPrivateDnsDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
         builder.setTitle(R.string.private_dns_dialog_heading)
         builder.setMessage(R.string.private_dns_dialog_desc)
         builder.setCancelable(false)
@@ -3115,9 +2910,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op
         }
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     private fun startAppsActivity() {
@@ -3325,7 +3118,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showFirstTimeVpnDialog(prepareVpnIntent: Intent) {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
         builder.setTitle(R.string.hsf_vpn_dialog_header)
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(false)
@@ -3345,9 +3138,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->
             // no-op
         }
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     private fun registerForActivityResult() {
@@ -3378,10 +3169,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     Logger.i(LOG_TAG_UI, "User accepted notification permission")
                 } else {
                     Logger.w(LOG_TAG_UI, "User rejected notification permission")
-                    Snackbar.make(
+                    ComposeSnackbarPresenter(
                         requireActivity().findViewById<View>(android.R.id.content).rootView,
                         getString(R.string.hsf_notification_permission_failure),
-                        Snackbar.LENGTH_LONG
+                        ComposeSnackbarPresenter.LENGTH_LONG,
+                        appearance = ComposeSnackbarPresenter.Appearance.Material
                     )
                         .show()
                 }
@@ -3437,7 +3229,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showLocalNetworkPermissionDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = HomeDialogBuilder(requireContext(), b)
         builder.setTitle(R.string.hsf_local_network_permission_dialog_heading)
         val appName = if (Utilities.isAlphaBuild()) getString(R.string.app_name_alpha) else getString(R.string.app_name)
         builder.setMessage(
@@ -3456,9 +3248,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             // no-op; the VPN remains disabled until the user grants the permission and starts it.
         }
-        val dialog = builder.create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
+        builder.show()
     }
 
     // Sets the UI DNS status on/off.
@@ -3605,26 +3395,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * from the old value to [newText] is never a jarring snap.  If the text is already equal
      * the view is left untouched to avoid unnecessary animation work.
      */
-    private fun android.widget.TextView.setTextAnimated(newText: String) {
+    private fun HomeNode.setTextAnimated(newText: String) {
         if (text?.toString() == newText) return
-        animate()
-            .alpha(0f)
-            .setDuration(TEXT_FADE_DURATION_MS)
-            .withEndAction {
-                text = newText
-                animate()
-                    .alpha(1f)
-                    .setDuration(TEXT_FADE_DURATION_MS)
-                    .start()
-            }
-            .start()
+        text = newText
     }
 
     /**
      * Shrinks and dims a card headline for its feature's inactive state so the
      * "off" hint reads as a subtle status indicator rather than a headline.
      */
-    private fun android.widget.TextView.applyLowEmphasis(activeSizePx: Float) {
+    private fun HomeNode.applyLowEmphasis(activeSizePx: Float) {
         if (activeSizePx <= 0f) return
         setTextSize(TypedValue.COMPLEX_UNIT_PX, activeSizePx * INACTIVE_TEXT_SCALE)
         // higher alpha in light mode for readability
@@ -3641,7 +3421,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /** Restores a card headline to its captured active-state emphasis. */
-    private fun android.widget.TextView.restoreFullEmphasis(activeSizePx: Float) {
+    private fun HomeNode.restoreFullEmphasis(activeSizePx: Float) {
         if (activeSizePx <= 0f) return
         setTextSize(TypedValue.COMPLEX_UNIT_PX, activeSizePx)
         alpha = 1f
