@@ -25,13 +25,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStateHistoryDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
-import com.celzero.bravedns.databinding.ActivityCustomerSupportBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
@@ -48,7 +49,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,9 +61,9 @@ import java.util.Locale
 /**
  * CustomerSupportActivity: lets users submit a support request via email.
  */
-class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support) {
+class CustomerSupportActivity : BaseActivity() {
 
-    private val b by viewBinding(ActivityCustomerSupportBinding::bind)
+    private val b by lazy { SupportUiState(this) }
 
     private val persistentState by inject<PersistentState>()
     private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
@@ -124,7 +124,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         loadSubscriptionSummary()
         prefillDescriptionFromExtras()
         setupSendButton()
-        applyScrollPadding()
+        restoreUtilityControls(savedInstanceState, b.savedControls)
+        setContent { RethinkTheme { SupportScreen(b) } }
     }
 
     private fun prefillDescriptionFromExtras() {
@@ -143,27 +144,11 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
      * Pads the scroll view's bottom by the runtime height of the bottom bar so
      * the send button bar never covers the last content.
      */
-    private fun applyScrollPadding() {
-        b.layoutBottomBar.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            updateScrollPadding()
-        }
-        b.nestedScroll.post { updateScrollPadding() }
-    }
 
-    private fun updateScrollPadding() {
-        b.nestedScroll.setPadding(
-            b.nestedScroll.paddingLeft,
-            b.nestedScroll.paddingTop,
-            b.nestedScroll.paddingRight,
-            b.layoutBottomBar.height
-        )
-    }
 
-    private fun setupToolbar() {
-        setSupportActionBar(b.toolbar)
-        b.collapsingToolbar.title = getString(R.string.contact_support_title)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-    }
+
+
+    private fun setupToolbar() { b.headerTitle = getString(R.string.contact_support_title) }
 
     /**
      * Called after subscription data is loaded to fill the hero subtitle: purchase
@@ -694,13 +679,12 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
             getString(R.string.about_bug_report_dialog_positive_btn)
         b.layoutLoading.isVisible = loading
         // the bar's height changes with the loading row; refresh after re-layout
-        b.nestedScroll.post { updateScrollPadding() }
+
     }
 
-    private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        currentFocus?.let { imm.hideSoftInputFromWindow(it.windowToken, 0) }
-    }
+    private fun hideKeyboard() { b.keyboardRequest++ }
+
+    override fun onSaveInstanceState(outState: Bundle) { saveUtilityControls(outState, b.savedControls); super.onSaveInstanceState(outState) }
 
     private fun formatTs(ms: Long): String {
         if (ms <= 0L || ms == Long.MAX_VALUE) return "N/A"
