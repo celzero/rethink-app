@@ -1,0 +1,5 @@
+<resources>
+    <string name="wg_compose_generate_key">Generate key pair</string>
+    <string name="wg_compose_refresh">Refresh</string>
+    <string name="wg_compose_choose_country">Choose country</string>
+</resources>

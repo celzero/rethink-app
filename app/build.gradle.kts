@@ -297,8 +297,11 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     buildFeatures {
-        viewBinding = true
         buildConfig = true
         compose = true
         resValues = true
@@ -359,6 +362,8 @@ android {
     lint {
         abortOnError = true
         ignoreTestSources = true
+        // Weblate locales are partial; Android falls back to the default English resources.
+        warning.add("MissingTranslation")
         disable.addAll(
             listOf(
                 "FragmentLiveDataObserve",
@@ -504,9 +509,6 @@ dependencies {
     download(libs.huAutsoftKrate)
     implementation(libs.huAutsoftKrate)
 
-    // viewBinding without reflection
-    "fullImplementation"(libs.devAndroidbroadcastVbpd)
-
     // add ":debug" suffix to the dependency to include debug symbols
     download(firestackDependency())
     "websiteImplementation"(firestackDependency())
@@ -568,7 +570,7 @@ dependencies {
     "fullImplementation"(libs.simplecityappsRecyclerviewFastscroll)
 
     // for confetti animation
-    "fullImplementation"(libs.nlDionsegijnKonfettiXml)
+    "fullImplementation"(libs.nlDionsegijnKonfettiCompose)
 
     "tvImplementation"(libs.jetbrainsKotlinKotlinStdlibJdk8)
     "tvImplementation"(libs.androidxAppcompatAppcompat)
@@ -590,34 +592,39 @@ dependencies {
     "tvImplementation"(libs.githubBumptechGlideOkhttp3Integration) { exclude(group = "glide-parent") }
     "kspTv"(libs.githubBumptechGlideCompilerTv)
     "tvImplementation"(libs.facebookShimmerShimmer)
-    "tvImplementation"(libs.devAndroidbroadcastVbpd)
     "tvImplementation"(libs.androidxNavigationNavigationFragmentKtx)
     "tvImplementation"(libs.androidxNavigationNavigationUiKtx)
     "tvImplementation"(libs.androidxBiometricBiometric)
     "tvImplementation"(libs.journeyappsZxingAndroidEmbedded)
     "tvImplementation"(libs.simplecityappsRecyclerviewFastscroll)
-    "tvImplementation"(libs.nlDionsegijnKonfettiXml)
+    "tvImplementation"(libs.nlDionsegijnKonfettiCompose)
 
     implementation(platform(libs.androidxComposeComposeBom))
     implementation(libs.androidxComposeRuntimeRuntime)
-    "tvImplementation"(platform(libs.androidxComposeComposeBomTv))
-    "tvImplementation"(libs.androidxComposeUiUi)
-    "tvImplementation"(libs.androidxComposeUiUiToolingPreview)
-    "tvImplementation"(libs.androidxComposeFoundationFoundation)
-    "tvImplementation"(libs.androidxComposeRuntimeRuntimeLivedata)
-    "tvImplementation"(libs.androidxComposeMaterial3Material3)
+    implementation(libs.androidxComposeUiUi)
+    implementation(libs.androidxComposeUiUiToolingPreview)
+    implementation(libs.androidxComposeFoundationFoundation)
+    implementation(libs.androidxComposeRuntimeRuntimeLivedata)
+    implementation(libs.androidxComposeMaterial3Material3)
     "tvImplementation"(libs.androidxTvTvMaterial)
-    "tvImplementation"(libs.androidxActivityActivityCompose)
-    "tvImplementation"(libs.androidxLifecycleLifecycleRuntimeCompose)
-    "tvImplementation"(libs.androidxLifecycleLifecycleViewmodelCompose)
+    implementation(libs.androidxActivityActivityCompose)
+    implementation(libs.androidxLifecycleLifecycleRuntimeCompose)
+    implementation(libs.androidxLifecycleLifecycleViewmodelCompose)
     "tvImplementation"(libs.insertKoinKoinAndroidxCompose)
     "tvImplementation"(libs.androidxNavigationNavigationCompose)
-    "tvImplementation"(libs.androidxComposeMaterialMaterialIconsExtended)
-    "tvImplementation"(libs.androidxPagingPagingCompose)
+    implementation(libs.androidxComposeMaterialMaterialIconsExtended)
+    implementation(libs.androidxPagingPagingCompose)
 
     constraints {
         implementation(libs.androidxAnnotationAnnotationExperimental)
     }
+
+    implementation(libs.androidxFragmentFragmentCompose)
+    testImplementation(libs.androidxComposeUiTestJunit4)
+    testImplementation(libs.androidxTestEspressoEspressoCore)
+    androidTestImplementation(platform(libs.androidxComposeComposeBom))
+    androidTestImplementation(libs.androidxComposeUiTestJunit4)
+    debugImplementation(libs.androidxComposeUiTestManifest)
 
     // for in-app purchases
     "playImplementation"(libs.androidBillingclientBilling)
