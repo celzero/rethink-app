@@ -15,6 +15,12 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
+
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -32,7 +38,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -62,8 +67,6 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
-import com.celzero.bravedns.databinding.ViewInsightsRankRowBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
@@ -73,8 +76,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
-import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.TOP_SLICES
-import com.celzero.bravedns.ui.custom.DonutChartView
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.ui.stats.CountryInsightsMapper
 import com.celzero.bravedns.ui.stats.StatsInsightsMath
@@ -102,8 +103,6 @@ import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -111,8 +110,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
-    private val b by viewBinding(ActivityAppDetailsBinding::bind)
+class AppInfoActivity : BaseActivity() {
+    private val b = AppDetailsState()
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
@@ -133,47 +132,23 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var notesDraft: String = ""
     private var shouldRestoreNotesDialog: Boolean = false
     private var isNotesSaveInFlight: Boolean = false
-    private var notesDialog: AlertDialog? = null
-    private var notesEditText: EditText? = null
+    private var notesDialog: android.app.Dialog? = null
+    private var notesEditText: AppNotesDraft? = null
 
     // current presentation mode of the network-log sections; mirrors the stats
     // screen's persisted preference so both surfaces stay in sync
-    private var statsViewMode: StatsViewMode = StatsViewMode.LIST
+    private var statsViewMode: StatsViewMode
+        get() = b.mode
+        set(value) { b.mode = value }
 
     // latest snapshot per insights section, kept in sync with the list
     // adapters so switching to Insights renders instantly without refetching
-    private val insightsSnapshots = mutableMapOf<AppInsightsSection, List<AppConnection>>()
+    private val insightsSnapshots get() = b.insightsSnapshots
 
     // (adapter, observer) pairs registered for snapshot mirroring; unregistered
     // in onDestroy so no observer outlives the activity's view hierarchy
     private val insightsObservers =
-        mutableListOf<Pair<PagingDataAdapter<AppConnection, *>, RecyclerView.AdapterDataObserver>>()
-
-    // theme-resolved insights colors; refreshed on every full render
-    private var allowedColor: Int = 0
-    private var blockedColor: Int = 0
-    private var trackColor: Int = 0
-    private var centerTextColor: Int = 0
-
-    // true when the ASN section was actually wired up (setting enabled and
-    // app is not Rethink itself); gates the insights ASN section
-    private var isAsnInsightsAvailable: Boolean = false
-
-    // network-log sections rendered in the insights view; both the Rethink and
-    // non-Rethink data sources map onto these same sections. declaration order
-    // mirrors the on-screen section order (App -> Country -> Provider ->
-    // Blocklist -> Domain -> IP), same as the stats screen
-    private enum class AppInsightsSection {
-        ACTIVE_CONNS,
-        COUNTRIES,
-        ASN,
-        BLOCKED_ASN,
-        BLOCKLISTS,
-        DOMAINS,
-        BLOCKED_DOMAINS,
-        IPS,
-        BLOCKED_IPS
-    }
+        mutableListOf<Pair<AppConnectionsPresenter, () -> Unit>>()
 
     private val warningBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -211,6 +186,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        setContent { RethinkTheme { AppDetailsContent(b) } }
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -395,7 +371,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
                 // first insights render now that the adapters (and their
                 // snapshot observers) are wired; later renders are data-driven
-                if (statsViewMode == StatsViewMode.INSIGHTS) renderInsights()
+
             }
         }
     }
@@ -475,77 +451,16 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
      * landing on either presentation is consistent.
      */
     private fun initStatsViewMode() {
-        // restore the persisted mode before the listener attaches (setting
-        // checkedButton here does not fire the toggle listener)
         statsViewMode = StatsViewMode.fromId(persistentState.statsViewMode)
-        val modeBtn = b.aadViewModeToggleGroup.findViewById<MaterialButton>(
-            if (statsViewMode == StatsViewMode.INSIGHTS) {
-                b.aadViewModeInsightsBtn.id
-            } else {
-                b.aadViewModeListBtn.id
+        b.onMode = { mode ->
+            if (mode != statsViewMode) {
+                statsViewMode = mode
+                persistentState.statsViewMode = mode.id
+                applyViewModeUi()
             }
-        )
-        modeBtn.isChecked = true
-        refreshViewModeToggleUi()
-        b.aadViewModeToggleGroup.addOnButtonCheckedListener(viewModeToggleListener)
+        }
         setupInsightsClickListeners()
         applyViewModeUi()
-    }
-
-    /**
-     * View-mode switch: persists the mode and flips the presentation only.
-     * Both views share the same adapters/state, so switching never refetches.
-     */
-    private val viewModeToggleListener =
-        MaterialButtonToggleGroup.OnButtonCheckedListener { _, _, isChecked ->
-            // restyle on BOTH events (checked + unchecked): the group emits the
-            // unchecked callback for the old button after (or before) the checked
-            // callback for the new one, so each event re-syncs the visuals
-            refreshViewModeToggleUi()
-            if (!isChecked) return@OnButtonCheckedListener
-            val newMode =
-                if (b.aadViewModeInsightsBtn.id == b.aadViewModeToggleGroup.checkedButtonId) {
-                    StatsViewMode.INSIGHTS
-                } else {
-                    StatsViewMode.LIST
-                }
-            if (newMode == statsViewMode) return@OnButtonCheckedListener
-            statsViewMode = newMode
-            persistentState.statsViewMode = newMode.id
-            applyViewModeUi()
-        }
-
-    /** Applies the selected/unselected styling to both view-mode buttons. */
-    private fun refreshViewModeToggleUi() {
-        styleViewModeBtn(b.aadViewModeListBtn)
-        styleViewModeBtn(b.aadViewModeInsightsBtn)
-    }
-
-    private fun styleViewModeBtn(mb: MaterialButton) {
-        // derive selection from statsViewMode (not isChecked): the group fires
-        // the checked/unchecked pair in quick succession and isChecked can be
-        // mid-transition, which would leave both buttons looking selected
-        val selected =
-            (mb.id == b.aadViewModeInsightsBtn.id) == (statsViewMode == StatsViewMode.INSIGHTS)
-        if (selected) {
-            mb.backgroundTintList =
-                ColorStateList.valueOf(
-                    UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
-                )
-            mb.iconTint =
-                ColorStateList.valueOf(
-                    UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor)
-                )
-        } else {
-            mb.backgroundTintList =
-                ColorStateList.valueOf(
-                    UIUtils.fetchToggleBtnColors(this, R.color.defaultToggleBtnBg)
-                )
-            mb.iconTint =
-                ColorStateList.valueOf(
-                    UIUtils.fetchColor(this, R.attr.defaultToggleBtnTxt)
-                )
-        }
     }
 
     /** Flips the two presentation containers; does not touch any data state. */
@@ -553,11 +468,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         val insights = statsViewMode == StatsViewMode.INSIGHTS
         b.aadListContainer.visibility = if (insights) View.GONE else View.VISIBLE
         b.aadInsightsContainer.visibility = if (insights) View.VISIBLE else View.GONE
-        refreshViewModeToggleUi()
         refreshLogToggleVisibility()
-        if (insights) {
-            renderInsights()
-        }
+
     }
 
     /**
@@ -635,17 +547,14 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
      * the snapshot hook feeds the matching insights section.
      */
     private fun setupBlockedSection(
-        containerView: View,
-        recyclerView: RecyclerView,
+        containerView: WgControlState,
+        recyclerView: AppDetailListState,
         section: AppInsightsSection,
         data: LiveData<PagingData<AppConnection>>,
-        adapter: PagingDataAdapter<AppConnection, *>
+        adapter: AppConnectionsPresenter
     ) {
-        recyclerView.layoutManager = LinearLayoutManager(this)
         // wrap_content height: data changes resize the view, so fixed-size must
         // stay off and animations disabled to avoid flicker on updates
-        recyclerView.setHasFixedSize(false)
-        recyclerView.itemAnimator = null
         hookInsightsSnapshot(section, adapter)
         data.observe(this) {
             adapter.submitData(this.lifecycle, it)
@@ -666,266 +575,17 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
      * Mirrors adapter list changes into [insightsSnapshots] and re-renders the
      * matching Insights section (only when the Insights view is visible).
      */
-    private fun hookInsightsSnapshot(
-        section: AppInsightsSection,
-        adapter: PagingDataAdapter<AppConnection, *>
-    ) {
-        val observer = object : RecyclerView.AdapterDataObserver() {
-            private fun cacheAndRender() {
-                insightsSnapshots[section] = adapter.snapshot().items
-                if (statsViewMode == StatsViewMode.INSIGHTS && !isFinishing && !isDestroyed) {
-                    renderInsightsSection(section)
-                }
-            }
-
-            override fun onChanged() = cacheAndRender()
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = cacheAndRender()
-            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) =
-                cacheAndRender()
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = cacheAndRender()
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = cacheAndRender()
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) =
-                cacheAndRender()
-        }
-        adapter.registerAdapterDataObserver(observer)
+    private fun hookInsightsSnapshot(section: AppInsightsSection, adapter: AppConnectionsPresenter) {
+        val observer: () -> Unit = { insightsSnapshots[section] = adapter.snapshot().items }
+        adapter.addSnapshotListener(observer)
         insightsObservers.add(adapter to observer)
-    }
-
-    /** Re-renders every insights section from the cached snapshots. */
-    private fun renderInsights() {
-        applyInsightsTheme()
-        AppInsightsSection.entries.forEach { renderInsightsSection(it) }
-        applyInsightsSectionGating()
-    }
-
-    private fun isBlockedSection(section: AppInsightsSection): Boolean {
-        return section == AppInsightsSection.BLOCKED_ASN ||
-            section == AppInsightsSection.BLOCKED_DOMAINS ||
-            section == AppInsightsSection.BLOCKED_IPS ||
-            section == AppInsightsSection.BLOCKLISTS
-    }
-
-    /** Hides insights sections whose list-view counterparts are unavailable. */
-    private fun applyInsightsSectionGating() {
-        // ASN lookups are an optional (downloaded) dataset and Rethink's own
-        // screen never wires the ASN adapter; when available, visibility is
-        // driven by the snapshot inside renderRanking (hidden until data exists)
-        if (!isAsnInsightsAvailable) {
-            b.aadIaAsnLl.visibility = View.GONE
-            b.aadIaBlockedAsnLl.visibility = View.GONE
-        }
-    }
-
-    /** Resolves every insights color from the active theme; no hardcoded colors. */
-    private fun applyInsightsTheme() {
-        allowedColor = UIUtils.fetchColor(this, R.attr.accentGood)
-        blockedColor = UIUtils.fetchColor(this, R.attr.accentBad)
-        trackColor = UIUtils.fetchColor(this, R.attr.colorSurfaceContainerHighest)
-        centerTextColor = UIUtils.fetchColor(this, R.attr.primaryTextColor)
-        val subtle = UIUtils.fetchColor(this, R.attr.secondaryTextColor)
-        b.aadIaCountriesMap.setColors(trackColor, allowedColor, subtle)
-        allInsightsDonuts().forEach { donut ->
-            donut.setTrackColor(trackColor)
-            donut.setCenterTextColor(centerTextColor)
-        }
-    }
-
-    private fun allInsightsDonuts(): List<DonutChartView> {
-        return listOf(
-            b.aadIaActiveConnsDonut,
-            b.aadIaAsnDonut,
-            b.aadIaDomainsDonut,
-            b.aadIaIpsDonut,
-            b.aadIaBlockedAsnDonut,
-            b.aadIaBlockedDomainsDonut,
-            b.aadIaBlockedIpsDonut,
-            b.aadIaBlocklistDonut
-        )
-    }
-
-    private fun renderInsightsSection(section: AppInsightsSection) {
-        val items = insightsSnapshots[section].orEmpty()
-        when (section) {
-            AppInsightsSection.ACTIVE_CONNS ->
-                renderRanking(
-                    section, b.aadIaActiveConnsLl, b.aadIaActiveConnsRows,
-                    b.aadIaActiveConnsDonut, items
-                )
-            AppInsightsSection.ASN ->
-                renderRanking(
-                    section, b.aadIaAsnLl, b.aadIaAsnRows,
-                    b.aadIaAsnDonut, items
-                )
-            AppInsightsSection.COUNTRIES -> {
-                renderRanking(
-                    section, b.aadIaCountriesLl, b.aadIaCountriesRows,
-                    null, items
-                )
-                updateCountryMap(items)
-            }
-            AppInsightsSection.DOMAINS ->
-                renderRanking(
-                    section, b.aadIaDomainsLl, b.aadIaDomainsRows,
-                    b.aadIaDomainsDonut, items
-                )
-            AppInsightsSection.IPS ->
-                renderRanking(
-                    section, b.aadIaIpsLl, b.aadIaIpsRows,
-                    b.aadIaIpsDonut, items
-                )
-            AppInsightsSection.BLOCKED_ASN ->
-                renderRanking(
-                    section, b.aadIaBlockedAsnLl, b.aadIaBlockedAsnRows,
-                    b.aadIaBlockedAsnDonut, items
-                )
-            AppInsightsSection.BLOCKED_DOMAINS ->
-                renderRanking(
-                    section, b.aadIaBlockedDomainsLl, b.aadIaBlockedDomainsRows,
-                    b.aadIaBlockedDomainsDonut, items
-                )
-            AppInsightsSection.BLOCKED_IPS ->
-                renderRanking(
-                    section, b.aadIaBlockedIpsLl, b.aadIaBlockedIpsRows,
-                    b.aadIaBlockedIpsDonut, items
-                )
-            AppInsightsSection.BLOCKLISTS -> {
-                // blocklist blocking only exists when dns is active; the
-                // section disappears until a blocklist has blocked something
-                if (appConfig.getBraveMode().isDnsActive()) {
-                    renderRanking(
-                        section, b.aadIaBlocklistLl, b.aadIaBlocklistRows,
-                        b.aadIaBlocklistDonut, items
-                    )
-                } else {
-                    b.aadIaBlocklistLl.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    /**
-     * Renders a section as a donut chart (top slices, single hue stepped by
-     * intensity) plus normalized ranking rows (bar length = value / maxValue,
-     * the longest item at ~100%). The whole section — heading, action chip
-     * and chart — is hidden when there is nothing to show; no separate
-     * empty-state message is displayed. Blocked sections use the negative
-     * accent hue throughout.
-     */
-    private fun renderRanking(
-        section: AppInsightsSection,
-        containerView: View,
-        rowsContainer: LinearLayout,
-        donut: DonutChartView?,
-        items: List<AppConnection>
-    ) {
-        val blocked = isBlockedSection(section)
-        containerView.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
-        if (items.isEmpty()) {
-            rowsContainer.removeAllViews()
-            donut?.visibility = View.GONE
-            return
-        }
-        donut?.visibility = View.VISIBLE
-        val fractions = StatsInsightsMath.normalizeFractions(items.map { it.count.toLong() })
-        renderDonut(donut, fractions, items, blocked)
-        val inflater = LayoutInflater.from(this)
-        val barColor = if (blocked) blockedColor else allowedColor
-        rowsContainer.removeAllViews()
-        // rows are capped to the donut's top-slice count: the full ranked list
-        // stays one tap away on the "see more" screen
-        val rows = minOf(TOP_SLICES, items.size)
-        items.take(rows).forEachIndexed { index, item ->
-            val rowBinding = ViewInsightsRankRowBinding.inflate(inflater, rowsContainer, false)
-            val label = rowLabel(item, section)
-            val metric = item.count.toString()
-            rowBinding.irName.text = label
-            rowBinding.irCount.text = metric
-            rowBinding.irBar.max = PERCENTAGE_MULTIPLIER
-            rowBinding.irBar.progress = (fractions[index] * PERCENTAGE_MULTIPLIER).toInt()
-            rowBinding.irBar.setIndicatorColor(
-                if (!blocked && item.blocked) blockedColor else barColor
-            )
-            rowBinding.root.contentDescription = getString(R.string.ci_desc, label, metric)
-            rowsContainer.addView(rowBinding.root)
-        }
-    }
-
-    /**
-     * Donut slices: the top [TOP_SLICES] items, one hue (green for
-     * allowed/contacted sections, red for blocked sections) at stepped
-     * intensities; the remainder stays visible as the neutral track ring.
-     * The center carries the section total.
-     */
-    private fun renderDonut(
-        donut: DonutChartView?,
-        fractions: List<Float>,
-        items: List<AppConnection>,
-        blocked: Boolean
-    ) {
-        donut ?: return
-        val base = if (blocked) blockedColor else allowedColor
-        val top = minOf(TOP_SLICES, fractions.size)
-        val slices = (0 until top).map { i ->
-            DonutChartView.Slice(fractions[i], ColorUtils.setAlphaComponent(base, SLICE_ALPHAS[i]))
-        }
-        donut.setData(slices)
-        donut.setCenterText(items.sumOf { it.count.toLong() }.toString())
-    }
-
-    private fun rowLabel(item: AppConnection, section: AppInsightsSection): String {
-        return when (section) {
-            AppInsightsSection.ACTIVE_CONNS,
-            AppInsightsSection.IPS,
-            AppInsightsSection.BLOCKED_IPS ->
-                item.ipAddress
-            AppInsightsSection.DOMAINS,
-            AppInsightsSection.BLOCKED_DOMAINS ->
-                item.appOrDnsName?.dropLastWhile { it == '.' }.orEmpty()
-            AppInsightsSection.COUNTRIES -> {
-                // country-name lookups fail with a dash placeholder, never a
-                // real name; such rows render as "Unknown <flag>"
-                val name = getCountryNameFromFlag(item.flag)
-                if (name.isNotEmpty() && !name.all { it == '-' }) {
-                    name
-                } else {
-                    getString(
-                        R.string.two_argument_space,
-                        getString(R.string.network_log_app_name_unknown),
-                        item.flag
-                    )
-                }
-            }
-            AppInsightsSection.ASN,
-            AppInsightsSection.BLOCKED_ASN ->
-                getString(R.string.two_argument_space, item.flag, item.appOrDnsName.orEmpty())
-            AppInsightsSection.BLOCKLISTS -> item.appOrDnsName.orEmpty()
-        }
-    }
-
-    /** Feeds the offline map: emoji flag -> ISO code -> connection count. */
-    private fun updateCountryMap(items: List<AppConnection>) {
-        val stats = items.mapNotNull { item ->
-            CountryInsightsMapper.toCountryCode(item.flag)?.let { it to item.count }
-        }.toMap()
-        b.aadIaCountriesMap.setCountryCounts(stats)
-        // accessibility summary: top few countries, list holds exact numbers
-        val summary = stats.entries.take(3).joinToString(", ") {
-            getString(R.string.ci_desc, it.key, it.value.toString())
-        }
-        b.aadIaCountriesMap.contentDescription =
-            if (summary.isEmpty()) {
-                getString(R.string.cd_stats_country_map)
-            } else {
-                getString(R.string.two_argument_colon, getString(R.string.cd_stats_country_map), summary)
-            }
     }
 
     override fun onDestroy() {
         // detach snapshot observers before the view tree goes away so nothing
         // holds a reference to the (dying) adapters or row containers
         insightsObservers.forEach { (adapter, observer) ->
-            runCatching { adapter.unregisterAdapterDataObserver(observer) }
+            runCatching { adapter.removeSnapshotListener(observer) }
         }
         insightsObservers.clear()
         insightsSnapshots.clear()
@@ -1017,8 +677,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
         }
 
-        TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
-        TooltipCompat.setTooltipText(b.aadAppInfoIcon, getString(R.string.about_settings_app_info))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             guardAppInfoInitialized("aadAppSettingsBypassDnsFirewall") {
@@ -1299,8 +957,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setActiveConnsAdapter(isRethink: Boolean) {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadActiveConnsRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid, isActiveConn = true)
         hookInsightsSnapshot(AppInsightsSection.ACTIVE_CONNS, adapter)
         val uptime = VpnController.uptimeMs()
@@ -1329,10 +985,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setASNAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadAsnRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid,  isAsn = true)
-        isAsnInsightsAvailable = true
         hookInsightsSnapshot(AppInsightsSection.ASN, adapter)
         // blocked providers: same list+insights wiring as the allowed section,
         // rendered ASN-style (no per-IP bottom sheet)
@@ -1399,19 +1052,12 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             b.aadBlocklistRl.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
             refreshLogToggleVisibility()
         }
-        b.aadBlocklistRv.layoutManager = LinearLayoutManager(this)
-        b.aadBlocklistRv.setHasFixedSize(false)
-        b.aadBlocklistRv.itemAnimator = null
         b.aadBlocklistRv.adapter = adapter
     }
 
     private fun setupCountriesAdapter(data: LiveData<PagingData<AppConnection>>) {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadMostContactedCountriesRv.layoutManager = layoutManager
         // wrap_content height: data changes resize the view, so fixed-size must
         // stay off and animations disabled to avoid flicker on updates
-        b.aadMostContactedCountriesRv.setHasFixedSize(false)
-        b.aadMostContactedCountriesRv.itemAnimator = null
         val adapter = AppWiseCountriesAdapter(this, this)
         hookInsightsSnapshot(AppInsightsSection.COUNTRIES, adapter)
         data.observe(this) {
@@ -1430,8 +1076,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setDomainsAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadMostContactedDomainRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid)
         hookInsightsSnapshot(AppInsightsSection.DOMAINS, adapter)
         setupBlockedSection(
@@ -1459,8 +1103,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setRethinkDomainLogsAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadMostContactedDomainRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid)
         hookInsightsSnapshot(AppInsightsSection.DOMAINS, adapter)
         setupBlockedSection(
@@ -1488,8 +1130,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setRethinkIpLogsAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.aadMostContactedIpsRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid)
         hookInsightsSnapshot(AppInsightsSection.IPS, adapter)
         setupBlockedSection(
@@ -1517,9 +1157,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun setIpAdapter() {
-        b.aadMostContactedIpsRv.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(this)
-        b.aadMostContactedIpsRv.layoutManager = layoutManager
         val adapter = AppWiseIpsAdapter(this, this, uid)
         hookInsightsSnapshot(AppInsightsSection.IPS, adapter)
         setupBlockedSection(
@@ -1547,33 +1184,15 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showAppInfoDialog(appNames: List<String>) {
-        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
-
-        val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(appNames)
-        builderSingle.setCancelable(false)
-
-        builderSingle.setItems(appNames.toTypedArray(), null)
-
-        builderSingle.setPositiveButton(getString(R.string.ada_noapp_dialog_positive)) {
-            dialog: DialogInterface,
-            _: Int ->
-            dialog.dismiss()
-        }
-
-        val alertDialog = builderSingle.create()
-        val ctx = this.applicationContext
-        alertDialog.listView.setOnItemClickListener { _, _, position, _ ->
+        showAppDetailsPackageDialog(this, appNames) { position ->
             io {
                 val pkg = FirewallManager.getPackageNameByAppName(appNames[position])
                 uiCtx {
                     Logger.i(LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
-                    openAndroidAppInfo(ctx, pkg)
+                    openAndroidAppInfo(applicationContext, pkg)
                 }
             }
         }
-        alertDialog.show()
     }
 
     private fun toggleMobileData(appInfo: AppInfo) {
@@ -1752,10 +1371,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
     }
 
-    private fun setDrawable(drawable: Int, txt: TextView) {
-        val top = ContextCompat.getDrawable(this, drawable)
-        txt.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null)
-    }
+    private fun setDrawable(drawable: Int, txt: WgControlState) { txt.imageResource = drawable }
 
     private fun getFirewallText(
         aStat: FirewallManager.FirewallStatus,
@@ -1793,7 +1409,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun showNoAppFoundDialog() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ada_noapp_dialog_title))
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
@@ -1814,7 +1430,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         prevConnStat: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builderSingle = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
@@ -1822,8 +1438,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())
         )
 
-        val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(packageList)
         builderSingle.setCancelable(false)
 
         builderSingle.setItems(packageList.toTypedArray(), null)
@@ -1840,14 +1454,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 _: Int ->
             }
 
-        val alertDialog: AlertDialog = builderSingle.create()
-        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        val alertDialog: android.app.Dialog = builderSingle.create()
         alertDialog.show()
     }
 
     private fun showCloseConnectionDialog(uid: Int, appName: String) {
         Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
-        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val dialog = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(this.getString(R.string.close_conns_dialog_title))
             .setMessage(getString(R.string.close_conns_dialog_desc, appName))
             .setPositiveButton(R.string.lbl_proceed) { _, _ ->
@@ -1865,9 +1478,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         dialog.show()
     }
 
-    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+    private fun displayIcon(drawable: Drawable?, mIconImageView: WgControlState) {
         if (isFinishing || isDestroyed) return
-        Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
+        mIconImageView.drawable = drawable ?: Utilities.getDefaultIcon(this)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -1894,69 +1507,18 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     private fun showNotesDialog(draftText: String? = null) {
         val initialText = draftText ?: if (::appInfo.isInitialized) appInfo.notes else ""
-        val editText = EditText(this).apply {
-            setText(initialText)
-            hint = getString(R.string.hint_notes)
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            setMinLines(4)
-            setMaxLines(10)
-            filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
-        }
-        val counterText = TextView(this).apply {
-            gravity = Gravity.END
-            text = getString(R.string.ctbs_note_char_counter, initialText.length, MAX_NOTE_LENGTH)
-        }
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            val horizontalPadding = (24 * resources.displayMetrics.density).toInt()
-            setPadding(horizontalPadding, 0, horizontalPadding, 0)
-            addView(
-                editText,
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-            addView(
-                counterText,
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-        }
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-
-            override fun afterTextChanged(s: Editable?) {
-                val currentLength = s?.length ?: 0
-                counterText.text = getString(R.string.ctbs_note_char_counter, currentLength, MAX_NOTE_LENGTH)
-            }
-        })
-
+        val editText = AppNotesDraft(initialText)
         notesEditText = editText
-
-        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(R.string.lbl_notes)
-            .setView(container)
-            .setPositiveButton(R.string.lbl_save) { _, _ ->
-                val newNotes = editText.text.toString().trim()
-                notesDraft = newNotes
-                saveNotesToDatabase(newNotes)
-            }
-            .setNegativeButton(R.string.lbl_cancel) { _, _ ->
-                notesDraft = ""
-            }
-            .create()
-        dialog.setOnDismissListener {
+        val dialog = showAppNotesDialog(this, editText, onSave = {
+            val newNotes = editText.text.toString().trim()
+            notesDraft = newNotes
+            saveNotesToDatabase(newNotes)
+        }, onCancel = { notesDraft = "" }, onDismiss = {
             notesDialog = null
             notesEditText = null
             shouldRestoreNotesDialog = false
-        }
+        })
         notesDialog = dialog
-        dialog.show()
     }
 
     private fun saveNotesToDatabase(newNotes: String) {

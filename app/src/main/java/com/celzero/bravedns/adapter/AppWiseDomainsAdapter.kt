@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
@@ -40,7 +43,6 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.VpnController
@@ -49,7 +51,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.log2
 
 class AppWiseDomainsAdapter(
@@ -58,7 +59,7 @@ class AppWiseDomainsAdapter(
     val uid: Int,
     val isActiveConn: Boolean = false
 ) :
-    PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
+    AppConnectionsPresenter(
         DIFF_CALLBACK
     ),
     AppDomainRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
@@ -90,26 +91,15 @@ class AppWiseDomainsAdapter(
         private const val PERCENTAGE_MULTIPLIER = 100
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ConnectionDetailsViewHolder {
-        val itemBinding =
-            ListItemAppDomainDetailsBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        return ConnectionDetailsViewHolder(itemBinding)
-    }
 
-    override fun onBindViewHolder(
-        holder: ConnectionDetailsViewHolder,
-        position: Int
-    ) {
-        val appConnection: AppConnection = getItem(position) ?: return
-        // updates the app-wise connections from network log to AppInfo screen
-        holder.update(appConnection)
+
+    @Composable
+    override fun Row(index: Int, connection: AppConnection, revision: Int) {
+        val state = remember(connection, revision) { AppDomainsRowState() }
+        val holder = remember(connection, revision) { ConnectionDetailsViewHolder(state, index) }
+        LaunchedEffect(holder) { holder.update(connection) }
+        DisposableEffect(holder) { onDispose { holder.clearTargets() } }
+        AppDomainsRowContent(state)
     }
 
     private fun calculatePercentage(c: Double): Int {
@@ -130,8 +120,9 @@ class AppWiseDomainsAdapter(
         }
     }
 
-    inner class ConnectionDetailsViewHolder(private val b: ListItemAppDomainDetailsBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class ConnectionDetailsViewHolder(private val b: AppDomainsRowState, private val absoluteAdapterPosition: Int) {
+        private val targets = mutableListOf<com.bumptech.glide.request.target.Target<Drawable>>()
+        fun clearTargets() { targets.forEach { Glide.with(context.applicationContext).clear(it) }; targets.clear() }
         fun update(conn: AppConnection) {
             displayTransactionDetails(conn)
             setupClickListeners(conn)
@@ -154,7 +145,7 @@ class AppWiseDomainsAdapter(
             }
 
             b.acdCount.text = conn.count.toString()
-            b.acdDomain.text = conn.appOrDnsName
+            b.acdDomain.text = conn.appOrDnsName.orEmpty()
             //b.acdFlag.text = conn.flag
             showFlagOrIcon(conn.appOrDnsName, conn.flag)
             if (conn.ipAddress.isNotEmpty()) {
@@ -167,7 +158,7 @@ class AppWiseDomainsAdapter(
         }
 
         private fun showFlagOrIcon(query: String?, flag: String? = null) {
-            b.acdFlag.text = flag
+            b.acdFlag.text = flag.orEmpty()
             if (query == null) {
                 hideFavIcon()
                 showFlag()
@@ -210,7 +201,7 @@ class AppWiseDomainsAdapter(
                 }
 
                 request.into(
-                    object : CustomViewTarget<ImageView, Drawable>(b.acdIcon) {
+                    object : com.bumptech.glide.request.target.CustomTarget<Drawable>(64, 64) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
                             showFlag()
                             hideFavIcon()
@@ -224,16 +215,16 @@ class AppWiseDomainsAdapter(
                             showFavIcon(resource)
                         }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
+                        override fun onLoadCleared(placeholder: Drawable?) {
                             hideFavIcon()
                             showFlag()
                         }
-                    }
+                    }.also { targets.add(it) }
                 )
             } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)?.into(
-                    object : CustomViewTarget<ImageView, Drawable>(b.acdIcon) {
+                    object : com.bumptech.glide.request.target.CustomTarget<Drawable>(64, 64) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
                             showFlag()
                             hideFavIcon()
@@ -247,11 +238,11 @@ class AppWiseDomainsAdapter(
                             showFavIcon(resource)
                         }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
+                        override fun onLoadCleared(placeholder: Drawable?) {
                             hideFavIcon()
                             showFlag()
                         }
-                    }
+                    }.also { targets.add(it) }
                 )
             }
         }
@@ -317,7 +308,7 @@ class AppWiseDomainsAdapter(
             }
 
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
-            val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
+            val dialog = WgAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
                 .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress))
                 .setPositiveButton(R.string.lbl_proceed) { _, _ ->
