@@ -15,6 +15,9 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import com.celzero.bravedns.ui.compose.wireguard.*
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -22,7 +25,6 @@ import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.BaseActivity
@@ -39,14 +41,13 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import com.celzero.firestack.backend.Backend
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) {
-    private val b by viewBinding(ActivityWgConfigEditorBinding::bind)
+class WgConfigEditorActivity : BaseActivity() {
+    private lateinit var b: WgEditorState
     private val persistentState by inject<PersistentState>()
 
     private var wgConfig: Config? = null
@@ -68,6 +69,9 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b = WgEditorState(this)
+        b.restoreForm(savedInstanceState, "wg.editor.")
+        setContent { RethinkTheme { WgEditorContent(b) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -87,6 +91,11 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
                     WgConfigDetailActivity.WgType.DEFAULT.value
                 )
             )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        b.saveForm(outState, "wg.editor.")
+        super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
@@ -136,7 +145,7 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
                 // TextView/View for non-EditText views)
                 if (wgInterface?.isAmnezia() == true) {
                     b.amzProps.visibility = android.view.View.VISIBLE
-                    b.amzProps.text = wgInterface?.getAmzProps()
+                    b.amzProps.text = wgInterface?.getAmzProps().orEmpty()
                 } else {
                     b.amzProps.visibility = android.view.View.GONE
                 }
