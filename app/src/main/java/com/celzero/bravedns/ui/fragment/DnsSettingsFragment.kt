@@ -15,13 +15,15 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import android.widget.CompoundButton
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dnssettings.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -31,7 +33,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
@@ -54,8 +55,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.firestack.backend.Backend
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,26 +62,42 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
+class DnsSettingsFragment : Fragment(),
     LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
-    private val b by viewBinding(FragmentDnsConfigureBinding::bind)
+    private var b = DnsSettingsState()
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val eventLogger by inject<EventLogger>()
 
-    private lateinit var animation: Animation
 
     companion object {
         fun newInstance() = DnsSettingsFragment()
 
         private const val REFRESH_TIMEOUT: Long = 4000
 
-        private const val ANIMATION_DURATION = 750L
-        private const val ANIMATION_REPEAT_COUNT = -1
-        private const val ANIMATION_PIVOT_VALUE = 0.5f
-        private const val ANIMATION_START_DEGREE = 0.0f
-        private const val ANIMATION_END_DEGREE = 360.0f
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = DnsSettingsState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DnsSettingsScreen(b,
+                onRestore = { b.restorePrompt = false; restoreDefaults() },
+                onCopySystemDns = { dns -> copySystemDns(dns); b.systemDns = null }) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBooleanArray("dns_checked_controls", b.restoreOrder.map { it.isChecked }.toBooleanArray())
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        savedInstanceState?.getBooleanArray("dns_checked_controls")?.forEachIndexed { i, value ->
+            b.restoreOrder.getOrNull(i)?.isChecked = value
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -108,8 +123,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
 
     private fun initView() {
-        // init animation
-        initAnimation()
         // display fav icon in dns logs
         b.dcFaviconSwitch.isChecked = persistentState.fetchFavIcon
         // enable per-app domain rules (dns alg)
@@ -200,8 +213,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun updateLocalBlocklistUi() {
         if (isPlayStoreFlavour()) {
-            b.dcLocalBlocklistRl.visibility = View.GONE
-            b.dividerLocalBlocklist.visibility = View.GONE
+            b.dcLocalBlocklistRl.visible = false
+            b.dividerLocalBlocklist.visible = false
             return
         }
 
@@ -212,13 +225,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                     R.string.settings_local_blocklist_in_use,
                     persistentState.numberOfLocalBlocklists.toString()
                 )
-            b.dcLocalBlocklistCount.setTextColor(
-                fetchColor(requireContext(), R.attr.secondaryTextColor)
-            )
+            b.dcLocalBlocklistCount.color = fetchColor(requireContext(), R.attr.secondaryTextColor)
             return
         }
 
-        b.dcLocalBlocklistCount.setTextColor(fetchColor(requireContext(), R.attr.accentBad))
+        b.dcLocalBlocklistCount.color = fetchColor(requireContext(), R.attr.accentBad)
         b.dcLocalBlocklistCount.text = getString(R.string.lbl_disabled)
     }
 
@@ -284,8 +295,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             } else {
                 // below R without ALG: show split DNS as enabled so user can toggle it on,
                 // which will auto-enable ALG as a dependency
-                b.dcSplitDnsRl.visibility = View.VISIBLE
-                b.dividerSplitDns.visibility = View.VISIBLE
+                b.dcSplitDnsRl.visible = true
+                b.dividerSplitDns.visible = true
                 enableSplitDnsUi()
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             }
@@ -317,8 +328,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (isAtleastR()) {
             // no-op, no need to depend of alg when device is running on Android 11 or above
             // as split dns option is shown to user regardless of dns alg
-            b.dcSplitDnsRl.visibility = View.VISIBLE
-            b.dividerSplitDns.visibility = View.VISIBLE
+            b.dcSplitDnsRl.visible = true
+            b.dividerSplitDns.visible = true
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             updateConnectedStatus(persistentState.connectedDnsName)
             showSplitDnsUi()
@@ -464,17 +475,17 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun initClickListeners() {
 
-        b.dcRestoreDefaults.setOnClickListener { showRestoreDefaultsDialog() }
+        b.dcRestoreDefaults.onClick = { showRestoreDefaultsDialog() }
 
-        b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
+        b.dcLocalBlocklistRl.onClick = { openLocalBlocklist() }
 
-        b.dcLocalBlocklistImg.setOnClickListener { openLocalBlocklist() }
+        b.dcLocalBlocklistImg.onClick = { openLocalBlocklist() }
 
-        b.dcCheckUpdateRl.setOnClickListener {
+        b.dcCheckUpdateRl.onClick = {
             b.dcCheckUpdateSwitch.isChecked = !b.dcCheckUpdateSwitch.isChecked
         }
 
-        b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+        b.dcCheckUpdateSwitch.onCheckedChange = { _: DnsControl, enabled: Boolean ->
             persistentState.periodicallyCheckBlocklistUpdate = enabled
             if (enabled) {
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
@@ -492,13 +503,13 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+        b.dcAlgSwitch.onCheckedChange = { _: DnsControl, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
             if (enabled) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(requireView(), persistentState)
                 }
             }
             updateSpiltDns()
@@ -508,23 +519,23 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
+        b.dcAlgRl.onClick = { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
 
-        b.dcFaviconRl.setOnClickListener {
+        b.dcFaviconRl.onClick = {
             b.dcFaviconSwitch.isChecked = !b.dcFaviconSwitch.isChecked
         }
 
-        b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+        b.dcFaviconSwitch.onCheckedChange = { _: DnsControl, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
             logEvent("fav icon? $enabled", "User changed fav icon setting to $enabled")
         }
 
-        b.dcPreventDnsLeaksRl.setOnClickListener {
+        b.dcPreventDnsLeaksRl.onClick = {
             b.dcPreventDnsLeaksSwitch.isChecked = !b.dcPreventDnsLeaksSwitch.isChecked
         }
 
-        b.dcPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean
+        b.dcPreventDnsLeaksSwitch.onCheckedChange = { _: DnsControl, enabled: Boolean
             ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcPreventDnsLeaksSwitch)
             persistentState.preventDnsLeaks = enabled
@@ -534,41 +545,41 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.rethinkPlusDnsRb.setOnCheckedChangeListener(null)
-        b.rethinkPlusDnsRb.setOnClickListener {
+        b.rethinkPlusDnsRb.onCheckedChange = null
+        b.rethinkPlusDnsRb.onClick = {
             // rethink dns plus
             invokeRethinkActivity(ConfigureRethinkBasicActivity.FragmentLoader.DB_LIST)
         }
 
-        b.customDnsRb.setOnCheckedChangeListener(null)
-        b.customDnsRb.setOnClickListener {
+        b.customDnsRb.onCheckedChange = null
+        b.customDnsRb.onClick = {
             // custom dns
             showCustomDns()
         }
 
-        b.networkDnsRb.setOnCheckedChangeListener(null)
-        b.networkDnsRb.setOnClickListener {
+        b.networkDnsRb.onCheckedChange = null
+        b.networkDnsRb.onClick = click@{
             if (isSystemDns()) {
                 io {
                     val sysDns = VpnController.getSystemDns()
                     uiCtx { showSystemDnsDialog(sysDns) }
                 }
-                return@setOnClickListener
+                return@click
             }
             // network dns proxy
             setNetworkDns()
         }
 
-        b.smartDnsRb.setOnCheckedChangeListener(null)
-        b.smartDnsRb.setOnClickListener {
+        b.smartDnsRb.onCheckedChange = null
+        b.smartDnsRb.onClick = {
             showSmartDnsList()
         }
 
-        b.dcDownloaderRl.setOnClickListener {
+        b.dcDownloaderRl.onClick = {
             b.dcDownloaderSwitch.isChecked = !b.dcDownloaderSwitch.isChecked
         }
 
-        b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        b.dcDownloaderSwitch.onCheckedChange = { _: DnsControl, b: Boolean ->
             persistentState.useCustomDownloadManager = b
             logEvent(
                 "custom download manager? $b",
@@ -576,11 +587,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcEnableCacheRl.setOnClickListener {
+        b.dcEnableCacheRl.onClick = {
             b.dcEnableCacheSwitch.isChecked = !b.dcEnableCacheSwitch.isChecked
         }
 
-        b.dcEnableCacheSwitch.setOnCheckedChangeListener { _, b ->
+        b.dcEnableCacheSwitch.onCheckedChange = { _, b ->
             persistentState.enableDnsCache = b
             logEvent(
                 "dns cache? $b",
@@ -588,9 +599,9 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcProxyDnsSwitch.setOnCheckedChangeListener { _, b -> persistentState.proxyDns = !b }
+        b.dcProxyDnsSwitch.onCheckedChange = { _, b -> persistentState.proxyDns = !b }
 
-        b.dcProxyDnsRl.setOnClickListener {
+        b.dcProxyDnsRl.onClick = {
             b.dcProxyDnsSwitch.isChecked = !b.dcProxyDnsSwitch.isChecked
             logEvent(
                 "proxy dns? ${!b.dcProxyDnsSwitch.isChecked}",
@@ -598,15 +609,14 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcRefresh.setOnClickListener {
+        b.dcRefresh.onClick = {
             b.dcRefresh.isEnabled = false
-            b.dcRefresh.animation = animation
-            b.dcRefresh.startAnimation(animation)
+            b.refreshing = true
             io { VpnController.refreshResolvers() }
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isAdded) {
                     b.dcRefresh.isEnabled = true
-                    b.dcRefresh.clearAnimation()
+                    b.refreshing = false
                     Utilities.showToastUiCentered(
                         requireContext(),
                         getString(R.string.dc_refresh_toast),
@@ -620,7 +630,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
+        b.dcSplitDnsSwitch.onCheckedChange = { _, isChecked ->
             persistentState.splitDns = isChecked
             if (isChecked) {
                 // below Android R, split DNS requires ALG; auto-enable it
@@ -630,7 +640,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 }
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(requireView(), persistentState)
                 }
             }
             updateConnectedStatus(persistentState.connectedDnsName)
@@ -641,22 +651,22 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcSplitDnsRl.setOnClickListener {
+        b.dcSplitDnsRl.onClick = {
             b.dcSplitDnsSwitch.isChecked = !b.dcSplitDnsSwitch.isChecked
         }
 
-        b.networkDnsInfo.setOnClickListener {
+        b.networkDnsInfo.onClick = {
             io {
                 val sysDns = VpnController.getSystemDns()
                 uiCtx { showSystemDnsDialog(sysDns) }
             }
         }
 
-        b.dcUndelegatedDomainsRl.setOnClickListener {
+        b.dcUndelegatedDomainsRl.onClick = {
             b.dcUndelegatedDomainsSwitch.isChecked = !b.dcUndelegatedDomainsSwitch.isChecked
         }
 
-        b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
+        b.dcUndelegatedDomainsSwitch.onCheckedChange = { _, isChecked ->
             persistentState.useSystemDnsForUndelegatedDomains = isChecked
             logEvent(
                 "undelegated domains? $isChecked",
@@ -664,15 +674,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcAllowedRecordTypesRl.setOnClickListener {
+        b.dcAllowedRecordTypesRl.onClick = {
             showDnsRecordTypesBottomSheet()
         }
 
-        b.dcBlockFreeDnsRl.setOnClickListener {
+        b.dcBlockFreeDnsRl.onClick = {
             showBlockFreeDnsModeBottomSheet()
         }
 
-        b.dcBlockUnknownSwitch.setOnCheckedChangeListener { _, isChecked ->
+        b.dcBlockUnknownSwitch.onCheckedChange = { _, isChecked ->
             persistentState.blockDnsForUnknownApp = isChecked
             logEvent(
                 "block unknown apps? $isChecked",
@@ -680,22 +690,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             )
         }
 
-        b.dcBlockHeadingRl.setOnClickListener { b.dcBlockUnknownSwitch.isChecked = !b.dcBlockUnknownSwitch.isChecked }
+        b.dcBlockHeadingRl.onClick = { b.dcBlockUnknownSwitch.isChecked = !b.dcBlockUnknownSwitch.isChecked }
     }
 
-    private fun showRestoreDefaultsDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setTitle(R.string.restore_defaults_dialog_title)
-            .setMessage(R.string.restore_defaults_dialog_message)
-            .setPositiveButton(R.string.lbl_proceed) { di, _ ->
-                di.dismiss()
-                restoreDefaults()
-            }
-            .setNegativeButton(R.string.lbl_cancel) { di, _ ->
-                di.dismiss()
-            }
-            .show()
-    }
+    private fun showRestoreDefaultsDialog() { b.restorePrompt = true }
 
     private fun restoreDefaults() {
         io {
@@ -757,43 +755,14 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         startActivity(intent)
     }
 
-    private fun showSystemDnsDialog(dns: String) {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setTitle(R.string.network_dns)
-            .setMessage(dns)
-            .setCancelable(true)
-            .setPositiveButton(R.string.ada_noapp_dialog_positive) { di, _ ->
-                di.dismiss()
-            }
-            .setNeutralButton(requireContext().getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-                UIUtils.clipboardCopy(
-                    requireContext(),
-                    dns,
-                    requireContext().getString(R.string.copy_clipboard_label)
-                )
-                Utilities.showToastUiCentered(
-                    requireContext(),
-                    requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
-                    Toast.LENGTH_SHORT
-                )
-            }
-        val dialog = builder.create()
-        dialog.show()
+    private fun showSystemDnsDialog(dns: String) { b.systemDns = dns }
+
+    private fun copySystemDns(dns: String) {
+        UIUtils.clipboardCopy(requireContext(), dns, requireContext().getString(R.string.copy_clipboard_label))
+        Utilities.showToastUiCentered(requireContext(), requireContext().getString(R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
     }
 
-    private fun initAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
-    }
+
 
     // open local blocklist bottom sheet
     private fun openLocalBlocklist() {
@@ -854,7 +823,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         io { appConfig.enableSystemDns() }
     }
 
-    private fun enableAfterDelay(ms: Long, vararg views: View) {
+    private fun enableAfterDelay(ms: Long, vararg views: DnsControl) {
         for (v in views) v.isEnabled = false
 
         Utilities.delay(ms, lifecycleScope) {
