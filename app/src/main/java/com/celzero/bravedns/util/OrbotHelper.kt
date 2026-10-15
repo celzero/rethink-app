@@ -56,8 +56,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.net.URI
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * One-click Orbot setup.
@@ -111,7 +114,53 @@ class OrbotHelper(
 
         var selectedProxyType: String = AppConfig.ProxyType.NONE.name
 
+        // latest Orbot endpoints, mirrored for callers without an instance reference
+        @Volatile var orbotSocks5Ip: String? = null
+            private set
+        @Volatile var orbotSocks5Port: Int? = null
+            private set
+        @Volatile var orbotHttpIp: String? = null
+            private set
+        @Volatile var orbotHttpPort: Int? = null
+            private set
+
         const val NOTIF_CHANNEL_ID_PROXY_ALERTS = "PROXY_ALERTS"
+
+        fun isOrbotProxyActive(): Boolean {
+            return selectedProxyType != AppConfig.ProxyType.NONE.name
+        }
+
+        // uses the selected proxy; SOCKS5 keeps .onion domains unresolved for Tor.
+        fun getOrbotProxy(): Proxy? {
+            val s5Ip = orbotSocks5Ip
+            val s5Port = orbotSocks5Port
+            val hasSocks5 = !s5Ip.isNullOrEmpty() && s5Port != null && isValidPort(s5Port)
+            val httpIp = orbotHttpIp
+            val httpPort = orbotHttpPort
+            val hasHttp = !httpIp.isNullOrEmpty() && httpPort != null && isValidPort(httpPort)
+
+            return when (selectedProxyType) {
+                AppConfig.ProxyType.SOCKS5.name ->
+                    if (hasSocks5) socks5Proxy(s5Ip, s5Port) else null
+                AppConfig.ProxyType.HTTP.name ->
+                    if (hasHttp) httpProxy(httpIp, httpPort) else null
+                AppConfig.ProxyType.HTTP_SOCKS5.name ->
+                    when {
+                        hasSocks5 -> socks5Proxy(s5Ip, s5Port)
+                        hasHttp -> httpProxy(httpIp, httpPort)
+                        else -> null
+                    }
+                else -> null
+            }
+        }
+
+        private fun socks5Proxy(ip: String, port: Int): Proxy {
+            return Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(ip, port))
+        }
+
+        private fun httpProxy(ip: String, port: Int): Proxy {
+            return Proxy(Proxy.Type.HTTP, InetSocketAddress(ip, port))
+        }
 
         suspend fun stats(): String {
             val sb = StringBuilder()
@@ -159,7 +208,7 @@ class OrbotHelper(
     fun getIntentForDownload(): Intent? {
         if (isPlayStoreFlavour()) { // For play store
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(ORBOT_MARKET_URI)
+            intent.data = ORBOT_MARKET_URI.toUri()
 
             val pm = context.packageManager
             val resInfos =
@@ -277,6 +326,10 @@ class OrbotHelper(
             )
         }
         selectedProxyType = AppConfig.ProxyType.NONE.name
+        orbotSocks5Ip = null
+        orbotSocks5Port = null
+        orbotHttpIp = null
+        orbotHttpPort = null
         appConfig.removeAllProxies()
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
@@ -480,6 +533,12 @@ class OrbotHelper(
         httpsIp = data?.getStringExtra(EXTRA_HTTP_PROXY_HOST)
         dnsPort = data?.getIntExtra(EXTRA_DNS_PORT, 0)
 
+        // mirror into the companion for callers without an instance reference
+        orbotSocks5Ip = socks5Ip
+        orbotSocks5Port = socks5Port
+        orbotHttpIp = httpsIp
+        orbotHttpPort = httpsPort
+
         Logger.d(
             LOG_TAG_VPN,
             "OrbotHelper: new val socks5:$socks5Ip($socks5Port), http: $httpsIp($httpsPort), dns: $dnsPort"
@@ -492,7 +551,7 @@ class OrbotHelper(
      */
     private suspend fun waitForOrbot() {
         io {
-            delay(TimeUnit.SECONDS.toMillis(15L))
+            delay(TimeUnit.SECONDS.toMillis(15L).milliseconds)
             Logger.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
 
             // Execute a task in the background thread after 15 sec.
