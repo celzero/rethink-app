@@ -24,8 +24,10 @@ import android.os.SystemClock
 import android.view.MotionEvent
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityPauseBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
@@ -36,7 +38,6 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,8 +46,8 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class PauseActivity : BaseActivity(R.layout.activity_pause) {
-    private val b by viewBinding(ActivityPauseBinding::bind)
+class PauseActivity : BaseActivity() {
+    private val b by lazy { PauseUiState(this) }
     private val persistentState by inject<PersistentState>()
     @Volatile var j: CompletableJob? = null
 
@@ -76,6 +77,7 @@ class PauseActivity : BaseActivity(R.layout.activity_pause) {
         observeAppState()
         observeTimer()
         openHomeScreenAndFinishIfNeeded()
+        setContent { RethinkTheme { PauseScreen(b) } }
     }
 
     private fun openHomeScreenAndFinishIfNeeded() {
