@@ -20,32 +20,42 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.*
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityCustomRulesBinding
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.BaseActivity
-import com.celzero.bravedns.ui.fragment.CustomDomainFragment
-import com.celzero.bravedns.ui.fragment.CustomIpFragment
+import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet
+import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.controls.OriginalTabStrip
+import com.celzero.bravedns.ui.compose.rules.RulesPage
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.tabs.TabLayoutMediator
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.viewmodel.CustomDomainViewModel
+import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CustomRulesActivity : BaseActivity(R.layout.activity_custom_rules) {
-    private val b by viewBinding(ActivityCustomRulesBinding::bind)
+class CustomRulesActivity : BaseActivity() {
     private var fragmentIndex = 0
     private var rulesType = RULES.APP_SPECIFIC_RULES.ordinal
     private var uid = Constants.UID_EVERYBODY
     private val persistentState by inject<PersistentState>()
+    private val eventLogger by inject<EventLogger>()
+    private val ipModel: CustomIpViewModel by viewModel()
+    private val domainModel by inject<CustomDomainViewModel>()
 
     enum class Tabs(val screen: Int) {
         IP_RULES(0),
@@ -101,36 +111,35 @@ class CustomRulesActivity : BaseActivity(R.layout.activity_custom_rules) {
     }
 
     private fun init() {
-
-        b.logsActViewpager.adapter =
-            object : FragmentStateAdapter(this) {
-                override fun createFragment(position: Int): Fragment {
-                    val rt = RULES.getType(rulesType)
-                    return when (position) {
-                        Tabs.DOMAIN_RULES.screen -> CustomDomainFragment.newInstance(uid, rt)
-                        Tabs.IP_RULES.screen -> CustomIpFragment.newInstance(uid, rt)
-                        else -> CustomIpFragment.newInstance(uid, rt)
+        val rules = RULES.getType(rulesType)
+        ipModel.setUid(uid)
+        domainModel.setUid(uid)
+        val app = rules == RULES.APP_SPECIFIC_RULES
+        val ipSource = if (app) ipModel.customIpDetails else ipModel.allIpRules
+        val domainSource = if (app) domainModel.customDomains else domainModel.allDomainRules
+        val ipCount = if (app) ipModel.ipRulesCount(uid) else ipModel.allIpRulesCount()
+        val domainCount = if (app) domainModel.domainRulesCount(uid) else domainModel.allDomainRulesCount()
+        setContent {
+            RethinkTheme {
+                val pager = rememberPagerState(initialPage = fragmentIndex.coerceIn(0, Tabs.getCount() - 1), pageCount = { Tabs.getCount() })
+                val scope = rememberCoroutineScope()
+                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+                        OriginalTabStrip(pager.currentPage,
+                            Tabs.entries.map { tab -> stringResource(if (tab == Tabs.IP_RULES) R.string.univ_view_blocked_ip else R.string.dc_custom_block_heading) },
+                            onSelect = { page -> scope.launch { pager.animateScrollToPage(page) } },
+                            pageOffset = pager.currentPageOffsetFraction)
+                        HorizontalPager(pager, Modifier.weight(1f), beyondViewportPageCount = 1) { page ->
+                            if (page == Tabs.IP_RULES.screen) RulesPage(false, uid, rules, ipSource, ipCount, ipModel::setFilter, eventLogger, pager.settledPage == page) { ip ->
+                                CustomIpRulesBtmSheet.newInstance(ip).let { it.show(supportFragmentManager, it.tag) }
+                            } else RulesPage(true, uid, rules, domainSource, domainCount, domainModel::setFilter, eventLogger, pager.settledPage == page) { domain ->
+                                CustomDomainRulesBtmSheet.newInstance(domain).let { it.show(supportFragmentManager, it.tag) }
+                            }
+                        }
                     }
                 }
-
-                override fun getItemCount(): Int {
-                    return Tabs.getCount()
-                }
             }
-
-        TabLayoutMediator(b.logsActTabLayout, b.logsActViewpager) { tab, position
-                -> // Styling each tab here
-                tab.text =
-                    when (position) {
-                        Tabs.DOMAIN_RULES.screen -> getString(R.string.dc_custom_block_heading)
-                        Tabs.IP_RULES.screen -> getString(R.string.univ_view_blocked_ip)
-                        else -> getString(R.string.univ_view_blocked_ip)
-                    }
-            }
-            .attach()
-
-        b.logsActViewpager.setCurrentItem(fragmentIndex, false)
-
+        }
         observeAppState()
     }
 
