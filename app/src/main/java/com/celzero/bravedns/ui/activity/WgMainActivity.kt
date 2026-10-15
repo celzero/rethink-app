@@ -15,7 +15,10 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import android.content.ActivityNotFoundException
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -26,9 +29,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.OneWgConfigAdapter
 import com.celzero.bravedns.adapter.WgConfigAdapter
@@ -36,7 +37,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
@@ -52,12 +52,10 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import com.google.zxing.qrcode.QRCodeReader
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,8 +63,8 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WgMainActivity :
-    BaseActivity(R.layout.activity_wireguard_main), OneWgConfigAdapter.DnsStatusListener {
-    private val b by viewBinding(ActivityWireguardMainBinding::bind)
+    BaseActivity(), OneWgConfigAdapter.DnsStatusListener {
+    private lateinit var b: WgMainState
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val eventLogger by inject<EventLogger>()
@@ -172,6 +170,8 @@ class WgMainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b = WgMainState(this)
+        setContent { RethinkTheme { WgMainContent(b) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -240,8 +240,6 @@ class WgMainActivity :
     }
 
     private fun setGeneralAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.wgGeneralInterfaceList.layoutManager = layoutManager
 
         wgConfigAdapter = WgConfigAdapter(this, this, persistentState.splitDns, eventLogger)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
@@ -249,21 +247,19 @@ class WgMainActivity :
     }
 
     private fun setOneWgAdapter() {
-        val layoutManager = LinearLayoutManager(this)
-        b.oneWgInterfaceList.layoutManager = layoutManager
 
         oneWgConfigAdapter = OneWgConfigAdapter(this, this, eventLogger)
         wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
         b.oneWgInterfaceList.adapter = oneWgConfigAdapter
     }
 
-    private fun selectToggleBtnUi(b: MaterialButton) {
+    private fun selectToggleBtnUi(b: WgControlState) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.accentGood))
         b.setTextColor(UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(b: MaterialButton) {
+    private fun unselectToggleBtnUi(b: WgControlState) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
         b.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
@@ -329,7 +325,6 @@ class WgMainActivity :
 
     private fun setupClickListeners() {
         // see CustomIpFragment#setupClickListeners#bringToFront()
-        b.wgAddFab.bringToFront()
         b.wgAddFab.setOnClickListener {
             if (b.createFab.isVisible) {
                 collapseFab()
@@ -483,17 +478,9 @@ class WgMainActivity :
         b.importFab.visibility = View.VISIBLE
         b.qrCodeFab.visibility = View.VISIBLE
         b.deleteAllFab.visibility = View.VISIBLE
-        b.createFab.animate().translationY(-resources.getDimension(R.dimen.standard_55))
-        b.importFab.animate().translationY(-resources.getDimension(R.dimen.standard_105))
-        b.qrCodeFab.animate().translationY(-resources.getDimension(R.dimen.standard_155))
-        b.deleteAllFab.animate().translationY(-resources.getDimension(R.dimen.standard_205))
     }
 
     private fun collapseFab() {
-        b.createFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
-        b.importFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
-        b.qrCodeFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
-        b.deleteAllFab.animate().translationY(resources.getDimension(R.dimen.standard_0))
         b.createFab.visibility = View.GONE
         b.importFab.visibility = View.GONE
         b.qrCodeFab.visibility = View.GONE
