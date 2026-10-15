@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -26,7 +30,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetDeviceNotRegisteredBinding
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
@@ -43,10 +46,9 @@ import org.koin.android.ext.android.inject
  */
 class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetDeviceNotRegisteredBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var supportAction: (() -> Unit)? = null
+    private var presentation: DeviceErrorState? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private val persistentState by inject<PersistentState>()
 
@@ -87,13 +89,12 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetDeviceNotRegisteredBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = DeviceErrorState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DeviceErrorContent(ui, unregistered = true, onSupport = { supportAction?.invoke() }, onDismiss = { dismissAllowingStateLoss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,14 +113,15 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
+        supportAction = null
     }
 
     private fun populateDetails(entitlementCid: String, deviceIdPrefix: String) {
-        binding.tvEntitlementCid.text = maskCid(entitlementCid)
+        ui.accountId = maskCid(entitlementCid)
             .ifBlank { getString(R.string.device_auth_error_id_unavailable) }
 
-        binding.tvDeviceIdPrefix.text = deviceIdPrefix.ifBlank {
+        ui.deviceId = deviceIdPrefix.ifBlank {
             getString(R.string.device_auth_error_id_unavailable)
         }
     }
@@ -135,12 +137,7 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun setupButtons(entitlementCid: String, deviceIdPrefix: String) {
-        binding.btnEmailSupport.setOnClickListener {
-            openEmailClient(entitlementCid, deviceIdPrefix)
-        }
-        binding.btnDismiss.setOnClickListener {
-            dismissAllowingStateLoss()
-        }
+        supportAction = { openEmailClient(entitlementCid, deviceIdPrefix) }
     }
 
     /**
