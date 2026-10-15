@@ -30,6 +30,9 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -45,7 +48,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
+class AppLockActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
 
     private lateinit var executor: Executor
@@ -66,6 +69,7 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        setContent { RethinkTheme { AppLockScreen() } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
