@@ -15,6 +15,11 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.networksettings.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
@@ -26,20 +31,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.provider.Settings
-import android.text.InputType
-import android.view.Gravity
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.ScrollView
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState as CompoundButton
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -53,7 +52,6 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.EventLogger
@@ -90,9 +88,7 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.networksettings.NetworkAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -105,8 +101,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
-    private val b by viewBinding(ActivityMiscSettingsBinding::bind)
+class MiscSettingsActivity : BaseActivity() {
+    private val b by lazy { MiscSettingsState(this) }
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -158,6 +154,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        setContent { RethinkTheme { NetworkSettingsScreen(b.layout) } }
         if (savedInstanceState != null) {
             isThemeChanged = savedInstanceState.getBoolean(KEY_THEME_CHANGE, false)
         }
@@ -178,7 +175,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        b.saveChecks(outState)
         outState.putBoolean(KEY_THEME_CHANGE, isThemeChanged)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     private fun setupOnBackPressed() {
@@ -226,7 +229,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
         // set log level name in the  description
         b.genSettingsGoLogDesc.text =
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
-                ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
+                ?.replaceFirstChar(Char::titlecase)?.replace("_", " ").orEmpty()
         // set log lifespan name in the description
         b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
 
@@ -666,7 +669,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             if (isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                 }
             }
             logEvent("Auto start on boot set to $b")
@@ -846,11 +849,11 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             updateConfigLevel(persistentState.goLoggerLevel)
             val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel)?.name?.lowercase()
-                    ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
+                    ?.replaceFirstChar(Char::titlecase)?.replace("_", " ").orEmpty()
             logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel)?.name}")
         }
 
-        val cb = MaterialCheckBox(this)
+        val cb = WgControlState(this, checkable = true)
         cb.text = getString(R.string.console_log_include_file_trace)
         cb.isChecked = persistentState.includeFileTrace
         cb.setOnCheckedChangeListener { _, isChecked ->
@@ -861,17 +864,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             )
             logEvent("File trace set to $isChecked")
         }
-        val density = resources.displayMetrics.density
-        val margin = (20 * density).toInt()
-        val container = LinearLayout(this)
-        val params =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        params.setMargins(margin, 0, margin, 0)
-        container.addView(cb, params)
-        alertBuilder.setView(container)
+        alertBuilder.setContent { NetworkCheckRow(cb) }
 
         alertBuilder.create().show()
     }
@@ -942,6 +935,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
     private fun invokeChangeLocaleDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        alertBuilder.setMaxHeightFraction(0.6f)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -1033,48 +1027,16 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
       }
 
       fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
-          val editText = AppCompatEditText(context).apply {
+          val editText = WgControlState(context).apply {
               hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
-              inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-              setHorizontallyScrolling(true)
               if (persistentState.appTriggerPackages.isNotEmpty()) {
                   setText(persistentState.appTriggerPackages)
               }
-            setPadding(50, 40, 50, 40)
-            gravity = Gravity.TOP or Gravity.START
-        }
-
-          val selectableTextView = AppCompatTextView(context).apply {
-              text = context.getString(R.string.adv_tasker_dialog_msg)
-              setTextIsSelectable(true)
-              setPadding(50, 40, 50, 0)
-              textSize = 16f
-          }
-
-          val instructionsTextView = AppCompatTextView(context).apply {
-              text = context.getString(R.string.adv_tasker_dialog_instructions)
-              setTextIsSelectable(true)
-              setPadding(50, 40, 50, 0)
-              textSize = 16f
-          }
-
-          // add a LinearLayout as the single child of the ScrollView, then add the text view and
-          // edit text to the LinearLayout.
-          val linearLayout = LinearLayout(context).apply {
-              orientation = LinearLayout.VERTICAL
-              addView(selectableTextView)
-              addView(editText)
-              addView(instructionsTextView)
-          }
-
-          val scrollView = ScrollView(context).apply {
-              setPadding(40, 10, 40, 0)
-              addView(linearLayout)
           }
 
           MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
               .setTitle(context.getString(R.string.adv_taster_title))
-              .setView(scrollView)
+              .setContent { NetworkTaskerContent(context, editText) }
               .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
                   val pkgName = editText.text.toString().trim()
                   if (pkgName.isNotEmpty()) {
@@ -1406,7 +1368,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
                 PackageManager.PERMISSION_GRANTED
     }
 
-    private fun enableAfterDelay(ms: Long, vararg views: View) {
+    private fun enableAfterDelay(ms: Long, vararg views: WgControlState) {
         for (v in views) v.isEnabled = false
 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
