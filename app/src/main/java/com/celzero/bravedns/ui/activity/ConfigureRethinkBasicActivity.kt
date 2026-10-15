@@ -20,12 +20,19 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.compose.ActivityFragmentContainer
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.ui.fragment.RethinkListFragment
 import com.celzero.bravedns.util.Constants
@@ -34,7 +41,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 
-class ConfigureRethinkBasicActivity : BaseActivity(R.layout.fragment_rethink_basic) {
+class ConfigureRethinkBasicActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
 
     enum class FragmentLoader {
@@ -66,12 +73,25 @@ class ConfigureRethinkBasicActivity : BaseActivity(R.layout.fragment_rethink_bas
         Logger.v(LOG_TAG_UI, "init configure rethink base activity")
         val type = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
         val fl = FragmentLoader.entries[type]
-        val fragment = fragment(fl)
+        // Do not replace the FragmentManager-restored instance and its in-progress selection.
+        val fragment = supportFragmentManager.findFragmentById(R.id.root_container) ?: fragment(fl)
         Logger.i(LOG_TAG_UI, "loading fragment: ${fragment.javaClass.simpleName}")
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.root_container, fragment, fragment.javaClass.simpleName)
-            .commit()
+        setContentView(ComposeView(this).apply {
+            // The nested Fragment ComposeView handles its own system-bar/IME insets.
+            consumeWindowInsets = false
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                RethinkTheme {
+                    ActivityFragmentContainer(
+                        fragmentManager = supportFragmentManager,
+                        containerId = R.id.root_container,
+                        modifier = Modifier.fillMaxSize(),
+                        fragmentTag = { it.javaClass.simpleName },
+                        createFragment = { fragment },
+                    )
+                }
+            }
+        })
     }
 
     private fun fragment(fl: FragmentLoader): Fragment {
