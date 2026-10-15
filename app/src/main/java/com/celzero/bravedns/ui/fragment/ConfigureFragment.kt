@@ -22,7 +22,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.databinding.FragmentConfigureBinding
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.ConfigureMenuState
+import com.celzero.bravedns.ui.compose.settings.ConfigureMenuContent
 import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -33,11 +39,10 @@ import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
 import com.celzero.bravedns.util.Utilities
-import dev.androidbroadcast.vbpd.viewBinding
 
-class ConfigureFragment : Fragment(R.layout.fragment_configure) {
+class ConfigureFragment : Fragment() {
 
-    private val b by viewBinding(FragmentConfigureBinding::bind)
+    private lateinit var b: ConfigureMenuState
 
     private val miscSettingsResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -58,6 +63,14 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         ADVANCED
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = ConfigureMenuState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ConfigureMenuContent(b) } }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
@@ -68,7 +81,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         // Show "α" badge next to the app name when running an alpha build so testers
         // can immediately identify they are on a pre-release version.
         if (Utilities.isAlphaBuild()) {
-            b.fhsTitleRethink.setText(R.string.app_name_alpha)
+            b.fhsTitleRethink.text = getString(R.string.app_name_alpha)
             b.fhsTitleRethink.isAllCaps = false
         }
         if (DEBUG) {
