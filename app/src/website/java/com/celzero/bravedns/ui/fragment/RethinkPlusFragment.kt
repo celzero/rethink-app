@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
+import com.celzero.bravedns.ui.compose.rpn.RpnControlState
 
-import android.animation.ObjectAnimator
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spanned
-import android.text.method.LinkMovementMethod
 import android.view.View
-import android.view.animation.AnticipateOvershootInterpolator
 import android.widget.Toast
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import dev.androidbroadcast.vbpd.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
-import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
 import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.MONEYBACK_WINDOW_DAYS
@@ -53,20 +52,19 @@ import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkPlusViewModel
 import com.celzero.bravedns.viewmodel.SubscriptionUiState
-import com.facebook.shimmer.Shimmer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
+class RethinkPlusFragment : Fragment(),
     GooglePlaySubsAdapter.SubscriptionChangeListener,
     BillingListener {
 
-    private val b by viewBinding(FragmentRethinkPlusPremiumBinding::bind)
+    private var b = SubscriptionScreenState()
     private val viewModel: RethinkPlusViewModel by viewModels()
 
-    private var adapter: GooglePlaySubsAdapter? = null
+    private var adapter: GooglePlaySubsAdapter? by mutableStateOf(null)
     private var processingBottomSheet: PurchaseProcessingBottomSheet? = null
 
     // dismiss the processing sheet after 60 s if no callback arrives.
@@ -87,6 +85,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
          *   purchase can buy an additional access window before their current one expires.
          */
         const val ARG_EXTEND_MODE = "arg_extend_mode"
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = SubscriptionScreenState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { SubscriptionContent(b) { adapter?.Content() } } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -183,42 +189,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         }
     }
 
-    private fun setupRecyclerView() {
-        b.subscriptionPlans.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2)
-            setHasFixedSize(false)
-        }
-    }
+    private fun setupRecyclerView() { /* Native Compose plan grid. */ }
 
     private fun setupTermsAndPolicy() {
-        b.termsText.apply {
-            text = updateHtmlEncodedText(getString(R.string.rethink_terms))
-            movementMethod = LinkMovementMethod.getInstance()
-            highlightColor = Color.TRANSPARENT
-            setLinkTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText))
-        }
+        b.termsText.text = getString(R.string.rethink_terms)
     }
 
     private fun adjustCtaBottomMargin() {
-        if (activity is FragmentHostActivity) {
-            val lp = b.ctaInnerContainer.layoutParams as? android.view.ViewGroup.MarginLayoutParams
-            lp?.bottomMargin = 0
-            b.ctaInnerContainer.layoutParams = lp
-        }
+        b.hosted = activity is FragmentHostActivity
     }
 
-    private fun syncScrollBottomPaddingWithCta() {
-        if (!isAdded) return
-        val ctaHeight = b.ctaContainer.height
-        if (ctaHeight <= 0) return
-        val scrollContent = b.scrollView.getChildAt(0) ?: return
-        scrollContent.setPadding(
-            scrollContent.paddingLeft,
-            scrollContent.paddingTop,
-            scrollContent.paddingRight,
-            ctaHeight
-        )
-    }
+    private fun syncScrollBottomPaddingWithCta() { /* Scaffold measures the CTA. */ }
 
     private fun setupProductTypeToggle() {
         updateToggleState(RethinkPlusViewModel.ProductTypeFilter.ONE_TIME)
@@ -237,37 +218,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun updateToggleState(selectedType: RethinkPlusViewModel.ProductTypeFilter) {
-        val ctx = requireContext()
-        val surfaceColor = UIUtils.fetchColor(ctx, R.attr.background)
-        val onSurfaceColor = UIUtils.fetchColor(ctx, R.attr.colorOnSurface)
-        val lightTextColor = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
-
-        when (selectedType) {
-            RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION -> {
-                b.btnSubscription.apply {
-                    setBackgroundColor(surfaceColor)
-                    setTextColor(onSurfaceColor)
-                    typeface = android.graphics.Typeface.DEFAULT_BOLD
-                }
-                b.btnOneTime.apply {
-                    setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(lightTextColor)
-                    typeface = android.graphics.Typeface.DEFAULT
-                }
-            }
-            RethinkPlusViewModel.ProductTypeFilter.ONE_TIME -> {
-                b.btnOneTime.apply {
-                    setBackgroundColor(surfaceColor)
-                    setTextColor(onSurfaceColor)
-                    typeface = android.graphics.Typeface.DEFAULT_BOLD
-                }
-                b.btnSubscription.apply {
-                    setBackgroundColor(Color.TRANSPARENT)
-                    setTextColor(lightTextColor)
-                    typeface = android.graphics.Typeface.DEFAULT
-                }
-            }
-        }
+        b.subscriptionSelected = selectedType == RethinkPlusViewModel.ProductTypeFilter.SUBSCRIPTION
     }
 
     // whether the current state is a resubscription (canceled / expired).
@@ -479,7 +430,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         b.scrollView.isVisible = true
         b.ctaContainer.isVisible = true
 
-        b.ctaContainer.doOnNextLayout { syncScrollBottomPaddingWithCta() }
 
         Logger.i(LOG_TAG_UI, "$TAG: Ready: ${products.size} products, resubscribe=$isResubscribe")
 
@@ -500,7 +450,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
                 selection?.second,
                 false
             )
-            b.subscriptionPlans.adapter = adapter
         } else {
             adapter?.setData(products)
         }
@@ -911,36 +860,20 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
 
 
     private fun startShimmer() {
-        if (!b.shimmerContainer.isShimmerStarted) {
-            val shimmer = Shimmer.AlphaHighlightBuilder()
-                .setDuration(2000)
-                .setBaseAlpha(0.85f)
-                .setDropoff(1f)
-                .setHighlightAlpha(0.35f)
-                .build()
-            b.shimmerContainer.setShimmer(shimmer)
-            b.shimmerContainer.startShimmer()
-        }
+        b.shimmerRunning = true
     }
 
     private fun stopShimmer() {
-        if (b.shimmerContainer.isShimmerStarted) b.shimmerContainer.stopShimmer()
+        b.shimmerRunning = false
     }
 
     private fun animateContentEntrance() {
-        b.scrollView.alpha = 0f
-        b.scrollView.animate().alpha(1f).setDuration(300).start()
-        b.ctaContainer.alpha = 0f
-        b.ctaContainer.animate().alpha(1f).setDuration(300).start()
+        b.contentEpoch++
     }
 
-    private fun animateButtonPress(view: View) {
-        ObjectAnimator.ofFloat(view, "scaleX", 1f, 0.95f, 1f).apply {
-            duration = 100; interpolator = AnticipateOvershootInterpolator(); start()
-        }
-        ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.95f, 1f).apply {
-            duration = 100; interpolator = AnticipateOvershootInterpolator(); start()
-        }
+    private fun animateButtonPress(view: RpnControlState) {
+        b.pulseTarget = view
+        b.pulseEpoch++
     }
 
     private fun updateHtmlEncodedText(text: String): Spanned =
@@ -950,11 +883,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     // draws the water surface, the dolphin breach cycle, splashes and sparse
     // bubbles. The fragment only drives its lifecycle.
     private fun startHeaderAnimations() {
-        b.dolphinOcean.start()
+        b.oceanEpoch++
+        b.oceanRunning = true
     }
 
     private fun stopHeaderAnimations() {
-        b.dolphinOcean.stop()
+        b.oceanRunning = false
     }
 
     override fun onConnectionResult(isSuccess: Boolean, message: String) {
@@ -974,7 +908,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
     }
 
     private fun updateMoneyBackBadge() {
-        b.moneyBackBadge.setDays(MONEYBACK_WINDOW_DAYS)
+        b.moneyBackDays = MONEYBACK_WINDOW_DAYS
     }
 
     private fun updateCancelPolicyText(productId: String?, planId: String?) {
