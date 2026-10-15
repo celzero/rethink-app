@@ -99,13 +99,18 @@ import com.celzero.firestack.intra.Tunnel
 import com.celzero.firestack.settings.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
 import java.net.URI
 import java.net.URLEncoder
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -2419,6 +2424,9 @@ class GoVpnAdapter : KoinComponent {
 
         private const val TAG = "TunAdapter;"
 
+        // max time to wait for one proxy check.
+        private const val PROBE_TIMEOUT_MS = 5_000L
+
         // if the default dns is set to none then no need to set the system dns as default,
         // set it as empty or null, which was the behaviour before v055a
         private const val SKIP_DEFAULT_DNS_ON_INIT = true
@@ -2631,26 +2639,101 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun getActiveProxiesIpAndMtu(): BraveVPNService.OverlayNetworks {
-        try {
-            val router = getProxies()?.router() ?: return BraveVPNService.OverlayNetworks()
-            val has4 = router.iP4()
-            // TODO: adding as a place holder as RPN always reports ipv6 as active even though
-            // there is no IPv6 available, report ipv6 false till the connectivity checks are
-            // implemented for proxies.
-            val has6 = !RpnProxyManager.isRpnActive() && router.iP6()
-            val failOpen = !router.iP4() && !router.iP6()
-            val mtu = router.mtu().toInt()
+    /**
+     * checks wg/rpn proxies to determine v4/v6 availability.
+     * failed check disables that ip version. MTU is taken from the proxy router.
+     */
+    suspend fun proxyReaches(): BraveVPNService.OverlayNetworks {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip proxy connectivity checks")
+            return BraveVPNService.OverlayNetworks()
+        }
+
+        val mtu = try {
+            getProxies()?.router()?.mtu()?.toInt() ?: Int.MAX_VALUE
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err proxy mtu: ${e.message}")
+            Int.MAX_VALUE
+        }
+
+        // pair of proxy-id (wg id or rpn key) and whether it is an rpn proxy
+        val proxies = mutableListOf<Pair<String, Boolean>>()
+        WireguardManager.getActiveConfigs().forEach {
+            proxies.add(Pair(ID_WG_BASE + it.getId(), false))
+        }
+        if (RpnProxyManager.isRpnActive()) {
+            RpnProxyManager.getEnabledConfigs().forEach {
+                // spl-case: the auto (win) server is looked up with an empty key
+                val key = if (it.key.contains(AUTO_SERVER_ID, ignoreCase = true)) "" else it.key
+                proxies.add(Pair(key, true))
+            }
+        }
+
+        if (proxies.isEmpty()) {
+            Logger.i(LOG_TAG_VPN, "$TAG no wg/rpn proxies active, fail open")
+            return BraveVPNService.OverlayNetworks(failOpen = true, mtu = mtu)
+        }
+
+        val v4Ips = persistentState.pingv4Ips
+        val v6Ips = persistentState.pingv6Ips
+
+        return try {
+            val results = coroutineScope {
+                proxies.map { (id, isRpn) ->
+                    async(Dispatchers.IO) { Pair(id, reachesPerFamily(id, isRpn, v4Ips, v6Ips)) }
+                }.awaitAll()
+            }
+            val has4 = results.all { it.second.first }
+            val has6 = results.all { it.second.second }
+            // all proxies unreachable on both families: fail open to the underlay
+            val failOpen = !has4 && !has6
             Logger.i(
                 LOG_TAG_VPN,
-                "$TAG proxy ip version, has4? $has4, has6? $has6, failOpen? $failOpen"
+                "$TAG proxy reaches: $results, has4? $has4, has6? $has6, failOpen? $failOpen"
             )
-            return BraveVPNService.OverlayNetworks(has4, has6, failOpen, mtu)
+            BraveVPNService.OverlayNetworks(has4, has6, failOpen, mtu)
         } catch (e: Exception) {
-            // exceptions are expected only when the wireguard is not available
-            Logger.w(LOG_TAG_VPN, "$TAG err proxy ip version: ${e.message}")
+            Logger.e(LOG_TAG_VPN, "$TAG err proxy reaches: ${e.message}", e)
+            BraveVPNService.OverlayNetworks(failOpen = true, mtu = mtu)
         }
-        return BraveVPNService.OverlayNetworks()
+    }
+
+    /**
+     * checks each proxy for v4 and v6 reachability in parallel.
+     * returns false if the check fails, times out, or has no router.
+     */
+    private suspend fun reachesPerFamily(
+        id: String,
+        isRpn: Boolean,
+        v4Ips: String,
+        v6Ips: String
+    ): Pair<Boolean, Boolean> = coroutineScope {
+        val v4 = async(Dispatchers.IO) {
+            probeReaches(id, isRpn, v4Ips)
+        }
+        val v6 = async(Dispatchers.IO) {
+            probeReaches(id, isRpn, v6Ips)
+        }
+        Pair(v4.await(), v6.await())
+    }
+
+    private suspend fun probeReaches(id: String, isRpn: Boolean, ips: String): Boolean {
+        return try {
+            withTimeout(PROBE_TIMEOUT_MS.milliseconds) {
+                val router =
+                    if (isRpn) getWinByKey(id)?.router() else getProxies()?.getProxy(id)?.router()
+                if (router == null) {
+                    Logger.w(LOG_TAG_VPN, "$TAG proxy reaches($id): no router, treating unreachable")
+                    return@withTimeout false
+                }
+                val res = router.reaches(ips)
+                Logger.i(LOG_TAG_VPN, "$TAG proxy reaches($id) for ips($ips): $res")
+                res
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err proxy reaches($id): ${e.message}")
+            false
+        }
     }
 
     suspend fun onLowMemory() {
