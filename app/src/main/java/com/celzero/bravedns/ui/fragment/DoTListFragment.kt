@@ -15,169 +15,49 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DoTEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DoTEndpoint
-import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
-import com.celzero.bravedns.databinding.FragmentDotListBinding
-import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dns.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.celzero.bravedns.database.DoTEndpoint
+import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
 
-class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
-    private val b by viewBinding(FragmentDotListBinding::bind)
-
+class DoTListFragment : Fragment() {
     private val appConfig by inject<AppConfig>()
-
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var adapter: DoTEndpointAdapter? = null
     private val viewModel: DoTEndpointViewModel by viewModel()
+    companion object { fun newInstance() = DoTListFragment() }
 
-    companion object {
-        fun newInstance() = DoTListFragment()
-
-        private val dpToPx: Float by lazy {
-            Resources.getSystem().displayMetrics.density
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
-
-        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        initClickListeners()
-        applyEdgeToEdge()
-    }
-
-    private fun initView() {
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerDot.layoutManager = layoutManager
-        b.recyclerDot.addItemDecoration(
-            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
-        )
-
-        adapter = DoTEndpointAdapter(requireContext(), get())
-        viewModel.dohEndpointList.observe(viewLifecycleOwner) {
-            adapter!!.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-        b.recyclerDot.adapter = adapter
-
-        adapter!!.addLoadStateListener { loadStates ->
-            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
-                    adapter!!.itemCount == 0
-            val isLoading = loadStates.source.refresh is LoadState.Loading
-
-            b.dotEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
-            b.dotLoadingIndicator.visibility = if (isLoading && adapter!!.itemCount == 0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            b.recyclerDot.visibility = if (isLoading && adapter!!.itemCount == 0) {
-                View.GONE
-            } else {
-                View.VISIBLE
-            }
-        }
-    }
-
-    private fun initClickListeners() {
-        b.dotFabAdd.setOnClickListener { showAddDialog() }
-    }
-
-    private fun applyEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDot) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
-                v.paddingBottom + systemBars.bottom
-            )
-            insets
-        }
-    }
-
-    private fun showAddDialog() {
-        val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        // resize the dialog when the keyboard opens, so that the buttons
-        // remain visible on smaller screens (instead of panning the window)
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val heading = dialogBinding.dialogCustomUrlTop
-        val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
-        val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
-        val customName = dialogBinding.dialogCustomNameEditText
-        val customURL = dialogBinding.dialogCustomUrlEditText
-        val progressBar = dialogBinding.dialogCustomUrlLoading
-        val errorTxt = dialogBinding.dialogCustomUrlFailureText
-        val checkBox = dialogBinding.dialogSecureCheckbox
-
-        heading.text =
-            getString(
-                R.string.two_argument_space,
-                getString(R.string.lbl_add).replaceFirstChar(Char::titlecase),
-                getString(R.string.lbl_dot)
-            )
-
-        // fetch the count from repository and increment by 1 to show the
-        // next doh name in the dialog
-        io {
-            val nextIndex = appConfig.getDoTCount().plus(1)
-            uiCtx {
-                customName.setText(
-                    getString(R.string.lbl_dot) + nextIndex.toString(),
-                    TextView.BufferType.EDITABLE
-                )
-            }
-        }
-
-        customURL.setText("")
-        customName.setText(getString(R.string.lbl_dot), TextView.BufferType.EDITABLE)
-        applyURLBtn.setOnClickListener {
-            val url = customURL.text.toString()
-            val name = customName.text.toString()
-            val isSecure = !checkBox.isChecked
-
-            insert(name, url, isSecure)
-            dialog.dismiss()
-        }
-
-        cancelURLBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        val owner = viewLifecycleOwner
+        (view as ComposeView).setContent { RethinkTheme {
+            val presenter = remember(owner) { DnsEndpointPresenter(requireContext(), owner, appConfig) }
+            // Ordinary dialogs are transient; recreation dismisses them as in the baseline.
+            var adding by remember { mutableStateOf(false) }
+            DnsEndpointScreen(viewModel.dohEndpointList, presenter::dot, R.string.dot_empty_state_title, R.string.dot_empty_state_desc, { adding = true })
+            if (adding) DnsServerEditor(DnsServerKind.DOT, { getString(R.string.lbl_dot) + appConfig.getDoTCount().plus(1).toString() },
+                onApply = { name, url, _, _, secure ->
+                        insert(name, url, secure); adding = false; null
+                }, onDismiss = { adding = false })
+        } }
     }
 
     private fun insert(name: String, url: String, isSecure: Boolean) {
@@ -206,11 +86,4 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            if (isAdded && view != null) {
-                f()
-            }
-        }
-    }
 }

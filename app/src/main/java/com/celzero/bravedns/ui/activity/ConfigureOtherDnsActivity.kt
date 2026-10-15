@@ -20,7 +20,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityConfigureOtherDnsBinding
+import com.celzero.bravedns.ui.compose.dnssettings.dnsFragmentHost
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.DnsCryptListFragment
@@ -31,11 +31,9 @@ import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
-class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other_dns) {
-    private val b by viewBinding(ActivityConfigureOtherDnsBinding::bind)
+class ConfigureOtherDnsActivity : BaseActivity() {
 
     private val persistentState by inject<PersistentState>()
 
@@ -97,7 +95,7 @@ class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other
     }
 
     private fun init() {
-        b.dnsDetailHeading.text = getDnsTypeName(dnsType)
+        setContentView(dnsFragmentHost(this, R.id.dns_detail_container, R.id.dns_detail_heading, R.id.dns_detail_fragment_container, getDnsTypeName(dnsType)))
 
         val fragment = when (DnsScreen.getDnsType(dnsType)) {
             DnsScreen.DNS_CRYPT -> DnsCryptListFragment.newInstance()
