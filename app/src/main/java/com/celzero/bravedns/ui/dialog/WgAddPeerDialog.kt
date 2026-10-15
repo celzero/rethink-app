@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.dialog
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import android.app.Activity
 import android.app.Dialog
@@ -23,11 +24,9 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
@@ -45,7 +44,7 @@ class WgAddPeerDialog(
     private val wgPeer: Peer?
 ) : Dialog(activity, themeID) {
 
-    private lateinit var b: DialogWgAddPeerBinding
+    private lateinit var b: WgPeerState
 
     private var isEditing = false
 
@@ -53,10 +52,17 @@ class WgAddPeerDialog(
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogWgAddPeerBinding.inflate(layoutInflater)
-        setContentView(b.root)
+        b = WgPeerState(context)
+        setWgContent(activity) { WgPeerContent(b) }
         initView()
         setupClickListener()
+        b.restoreForm(savedInstanceState, "wg.peer.")
+    }
+
+    override fun onSaveInstanceState(): Bundle = super.onSaveInstanceState().also { b.saveForm(it, "wg.peer.") }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreForm(savedInstanceState, "wg.peer.")
     }
 
     private fun initView() {
@@ -66,7 +72,6 @@ class WgAddPeerDialog(
         )
         // keep the dialog within the app's max width on expanded windows (foldables/tablets)
         UIUtils.capDialogWidth(this)
-        setupAutoExpand(b.peerAllowedIps)
 
         if (wgPeer != null) {
             isEditing = true
@@ -87,33 +92,13 @@ class WgAddPeerDialog(
                 b.keepAliveHint.visibility = View.GONE
             }
         }
-        // re-measure after setting text
-        b.root.post {
-            triggerExpandNow()
-        }
     }
 
-    private fun triggerExpandNow() {
-        listOf(b.peerAllowedIps).forEach { adjustMaxLines(it) }
-    }
 
-    private fun setupAutoExpand(et: com.google.android.material.textfield.TextInputEditText) {
-        et.setHorizontallyScrolling(false)
-        et.maxLines = 4 // initial cap
-        et.doOnTextChanged { _, _, _, _ -> adjustMaxLines(et) }
-    }
 
-    private fun adjustMaxLines(et: com.google.android.material.textfield.TextInputEditText) {
-        // post to ensure lineCount updated after layout
-        et.post {
-            val lines = et.lineCount
-            val threshold = 4
-            val hardCap = 12
-            if (lines > threshold) {
-                et.maxLines = minOf(lines, hardCap)
-            }
-        }
-    }
+
+
+
 
     private fun setupClickListener() {
         b.customDialogDismissButton.setOnClickListener { this.dismiss() }
