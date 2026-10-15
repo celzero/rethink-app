@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.firewallapps.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import android.content.Context
 import android.content.res.Configuration
@@ -43,7 +47,6 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityAppListBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -55,8 +58,6 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,15 +68,14 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AppListActivity :
-    BaseActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener {
+    BaseActivity(), SearchView.OnQueryTextListener {
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
-    private val b by viewBinding(ActivityAppListBinding::bind)
+    private val b = FirewallAppsState()
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
     private val refreshDatabase by inject<RefreshDatabase>()
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
     private var scrollToTopAfterSort = false
     private var previousSort = SortOption.NAME
 
@@ -218,6 +218,7 @@ class AppListActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        setContent { RethinkTheme { FirewallAppsContent(b) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -233,11 +234,21 @@ class AppListActivity :
         setupClickListener()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("compose-app-list-query", b.ffaSearch.query)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        // Restore after filters/list observation/listeners have initialized, like SearchView.
+        b.ffaSearch.setQuery(savedInstanceState.getString("compose-app-list-query").orEmpty(), false)
+    }
+
     override fun onResume() {
         super.onResume()
         setFirewallFilter(filters.value?.firewallFilter)
         filters.value = filters.value ?: Filters()
-        b.ffaAppList.requestFocus()
+        b.ffaSearch.clearFocus()
     }
 
     private fun initObserver() {
@@ -278,7 +289,7 @@ class AppListActivity :
 
     override fun onPause() {
         b.ffaSearch.clearFocus()
-        b.ffaAppList.requestFocus()
+        b.ffaSearch.clearFocus()
         super.onPause()
     }
 
@@ -485,7 +496,7 @@ class AppListActivity :
 
     private fun showBulkRulesUpdateDialog(title: String, message: String, type: BlockType) {
         val builder =
-            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(getString(R.string.lbl_apply)) { _, _ -> updateBulkRules(type) }
@@ -518,92 +529,19 @@ class AppListActivity :
         }
     }
 
-    private fun showInfoDialog() {
-        val li = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(view)
-        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.setCancelable(true)
-        builder.create().show()
-    }
+    private fun showInfoDialog() { showFirewallInfoDialog(this) }
 
     private fun setFirewallFilter(firewallFilter: FirewallFilter?) {
         if (firewallFilter == null) return
-
-        val view: Chip = b.ffaFirewallChipGroup.findViewWithTag(firewallFilter.id)
-        b.ffaFirewallChipGroup.check(view.id)
-        colorUpChipIcon(view)
+        b.selectFirewall(firewallFilter.id)
     }
 
     private fun remakeFirewallChipsUi() {
-        b.ffaFirewallChipGroup.removeAllViews()
-
-        val none = makeFirewallChip(FirewallFilter.ALL.id, getString(R.string.lbl_all), true)
-        val allowed =
-            makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
-        val blocked =
-            makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
-        val blockedWifiTxt = getString(
-            R.string.two_argument_colon,
-            getString(R.string.lbl_blocked),
-            getString(R.string.firewall_rule_block_unmetered)
-        )
-        val blockedWifi =
-            makeFirewallChip(FirewallFilter.BLOCKED_WIFI.id, blockedWifiTxt, false)
-        val blockedMobileDataTxt = getString(
-            R.string.two_argument_colon,
-            getString(R.string.lbl_blocked),
-            getString(R.string.firewall_rule_block_metered)
-        )
-        val blockedMobileData =
-            makeFirewallChip(FirewallFilter.BLOCKED_MOBILE_DATA.id, blockedMobileDataTxt, false)
-
-        val bypassUniversal =
-            makeFirewallChip(
-                FirewallFilter.BYPASS.id,
-                getString(R.string.fapps_firewall_filter_bypass_universal),
-                false)
-        val excluded =
-            makeFirewallChip(
-                FirewallFilter.EXCLUDED.id,
-                getString(R.string.fapps_firewall_filter_excluded),
-                false)
-        val lockdown =
-            makeFirewallChip(
-                FirewallFilter.LOCKDOWN.id,
-                getString(R.string.fapps_firewall_filter_isolate),
-                false)
-
-        b.ffaFirewallChipGroup.addView(none)
-        b.ffaFirewallChipGroup.addView(allowed)
-        b.ffaFirewallChipGroup.addView(blocked)
-        b.ffaFirewallChipGroup.addView(blockedWifi)
-        b.ffaFirewallChipGroup.addView(blockedMobileData)
-        b.ffaFirewallChipGroup.addView(bypassUniversal)
-        b.ffaFirewallChipGroup.addView(excluded)
-        b.ffaFirewallChipGroup.addView(lockdown)
+        b.selectedFilter = FirewallFilter.ALL.id
+        b.onFirewall = { applyFirewallFilter(it) }
     }
 
-    private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
 
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applyFirewallFilter(button.tag)
-                colorUpChipIcon(chip)
-            } else {
-                // no-op
-                // no action needed for checkState: false
-            }
-        }
-
-        return chip
-    }
 
     private fun applyFirewallFilter(tag: Any) {
         val firewallFilter = FirewallFilter.filter(tag as Int)
@@ -618,13 +556,7 @@ class AppListActivity :
         filters.postValue(filters.value)
     }
 
-    private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter =
-            PorterDuffColorFilter(
-                ContextCompat.getColor(this, R.color.primaryText), PorterDuff.Mode.SRC_IN)
-        chip.checkedIcon?.colorFilter = colorFilter
-        chip.chipIcon?.colorFilter = colorFilter
-    }
+
 
     private fun resetFirewallIcons(type: BlockType) {
         // reset all icons to default state based on selection
@@ -769,7 +701,7 @@ class AppListActivity :
         logEvent("Bulk lockdown rule update performed, isLockdown: $lockdown")
     }
 
-    private fun isInitTag(view: View): Boolean {
+    private fun isInitTag(view: AppListControlState): Boolean {
         return view.tag.equals("0") || view.tag == 0
     }
 
@@ -778,56 +710,15 @@ class AppListActivity :
         b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
         remakeFirewallChipsUi()
-        handleKeyboardEvent()
     }
 
-    private fun handleKeyboardEvent() {
-        // ref: stackoverflow.com/a/36259261
-        val rootView = findViewById<View>(android.R.id.content)
 
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            private var alreadyOpen = false
-            private val defaultKeyboardHeightDP = 100
-            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
-            private val rect = Rect()
-
-            override fun onGlobalLayout() {
-                val estimatedKeyboardHeight = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    EstimatedKeyboardDP.toFloat(),
-                    rootView.resources.displayMetrics
-                ).toInt()
-                rootView.getWindowVisibleDisplayFrame(rect)
-                val heightDiff = rootView.rootView.height - (rect.bottom - rect.top)
-                val isShown = heightDiff >= estimatedKeyboardHeight
-
-                if (isShown == alreadyOpen) {
-                    return // nothing to do
-                }
-
-                alreadyOpen = isShown
-
-                if (!isShown) {
-                    if (b.ffaSearch.hasFocus()) {
-                        // clear focus from search view when keyboard is closed
-                        b.ffaSearch.clearFocus()
-                    }
-                }
-            }
-        })
-    }
 
     private fun initListAdapter() {
         val recyclerAdapter = FirewallAppListAdapter(this, this, eventLogger)
 
-        b.ffaAppList.setHasFixedSize(true)
 
-        layoutManager = LinearLayoutManager(this)
-        b.ffaAppList.layoutManager = layoutManager
 
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         recyclerAdapter.addLoadStateListener { loadStates ->
             if (
@@ -835,8 +726,7 @@ class AppListActivity :
                 loadStates.refresh is LoadState.NotLoading &&
                 recyclerAdapter.itemCount > 0
             ) {
-                (b.ffaAppList.layoutManager as? LinearLayoutManager)
-                    ?.scrollToPositionWithOffset(0, 0)
+                b.scrollToTopGeneration++
 
                 scrollToTopAfterSort = false
             }
