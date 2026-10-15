@@ -15,24 +15,19 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import com.celzero.bravedns.ui.compose.wireguard.*
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.DialogWgAppsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.BaseActivity
@@ -41,25 +36,22 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
+class WgIncludeAppsActivity : BaseActivity(),
     SearchView.OnQueryTextListener {
 
-    private val b by viewBinding(DialogWgAppsBinding::bind)
+    private lateinit var b: WgIncludeAppsState
     private val persistentState by inject<PersistentState>()
     private val refreshDatabase by inject<RefreshDatabase>()
     private val viewModel: ProxyAppsMappingViewModel by viewModel()
 
     private lateinit var appsAdapter: WgIncludeAppsAdapter
-    private lateinit var animation: Animation
 
     private var proxyId: String = ""
     private var proxyName: String = ""
@@ -94,6 +86,8 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b = WgIncludeAppsState(this)
+        setContent { RethinkTheme { WgIncludeAppsContent(b, ::onQueryTextSubmit) } }
 
         proxyId = intent.getStringExtra(INTENT_EXTRA_PROXY_ID) ?: ""
         proxyName = intent.getStringExtra(INTENT_EXTRA_PROXY_NAME) ?: ""
@@ -103,7 +97,6 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
             return
         }
 
-        addAnimation()
         remakeFirewallChipsUi()
         initializeValues()
         observeApps()
@@ -111,32 +104,27 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
         syncBulkToggleState()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("wg.apps.query", b.wgIncludeAppDialogSearchView.text.toString())
+        super.onSaveInstanceState(outState)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState.containsKey("wg.apps.query")) b.wgIncludeAppDialogSearchView.setText(savedInstanceState.getString("wg.apps.query"))
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun addAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
-    }
+
 
     private fun initializeValues() {
         appsAdapter =
             WgIncludeAppsAdapter(this, proxyId, proxyName, onAppModified = { onAppModified() })
         viewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
 
-        val layoutManager = LinearLayoutManager(this)
-        b.wgIncludeAppRecyclerViewDialog.layoutManager = layoutManager
         b.wgIncludeAppRecyclerViewDialog.adapter = appsAdapter
     }
 
@@ -149,62 +137,26 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
     }
 
     private fun remakeFirewallChipsUi() {
-        b.wgIncludeAppDialogChipGroup.removeAllViews()
-
-        val all =
-            makeFirewallChip(
-                ProxyAppsMappingViewModel.TopLevelFilter.ALL_APPS.id,
-                getString(ProxyAppsMappingViewModel.TopLevelFilter.ALL_APPS.getLabelId()),
-                true
-            )
-
-        val selected =
-            makeFirewallChip(
-                ProxyAppsMappingViewModel.TopLevelFilter.SELECTED_APPS.id,
-                getString(ProxyAppsMappingViewModel.TopLevelFilter.SELECTED_APPS.getLabelId()),
-                false
-            )
-
-        val unselected =
-            makeFirewallChip(
-                ProxyAppsMappingViewModel.TopLevelFilter.UNSELECTED_APPS.id,
-                getString(ProxyAppsMappingViewModel.TopLevelFilter.UNSELECTED_APPS.getLabelId()),
-                false
-            )
-
-        b.wgIncludeAppDialogChipGroup.addView(all)
-        b.wgIncludeAppDialogChipGroup.addView(selected)
-        b.wgIncludeAppDialogChipGroup.addView(unselected)
-    }
-
-    private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applyFilter(button.tag)
-                colorUpChipIcon(chip)
-            } else {
-                // no-op
-                // no action needed for checkState: false
+        b.filters.clear()
+        listOf(ProxyAppsMappingViewModel.TopLevelFilter.ALL_APPS,
+            ProxyAppsMappingViewModel.TopLevelFilter.SELECTED_APPS,
+            ProxyAppsMappingViewModel.TopLevelFilter.UNSELECTED_APPS).forEach { filter ->
+            val chip = WgControlState(this, checkable = true)
+            chip.text = getString(filter.getLabelId())
+            chip.isChecked = filter == ProxyAppsMappingViewModel.TopLevelFilter.ALL_APPS
+            chip.setOnCheckedChangeListener { _, selected ->
+                if (selected) {
+                    b.filters.filter { it !== chip }.forEach { it.isChecked = false }
+                    applyFilter(filter.id)
+                }
             }
+            b.filters.add(chip)
         }
-
-        return chip
     }
 
-    private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter =
-            PorterDuffColorFilter(
-                ContextCompat.getColor(this, R.color.primaryText),
-                PorterDuff.Mode.SRC_IN
-            )
-        chip.checkedIcon?.colorFilter = colorFilter
-        chip.chipIcon?.colorFilter = colorFilter
-    }
+
+
+
 
     private fun applyFilter(tag: Any) {
         when (tag as Int) {
@@ -224,12 +176,7 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
     }
 
     private fun initializeClickListeners() {
-        b.wgIncludeAppDialogSearchView.setOnQueryTextListener(this)
-
-        b.wgIncludeAppDialogSearchView.setOnCloseListener {
-            clearSearch()
-            false
-        }
+        b.wgIncludeAppDialogSearchView.onTextChanged = { if (it.toString() != searchText) onQueryTextChange(it.toString()) }
 
         // Both bulk actions are always visible. Each acts immediately on click
         // (after a confirmation); the checked visual state is owned by
@@ -246,13 +193,12 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
 
         b.wgRefreshList.setOnClickListener {
             b.wgRefreshList.isEnabled = false
-            b.wgRefreshList.animation = animation
-            b.wgRefreshList.startAnimation(animation)
+            b.wgRefreshList.isIndeterminate = true
             refreshDatabase()
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (!isDestroyed && !isFinishing) {
                     b.wgRefreshList.isEnabled = true
-                    b.wgRefreshList.clearAnimation()
+                    b.wgRefreshList.isIndeterminate = false
                     Utilities.showToastUiCentered(
                         this@WgIncludeAppsActivity,
                         getString(R.string.refresh_complete),
