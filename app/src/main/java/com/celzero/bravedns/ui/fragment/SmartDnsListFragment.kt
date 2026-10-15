@@ -15,95 +15,50 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.SmartDnsEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.FragmentSmartDnsListBinding
-import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dns.SmartDnsContent
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.celzero.bravedns.viewmodel.SmartDnsEndpointViewModel
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SmartDnsListFragment : Fragment(R.layout.fragment_smart_dns_list) {
-    private val b by viewBinding(FragmentSmartDnsListBinding::bind)
-
+class SmartDnsListFragment : Fragment() {
     private val appConfig by inject<AppConfig>()
     private val viewModel: SmartDnsEndpointViewModel by viewModel()
+    companion object { fun newInstance() = SmartDnsListFragment() }
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var smartDnsAdapter: SmartDnsEndpointAdapter? = null
-
-    companion object {
-        fun newInstance() = SmartDnsListFragment()
-
-        private val dpToPx: Float by lazy {
-            Resources.getSystem().displayMetrics.density
-        }
-
-        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply { setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        applyEdgeToEdge()
-    }
-
-    private fun initView() {
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerSmartDnsList.layoutManager = layoutManager
-        b.recyclerSmartDnsList.addItemDecoration(
-            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
-        )
-
-        smartDnsAdapter =
-            SmartDnsEndpointAdapter(requireContext()) { appConfig.isSmartDnsEnabled() }
-        smartDnsAdapter?.onEndpointSelected = { endpoint ->
-            io { appConfig.enableSmartDns(endpoint.id) }
-        }
-        b.recyclerSmartDnsList.adapter = smartDnsAdapter
-
-        viewModel.smartDnsEndpointList.observe(viewLifecycleOwner) {
-            smartDnsAdapter?.submitList(it)
-            b.smartDnsEmptyState.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-        }
-    }
-
-    private fun applyEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerSmartDnsList) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
-                v.paddingBottom + systemBars.bottom
-            )
-            insets
-        }
+        (view as ComposeView).setContent { RethinkTheme {
+            val items by viewModel.smartDnsEndpointList.observeAsState()
+            SmartDnsContent(items, appConfig.isSmartDnsEnabled(),
+                onSelect = { endpoint -> io { appConfig.enableSmartDns(endpoint.id) } },
+                onInfo = { endpoint ->
+                    WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+                        .setTitle(endpoint.dnsName).setMessage(endpoint.dnsExplanation).setCancelable(true)
+                        .setPositiveButton(R.string.dns_info_positive) { dialog, _ -> dialog.dismiss() }.show()
+                })
+        } }
     }
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            if (isAdded && view != null) {
-                f()
-            }
-        }
     }
 }
