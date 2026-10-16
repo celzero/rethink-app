@@ -36,7 +36,7 @@ object ViewModelModule {
         viewModel { AppCustomIpViewModel(get()) }
         viewModel { RethinkRemoteFileTagViewModel(get()) }
         viewModel { RethinkLocalFileTagViewModel(get()) }
-        viewModel { AppConnectionsViewModel(get(), get(), get()) }
+        viewModel { AppConnectionsViewModel(get(), get(), get(), get()) }
         viewModel { SummaryStatisticsViewModel(get(), get()) }
         viewModel { DetailedStatisticsViewModel(get(), get()) }
         viewModel { LocalBlocklistPacksMapViewModel(get()) }
@@ -48,7 +48,7 @@ object ViewModelModule {
         viewModel { BlockFreeDnsViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
-        viewModel { ConsoleLogViewModel(get()) }
+        viewModel { ConsoleLogViewModel(get(), get(), get(), get()) }
         viewModel { DomainConnectionsViewModel(get()) }
         viewModel { WgNwActivityViewModel(get()) }
         viewModel { EventsViewModel(get()) }

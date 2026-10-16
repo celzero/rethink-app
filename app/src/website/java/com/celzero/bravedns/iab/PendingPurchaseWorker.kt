@@ -135,12 +135,17 @@ class PendingPurchaseWorker(
     }
 
     private val listener = object : BillingListener {
+        private fun detach() {
+            InAppBillingHandler.unregisterListener(this)
+        }
+
         override fun onConnectionResult(isSuccess: Boolean, message: String) {
             Logger.d(LOG_IAB, "$TAG; onConnectionResult: $isSuccess, $message")
         }
 
         override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>) {
             Logger.v(LOG_IAB, "$TAG; purchasesResult: $isSuccess, size=${purchaseDetailList.size}")
+            detach()
         }
 
         override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {

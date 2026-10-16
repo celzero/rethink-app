@@ -1205,9 +1205,9 @@ class WireguardManagerTest : KoinTest {
         every { ProxyManager.getProxyIdsForApp(any<Int>()) } returns emptySet()
 
         val ids = WireguardManager.getAllPossibleConfigIdsForApp(
-            100, "1.1.1.1", 80, "", false, "AnyWiFi", ""
+            100, "1.1.1.1", 80, "", false, "", ""
         )
-        assertTrue("ssidEnabled=true with empty SSID list should match all",
+        assertTrue("ssidEnabled=true with empty SSID list should match when the SSID is unavailable",
             ids.contains("${ID_WG_BASE}1"))
         unmockkObject(ProxyManager)
     }

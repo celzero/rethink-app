@@ -15,16 +15,16 @@ buildscript {
         
         // add firebase plugins - will be conditionally applied in app/build.gradle
         val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
-        val apkBuild = taskNames.contains("full")
+        val playBuild = taskNames.contains("play")
         val fdroidBuild = taskNames.contains("fdroid")
 
         // check for fdroidserver value is set in system env
         val fdroidBuildServer = System.getenv("fdroidserver")
         val isFdroidBuildServer = !fdroidBuildServer.isNullOrEmpty() && fdroidBuildServer != "null"
-        val deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer
+        val deGoogled = !playBuild || fdroidBuild || isFdroidBuildServer
 
         println("app-task names: '$taskNames'")
-        println("app; deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+        println("app; deGoogled? $deGoogled (playBuild: $playBuild, fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer)")
 
         if (!deGoogled) {
             classpath(libs.googleGmsGoogleServices)

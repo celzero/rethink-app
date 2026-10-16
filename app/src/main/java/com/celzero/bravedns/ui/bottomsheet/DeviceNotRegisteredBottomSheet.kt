@@ -24,22 +24,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomsheetDeviceNotRegisteredBinding
+import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
+import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 /**
  * Bottom sheet shown when the CID embedded in the active entitlement payload
  * (the authoritative Google Play CID) differs from the locally stored CID and
- * the server cannot return a valid DID for the entitlement CID.
+ * the server cannot return a DID for the entitlement CID.
  *
  * This means the device is not registered under the subscription account.
- * The user is guided to contact support with their account details.
+ * When the stored cid is a foreign one (never rebindable), the sheet offers a
+ * guarded identity reset that discards the stored identity so the active
+ * purchase can claim the store; otherwise the user is guided to contact
+ * support with their account details.
  */
 class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
@@ -47,6 +59,10 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
     private val binding
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
+
+    private var entitlementCid: String = ""
+
+    private var resetInFlight: Boolean = false
 
     private val persistentState by inject<PersistentState>()
 
@@ -103,11 +119,12 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
         }
 
         val args          = requireArguments()
-        val entitlementCid = args.getString(ARG_ENTITLEMENT_CID, "")
+        entitlementCid = args.getString(ARG_ENTITLEMENT_CID, "")
+        val storedCid      = args.getString(ARG_STORED_CID, "")
         val deviceIdPrefix = args.getString(ARG_DEVICE_ID_PREFIX, "")
 
         populateDetails(entitlementCid, deviceIdPrefix)
-        setupButtons(entitlementCid, deviceIdPrefix)
+        setupButtons(entitlementCid, storedCid, deviceIdPrefix)
     }
 
     override fun onDestroyView() {
@@ -125,7 +142,7 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     /**
-     * Masks a CID to show only the first 12
+     * Masks a CID to the first 12 characters; shorter CIDs are shown in full.
      *
      * Example: "abcdefghijklmnopqrstuvwx" → "abcdefghijkl"
      */
@@ -134,12 +151,68 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
         return cid.take(12)
     }
 
-    private fun setupButtons(entitlementCid: String, deviceIdPrefix: String) {
+    private fun setupButtons(entitlementCid: String, storedCid: String, deviceIdPrefix: String) {
         binding.btnEmailSupport.setOnClickListener {
             openEmailClient(entitlementCid, deviceIdPrefix)
         }
         binding.btnDismiss.setOnClickListener {
             dismissAllowingStateLoss()
+        }
+        // The stored identity can never be rebound to the entitlement cid while the
+        // store holds a foreign cid, so offer to discard it and let the active
+        // purchase claim the empty store.
+        val resettable = entitlementCid.isNotBlank() && storedCid.isNotBlank() &&
+            entitlementCid != storedCid
+        if (resettable) {
+            binding.btnResetIdentity.visibility = View.VISIBLE
+            binding.btnResetIdentity.setOnClickListener {
+                confirmIdentityReset()
+            }
+        }
+    }
+
+    private fun confirmIdentityReset() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.server_selection_error_retry)
+            .setMessage(R.string.device_not_registered_reset_confirm_msg)
+            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
+                resetIdentity()
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
+    }
+
+    private fun resetIdentity() {
+        if (resetInFlight) return
+        resetInFlight = true
+        isCancelable = false
+        binding.btnResetIdentity.isEnabled = false
+        binding.btnEmailSupport.isEnabled = false
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val cleared = try {
+                InAppBillingHandler.resetIdentityForRebind(entitlementCid)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(LOG_IAB, "$TAG: identity reset failed: ${e.message}", e)
+                false
+            }
+            withContext(Dispatchers.Main) {
+                val ctx = context ?: return@withContext
+                if (cleared) {
+                    DeviceNotRegisteredNotifier.cancel(ctx)
+                    Toast.makeText(ctx, R.string.device_not_registered_reset_success,
+                        Toast.LENGTH_LONG).show()
+                    dismissAllowingStateLoss()
+                } else {
+                    resetInFlight = false
+                    isCancelable = true
+                    binding.btnResetIdentity.isEnabled = true
+                    binding.btnEmailSupport.isEnabled = true
+                    Toast.makeText(ctx, R.string.device_not_registered_reset_failed,
+                        Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 

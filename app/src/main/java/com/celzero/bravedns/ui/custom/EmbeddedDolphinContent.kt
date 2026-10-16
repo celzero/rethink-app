@@ -31,7 +31,7 @@ import com.celzero.bravedns.R
 object EmbeddedDolphinContent {
 
     /** A dolphin artwork paired with a quote to render beneath it. */
-    data class Signature(@DrawableRes val image: Int, @StringRes val quote: Int)
+    data class Signature(@param:DrawableRes val image: Int, @param:StringRes val quote: Int)
 
     // --- the ten regular dolphins (extracted from sprite sheets) ---
     // dolphin_waves        : riding a wave line

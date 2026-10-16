@@ -31,6 +31,7 @@ import com.celzero.bravedns.data.BlocklistStatsAggregator
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.StatsSummaryDao
+import com.celzero.bravedns.service.LogActivityAggregator
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,8 @@ import kotlinx.coroutines.withContext
 class AppConnectionsViewModel(
     private val nwlogDao: ConnectionTrackerDAO,
     private val rinrDao: RethinkLogDao,
-    private val statsDao: StatsSummaryDao
+    private val statsDao: StatsSummaryDao,
+    private val logActivityAggregator: LogActivityAggregator
 ) : ViewModel() {
     private val ipFilter: MutableLiveData<String> = MutableLiveData()
     private val domainFilter: MutableLiveData<String> = MutableLiveData()
@@ -239,7 +241,7 @@ class AppConnectionsViewModel(
             .cachedIn(viewModelScope)
     }
 
-    fun deleteLogs(uid: Int) {
+    suspend fun deleteLogs(uid: Int) {
         // delete based on the time category
         when (timeCategory) {
             TimeCategory.ONE_HOUR -> {
@@ -254,6 +256,8 @@ class AppConnectionsViewModel(
                 nwlogDao.clearLogsByUid(uid) // similar to clearing logs for uid
             }
         }
+        // rebuild the home-screen activity wall
+        logActivityAggregator.forceRestoreFromDatabase()
     }
 
     private fun getStartTime(): Long {

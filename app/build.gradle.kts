@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.util.Properties
 import java.io.FileInputStream
+import java.lang.reflect.Method
 
 plugins {
     id("com.android.application")
@@ -20,7 +21,7 @@ plugins {
 // strategy: For command-line builds, check task names. For IDE, always apply plugins,
 // but they'll only process play/website variants (Firebase deps are scoped to those variants)
 val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
-val apkBuild = taskNames.contains("full")
+val playBuild = taskNames.contains("play")
 val fdroidBuild = taskNames.contains("fdroid")
 // for alpha builds generate universal apk only
 val alphaBuild = taskNames.contains("alpha")
@@ -28,13 +29,21 @@ val alphaBuild = taskNames.contains("alpha")
 // check for fdroidserver value is set in system env
 val fdroidBuildServer: String? = System.getenv("fdroidserver")
 val isFdroidBuildServer = !fdroidBuildServer.isNullOrEmpty() && fdroidBuildServer != "null"
-val deGoogled = !apkBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
+val deGoogled = !playBuild || fdroidBuild || isFdroidBuildServer || alphaBuild
 val shouldSplit = !alphaBuild
 
 // Pass -PwebsiteDegoogled=true when building the fdroid flavor with our own keys.
 // Official F-Droid builds omit this flag and will be labeled as "fdroid".
-val isWebsiteDegoogled = providers.gradleProperty("websiteDegoogled")
+// IzzyOnDroid builds pass -Pizzyondroid=true instead (.github/workflows/izzyondroid.yml);
+// they are degoogled builds with our keys too, so the izzy flag implies websiteDegoogled.
+val isIzzyBuild = providers.gradleProperty("izzyondroid")
     .orNull?.toBoolean() ?: false
+val isWebsiteDegoogled = isIzzyBuild ||
+    (providers.gradleProperty("websiteDegoogled").orNull?.toBoolean() ?: false)
+
+// file-level so the reflective lookup stays outside the buildTypes scope
+fun findMethodByName(receiver: Any, name: String): Method? =
+    receiver.javaClass.methods.firstOrNull { it.name == name }
 
 // Add google-services.json only for play/website builds.
 // local dev: copy from the sibling ../firebase/{debug,release} directory (gitignored, outside repo).
@@ -71,11 +80,11 @@ if (!deGoogled) {
         }
     }
 } else {
-    logger.info("skipping google-services.json for de-googled/F-Droid build")
+    logger.info("skipping google-services.json for non-play build")
 }
 
 logger.info("app-task names: '$taskNames'")
-logger.info("gradle deGoogled? $deGoogled (fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer, apkBuild: $apkBuild)")
+logger.info("gradle deGoogled? $deGoogled (playBuild: $playBuild, fdroidBuild: $fdroidBuild, fdroidBuildServer: $isFdroidBuildServer)")
 logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 
 // don't apply firebase plugins for fdroid CLI builds
@@ -84,7 +93,7 @@ if (!deGoogled) {
     apply(plugin = "com.google.firebase.crashlytics")
     logger.info("app firebase plugins applied")
 } else {
-    logger.info("app firebase plugins SKIPPED")
+    logger.info("app firebase plugins SKIPPED (non-play build)")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -104,8 +113,6 @@ val gitVersion = providers.exec {
     commandLine("git", "describe", "--tags", "--always")
 }.standardOutput.asText.get().trim()
 
-// for GitHub builds, the version code is set in the GitHub action via env
-// for local builds, the version code is set in gradle.properties
 fun getVersionCode(): Int {
     var code = 0
     try {
@@ -118,7 +125,7 @@ fun getVersionCode(): Int {
         logger.info("missing env version code: ${ex.message}")
     }
     if (code == 0) {
-        code = project.properties["VERSION_CODE"]?.toString()?.toInt() ?: 0
+        code = project.properties["VERSION_CODE"]?.toString()?.toIntOrNull() ?: 0
         logger.info("project properties version code: $code")
     }
     return code
@@ -209,14 +216,15 @@ android {
 
     buildTypes {
         getByName("release") {
-            // modified as part of #352, now webview is removed from app, flipping back
-            // the setting to true
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // AGP 9.3 DSL: enables both code and resource optimization and
+            // includes the default Android keep rules (equivalent to
+            // proguard-android-optimize.txt, which the webview removal in #352
+            // allowed flipping back on). Project keep rules live in
+            // src/main/keepRules/*.keep (see developer.android.com/topic/
+            // performance/app-optimization/enable-app-optimization).
+            optimization {
+                enable = true // Enables code and resource optimizations.
+            }
             ndk {
                 // Use SYMBOL_TABLE to reduce symbol file size significantly
                 debugSymbolLevel = "SYMBOL_TABLE"
@@ -230,11 +238,12 @@ android {
                 // to avoid compilation errors when the plugin is not applied or its classes are not visible
                 val crashlyticsExtension = extensions.findByName("firebaseCrashlytics")
                 if (crashlyticsExtension != null) {
-                    val method = crashlyticsExtension.javaClass.getMethod(
-                        "setNativeSymbolUploadEnabled",
-                        Boolean::class.javaPrimitiveType
-                    )
-                    method.invoke(crashlyticsExtension, true)
+                    val setter = findMethodByName(crashlyticsExtension, "setNativeSymbolUploadEnabled")
+                    if (setter != null) {
+                        setter.invoke(crashlyticsExtension, true)
+                    } else {
+                        logger.warn("firebaseCrashlytics extension has no setNativeSymbolUploadEnabled; skipping native symbol upload setup")
+                    }
                 }
             }
             signingConfig = if (isWebsiteDegoogled) {
@@ -244,6 +253,10 @@ android {
                 logger.info("Normal build: using config signing config")
                 signingConfigs.getByName("config")
             }
+            // IzzyOnDroid builds ship as com.celzero.bravedns.izzy
+            if (isIzzyBuild) {
+                applicationIdSuffix = ".izzy"
+            }
         }
         create("leakCanary") {
             matchingFallbacks += listOf("debug")
@@ -252,24 +265,19 @@ android {
         create("alpha") {
             // archive.is/y8uCB
             applicationIdSuffix = ".alpha"
-            isMinifyEnabled = true
-            isShrinkResources = true
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig = signingConfigs.getByName("alpha")
             resValue("string", "app_name", "Rethink(α)")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
         create("releaseDebug") {
             initWith(getByName("release"))
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // set explicitly; initWith may not copy the optimization block
+            optimization {
+                enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
+            }
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
                 abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
@@ -312,9 +320,6 @@ android {
     }
 
     packaging {
-        jniLibs {
-            keepDebugSymbols.add("**/*.so")
-        }
         // required for Google Play developer api model classes
         resources {
             excludes.add("META-INF/INDEX.LIST")
@@ -328,7 +333,7 @@ android {
         }
         create("fdroid") {
             dimension = "releaseChannel"
-            // true only when built with -PwebsiteDegoogled=true (our own keys).
+            // true only when built with -PwebsiteDegoogled=true or -Pizzyondroid=true (our own keys).
             buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", isWebsiteDegoogled.toString())
         }
         create("website") {
@@ -406,14 +411,7 @@ androidComponents {
                 // so installed universal APKs are not treated as a downgrade
                 // when splits are disabled (e.g. alpha builds), firstAbi is null; fall back to
                 // the arm64-v8a multiplier (3) so versionCode arithmetic still works
-                val firstAbi = variant.outputs
-                    .firstOrNull { candidate ->
-                        candidate.filters.any { it.filterType == FilterConfiguration.FilterType.ABI }
-                    }
-                    ?.filters
-                    ?.firstOrNull { it.filterType == FilterConfiguration.FilterType.ABI }
-                    ?.identifier
-                val multiplier = if (firstAbi != null) abiVersionCodes[firstAbi] ?: 3 else 3
+                val multiplier = abiVersionCodes.getValue("arm64-v8a")
                 val v = multiplier * 10000000 + (output.versionCode.get())
                 output.versionCode.set(v)
             }
@@ -475,7 +473,6 @@ dependencies {
 
     "fullImplementation"(libs.squareupOkhttp3Okhttp)
     "fullImplementation"(libs.squareupOkhttp3OkhttpDnsoverhttps)
-    "fullImplementation"(libs.squareupOkhttp3LoggingInterceptor)
 
     "fullImplementation"(libs.squareupRetrofit2Retrofit)
     "fullImplementation"(libs.squareupRetrofit2ConverterGson)
@@ -651,11 +648,7 @@ dependencies {
     // battery optimization permission helper
     implementation(libs.waseemsabirBetterypermissionhelper)
 
-    // Firebase dependencies for error reporting (website and play variants only)
-    "websiteImplementation"(platform(libs.googleFirebaseFirebaseBom))
-    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlytics)
-    "websiteImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)
-
+    // Firebase dependencies for error reporting (play variants only)
     "playImplementation"(platform(libs.googleFirebaseFirebaseBom))
     "playImplementation"(libs.googleFirebaseFirebaseCrashlytics)
     "playImplementation"(libs.googleFirebaseFirebaseCrashlyticsNdk)

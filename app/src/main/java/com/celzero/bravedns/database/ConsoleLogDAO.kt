@@ -37,6 +37,10 @@ interface ConsoleLogDAO {
     @Query("SELECT * FROM ConsoleLog WHERE message LIKE :input AND level >= :minLevel ORDER BY id DESC")
     fun getLogs(input: String, minLevel: Int): PagingSource<Int, ConsoleLog>
 
+    // Newest-first full list for the merged console + RPN screen (see ConsoleLogViewModel).
+    @Query("SELECT * FROM ConsoleLog WHERE message LIKE :input AND level >= :minLevel ORDER BY timestamp DESC, id DESC LIMIT :limit")
+    suspend fun getLogsForUi(input: String, minLevel: Int, limit: Int): List<ConsoleLog>
+
     @Query("DELETE FROM ConsoleLog WHERE timestamp < :to")
     suspend fun deleteOldLogs(to: Long)
 

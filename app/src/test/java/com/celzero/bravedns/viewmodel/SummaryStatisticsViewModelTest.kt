@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,9 +44,11 @@ class SummaryStatisticsViewModelTest {
     @Test
     fun `test timeCategoryChanged updates startTime`() {
         val initialStartTime = viewModel.getTimeCategory()
+        val initialCutoff = viewModel.getStartTime()
         assertEquals(SummaryStatisticsViewModel.TimeCategory.ONE_HOUR, initialStartTime)
         
         viewModel.timeCategoryChanged(SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR)
         assertEquals(SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR, viewModel.getTimeCategory())
+        assertNotEquals(initialCutoff, viewModel.getStartTime())
     }
 }

@@ -578,6 +578,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val intent = Intent(requireContext(), DetailedStatisticsActivity::class.java)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TIME_CATEGORY, timeCategory)
+        intent.putExtra(DetailedStatisticsActivity.INTENT_START_TIME, viewModel.getStartTime())
         startActivity(intent)
     }
 

@@ -177,7 +177,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // Rotating gradient border on the start button; runs only while the VPN
     // is stopped to draw attention to the call-to-action. Cleared in
-    // onDestroyView().
+    // onPause() and onDestroyView().
     private var rotationAnimator: ValueAnimator? = null
 
     // Active-state presentation captured once per view (in px / drawable)
@@ -191,6 +191,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // last state emitted by LogActivityAggregator; kept so the toggle can
     // re-render without waiting for a new emission
     private var lastActivityState: LogActivityState? = null
+    // intensity levels of the last rendered activity wall, and the display
+    // mode it was rendered for; used to skip rebuilding the 144-cell grid
+    // when a published snapshot does not change the rendered output
+    private var lastGridSignature: IntArray? = null
+    private var lastGridSignatureMode: ActivityDisplayMode? = null
 
     // last tap coordinates on the activity grid, used to resolve the exact
     // cell (row == hour, column == day) the user tapped; zeroed on
@@ -264,14 +269,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // animated border ring around the start button (VPN-off call-to-action)
         private const val BORDER_STROKE_WIDTH_DP = 2.5f
-        // duration of one full swing across the contrast color band; the ring
-        // spins fast until the first swing completes, then settles slower
+        // duration of one full 360° sweep of the rainbow hue wheel
         private const val BORDER_HUE_CYCLE_MS = 3000L
-        // half-width of the hue band around the complementary hue, so the
-        // highlight stays on the contrasting side of the wheel
-        private const val BORDER_HUE_SWING_DEG = 30f
-        private const val BORDER_FAST_ROTATION_MS = 1200L
-        private const val BORDER_SLOW_ROTATION_MS = 3000L
+        // duration of one full ring turn; rotation runs at this constant pace
+        // for the lifetime of the animation (no fast/slow phases)
+        private const val BORDER_ROTATION_MS = 4000L
 
         // UI interaction delays (milliseconds)
         private const val UI_DELAY_MS = 500L
@@ -669,6 +671,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             syncDnsStatus()
             handleRethinkAppStatus()
             handleShimmer()
+            startTrafficStats()
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
@@ -732,15 +735,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * pill drawable whose sweep-gradient highlight rotates via its shader
      * matrix, so only the border moves — never the shape.
      *
-     * The highlight color stays inside the complementary band of the button's
-     * own accent (accentGood), resolved from the active theme: hues near the
-     * fill color would blend into the button, while the opposite side of the
-     * wheel always contrasts. The hue swings smoothly across that band while
-     * the ring spins fast; once the first color swing completes, the rotation
-     * settles to a slower, calmer pace.
+     * The highlight traverses the entire hue wheel at a constant rate,
+     * producing a rainbow cycle; it starts from the hue opposite the button's
+     * fill color (accentGood) so the first frame always contrasts. The ring
+     * itself rotates at one fixed speed for the animation's lifetime — there
+     * are no fast or slow phases.
      */
     private fun startBorderAnimation() {
         val ctx = context ?: return
+        val root = view
+        if (root == null || !root.isShown) return
         val borderView = b.fhsAnimatedBorderView
         borderView.isVisible = true
 
@@ -756,7 +760,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
 
         if (rotationAnimator?.isRunning == true) return
-        // center of the contrast band: the hue directly opposite the fill
+        // rainbow starts opposite the fill color so the first frame contrasts
         val hsv = FloatArray(3)
         Color.colorToHSV(UIUtils.fetchColor(ctx, R.attr.accentGood), hsv)
         val contrastHue = (hsv[0] + 180f) % 360f
@@ -769,14 +773,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener { anim ->
                 val elapsed = SystemClock.elapsedRealtime() - startElapsedMs
-                // triangle wave: sweep to one edge of the band and back
+                // linear sweep across the full hue wheel per cycle
                 val frac =
                     (elapsed % BORDER_HUE_CYCLE_MS).toFloat() / BORDER_HUE_CYCLE_MS
-                val swing = if (frac <= 0.5f) frac * 2f else 2f - frac * 2f
-                drawable.setHighlightHue(contrastHue + swing * BORDER_HUE_SWING_DEG)
-                // negated so the highlight travels counterclockwise
-                drawable.rotation = -borderRotationFor(elapsed)
-                borderView.invalidate()
+                // single combined update: one color-table/shader rebuild and
+                // one invalidation per frame instead of one per property
+                // (negated so the highlight travels counterclockwise)
+                drawable.setHighlightHueAndRotation(
+                    contrastHue + frac * 360f,
+                    -borderRotationFor(elapsed)
+                )
             }
             start()
         }
@@ -784,17 +790,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Ring rotation for a given elapsed time: one turn per [BORDER_FAST_ROTATION_MS]
-     * during the first hue cycle, then one turn per [BORDER_SLOW_ROTATION_MS].
+     * Ring rotation for a given elapsed time: one turn per [BORDER_ROTATION_MS],
+     * at a constant pace for the animation's lifetime.
      */
-    private fun borderRotationFor(elapsedMs: Long): Float {
-        val fastTurns = BORDER_HUE_CYCLE_MS.toFloat() / BORDER_FAST_ROTATION_MS
-        if (elapsedMs <= BORDER_HUE_CYCLE_MS) {
-            return (elapsedMs.toFloat() / BORDER_FAST_ROTATION_MS) * 360f
-        }
-        val slowMs = elapsedMs - BORDER_HUE_CYCLE_MS
-        return (fastTurns + slowMs.toFloat() / BORDER_SLOW_ROTATION_MS) * 360f
-    }
+    private fun borderRotationFor(elapsedMs: Long): Float =
+        (elapsedMs.toFloat() / BORDER_ROTATION_MS) * 360f
 
     private fun stopBorderAnimation() {
         rotationAnimator?.cancel()
@@ -1132,7 +1132,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     // counts are pending, but the RPN stopped flag is
                     // independent of them
                     val stoppedCount =
-                        if (isRpnStoppedEarly()) RpnProxyManager.getEnabledConfigs().size else 0
+                        (if (isRpnStoppedEarly()) RpnProxyManager.getEnabledConfigs().size else 0) +
+                            getStoppedWgCount()
                     uiCtx {
                         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_checking))
@@ -1161,11 +1162,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 val isBoth = proxies.isNotEmpty() && rpnProxies.isNotEmpty()
 
-                // The "Stopped" slot tracks the RPN alone: while the RPN is
-                // not routing (soft-stopped), every selected RPN server counts
-                // as stopped — even while WireGuard is up.
                 val isRpnStopped = RpnProxyManager.hasValidSubscription() && !RpnProxyManager.isRpnActive()
-                val stoppedCount = if (isRpnStopped) RpnProxyManager.getEnabledConfigs().size else 0
+                val rpnStoppedCount = if (isRpnStopped) RpnProxyManager.getEnabledConfigs().size else 0
+                val stoppedCount = getStoppedWgCount() + rpnStoppedCount
 
                 uiCtx {
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
@@ -1189,6 +1188,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     if (isBoth) {
                         b.fhsCardOtherProxyCount.isSelected = true
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.two_argument, getString(R.string.rpn_title), getString(R.string.lbl_wireguard)))
+                    } else if (rpnProxies.isNotEmpty()) {
+                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.rpn_title))
+                    } else if (proxies.isNotEmpty()) {
+                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_wireguard))
                     } else {
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
@@ -1210,7 +1213,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return
             }
             b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-            b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
+            val headline =
+                if (RpnProxyManager.isRpnActive() && !appConfig.isProxyEnabled()) {
+                    getString(R.string.rpn_title)
+                } else {
+                    getString(resId)
+                }
+            b.fhsCardOtherProxyCount.setTextAnimated(headline)
         }
     }
 
@@ -1491,7 +1500,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /**
-     * Shows/hides the RPN-only "Stopped" slot (legend column + bar segment).
+     * Shows/hides the "Stopped" slot (legend column + bar segment).
      * Both views toggle together so the remaining bars keep equal widths.
      */
     private fun updateStoppedSlot(show: Boolean) {
@@ -1501,14 +1510,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsProxyStoppedColumn.isVisible = show
     }
 
-    /**
-     * The "Stopped" slot appears only when RPN is part of the proxy card:
-     * while RPN is routing, or when RPN is stopped but the subscription is
-     * still valid (so the slot can flag "stopped"). It never shows for
-     * WireGuard-only or plain SOCKS5/HTTP proxies.
-     */
+    private fun getStoppedWgCount(): Int {
+        if (WireguardManager.getActiveWgCount() == 0) return 0
+        val stopped = WireguardManager.getNumberOfMappings() - WireguardManager.getActiveWgCount()
+        return stopped.coerceAtLeast(0)
+    }
+
     private fun isStoppedSlotVisible(): Boolean {
-        return RpnProxyManager.isRpnActive() || RpnProxyManager.hasValidSubscription()
+        return RpnProxyManager.isRpnActive() ||
+            RpnProxyManager.hasValidSubscription() ||
+            getStoppedWgCount() > 0
     }
 
     /** True when a valid RPN subscription exists but RPN is not routing. */
@@ -1524,7 +1535,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // re-render from the cached aggregate only; the toggle must not
         // trigger another database query
-        lastActivityState?.let { buildLogsHeatmap(it, mode) }
+        lastActivityState?.let { buildLogsHeatmap(it, mode, force = true) }
     }
 
     /**
@@ -1994,7 +2005,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun observeLogActivity() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            // RESUMED (not STARTED): each published snapshot rebuilds the
+            // heatmap grid, which must not happen while another screen covers
+            // this fragment but has not stopped it. The StateFlow replays the
+            // latest snapshot on resume, so nothing is lost.
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 activityAggregator.activity.collect { state ->
                     lastActivityState = state
                     buildLogsHeatmap(state, displayMode)
@@ -2030,10 +2045,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun buildLogsHeatmap(
         state: LogActivityState,
-        mode: ActivityDisplayMode = displayMode
+        mode: ActivityDisplayMode = displayMode,
+        force: Boolean = false
     ) {
         renderLogsHourAxisLabels()
         val grid = logsPage.fhsLogsGrid
+
+        // the aggregator publishes an immutable snapshot even when the
+        // rendered wall is unchanged (counts may shift within a log level);
+        // rebuilding the grid is expensive (removal + 144 view/drawable
+        // allocations), so skip it when the rendered output would be
+        // identical and only refresh the header counts
+        val signature = gridSignature(state, mode)
+        if (!force && mode == lastGridSignatureMode && signature.contentEquals(lastGridSignature)) {
+            renderLogsHeaderCount(state)
+            return
+        }
+        lastGridSignature = signature
+        lastGridSignatureMode = mode
+
         grid.removeAllViews()
 
         val ctx = context ?: return
@@ -2194,6 +2224,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun intensityLevel(count: Long): Int {
         if (count <= 0L) return 0
         return minOf(alphasMaxIndex(), log10(count.toDouble()).toInt() + 1)
+    }
+
+    // rendered-output fingerprint of the wall for [mode]: the log intensity
+    // level of every bucket; two states with the same signature draw the
+    // exact same grid
+    private fun gridSignature(state: LogActivityState, mode: ActivityDisplayMode): IntArray {
+        val blockedMode = mode == ActivityDisplayMode.BLOCKED
+        return IntArray(LogActivityAggregator.TOTAL_SLOTS) { i ->
+            val interval = state.intervals[i]
+            intensityLevel(if (blockedMode) interval.blocked else interval.allowed)
+        }
     }
 
     private fun alphasMaxIndex(): Int = HEATMAP_INTENSITY_LEVELS - 1
@@ -2412,8 +2453,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsLogsEnableChip.visibility = View.GONE
 
         // render immediately from the cached aggregate so the header counts
-        // are not blank until the next aggregator emission
-        lastActivityState?.let { buildLogsHeatmap(it, displayMode) }
+        // are not blank until the next aggregator emission; force is needed
+        // because the grid was torn down with the card and must be rebuilt
+        // even if the rendered output is unchanged
+        lastActivityState?.let { buildLogsHeatmap(it, displayMode, force = true) }
     }
 
     /**
@@ -2614,9 +2657,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         b.fhsAppsLabel.visibility = View.VISIBLE
                         b.fhsCardAppsAllApps.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_slash), allApps.toString())
                         b.fhsCardAppsBlockedCount.text = getString(R.string.two_argument_space, blockedCount.toString(), getString(R.string.lbl_blocked).lowercase())
+                        b.fhsCardAppsBlockedCount.isSelected = true
                         b.fhsCardAppsIsolatedCount.text = getString(R.string.two_argument_space, isolatedCount.toString(), getString(R.string.fapps_firewall_filter_isolate).lowercase())
+                        b.fhsCardAppsIsolatedCount.isSelected = true
                         b.fhsCardAppsBypassedCount.text = getString(R.string.two_argument_space, bypassCount.toString(), getString(R.string.fapps_firewall_filter_bypass_universal).lowercase())
+                        b.fhsCardAppsBypassedCount.isSelected = true
                         b.fhsCardAppsExcludedCount.text = getString(R.string.two_argument_space, excludedCount.toString(), getString(R.string.fapps_firewall_filter_excluded).lowercase())
+                        b.fhsCardAppsExcludedCount.isSelected = true
                     }
                 } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                     Logger.e(
@@ -2788,6 +2835,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         handleShimmer()
         maybeAutoStartVpn()
         updateCardsUi()
+        refreshTopAppsHistogram(force = true)
         syncDnsStatus()
         handleLockdownModeIfNeeded()
         startTrafficStats()
@@ -2830,12 +2878,24 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // onResume() restarts this ticker; cancel the previous job first so
         // multiple tickers never stack up
         stopTrafficStats()
+        // traffic-rate and protocol values only exist while the VPN tunnels
+        // traffic; with the VPN off show a static placeholder instead of
+        // polling TrafficStats every 5 s
+        if (!isVpnActivated) {
+            showTrafficPlaceholder()
+            return
+        }
         trafficStatsTicker =
             ui("trafficStatsTicker") {
                 var counter = 0
                 while (true) {
                     // make it as 3 options and add the protos
                     if (!isAdded) return@ui
+
+                    if (!isVpnActivated) {
+                        showTrafficPlaceholder()
+                        return@ui
+                    }
 
                     if (counter % TRAFFIC_DISPLAY_CYCLE_MODULO == TRAFFIC_DISPLAY_STATS_RATE) {
                         displayTrafficStatsRate()
@@ -2851,9 +2911,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
     }
 
+    /**
+     * Static VPN-off state for the throughput card: both labels carry a
+     * neutral placeholder so the card never looks broken, without any
+     * recurring updates while the VPN is not running.
+     */
+    private fun showTrafficPlaceholder() {
+        if (view == null || !isAdded) return
+        txRx = TxRx()
+        b.fhsInternetSpeed.text = getString(R.string.lbl_inactive)
+        b.fhsInternetSpeedUnit.text = ""
+    }
+
     private fun displayProtos() {
-        b.fhsInternetSpeed.visibility = View.VISIBLE
-        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text = VpnController.protocols()
         b.fhsInternetSpeedUnit.text = getString(R.string.lbl_protos)
         // refresh the active-since label on the protection bar as well
@@ -2888,8 +2958,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun displayTrafficStatsBW() {
         val txRx = convertToCommonUnit(txRx.tx, txRx.rx)
 
-        b.fhsInternetSpeed.visibility = View.VISIBLE
-        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text =
             getString(
                 R.string.two_argument_space,
@@ -2938,8 +3006,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val rx = curr.rx - txRx.rx
         txRx = curr
         val txRx = convertToCommonUnit(tx/dur, rx/dur)
-        b.fhsInternetSpeed.visibility = View.VISIBLE
-        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text =
             getString(
                 R.string.two_argument_space,
@@ -3051,10 +3117,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onPause() {
         super.onPause()
+        stopBorderAnimation()
         stopShimmer()
         stopTrafficStats()
         proxyStateListenerJob?.cancel()
         dnsStateListenerJob?.cancel()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            stopBorderAnimation()
+            stopTrafficStats()
+        } else {
+            updateMainButtonUi()
+            startTrafficStats()
+        }
     }
 
     override fun onDestroyView() {
@@ -3064,6 +3142,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         proxyStatusLiveData = null
         dnsObserverActive = false
         stopBorderAnimation()
+        lastGridSignature = null
+        lastGridSignatureMode = null
         // ViewPager2 keeps a global reference to its callback; unregistering
         // here prevents it from outliving the (recreated) view
         logsPagerCallback?.let { b.fhsLogsPager.unregisterOnPageChangeCallback(it) }

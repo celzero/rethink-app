@@ -74,7 +74,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_stall_no_nw_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -140,7 +140,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_allow_bypass_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -215,7 +215,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_lan_traffic_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -279,7 +279,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_all_network_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -343,7 +343,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_tunnel_metered_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -408,7 +408,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_mobile_metered_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -472,7 +472,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_r_in_r_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -538,7 +538,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_default_dns_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -604,7 +604,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_vpn_process_policy_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -689,7 +689,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_exclude_proxy_apps_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -753,7 +753,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_wg_listen_port_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -817,7 +817,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_wg_allow_incoming_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -883,7 +883,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_wg_lockdown_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -948,7 +948,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_flood_wg_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1012,7 +1012,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_wg_smart_persistent_keepalive_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1099,7 +1099,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_tcp_keep_alive_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1164,7 +1164,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_eimf_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1228,7 +1228,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_timeout_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1321,7 +1321,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_use_max_mtu_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1386,7 +1386,7 @@
 
                 <RelativeLayout
                     android:id="@+id/dv_socket_buffer_size_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1479,7 +1479,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_ip_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1546,7 +1546,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_ptrans_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1613,7 +1613,7 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_activity_connectivity_checks_rl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
@@ -1700,7 +1700,7 @@
 
                     <RelativeLayout
                         android:id="@+id/settings_custom_lan_ip_rl"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?android:attr/selectableItemBackground"
                         android:paddingTop="15dp"

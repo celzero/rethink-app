@@ -38,6 +38,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
+import com.celzero.bravedns.service.LogActivityAggregator
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
@@ -72,6 +73,7 @@ class ConnectionTrackerFragment :
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val rethinkLogRepository by inject<RethinkLogRepository>()
     private val persistentState by inject<PersistentState>()
+    private val logActivityAggregator by inject<LogActivityAggregator>()
 
     private var fromWireGuardScreen: Boolean = false
     private var fromRpnScreen: Boolean = false
@@ -482,6 +484,8 @@ class ConnectionTrackerFragment :
                         if (MERGE_RETHINK_LOGS) {
                             rethinkLogRepository.clearLogsByRule(rule)
                         }
+                        // rebuild the home-screen activity wall
+                        logActivityAggregator.forceRestoreFromDatabase()
                     }
                 }
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
@@ -499,6 +503,8 @@ class ConnectionTrackerFragment :
                         if (MERGE_RETHINK_LOGS) {
                             rethinkLogRepository.clearAllData()
                         }
+                        // rebuild the home-screen activity wall
+                        logActivityAggregator.forceRestoreFromDatabase()
                     }
                 }
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }

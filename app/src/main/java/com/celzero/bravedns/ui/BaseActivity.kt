@@ -21,11 +21,13 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.FrameLayout
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -89,6 +91,7 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
         if (Utilities.isAlphaBuild()) {
             applyAlphaThemeOverlay()
         }
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         // Android 15 (API 35) enforces edge-to-edge — the system no longer draws a scrim
         // behind the status bar, so the app must declare whether icons should be dark or
@@ -98,7 +101,8 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        applyMaxContentWidth()
+        // applyMaxContentWidth()
+        TextSelectionGuard.apply(findViewById(android.R.id.content))
     }
 
     /**

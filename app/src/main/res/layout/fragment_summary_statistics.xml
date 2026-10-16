@@ -22,10 +22,10 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingTop="15dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp">
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="8dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -39,13 +39,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:alpha="0.5"
-                        android:text="@string/app_name_small_case" />
+                        android:text="@string/app_name_small_case"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="14sp"
+                        app:autoSizeMaxTextSize="@dimen/rethink_header_text" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.SubHeading.HomeScreen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:alpha="0.5"
+                        android:paddingTop="2dp"
                         android:text="@string/about_title_desc" />
 
                 </LinearLayout>

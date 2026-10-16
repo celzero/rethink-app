@@ -23,6 +23,7 @@ import com.celzero.bravedns.database.RpnProxy
 import com.celzero.bravedns.database.RpnProxyRepository
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.iab.BillingBackendClient
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
@@ -77,6 +78,7 @@ class RpnProxyManagerTest : KoinTest {
     private val mockPersistentState: PersistentState = mockk(relaxed = true)
     private val mockBillingBackendClient: BillingBackendClient = mockk(relaxed = true)
     private val mockSubscriptionStatusDb: SubscriptionStatusRepository = mockk(relaxed = true)
+    private val mockAppConfig: AppConfig = mockk(relaxed = true)
     private lateinit var mockStateMachine: SubscriptionStateMachineV2
 
     private val stateFlow = MutableStateFlow<SubscriptionStateMachineV2.SubscriptionState>(SubscriptionStateMachineV2.SubscriptionState.Initial)
@@ -96,11 +98,14 @@ class RpnProxyManagerTest : KoinTest {
                 single { mockBillingBackendClient }
                 single { mockSubscriptionStatusDb }
                 single { mockStateMachine }
+                single { mockAppConfig }
             })
         }
 
         mockkObject(VpnController)
         mockkObject(InAppBillingHandler)
+        // The real handler posts UI on the main dispatcher, which never runs under runTest.
+        coEvery { InAppBillingHandler.handleUnauthorized401(any(), any(), any()) } just Runs
         mockkObject(EncryptedFileManager)
         mockkObject(ProxyManager)
         mockkObject(IpRulesManager)
@@ -118,6 +123,7 @@ class RpnProxyManagerTest : KoinTest {
         setStaticFinalField(RpnProxyManager::class.java, "billingBackendClient\$delegate", lazyOf(mockBillingBackendClient))
         setStaticFinalField(RpnProxyManager::class.java, "subscriptionStatusRepository\$delegate", lazyOf(mockSubscriptionStatusDb))
         setStaticFinalField(RpnProxyManager::class.java, "subscriptionStateMachine\$delegate", lazyOf(mockStateMachine))
+        setStaticFinalField(RpnProxyManager::class.java, "appConfig\$delegate", lazyOf(mockAppConfig))
 
         // Safely clear cache
         try {
@@ -362,7 +368,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns updatedPurchase
         coEvery { mockSubscriptionStatusDb.updateDeveloperPayload(any(), any(), any()) } returns 1
         every { mockStateMachine.getSubscriptionData() } returns null
@@ -411,7 +417,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } throws RuntimeException("Server error")
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { token() } returns "db-token"
@@ -444,7 +450,7 @@ class RpnProxyManagerTest : KoinTest {
 
         every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
         every { mockStateMachine.hasValidSubscription() } returns true
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns updatedPurchase
         every { mockStateMachine.getSubscriptionData() } returns subData
         coEvery { mockSubscriptionStatusDb.updateDeveloperPayload(any(), any(), any()) } returns 1
@@ -973,7 +979,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns mockk {
             coEvery { expiry() } returns futureIso
         }
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
 
         val expiry = RpnProxyManager.getExpiryFromPayload(payload)
         assertNotNull(expiry)
@@ -1105,14 +1111,51 @@ class RpnProxyManagerTest : KoinTest {
 
     @Test
     fun `updateCancelledSubscription success handles cancellation`() = runTest {
+        // updateCancelledSubscription verifies the DB row actually reflects the
+        // cancellation (rather than assuming the state machine event was applied),
+        // so the post-event row must reflect a terminal (cancelled) state.
+        coEvery { mockSubscriptionStatusDb.getByPurchaseToken("tok-1") } returns SubscriptionStatus().apply {
+            purchaseToken = "tok-1"
+            status = SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id
+        }
+
         val result = RpnProxyManager.updateCancelledSubscription("acc-1", "tok-1")
         assertTrue(result)
     }
 
     @Test
+    fun `updateCancelledSubscription returns false when db row not cancelled`() = runTest {
+        // e.g. the state machine dropped the event because no transition matched
+        // the current state - the caller must not falsely report success.
+        coEvery { mockSubscriptionStatusDb.getByPurchaseToken("tok-1") } returns SubscriptionStatus().apply {
+            purchaseToken = "tok-1"
+            status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+        }
+
+        val result = RpnProxyManager.updateCancelledSubscription("acc-1", "tok-1")
+        assertFalse(result)
+    }
+
+    @Test
     fun `updateRevokedSubscription success handles revocation`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getByPurchaseToken("tok-1") } returns SubscriptionStatus().apply {
+            purchaseToken = "tok-1"
+            status = SubscriptionStatus.SubscriptionState.STATE_REVOKED.id
+        }
+
         val result = RpnProxyManager.updateRevokedSubscription("acc-1", "tok-1")
         assertTrue(result)
+    }
+
+    @Test
+    fun `updateRevokedSubscription returns false when db row not revoked`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getByPurchaseToken("tok-1") } returns SubscriptionStatus().apply {
+            purchaseToken = "tok-1"
+            status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+        }
+
+        val result = RpnProxyManager.updateRevokedSubscription("acc-1", "tok-1")
+        assertFalse(result)
     }
 
     // =========================================================================
@@ -1185,7 +1228,7 @@ class RpnProxyManagerTest : KoinTest {
             lastUpdated = System.currentTimeMillis()
         )
         every { mockStateMachine.getSubscriptionData() } returns subData
-        coEvery { mockBillingBackendClient.getDeviceId() } returns "did-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
         every { mockPersistentState.appTestMode } returns false
 
         RpnProxyManager.consumePurchaseIfTest()
@@ -1200,6 +1243,7 @@ class RpnProxyManagerTest : KoinTest {
     @Test
     fun `matchesSsidList empty list matches all`() {
         assertTrue(RpnProxyManager.matchesSsidList("", "MyWiFi"))
+        assertTrue(RpnProxyManager.matchesSsidList("[]", ""))
     }
 
     @Test
@@ -1356,6 +1400,87 @@ class RpnProxyManagerTest : KoinTest {
     fun `DnsMode tunTypesFromSet empty returns default`() {
         val csv = RpnProxyManager.DnsMode.tunTypesFromSet(emptySet())
         assertEquals("default", csv)
+    }
+
+    // =========================================================================
+    // 21. Restore Defaults — identity recovery (resetAndRefetchRpn)
+    // =========================================================================
+
+    /** Active-looking subscription row with the identifiers resetAndRefetchRpn requires. */
+    private fun makeResetSubRow() = SubscriptionStatus().apply {
+        id = 1
+        purchaseToken = "tok-reset"
+        productId = "standard.tier"
+        planId = "standard.tier"
+        accountId = "acc-reset-1234"
+        status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id
+        billingExpiry = System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L
+        lastUpdatedTs = System.currentTimeMillis()
+    }
+
+    /**
+     * R11a: when no DID is bound to the purchase cid, Restore Defaults must fail fast
+     * with a device-registration reason and must NOT proceed to the entitlement query
+     * with a missing DID (identity reconciliation happens at purchase time, not here).
+     */
+    @Test
+    fun `resetAndRefetchRpn missing bound DID fails fast without entitlement query`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns ""
+
+        val result = RpnProxyManager.resetAndRefetchRpn()
+
+        assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
+        val reason = (result as RpnProxyManager.ResetResult.Failure).reason
+        assertTrue("reason should mention device registration: $reason", reason.contains("device registration", ignoreCase = true))
+        // Must not query entitlement without a DID
+        coVerify(exactly = 0) { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) }
+    }
+
+    /**
+     * R11b: a DID is bound to the purchase cid but the entitlement query still returns
+     * 401 — Restore Defaults must surface an authorization failure instead of
+     * queryEntitlementFromServer's silent "return the original purchase" (which
+     * produced a stale-payload fake success).
+     */
+    @Test
+    fun `resetAndRefetchRpn entitlement 401 surfaces auth failure not fake success`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Unauthorized("acc-reset-1234", "did-fresh-123")
+
+        val result = RpnProxyManager.resetAndRefetchRpn()
+
+        assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
+        val reason = (result as RpnProxyManager.ResetResult.Failure).reason
+        assertTrue("reason should mention authorization: $reason", reason.contains("authorization", ignoreCase = true))
+        // The wrapper that collapses 401 into "unchanged purchase" must not be used here
+        coVerify(exactly = 0) {
+            InAppBillingHandler.queryEntitlementFromServer(any(), any(), any())
+        }
+        // The 401 must reach the shared auth-error funnel (UI surfacing + identity recovery)
+        coVerify(exactly = 1) {
+            InAppBillingHandler.handleUnauthorized401(any(), any(), any())
+        }
+    }
+
+    /**
+     * R11c: DID bound, entitlement Success but an empty payload — the explicit
+     * payload guard still fails the reset (no empty-entitlement WIN registration).
+     */
+    @Test
+    fun `resetAndRefetchRpn empty payload fails explicitly`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = ""))
+
+        val result = RpnProxyManager.resetAndRefetchRpn()
+
+        assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
+        val reason = (result as RpnProxyManager.ResetResult.Failure).reason
+        assertTrue("reason should mention empty entitlement: $reason", reason.contains("empty entitlement", ignoreCase = true))
     }
 
     // =========================================================================

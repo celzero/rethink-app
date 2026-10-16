@@ -151,6 +151,15 @@ object WireguardManager : KoinComponent {
                 configs.add(c)
             }
         }
+        // Recovery path above (and any other non-disableConfig deactivation) can leave the
+        // persisted proxy provider stuck at WIREGUARD with no config actually active; clear it
+        // so the proxy card and related UI do not report a WireGuard that is not running.
+        if (mappings.none { it.isActive } &&
+            AppConfig.ProxyProvider.WIREGUARD.name == appConfig.getProxyProvider()
+        ) {
+            Logger.w(LOG_TAG_PROXY, "no active wg configs but provider is WIREGUARD; resetting proxy provider")
+            appConfig.removeProxy(AppConfig.ProxyType.WIREGUARD, AppConfig.ProxyProvider.WIREGUARD)
+        }
         configs.size
     }
 
@@ -402,10 +411,11 @@ object WireguardManager : KoinComponent {
                 if (active.getId() == id) return@any false
                 val activePrivateKey =
                     active.getInterface()?.getKeyPair()?.getPrivateKey()?.base64()
-                if (privateKey != null && activePrivateKey == privateKey) return@any true
+                val privateKeyMatches = privateKey != null && activePrivateKey == privateKey
                 val activePeerKeys =
                     active.getPeers()?.map { it.getPublicKey().base64() }?.toSet() ?: emptySet()
-                peerKeys.any { it in activePeerKeys }
+                val peerKeyMatches = peerKeys.any { it in activePeerKeys }
+                privateKeyMatches && peerKeyMatches
             }
             if (duplicate) {
                 Logger.i(

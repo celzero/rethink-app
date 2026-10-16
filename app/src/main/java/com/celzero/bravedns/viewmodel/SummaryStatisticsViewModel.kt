@@ -74,6 +74,8 @@ class SummaryStatisticsViewModel(
         return timeCategory
     }
 
+    fun getStartTime(): Long = checkNotNull(startTime.value)
+
     fun setLoadMoreClicked(b: Boolean) {
         loadMoreClicked = b
         // initialise the live data to trigger the switchMap

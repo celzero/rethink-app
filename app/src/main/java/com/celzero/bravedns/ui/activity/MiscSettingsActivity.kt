@@ -15,10 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
-import com.celzero.bravedns.util.Logger.updateConfigLevel
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
@@ -30,21 +26,15 @@ import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.provider.Settings
-import android.text.InputType
-import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -70,12 +60,18 @@ import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.PcapFilesBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.TaskerAutomationBottomSheet
 import com.celzero.bravedns.util.BubbleHelper
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.LogLifespan
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.updateConfigLevel
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.SnackbarHelper
@@ -106,7 +102,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
+class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
+    PcapFilesBottomSheet.PcapModeSelectListener {
     private val b by viewBinding(ActivityMiscSettingsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -224,9 +221,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
 
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
-        // set log level name in the  description
+        // set log level name in the  description; usr is never shown, it is
+        // displayed as none (same mapping as the log level dialog)
+        val goLogLevel = persistentState.goLoggerLevel.toInt()
+        val goLogLevelDisplay =
+            if (goLogLevel == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else goLogLevel
         b.genSettingsGoLogDesc.text =
-            Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())?.name?.lowercase()
+            Logger.LoggerLevel.fromId(goLogLevelDisplay)?.name?.lowercase()
                 ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
         // set log lifespan name in the description
         b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
@@ -446,43 +447,27 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
-        val items =
-            arrayOf(
-                getString(R.string.settings_pcap_dialog_option_1),
-                getString(R.string.settings_pcap_dialog_option_2),
-                getString(R.string.settings_pcap_dialog_option_3),
-            )
-        val checkedItem = persistentState.pcapMode
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            dialog.dismiss()
-            if (persistentState.pcapMode == which) {
-                return@setSingleChoiceItems
+        val sheet = PcapFilesBottomSheet()
+        sheet.modeSelectListener = this
+        sheet.show(supportFragmentManager, PcapFilesBottomSheet::class.java.simpleName)
+    }
+
+    override fun onPcapModeSelected(mode: PcapMode) {
+        when (mode) {
+            PcapMode.NONE -> {
+                appConfig.setPcap(PcapMode.NONE.id)
             }
 
-            when (PcapMode.getPcapType(which)) {
-                PcapMode.NONE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_1)
-                    appConfig.setPcap(PcapMode.NONE.id)
-                }
-
-                PcapMode.LOGCAT -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_2)
-                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
-                }
-
-                PcapMode.EXTERNAL_FILE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_3)
-                    createAndSetPcapFile()
-                }
+            PcapMode.LOGCAT -> {
+                appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
             }
-            logEvent("PCAP mode set to ${PcapMode.getPcapType(which)}")
+
+            PcapMode.EXTERNAL_FILE -> {
+                createAndSetPcapFile()
+            }
         }
-        alertBuilder.create().show()
+        logEvent("PCAP mode set to $mode")
+        displayPcapUi()
     }
 
     private fun displayAppThemeUi() {
@@ -674,10 +659,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
         }
 
         b.settingsTaskerRl.setOnClickListener {
-            showAppTriggerPackageDialog(this , onPackageSet = { packageName ->
-                persistentState.appTriggerPackages = packageName
-                logEvent("App trigger package set to $packageName")
-            })
+            showTaskerAutomationBottomSheet()
         }
 
         b.settingsIpInfoRl.setOnClickListener {
@@ -813,7 +795,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             workScheduler.schedulePurgeConnectionsLog()
             val selectedItem = items[which]
             b.genSettingsLogLifespanDesc.text = selectedItem
-            logEvent("Log lifespan set to ${selectedItem}")
+            logEvent("Log lifespan set to $selectedItem")
 
         }
 
@@ -843,7 +825,8 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
             }
 
             persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), includeFileTrace = persistentState.includeFileTrace)
+            Logger.uiLogLevel = which.toLong()
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt(), Logger.uiLogLevel.toInt(), persistentState.includeFileTrace)
             updateConfigLevel(persistentState.goLoggerLevel)
             val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel)?.name?.lowercase()
@@ -1024,6 +1007,17 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
           bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
       }
 
+      private fun showTaskerAutomationBottomSheet() {
+          if (this.isFinishing || this.isDestroyed) {
+              Logger.w(LOG_TAG_UI, "err opening tasker btmsheet, activity is destroyed")
+              return
+          }
+
+          val bottomSheetFragment = TaskerAutomationBottomSheet()
+          bottomSheetFragment.show(this.supportFragmentManager, TaskerAutomationBottomSheet.TAG)
+          logEvent("Tasker automation bottom sheet opened")
+      }
+
       private fun openConsoleLogActivity() {
           try {
               val intent = Intent(this, ConsoleLogActivity::class.java)
@@ -1032,61 +1026,6 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings) {
               Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
           }
       }
-
-      fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
-          val editText = AppCompatEditText(context).apply {
-              hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
-              inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-              setHorizontallyScrolling(true)
-              if (persistentState.appTriggerPackages.isNotEmpty()) {
-                  setText(persistentState.appTriggerPackages)
-              }
-            setPadding(50, 40, 50, 40)
-            gravity = Gravity.TOP or Gravity.START
-        }
-
-          val selectableTextView = AppCompatTextView(context).apply {
-              text = context.getString(R.string.adv_tasker_dialog_msg)
-              setTextIsSelectable(true)
-              setPadding(50, 40, 50, 0)
-              textSize = 16f
-          }
-
-          val instructionsTextView = AppCompatTextView(context).apply {
-              text = context.getString(R.string.adv_tasker_dialog_instructions)
-              setTextIsSelectable(true)
-              setPadding(50, 40, 50, 0)
-              textSize = 16f
-          }
-
-          // add a LinearLayout as the single child of the ScrollView, then add the text view and
-          // edit text to the LinearLayout.
-          val linearLayout = LinearLayout(context).apply {
-              orientation = LinearLayout.VERTICAL
-              addView(selectableTextView)
-              addView(editText)
-              addView(instructionsTextView)
-          }
-
-          val scrollView = ScrollView(context).apply {
-              setPadding(40, 10, 40, 0)
-              addView(linearLayout)
-          }
-
-          MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
-              .setTitle(context.getString(R.string.adv_taster_title))
-              .setView(scrollView)
-              .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
-                  val pkgName = editText.text.toString().trim()
-                  if (pkgName.isNotEmpty()) {
-                      onPackageSet(pkgName)
-                  }
-                  dialog.dismiss()
-              }
-              .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
-              .show()
-      }
-
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==

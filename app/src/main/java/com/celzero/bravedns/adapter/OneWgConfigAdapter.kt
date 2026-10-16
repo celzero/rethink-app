@@ -49,6 +49,7 @@ import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
+import com.celzero.bravedns.util.StatusTicker
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
@@ -98,9 +99,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        // cancel polling jobs before dropping the lifecycle owner, otherwise the
-        // jobs' own inactivity guard cannot fire (it reads lifecycleOwner)
-        activeHolders.forEach { it.cancelJobIfAny() }
+        statusTicker.cancel()
+        statusHolders.clear()
         activeHolders.clear()
         lifecycleOwner = null
     }
@@ -131,11 +131,50 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         holder.cancelJobIfAny()
     }
 
+    private val statusHolders = mutableListOf<WgInterfaceViewHolder>()
+    private val statusTicker = StatusTicker()
+
+    private fun registerForStatusUpdates(holder: WgInterfaceViewHolder) {
+        if (statusHolders.contains(holder)) return
+        statusHolders.add(holder)
+        if (!ensureStatusTicker()) refreshStatuses()
+    }
+
+    private fun ensureStatusTicker(): Boolean {
+        val owner = lifecycleOwner ?: return false
+        return statusTicker.start(owner.lifecycleScope, DELAY_MS) { refreshStatuses() }
+    }
+
+    private fun refreshStatuses(): Boolean {
+        val iterator = statusHolders.iterator()
+        val active = ArrayList<WgInterfaceViewHolder>()
+        while (iterator.hasNext()) {
+            val holder = iterator.next()
+            val lifecycleActive =
+                lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
+            if (!lifecycleActive || holder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                iterator.remove()
+                continue
+            }
+            active.add(holder)
+        }
+        if (active.isEmpty()) {
+            statusTicker.cancel()
+            return false
+        }
+        io {
+            active.forEach { it.pollStatus() }
+        }
+        return true
+    }
+
     inner class WgInterfaceViewHolder(private val b: ListItemWgOneInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
-        private var job: Job? = null
+
+        private var boundConfig: WgConfigFiles? = null
 
         fun update(config: WgConfigFiles) {
+            boundConfig = config
             b.interfaceNameText.text = config.name
             b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
@@ -146,7 +185,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 updateFlag(null, config.id)
             }
             if (isWgActive) {
-                keepStatusUpdated(config)
+                registerForStatusUpdates(this)
             } else {
                 cancelJobIfAny()
                 disableInterface()
@@ -154,18 +193,15 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         fun cancelJobIfAny() {
-            if (job?.isActive == true) {
-                job?.cancel()
+            statusHolders.remove(this)
+            if (statusHolders.isEmpty()) {
+                statusTicker.cancel()
             }
         }
 
-        private fun keepStatusUpdated(config: WgConfigFiles) {
-            job = io {
-                while (true) {
-                    updateStatus(config)
-                    delay(DELAY_MS.milliseconds)
-                }
-            }
+        suspend fun pollStatus() {
+            val config = boundConfig ?: return
+            updateStatus(config)
         }
 
         private fun updateProtocolChip(pair: Pair<Boolean, Boolean>) {
@@ -197,14 +233,12 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         private suspend fun updateStatus(config: WgConfigFiles) {
-            // if the view is not active then cancel the job
             if (
                 lifecycleOwner
                     ?.lifecycle
                     ?.currentState
                     ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
-                job?.cancel()
                 return
             }
 

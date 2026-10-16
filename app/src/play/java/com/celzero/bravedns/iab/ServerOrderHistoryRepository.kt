@@ -72,10 +72,10 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
                 return Result.NoCredentials
             }
             val accountId = purchase.accountId
-            val deviceId = InAppBillingHandler.getObfuscatedDeviceId()
+            val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
             val purchaseToken = purchase.purchaseToken
-            if (accountId.isBlank() || purchaseToken.isBlank()) {
-                Logger.w(LOG_TAG_UI, "$TAG $mname: accountId or purchaseToken blank")
+            if (accountId.isBlank() || purchaseToken.isBlank() || deviceId.isBlank()) {
+                Logger.w(LOG_TAG_UI, "$TAG $mname: accountId, purchaseToken or deviceId blank")
                 return Result.NoCredentials
             }
 

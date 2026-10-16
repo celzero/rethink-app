@@ -31,6 +31,8 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogRepository
+import com.celzero.bravedns.database.RpnLog
+import com.celzero.bravedns.database.RpnLogRepository
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.ui.activity.AppLockActivity
@@ -40,7 +42,7 @@ import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.LogConsumer
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.io.BufferedOutputStream
 import java.io.FileDescriptor
@@ -73,6 +75,7 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
     // Go logs already pre-batched per [drain] call and the batcher's ~2.5s flush delay +
     // per-line coroutine launches only add latency and dropping logs.
     private val consoleLogRepository by inject<ConsoleLogRepository>()
+    private val rpnLogRepository by inject<RpnLogRepository>()
 
     // Single-thread background dispatcher; all buffer processing is serialized here so
     // prevLogLevel and tombstoneStream need no additional synchronization.
@@ -101,6 +104,9 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
         /** Safety cap: never read more than this per [drain] call. */
         private const val MAX_DRAIN_BYTES = 512 * 1024
 
+        // pending drain backlog; on overflow drain() reports 0 so go-tun re-drains the range
+        private const val DRAIN_QUEUE_CAPACITY = 256
+
         private val NEWLINE_BYTE: Byte = '\n'.code.toByte()
 
         fun getInstance(appContext: Context?, scope: CoroutineScope?, fda: Long, fdb: Long, slotSize: Int): LogConsumer? {
@@ -124,14 +130,50 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
 
     }
 
+    // drain work items; Close keeps tombstone teardown FIFO-ordered after all in-flight drains
+    private sealed interface DrainMsg
+    private class DrainData(val buffer: ByteArray, val bytesRead: Int) : DrainMsg
+    private object DrainClose : DrainMsg
+
+    private val drains = Channel<DrainMsg>(DRAIN_QUEUE_CAPACITY)
+
+    init {
+        // single consumer on the processor dispatcher: all buffer processing and DB flushes
+        // are serialized here in arrival order, no per-drain coroutine launches
+        scope.launch(processor) { consumeDrains() }
+    }
+
+    private suspend fun consumeDrains() {
+        try {
+            for (msg in drains) {
+                when (msg) {
+                    is DrainData -> {
+                        try {
+                            processBuffer(msg.buffer, msg.bytesRead)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            Logger.e(LOG_TAG_BUG_REPORT, "$TAG consumeDrains: processBuffer failed: ${e.message}", e)
+                        }
+                    }
+                    // tombstone teardown is handled by the finally block so it also
+                    // runs when the channel is closed with queued items remaining
+                    DrainClose -> return
+                }
+            }
+        } finally {
+            closeTombstoneStream()
+        }
+    }
+
     /**
      * Called by go-tun when new log data is available in shared memory at [fd][start, end).
      *
      * Copies the bytes via [Os.pread] (non-seeking pread is safe for the ring-buffer pattern),
-     * enqueues the raw [ByteArray] on [processor], and returns immediately.
+     * enqueues the raw [ByteArray] on the drain queue, and returns immediately.
      * Go's goroutine is therefore never blocked by log processing.
      *
-     * @return number of bytes consumed; 0 on any error.
+     * @return number of bytes consumed; 0 on any error (go-tun re-drains the reported range).
      */
     override fun drain(fd: Long, start: Long, end: Long): Long {
         if (end <= start) {
@@ -159,7 +201,11 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
                 Logger.w(LOG_TAG_BUG_REPORT, "$TAG drain: pread returned $bytesRead for fd=$fd")
                 return 0L
             }
-            scope.launch(processor) { processBuffer(buffer, bytesRead) }
+            // queue-full is not a loss: reporting 0 makes go-tun re-drain this range later
+            if (drains.trySend(DrainData(buffer, bytesRead)).isFailure) {
+                Logger.w(LOG_TAG_BUG_REPORT, "$TAG drain: queue full fd=$fd ($start,$end), re-drain expected")
+                return 0L
+            }
             bytesRead.toLong()
         } catch (e: ErrnoException) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG drain: pread errno=${e.errno} fd=$fd ($start,$end): ${e.message}", e)
@@ -172,12 +218,17 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
 
     /**
      * Called by go-tun when the writer is done.
-     * Schedules tombstone-stream teardown on [processor] so it executes after all
-     * in-flight [drain] work has finished (single-thread dispatcher guarantees FIFO order).
+     * Enqueues a Close marker on the drain queue so teardown executes after all in-flight
+     * drain work has finished (single consumer guarantees FIFO order).
      */
     override fun onClose(): Boolean {
         Logger.d(LOG_TAG_BUG_REPORT, "$TAG onClose: scheduling cleanup")
-        scope.launch(processor) { closeTombstoneStream() }
+        if (drains.trySend(DrainClose).isFailure) {
+            // queue full: close the channel so the consumer drains remaining queued
+            // work before exiting and tearing down via its finally block; a direct
+            // teardown task here could race ahead of queued drain processing
+            drains.close()
+        }
         return false
     }
 
@@ -186,15 +237,16 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
      * Trailing bytes that do not form a complete slot are silently discarded
      * guarantees slot alignment so this is only a last-resort safety net.
      */
-    private fun processBuffer(buffer: ByteArray, bytesRead: Int) {
-        val batch = ArrayList<ConsoleLog>(bytesRead / slotSize)
+    private suspend fun processBuffer(buffer: ByteArray, bytesRead: Int) {
+        val consoleBatch = ArrayList<ConsoleLog>(bytesRead / slotSize)
+        val rpnBatch = ArrayList<RpnLog>(bytesRead / slotSize)
         var slotOffset = 0
         while (slotOffset + slotSize <= bytesRead) {
-            val consoleLog = processSlot(buffer, slotOffset)
-            if (consoleLog != null) batch.add(consoleLog)
+            processSlot(buffer, slotOffset, consoleBatch, rpnBatch)
             slotOffset += slotSize
         }
-        if (batch.isNotEmpty()) flushBatch(batch)
+        if (consoleBatch.isNotEmpty()) flushBatch(consoleBatch)
+        if (rpnBatch.isNotEmpty()) flushRpnBatch(rpnBatch)
     }
 
     /**
@@ -206,11 +258,16 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
      *   buffer[NL .. offset+799]   → garbage padding (ignored)
      * ```
      *
-     * @return a [ConsoleLog] row for normal-level slots (may be `null` when filtered out by the
-     *   [Logger.LoggerLevel] UI gate); `null` for stacktrace / user-level slots, whose handling is
-     *   purely side-effectual (tombstone file write / notification + VPN stop).
+     * Normal-level rows are appended to [consoleBatch] or [rpnBatch] depending on whether the
+     * payload is RPN-related; stacktrace / user-level slots are handled purely side-effectually
+     * (tombstone file write / notification + VPN stop) and append nothing.
      */
-    private fun processSlot(buffer: ByteArray, offset: Int): ConsoleLog? {
+    private fun processSlot(
+        buffer: ByteArray,
+        offset: Int,
+        consoleBatch: MutableList<ConsoleLog>,
+        rpnBatch: MutableList<RpnLog>
+    ) {
         // Byte 0: Go level character.
         val levelChar = (buffer[offset].toInt() and 0xFF).toChar()
         val goLevel = Logger.LoggerLevel.fromChar(levelChar)
@@ -243,7 +300,7 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
                 // Write level byte + payload bytes directly no String created.
                 ensureTombstoneStreamReady()
                 writeBytesToTombstone(buffer, offset, newlinePos - offset)
-                return null
+                return
             }
             level.user() -> {
                 // Notification API requires a String; unavoidable.
@@ -252,42 +309,63 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
                 else ""
                 showNwEngineNotification(msg)
                 VpnController.stop("goNotif", appContext, userInitiated = false)
-                return null
+                return
             }
             else -> {
+                val isRpn = Logger.isRpnPayload(buffer, payloadStart, newlinePos)
                 // String created here, on the processor thread, never inside drain().
                 val payload = if (payloadLength > 0)
                     String(buffer, payloadStart, payloadLength, Charsets.UTF_8)
                 else ""
                 // Build the DB row (centralized formatting + uiLogLevel gate live in
-                // Logger.goLog3); the row is collected by processBuffer and bulk-inserted
-                // as one batch, avoiding the per-line NetLogBatcher coroutine + flush delay.
-                return Logger.goLog3(payload, level)
+                // Logger.makeGoConsoleLog / Logger.makeGoRpnLog); RPN-related rows are
+                // collected separately and bulk-inserted into their own database, all
+                // other rows go to the console log database as one batch.
+                if (isRpn) {
+                    Logger.makeGoRpnLog(payload, level, true)?.let { rpnBatch.add(it) }
+                } else {
+                    Logger.makeGoConsoleLog(payload, level, false)?.let { consoleBatch.add(it) }
+                }
             }
         }
     }
 
     /**
-     * Bulk-inserts a batch of normal-level Go log rows into the ConsoleLog DB on an IO dispatcher.
+     * Bulk-inserts a batch of normal-level Go log rows into the ConsoleLog DB.
      *
-     * Unlike the per-line [NetLogBatcher] path used by other console-log sources, Go logs arrive
-     * already grouped per [drain] call, so routing each row through the batcher would only add its
-     * ~2.5s timed flush plus a coroutine launch per line. Room serializes writes on the same DB
+     * Runs inline on the drain consumer (a background thread), so no extra
+     * per-flush Dispatchers.IO launch is needed; Room serializes writes on the same DB
      * connection, so this direct insert stays safe alongside concurrent batcher inserts.
      */
-    private fun flushBatch(batch: List<ConsoleLog>) {
-        io {
-            try {
-                consoleLogRepository.insertBatch(batch)
-            } catch (e: CancellationException) {
+    private suspend fun flushBatch(batch: List<ConsoleLog>) {
+        try {
+            consoleLogRepository.insertBatch(batch)
+        } catch (e: CancellationException) {
             throw e
-            } catch (e: Exception) {
-                Logger.e(
-                    LOG_TAG_BUG_REPORT,
-                    "$TAG flushBatch: insertBatch failed (size=${batch.size}): ${e.message}",
-                    e
-                )
-            }
+        } catch (e: Exception) {
+            Logger.e(
+                LOG_TAG_BUG_REPORT,
+                "$TAG flushBatch: insertBatch failed (size=${batch.size}): ${e.message}",
+                e
+            )
+        }
+    }
+
+    /**
+     * Bulk-inserts a batch of RPN-related Go log rows into the RpnLog DB.
+     * Same rationale as [flushBatch]: Go logs arrive already grouped per [drain] call.
+     */
+    private suspend fun flushRpnBatch(batch: List<RpnLog>) {
+        try {
+            rpnLogRepository.insertBatch(batch)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.e(
+                LOG_TAG_BUG_REPORT,
+                "$TAG flushRpnBatch: insertBatch failed (size=${batch.size}): ${e.message}",
+                e
+            )
         }
     }
 
@@ -382,10 +460,6 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
         builder.color = ContextCompat.getColor(appContext, getAccentColor(Themes.SYSTEM_DEFAULT.id))
         notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "$TAG nw eng notification: $msg")
-    }
-
-    private fun io (fn: suspend CoroutineScope.() -> Unit) {
-        scope.launch(Dispatchers.IO) { fn() }
     }
 }
 

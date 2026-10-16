@@ -19,15 +19,18 @@ import android.content.Context
 
 /** Stub: purchase-conflict notifications are not supported in this build. */
 object PurchaseConflictNotifier {
-    const val EXTRA_ENDPOINT       = "conflict_endpoint"
-    const val EXTRA_OPERATION      = "conflict_operation"
-    const val EXTRA_SERVER_MSG     = "conflict_server_msg"
-    const val EXTRA_ACCOUNT_ID     = "conflict_account_id"
-    const val EXTRA_DEVICE_ID      = "conflict_device_id"
+    const val EXTRA_ENDPOINT = "conflict_endpoint"
+    const val EXTRA_OPERATION = "conflict_operation"
+    const val EXTRA_SERVER_MSG = "conflict_server_msg"
+    const val EXTRA_ACCOUNT_ID = "conflict_account_id"
+    const val EXTRA_DEVICE_ID = "conflict_device_id"
     const val EXTRA_PURCHASE_TOKEN = "conflict_purchase_token"
-    const val EXTRA_SKU            = "conflict_sku"
+    const val EXTRA_SKU = "conflict_sku"
 
     @Suppress("UNUSED_PARAMETER")
     fun cancel(context: Context) { /* no-op */ }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun notify(context: Context, error: ServerApiError.Conflict409, theme: Int) { /* no-op */ }
 }
 

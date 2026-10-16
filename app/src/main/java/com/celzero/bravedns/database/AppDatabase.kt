@@ -58,7 +58,7 @@ import com.celzero.bravedns.util.Constants
         SponsorEntity::class,
         SmartDnsEndpoint::class
     ],
-    version = 35,
+    version = 36,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -186,6 +186,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_32_33)
                 .addMigrations(MIGRATION_33_34)
                 .addMigrations(MIGRATION_34_35)
+                .addMigrations(MIGRATION_35_36)
                 .build()
 
         private val roomCallback: Callback =
@@ -1577,6 +1578,18 @@ abstract class AppDatabase : RoomDatabase() {
                                     "WHERE id = 5 AND dnsCryptName = 'Quad9'"
                         )
                     }
+                }
+            }
+
+        private val MIGRATION_35_36: Migration =
+            object : Migration(35, 36) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "ALTER TABLE CountryConfig ADD COLUMN ipv4 INTEGER NOT NULL DEFAULT 0"
+                    )
+                    db.execSQL(
+                        "ALTER TABLE CountryConfig ADD COLUMN ipv6 INTEGER NOT NULL DEFAULT 0"
+                    )
                 }
             }
 

@@ -30,6 +30,8 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
+import com.celzero.bravedns.database.RpnLog
+import com.celzero.bravedns.database.RpnLogRepository
 import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.NetLogBatcher
 import com.celzero.firestack.backend.DNSSummary
@@ -51,6 +53,7 @@ internal constructor(
     rethinkLogRepository: RethinkLogRepository,
     dnsLogRepository: DnsLogRepository,
     consoleLogRepository: ConsoleLogRepository,
+    rpnLogRepository: RpnLogRepository,
     private val persistentState: PersistentState
 ) : KoinComponent {
 
@@ -60,11 +63,13 @@ internal constructor(
     private val ipdb: IPTracker =
         IPTracker(connectionTrackerRepository, rethinkLogRepository, context)
     private val consoleLogDb: ConsoleLogManager = ConsoleLogManager(consoleLogRepository)
+    private val rpnLogDb: RpnLogManager = RpnLogManager(rpnLogRepository)
 
     private var dnsBatcher: NetLogBatcher<DnsLog, Nothing>? = null
     private var ipBatcher: NetLogBatcher<ConnectionTracker, ConnectionSummary>? = null
     private var rrBatcher: NetLogBatcher<RethinkLog, ConnectionSummary>? = null
     private var consoleLogBatcher: NetLogBatcher<ConsoleLog, Nothing>? = null
+    private var rpnLogBatcher: NetLogBatcher<RpnLog, Nothing>? = null
 
     // dispatch buffer to consumer if greater than batch size for dns, ip and rr logs
     // expected per row size is 100 bytes to 500 bytes, so a batch of 40 rows is around 4KB to 20KB
@@ -103,16 +108,20 @@ internal constructor(
                 )
             val b4 =
                 NetLogBatcher<ConsoleLog, Nothing>("console", consoleLogLooper, consoleLogBatchSize, consoleLogDb::insertBatch)
+            val b5 =
+                NetLogBatcher<RpnLog, Nothing>("rpn", consoleLogLooper, consoleLogBatchSize, rpnLogDb::insertBatch)
 
             b1.begin(s)
             b2.begin(s)
             b3.begin(s)
             b4.begin(s)
+            b5.begin(s)
 
             this.dnsBatcher = b1
             this.ipBatcher = b2
             this.rrBatcher = b3
             this.consoleLogBatcher = b4
+            this.rpnLogBatcher = b5
 
             s.launch(Dispatchers.IO) { monitorCancellation() }
             Log.d(LOG_BATCH_LOGGER, "tracker: restart, $scope")
@@ -136,6 +145,8 @@ internal constructor(
             withContext(consoleLogLooper + NonCancellable) {
                 consoleLogBatcher?.close()
                 consoleLogBatcher = null
+                rpnLogBatcher?.close()
+                rpnLogBatcher = null
                 Logger.d(LOG_BATCH_LOGGER, "tracker: close consoleLogLooper")
             }
         }
@@ -207,6 +218,12 @@ internal constructor(
     fun writeConsoleLog(log: ConsoleLog) {
         serializer("writeConsoleLog", consoleLogLooper) {
             consoleLogBatcher?.add(log)
+        }
+    }
+
+    fun writeRpnLog(log: RpnLog) {
+        serializer("writeRpnLog", consoleLogLooper) {
+            rpnLogBatcher?.add(log)
         }
     }
 

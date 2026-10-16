@@ -250,6 +250,9 @@ class SubscriptionStatusRepository(private val subscriptionStatusDAO: Subscripti
         }
     }
 
+    suspend fun getSubscriptionsByStatesRaw(statuses: List<Int>): List<SubscriptionStatus> =
+        subscriptionStatusDAO.getSubscriptionsByStates(statuses)
+
     /**
      * Get all invalid subscriptions
      */

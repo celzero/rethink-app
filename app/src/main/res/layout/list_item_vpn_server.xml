@@ -309,6 +309,28 @@
 
         </LinearLayout>
 
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_ip_version"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
+            android:layout_marginStart="6dp"
+            android:textColor="?attr/serverChipTextColor"
+            android:textSize="@dimen/small_font_subheading_text"
+            android:visibility="gone"
+            app:chipStrokeColor="?attr/serverChipStrokeColor"
+            app:chipStrokeWidth="1dp"
+            app:chipMinHeight="22dp"
+            app:chipStartPadding="5dp"
+            app:chipEndPadding="5dp"
+            app:chipIconEnabled="false"
+            app:closeIconEnabled="false"
+            app:ensureMinTouchTargetSize="false"
+            app:layout_constraintBottom_toBottomOf="@id/relay_action_container"
+            app:layout_constraintStart_toEndOf="@id/relay_action_container"
+            app:layout_constraintTop_toTopOf="@id/relay_action_container"
+            tools:text="v46"
+            tools:visibility="visible" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

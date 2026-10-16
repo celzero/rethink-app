@@ -30,14 +30,15 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.iab.BillingBackendClient
+import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.DeviceRegistrationGuard
 import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.iab.PrimaryPurchaseResolver
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.RegisterDeviceResult
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker.Companion.INTERVAL_MINUTES
 import com.celzero.bravedns.service.PersistentState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -78,7 +79,7 @@ class RpnProxyUpdateWorker(
         /** Initial back-off delay for retries. */
         private const val BACKOFF_DELAY_MINUTES = 1L
 
-        const val REGISTRATION_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000 //  1 day once
+        const val REGISTRATION_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000L //  1 day once
 
         fun schedule(context: Context) {
             val constraints = Constraints.Builder()
@@ -103,11 +104,11 @@ class RpnProxyUpdateWorker(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE; fresh timer from registration)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (UPDATE; keeps the periodic timer stable across reschedules)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */
@@ -231,56 +232,54 @@ class RpnProxyUpdateWorker(
         // check concurrently. Coalesce overlapping runs so concurrent reconciles cannot
         // race into minting duplicate DIDs (two POST /d/reg at the same second).
         if (!DeviceRegistrationGuard.tryBegin(mname)) return
+        var guardSuccess = false
         try {
-            val storedAccountId = billingBackendClient.getAccountId()
-            val storedDeviceId  = billingBackendClient.getDeviceId()
-
-            val storedTs = persistentState.deviceRegistrationTimestamp
-            val now = System.currentTimeMillis()
-            val isStale = (now - storedTs) > REGISTRATION_REFRESH_INTERVAL_MS
-
-            // When a user already has an active purchase (e.g. restored from Play Store
-            // backup / reinstall) but no deviceId was ever written to the DB, we must
-            // call /g/reg to associate this device. Use the purchase's accountId so
-            // the server links the existing account, not a brand-new one.
+            // prefer the machine's current purchase; otherwise use the newest purchase.
+            // only the primary purchase may claim the stored identity.
             val purchases = InAppBillingHandler.getActivePurchasesSnapshot()
-            val firstPurchase = purchases.firstOrNull()
+            val machineToken = RpnProxyManager.getEffectivePurchaseDetail()?.purchaseToken
+            val primaryPurchase = PrimaryPurchaseResolver.primaryPurchase(purchases, machineToken)
 
-            if (firstPurchase != null && storedDeviceId.isBlank()) {
-                val purchaseAccountId = firstPurchase.accountId.takeIf { it.isNotBlank() }
-                    ?: storedAccountId
-                if (purchaseAccountId != storedAccountId) {
-                    // reconciles the device id based on the current cid
-                    billingBackendClient.getDeviceId(purchaseAccountId)
+            billingBackendClient.ensureDeviceRegistration(
+                primaryPurchase = primaryPurchase,
+                refreshIntervalMs = REGISTRATION_REFRESH_INTERVAL_MS,
+                onDeviceNotRegistered = { cid -> postDeviceNotRegistered(cid) },
+                register = { accountId, deviceId, purchase ->
+                    if (purchase == null) {
+                        Logger.w(LOG_IAB, "$TAG; $mname: no purchases in snapshot; bare registration (no meta)")
+                        callBareDeviceRegistration(accountId, deviceId)
+                    } else {
+                        Logger.i(LOG_IAB, "$TAG; $mname: registration with meta, productId=${purchase.productId}")
+                        callDeviceRegistrationWithMeta(accountId, deviceId, purchase)
+                    }
                 }
-                val freshDeviceId = billingBackendClient.getDeviceId()
-                val freshAccountId = billingBackendClient.getAccountId()
-                Logger.i(LOG_IAB, "$TAG; $mname: registration needed " +
-                        "(storedAccount=${storedAccountId.take(8)}, freshAccount=${freshAccountId.take(8)}, " +
-                        "storedDevice-len=${storedDeviceId.length}, freshDevice-len=${freshDeviceId.length}, " +
-                        "storedTs=$storedTs, isStale=$isStale), calling /g/device")
-                callDeviceRegistrationWithMeta(freshAccountId, freshDeviceId, firstPurchase)
-                return
-            }
-
-            if (!isStale) {
-                Logger.d(LOG_IAB, "$TAG; $mname: device already registered within window, skipping")
-                return
-            }
-
-            if (firstPurchase == null) {
-                Logger.w(LOG_IAB, "$TAG; $mname: no purchases in snapshot; bare registration (no meta)")
-                callBareDeviceRegistration(storedAccountId, storedDeviceId)
-            } else {
-                Logger.i(LOG_IAB, "$TAG; $mname: registration with meta, productId=${firstPurchase.productId}")
-                callDeviceRegistrationWithMeta(storedAccountId, storedDeviceId, firstPurchase)
-            }
-
+            )
+            guardSuccess = true
         } catch (e: Exception) {
             // failure here must not block purchase validation
             Logger.e(LOG_IAB, "$TAG; $mname: error (non-fatal): ${e.message}", e)
         } finally {
-            DeviceRegistrationGuard.end(mname)
+            DeviceRegistrationGuard.end(mname, guardSuccess)
+        }
+    }
+
+    /** Posts a device-not-registered error to the UI or system notification. */
+    private suspend fun postDeviceNotRegistered(entitlementCid: String) {
+        if (InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.Conflict409) {
+            Logger.i(LOG_IAB, "$TAG; postDeviceNotRegistered: sticky 409 conflict present; keeping it")
+            return
+        }
+        val storedCid = runCatching { billingBackendClient.peekStoredCid() }.getOrDefault("")
+        val error = ServerApiError.DeviceNotRegistered(
+            entitlementCid = entitlementCid,
+            storedCid      = storedCid,
+            deviceIdPrefix = ""
+        )
+        withContext(Dispatchers.Main) {
+            InAppBillingHandler.serverApiErrorLiveData.value = error
+            if (!InAppBillingHandler.serverApiErrorLiveData.hasActiveObservers()) {
+                DeviceNotRegisteredNotifier.notify(applicationContext, error, persistentState.theme)
+            }
         }
     }
 

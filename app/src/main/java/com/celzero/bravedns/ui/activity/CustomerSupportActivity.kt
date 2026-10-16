@@ -30,7 +30,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.ConsoleLogRepository
+import com.celzero.bravedns.database.RpnLogRepository
 import com.celzero.bravedns.database.SubscriptionStateHistoryDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
@@ -65,6 +68,8 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     private val b by viewBinding(ActivityCustomerSupportBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val consoleLogRepository by inject<ConsoleLogRepository>()
+    private val rpnLogRepository by inject<RpnLogRepository>()
     private val subscriptionStatusDao by inject<SubscriptionStatusDao>()
     private val subscriptionStateHistoryDao by inject<SubscriptionStateHistoryDao>()
 
@@ -73,8 +78,12 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         private const val MAX_HISTORY_ENTRIES = 50
         private const val DIAG_FILE_NAME = "rpn_support_diag.txt"
         private const val SUPPORT_ZIP_FILE_NAME = "rpn_support_diagnostics.zip"
+        private const val SUPPORT_CONSOLE_LOG_FILE_NAME = "console_logs.txt"
+        private const val SUPPORT_RPN_LOG_FILE_NAME = "rpn_logs.txt"
         private const val WIRELOG_ATTACH_LIMIT_BYTES = 1 * 1024 * 1024L  // 1 MB
         private const val OTHER_ATTACH_THRESHOLD_BYTES = 1 * 1024 * 1024L // cap wirelog at 1 MB if other attachments exceed this
+        private const val SUPPORT_ZIP_OVERHEAD_RESERVE_BYTES = 64 * 1024L
+        private const val MIN_CONSOLE_LOG_ATTACHMENT_BYTES = 64 * 1024L
         // process info (stack traces) larger than this is zipped as process_info.zip
         private const val PROC_INFO_ZIP_THRESHOLD_BYTES = 512 * 1024
         // bugreport zips larger than this keep only the newest entries when attached
@@ -315,9 +324,119 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 val bugZip = File(BugReportZipper.getZipFileName(filesDir))
                     .takeIf { it.exists() && it.length() > 0L }
                     ?.let { trimBugZipIfNeeded(it) }
-                val otherAttachSize = (diagFile?.length() ?: 0L) + (procInfoBytes?.size?.toLong() ?: 0L)
-                val wirelogBytes = prepareWirelogAttachment(otherAttachSize)
-                val supportZip = buildSupportZip(diagFile, wirelogBytes, procInfoBytes, bugZip)
+                val procInfoAttachment = procInfoBytes?.let {
+                    if (it.size > PROC_INFO_ZIP_THRESHOLD_BYTES) {
+                        "process_info.zip" to zipBytes("process_info.txt", it)
+                    } else {
+                        "process_info.txt" to it
+                    }
+                }
+
+                val hasConsoleLogs = consoleLogRepository.getLogCount() > 0
+                val hasRpnLogs = rpnLogRepository.getLogCount() > 0
+                val supportDir = File(filesDir, "support").also { it.mkdirs() }
+                val consoleLogFile = File(supportDir, SUPPORT_CONSOLE_LOG_FILE_NAME)
+                val rpnLogFile = File(supportDir, SUPPORT_RPN_LOG_FILE_NAME)
+                var attachedBugZip = bugZip
+                var attachedProcInfo = procInfoAttachment
+                var wirelogReserve = WIRELOG_ATTACH_LIMIT_BYTES
+                var includeConsoleLogs = hasConsoleLogs
+
+                fun fixedAttachmentSize(): Long =
+                    (diagFile?.length() ?: 0L) +
+                        (attachedProcInfo?.second?.size?.toLong() ?: 0L) +
+                        (attachedBugZip?.length() ?: 0L)
+
+                fun logBudget(): Long =
+                    (BugReportZipper.MAX_ZIP_SIZE_BYTES -
+                        fixedAttachmentSize() -
+                        wirelogReserve -
+                        SUPPORT_ZIP_OVERHEAD_RESERVE_BYTES)
+
+                fun isOverBudget(): Boolean {
+                    val budget = logBudget()
+                    return if (hasRpnLogs || includeConsoleLogs) {
+                        budget < MIN_CONSOLE_LOG_ATTACHMENT_BYTES
+                    } else {
+                        budget < 0L
+                    }
+                }
+
+                // drop order: bug zip → process info → wirelogs → console logs;
+                // RPN logs are never dropped (this is the RPN support screen)
+                if (isOverBudget() && attachedBugZip != null) {
+                    Logger.w(LOG_TAG_UI, "$TAG omitting bug report zip to fit support logs within email size limit")
+                    attachedBugZip = null
+                }
+                if (isOverBudget() && attachedProcInfo != null) {
+                    Logger.w(LOG_TAG_UI, "$TAG omitting process info to fit support logs within email size limit")
+                    attachedProcInfo = null
+                }
+                if (isOverBudget()) {
+                    Logger.w(LOG_TAG_UI, "$TAG omitting wirelogs to fit support attachment size limit")
+                    wirelogReserve = 0L
+                }
+                if (isOverBudget() && includeConsoleLogs) {
+                    Logger.w(LOG_TAG_UI, "$TAG omitting console logs to keep RPN logs within email size limit")
+                    includeConsoleLogs = false
+                }
+                if (isOverBudget()) {
+                    throw IllegalStateException("Support diagnostics exceed the email attachment size limit")
+                }
+
+                val maxLogBytes = logBudget().coerceAtLeast(0L)
+                val exportedRpnLogs = hasRpnLogs &&
+                    BugReportZipper.dumpRpnLogs(
+                        rpnLogRepository,
+                        rpnLogFile,
+                        maxBytes = maxLogBytes
+                    )
+                if (hasRpnLogs && !exportedRpnLogs) {
+                    throw IllegalStateException("Unable to include RPN logs in the support attachment")
+                }
+                val rpnLogs = rpnLogFile.takeIf { exportedRpnLogs && it.exists() && it.length() > 0L }
+
+                val maxConsoleLogBytes = (maxLogBytes - (rpnLogs?.length() ?: 0L)).coerceAtLeast(0L)
+                val exportedConsoleLogs = includeConsoleLogs &&
+                    BugReportZipper.dumpConsoleLogs(
+                        consoleLogRepository,
+                        consoleLogFile,
+                        maxBytes = maxConsoleLogBytes
+                    )
+                if (includeConsoleLogs && !exportedConsoleLogs) {
+                    Logger.w(LOG_TAG_UI, "$TAG console log export did not fit, omitting console logs")
+                }
+                val consoleLogs = consoleLogFile.takeIf { exportedConsoleLogs && it.exists() && it.length() > 0L }
+
+                // dumpRpnLogs exports RpnLog rows verbatim from the dedicated RPN in-memory
+                // database; dumpConsoleLogs exports the remaining (non-RPN) console logs.
+                val otherAttachSize = fixedAttachmentSize() +
+                    (rpnLogs?.length() ?: 0L) +
+                    (consoleLogs?.length() ?: 0L)
+                val wirelogBytes =
+                    if (wirelogReserve > 0L) prepareWirelogAttachment(otherAttachSize) else null
+                val supportZip = buildSupportZip(
+                    diagFile,
+                    wirelogBytes,
+                    attachedProcInfo,
+                    attachedBugZip,
+                    consoleLogs,
+                    rpnLogs
+                )
+                rpnLogs?.let {
+                    if (it.exists() && !it.delete()) {
+                        Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary RPN log attachment")
+                    }
+                }
+                consoleLogs?.let {
+                    if (it.exists() && !it.delete()) {
+                        Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary console log attachment")
+                    }
+                }
+                if (supportZip != null && supportZip.length() > BugReportZipper.MAX_ZIP_SIZE_BYTES) {
+                    supportZip.delete()
+                    throw IllegalStateException("Support attachment exceeds the email size limit")
+                }
 
                 val emailBody = buildEmailBody(description, category)
 
@@ -361,6 +480,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         sb.append(heavy)
         sb.append("Generated   : $now\n")
         sb.append("App version : $versionName\n")
+        sb.append("Flavour     : ${appFlavour()}\n")
         sb.append("Device      : ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}\n")
         sb.append("Android     : ${android.os.Build.VERSION.RELEASE} (SDK ${android.os.Build.VERSION.SDK_INT})\n")
         sb.append("Package     : $packageName\n")
@@ -456,11 +576,12 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         sb.append("\n\n")
         sb.append("--- Device info ---\n")
         sb.append("App version : ${appVersionName()}\n")
+        sb.append("Flavour     : ${appFlavour()}\n")
         sb.append("Device      : ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}\n")
         sb.append("Android     : ${android.os.Build.VERSION.RELEASE} (SDK ${android.os.Build.VERSION.SDK_INT})\n")
         sb.append("\n")
-        sb.append("All subscription status, state history, and proxy statistics\n")
-        sb.append("are included in the attached diagnostic file.\n\n")
+        sb.append("Subscription status, state history, proxy statistics, and available recent console logs\n")
+        sb.append("are included in the attached diagnostic ZIP.\n\n")
         sb.append("--\nSent via Rethink Plus Support")
 
         return sb.toString()
@@ -497,10 +618,14 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     private fun buildSupportZip(
         diagFile: File?,
         wirelogBytes: ByteArray?,
-        procInfoBytes: ByteArray?,
-        bugZip: File?
+        procInfoAttachment: Pair<String, ByteArray>?,
+        bugZip: File?,
+        consoleLogs: File?,
+        rpnLogs: File?
     ): File? {
-        if (diagFile == null && wirelogBytes == null && procInfoBytes == null && bugZip == null) {
+        if (diagFile == null && wirelogBytes == null && procInfoAttachment == null &&
+            bugZip == null && consoleLogs == null && rpnLogs == null
+        ) {
             return null
         }
         return try {
@@ -511,16 +636,9 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     it.inputStream().use { ins -> ins.copyTo(zos) }
                     zos.closeEntry()
                 }
-                procInfoBytes?.takeIf { it.isNotEmpty() }?.let {
-                    if (it.size > PROC_INFO_ZIP_THRESHOLD_BYTES) {
-                        // large snapshots (full JVM/Go stack traces) are added as a
-                        // compressed process_info.zip to keep the support zip lean
-                        zos.putNextEntry(java.util.zip.ZipEntry("process_info.zip"))
-                        zos.write(zipBytes("process_info.txt", it))
-                    } else {
-                        zos.putNextEntry(java.util.zip.ZipEntry("process_info.txt"))
-                        zos.write(it)
-                    }
+                procInfoAttachment?.takeIf { it.second.isNotEmpty() }?.let { (name, bytes) ->
+                    zos.putNextEntry(java.util.zip.ZipEntry(name))
+                    zos.write(bytes)
                     zos.closeEntry()
                 }
                 wirelogBytes?.takeIf { it.isNotEmpty() }?.let {
@@ -530,6 +648,16 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 }
                 bugZip?.takeIf { it.exists() }?.let {
                     zos.putNextEntry(java.util.zip.ZipEntry("bugreport.zip"))
+                    it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+                rpnLogs?.takeIf { it.exists() && it.length() > 0L }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry(SUPPORT_RPN_LOG_FILE_NAME))
+                    it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+                consoleLogs?.takeIf { it.exists() && it.length() > 0L }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry(SUPPORT_CONSOLE_LOG_FILE_NAME))
                     it.inputStream().use { ins -> ins.copyTo(zos) }
                     zos.closeEntry()
                 }
@@ -665,6 +793,23 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
     private fun appVersionName(): String =
         runCatching { packageManager.getPackageInfo(packageName, 0).versionName ?: "?" }
             .getOrElse { "?" }
+
+    /**
+     * Returns the distribution channel of the installed build: "play",
+     * "fdroid", "website", "izzy", "alpha" or "unknown". IzzyOnDroid builds
+     * use the fdroid flavor with an ".izzy" application id suffix, similar to
+     * the ".alpha" suffix used by alpha builds.
+     */
+    private fun appFlavour(): String {
+        return when {
+            packageName.contains(".izzy") -> "izzy"
+            packageName.contains(".alpha") -> Constants.BUILD_TYPE_ALPHA
+            Utilities.isPlayStoreFlavour() -> Constants.FLAVOR_PLAY
+            Utilities.isFdroidFlavour() -> Constants.FLAVOR_FDROID
+            Utilities.isWebsiteFlavour() -> Constants.FLAVOR_WEBSITE
+            else -> BuildConfig.FLAVOR_releaseChannel
+        }
+    }
 
     /**
      * Redacts a sensitive ID (accountId, cid, etc.) so that at most the first

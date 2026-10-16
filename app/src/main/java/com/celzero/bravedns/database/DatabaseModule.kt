@@ -26,6 +26,7 @@ object DatabaseModule {
         single { AppDatabase.buildDatabase(androidContext()) }
         single { LogDatabase.buildDatabase(androidContext()) }
         single { ConsoleLogDatabase.buildDatabase(androidContext()) }
+        single { RpnLogDatabase.buildDatabase(androidContext()) }
     }
     private val daoModule = module {
         single { get<AppDatabase>().appInfoDAO() }
@@ -61,6 +62,7 @@ object DatabaseModule {
         single { get<LogDatabase>().eventDao() }
 
         single { get<ConsoleLogDatabase>().consoleLogDAO() }
+        single { get<RpnLogDatabase>().rpnLogDAO() }
 
         single { get<AppDatabase>().sponsorDao() }
 
@@ -98,6 +100,7 @@ object DatabaseModule {
         single { get<LogDatabase>().ipInfoRepository() }
 
         single { get<ConsoleLogDatabase>().consoleLogRepository() }
+        single { get<RpnLogDatabase>().rpnLogRepository() }
 
         single { SponsorRepository(get()) }
         single { ServerOrderHistoryRepository(get()) }

@@ -284,6 +284,10 @@
             <intent-filter>
                 <action android:name="com.celzero.bravedns.intent.action.VPN_START" />
                 <action android:name="com.celzero.bravedns.intent.action.VPN_STOP" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_START" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_STOP" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_PAUSE" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_RESUME" />
             </intent-filter>
         </receiver>
         <receiver

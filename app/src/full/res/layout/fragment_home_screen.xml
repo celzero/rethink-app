@@ -171,7 +171,7 @@
                 <LinearLayout
                     android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:gravity="center"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -183,13 +183,13 @@
                     <LinearLayout
                         android:id="@+id/fhs_firewall_badges_row"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/fhs_card_firewall_rules_card"
                             android:layout_width="match_parent"
-                            android:layout_height="84dp"
+                            android:layout_height="match_parent"
                             app:cardBackgroundColor="?attr/cardBackgroundColor"
                             app:cardCornerRadius="18dp"
                             app:cardElevation="0dp">
@@ -694,70 +694,93 @@
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <androidx.constraintlayout.helper.widget.Flow
-                        android:id="@+id/fhs_apps_flow"
+                    <LinearLayout
+                        android:id="@+id/fhs_apps_grid"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_marginEnd="8dp"
-                        app:constraint_referenced_ids="fhs_card_apps_blocked_count,fhs_card_apps_isolated_count,fhs_card_apps_bypassed_count,fhs_card_apps_excluded_count"
-                        app:flow_horizontalBias="1"
-                        app:flow_horizontalGap="12dp"
-                        app:flow_horizontalStyle="packed"
-                        app:flow_maxElementsWrap="2"
-                        app:flow_wrapMode="aligned"
+                        android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/fhs_apps_arrow"
                         app:layout_constraintStart_toEndOf="@id/fhs_apps_count_container"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_card_apps_blocked_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.8"
-                        android:letterSpacing="0.02"
-                        tools:text="0 blocked"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_text_view"
-                        tools:ignore="MissingConstraints" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_card_apps_isolated_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.8"
-                        android:letterSpacing="0.02"
-                        tools:text="1 isolated"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_text_view"
-                        tools:ignore="MissingConstraints" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/fhs_card_apps_blocked_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:alpha="0.8"
+                                android:ellipsize="marquee"
+                                android:letterSpacing="0.02"
+                                android:maxLines="1"
+                                android:textAlignment="viewEnd"
+                                tools:text="0 blocked"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/small_font_text_view" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_card_apps_bypassed_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.8"
-                        android:letterSpacing="0.02"
-                        tools:text="0 bypassed"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_text_view"
-                        tools:ignore="MissingConstraints" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/fhs_card_apps_isolated_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:layout_weight="1"
+                                android:alpha="0.8"
+                                android:ellipsize="marquee"
+                                android:letterSpacing="0.02"
+                                android:maxLines="1"
+                                android:textAlignment="viewEnd"
+                                tools:text="1 isolated"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/small_font_text_view" />
+                        </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/fhs_card_apps_excluded_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.8"
-                        android:letterSpacing="0.02"
-                        tools:text="0 excluded"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/small_font_text_view"
-                        tools:ignore="MissingConstraints" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/fhs_card_apps_bypassed_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:alpha="0.8"
+                                android:ellipsize="marquee"
+                                android:letterSpacing="0.02"
+                                android:maxLines="1"
+                                android:textAlignment="viewEnd"
+                                tools:text="0 bypassed"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/small_font_text_view" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/fhs_card_apps_excluded_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:layout_weight="1"
+                                android:alpha="0.8"
+                                android:ellipsize="marquee"
+                                android:letterSpacing="0.02"
+                                android:maxLines="1"
+                                android:textAlignment="viewEnd"
+                                tools:text="0 excluded"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/small_font_text_view" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/fhs_apps_arrow"

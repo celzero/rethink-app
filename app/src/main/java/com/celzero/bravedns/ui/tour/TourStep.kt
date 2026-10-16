@@ -33,9 +33,9 @@ import androidx.annotation.StringRes
  * @param total         Total number of steps in the flow.
  */
 data class TourStep(
-    @IdRes val targetViewId: Int,
-    @StringRes val titleRes: Int,
-    @StringRes val descRes: Int,
+    @param:IdRes val targetViewId: Int,
+    @param:StringRes val titleRes: Int,
+    @param:StringRes val descRes: Int,
     val tooltipSide: TooltipSide = TooltipSide.AUTO,
     val spotlightShape: SpotlightShape = SpotlightShape.ROUNDED_RECT,
     val isPremium: Boolean = false,
