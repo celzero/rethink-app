@@ -282,10 +282,12 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         ct.message.isEmpty()
                     ) {
                         var hasMinSummary = false
+                        b.connectionDuration.alpha = 1f
                         if (hasCid) {
                             b.connectionSummaryLl.visibility = View.VISIBLE
                             b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                             b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
+                            b.connectionDuration.alpha = 0.7f
                             b.connectionDelay.text = ""
                             hasMinSummary = true
                         } else {

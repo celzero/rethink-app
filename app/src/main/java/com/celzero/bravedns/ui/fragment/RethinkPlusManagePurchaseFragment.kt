@@ -32,6 +32,7 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.databinding.FragmentRethinkPlusManagePurchaseBinding
 import com.celzero.bravedns.iab.AckFailureInfo
+import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
@@ -69,6 +70,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     private val b by viewBinding(FragmentRethinkPlusManagePurchaseBinding::bind)
 
     private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
+    private val persistentState by inject<com.celzero.bravedns.service.PersistentState>()
     private val viewModel: ManagePurchaseViewModel by viewModel()
 
     companion object {
@@ -98,9 +100,10 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         setDolphinSignature()
     }
 
-    /** Dolphin signature (at the end of the manage-purchase content.); random pairing, fresh on every visit. */
+    /** Dolphin signature: bottom overlay revealed at the end of the content scroll. */
     private fun setDolphinSignature() {
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+        b.dolphinSignature.revealAtScrollEndOf(b.managePurchaseScroll)
     }
 
     override fun onResume() {
@@ -137,7 +140,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val fmt = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
         val model = SubscriptionUiStateResolver.resolve(state, sub)
 
-        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
+        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.chipTextPositive)
         val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
         val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
 
@@ -303,7 +306,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         b.rowCancelPurchase.isVisible = false
         b.rowRequestRefund.isVisible = false
         b.dividerRefund.isVisible = false
-        b.tvEndNote.isVisible = false
 
         // dbRowCancelled covers the cold-start restoration case where the machine is
         // Active-in-memory but the persisted row is CANCELLED (and Play does not report
@@ -318,10 +320,8 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val canRevoke = canRevoke(subscriptionData)
         if (canRevoke) {
             b.rowRequestRefund.isVisible = true
-            b.tvEndNote.text = getString(R.string.revoke_subscription_note)
         } else if (!isInApp) {
             b.rowCancelPurchase.isVisible = true
-            b.tvEndNote.text = getString(R.string.cancel_subscription_note_future)
         }
 
         // Never render a dangling "Ending your plan" header or an empty card shell:
@@ -330,7 +330,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         val hasEndingOption = b.rowRequestRefund.isVisible || b.rowCancelPurchase.isVisible
         b.tvEndingPlanHeader.isVisible = hasEndingOption
         b.cardEndingPlan.isVisible = hasEndingOption
-        b.tvEndNote.isVisible = hasEndingOption
 
         if (b.rowRequestRefund.isVisible && b.rowCancelPurchase.isVisible) {
             b.dividerRefund.isVisible = true
@@ -376,6 +375,15 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             .show()
     }
 
+    private fun showPurchaseAlreadyEndedDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.rpn_purchase_already_ended_title))
+            .setMessage(getString(R.string.rpn_purchase_already_ended_message))
+            .setPositiveButton(android.R.string.ok, null)
+            .setCancelable(true)
+            .show()
+    }
+
     private fun observeOperationState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -385,13 +393,21 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
                         is OperationState.InProgress -> showProgressOverlay(state)
                         is OperationState.Success -> {
                             hideProgressOverlay()
-                            showToastUiCentered(requireContext(), state.message, Toast.LENGTH_SHORT)
+                            showToastUiCentered(requireContext(), getString(state.messageRes), Toast.LENGTH_SHORT)
+                            loadSubscriptionDetails()
+                            viewModel.resetOperationState()
+                        }
+                        is OperationState.AlreadyEnded -> {
+                            hideProgressOverlay()
+                            showPurchaseAlreadyEndedDialog()
                             loadSubscriptionDetails()
                             viewModel.resetOperationState()
                         }
                         is OperationState.Failure -> {
                             hideProgressOverlay()
-                            showToastUiCentered(requireContext(), state.message, Toast.LENGTH_LONG)
+                            val msg = state.serverMessage ?: getString(state.messageRes)
+                            showToastUiCentered(requireContext(), msg, Toast.LENGTH_LONG)
+                            loadSubscriptionDetails()
                             viewModel.resetOperationState()
                         }
                     }
@@ -444,8 +460,10 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeAckFailureState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            InAppBillingHandler.ackFailureFlow.collect { info ->
-                updateAckFailureBanner(info)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                InAppBillingHandler.ackFailureFlow.collect { info ->
+                    updateAckFailureBanner(info)
+                }
             }
         }
     }
@@ -461,14 +479,16 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
     private fun observeSubscriptionState() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            RpnProxyManager.collectSubscriptionState().collect { state ->
-                val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
-                val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
-                val subscriptionData = RpnProxyManager.getSubscriptionData()
-                val expiry = VpnController.getWinExpiryTs() ?: 0L
-                val hex = expiry.toString(16)
-                val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
-                uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                RpnProxyManager.collectSubscriptionState().collect { state ->
+                    val sub = runCatching { subscriptionStatusRepository.getCurrentSubscription() }.getOrNull()
+                    val deviceId = runCatching { InAppBillingHandler.getObfuscatedDeviceId() }.getOrDefault("")
+                    val subscriptionData = RpnProxyManager.getSubscriptionData()
+                    val expiry = VpnController.getWinExpiryTs() ?: 0L
+                    val hex = expiry.toString(16)
+                    val who = runCatching { VpnController.getWinIdentifier() }.getOrNull().orEmpty()
+                    uiCtx { populateView(sub, state, subscriptionData, deviceId, hex, who) }
+                }
             }
         }
     }
@@ -493,18 +513,29 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     }
 
     private fun showDeviceNotRegisteredBottomSheet(error: ServerApiError.DeviceNotRegistered) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceNotRegistered") != null) return
         DeviceNotRegisteredNotifier.cancel(requireContext())
         DeviceNotRegisteredBottomSheet.newInstance(error).show(childFragmentManager, "deviceNotRegistered")
     }
 
     private fun showDeviceAuthErrorBottomSheet(error: ServerApiError.Unauthorized401) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceAuthError401") != null) return
         DeviceAuthErrorBottomSheet.newInstance(error).show(childFragmentManager, "deviceAuthError401")
     }
 
     private fun showConflictBottomSheet(error: ServerApiError.Conflict409) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
         if (childFragmentManager.findFragmentByTag("conflict409") != null) return
         PurchaseConflictNotifier.cancel(requireContext())
         val sheet = PurchaseConflictBottomSheet.newInstance(error)
@@ -514,6 +545,24 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             }
         }
         sheet.show(childFragmentManager, "conflict409")
+    }
+
+    /**
+     * Keeps the error available for the next observer and posts a system
+     * notification when the sheet cannot be shown.
+     */
+    private fun deferServerError(error: ServerApiError) {
+        InAppBillingHandler.serverApiErrorLiveData.value = error
+        val ctx = context?.applicationContext ?: return
+        when (error) {
+            is ServerApiError.Unauthorized401 ->
+                DeviceAuthErrorNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.DeviceNotRegistered ->
+                DeviceNotRegisteredNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.Conflict409 ->
+                PurchaseConflictNotifier.notify(ctx, error, persistentState.theme)
+            else -> Unit
+        }
     }
 
     private fun managePlayStoreSubs() {

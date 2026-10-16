@@ -48,9 +48,9 @@ import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -96,11 +96,6 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
         return b.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -593,6 +588,8 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
 
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val okBtn = dialogBinding.infoRulesDialogCancelImg
         val descText = dialogBinding.infoRulesDialogRulesDesc

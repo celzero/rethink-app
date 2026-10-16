@@ -75,6 +75,11 @@ class DnsLog {
     var blockedTarget: String = ""
     var isEch: Boolean = false
 
+    // firewall rule id (see FirewallRuleset.id) recorded during the upstream-answer
+    // evaluation; explains why this query was blocked or allowed. empty when no
+    // specific rule applied (default-allow or dns-firewall not involved)
+    var blockedReason: String = ""
+
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false
         if (id != other.id) return false

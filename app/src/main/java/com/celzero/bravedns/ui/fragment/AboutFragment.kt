@@ -49,7 +49,9 @@ import androidx.core.net.toUri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -376,8 +378,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             // the "Sponsor" button (visible by default in the layout) is shown briefly
             // even for already-sponsored users on the initial launch.
             applySponsorState(sponsorRepository.isCurrentlySponsored())
-            sponsorRepository.isSponsored.collect { isSponsored ->
-                applySponsorState(isSponsored)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                sponsorRepository.isSponsored.collect { isSponsored ->
+                    applySponsorState(isSponsored)
+                }
             }
         }
     }
@@ -581,17 +585,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         lastTapTime = currentTime
 
         if (tapCount == REQUIRED_TAPS) {
-            enableTestMode()
+            toggleTestMode()
             tapCount = 0
         }
     }
 
-    private fun enableTestMode() {
-        persistentState.appTestMode = true
+    private fun toggleTestMode() {
+        val enabling = !persistentState.appTestMode
+        persistentState.appTestMode = enabling
         val ctx = context ?: return
-        showToastUiCentered(ctx, "Test mode enabled", Toast.LENGTH_SHORT)
-        Logger.i(LOG_TAG_UI, "Test mode enabled")
-        logEvent(EventType.UI_TOGGLE, "Test mode enabled", "User enabled test mode")
+        val label = if (enabling) "Test mode enabled" else "Test mode disabled"
+        showToastUiCentered(ctx, label, Toast.LENGTH_SHORT)
+        Logger.i(LOG_TAG_UI, label)
+        logEvent(EventType.UI_TOGGLE, label, "User toggled test mode")
     }
 
     private fun openStackTraceDialog() {
@@ -1733,6 +1739,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val heading = dialogBinding.infoRulesDialogRulesTitle
         val okBtn = dialogBinding.infoRulesDialogCancelImg

@@ -46,6 +46,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private val pagingConfig: PagingConfig
+    private val mergedPagingConfig: PagingConfig
 
     init {
         _filterString.value = ""
@@ -57,6 +58,15 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                 maxSize = LIVEDATA_PAGE_SIZE * 6,
                 pageSize = LIVEDATA_PAGE_SIZE,
                 jumpThreshold = LIVEDATA_PAGE_SIZE * 3
+            )
+        mergedPagingConfig =
+            PagingConfig(
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
+                maxSize = LIVEDATA_PAGE_SIZE * 3,
+                pageSize = LIVEDATA_PAGE_SIZE * 2,
+                jumpThreshold = 5
             )
     }
 
@@ -114,13 +124,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         if (s.startsWith(protocolPrefix)) {
             val protocol = s.substringAfter(protocolPrefix)
             return if (filterRules.isNotEmpty()) {
-                Pager(pagingConfig) {
+                Pager(mergedPagingConfig) {
                         connectionTrackerDAO.getMergedProtocolFilteredConnections(protocol, filterRules)
                     }
                     .liveData
                     .cachedIn(viewModelScope)
             } else {
-                Pager(pagingConfig) {
+                Pager(mergedPagingConfig) {
                         connectionTrackerDAO.getMergedProtocolFilteredConnections(protocol)
                     }
                     .liveData
@@ -190,7 +200,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getBlockedMergedNetworkLogs(input: String): LiveData<PagingData<MergedConnectionLog>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(pagingConfig) {
+            Pager(mergedPagingConfig) {
                     if (input.isBlank())
                         connectionTrackerDAO.getMergedBlockedConnectionsFiltered(filterRules)
                     else connectionTrackerDAO.getMergedBlockedConnectionsFiltered("%$input%", filterRules)
@@ -198,7 +208,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(pagingConfig) {
+            Pager(mergedPagingConfig) {
                     if (input.isBlank()) connectionTrackerDAO.getMergedBlockedConnections()
                     else connectionTrackerDAO.getMergedBlockedConnections("%$input%")
                 }
@@ -209,7 +219,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getAllowedMergedNetworkLogs(input: String): LiveData<PagingData<MergedConnectionLog>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(pagingConfig) {
+            Pager(mergedPagingConfig) {
                     if (input.isBlank())
                         connectionTrackerDAO.getMergedAllowedConnectionsFiltered(filterRules)
                     else connectionTrackerDAO.getMergedAllowedConnectionsFiltered("%$input%", filterRules)
@@ -217,7 +227,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(pagingConfig) {
+            Pager(mergedPagingConfig) {
                     if (input.isBlank()) connectionTrackerDAO.getMergedAllowedConnections()
                     else connectionTrackerDAO.getMergedAllowedConnections("%$input%")
                 }
@@ -227,7 +237,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun getAllMergedNetworkLogs(input: String): LiveData<PagingData<MergedConnectionLog>> {
-        return Pager(pagingConfig) {
+        return Pager(mergedPagingConfig) {
                 if (input.isBlank()) connectionTrackerDAO.getMergedConnectionTrackerByName()
                 else connectionTrackerDAO.getMergedConnectionTrackerByName("%$input%")
             }

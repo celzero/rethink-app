@@ -880,7 +880,6 @@
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Uma regra de firewall definida pelo usuário bloqueou o <i>domínio</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>domínio</i> está configurado como Domínio confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Esta conexão foi permitida porque o <i>domínio</i> está configurado como confiável nas regras de domínio universal.<br/><br/> Para alterar esse comportamento, acesse a guia <i>Configurar DNS</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt;</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Agrupar solicitações, respostas de cache, tratamento de erros resiliente</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s lista(s) de bloqueio</string>
     <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">países mais contactados</string>
@@ -1159,7 +1158,6 @@
     <string name="fapps_filter_sort_package" translatable="true">Nome do pacote</string>
     <string name="fapps_filter_sort_uid" translatable="true">UID</string>
     <string name="build_flavor_website_degoogled" translatable="true">site desvinculado do Google</string>
-    <string name="bsdl_app_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt; para este aplicativo</string>
     <string name="config_delete_all_dialog_desc" translatable="true">Tem certeza de que deseja excluir TODAS as configurações de VPN do WireGuard? Esta ação é IRREVERSÍVEL.</string>
     <string name="config_delete_all_dialog_title" translatable="true">Excluir tudo</string>
     <string name="wireguard_dns_mode_conflict" translatable="true">O WireGuard não pode ser ativado no modo somente DNS. Alterne para o modo Firewall ou DNS+Firewall.</string>

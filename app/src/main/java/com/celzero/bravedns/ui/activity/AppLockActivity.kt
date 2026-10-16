@@ -24,6 +24,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.widget.Toast
 import androidx.biometric.BiometricManager
@@ -162,12 +164,17 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
 
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
-        val intent = Intent(this, HomeScreenActivity::class.java).apply {
-            putExtras(intent)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        // finishing inside onCreate() races with the androidx lifecycle ON_CREATE dispatch
+        // on API < 29 (Android 6). Post the navigation so onCreate() completes first.
+        Handler(Looper.getMainLooper()).post {
+            if (isDestroyed || isFinishing) return@post
+            val i = Intent(this, HomeScreenActivity::class.java).apply {
+                putExtras(intent)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            startActivity(i)
+            finish()
         }
-        startActivity(intent)
-        finish()
     }
 
     private fun isBiometricEnabled(): Boolean {
@@ -183,6 +190,17 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
         } catch (_: Exception) {
             false
+        }
+    }
+
+    override fun onDestroy() {
+        try {
+            super.onDestroy()
+        } catch (e: IllegalStateException) {
+            // Safety net for the framework/lifecycle race on API < 29 where destroy is
+            // dispatched while the registry is still INITIALIZED (Android 6 devices).
+            // Swallowing is safe here: no observer can receive ON_DESTROY in that state.
+            Logger.e(LOG_TAG_UI, "$TAG err moving lifecycle to destroyed", e)
         }
     }
 }

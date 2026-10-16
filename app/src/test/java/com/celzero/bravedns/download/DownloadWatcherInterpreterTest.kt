@@ -16,14 +16,19 @@
 package com.celzero.bravedns.download
 
 import android.app.DownloadManager
-import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+// SDK pinned (see app/src/test/resources/robolectric.properties): manifest
+// targetSdk 37 needs a Java 21 Robolectric sandbox; this test only exercises
+// resource resolution, so a fixed level is sufficient and hermetic.
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
 class DownloadWatcherInterpreterTest {
 
     @Test
@@ -129,11 +134,36 @@ class DownloadWatcherInterpreterTest {
 
     @Test
     fun testResIdsResolve() {
-        // Ensure the resource ids referenced by the interpreter are valid (compiled) resources.
-        val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
-        assertEquals(
-            ctx.getString(R.string.download_err_network),
-            ctx.getString(DownloadWatcher.Interpreter.reasonToResId(DownloadManager.ERROR_HTTP_DATA_ERROR))
-        )
+        // Ensure every reason maps to one of the interpreter's compiled string
+        // constants. Runtime resource inflation is unavailable in plain JVM
+        // tests (no merged resources), so ids are checked directly.
+        val allReasons =
+            listOf(
+                DownloadManager.ERROR_CANNOT_RESUME,
+                DownloadManager.ERROR_HTTP_DATA_ERROR,
+                DownloadManager.ERROR_TOO_MANY_REDIRECTS,
+                DownloadManager.ERROR_UNHANDLED_HTTP_CODE,
+                DownloadManager.ERROR_DEVICE_NOT_FOUND,
+                DownloadManager.ERROR_FILE_ALREADY_EXISTS,
+                DownloadManager.ERROR_FILE_ERROR,
+                DownloadManager.ERROR_INSUFFICIENT_SPACE,
+                DownloadManager.ERROR_UNKNOWN,
+                0, // unknown reason
+                12345
+            )
+        val validIds =
+            setOf(
+                R.string.download_err_network,
+                R.string.download_err_storage,
+                R.string.download_err_system_manager,
+                R.string.download_err_internal
+            )
+        allReasons.forEach { reason ->
+            val id = DownloadWatcher.Interpreter.reasonToResId(reason)
+            assertTrue(
+                "reason $reason must map to a known download error string",
+                id in validIds
+            )
+        }
     }
 }

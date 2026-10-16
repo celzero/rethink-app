@@ -21,28 +21,48 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.BlocklistAppsAdapter
 import com.celzero.bravedns.adapter.DomainConnectionsAdapter
+import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
+import kotlinx.coroutines.launch
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connections){
     private val b by viewBinding(ActivityDomainConnectionsBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val viewModel by viewModel<DomainConnectionsViewModel>()
 
     private var type: InputType = InputType.DOMAIN
+
+    // when set, the blocklist drill-down shows only this app's blocked domains
+    // (per-app screen); INVALID_UID keeps the expandable all-apps list
+    private var scopedUid: Int = Constants.INVALID_UID
+
+    // active chip filter in the blocklist detail view; rows match any of the
+    // selected lists (OR). starts as the full set once chips are built
+    private var selectedBlocklistTags: Set<String> = emptySet()
 
     private fun Context.isDarkThemeOn(): Boolean {
             return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -55,12 +75,14 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
         const val INTENT_EXTRA_DOMAIN = "DOMAIN"
         const val INTENT_EXTRA_ASN = "ASN"
         const val INTENT_EXTRA_IP = "IP"
+        const val INTENT_EXTRA_BLOCKLIST = "BLOCKLIST"
         const val INTENT_EXTRA_IS_BLOCKED = "IS_BLOCKED"
         const val INTENT_EXTRA_TIME_CATEGORY = "TIME_CATEGORY"
+        const val INTENT_EXTRA_UID = "UID"
     }
 
     enum class InputType(val type: Int) {
-        DOMAIN(0), FLAG(1), ASN(2), IP(3);
+        DOMAIN(0), FLAG(1), ASN(2), IP(3), BLOCKLIST(4);
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,6 +123,16 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
                 viewModel.setIp(ip, isBlocked)
                 b.dcTitle.text = ip
             }
+            InputType.BLOCKLIST -> {
+                val blocklist = intent.getStringExtra(INTENT_EXTRA_BLOCKLIST) ?: ""
+                viewModel.setBlocklist(blocklist)
+                b.dcTitle.text = blocklist
+                val uid = intent.getIntExtra(INTENT_EXTRA_UID, Constants.INVALID_UID)
+                if (uid != Constants.INVALID_UID) {
+                    scopedUid = uid
+                    viewModel.setUid(uid)
+                }
+            }
         }
         val tc = intent.getIntExtra(INTENT_EXTRA_TIME_CATEGORY, 0)
         val timeCategory =
@@ -108,7 +140,7 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
                 ?: DomainConnectionsViewModel.TimeCategory.ONE_HOUR
         setSubTitle(timeCategory)
         viewModel.timeCategoryChanged(timeCategory)
-        setRecyclerView()
+        setRecyclerView(timeCategory)
     }
 
     private fun setSubTitle(timeCategory: DomainConnectionsViewModel.TimeCategory) {
@@ -143,7 +175,13 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
             }
     }
 
-    private fun setRecyclerView() {
+    private fun setRecyclerView(timeCategory: DomainConnectionsViewModel.TimeCategory) {
+        if (type == InputType.BLOCKLIST) {
+            // blocklist drill-down uses a dedicated expandable list (apps ->
+            // domains) instead of the shared paged adapter
+            setBlocklistRecyclerView()
+            return
+        }
         b.dcRecycler.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.dcRecycler.layoutManager = layoutManager
@@ -162,6 +200,10 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
             }
             InputType.IP -> {
                 viewModel.ipConnectionList
+            }
+            InputType.BLOCKLIST -> {
+                // handled by setBlocklistRecyclerView(); unreachable here
+                viewModel.domainConnectionList
             }
         }
 
@@ -184,5 +226,154 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
             }
         }
         b.dcRecycler.adapter = recyclerAdapter
+    }
+
+    private fun setBlocklistRecyclerView() {
+        b.dcRecycler.setHasFixedSize(false)
+        b.dcRecycler.layoutManager = LinearLayoutManager(this)
+        b.dcRecycler.itemAnimator = null
+
+        if (scopedUid != Constants.INVALID_UID) {
+            // per-app scope: the app is already known, so skip the expandable
+            // apps list and show this app's blocked domains directly
+            setScopedBlocklistDomainsRecyclerView()
+            return
+        }
+
+        val adapter = BlocklistAppsAdapter(this) { uid ->
+            viewModel.getBlocklistDomainsForApp(uid, selectedBlocklistTags)
+        }
+        b.dcRecycler.adapter = adapter
+
+        val chipTagById = HashMap<Int, String>()
+        lifecycleScope.launch {
+            // one checkable chip per list tag attributed to this blocklist, so
+            // the "n lists" hint on the stats screen resolves into actual
+            // names; all start checked and unchecking narrows the list below
+            val tags = viewModel.getBlocklistTags()
+            if (tags.isNotEmpty()) {
+                b.dcBlocklistChips.removeAllViews()
+                tags.forEach { tag ->
+                    val chip = layoutInflater.inflate(
+                        R.layout.item_chip_filter,
+                        b.dcBlocklistChips,
+                        false
+                    ) as Chip
+                    chip.text = tag
+                    chip.isChecked = true
+                    chip.isCheckedIconVisible = false
+                    chip.id = View.generateViewId()
+                    chipTagById[chip.id] = tag
+                    b.dcBlocklistChips.addView(chip)
+                }
+                b.dcBlocklistChips.visibility = View.VISIBLE
+            }
+            selectedBlocklistTags = tags.toSet()
+
+            var lastCheckedId = b.dcBlocklistChips.checkedChipIds.lastOrNull()
+            // attach only after the initial programmatic checks so the
+            // listener reflects user-driven changes from here on; at least
+            // one chip always stays selected
+            b.dcBlocklistChips.setOnCheckedStateChangeListener { group, checkedIds ->
+                if (checkedIds.isEmpty()) {
+                    lastCheckedId?.let { group.check(it) }
+                    return@setOnCheckedStateChangeListener
+                }
+                lastCheckedId = checkedIds.last()
+                selectedBlocklistTags = checkedIds.mapNotNull { chipTagById[it] }.toSet()
+                refetchBlocklistApps(adapter)
+            }
+
+            refetchBlocklistApps(adapter)
+        }
+    }
+
+    /**
+     * Per-app variant: a flat list of the domains this blocklist blocked for
+     * the scoped uid; the tag chips narrow the same way as the global view.
+     */
+    private fun setScopedBlocklistDomainsRecyclerView() {
+        val adapter = SummaryStatisticsAdapter(
+            this,
+            persistentState,
+            appConfig,
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+        )
+        // scoping the adapter makes its rows open the block/trust domain
+        // rules bottom sheet (down arrow) for this app
+        adapter.setUid(scopedUid)
+        adapter.setTimeCategory(
+            SummaryStatisticsViewModel.TimeCategory.fromValue(
+                intent.getIntExtra(
+                    INTENT_EXTRA_TIME_CATEGORY,
+                    SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS.value
+                )
+            ) ?: SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS
+        )
+        b.dcRecycler.adapter = adapter
+
+        val chipTagById = HashMap<Int, String>()
+        lifecycleScope.launch {
+            val tags = viewModel.getBlocklistTags()
+            if (tags.isNotEmpty()) {
+                b.dcBlocklistChips.removeAllViews()
+                tags.forEach { tag ->
+                    val chip = layoutInflater.inflate(
+                        R.layout.item_chip_filter,
+                        b.dcBlocklistChips,
+                        false
+                    ) as Chip
+                    chip.text = tag
+                    chip.isChecked = true
+                    chip.isCheckedIconVisible = false
+                    chip.id = View.generateViewId()
+                    chipTagById[chip.id] = tag
+                    b.dcBlocklistChips.addView(chip)
+                }
+                b.dcBlocklistChips.visibility = View.VISIBLE
+            }
+            selectedBlocklistTags = tags.toSet()
+
+            var lastCheckedId = b.dcBlocklistChips.checkedChipIds.lastOrNull()
+            b.dcBlocklistChips.setOnCheckedStateChangeListener { group, checkedIds ->
+                if (checkedIds.isEmpty()) {
+                    lastCheckedId?.let { group.check(it) }
+                    return@setOnCheckedStateChangeListener
+                }
+                lastCheckedId = checkedIds.last()
+                selectedBlocklistTags = checkedIds.mapNotNull { chipTagById[it] }.toSet()
+                refetchScopedBlocklistDomains(adapter)
+            }
+
+            refetchScopedBlocklistDomains(adapter)
+        }
+    }
+
+    private fun refetchScopedBlocklistDomains(adapter: SummaryStatisticsAdapter) {
+        lifecycleScope.launch {
+            val domains = viewModel.getBlocklistDomainsForApp(scopedUid, selectedBlocklistTags)
+            adapter.submitData(lifecycle, PagingData.from(domains))
+            if (domains.isEmpty()) {
+                b.dcRecycler.visibility = View.GONE
+                b.dcNoDataRl.visibility = View.VISIBLE
+            } else {
+                b.dcRecycler.visibility = View.VISIBLE
+                b.dcNoDataRl.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun refetchBlocklistApps(adapter: BlocklistAppsAdapter) {
+        lifecycleScope.launch {
+            val apps = viewModel.getBlocklistApps(selectedBlocklistTags)
+            adapter.submitApps(apps)
+            if (apps.isEmpty()) {
+                b.dcRecycler.visibility = View.GONE
+                b.dcNoDataRl.visibility = View.VISIBLE
+            } else {
+                b.dcRecycler.visibility = View.VISIBLE
+                b.dcNoDataRl.visibility = View.GONE
+            }
+        }
     }
 }

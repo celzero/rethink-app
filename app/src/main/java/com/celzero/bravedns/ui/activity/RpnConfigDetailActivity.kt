@@ -40,6 +40,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
@@ -115,6 +116,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var configKey: String = ""
     private var countryConfig: CountryConfig? = null
     private var pubPub: String = ""
+    private var pendingSsidEditor = false
+    private var waitingForLocationSettings = false
 
 
     private var suppressHopListener: Boolean = false
@@ -150,6 +153,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
             b.heroContent.alpha = alpha
             b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
+            // Flag watermark fades with the hero; visibility is owned by the
+            // view itself (GONE when no flag is set), so only alpha moves here.
+            b.flagWatermark.alpha = alpha
         }
 
     // SSID permission callback
@@ -162,11 +168,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
                 }
             } else {
-                ui { refreshSsidSection() }
+                ui { continuePendingSsidEditor() }
             }
         }
         override fun onPermissionsDenied() {
             Logger.vv(LOG_TAG_UI, "ssid-callback permissions denied")
+            pendingSsidEditor = false
             ui { showPermissionDeniedDialog() }
         }
         override fun onPermissionsRationale() {
@@ -229,6 +236,15 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     override fun onResume() {
         super.onResume()
         init()
+        if (waitingForLocationSettings) {
+            waitingForLocationSettings = false
+            if (pendingSsidEditor && SsidPermissionManager.isLocationEnabled(this)) {
+                continuePendingSsidEditor()
+            } else {
+                pendingSsidEditor = false
+                refreshSsidSection()
+            }
+        }
     }
 
     override fun onPause() {
@@ -342,7 +358,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Placeholder while we fetch from DB.
         b.configNameText.text = ""
         b.tvHeroCity.text = ""
-        b.tvHeroFlag.visibility = View.GONE
+        b.flagWatermark.clear()
         b.chipHeroStats.visibility = View.GONE
 
         // Show inline shimmer for client IPs (stats table is already visible).
@@ -357,15 +373,20 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                 // SSID section needs countryConfig.
                 setupSsidSection(configKey)
-                // Banner.
+                // Banner. The flag renders as a full-banner watermark behind
+                // the hero content while expanded (same treatment as the
+                // server-list cards, scaled up); when collapsed it only
+                // travels with the collapsing-toolbar title.
                 if (config != null) {
+                    b.flagWatermark.setSpread(true)
                     if (configKey.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroFlag.visibility = View.GONE
-                        b.ivHeroFlag.visibility = View.VISIBLE
+                        // AUTO carries no country flag; fall back to the globe glyph.
+                        b.flagWatermark.setFlagDrawable(
+                            AppCompatResources.getDrawable(this@RpnConfigDetailActivity, R.drawable.ic_rpn_auto),
+                            R.attr.primaryTextColor
+                        )
                     } else {
-                        b.ivHeroFlag.visibility = View.GONE
-                        b.tvHeroFlag.visibility = View.VISIBLE
-                        b.tvHeroFlag.text = config.flagEmoji
+                        b.flagWatermark.setFlagText(config.flagEmoji)
                     }
                     b.configNameText.text = config.countryName
                     val city = config.city.ifBlank { config.serverLocation }
@@ -377,7 +398,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     b.collapsingToolbar.title =
                         collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
                 } else {
-                    b.tvHeroFlag.visibility = View.GONE
+                    b.flagWatermark.clear()
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
                     b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
@@ -444,7 +465,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // update load if available
                     buildLoadSpeedText(addlInfo.load, addlInfo.link)
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
-                        b.tvHeroCity.text = addlInfo.city + ", " + addlInfo.cc.capitalizeWords()
+                        b.tvHeroCity.text = addlInfo.city.capitalizeWords()
                         // Keep the collapsing toolbar title in sync with the hero city.
                         b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
                     }
@@ -490,9 +511,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 val entryIp = addlInfo?.addr
                     ?.split(",")?.getOrNull(1)?.trim().orEmpty()
                 val entryCity = addlInfo?.city.orEmpty()
-                uiCtx { b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity) }
+                uiCtx {
+                    b.valueIpv4.text = buildHopIpSpan(stripPort(entryIp), ip4, entryCity)
+                    b.labelIpv4.visibility = View.GONE
+                }
             }
         } else {
+            b.labelIpv4.visibility = View.VISIBLE
             b.valueIpv4.text = ip4
                 ?.takeIf { it.ip?.isNotBlank() == true }
                 ?.let { buildIpDetailSpan(it) }
@@ -706,17 +731,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // Use the time when this server key was selected by the user, not the VPN uptime.
         val selectedSinceTs = stats?.since ?: 0L
 
-        // when Auto is paused the relay is effectively paused too, regardless of this
-        // location's own state
-        var isAutoPaused = false
-        if (!id.contains(AUTO_SERVER_ID, ignoreCase = true) && config?.hopEnabled == true) {
-            isAutoPaused = runCatching {
-                VpnController.getProxyStatusById(Backend.RpnWin).first == Backend.TPU
-            }.getOrDefault(false)
-        }
-
         uiCtx {
-            applyStats(statusPair, stats, config, selectedSinceTs, isAutoPaused)
+            applyStats(statusPair, stats, config, selectedSinceTs)
         }
     }
 
@@ -731,15 +747,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         statusPair: Pair<Int?, String>,
         stats: RouterStats?,
         config: CountryConfig?,
-        selectedSinceTs: Long,
-        isAutoPaused: Boolean = false
+        selectedSinceTs: Long
     ) {
         val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
-        // Paused override (same as VpnServerAdapter): a relayed (hop) location
-        // whose AUTO is paused shows "Paused" even when it reports failing.
-        val effectiveStatus =
-            if (isAutoPaused && ps != UIUtils.ProxyStatus.TPU) UIUtils.ProxyStatus.TPU else ps
-        val statusColor = fetchColor(this, buildStatusColor(effectiveStatus))
+        val statusColor = fetchColor(this, buildStatusColor(ps))
 
         b.valueStatus.text = getString(R.string.lbl_active)
 
@@ -751,7 +762,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.valueTx.text = getString(R.string.symbol_upload, Utilities.humanReadableByteCount(tx, true))
 
         // e.g. "Connected · 🤝 1m · 🔃 12m"
-        val statusText = buildStatusText(effectiveStatus, statusPair.second)
+        val statusText = buildStatusText(ps, statusPair.second)
         val lastOK = stats?.lastOK ?: 0L
         val lastOpen = stats?.lastOpen ?: 0L
         val okTxt = if (lastOK > 0L)
@@ -803,18 +814,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             val loadPct = config?.load ?: 0
             val linkMbps = config?.link ?: 0
             buildLoadSpeedText(loadPct, linkMbps)
-        }
-
-        // only shown when proxy is in a failing state (suppressed while the
-        // paused override is active — a relay paused via AUTO is not an error).
-        val isFailing = isFailing(effectiveStatus)
-        if (isFailing && (rx == 0L && tx == 0L && selectedSinceTs > 0L)) {
-            b.rowErrors.visibility = View.VISIBLE
-            b.dividerErrors.visibility = View.VISIBLE
-            b.valueErrors.text = getString(R.string.status_failing)
-        } else {
-            b.rowErrors.visibility = View.GONE
-            b.dividerErrors.visibility = View.GONE
         }
     }
 
@@ -935,28 +934,20 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun observeAppCount(configKey: String) {
         if (configKey.isBlank()) return
         // proxyId stored in ProxyApplicationMapping is always Backend.RpnWin + configKey.
-        io {
-            val pid = if (configKey == AUTO_SERVER_ID) {
-                VpnController.getWinProxyId() ?: configKey
-            } else {
-                Backend.RpnWin + configKey
-            }
-            Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
-            uiCtx {
-                mappingViewModel.getAppCountById(pid).observe(this) { count ->
-                    // Don't override the "All apps" state when catch-all is active
-                    if (b.catchAllCheck.isChecked) return@observe
-                    val c = count ?: 0
-                    b.appsLabel.text = getString(
-                        R.string.two_argument_parenthesis,
-                        getString(R.string.apps_info_title),
-                        c
-                    )
-                    b.appsLabel.setTextColor(
-                        fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
-                    )
-                }
-            }
+        val pid = Backend.RpnWin + configKey
+        Logger.d(LOG_TAG_UI, "observeAppCount[$pid]")
+        mappingViewModel.getAppCountById(pid).observe(this) { count ->
+            // Don't override the "All apps" state when catch-all is active
+            if (b.catchAllCheck.isChecked) return@observe
+            val c = count ?: 0
+            b.appsLabel.text = getString(
+                R.string.two_argument_parenthesis,
+                getString(R.string.apps_info_title),
+                c
+            )
+            b.appsLabel.setTextColor(
+                fetchColor(this, if (c > 0) R.attr.accentGood else R.attr.accentBad)
+            )
         }
     }
 
@@ -1111,8 +1102,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // Revert the checkbox first; re-applied on proceed.
                     setMobileCheckSilently(false)
                     MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
-                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
                         .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> applyMobileOnly(true) }
                         .setNegativeButton(getString(R.string.lbl_cancel), null)
                         .show()
@@ -1341,23 +1332,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             cc != null && cc.name.isNotBlank() -> cc.name
             else -> configKey
         }
-        // AUTO (catch-all) has no per-key proxy id; resolve the live WIN proxy id
-        // from the tunnel, mirroring openLogsDialog().
-        if (configKey.contains(AUTO_SERVER_ID, ignoreCase = true)) {
-            io {
-                val proxyId = VpnController.getWinProxyId()
-                uiCtx {
-                    if (proxyId.isNullOrBlank()) {
-                        Logger.e(LOG_TAG_UI, "openAppsDialog: win proxy id unavailable for AUTO")
-                        return@uiCtx
-                    }
-                    includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
-                }
-            }
-        } else {
-            val proxyId = Backend.RpnWin + configKey
-            includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
-        }
+
+        val proxyId = Backend.RpnWin + configKey
+        includeAppsLauncher.launch(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
     }
 
     /**
@@ -1449,8 +1426,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         // section refresh.
         setSsidCheckSilently(enabled)
 
-        if (enabled && hasPermissions && isLocationEnabled) {
-            // SSID enabled and all permissions/location available — show current values
+        if (enabled) {
+            // Saved SSID rules can be displayed without reading the current SSID.
             if (ssidItems.isEmpty()) {
                 val allTxt = getString(
                     R.string.single_argument_parenthesis,
@@ -1469,7 +1446,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             LOG_TAG_UI,
             "setupSsidSectionUI: hasPermissions=$hasPermissions, locationEnabled=$isLocationEnabled, checked=${sw.isChecked}"
         )
-        updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
+        updateErrorLayouts(
+            hasPermissions,
+            isLocationEnabled,
+            ssidItems.isNotEmpty(),
+            permissionErrorLayout,
+            locationErrorLayout
+        )
 
         sw.setOnCheckedChangeListener { _, isChecked ->
             // Guard: skip the echo of a programmatic update (section refresh,
@@ -1479,31 +1462,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 lastProgrammaticSsidState = null
                 return@setOnCheckedChangeListener
             }
-            val hasForeground = SsidPermissionManager.hasForegroundPermissions(this)
-            val hasBackground = SsidPermissionManager.hasBackgroundLocationPermission(this)
             val currentLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
-
-            if (isChecked) {
-                if (!hasForeground) {
-                    showLocationDisclosureDialog {
-                        SsidPermissionManager.requestSsidPermissions(this@RpnConfigDetailActivity)
-                    }
-                    Logger.d(LOG_TAG_UI, "SSID foreground permissions not granted, requesting...")
-                    return@setOnCheckedChangeListener
-                } else if (isAtleastQ() && !hasBackground) {
-                    showLocationDisclosureDialog {
-                        SsidPermissionManager.requestBackgroundLocationPermission(this@RpnConfigDetailActivity)
-                    }
-                    Logger.d(LOG_TAG_UI, "SSID background permissions not granted, requesting...")
-                    return@setOnCheckedChangeListener
-                }
-            }
-
-            if (isChecked && !currentLocationEnabled) {
-                showLocationEnableDialog()
-                Logger.d(LOG_TAG_UI, "Location services not enabled, prompting user...")
-                return@setOnCheckedChangeListener
-            }
 
             val persistSsid: (Boolean) -> Unit = { checked ->
                 // Sync the switch: on the dialog-proceed path it was reverted
@@ -1512,7 +1471,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                 // Persist the new state
                 io { RpnProxyManager.updateSsidBased(configKey, checked) }
 
-                if (checked && SsidPermissionManager.hasRequiredPermissions(this) && currentLocationEnabled) {
+                if (checked) {
                     if (persistentState.enableStabilityDependentSettings()) {
                         SnackbarHelper.showStabilityProgram(b.root, persistentState)
                     }
@@ -1539,7 +1498,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     Logger.i(LOG_TAG_UI, "SSID feature disabled for configKey: $configKey")
                 }
 
-                updateErrorLayouts(SsidPermissionManager.hasRequiredPermissions(this), currentLocationEnabled, permissionErrorLayout, locationErrorLayout)
+                updateErrorLayouts(
+                    SsidPermissionManager.hasRequiredPermissions(this),
+                    currentLocationEnabled,
+                    ssidItems.isNotEmpty(),
+                    permissionErrorLayout,
+                    locationErrorLayout
+                )
             }
 
             if (!isChecked) {
@@ -1564,8 +1529,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     // Revert the switch first; re-applied on proceed.
                     setSsidCheckSilently(false)
                     MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-                        .setTitle(getString(R.string.rpn_automation_relay_dialog_title))
-                        .setMessage(getString(R.string.rpn_automation_relay_dialog_message))
+                        .setTitle(getString(R.string.qs_relay_automation_dialog_title))
+                        .setMessage(getString(R.string.qs_relay_automation_dialog_message))
                         .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> persistSsid(true) }
                         .setNegativeButton(getString(R.string.lbl_cancel), null)
                         .show()
@@ -1575,7 +1540,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
         layout.setOnClickListener { sw.performClick() }
 
-        editBtn.setOnClickListener { openSsidDialog() }
+        editBtn.setOnClickListener { requestSsidEditor() }
 
         setupSsidErrorActionListeners()
     }
@@ -1594,19 +1559,19 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private fun updateErrorLayouts(
         hasPermissions: Boolean,
         isLocationEnabled: Boolean,
+        hasConfiguredSsids: Boolean,
         permissionErrorLayout: LinearLayout,
         locationErrorLayout: LinearLayout
     ) {
         val sw = b.ssidCheck
-        // Show permission error only when SSID is enabled but permissions are missing
-        if (sw.isChecked && !hasPermissions) {
+        // Location access is only needed when a configured SSID list must be evaluated.
+        if (sw.isChecked && hasConfiguredSsids && !hasPermissions) {
             Logger.vv(LOG_TAG_UI, "Showing SSID permission error layout")
             permissionErrorLayout.visibility = View.VISIBLE
         } else {
             permissionErrorLayout.visibility = View.GONE
         }
-        // Show location error only when SSID is enabled, permissions ok, but location is off
-        if (sw.isChecked && hasPermissions && !isLocationEnabled) {
+        if (sw.isChecked && hasConfiguredSsids && hasPermissions && !isLocationEnabled) {
             Logger.vv(LOG_TAG_UI, "Showing SSID location error layout")
             locationErrorLayout.visibility = View.VISIBLE
         } else {
@@ -1631,10 +1596,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             .setPositiveButton(getString(R.string.ssid_permission_error_action)) { _, _ ->
                 SsidPermissionManager.openAppSettings(this)
             }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-                b.ssidCheck.isChecked = false
-                io { RpnProxyManager.updateSsidBased(configKey, false) }
-            }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
             .create().show()
     }
 
@@ -1671,6 +1633,35 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         dlg.show()
     }
 
+    private fun requestSsidEditor() {
+        pendingSsidEditor = true
+        when {
+            !SsidPermissionManager.hasForegroundPermissions(this) ->
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestSsidPermissions(this)
+                }
+            isAtleastQ() && !SsidPermissionManager.hasBackgroundLocationPermission(this) ->
+                showLocationDisclosureDialog {
+                    SsidPermissionManager.requestBackgroundLocationPermission(this)
+                }
+            else -> continuePendingSsidEditor()
+        }
+    }
+
+    private fun continuePendingSsidEditor() {
+        if (!pendingSsidEditor || isFinishing || isDestroyed) return
+        if (!SsidPermissionManager.hasRequiredPermissions(this)) {
+            pendingSsidEditor = false
+            return
+        }
+        if (!SsidPermissionManager.isLocationEnabled(this)) {
+            showLocationEnableDialog()
+            return
+        }
+        pendingSsidEditor = false
+        openSsidDialog()
+    }
+
     private fun showLocationDisclosureDialog(onContinue: () -> Unit) {
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.location_disclosure_title))
@@ -1681,9 +1672,9 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             dialog.dismiss()
         }
         builder.setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
-            b.ssidCheck.isChecked = false
-            io { RpnProxyManager.updateSsidBased(configKey, false) }
+            pendingSsidEditor = false
         }
+        builder.setOnCancelListener { pendingSsidEditor = false }
         builder.create().show()
     }
 
@@ -1693,14 +1684,14 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             .setMessage(getString(R.string.location_disclosure_message))
             .setCancelable(true)
             .setPositiveButton(getString(R.string.location_disclosure_positive)) { dlg, _ ->
-                SsidPermissionManager.requestLocationEnable(this); dlg.dismiss()
+                waitingForLocationSettings = true
+                SsidPermissionManager.requestLocationEnable(this)
+                dlg.dismiss()
             }
             .setNegativeButton(getString(R.string.location_disclosure_negative)) { _, _ ->
-                b.ssidCheck.isChecked = false
-                io {
-                    RpnProxyManager.updateSsidBased(configKey, false)
-                }
+                pendingSsidEditor = false
             }
+            .setOnCancelListener { pendingSsidEditor = false }
             .create().show()
     }
 
@@ -1733,4 +1724,3 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         }
     }
 }
-

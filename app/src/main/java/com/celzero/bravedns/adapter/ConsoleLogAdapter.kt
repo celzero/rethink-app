@@ -29,6 +29,7 @@ import com.celzero.bravedns.databinding.ListItemConsoleLogBinding
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import kotlin.math.abs
 
 class ConsoleLogAdapter(private val context: Context) :
     PagingDataAdapter<ConsoleLog, ConsoleLogAdapter.ConsoleLogViewHolder>(DIFF_CALLBACK) {
@@ -100,7 +101,7 @@ class ConsoleLogAdapter(private val context: Context) :
                 }
                 b.logDetail.text = log.message
                 if (DEBUG) {
-                    b.logTimestamp.text = "${log.id}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
+                    b.logTimestamp.text = "${abs(log.id)}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
                 } else {
                     b.logTimestamp.text = Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
                 }

@@ -23,6 +23,7 @@ import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.DialogDnscryptRelaysBinding
+import com.celzero.bravedns.util.UIUtils
 
 class DnsCryptRelaysDialog(
     private var activity: Activity,
@@ -48,6 +49,8 @@ class DnsCryptRelaysDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
         )
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(this)
 
         mLayoutManager = LinearLayoutManager(activity)
 

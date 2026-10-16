@@ -38,6 +38,7 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.os.Build
+import android.os.Process
 import androidx.annotation.ChecksSdkIntAtLeast
 import android.os.Looper
 import android.provider.Settings
@@ -117,7 +118,16 @@ object Utilities {
     private const val MINIMUM_OS_VERSION_PARTS = 2
     private const val DECIMAL_FORMAT_PATTERN = "%.1f %sB"
 
+    // Xiaomi family identifiers; matched against Build.MANUFACTURER and Build.BRAND.
+    private val XIAOMI_BRANDS = setOf("xiaomi", "redmi", "poco")
+
+    // Android encodes the user id in the uid's higher bits: uid = userId * 100000 + appId.
+    private const val UID_USER_FACTOR = 100_000
+
     private var countryMap: CountryMap? = null
+
+    // SecureRandom is thread-safe; a single shared instance avoids per-call
+    private val secureRandom = SecureRandom()
 
     // convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
     fun getETldPlus1(fqdn: String): String? {
@@ -747,6 +757,20 @@ object Utilities {
         return BuildConfig.BUILD_TYPE == BUILD_TYPE_ALPHA
     }
 
+    /**
+     * Whether this install is affected by the MIUI floating-toolbar crash: on Xiaomi
+     * family devices (Xiaomi/Redmi/POCO) running in a secondary user (Dual Apps /
+     * cloned app / work profile), the OEM's floating text-selection toolbar registers
+     * its popup window with the accessibility service using a cross-user lookup, which
+     * Android rejects with a fatal SecurityException. See #3177
+     */
+    private val miuiFloatingToolbarBugAffected: Boolean =
+        (Build.MANUFACTURER?.lowercase() in XIAOMI_BRANDS ||
+            Build.BRAND?.lowercase() in XIAOMI_BRANDS) &&
+            Process.myUid() / UID_USER_FACTOR != 0
+
+    fun isMiuiFloatingToolbarBugAffected(): Boolean = miuiFloatingToolbarBugAffected
+
     @Suppress("TooGenericExceptionCaught")
     fun getApplicationInfo(ctx: Context, packageName: String): ApplicationInfo? {
         return try {
@@ -988,7 +1012,6 @@ object Utilities {
     // generates a user-specified number of random bytes, converts it to hexadecimal, and then
     // provides the hexadecimal value as a string
     fun getRandomString(length: Int): String {
-        val secureRandom = SecureRandom()
         val random = ByteArray(length)
         secureRandom.nextBytes(random)
         // formats each byte as a two-character hexadecimal string

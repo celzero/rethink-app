@@ -27,16 +27,70 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isAtleastU
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/**
+ * Receiver for external automation apps.
+ *
+ * Actions (all require the sender package to be in [PersistentState.appTriggerPackages]):
+ *  - [ACTION_START] - start the Rethink VPN
+ *  - [ACTION_STOP] - stop the Rethink VPN
+ *  - [ACTION_WG_START] - enable wireguard config(s), adds the proxy to the tunnel
+ *  - [ACTION_WG_STOP] - disable wireguard config(s), removes the proxy from the tunnel
+ *  - [ACTION_WG_PAUSE] - pause live wireguard proxy(es)
+ *  - [ACTION_WG_RESUME] - resume live wireguard proxy(es)
+ *
+ * Caller identity:
+ *  - Android 14 (API 34) and above: resolved exclusively from the OS-provided
+ *    [BroadcastReceiver.getSentFromPackage] / [BroadcastReceiver.getSentFromUid]; intent extras
+ *    are never trusted, even when the OS identity is absent.
+ *  - Below Android 14: no OS-provided broadcast sender identity exists, so the legacy
+ *    [EXTRA_SENDER] extra convention is honored instead. NOTE: that extra is sender-controlled
+ *    and therefore spoofable on this path; it is kept solely to preserve automation support on
+ *    older Android versions.
+ *
+ * Extras:
+ *  - [EXTRA_SENDER] (String, legacy, only honored below Android 14): calling package name
+ *  - [EXTRA_WG_IDS] (String, required for the WG_* actions): comma separated wireguard config
+ *    ids, e.g. "1,3"
+ *
+ * The WG_* actions are only honored when [PersistentState.wgTaskerAutomationEnabled] is on.
+ */
 class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     private val persistentState by inject<PersistentState>()
+    private val appScope by inject<CoroutineScope>()
+
+    // seam for tests; executes validated wg commands
+    internal var wgCommands: WgCommands = WgCommands()
+
+    // seam for tests; resolves the caller identity (never from untrusted extras on API 34+)
+    internal var callerResolver: (Context, Intent) -> String? =
+        { context, intent -> defaultCallerResolver(context, intent) }
+
     companion object {
         private const val TAG = "VpnCtrlRecr"
-        private const val ACTION_START = "com.celzero.bravedns.intent.action.VPN_START"
-        private const val ACTION_STOP = "com.celzero.bravedns.intent.action.VPN_STOP"
+        const val ACTION_START = "com.celzero.bravedns.intent.action.VPN_START"
+        const val ACTION_STOP = "com.celzero.bravedns.intent.action.VPN_STOP"
+        const val ACTION_WG_START = "com.celzero.bravedns.intent.action.WG_START"
+        const val ACTION_WG_STOP = "com.celzero.bravedns.intent.action.WG_STOP"
+        const val ACTION_WG_PAUSE = "com.celzero.bravedns.intent.action.WG_PAUSE"
+        const val ACTION_WG_RESUME = "com.celzero.bravedns.intent.action.WG_RESUME"
+        const val EXTRA_SENDER = "sender"
+        const val EXTRA_WG_IDS = "wg_ids"
         private const val STOP_REASON = "tasker_stop"
+
+        /**
+         * Parses the [EXTRA_WG_IDS] extra (comma separated config ids, e.g. "1, 3").
+         * Blank segments and non-numeric segments are dropped; an empty/missing value
+         * yields an empty list which callers should treat as an invalid intent.
+         */
+        fun parseWgIds(raw: String?): List<Int> {
+            if (raw.isNullOrBlank()) return emptyList()
+            return raw.split(",").mapNotNull { it.trim().toIntOrNull() }
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -63,11 +117,50 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (intent.action == ACTION_START) {
-            handleVpnStart(context)
+        when (intent.action) {
+            ACTION_START -> handleVpnStart(context)
+            ACTION_STOP -> handleVpnStop(context)
+            ACTION_WG_START, ACTION_WG_STOP, ACTION_WG_PAUSE, ACTION_WG_RESUME ->
+                handleWgAction(context, intent)
+            else -> Logger.w(LOG_TAG_VPN, "$TAG Received unknown action: ${intent.action}")
         }
-        if (intent.action == ACTION_STOP) {
-            handleVpnStop(context)
+    }
+
+    private fun handleWgAction(context: Context, intent: Intent) {
+        if (!persistentState.wgTaskerAutomationEnabled) {
+            Logger.i(
+                LOG_TAG_VPN,
+                "$TAG wg tasker automation is disabled, ignoring action: ${intent.action}"
+            )
+            return
+        }
+
+        val ids = parseWgIds(intent.getStringExtra(EXTRA_WG_IDS))
+        if (ids.isEmpty()) {
+            Logger.w(
+                LOG_TAG_VPN,
+                "$TAG missing or invalid $EXTRA_WG_IDS extra, ignoring action: ${intent.action}"
+            )
+            return
+        }
+
+        Logger.i(LOG_TAG_VPN, "$TAG handling ${intent.action} for wg ids: $ids")
+        // wg commands touch the db + go backend, run them off the main thread; goAsync-style
+        // correctness is not critical here as the commands are idempotent
+        val pendingResult = goAsync()
+        appScope.launch {
+            try {
+                val failures = when (intent.action) {
+                    ACTION_WG_START -> wgCommands.start(ids)
+                    ACTION_WG_STOP -> wgCommands.stop(ids)
+                    ACTION_WG_PAUSE -> wgCommands.pause(ids)
+                    ACTION_WG_RESUME -> wgCommands.resume(ids)
+                    else -> emptyList()
+                }
+                WgAutomationNotifier.onCommandResult(context, intent.action, ids.size, failures)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 
@@ -115,49 +208,32 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     }
 
     private fun getCallerPkg(context: Context, intent: Intent): String? {
-        // package name of the app that sent the broadcast
+        return callerResolver(context, intent)
+    }
+
+    internal fun defaultCallerResolver(context: Context, intent: Intent): String? {
         if (DEBUG) dumpIntent(intent)
 
-        // expecting the intent to have a package name in the extras with key "sender"
-        var callerPkg = intent.getStringExtra("sender")
-        if (callerPkg != null) {
-            Logger.i(LOG_TAG_VPN, "$TAG Received intent from extra sender: $callerPkg, from sender")
-            return callerPkg
-        }
-
-        // above 34 (Android U) sentFromPackage and sentFromUid are available
+        // Android 14 (API 34) and above: the OS stamps the sender identity on every broadcast;
+        // only trust that, never sender-controlled extras
         if (isAtleastU()) {
-            callerPkg = sentFromPackage
-            if (callerPkg != null) {
-                Logger.i(LOG_TAG_VPN, "$TAG Received intent from sentFromPackage: $callerPkg")
-                return callerPkg
+            val pkg = sentFromPackage
+                ?: context.packageManager.getPackagesForUid(sentFromUid)?.firstOrNull()
+            if (pkg != null) {
+                Logger.i(LOG_TAG_VPN, "$TAG caller from OS-provided identity: $pkg")
+                return pkg
             }
-            val uid = sentFromUid
-            callerPkg = context.packageManager.getPackagesForUid(uid)?.firstOrNull()
-            if (callerPkg != null) {
-                Logger.i(LOG_TAG_VPN, "$TAG received intent from sentFromUid, $uid, $callerPkg")
-                return callerPkg
-            }
+            Logger.w(LOG_TAG_VPN, "$TAG no OS-provided sender identity, rejecting intent")
+            return null
         }
 
-        // see if the intent has a package name in the extras with key "EXTRA_PACKAGE_NAME" or
-        // "EXTRA_INTENT", less reliable method unless the app explicitly sets it
-        // Intent.EXTRA_PACKAGE_NAME is typically for identifying the target package of an explicit
-        // intent, not usually the sender of a broadcast. However, checking it doesn't hurt.
-        // Intent.EXTRA_INTENT might contain package name.
-        callerPkg = if (isAtleastT()) {
-            intent.getStringExtra(Intent.EXTRA_PACKAGE_NAME)
-        } else {
-            intent.getStringExtra(Intent.EXTRA_INTENT)
+        // below Android 14 there is no OS-provided broadcast sender identity; fall back to the
+        // legacy "sender" extra convention (spoofable on this path, accepted for automation)
+        val legacy = intent.getStringExtra(EXTRA_SENDER)
+        if (legacy != null) {
+            Logger.i(LOG_TAG_VPN, "$TAG caller from legacy extra: $legacy")
         }
-        if (callerPkg != null) {
-            Logger.i(LOG_TAG_VPN, "$TAG Received intent from extra sender: $callerPkg, from sender")
-            return callerPkg
-        }
-
-
-        Logger.i(LOG_TAG_VPN, "$TAG could not determine caller pkg")
-        return callerPkg
+        return legacy
     }
 
     fun dumpIntent(intent: Intent) {

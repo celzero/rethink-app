@@ -25,8 +25,9 @@ import org.json.JSONObject
  * Sealed result returned by every Rethink server billing endpoint.
  *
  * Use [RpnPurchaseAckServerResponse.from] to deserialise raw HTTP response bodies.
- * A 2xx response with `"success" != false` is treated as [Ok]; everything
- * else (non-2xx, `"error"` key present, or `"success" == false`) is [Err].
+ * A 2xx response with a JSON body and `"success" != false` is treated as [Ok];
+ * everything else (non-2xx, missing or non-JSON body, `"error"` key present, or
+ * `"success" == false`) is [Err].
  */
 sealed class RpnPurchaseAckServerResponse {
     data class Ok(val payload: ResponseOk) : RpnPurchaseAckServerResponse()
@@ -48,7 +49,14 @@ sealed class RpnPurchaseAckServerResponse {
                 return Err(payload)
             }
 
-            val json = body?.trimmedJson() ?: JSONObject()
+            // The server always replies with a JSON object (it carries at least "ray"),
+            // so a missing or non-JSON 2xx body (e.g. from a proxy) is not a success.
+            val json = body?.trimmedJson()
+            if (json == null) {
+                val payload = ResponseErr(error = "malformed response", httpCode = httpCode)
+                Logger.d(LOG_IAB, "PlayErr: $payload")
+                return Err(payload)
+            }
 
             // If "error" key is present, or "success" is explicitly false → error
             return if (json.has("error") || !json.optBoolean("success", true)) {
@@ -63,10 +71,10 @@ sealed class RpnPurchaseAckServerResponse {
             }
         }
 
-        private fun String.trimmedJson(): JSONObject = try {
+        private fun String.trimmedJson(): JSONObject? = try {
             JSONObject(this.trim())
         } catch (_: Exception) {
-            JSONObject()
+            null
         }
     }
 }

@@ -825,7 +825,6 @@
     <string name="ada_app_status_block_md" translatable="true">மீட்டர் (மொபைல்) நெட்வொர்க்குகளில் தடுக்கப்பட்டுள்ளது</string>
     <string name="exclude_apps_from_proxy_failure_toast">இந்த பயன்பாடு ப்ராக்சிகளை புறக்கணிக்கிறது</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">இந்த பயன்பாடு தொடர்பான அனைத்து பதிவுகளையும் அழிக்கவும்.</string>
-    <string name="bsdl_block_desc" translatable="true">தொகுதி, நம்புங்கள் &lt;u&gt; இந்த டொமைன் &lt;/u&gt;</string>
     <string name="network_dns" translatable="true">கணினி டி.என்.எச்</string>
     <string name="notif_download_content_title" translatable="true">ஆன்-டெவிச் பிளாக்லிச்ட் பதிவிறக்கம்</string>
     <string name="notif_download_content_text" translatable="true">பதிவிறக்கம் முன்னேற்றத்தில்…</string>

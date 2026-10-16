@@ -37,7 +37,6 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin" />
 
-            <!-- Hero subtitle: plan name + account ID (sits just above bottom of header) -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_hero_subtitle"
                 android:layout_width="match_parent"
@@ -67,6 +66,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:overScrollMode="never"
+        android:layout_marginBottom="160dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -94,7 +94,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -117,7 +116,7 @@
                         android:layout_height="wrap_content"
                         app:singleSelection="true"
                         app:selectionRequired="false"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="8dp">
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_payment"
@@ -216,7 +215,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -283,53 +281,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/support_attach_history"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium"
-                                android:textColor="?attr/primaryTextColor" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/support_attach_history_desc"
-                                android:textSize="12sp"
-                                android:textColor="?attr/primaryLightColorText" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/switch_attach_history"
-                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/divider"
-                        android:layout_marginBottom="10dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical">
 
                         <LinearLayout
@@ -370,6 +321,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?attr/divider"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp" />
 
                     <LinearLayout
@@ -416,32 +368,6 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp"
-                android:padding="12dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_rethink_plus"
-                    android:tint="?attr/primaryLightColorText"
-                    android:layout_marginEnd="8dp" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/support_privacy_note"
-                    android:textSize="12sp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:lineSpacingExtra="3dp" />
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
@@ -452,12 +378,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:paddingStart="16dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp"
         android:background="?attr/colorSurface"
         android:elevation="8dp">
 
@@ -468,10 +388,28 @@
             android:text="@string/about_bug_report_dialog_positive_btn"
             android:textSize="16sp"
             app:cornerRadius="28dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             app:iconGravity="textStart"
             android:textColor="?attr/accentGood"
             app:iconPadding="8dp"
             style="@style/Widget.Material3.Button.OutlinedButton" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/support_privacy_note"
+            android:textSize="10sp"
+            android:alpha="0.8"
+            android:layout_marginTop="6dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:lineSpacingExtra="3dp" />
 
         <LinearLayout
             android:id="@+id/layout_loading"

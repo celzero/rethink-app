@@ -122,6 +122,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcEnableCacheSwitch.isChecked = persistentState.enableDnsCache
         // use system dns for undelegated domains
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
+        // use system dns on captive portals
+        b.dcCaptivePortalSwitch.isChecked = persistentState.useSystemDnsOnCaptivePortal
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dcBlockUnknownSwitch.isChecked = persistentState.blockDnsForUnknownApp
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
@@ -661,6 +663,18 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             logEvent(
                 "undelegated domains? $isChecked",
                 "User changed use system dns for undelegated domains setting to $isChecked"
+            )
+        }
+
+        b.dcCaptivePortalRl.setOnClickListener {
+            b.dcCaptivePortalSwitch.isChecked = !b.dcCaptivePortalSwitch.isChecked
+        }
+
+        b.dcCaptivePortalSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.useSystemDnsOnCaptivePortal = isChecked
+            logEvent(
+                "captive portal? $isChecked",
+                "User changed use system dns on captive portals setting to $isChecked"
             )
         }
 

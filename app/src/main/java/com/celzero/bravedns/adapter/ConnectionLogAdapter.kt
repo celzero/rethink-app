@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -114,7 +115,16 @@ class ConnectionLogAdapter(private val context: Context) :
                 parent,
                 false
             )
-        return ConnectionLogViewHolder(itemBinding)
+        val owner =
+            parent.findViewTreeLifecycleOwner() ?: parent.context as? LifecycleOwner
+        return ConnectionLogViewHolder(itemBinding, owner)
+    }
+
+    override fun onViewRecycled(holder: ConnectionLogViewHolder) {
+        super.onViewRecycled(holder)
+        // Stop any in progress item work (DB reads, icon loads) for a view that is
+        // leaving the screen; rebinding re-launches whatever is needed.
+        holder.cancelBinding()
     }
 
     override fun onBindViewHolder(holder: ConnectionLogViewHolder, position: Int) {
@@ -128,12 +138,13 @@ class ConnectionLogAdapter(private val context: Context) :
         holder.setTag(log)
     }
 
-    inner class ConnectionLogViewHolder(private val b: ListItemConnTrackBinding) :
+    inner class ConnectionLogViewHolder(private val b: ListItemConnTrackBinding,
+                                        private val owner: LifecycleOwner?) :
         RecyclerView.ViewHolder(b.root) {
 
         private var bindingScope: CoroutineScope? = null
 
-        private fun cancelBinding() {
+        fun cancelBinding() {
             bindingScope?.cancel()
             bindingScope = null
         }
@@ -141,9 +152,9 @@ class ConnectionLogAdapter(private val context: Context) :
         /** Launches [block] on IO in [bindingScope]. Cancelling [bindingScope]
          *  via [cancelBinding] will cancel all active children. */
         private fun launchBinding(block: suspend CoroutineScope.() -> Unit): Job? {
-            val owner = context as? LifecycleOwner ?: return null
+            val lifecycleOwner = owner ?: return null
             if (bindingScope == null) {
-                val parentJob = owner.lifecycleScope.coroutineContext[Job]
+                val parentJob = lifecycleOwner.lifecycleScope.coroutineContext[Job]
                 bindingScope = CoroutineScope(Dispatchers.IO + SupervisorJob(parentJob))
             }
             return bindingScope?.launch(block = block)
@@ -500,10 +511,6 @@ class ConnectionLogAdapter(private val context: Context) :
         private fun isConnectionSlower(log: MergedConnectionLog): Boolean {
             return (log.protocol == Protocol.UDP.protocolType && log.duration > MAX_TIME_UDP) ||
                 (log.protocol == Protocol.TCP.protocolType && log.duration > MAX_TIME_TCP)
-        }
-
-        private fun loadAppIcon(drawable: Drawable?) {
-            b.connectionAppIcon.setImageDrawable(drawable)
         }
     }
 }

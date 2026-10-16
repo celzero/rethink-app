@@ -40,6 +40,7 @@ import com.celzero.bravedns.shadows.ShadowMark
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSOpts
@@ -67,13 +68,12 @@ import org.robolectric.annotation.Config
 )
 class TunDnsManagerTest {
 
-    private val persistentState = mockk<PersistentState>(relaxed = true)
-    private val appConfig = mockk<AppConfig>(relaxed = true)
+    private val rethinkUid = 10000
+
+    // keep only non-cached collaborators as per-test mocks; cached ones live in the companion
     private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
     private val keyguardManager = mockk<KeyguardManager>(relaxed = true)
-
-    private val rethinkUid = 10000
 
     companion object {
         // TunDnsManager is a process-lifetime `object`; its `by inject<NetLogTracker>()`
@@ -83,19 +83,28 @@ class TunDnsManagerTest {
         // Share a single mock across all tests (the cached delegate and the verified instance
         // become the same object); recorded calls are cleared in @Before for per-test isolation.
         private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+
+        // same reasoning as netLogTracker: TunDnsManager also caches PersistentState and
+        // AppConfig on first resolve, so these must be shared or stubs silently miss production
+        private val persistentState = mockk<PersistentState>(relaxed = true)
+        private val appConfig = mockk<AppConfig>(relaxed = true)
     }
 
     @Before
     fun setUp() {
         // reset recorded calls/verifications so each test starts clean (counts matter for
-        // verify(exactly = N)); answers/relaxed behaviour are unaffected.
-        clearMocks(netLogTracker)
+        // verify(exactly = N)); relaxed behaviour is unaffected. answers are cleared too so
+        // stubs from one test never leak into the next via the shared companion mocks
+        clearMocks(netLogTracker, appConfig, persistentState)
         startKoin {
             modules(module {
                 single { persistentState }
                 single { appConfig }
                 single { netLogTracker }
                 single { rdb }
+                // WireguardManager.db resolves this lazily; unstubbed WireguardManager
+                // calls fall through to the original and would otherwise throw
+                single { mockk<com.celzero.bravedns.database.WgConfigFilesRepository>(relaxed = true) }
             })
         }
         // gomobile's DNSOpts() constructor NPEs under Robolectric (native seq, not interceptable
@@ -960,6 +969,65 @@ class TunDnsManagerTest {
         return summary
     }
 
+    // region handleOnQuery - captive portal tests
+
+    private fun createQueryParams(
+        isCaptivePortal: Boolean,
+        uidStr: String = "10123",
+        qtype: Long = 1L
+    ): TunDnsManager.DnsParams {
+        return TunDnsManager.DnsParams(
+            origin = Backend.OriginInternal,
+            uidStr = uidStr,
+            fqdn = "example.com",
+            qtype = qtype,
+            isLockdown = false,
+            ssid = null,
+            isIfaceCellular = false,
+            isCaptivePortal = isCaptivePortal
+        )
+    }
+
+    @Test
+    fun `handleOnQuery - captive portal routes to system dns and bypasses blocklists`() = runTest {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+
+        val opts = TunDnsManager.handleOnQuery(createQueryParams(isCaptivePortal = true))
+
+        assertTrue(opts.tidcsv.contains(Backend.System))
+        assertTrue(opts.noblock)
+    }
+
+    @Test
+    fun `handleOnQuery - non-captive keeps user-configured transport`() = runTest {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS
+        every { appConfig.isSystemDns() } returns false
+        every { appConfig.isSmartDnsEnabled() } returns false
+        every { VpnController.isAppPaused() } returns false
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+
+        val opts = TunDnsManager.handleOnQuery(createQueryParams(isCaptivePortal = false))
+
+        assertFalse(opts.tidcsv.contains(Backend.System))
+        assertTrue(opts.tidcsv.contains(Backend.Preferred))
+        assertFalse(opts.noblock)
+    }
+
+    @Test
+    fun `handleOnQuery - captive portal still applies qtype filter`() = runTest {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+
+        // qtype 28 (AAAA) is not in the allowed set, so even captive queries get blocked
+        val opts = TunDnsManager.handleOnQuery(createQueryParams(isCaptivePortal = true, qtype = 28L))
+
+        assertTrue(opts.tidcsv.contains(Backend.BlockAll))
+        assertFalse(opts.noblock)
+    }
+
+    // endregion
+
     private fun createUpstreamParams(
         id: String = "Preferred",
         smm: DNSSummary = createDnsSummary(uid = "10123"),
@@ -975,7 +1043,8 @@ class TunDnsManagerTest {
         isConnectionMetered: (String) -> Boolean = { false },
         determineProxyDetails: suspend (ConnTrackerMetaData, Boolean, Boolean) -> Mark = { _, _, _ -> mockk(relaxed = true) },
         onDeviceLocked: (() -> Unit)? = null,
-        onAccessibilityFailure: (() -> Unit)? = null
+        onAccessibilityFailure: (() -> Unit)? = null,
+        isCaptivePortal: Boolean = false
     ): TunDnsManager.UpstreamAnswerParams {
         return TunDnsManager.UpstreamAnswerParams(
             scope = CoroutineScope(SupervisorJob()),
@@ -993,7 +1062,8 @@ class TunDnsManagerTest {
             isConnectionMetered = isConnectionMetered,
             determineProxyDetails = determineProxyDetails,
             onDeviceLocked = onDeviceLocked,
-            onAccessibilityFailure = onAccessibilityFailure
+            onAccessibilityFailure = onAccessibilityFailure,
+            isCaptivePortal = isCaptivePortal
         )
     }
 

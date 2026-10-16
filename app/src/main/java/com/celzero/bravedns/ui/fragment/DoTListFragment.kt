@@ -35,6 +35,7 @@ import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDotListBinding
 import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -133,6 +134,8 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         // remain visible on smaller screens (instead of panning the window)
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         dialog.window?.attributes = lp
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(dialog)
 
         val heading = dialogBinding.dialogCustomUrlTop
         val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn

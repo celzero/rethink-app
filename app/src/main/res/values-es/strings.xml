@@ -766,7 +766,6 @@
     <string name="lbl_blocked" translatable="true">Bloqueadas</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Dominio de confianza (App)</string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Una regla del cortafuegos establecida por el usuario bloqueó el <i>dominio</i>.<br><br> Para modificarla, ve a la pantalla <i>Cortafuegos específico de la aplicación</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar en &lt;u&gt;este dominio&lt;/u&gt;</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta conexión se permitió porque el <i>dominio</i> está configurado como dominio de confianza.<br><br> Para modificarlo, ve a la pantalla <i>Cortafuegos específico de la aplicación</i>.]]></string>
     <string name="cd_no_rules_text" translatable="true">No hay reglas de dominio.</string>
     <string name="firewall_rule_block_domain" translatable="true">Dominio (App)</string>

@@ -770,7 +770,6 @@
     <string name="lbl_wildcard" translatable="true">Подстановочный знак</string>
     <string name="lbl_domain_rules" translatable="true">Правила домена</string>
     <string name="cd_no_rules_text" translatable="true">Нет правил домена.</string>
-    <string name="bsdl_block_desc" translatable="true">Блокировка, доверие к &lt;u&gt;этому домену&lt;/u&gt;</string>
     <string name="lbl_rules" translatable="true">Правила</string>
     <string name="lbl_configure" translatable="true">Настроить</string>
     <string name="lbl_logs" translatable="true">Журнал активности</string>

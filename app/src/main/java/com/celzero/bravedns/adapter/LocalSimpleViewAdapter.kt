@@ -194,6 +194,9 @@ class LocalSimpleViewAdapter(val context: Context, private val fragment: Rethink
         }
 
         private fun ui(f: () -> Unit) {
+            // Skip UI callbacks once the host fragment's view is gone; the
+            // persistence write in io() still completes regardless.
+            if (!fragment.isAdded) return
             CoroutineScope(Dispatchers.Main).launch { f() }
         }
     }

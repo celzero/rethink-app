@@ -21,6 +21,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import android.content.Context
 import com.android.billingclient.api.BillingClient
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.CountryConfigRepository
@@ -31,6 +32,7 @@ import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.iab.BillingBackendClient
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.iab.QueryEntitlementResult
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.DnsMode.Companion.setFromCsv
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.DnsMode.Companion.tunTypesFromSet
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.activateRpn
@@ -74,6 +76,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
+import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -88,6 +92,8 @@ object RpnProxyManager : KoinComponent {
     private val db: RpnProxyRepository by inject()
     private val countryConfigRepo: CountryConfigRepository by inject()
     private val persistentState by inject<PersistentState>()
+
+    private val appConfig by inject<AppConfig>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val subscriptionStatusRepository: SubscriptionStatusRepository by inject()
 
@@ -129,7 +135,7 @@ object RpnProxyManager : KoinComponent {
     // (both observing win()==null before either completes). NOT held during the
     // recovery ladder (entitlement re-derivation, server queries), the
     // server-location fetch, reset's unregisterWin(), or the deviceId resolution
-    // (billingBackendClient.getDeviceId(), which can block on identityMutex /
+    // (didForCid, which can block on identityMutex /
     // issue a network identity refresh) — those remain parallel. The prior
     // winRegistrationMutex locked the entire function (including the slow recovery
     // ladder), causing ~15s stalls; this narrow lock avoids that.
@@ -384,6 +390,8 @@ object RpnProxyManager : KoinComponent {
             return
         }
         persistentState.rpnMode = mode.id
+        // re-publish the proxy-card label so observers pick up the transition
+        persistentState.updateProxyStatus()
         Logger.i(LOG_TAG_PROXY, "$TAG; rpn mode set to ${mode.name}")
     }
 
@@ -393,6 +401,8 @@ object RpnProxyManager : KoinComponent {
             return
         }
         persistentState.rpnState = state.id
+        // re-publish the proxy-card label so observers pick up the transition
+        persistentState.updateProxyStatus()
         Logger.i(LOG_TAG_PROXY, "$TAG; rpn state set to ${state.name}")
     }
 
@@ -405,6 +415,8 @@ object RpnProxyManager : KoinComponent {
 
         // no need to check the state, as user can manually deactivate RPN
         persistentState.rpnState = RpnState.DISABLED.id
+        // re-publish the proxy-card label so observers pick up the transition
+        persistentState.updateProxyStatus()
     }
 
     /**
@@ -441,6 +453,9 @@ object RpnProxyManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG; startProxy: proxy already running (mode=${rpnMode()})")
             VpnController.handleRpnProxies()
             return
+        }
+        if (!appConfig.getBraveMode().isDnsFirewallMode()) {
+            appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode)
         }
         setRpnMode(RpnMode.ANTI_CENSORSHIP)
         setRpnState(RpnState.ENABLED)
@@ -517,6 +532,8 @@ object RpnProxyManager : KoinComponent {
 
         try {
             persistentState.rpnState = RpnState.ENABLED.id
+            // re-publish the proxy-card label so observers pick up the transition
+            persistentState.updateProxyStatus()
             Logger.i(
                 LOG_TAG_PROXY,
                 "$TAG; activateRpn: rpn activated, mode: ${rpnMode()}, product: ${purchase.productId}"
@@ -525,6 +542,7 @@ object RpnProxyManager : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG; activateRpn: error activating RPN: ${e.message}", e)
             // Rollback on error
             persistentState.rpnState = RpnState.DISABLED.id
+            persistentState.updateProxyStatus()
             throw e
         }
     }
@@ -533,7 +551,9 @@ object RpnProxyManager : KoinComponent {
         // "developerPayload":"{\"ws\":{\"cid\":\"aa95f04efcb19a54c7605a02e5dd0b435906b993d12bec031a60f3f1272f4f0e\",\"sessiontoken\":\"22695:4:1752256088:524537c17**c146ba3404af:023f958b6c194**fe6885d3e57322\",\"expiry\":\"2025-08-11T00:00:00.000Z\",\"status\":\"valid\"}}"
         try {
             val ws = extractWsObject(payload) ?: return ""
-            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
+            // read the stored DID only; do not perform network-based identity resolution
+            // while the state lock is held.
+            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.peekStoredDid())
             val sessionToken = ent?.token()
             Logger.i(LOG_TAG_PROXY, "$TAG; session token parsed from payload? ${sessionToken?.isNotEmpty()}")
             return sessionToken ?: ""
@@ -547,7 +567,7 @@ object RpnProxyManager : KoinComponent {
         if (payload.isEmpty()) return null
         try {
             val ws = extractWsObject(payload) ?: return null
-            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
+            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.storedIdentityDidForCurrentEnv())
             val timestamp = ent?.expiry()
             Logger.i(LOG_TAG_PROXY, "$TAG; expiry parsed from payload: $timestamp")
             return timestamp
@@ -565,7 +585,7 @@ object RpnProxyManager : KoinComponent {
         }
 
         return try {
-            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.getDeviceId())
+            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.storedIdentityDidForCurrentEnv())
             return entitlement
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG; getEntitlementDetails: ${e.message}")
@@ -575,7 +595,7 @@ object RpnProxyManager : KoinComponent {
 
     suspend fun getIsTestEntitlement(retryAttempt: Int = 0): Boolean {
         return try {
-            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.getDeviceId())
+            val entitlement = VpnController.getEntitlementDetails(getWinEntitlement(), billingBackendClient.storedIdentityDidForCurrentEnv())
             // RpnEntitlement.test() returns Boolean: true = test, false = production
             if (entitlement == null) {
                 Logger.d(LOG_TAG_PROXY, "$TAG; getIsTestEntitlement: null entitlement, querying server for refresh, attempt: $retryAttempt")
@@ -614,8 +634,7 @@ object RpnProxyManager : KoinComponent {
         val sku = purchase.productId
         Logger.i(LOG_IAB, "$TAG; $mname: delegating to BillingServerRepository for " +
                 "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
-        // purchase.deviceId holds only the sentinel indicator, always fetch the real ID from SecureIdentityStore.
-        val deviceId = billingBackendClient.getDeviceId()
+        val deviceId = billingBackendClient.getDeviceIdForCid(purchase.accountId)
         val success = billingBackendClient.consumePurchase(purchase.accountId, deviceId, sku, purchase.purchaseToken)
         if (success) {
             Logger.i(LOG_IAB, "$TAG; $mname: consume succeeded for token=${purchase.purchaseToken.take(8)}")
@@ -636,24 +655,17 @@ object RpnProxyManager : KoinComponent {
 
     /**
      * Performs a full RPN reset:
-     *  1. Unregisters the current WIN registration from the tunnel.
-     *  2. Fetches a fresh entitlement from the server.
-     *  3. Stores the new entitlement (replacing the old one).
-     *  4. Re-registers WIN in the tunnel with the fresh entitlement.
-     *  5. Force-fetches the server list and syncs it to DB/cache.
+     *  1. Fetches a fresh entitlement from the server.
+     *  2. Stores the new entitlement (replacing the old one).
+     *  3. Unregisters the old WIN registration and re-registers WIN in the tunnel
+     *     with the fresh entitlement (both under [winRegistrationMutex]).
+     *  4. Force-fetches the server list and syncs it to DB/cache.
      *
      * Returns [ResetResult.Success] when all steps complete, or
      * [ResetResult.Failure] with a reason string if a fatal step fails.
      */
     suspend fun resetAndRefetchRpn(): ResetResult {
         Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: starting full reset")
-
-        try {
-            VpnController.unregisterWin()
-            Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: unregistered from tunnel")
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: unregister failed (non-fatal): ${e.message}")
-        }
 
         val sub = try {
             subscriptionStatusRepository.getCurrentSubscription()
@@ -678,7 +690,11 @@ object RpnProxyManager : KoinComponent {
             return ResetResult.Failure("Account information is incomplete")
         }
 
-        val deviceId = billingBackendClient.getDeviceId(accountId)
+        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+        if (deviceId.isBlank()) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: no did bound to purchase cid")
+            return ResetResult.Failure("Device registration failed; try again later")
+        }
 
         val fakePurchase = PurchaseDetail(
             productId = sub.productId,
@@ -701,11 +717,29 @@ object RpnProxyManager : KoinComponent {
             orderId = sub.orderId
         )
 
-        val updatedPurchase = try {
-            InAppBillingHandler.queryEntitlementFromServer(accountId, deviceId, fakePurchase)
+        val entitlementResult = try {
+            billingBackendClient.queryEntitlement(accountId, deviceId, fakePurchase, purchaseToken)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: entitlement query failed: ${e.message}", e)
             return ResetResult.Failure("Failed to fetch entitlement from server")
+        }
+        val updatedPurchase = when (entitlementResult) {
+            is QueryEntitlementResult.Success -> entitlementResult.purchase
+            is QueryEntitlementResult.Unauthorized -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: 401 unauthorized for token=${purchaseToken.take(8)}")
+                InAppBillingHandler.handleUnauthorized401(
+                    com.celzero.bravedns.iab.ServerApiError.Operation.ACKNOWLEDGE, accountId, deviceId
+                )
+                return ResetResult.Failure("Device authorization failed; try again later")
+            }
+            is QueryEntitlementResult.Conflict ->
+                return ResetResult.Failure("Conflicting subscription record")
+            is QueryEntitlementResult.Expired ->
+                return ResetResult.Failure("Subscription is no longer active")
+            is QueryEntitlementResult.Failure, is QueryEntitlementResult.Transient -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: entitlement query not definitive (token=${purchaseToken.take(8)})")
+                return ResetResult.Failure("Failed to fetch entitlement from server")
+            }
         }
 
         if (updatedPurchase.payload.isEmpty()) {
@@ -721,14 +755,21 @@ object RpnProxyManager : KoinComponent {
             return ResetResult.Failure("Failed to store new entitlement")
         }
 
-        // Update state machine with fresh payload (non-fatal)
+        // Update state machine with fresh payload (non-fatal); token-strict and
+        // lock-serialized so a concurrent transition's status write is never reverted.
         try {
-            val subsData = subscriptionStateMachine.getSubscriptionData()
-            if (subsData != null) {
-                subsData.subscriptionStatus.developerPayload = updatedPurchase.payload
-                val updatedSubsData = subsData.copy(purchaseDetail = updatedPurchase)
-                subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
-                Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: state machine payload updated")
+            val refreshed = subscriptionStateMachine.refreshPayloadForToken(
+                purchaseToken, updatedPurchase.payload, updatedPurchase)
+            if (refreshed) {
+                Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: machine+DB payload updated")
+            } else {
+                try {
+                    subscriptionStatusRepository.updateDeveloperPayload(
+                        sub.id, updatedPurchase.payload, System.currentTimeMillis())
+                    Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: DB payload updated (machine not serving token)")
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: DB payload update failed (non-fatal): ${e.message}")
+                }
             }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: state machine update failed (non-fatal): ${e.message}")
@@ -739,6 +780,12 @@ object RpnProxyManager : KoinComponent {
 
         val registrationBytes = try {
             winRegistrationMutex.withLock {
+                try {
+                    VpnController.unregisterWin()
+                    Logger.i(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: unregistered from tunnel")
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: unregister failed (non-fatal): ${e.message}")
+                }
                 val regBytes = registerAndFetchWinWithTimeout(
                     entitlementBytes, prevRegistrationBytes, deviceId, "reset"
                 )
@@ -1139,7 +1186,7 @@ object RpnProxyManager : KoinComponent {
                     val accountId = sub?.accountId.orEmpty()
                     Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server-entitlement sub=${if (sub != null) "present" else "null"}, accountIdLen=${accountId.length}, purchaseTokenLen=${sub?.purchaseToken?.length ?: 0}")
                     // sub.deviceId holds only the sentinel indicator "pip/identity.json"
-                    val deviceId = billingBackendClient.getDeviceId(accountId)
+                    val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
                     val purchaseToken = sub?.purchaseToken.orEmpty()
                     if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
                         Logger.i(
@@ -1164,7 +1211,7 @@ object RpnProxyManager : KoinComponent {
                                 isAutoRenewing = false,
                                 accountId = accountId,
                                 // Store only the sentinel
-                                // Callers that need the actual ID use billingBackendClient.getDeviceId().
+                                // Callers that need the actual ID use billingBackendClient.getDeviceIdForCid(cid).
                                 deviceId = if (deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
                                 payload = "",
                                 expiryTime = sub?.billingExpiry ?: 0L,
@@ -1229,20 +1276,36 @@ object RpnProxyManager : KoinComponent {
 
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
                 var ok = true
-                // Resolve the device ID BEFORE acquiring winRegistrationMutex.
-                // getDeviceId() can block on identityMutex (contended by concurrent
-                // refreshIdentity / reconcileDidForCid calls) and may issue a network
-                // identity refresh (createOrRegisterDid / refreshIdentityLocked) when no
-                // DID is stored — running it inside the lock would stall every queued
-                // registerProxy caller for its full duration, reintroducing the convoy
-                // the narrow lock is meant to avoid. The DID is independent of the
-                // check-then-register critical section (it does not depend on
-                // isWinRegistered state), so resolving it in parallel is safe;
-                // identityMutex already serializes identity mutations internally.
-                val deviceId = billingBackendClient.getDeviceId()
+                val storedDid = billingBackendClient.storedIdentityDidForCurrentEnv()
+                val payloadCid = if (storedDid.isBlank()) {
+                    ""
+                } else {
+                    entitlementBytes?.let { bytes ->
+                        try {
+                            VpnController.getEntitlementDetails(bytes, storedDid)?.cid()
+                        } catch (e: Exception) {
+                            Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: payload cid parse failed: ${e.message}")
+                            null
+                        }
+                    }.orEmpty()
+                }
+
+                // bind the DID to the entitlement CID before registration.
+                val didResult = billingBackendClient.didForCid(payloadCid, mintIfMissing = true)
+                if (!didResult.isSuccess) {
+                    Logger.e(
+                        LOG_TAG_PROXY,
+                        "$TAG; registerProxy: no did bound to the entitlement's cid " +
+                            "(cid=${payloadCid.take(8)}, code=${didResult.errorCode}); refusing WIN " +
+                            "registration rather than sending a pair the server will reject"
+                    )
+                    InAppBillingHandler.postDeviceNotRegisteredError(payloadCid, didResult.errorCode)
+                    return false
+                }
+                val deviceId = didResult.deviceId
                 Logger.i(
                     LOG_TAG_PROXY,
-                    "$TAG; registerProxy: getDeviceId() returned len=${deviceId.length} (ent bytes=${entitlementBytes?.size}, state bytes=${stateBytes?.size})"
+                    "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${entitlementBytes?.size}, state bytes=${stateBytes?.size})"
                 )
                 // Single-flight: serialize ONLY the check-then-register critical section so
                 // concurrent callers coalesce into one registerWin Go call. The recovery
@@ -1450,6 +1513,18 @@ object RpnProxyManager : KoinComponent {
         return subscriptionStateMachine.getSubscriptionData()
     }
 
+    /** Returns true when the stored WIN entitlement matches the subscription payload. */
+    private suspend fun isEntitlementCurrentFor(status: SubscriptionStatus): Boolean {
+        return try {
+            val stored = getWinEntitlement() ?: return false
+            val expected = extractWsObject(status.developerPayload) ?: return false
+            stored.contentEquals(expected)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; isEntitlementCurrentFor: comparison failed: ${e.message}")
+            false
+        }
+    }
+
     /**
      * Returns the best available [PurchaseDetail] for the current subscription.
      * Returns `null` only when there is no subscription data at all.
@@ -1471,8 +1546,16 @@ object RpnProxyManager : KoinComponent {
             return false
         }
         // TODO: perform the validation of purchaseToken and accountId with the subscription data
-        handleUserCancellation()
-        return true
+        handleUserCancellation(purchaseToken)
+        val row = subscriptionStatusRepository.getByPurchaseToken(purchaseToken)
+        val cancelled = row != null &&
+            (row.status == SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id ||
+                row.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id ||
+                row.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id)
+        if (!cancelled) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; updateCancelledSubscription: row not cancelled after event (token=${purchaseToken.take(8)}, status=${row?.status})")
+        }
+        return cancelled
     }
 
     suspend fun updateRevokedSubscription(accountId: String, purchaseToken: String): Boolean {
@@ -1480,8 +1563,16 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG; err; purchaseToken is empty")
             return false
         }
-        handleSubscriptionRevoked()
-        return true
+        handleSubscriptionRevoked(purchaseToken)
+        // revoked or expired are both terminal states and count as success.
+        val row = subscriptionStatusRepository.getByPurchaseToken(purchaseToken)
+        val revoked = row != null &&
+            (row.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id ||
+                row.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id)
+        if (!revoked) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; updateRevokedSubscription: row not revoked/expired after event (token=${purchaseToken.take(8)}, status=${row?.status})")
+        }
+        return revoked
     }
 
     /**
@@ -1534,7 +1625,7 @@ object RpnProxyManager : KoinComponent {
 
         // 3. If the server confirms the linked purchase, reactivate it.
         return when (result) {
-            is com.celzero.bravedns.iab.QueryEntitlementResult.Success -> {
+            is QueryEntitlementResult.Success -> {
                 val updatedPurchase = result.purchase
                 Logger.i(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} confirmed valid by server; reactivating")
                 try {
@@ -1547,19 +1638,22 @@ object RpnProxyManager : KoinComponent {
                     false
                 }
             }
-            is com.celzero.bravedns.iab.QueryEntitlementResult.Failure -> {
+            is QueryEntitlementResult.Failure -> {
                 Logger.w(LOG_TAG_PROXY, "$TAG; $mname: linkedToken=${linkedToken.take(8)} also invalid per server (no linkedPurchaseId in response)")
                 false
             }
-            is com.celzero.bravedns.iab.QueryEntitlementResult.Transient -> {
+            is QueryEntitlementResult.Transient -> {
                 Logger.w(LOG_TAG_PROXY, "$TAG; $mname: transient failure querying linkedToken=${linkedToken.take(8)}, not reactivating (fail-safe)")
                 false
             }
-            is com.celzero.bravedns.iab.QueryEntitlementResult.Unauthorized -> {
+            is QueryEntitlementResult.Unauthorized -> {
                 Logger.e(LOG_TAG_PROXY, "$TAG; $mname: 401 unauthorized for linkedToken=${linkedToken.take(8)}")
+                InAppBillingHandler.handleUnauthorized401(
+                    com.celzero.bravedns.iab.ServerApiError.Operation.ACKNOWLEDGE, accountId, deviceId
+                )
                 false
             }
-            is com.celzero.bravedns.iab.QueryEntitlementResult.Conflict -> {
+            is QueryEntitlementResult.Conflict -> {
                 Logger.w(LOG_TAG_PROXY, "$TAG; $mname: 409 conflict for linkedToken=${linkedToken.take(8)}")
                 false
             }
@@ -1583,7 +1677,11 @@ object RpnProxyManager : KoinComponent {
     suspend fun processRpnPurchase(purchase: PurchaseDetail?, existingSubs: SubscriptionStatus): Boolean {
         if (purchase == null) {
             Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: no purchase to process")
-            try { subscriptionStateMachine.subscriptionExpired() } catch (e: Exception) {
+            try {
+                subscriptionStateMachine.subscriptionExpired(
+                    existingSubs.purchaseToken.takeIf { it.isNotBlank() }
+                )
+            } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; processRpnPurchase: error notifying state machine: ${e.message}", e)
             }
             return false
@@ -1626,9 +1724,7 @@ object RpnProxyManager : KoinComponent {
                     "accExpiry=$accExpiry, billingExpiry=$billingExpiry)")
 
             val accountId = purchase.accountId.ifEmpty { existingSubs.accountId }
-            // purchase.deviceId holds only the sentinel indicator (or is empty)
-            // Always resolve the actual device ID from SecureIdentityStore via billingBackendClient.
-            val deviceId = billingBackendClient.getDeviceId()
+            val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
             if (accountId.isEmpty()) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: accountId empty, cannot query server, using best available payload")
                 // Fall through to activateRpn with whatever we have (may also check DB below)
@@ -1651,19 +1747,17 @@ object RpnProxyManager : KoinComponent {
                             )
                         }
 
-                        // Update state machine and DB with fresh payload
-                        val subsData = subscriptionStateMachine.getSubscriptionData()
-                        if (subsData != null) {
-                            subsData.subscriptionStatus.developerPayload = updatedPurchase.payload
-                            val updatedSubsData = subsData.copy(purchaseDetail = updatedPurchase)
-                            subscriptionStateMachine.stateMachine.updateData(updatedSubsData)
+                        // Update the state and DB with the latest payload for this token
+                        val updatedData = subscriptionStateMachine.updatePayloadForToken(
+                            purchase.purchaseToken, updatedPurchase.payload, updatedPurchase)
+                        if (updatedData != null) {
                             subscriptionStatusRepository.updateDeveloperPayload(
-                                subsData.subscriptionStatus.id,
+                                updatedData.subscriptionStatus.id,
                                 updatedPurchase.payload,
                                 System.currentTimeMillis()
                             )
                         } else {
-                            Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: subscription data is null, cannot update payload in state machine")
+                            Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: machine not serving token=${purchase.purchaseToken.take(8)}; payload not updated")
                         }
                     } else {
                         Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: server entitlement returned but payload unusable, using DB payload as fallback")
@@ -1708,7 +1802,7 @@ object RpnProxyManager : KoinComponent {
         if (payload.isEmpty()) return false
         return try {
             val ws = extractWsObject(payload) ?: return false
-            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.getDeviceId())
+            val ent = VpnController.getEntitlementDetails(ws, billingBackendClient.storedIdentityDidForCurrentEnv())
             Logger.i(LOG_TAG_PROXY, "$TAG; isPayloadUsable: extracted entitlement from payload, checking session token usability")
             if (DEBUG) {
                 Logger.d(LOG_TAG_PROXY, "$TAG; isPayloadUsable: payload ws block: $ws")
@@ -1729,7 +1823,8 @@ object RpnProxyManager : KoinComponent {
             try {
                 subscriptionStateMachine.currentState.collect { state ->
                     Logger.d(LOG_TAG_PROXY, "$TAG; collect; initial subscription state: ${state.name}")
-                    io { handleStateChange(state) }
+                    // process state changes sequentially to preserve their order
+                    handleStateChange(state)
                 }
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; collect; error in state observer: ${e.message}", e)
@@ -1742,6 +1837,14 @@ object RpnProxyManager : KoinComponent {
             is SubscriptionStateMachineV2.SubscriptionState.Active -> {
                 Logger.i(LOG_TAG_PROXY, "$TAG; subscription activated, ensuring RPN is enabled and entitlement refreshed")
                 val subs = subscriptionStateMachine.getSubscriptionData()
+                val rowStatus = subs?.subscriptionStatus?.status
+                if (rowStatus == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id ||
+                    rowStatus == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id
+                ) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; active machine state has terminal DB data; refusing RPN activation")
+                    deactivateRpn("Subscription is terminal")
+                    return
+                }
                 // Use getEffectivePurchaseDetail() which tries in-memory purchaseDetail first,
                 // then falls back to reconstructing from subscriptionStatus (DB-restored cold-start).
                 val purchaseDetail = getEffectivePurchaseDetail()
@@ -1762,15 +1865,38 @@ object RpnProxyManager : KoinComponent {
                 }
             }
             is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> {
-                Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled, checking if should disable RPN")
+                Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled, checking entitlement validity")
                 try {
                     val subs = subscriptionStateMachine.getSubscriptionData()
                     val status = subs?.subscriptionStatus
                     val currTs = System.currentTimeMillis()
-                    if ((status != null && status.billingExpiry > currTs) || DEBUG) {
-                        Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled but still valid until ${status?.billingExpiry}, not deactivating RPN yet")
+                    if (status == null ||
+                        status.status == SubscriptionStatus.SubscriptionState.STATE_EXPIRED.id ||
+                        status.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id
+                    ) {
+                        deactivateRpn("Cancelled state has terminal subscription data")
+                        return
+                    }
+                    // keep RPN active until the billing window ends.
+                    val expiryKnown = status.billingExpiry > 0L &&
+                        status.billingExpiry != Long.MAX_VALUE
+                    val windowEnded = expiryKnown && status.billingExpiry <= currTs
+                    if (windowEnded) {
+                        deactivateRpn("Subscription cancelled and billing window ended")
                     } else {
-                        deactivateRpn("Subscription cancelled and expired")
+                        val purchaseDetail = getEffectivePurchaseDetail()
+                        if (purchaseDetail == null) {
+                            if (!DEBUG) {
+                                Logger.w(LOG_TAG_PROXY, "$TAG; cancelled state has no purchase detail; cannot ensure RPN access")
+                            }
+                            return
+                        }
+                        // re-activate only when the current entitlement is not already enabled.
+                        if (isRpnEnabled() && isEntitlementCurrentFor(status)) {
+                            Logger.d(LOG_TAG_PROXY, "$TAG; cancelled state: RPN already enabled for the current entitlement; skipping re-activation")
+                        } else {
+                            activateRpn(purchaseDetail)
+                        }
                     }
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; error handling cancelled state: ${e.message}", e)
@@ -1811,21 +1937,25 @@ object RpnProxyManager : KoinComponent {
         return valid
     }
 
-    suspend fun handleUserCancellation() {
+    suspend fun handleUserCancellation(purchaseToken: String? = null) {
         try {
-            subscriptionStateMachine.userCancelled()
+            subscriptionStateMachine.userCancelled(purchaseToken, "updateCancelledSubscription")
             Logger.i(LOG_TAG_PROXY, "$TAG; user cancellation handled")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; error handling user cancellation: ${e.message}", e)
         }
     }
 
-    suspend fun handleSubscriptionRevoked() {
+    suspend fun handleSubscriptionRevoked(purchaseToken: String? = null) {
         try {
-            subscriptionStateMachine.subscriptionRevoked()
-            Logger.w(LOG_TAG_PROXY, "$TAG; subscription revocation handled")
-            deactivateRpn()
-            Logger.i(LOG_TAG_PROXY, "$TAG; RPN deactivated due to revocation")
+            // only deactivate RPN if the revoked token is the current purchase.
+            val revokesCurrentPurchase = subscriptionStateMachine.subscriptionRevoked(purchaseToken)
+            if (revokesCurrentPurchase) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; current subscription revoked")
+                deactivateRpn()
+            } else {
+                Logger.i(LOG_TAG_PROXY, "$TAG; non-current purchase revoked; current RPN entitlement retained")
+            }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; error handling subscription revocation: ${e.message}", e)
         }
@@ -2413,7 +2543,9 @@ object RpnProxyManager : KoinComponent {
                      link = loc.link,
                      premium = loc.premium,
                      count = loc.count,
-                     isActive = true
+                     isActive = true,
+                     ipv4 = true,
+                     ipv6 = true
                  )
                  newServers.add(cfg)
              } catch (e: Exception) {
@@ -2497,6 +2629,9 @@ object RpnProxyManager : KoinComponent {
                 countryConfigRepo.update(config)
                 // Record the selection for frequent-country tracking and refresh chips.
                 countryConfigRepo.incrementSelectionCount(config.key)
+                winCacheMutex.withLock {
+                    winServersCache.filter { it.key == key }.forEach { it.selectionCount += 1 }
+                }
                 Logger.i(LOG_TAG_PROXY, "$TAG; enableWinServer: enabled rpn: $key")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; enableWinServer: failed to update DB for $key: ${e.message}", e)
@@ -3055,6 +3190,7 @@ object RpnProxyManager : KoinComponent {
 
         if (isAnyProxyLockdown(proxyIds)) {
             Logger.i(LOG_TAG_PROXY, "$TAG lockdown rpn for app($uid) => return $proxyIds")
+            moveAutoServerIdToEnd(proxyIds)
             return proxyIds
         }
 
@@ -3073,7 +3209,7 @@ object RpnProxyManager : KoinComponent {
         cac.forEach {
             try {
                 val configId = Backend.RpnWin + it.key
-                if (isEligibleForNetwork(it.id, usesMobileNw, ssid, it.mobileOnly, it.ssidBased) &&
+                if (isEligibleForNetwork(it.key, usesMobileNw, ssid, it.mobileOnly, it.ssidBased) &&
                     !proxyIds.contains(configId)
                 ) {
                     val id = if (configId.contains(AUTO_SERVER_ID, true)) {
@@ -3084,7 +3220,7 @@ object RpnProxyManager : KoinComponent {
                     if (id != null) proxyIds.add(id)
                     Logger.i(
                         LOG_TAG_PROXY,
-                        "$TAG catch-all config is active: ${it.id}, ${it.name} => add $id"
+                        "$TAG catch-all config is active: ${it.key}, ${it.name} => add $id"
                     )
                 }
             } catch (e: Exception) {
@@ -3095,8 +3231,20 @@ object RpnProxyManager : KoinComponent {
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
         // the go-tun will check the routing based on the order of the list
+        moveAutoServerIdToEnd(proxyIds)
         Logger.i(LOG_TAG_PROXY, "$TAG returning proxy ids for $uid, $ip, $port, $domain: $proxyIds")
         return proxyIds
+    }
+
+    // the auto server id is always evaluated last, so any specific cc config present in the list
+    // takes priority over it
+    private suspend fun moveAutoServerIdToEnd(proxyIds: MutableList<String>) {
+        val autoId = VpnController.getWinByKey("")?.id() ?: return
+        // true if any element was removed from this collection, or false when no
+        // elements were removed
+        if (proxyIds.removeAll { it == autoId }) {
+            proxyIds.add(autoId)
+        }
     }
 
     private suspend fun isEligibleForNetwork(id: String, usesMobileNw: Boolean, ssid: String, mobileOnlySetting: Boolean, ssidEnabled: Boolean): Boolean {
@@ -3146,13 +3294,13 @@ object RpnProxyManager : KoinComponent {
 
         val lockdown = config.lockdown
 
-        if (lockdown && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
+        if (lockdown && isEligibleForNetwork(actualId, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
             Logger.d(LOG_TAG_PROXY, "$TAG; lockdown wg for $type => return $id")
             return true // no need to proceed further for lockdown
         }
 
         // check if the config is active and if it can be used on this network
-        if (config.isEnabled && isEligibleForNetwork(id, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
+        if (config.isEnabled && isEligibleForNetwork(actualId, usesMobileNw, ssid, config.mobileOnly, config.ssidBased)) {
             Logger.d(LOG_TAG_PROXY, "$TAG active wg for $type => add $id")
             return true
         }
@@ -3196,7 +3344,10 @@ object RpnProxyManager : KoinComponent {
     }
 
     fun matchesSsidList(ssidList: String, ssid: String): Boolean {
-        if (ssidList.isEmpty()) {
+        val ssidItems = SsidItem.parseStorageList(ssidList)
+
+        // unknown SSID must never match a stored SSID list.
+        if (ssidItems.isEmpty() && isEmptyStoredSsidList(ssidList)) {
             // Empty list means match all
             Logger.v(LOG_TAG_PROXY, "$TAG; matchesSsidList: empty ssidList, match all")
             return true
@@ -3205,13 +3356,6 @@ object RpnProxyManager : KoinComponent {
         if (ssid.isEmpty()) {
             Logger.v(LOG_TAG_PROXY, "$TAG; matchesSsidList: empty ssid, no match")
             return false
-        }
-
-        val ssidItems = try {
-            SsidItem.parseStorageList(ssidList)
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; matchesSsidList: failed to parse ssidList: ${e.message}", e)
-            return true // Fail open
         }
 
         if (ssidItems.isEmpty()) { // treat empty as match all
@@ -3263,6 +3407,15 @@ object RpnProxyManager : KoinComponent {
                 Logger.w(LOG_TAG_PROXY, "$TAG; matchesSsidList: error matching EQUAL item: ${e.message}")
                 false
             }
+        }
+    }
+
+    private fun isEmptyStoredSsidList(ssidList: String): Boolean {
+        if (ssidList.isBlank()) return true
+        return try {
+            JSONArray(ssidList).length() == 0
+        } catch (_: JSONException) {
+            false
         }
     }
 

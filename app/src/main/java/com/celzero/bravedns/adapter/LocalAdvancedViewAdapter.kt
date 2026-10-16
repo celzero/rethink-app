@@ -168,7 +168,11 @@ class LocalAdvancedViewAdapter(val context: Context, private val fragment: Rethi
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagLocal(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                fragment.updateFileTagList(list)
+                // Skip the host-fragment callback once its view is gone; the
+                // persistence write above still completes regardless.
+                if (fragment.isAdded) {
+                    fragment.updateFileTagList(list)
+                }
             }
         }
 

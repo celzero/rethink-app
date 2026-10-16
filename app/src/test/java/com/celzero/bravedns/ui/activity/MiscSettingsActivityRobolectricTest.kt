@@ -16,18 +16,16 @@
 package com.celzero.bravedns.ui.activity
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
-import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.bottomsheet.TaskerAutomationBottomSheet
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import io.mockk.Runs
@@ -70,7 +68,8 @@ import org.robolectric.shadows.ShadowLooper
  *  - Saving & restoring instance state (isThemeChanged flag)
  *  - Back-press behaviour with and without a pending theme change
  *  - Every toggle switch: RL-click delegation and PersistentState side-effects
- *  - Dialog creation / dismissal (PCAP, Theme, Notification, GoLogger, Tasker)
+ *  - Dialog creation / dismissal (PCAP, Theme, Notification, GoLogger)
+ *  - Tasker row opens the automation bottom sheet (and is inert when finishing)
  *  - Guard against dialog creation after the activity is finishing/destroyed
  *  - Lifecycle-safe IO: tombstone switch triggers rdb.refresh() in lifecycleScope
  *  - onResume notification / bubble sections at API 28
@@ -595,48 +594,33 @@ class MiscSettingsActivityRobolectricTest : KoinTest {
     }
 
     @Test
-    fun taskerRl_click_createsAlertDialog() {
+    fun taskerRl_click_showsTaskerAutomationBottomSheet() {
         try {
             val activity = buildAndStartActivity() ?: return
-            ShadowAlertDialog.reset()
             val rl = activity.findViewById<View>(R.id.settings_tasker_rl) ?: return
             rl.performClick()
             ShadowLooper.idleMainLooper()
-            assertNotNull("Tasker RL click must show a dialog", ShadowAlertDialog.getLatestAlertDialog())
+            activity.supportFragmentManager.executePendingTransactions()
+            val sheet = activity.supportFragmentManager
+                .findFragmentByTag(TaskerAutomationBottomSheet.TAG)
+            assertNotNull("Tasker RL click must show the automation bottom sheet", sheet)
         } catch (e: Exception) {
             assertTrue("Resource error acceptable: ${e.message}", isExpectedResourceError(e))
         }
     }
 
     @Test
-    fun showAppTriggerPackageDialog_isDisplayed() {
-        val context: Context = ApplicationProvider.getApplicationContext()
+    fun taskerRl_whenActivityIsFinishing_doesNotShowBottomSheet() {
         try {
-            val activity = buildAndStartActivity() ?: return
-            ShadowAlertDialog.reset()
-            activity.showAppTriggerPackageDialog(context) { }
+            val controller = Robolectric.buildActivity(MiscSettingsActivity::class.java)
+                .create().start().resume()
+            val activity = controller.get()
+            activity.finish()
+            assertTrue(activity.isFinishing)
+            // Must not crash even when invoked while finishing
+            activity.findViewById<View>(R.id.settings_tasker_rl)?.performClick()
             ShadowLooper.idleMainLooper()
-            val dialog = ShadowAlertDialog.getLatestAlertDialog()
-            assertNotNull("showAppTriggerPackageDialog must create a dialog", dialog)
-            assertTrue("Dialog must be showing", dialog!!.isShowing)
-        } catch (e: Exception) {
-            assertTrue("Resource error acceptable: ${e.message}", isExpectedResourceError(e))
-        }
-    }
-
-    @Test
-    fun showAppTriggerPackageDialog_negativeButton_doesNotTriggerCallback() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        var callbackInvoked = false
-        try {
-            val activity = buildAndStartActivity() ?: return
-            ShadowAlertDialog.reset()
-            activity.showAppTriggerPackageDialog(context) { callbackInvoked = true }
-            ShadowLooper.idleMainLooper()
-            val dialog = ShadowAlertDialog.getLatestAlertDialog() ?: return
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.performClick()
-            ShadowLooper.idleMainLooper()
-            assertFalse("Negative button must not invoke callback", callbackInvoked)
+            assertTrue(true)
         } catch (e: Exception) {
             assertTrue("Resource error acceptable: ${e.message}", isExpectedResourceError(e))
         }

@@ -755,7 +755,6 @@
     <string name="lbl_disabled" translatable="true">Desativada</string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar &lt;u&gt;neste domínio&lt;/u&gt;</string>
     <string name="lbl_cancel" translatable="true">Cancelar</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
     <string name="lbl_dismiss" translatable="true">Cancelar</string>

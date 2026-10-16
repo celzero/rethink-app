@@ -39,6 +39,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
 import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
@@ -86,8 +87,22 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
     private var lastConnectivityCheckState: ConnectivityCheckState? = null
 
+    // last captive-portal state observed in onCapabilitiesChanged
+    @Volatile
+    private var lastCaptiveState: Boolean? = null
+
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
+
+    /** Returns true when the active network's captive portal state changes. */
+    private fun isCaptivePortalTransition(network: Network, capabilities: NetworkCapabilities): Boolean {
+        val active = cm.activeNetwork
+        if (active == null || !isNetworkSame(network, active)) return false
+        val captive = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
+        val prev = lastCaptiveState
+        lastCaptiveState = captive
+        return prev != null && prev != captive
+    }
 
     /**
      * Checks if connectivity check should be performed based on event type and timing
@@ -145,7 +160,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         lastConnectivityCheckState = ConnectivityCheckState(time, networkHandles)
     }
 
-    fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
+    private fun createInternetValidatedCallback(): ConnectivityManager.NetworkCallback {
         return if (isAtleastS()) {
             // Only called on S+ devices
             object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
@@ -154,7 +169,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -210,7 +225,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -252,7 +267,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         }
     }
 
-    fun transportCallback(): ConnectivityManager.NetworkCallback {
+    private fun createTransportCallback(): ConnectivityManager.NetworkCallback {
         return if (isAtleastS()) {
             object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
                 override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
@@ -260,7 +275,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -303,7 +318,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                        if (isCaptivePortalTransition(network, capabilities) || shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
                             sendNetworkChanges()
                         }
                     }
@@ -340,6 +355,14 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 }
             }
         }
+    }
+
+    fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
+        return validatedCallback ?: createInternetValidatedCallback().also { validatedCallback = it }
+    }
+
+    fun transportCallback(): ConnectivityManager.NetworkCallback {
+        return transportNetworkCallback ?: createTransportCallback().also { transportNetworkCallback = it }
     }
 
 
@@ -429,7 +452,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
     private fun showNotificationIfNeeded() {
         val wgs = WireguardManager.getActiveSsidEnabledConfigs()
-        if (wgs.isEmpty()) return
+        if (wgs.none { SsidItem.parseStorageList(it.ssids).isNotEmpty() }) return
 
         val hasPermission = SsidPermissionManager.hasRequiredPermissions(context)
         val locationEnabled = SsidPermissionManager.isLocationEnabled(context)
@@ -529,6 +552,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     private lateinit var wm: WifiManager
 
     private var diagsMgr: DiagnosticsManager? = null
+    private var validatedCallback: ConnectivityManager.NetworkCallback? = null
+    private var transportNetworkCallback: ConnectivityManager.NetworkCallback? = null
 
     companion object {
         // add active network as underlying vpn network
@@ -754,8 +779,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     fun registerDiags(context: Context) {
         if (isAtleastR()) {
             try {
-                val diagnosticMgr = DiagnosticsManager(context, scope, this)
-                diagnosticMgr.register()
+                diagsMgr = DiagnosticsManager(context, scope, this)
+                diagsMgr?.register()
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while getting connectivity diagnostics manager")
             }
@@ -783,16 +808,24 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // check if connectivity manager is initialized as it is lazy initialized
                 if (::cm.isInitialized) {
                     try {
-                        cm.unregisterNetworkCallback(internetValidatedCallback())
+                        validatedCallback?.let {
+                            Logger.d(LOG_TAG_CONNECTION, "unregister internetValidatedCallback")
+                            cm.unregisterNetworkCallback(it)
+                        }
                     } catch (_: Exception) { }
                     try {
-                        cm.unregisterNetworkCallback(transportCallback())
+                        transportNetworkCallback?.let {
+                            Logger.d(LOG_TAG_CONNECTION, "unregister transportCallback")
+                            cm.unregisterNetworkCallback(it)
+                        }
                     } catch (_: Exception) { }
                 }
                 if (isAtleastR()) {
                     unregisterDiags()
                 }
                 networkSet.clear()
+                validatedCallback = null
+                transportNetworkCallback = null
                 if (::channel.isInitialized) {
                     channel.close()
                 }
@@ -873,7 +906,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         val activeSsid: String?, // may be updated by client listener
         var lastUpdated: Long, // may be updated by client listener
         val dnsServers: Map<InetAddress, Network>,
-        var vpnLockdown: Boolean = false // updated by client listener
+        var vpnLockdown: Boolean = false, // updated by client listener
+        val isActiveNetworkCaptive: Boolean = false // updated when active network is behind a captive portal
     )
 
     data class IpsAndUrlToProbe(
@@ -980,6 +1014,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // fetch from newNetworks set
                 activeSsid = newNetworks.firstOrNull { it.ssid != null }?.ssid
             }
+            val isCaptiveActive = newActiveNetwork != null && isCaptivePortal(newActiveNetwork)
 
             Logger.i(LOG_TAG_CONNECTION, "process message active nws, currNws: $newNetworks")
             Logger.i(
@@ -987,13 +1022,13 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
                 }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, test? ${opPrefs.testReachability}," +
-                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged, activeSsid: $activeSsid"
+                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged, activeSsid: $activeSsid, captive? $isCaptiveActive"
             )
 
             currentNetworks = newNetworks
             repopulateTrackedNetworks(opPrefs, currentNetworks)
             // client code must call setUnderlyingNetworks() to invoke linkCapabilities for other uids
-            informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes)
+            informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes, isCaptiveActive)
         }
 
         private suspend fun hasNwDnsChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
@@ -1025,13 +1060,14 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 // fetch from newNetworks set
                 activeSsid = newNetworks.firstOrNull { it.ssid != null }?.ssid
             }
+            val isCaptiveActive = newActiveNetwork != null && isCaptivePortal(newActiveNetwork)
 
             Logger.i(LOG_TAG_CONNECTION, "process message all nws, currNws: $newNetworks")
-            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid")
+            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid, captive? $isCaptiveActive")
 
             currentNetworks = newNetworks
             repopulateTrackedNetworks(opPrefs, currentNetworks)
-            informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes)
+            informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, activeSsid, vpnRoutes, isCaptiveActive)
         }
 
         /**
@@ -1171,7 +1207,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             isActiveNetworkMetered: Boolean,
             isActiveNetworkCellular: Boolean,
             activeSsid: String?,
-            vpnRoutes: Pair<Boolean, Boolean>?
+            vpnRoutes: Pair<Boolean, Boolean>?,
+            isCaptiveActive: Boolean = false
         ) {
             // TODO: use currentNetworks instead of trackedIpv4Networks and trackedIpv6Networks
             // to determine whether to call onNetworkConnected or onNetworkDisconnected
@@ -1205,7 +1242,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         isActiveNetworkCellular,
                         activeSsid,
                         SystemClock.elapsedRealtimeNanos(),
-                        Collections.unmodifiableMap(dnsServers)
+                        Collections.unmodifiableMap(dnsServers),
+                        isActiveNetworkCaptive = isCaptiveActive
                     )
                 listener.onNetworkChange(underlyingNetworks)
             } else {
@@ -1656,7 +1694,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (reachabilityCount > maxReachabilityCount) return
 
                 val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
-                delay(delay)
+                delay(delay.milliseconds)
                 redrive()
             } else {
                 Logger.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")

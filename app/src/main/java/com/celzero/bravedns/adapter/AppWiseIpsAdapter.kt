@@ -174,27 +174,33 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         }
 
         private fun updateStatusUi(conn: AppConnection) {
-            val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
-            when (status) {
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                    )
+            if (conn.blocked) {
+                b.progress.setIndicatorColor(
+                    UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                )
+            } else {
+                val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
+                when (status) {
+                    IpRulesManager.IpRuleStatus.NONE -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                        )
+                    }
+                    IpRulesManager.IpRuleStatus.BLOCK -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                        )
+                    }
+                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                        )
+                    }
+                    IpRulesManager.IpRuleStatus.TRUST -> {
+                        b.progress.setIndicatorColor(
+                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                        )
+                    }
                 }
             }
 

@@ -74,7 +74,6 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
             app:strokeWidth="0dp"
             app:cardBackgroundColor="?attr/chipBgColorPositive">
 
@@ -145,7 +144,6 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="100dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
             app:strokeWidth="0dp">
 
             <com.facebook.shimmer.ShimmerFrameLayout
@@ -268,14 +266,12 @@
 
     </LinearLayout>
 
-    <!-- pinned outside the scrolling container: the appbar behavior offsets the
-         container below the screen while the hero is expanded, which would hide
-         the signature entirely -->
     <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
         android:id="@+id/dolphin_signature"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:alpha="0.8"
         android:layout_marginBottom="12dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

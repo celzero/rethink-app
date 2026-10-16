@@ -36,6 +36,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Enable or disable Firebase Crashlytics data collection - no-op for website variant
      */
+    @Suppress("UnusedParameter") // parameter kept so the stub matches the play-flavour API surface
     fun setEnabled(enabled: Boolean) {
         Logger.i(LOG_FIREBASE, "crashlytics not available in website variant")
     }
@@ -43,6 +44,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Check if Firebase Crashlytics is available - Always false for website variant
      */
+    @Suppress("FunctionOnlyReturningConstant") // stub must keep the real implementation's signature
     fun isAvailable(): Boolean {
         return false
     }
@@ -50,6 +52,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Log a custom message - no-op for website variant
      */
+    @Suppress("UnusedParameter") // parameter kept so the stub matches the play-flavour API surface
     fun log(msg: String) {
         // no-op: firebase not available in website variant
     }
@@ -57,6 +60,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Record a non-fatal exception - no-op for website variant
      */
+    @Suppress("UnusedParameter") // parameter kept so the stub matches the play-flavour API surface
     fun recordException(throwable: Throwable) {
         // no-op: firebase not available in website variant
     }
@@ -64,6 +68,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Set user ID - no-op for website variant
      */
+    @Suppress("UnusedParameter") // parameter kept so the stub matches the play-flavour API surface
     fun setUserId(uid: String) {
         // no-op: firebase not available in website variant
     }
@@ -71,6 +76,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Set custom key-value pairs - no-op for website variant
      */
+    @Suppress("UnusedParameter") // parameters kept so the stub matches the play-flavour API surface
     fun setCustomKey(key: String, value: String) {
         // no-op: firebase not available in website variant
     }

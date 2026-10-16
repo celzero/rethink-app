@@ -50,6 +50,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
+import com.celzero.bravedns.util.StatusTicker
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
@@ -96,9 +97,19 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
     }
 
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
+        if (lifecycleOwner == null) {
+            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
+        }
         val item = getItem(position)
         val wgConfigFiles: WgConfigFiles = item ?: return
         holder.update(wgConfigFiles)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        statusTicker.cancel()
+        statusHolders.clear()
+        lifecycleOwner = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgInterfaceViewHolder {
@@ -114,6 +125,50 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         return WgInterfaceViewHolder(itemBinding)
     }
 
+    private val statusHolders = mutableListOf<WgInterfaceViewHolder>()
+    private val statusTicker = StatusTicker()
+
+    private fun registerForStatusUpdates(holder: WgInterfaceViewHolder) {
+        if (statusHolders.contains(holder)) return
+        statusHolders.add(holder)
+        if (!ensureStatusTicker()) refreshStatuses()
+    }
+
+    private fun unregisterFromStatusUpdates(holder: WgInterfaceViewHolder) {
+        statusHolders.remove(holder)
+        if (statusHolders.isEmpty()) {
+            statusTicker.cancel()
+        }
+    }
+
+    private fun ensureStatusTicker(): Boolean {
+        val owner = lifecycleOwner ?: return false
+        return statusTicker.start(owner.lifecycleScope, DELAY_MS) { refreshStatuses() }
+    }
+
+    private fun refreshStatuses(): Boolean {
+        val iterator = statusHolders.iterator()
+        val active = ArrayList<WgInterfaceViewHolder>()
+        while (iterator.hasNext()) {
+            val holder = iterator.next()
+            val lifecycleActive =
+                lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
+            if (!lifecycleActive || holder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                iterator.remove()
+                continue
+            }
+            active.add(holder)
+        }
+        if (active.isEmpty()) {
+            statusTicker.cancel()
+            return false
+        }
+        io {
+            active.forEach { it.pollStatus() }
+        }
+        return true
+    }
+
     override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
         super.onViewDetachedFromWindow(holder)
         holder.cancelJobIfAny()
@@ -121,9 +176,11 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgGeneralInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
-        private var job: Job? = null
+
+        private var boundConfig: WgConfigFiles? = null
 
         fun update(config: WgConfigFiles) {
+            boundConfig = config
             b.interfaceNameText.text = config.name
             b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
@@ -142,7 +199,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private fun updateStatusJob(config: WgConfigFiles) {
             if (config.isActive && VpnController.hasTunnel()) {
-                job = updateProxyStatusContinuously(config)
+                registerForStatusUpdates(this)
             } else {
                 cancelJobIfAny()
                 disableInactiveConfig(config)
@@ -172,13 +229,13 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
-            return io {
-                while (true) {
-                    updateStatus(config)
-                    delay(DELAY_MS.milliseconds)
-                }
-            }
+        fun cancelJobIfAny() {
+            unregisterFromStatusUpdates(this)
+        }
+
+        suspend fun pollStatus() {
+            val config = boundConfig ?: return
+            updateStatus(config)
         }
 
         private fun updateProtocolChip(pair: Pair<Boolean, Boolean>?) {
@@ -288,12 +345,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             Logger.d(LOG_TAG_UI, "$TAG cc: ${ipInfo?.countryCode}, flag? ${b.interfaceFlagText.isVisible}, ipInfo: $ipInfo")
         }
 
-        fun cancelJobIfAny() {
-            if (job?.isActive == true) {
-                job?.cancel()
-            }
-        }
-
         private suspend fun updateStatus(config: WgConfigFiles) {
             val id = ID_WG_BASE + config.id
             val statusId = VpnController.getProxyStatusById(id)
@@ -313,17 +364,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     false
                 }
 
-            // if the view is not active then cancel the job
-            if (
-                lifecycleOwner != null &&
-                    lifecycleOwner
-                        ?.lifecycle
-                        ?.currentState
-                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
-            ) {
-                cancelJobIfAny()
-                return
-            }
             uiCtx {
                 updateStatusUi(config, statusId, dnsStatusId, stats)
                 updateProtocolChip(pair)
@@ -470,11 +510,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             val since = stats?.since ?: 0L
             val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
-                // treat TNT as neutral, for v055u (until fixed in go), as there is a scenario
-                // where idle is behaving as waiting
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative // TKO, TEND
+                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TKO, TEND, TNT
             }
         }
 
@@ -700,9 +738,48 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 return
             }
 
+            // key overlap is a warning now: the user can proceed or keep the config disabled
+            if (!WireguardManager.canEnableProxy(cfg.id)) {
+                Logger.i(LOG_TAG_PROXY, "$TAG wg keys overlap with an active config: ${cfg.id}")
+                uiCtx { showDuplicateKeysWarningDialog { io { enableWg(cfg) } } }
+                return
+            }
+
+            enableWg(cfg)
+        }
+
+        private suspend fun enableWg(cfg: WgConfigFilesImmutable) {
             WireguardManager.enableConfig(cfg)
             logEvent("Wireguard enable", "Enabled WireGuard config: ${cfg.name} (id: ${cfg.id})")
             uiCtx { listener.onDnsStatusChanged() }
+        }
+
+        // Warns that the config's keys are already in use by another active config.
+        // Proceed enables the config anyway; OK keeps it disabled.
+        private fun showDuplicateKeysWarningDialog(onProceed: () -> Unit) {
+            val ctx = context
+            if (ctx is android.app.Activity && !ctx.isFinishing) {
+                val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                    .setTitle(R.string.wireguard_duplicate_keys_warning_title)
+                    .setMessage(R.string.wireguard_duplicate_keys_warning)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.dns_info_positive) { d, _ ->
+                        b.interfaceSwitch.isChecked = false
+                        d.dismiss()
+                    }
+                    .setNeutralButton(R.string.lbl_proceed) { _, _ -> onProceed() }
+                    .create()
+                dialog.setOnCancelListener { b.interfaceSwitch.isChecked = false }
+                dialog.show()
+            } else {
+                // no activity context: fall back to keeping the config disabled
+                b.interfaceSwitch.isChecked = false
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.wireguard_duplicate_keys_warning),
+                    Toast.LENGTH_LONG
+                )
+            }
         }
 
         // Shows an "invalid config" AlertDialog when an Activity context is
@@ -759,10 +836,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
             f()
         }
-    }
-
-    private suspend fun <T> ioCtx(f: suspend () -> T): T {
-        return withContext(Dispatchers.IO) { f() }
     }
 
     private fun io(f: suspend () -> Unit): Job? {

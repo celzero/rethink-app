@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.AppWiseCountriesAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ActivityAppWiseIpLogsBinding
@@ -64,6 +65,9 @@ class AppWiseIpLogsActivity :
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
     private var isAsn = false
+    private var isCountry = false
+
+    private var isBlocked: Boolean? = null
 
     companion object {
         private const val QUERY_TEXT_DELAY: Long = 1000
@@ -87,11 +91,20 @@ class AppWiseIpLogsActivity :
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
         isAsn = intent.getBooleanExtra(AppInfoActivity.INTENT_ASN, false)
+        isCountry = intent.getBooleanExtra(AppInfoActivity.INTENT_COUNTRY, false)
+        if (intent.hasExtra(AppInfoActivity.INTENT_IS_BLOCKED)) {
+            isBlocked = intent.getBooleanExtra(AppInfoActivity.INTENT_IS_BLOCKED, false)
+        }
         if (uid == INVALID_UID) {
             finish()
         }
+        // must be set before the adapters observe; the paged queries branch on it
+        networkLogsViewModel.setBlockedFilter(isBlocked)
         init()
-        if (android.os.Process.myUid() == uid) {
+        if (isCountry) {
+            b.awlSearch.isEnabled = false
+            setCountriesAdapter()
+        } else if (android.os.Process.myUid() == uid) {
             setRethinkAdapter()
         } else {
             if (isAsn) {
@@ -269,6 +282,18 @@ class AppWiseIpLogsActivity :
         }*/
     }
 
+    private fun setCountriesAdapter() {
+        networkLogsViewModel.setUid(uid)
+        b.awlRecyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.awlRecyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = AppWiseCountriesAdapter(this, this)
+        networkLogsViewModel.countryLogs.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
+        b.awlRecyclerConnection.adapter = recyclerAdapter
+    }
+
     private fun setRethinkAdapter() {
         networkLogsViewModel.setUid(uid)
         b.awlRecyclerConnection.setHasFixedSize(true)
@@ -301,15 +326,26 @@ class AppWiseIpLogsActivity :
 
     private fun updateAppNameInSearchHint(appName: String) {
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
-        val hint = if (isAsn) {
-            val txt = getString(R.string.two_argument_space, getString(R.string.lbl_search), getString(R.string.lbl_service_providers))
-            getString(R.string.two_argument_colon, appNameTruncated, txt)
-        } else {
-            getString(
-                R.string.two_argument_colon,
-                appNameTruncated,
-                getString(R.string.search_universal_ips)
-            )
+        val hint = when {
+            isCountry -> {
+                val txt = getString(
+                    R.string.two_argument_space,
+                    getString(R.string.lbl_search),
+                    getString(R.string.ssv_most_contacted_countries_heading)
+                )
+                getString(R.string.two_argument_colon, appNameTruncated, txt)
+            }
+            isAsn -> {
+                val txt = getString(R.string.two_argument_space, getString(R.string.lbl_search), getString(R.string.lbl_service_providers))
+                getString(R.string.two_argument_colon, appNameTruncated, txt)
+            }
+            else -> {
+                getString(
+                    R.string.two_argument_colon,
+                    appNameTruncated,
+                    getString(R.string.search_universal_ips)
+                )
+            }
         }
         b.awlSearch.queryHint = hint
         b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =

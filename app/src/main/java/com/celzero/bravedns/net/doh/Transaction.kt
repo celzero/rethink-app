@@ -48,6 +48,10 @@ class Transaction {
     var blockedTarget: String = ""
     var isEch: Boolean = false
 
+    // firewall rule id (see FirewallRuleset.id) that blocked or allowed this query,
+    // resolved from the dns-filter decision cache using the query's flow id
+    var blockedReason: String = ""
+
     enum class Status(val id: Int) {
         START(Backend.Start),
         COMPLETE(Backend.Complete),

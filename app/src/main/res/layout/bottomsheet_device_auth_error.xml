@@ -214,6 +214,21 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reset_identity"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/device_auth_error_btn_reset"
+            android:textAllCaps="false"
+            android:textSize="@dimen/default_font_text_view"
+            android:textColor="?attr/accentBad"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/btn_email_support"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_dismiss"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="0dp"
@@ -222,7 +237,7 @@
             android:text="@string/lbl_cancel"
             android:textAllCaps="false"
             android:textColor="?attr/primaryLightColorText"
-            app:layout_constraintTop_toBottomOf="@id/btn_email_support"
+            app:layout_constraintTop_toBottomOf="@id/btn_reset_identity"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

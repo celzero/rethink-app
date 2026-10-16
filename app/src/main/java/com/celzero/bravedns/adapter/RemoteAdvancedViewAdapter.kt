@@ -169,7 +169,11 @@ class RemoteAdvancedViewAdapter(val context: Context, private val fragment: Reth
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagRemote(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                fragment.updateFileTagList(list)
+                // Skip the host-fragment callback once its view is gone; the
+                // persistence write above still completes regardless.
+                if (fragment.isAdded) {
+                    fragment.updateFileTagList(list)
+                }
             }
         }
 

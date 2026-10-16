@@ -60,15 +60,6 @@
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/laa_blocked_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textColor="?attr/accentBad"
-        android:textSize="13sp"
-        android:textStyle="bold" />
-
-    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/laa_allowed_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,11 +68,21 @@
         android:textSize="13sp"
         android:textStyle="bold" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/laa_blocked_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="?attr/accentBad"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/laa_chevron"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:layout_marginStart="10dp"
+        android:alpha="0.75"
         android:src="@drawable/ic_arrow_down_small"
         app:tint="?attr/primaryLightColorText"
         xmlns:app="http://schemas.android.com/apk/res-auto" />

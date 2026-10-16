@@ -38,8 +38,6 @@ import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -95,19 +93,13 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
         return b.root
     }
 
+    // full-height frame so the file list scrolls within the expanded sheet
+    override val bottomSheetHeight: Int = ViewGroup.LayoutParams.MATCH_PARENT
+
     override fun onStart() {
         super.onStart()
         dialog?.window?.let { window ->
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
-        }
-        dialog?.let {
-            val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
-        }
-        (dialog as? BottomSheetDialog)?.behavior?.apply {
-            skipCollapsed = true
-            state = BottomSheetBehavior.STATE_EXPANDED
-            isDraggable = true
         }
     }
 

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.util
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
@@ -24,6 +25,7 @@ import android.graphics.RectF
 import android.graphics.SweepGradient
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.ColorUtils
+import kotlin.math.roundToInt
 
 /**
  * Pill-shaped border whose color is a sweep gradient that rotates, so a
@@ -49,6 +51,12 @@ class RotatingBorderDrawable : Drawable() {
     private var strokeWidthPx = 0f
     private var rotationDegrees = 0f
 
+    // hue-shift mode: the highlight's hue is shifted externally (see
+    // setHighlightHue) so the travelling highlight sweeps through a band of
+    // colors chosen by the caller instead of staying on a single accent color
+    private var rainbow = false
+    private var currentHue = -1f
+
     // base sweep pattern (no rotation): transparent at 0deg, accent at 180deg,
     // sampled every ANGLE_STEP_DEG; index i corresponds to angle i*step
     private var baseColors: IntArray? = null
@@ -71,15 +79,64 @@ class RotatingBorderDrawable : Drawable() {
     /**
      * @param accent color of the highlight; edges of the sweep fade to transparent
      * @param widthPx stroke thickness in px
+     * @param rainbow when true the highlight color follows hue shifts requested
+     * via [setHighlightHue]; [accent] then only seeds the initial color
      */
-    fun configure(accent: Int, widthPx: Float) {
-        accentColor = accent
+    fun configure(accent: Int, widthPx: Float, rainbow: Boolean = false) {
+        this.rainbow = rainbow
+        currentHue = -1f
         strokeWidthPx = widthPx
         paint.strokeWidth = widthPx
-        transparentColor = ColorUtils.setAlphaComponent(accent, 0)
-        buildBaseColors()
+        applyAccent(accent)
+        invalidateSelf()
+    }
+
+    /**
+     * Shifts the highlight hue (0..360) while keeping fixed saturation and
+     * brightness, producing a rainbow cycle. Rebuilds the small color table on
+     * every change, which is cheap enough for per-frame invocation. No-op when
+     * rainbow mode is disabled.
+     */
+    fun setHighlightHue(hueDegrees: Float) {
+        if (!rainbow) return
+        val wrapped = ((hueDegrees % 360f) + 360f) % 360f
+        if (wrapped == currentHue) return
+        currentHue = wrapped
+        val hsv = floatArrayOf(wrapped, RAINBOW_SATURATION, RAINBOW_BRIGHTNESS)
+        applyAccent(Color.HSVToColor(hsv))
+    }
+
+    /**
+     * Per-frame combined update for animated callers: applies the highlight
+     * hue and rotation in a single pass so the color table and shader are
+     * rebuilt (and the drawable invalidated) at most once per invocation
+     * instead of once per property. Skips all work when neither wrapped value
+     * changed since the last frame.
+     */
+    fun setHighlightHueAndRotation(hueDegrees: Float, newRotationDegrees: Float) {
+        val wrappedRotation = ((newRotationDegrees % 360f) + 360f) % 360f
+        val wrappedHue = ((hueDegrees % 360f) + 360f) % 360f
+        val rotationChanged = wrappedRotation != rotationDegrees
+        val hueChanged = rainbow && wrappedHue != currentHue
+        if (!rotationChanged && !hueChanged) return
+        if (hueChanged) {
+            currentHue = wrappedHue
+            val hsv = floatArrayOf(wrappedHue, RAINBOW_SATURATION, RAINBOW_BRIGHTNESS)
+            accentColor = Color.HSVToColor(hsv)
+            transparentColor = ColorUtils.setAlphaComponent(accentColor, 0)
+            buildBaseColors()
+        }
+        this.rotationDegrees = wrappedRotation
         refreshShader()
         invalidateSelf()
+    }
+
+    /** Updates the highlight color and everything derived from it. */
+    private fun applyAccent(color: Int) {
+        accentColor = color
+        transparentColor = ColorUtils.setAlphaComponent(color, 0)
+        buildBaseColors()
+        refreshShader()
     }
 
     override fun onBoundsChange(bounds: Rect) {
@@ -122,7 +179,7 @@ class RotatingBorderDrawable : Drawable() {
         val table = baseColors ?: return
         // shift the base table by the rotation, expressed in table steps
         val shift =
-            Math.round(rotationDegrees / 360f * COLOR_TABLE_SIZE).toInt() % COLOR_TABLE_SIZE
+            (rotationDegrees / 360f * COLOR_TABLE_SIZE).roundToInt() % COLOR_TABLE_SIZE
         val colors = IntArray(COLOR_TABLE_SIZE) { i -> table[(i + shift) % COLOR_TABLE_SIZE] }
         val positions = FloatArray(COLOR_TABLE_SIZE) { i -> i / (COLOR_TABLE_SIZE - 1f) }
         paint.shader = SweepGradient(rect.centerX(), rect.centerY(), colors, positions)
@@ -153,7 +210,13 @@ class RotatingBorderDrawable : Drawable() {
 
     companion object {
         // resolution of the sweep pattern; 5deg steps are visually smooth at
-        // the animation speed used (one full turn every ~3s)
+        // the animation speed used (one full turn every few seconds)
         private const val COLOR_TABLE_SIZE = 72
+
+        // saturation/brightness of the rainbow highlight; slightly softened
+        // from pure HSV primaries so the wheel does not look harsh on either
+        // light or dark themes
+        private const val RAINBOW_SATURATION = 0.85f
+        private const val RAINBOW_BRIGHTNESS = 1f
     }
 }

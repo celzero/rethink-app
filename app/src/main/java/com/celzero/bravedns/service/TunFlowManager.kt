@@ -75,10 +75,10 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.InetAddress
+import java.time.Duration
 import java.util.Collections
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 object TunFlowManager : KoinComponent {
     private const val TAG = "TunFlowManager"
@@ -147,7 +147,7 @@ object TunFlowManager : KoinComponent {
     // remove the entry from this map
     private val trackedConnMetaData: Cache<String, ConnTrackerMetaData> =
         CacheBuilder.newBuilder()
-            .expireAfterWrite(300, TimeUnit.SECONDS) // entry removed 300s after creation/update
+            .expireAfterWrite(Duration.ofSeconds(300)) // entry removed 300s after creation/update
             .removalListener<String, ConnTrackerMetaData> { notification ->
                 handleExpiredConnMetaData(notification)
             }
@@ -289,8 +289,10 @@ object TunFlowManager : KoinComponent {
                 netLogTracker.updateIpSummary(connectionSummary)
             }
             removeTrackedCid(ctx.scope, connectionSummary.connId, key.uid)
-            io(ctx.scope, "dlIpInfo") {
-                IpInfoDownloader.fetchIpInfoIfRequired(s.target)
+            if (persistentState.downloadIpInfo) {
+                io(ctx.scope, "dlIpInfo") {
+                    IpInfoDownloader.fetchIpInfoIfRequired(s.target)
+                }
             }
         } catch (e: NumberFormatException) {
             Logger.e(LOG_TAG_VPN, "onSocketClosed: ${e.message}", e)
@@ -307,8 +309,8 @@ object TunFlowManager : KoinComponent {
         val srcIpPort = parseIpAndPort(src)
         val dstIpPort = parseIpAndPort(dst)
         Logger.d(LOG_TAG_VPN, "preflow: init, uid: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
-        val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
-            val resolvedUid = getUid(
+        var newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
+            getUid(
                 ctx,
                 uid,
                 protocol,
@@ -317,10 +319,11 @@ object TunFlowManager : KoinComponent {
                 dstIpPort.first,
                 dstIpPort.second
             )
-            resolvedUid
         } else {
             uid
         }
+        // fixme: see flow()
+        newUid = FirewallManager.appId(newUid, ctx.isPrimaryUser)
         Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIpPort, $dstIpPort")
 
         val p = PreMark()
@@ -1091,11 +1094,14 @@ object TunFlowManager : KoinComponent {
                 "flow/inflow: returning mark: $mark for src(${cm.sourceIP}: ${cm.sourcePort}), dest(${cm.destIP}:${cm.destPort}, ${cm.query})"
             )
         }
-        io(ctx.scope, "handleSmartKeepAlive") {
-            if (persistentState.smartPersistentKeepalive) {
+        if (persistentState.smartPersistentKeepalive) {
+            io(ctx.scope, "handleSmartKeepAlive") {
                 proxyIds.split(",").forEach {
                     if (it.startsWith(ID_WG_BASE) || it.startsWith(Backend.RpnWin)) {
-                        Logger.vv(LOG_TAG_VPN, "rpnProxiesToPing: smart keepalive is enabled, curr used proxy: $it")
+                        Logger.vv(
+                            LOG_TAG_VPN,
+                            "rpnProxiesToPing: smart keepalive is enabled, curr used proxy: $it"
+                        )
                         ctx.handleWgOrRpnProxiesToPing(it)
                     }
                 }

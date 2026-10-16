@@ -63,6 +63,10 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
         return dnsLogDAO.getAppActivity(start, end, limit)
     }
 
+    suspend fun getTopBlockedApps(start: Long, end: Long, limit: Int): List<AppBlockedRow> {
+        return dnsLogDAO.getTopBlockedApps(start, end, limit)
+    }
+
     suspend fun getDnsLogsInWindowForUid(
         start: Long,
         end: Long,
@@ -70,5 +74,14 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
         limit: Int
     ): List<DnsLog> {
         return dnsLogDAO.getDnsLogsInWindowForUid(start, end, uid, limit)
+    }
+
+    suspend fun getDomainActivityForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DomainActivityRow> {
+        return dnsLogDAO.getDomainActivityForUid(start, end, uid, limit)
     }
 }

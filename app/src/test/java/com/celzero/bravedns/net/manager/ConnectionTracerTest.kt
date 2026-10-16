@@ -78,13 +78,14 @@ class ConnectionTracerTest {
         val dstPort = 443
         val expectedUid = 10002
 
-        // First call fails (returns INVALID_UID)
-        every { 
+        // First call fails (returns INVALID_UID); the destination (remote) address
+        // carries dstPort on the initial attempt
+        every {
             connectivityManager.getConnectionOwnerUid(
-                protocol, 
-                match { it.port == dstPort }, 
-                any()
-            ) 
+                protocol,
+                any(),
+                match { it.port == dstPort }
+            )
         } returns Constants.INVALID_UID
 
         // Retry call with port 0 succeeds

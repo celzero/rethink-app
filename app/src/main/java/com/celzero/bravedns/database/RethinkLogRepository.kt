@@ -92,4 +92,13 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
     ): List<RethinkLog> {
         return logDao.getRethinkLogsInWindowForUid(start, end, uid, limit)
     }
+
+    suspend fun getDomainActivityForUid(
+        start: Long,
+        end: Long,
+        uid: Int,
+        limit: Int
+    ): List<DomainActivityRow> {
+        return logDao.getDomainActivityForUid(start, end, uid, limit)
+    }
 }

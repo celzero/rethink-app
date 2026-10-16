@@ -22,10 +22,12 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.billingclient.api.BillingClient.ProductType
@@ -95,6 +97,11 @@ class GooglePlaySubsAdapter(
             is ShimmerViewHolder -> holder.shimmerLayout.startShimmer()
             is SubscriptionPlansViewHolder -> holder.bind(pds[position], position)
         }
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        if (holder is SubscriptionPlansViewHolder) holder.stopBorderAnimation()
+        super.onViewDetachedFromWindow(holder)
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
@@ -247,11 +254,29 @@ class GooglePlaySubsAdapter(
             if (selected) {
                 binding.selectionBorderContainer.visibility = View.VISIBLE
                 binding.planCard.cardElevation = context.resources.displayMetrics.density * 4f
+                // The rotating gradient border sits behind the card; an opaque
+                // card fill is required to mask it so only the rim stays
+                // visible. Themes with a transparent card fill (frost) would
+                // otherwise show the whole sweep gradient through the body.
+                binding.planCard.setCardBackgroundColor(
+                    resolveThemeColor(com.google.android.material.R.attr.colorSurface)
+                )
                 startBorderAnimation()
             } else {
                 binding.selectionBorderContainer.visibility = View.GONE
                 binding.planCard.cardElevation = context.resources.displayMetrics.density * 1f
+                binding.planCard.setCardBackgroundColor(resolveThemeColor(R.attr.background))
                 stopBorderAnimation()
+            }
+        }
+
+        private fun resolveThemeColor(attr: Int): Int {
+            val tv = TypedValue()
+            if (!context.theme.resolveAttribute(attr, tv, true)) return 0
+            return if (tv.resourceId != 0) {
+                ContextCompat.getColor(context, tv.resourceId)
+            } else {
+                tv.data
             }
         }
 
@@ -272,10 +297,16 @@ class GooglePlaySubsAdapter(
         }
 
         private fun animateSelection() {
+            // pulse the card and its border container together so the rim
+            // hugs the card instead of detaching while the card shrinks
             val scaleX = ObjectAnimator.ofFloat(binding.planCard, "scaleX", 1f, 0.96f, 1f)
             val scaleY = ObjectAnimator.ofFloat(binding.planCard, "scaleY", 1f, 0.96f, 1f)
+            val borderScaleX =
+                ObjectAnimator.ofFloat(binding.selectionBorderContainer, "scaleX", 1f, 0.96f, 1f)
+            val borderScaleY =
+                ObjectAnimator.ofFloat(binding.selectionBorderContainer, "scaleY", 1f, 0.96f, 1f)
             AnimatorSet().apply {
-                playTogether(scaleX, scaleY)
+                playTogether(scaleX, scaleY, borderScaleX, borderScaleY)
                 duration = 120
                 start()
             }

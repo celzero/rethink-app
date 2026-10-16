@@ -31,7 +31,6 @@ import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.button.MaterialButton
 import org.koin.android.ext.android.inject
 
@@ -62,11 +61,6 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetDnsRecordTypesBinding.inflate(inflater, container, false)
         return b.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

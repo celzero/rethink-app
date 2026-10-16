@@ -1,0 +1,31 @@
+Säg hej till en säkrare, mer transparent och trygg Android.
+
+VPN: Anslut till flera WireGuard-VPN:er som du själv väljer.
+
+Säker: Visar nätverksaktiviteten från installerade appar och låter dig inaktivera, avinstallera eller blockera dem med brandväggen.
+
+Skyddad: Första försvarslinjen mot spionprogram, utpressningsprogram och skadlig kod som stjäl personuppgifter och tar över konton. Skyddar mot DNS-manipulation som vanligtvis används för att censurera webbplatser, sociala medier och meddelandeappar.
+
+Snabb: DNS-servrar på över 300 platser runt om i världen gör att din internetanslutning blir så snabb och hög tillgänglig som möjligt.
+
+Öppen: Öppen källkod och helt fri från spårare.
+
+***Funktioner***
+
+Brandvägg: Hindra appar från att ansluta till internet. Blockera spionprogram, skadlig kod, utpressningsprogram med mera.
+
+En brandvägg blockerar alla appar som ansluter till internet via Wi-Fi eller mobildata. Eftersom de flesta former av övervakning kräver att data skickas via nätverket till en server begränsar brandväggen hotet effektivt (filhanterare, väckarklockor och miniräknare är exempel på appar som inte behöver någon internetanslutning för att fungera). Brandväggsfunktionen använder tillgänglighetstjänsten för att upptäcka och blockera bakgrundsappar.
+
+Övervakning: Håll koll på inkommande och utgående internettrafik.
+
+Om funktionen är aktiverad samlas anslutningsloggar in och analyseras. Automatiska rapporter markerar tidigare okända eller misstänkta anslutningar och visar i vilken utsträckning spionprogramsnätverk försöker stjäla data. I våra tester markeras och rapporteras omkring 60 % av trafiken som initierad av kända spionprogram. De genererade loggarna görs tillgängliga för användaren i nära realtid för egen analys.
+
+WireGuard: Skydda utgående internettrafik.
+
+Appen använder det snabba, moderna, resurssnåla och säkra WireGuard-protokollet för att kryptera utgående anslutningar till valfri kompatibel VPN-leverantör.
+
+Kringgå censur:
+
+Appen krypterar din internetanslutning till DNS-servrar som drivs av Rethink och finns på över 300 platser i världen. DNS-servrar är internets adressbok: en DNS-server ger de exakta adresser du behöver för att besöka en webbplats eller öppna en app.
+
+Dataövervakning: Spåra mobildata- och Wi-Fi-användning per app och anslutning.

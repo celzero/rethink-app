@@ -4,7 +4,7 @@
 
   This file mirrors `app/src/full/AndroidManifest.xml` because the `tv`
   flavor inherits the entire `app/src/full/java` source set (see
-  `sourceSets.tv` in `app/build.gradle`). Every activity / receiver /
+  `sourceSets.tv` in `app/build.gradle.kts`). Every activity / receiver /
   service that upstream's Kotlin code references must be declared, or
   startActivity / PackageManager calls from the inherited classes will
   crash at runtime with ActivityNotFoundException / NameNotFoundException.
@@ -284,6 +284,10 @@
             <intent-filter>
                 <action android:name="com.celzero.bravedns.intent.action.VPN_START" />
                 <action android:name="com.celzero.bravedns.intent.action.VPN_STOP" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_START" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_STOP" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_PAUSE" />
+                <action android:name="com.celzero.bravedns.intent.action.WG_RESUME" />
             </intent-filter>
         </receiver>
         <receiver

@@ -768,7 +768,6 @@
     <string name="cd_no_rules_text" translatable="true">Aucune règle de domaine.</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
-    <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer &lt;u&gt;ce domaine&lt;/u&gt;</string>
     <string name="lbl_rules" translatable="true">règles</string>
     <string name="lbl_configure" translatable="true">Configurer</string>
     <string name="lbl_logs" translatable="true">journaux</string>

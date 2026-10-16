@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * https://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,6 @@ import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.OrbotHelper.Companion.NOTIF_CHANNEL_ID_PROXY_ALERTS
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -45,76 +44,53 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val rdb by inject<RefreshDatabase>()
     private val persistentState by inject<PersistentState>()
 
+    private val appScope by inject<CoroutineScope>()
+
     override fun onReceive(context: Context, intent: Intent) {
         // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
         Logger.i(LOG_TAG_VPN, "received notification action: $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
-            OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
-                orbotHelper.openOrbotApp()
-                manager.cancel(NOTIF_CHANNEL_ID_PROXY_ALERTS, OrbotHelper.ORBOT_SERVICE_ID)
-            }
-            Constants.NOTIF_ACTION_PAUSE_VPN -> {
-                pauseApp(context)
-            }
-            Constants.NOTIF_ACTION_RESUME_VPN -> {
-                resumeApp()
-            }
-            Constants.NOTIF_ACTION_STOP_VPN -> {
-                stopVpn(context)
-            }
-            Constants.NOTIF_ACTION_DNS_VPN -> {
-                dnsMode(context)
-            }
-            Constants.NOTIF_ACTION_DNS_FIREWALL_VPN -> {
-                dnsFirewallMode()
-            }
-            Constants.NOTIF_ACTION_RULES_FAILURE -> {
-                reloadRules()
-            }
-            Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
-                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
-                if (uid < 0) {
-                    Logger.i(LOG_TAG_VPN, "Invalid uid: $uid, on new app allow, ignoring")
-                    return
-                }
+            OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> handleOrbot(manager)
+            Constants.NOTIF_ACTION_PAUSE_VPN -> pauseApp(context)
+            Constants.NOTIF_ACTION_RESUME_VPN -> resumeApp()
+            Constants.NOTIF_ACTION_STOP_VPN -> stopVpn(context)
+            Constants.NOTIF_ACTION_DNS_VPN -> dnsMode(context)
+            Constants.NOTIF_ACTION_DNS_FIREWALL_VPN -> dnsFirewallMode()
+            Constants.NOTIF_ACTION_RULES_FAILURE -> refreshDatabase()
+            Constants.NOTIF_ACTION_NEW_APP_ALLOW -> handleNewAppFirewallAction(
+                context, intent, manager, FirewallManager.ConnectionStatus.ALLOW, "allow"
+            )
+            Constants.NOTIF_ACTION_NEW_APP_DENY -> handleNewAppFirewallAction(
+                context, intent, manager, FirewallManager.ConnectionStatus.BOTH, "deny"
+            )
+            Constants.NOTIF_ACTION_DB_CORRUPTED_CLEAR -> clearCorruptedDatabase(manager)
+            Constants.NOTIF_ACTION_DB_CORRUPTED_DISMISS -> dismissCorruptedDatabase(manager)
+            Constants.NOTIF_ACTION_RETHINK_BLOCK_DISMISS -> dismissRethinkBlock(manager)
+        }
+    }
 
-                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
-
-                modifyAppFirewallSettings(context, uid, FirewallManager.ConnectionStatus.ALLOW)
-            }
-            Constants.NOTIF_ACTION_NEW_APP_DENY -> {
-                val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
-                if (uid < 0) {
-                    Logger.i(LOG_TAG_VPN, "Invalid uid: $uid, on new app deny, ignoring")
-                    return
-                }
-
-                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
-
-                modifyAppFirewallSettings(context, uid, FirewallManager.ConnectionStatus.BOTH)
-            }
-            Constants.NOTIF_ACTION_DB_CORRUPTED_CLEAR -> {
-                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
-                io { rdb.clearCoreTablesAndRebuild() }
-            }
-            Constants.NOTIF_ACTION_DB_CORRUPTED_DISMISS -> {
-                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
-            }
-            Constants.NOTIF_ACTION_RETHINK_BLOCK_DISMISS -> {
-                manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, Constants.NOTIF_ID_RETHINK_BLOCK)
-                persistentState.showRethinkBlockNotification = false
+    /**
+     * Runs [work] as background work for this broadcast via goAsync(): the
+     * receiver stays "alive" (and the broadcast is not yet considered finished)
+     * until PendingResult.finish() is called, extending the broadcast window to
+     * roughly ten seconds.
+     */
+    private fun io(work: suspend () -> Unit) {
+        val pendingResult: BroadcastReceiver.PendingResult = goAsync()
+        appScope.launch {
+            try {
+                work()
+            } finally {
+                pendingResult.finish()
             }
         }
     }
 
-    private fun reloadRules() {
-        io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
-    }
-
-    private fun stopVpn(context: Context) {
-        VpnController.stop("notif", context)
+    private fun handleOrbot(manager: NotificationManager) {
+        orbotHelper.openOrbotApp()
+        manager.cancel(NOTIF_CHANNEL_ID_PROXY_ALERTS, OrbotHelper.ORBOT_SERVICE_ID)
     }
 
     private fun pauseApp(context: Context) {
@@ -132,6 +108,19 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun resumeApp() {
         VpnController.resumeApp()
+    }
+
+    private fun stopVpn(context: Context) {
+        VpnController.stop("notif", context)
+    }
+
+    private fun dismissCorruptedDatabase(manager: NotificationManager) {
+        manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
+    }
+
+    private fun dismissRethinkBlock(manager: NotificationManager) {
+        manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, Constants.NOTIF_ID_RETHINK_BLOCK)
+        persistentState.showRethinkBlockNotification = false
     }
 
     private fun dnsMode(context: Context) {
@@ -152,23 +141,38 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode) }
     }
 
-    private fun modifyAppFirewallSettings(
+    private fun refreshDatabase() {
+        io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
+    }
+
+    private fun clearCorruptedDatabase(manager: NotificationManager) {
+        manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, RefreshDatabase.NOTIF_ID_DB_CORRUPTION)
+        io { rdb.clearCoreTablesAndRebuild() }
+    }
+
+    private fun handleNewAppFirewallAction(
         context: Context,
-        uid: Int,
-        connectionStatus: FirewallManager.ConnectionStatus
+        intent: Intent,
+        manager: NotificationManager,
+        connectionStatus: FirewallManager.ConnectionStatus,
+        actionLabel: String
     ) {
+        val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
+        if (uid < 0) {
+            Logger.i(LOG_TAG_VPN, "Invalid uid: $uid, on new app $actionLabel, ignoring")
+            return
+        }
+
+        manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
+
         val text =
             if (connectionStatus == FirewallManager.ConnectionStatus.BOTH) {
                 context.getString(R.string.new_app_notification_action_toast_deny)
             } else {
                 context.getString(R.string.new_app_notification_action_toast_allow)
             }
-
         Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
-        io { FirewallManager.updateFirewalledApps(uid, connectionStatus) }
-    }
 
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
+        io { FirewallManager.updateFirewalledApps(uid, connectionStatus) }
     }
 }

@@ -325,9 +325,7 @@ object IpRulesManager : KoinComponent {
     }
 
     fun hasRule(uid: Int, ipstr: String, port: Int): IpRuleStatus {
-        val pair = hostAddr(ipstr, port)
-        val ipNetPort = joinIpNetPort(normalize(pair.first) + pair.second)
-        val ck = CacheKey(ipNetPort, uid)
+        val ck = CacheKey(joinIpNetPort(ipstr, port), uid)
 
         resultsCache.getIfPresent(ck)?.let {
             // return only if both ip and app(uid) matches

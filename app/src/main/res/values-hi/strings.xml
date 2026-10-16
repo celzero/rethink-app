@@ -724,7 +724,6 @@
     <string name="ada_noapp_dialog_title" translatable="true">ऐसा कोई ऐप नही</string>
     <string name="ada_noapp_dialog_message" translatable="true">ऐप जानकारी लापता। शायद इसे अनइंस्टाल कर दिया गया?</string>
     <string name="ada_app_status_block_md" translatable="true">को मीटर्ड (मोबाइल) नेटवर्क पर अवरुद्ध किया है</string>
-    <string name="bsdl_block_desc" translatable="true">अवरोधित करें, विश्वास करे &lt;u&gt;इस डोमेन पर &lt;/u&gt;</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[इस कनेक्शन की अनुमति दी गई थी क्योंकि <i>गंतव्य आईपी</i> सभी यूनीवर्सल फ़ायरवॉल नियमों को बायपास करने के लिए सेट है।<br/><br/> बदलने के लिए <i>आईपी नियम</i> में जाए जो <i>यूनीवर्सल</i> टैब में है।]]></string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[<i>अनमीटर्ड</i> नेटवर्क पर कनेक्ट करने का प्रयास करते समय एक उपयोगकर्ता-सेट फ़ायरवॉल नियम ने इस <i>ऐप</i> को अवरुद्ध कर दिया। <br/> <br/> बदलने के लिए <i>सभी ऐप्स</i> टैब पर जाएं।]]></string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">इस एप्लिकेशन से संबंधित सभी लॉग साफ़ करें।</string>

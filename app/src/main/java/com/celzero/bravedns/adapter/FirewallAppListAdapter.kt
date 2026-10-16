@@ -186,7 +186,7 @@ class FirewallAppListAdapter(
             if (proxy.isEmpty() || (proxy.size == 1 && proxy[0] == ID_NONE)) {
                 return
             }
-            b.firewallAppLabelTv.append(context.getString(R.string.symbol_key))
+            b.firewallAppToggleOther.append("  " + context.getString(R.string.symbol_key))
         }
 
         private fun getFirewallText(

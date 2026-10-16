@@ -24,10 +24,10 @@ import androidx.room.Query
 @Dao
 interface SmartDnsEndpointDAO {
 
-    @Query("SELECT * FROM SmartDnsEndpoint ORDER BY dnsMode ASC")
+    @Query("SELECT * FROM SmartDnsEndpoint order by isSelected desc")
     suspend fun getSmartDnsEndpoints(): List<SmartDnsEndpoint>
 
-    @Query("SELECT * FROM SmartDnsEndpoint ORDER BY dnsMode ASC")
+    @Query("SELECT * FROM SmartDnsEndpoint order by isSelected desc")
     fun getSmartDnsEndpointsLiveData(): LiveData<List<SmartDnsEndpoint>>
 
     @Query("SELECT * FROM SmartDnsEndpoint WHERE isSelected = 1 LIMIT 1")

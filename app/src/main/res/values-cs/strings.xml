@@ -856,7 +856,6 @@
     <string name="exclude_apps_from_proxy">Obcházet aplikaci pro všechny proxy</string>
     <string name="exclude_apps_from_proxy_failure_toast">Tato aplikace již obchází proxy</string>
     <string name="bsac_title_desc" translatable="true">Pravidla platí pouze pro tuto aplikaci.</string>
-    <string name="bsdl_block_desc" translatable="true">Blokovat, důvěřovat &lt;u&gt;této doméně&lt;/u&gt;</string>
     <string name="notif_download_content_title" translatable="true">Stahování On-Device blokovacího seznamu</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuje malware, ransomware, cryptoware, phishing a další hrozby.</string>
     <string name="rt_dialog_title" translatable="true">Uložit změny</string>
@@ -1040,7 +1039,6 @@
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Toto připojení bylo zablokováno, protože WireGuard je v režimu <i>lockdown</i>.<br><br> Pro změnu přejděte na obrazovku <i>WireGuard</i>.]]></string>
     <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Toto připojení bylo zablokováno, protože pro aplikaci není vybrána žádná <i>proxy</i>.<br><br> Pro změnu přejděte na <i>Proxy</i> na obrazovce <i>Konfigurace</i>.]]></string>
     <string name="build_flavor_website_degoogled" translatable="true">webová-degoogled</string>
-    <string name="bsdl_app_block_desc" translatable="true">Blokovat, důvěřovat &lt;u&gt;této doméně&lt;/u&gt; pro tuto aplikaci</string>
     <string name="config_delete_all_dialog_desc" translatable="true">Opravdu chcete smazat VŠECHNY konfigurace WireGuard VPN? Tuto akci NELZE VRÁTIT ZPĚT.</string>
     <string name="config_delete_all_dialog_title" translatable="true">Smazat vše</string>
     <string name="wireguard_disable_failure_relay" translatable="true">„Relay WireGuard“ nelze vypnout</string>

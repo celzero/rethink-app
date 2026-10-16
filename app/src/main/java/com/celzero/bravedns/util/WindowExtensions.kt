@@ -60,7 +60,7 @@ fun AppCompatActivity.handleFrostEffectIfNeeded(themeId: Int) {
         // Apply the current system blur state immediately so the first draw is
         // already correct (the attach-listener fires later and handles transitions).
         val enabled = windowManager.isCrossWindowBlurEnabled
-        Logger.v(LOG_TAG_UI, "Blur enabled by system? $enabled")
+        Logger.d(LOG_TAG_UI, "Cross-window blur enabled? $enabled (sdk=${Build.VERSION.SDK_INT})")
         updateWindowForBlurs(windowBackgroundDrawable, enabled)
     } else {
         Logger.v(LOG_TAG_UI, "Blurs not supported, below Android S")
@@ -90,20 +90,16 @@ private fun AppCompatActivity.setupWindowBlurListener(windowBackgroundDrawable: 
 }
 
 // Blur radius in dp for density-independent blur strength across devices.
-// Converted to px at point of use. 150dp is the platform maximum; 120dp
-// gives a strong frosted blur while leaving some headroom.
-private const val BACKGROUND_BLUR_RADIUS_DP = 120f
-private const val BLUR_BEHIND_RADIUS_DP = 120f
-// Stronger dim to reduce background visibility while still letting the blur
-// show through. 0.7f was too aggressive; 0.45f strikes a balance between
-// obscuring background content and retaining the glass aesthetic.
-private const val DIM_AMOUNT_WITH_BLUR = 0.45f
+private const val BACKGROUND_BLUR_RADIUS_DP = 70f
+private const val BLUR_BEHIND_RADIUS_DP = 70f
+// Moderate dim: darkens the backdrop enough that foreground content stands
+// out, while the blur keeps it alive behind the translucent cards.
+private const val DIM_AMOUNT_WITH_BLUR = 0.28f
 // Frost theme is only selectable on S+, so the no-blur path is a safeguard only.
 // No dim is applied; the nearly-opaque window background acts as the backdrop.
 private const val DIM_AMOUNT_NO_BLUR = 0.0f
-// ~59 % opacity of the dark surface colour — strong frosted tint that
-// significantly reduces background visibility without fully hiding the blur.
-private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 40
+// opacity of the window gradient
+private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 30
 // Nearly-opaque fallback when blur is unavailable on S+.
 private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 230
 // Legacy Frost constants (API 23-30)

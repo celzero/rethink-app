@@ -173,14 +173,14 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/ping_button"
-                    style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:layout_marginTop="16dp"
+                    android:backgroundTint="?attr/serverHeaderGradientEnd"
                     android:letterSpacing="0.02"
+                    android:textColor="?attr/primaryTextColor"
                     android:text="@string/rpn_perform_test"
                     android:textSize="16sp"
-                    android:textStyle="bold"
                     app:cornerRadius="26dp" />
 
             </LinearLayout>
@@ -225,15 +225,18 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
-                android:id="@+id/dolphin_signature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
+
+    <com.celzero.bravedns.ui.custom.EmbeddedDolphinSignature
+        android:id="@+id/dolphin_signature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="48dp"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

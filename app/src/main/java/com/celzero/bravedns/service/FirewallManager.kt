@@ -48,10 +48,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 object FirewallManager : KoinComponent {
 
@@ -322,7 +322,7 @@ object FirewallManager : KoinComponent {
         @Volatile var tempAllowedUids: MutableMap<Int, Long> = mutableMapOf()
     }
 
-    // ---- Temp Allow (15 min) cache + DB (source of truth) ----
+    // temp Allow (15 min) cache + DB
 
     private val tempAllowDbExecutor: Executor = Executors.newSingleThreadExecutor { r ->
         Thread(r, "fw-temp-allow-db").apply { isDaemon = true }
@@ -336,7 +336,7 @@ object FirewallManager : KoinComponent {
     private val tempAllowCache: Cache<Int, Long> = CacheBuilder.newBuilder()
         .maximumSize(10_000)
         // Hard upper bound; real expiry is based on stored expiryEpochMs.
-        .expireAfterWrite(60, TimeUnit.MINUTES)
+        .expireAfterWrite(Duration.ofMinutes(60))
         .removalListener(
             RemovalListener<Int, Long> { notification ->
                 val uid = notification.key ?: return@RemovalListener
@@ -355,9 +355,27 @@ object FirewallManager : KoinComponent {
         )
         .build()
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private fun io(f: suspend () -> Unit) {
+        scope.launch { f() }
+    }
+
     init {
-        io { load() }
-        io { hydrateTempAllowCacheFromDb() }
+        io {
+            try {
+                load()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "err loading app infos during init: ${e.message}")
+            }
+        }
+        io {
+            try {
+                hydrateTempAllowCacheFromDb()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_FIREWALL, "err hydrating temp-allow cache during init: ${e.message}")
+            }
+        }
     }
 
     private var appContext: Context? = null
@@ -956,13 +974,6 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun ioScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        ioScope().launch(Dispatchers.IO) { f() }
-    }
 
     private suspend fun getAppInfos(): Collection<AppInfo> {
         mutex.withLock {

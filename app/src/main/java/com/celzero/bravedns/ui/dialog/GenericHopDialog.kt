@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.adapter.GenericHopAdapter
 import com.celzero.bravedns.adapter.HopItem
 import com.celzero.bravedns.databinding.DialogWgHopBinding
+import com.celzero.bravedns.util.UIUtils
 
 /**
  * Generic dialog for hopping between different proxy types
@@ -58,6 +59,8 @@ open class GenericHopDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT
         )
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(this)
 
         mLayoutManager = LinearLayoutManager(activity)
 

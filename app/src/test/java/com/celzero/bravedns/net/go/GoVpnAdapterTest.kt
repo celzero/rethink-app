@@ -233,23 +233,22 @@ class GoVpnAdapterTest : KoinTest {
     }
 
     @Test
-    fun `getDnsStatus returns rpn status for rpn-win id`() = runTest {
+    fun `getDnsStatus returns null for rpn-win id since it is not a resolver transport`() = runTest {
+        // getDnsStatus serves DNS transport status only; WIN proxy status is exposed
+        // via the RPN API surface (e.g. hasRpnWin / rpn().win()), not the resolver
         val tunnel = mockk<Tunnel>(relaxed = true)
         every { tunnel.isConnected } returns true
 
-        val proxies = mockk<Proxies>(relaxed = true)
-        val rpn = mockk<com.celzero.firestack.backend.Rpn>(relaxed = true)
-        val win = mockk<com.celzero.firestack.backend.RpnProxy>(relaxed = true)
-        every { tunnel.proxies } returns proxies
-        every { proxies.rpn() } returns rpn
-        every { rpn.win() } returns win
-        every { win.status() } returns 11
+        val resolver = mockk<DNSResolver>(relaxed = true)
+        every { tunnel.resolver } returns resolver
+        // no transport registered for the rpn-win id
+        every { resolver.get(com.celzero.firestack.backend.Backend.RpnWin) } returns null
 
         val adapter = newAdapter(tunnel)
 
         val status = adapter.getDnsStatus(com.celzero.firestack.backend.Backend.RpnWin)
 
-        assertEquals(11, status)
+        assertNull(status)
     }
 
     @Test

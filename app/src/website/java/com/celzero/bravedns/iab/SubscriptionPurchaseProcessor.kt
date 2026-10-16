@@ -44,7 +44,10 @@ internal class SubscriptionPurchaseProcessor(
     private val activateRpn: suspend (purchaseDetail: PurchaseDetail) -> Unit,
     /** Returns the product type string (ProductType.SUBS or INAPP) for a purchase. */
     private val getProductType: (Purchase) -> String,
-    private val getDeviceId: suspend () -> String = { "" },
+    /** Returns the DID bound to the account, or blank if unavailable. */
+    private val getDeviceId: suspend (accountId: String) -> String = { "" },
+    /** Resolves and, if needed, mints the DID for the server-ack path. */
+    private val mintDeviceId: suspend (accountId: String) -> String = { "" },
     private val reconcileCidDid: suspend (accountId: String) -> Unit,
     private val validatePayloadAndFetchIfRequired: suspend (purchaseDtl: PurchaseDetail) -> PurchaseDetail
 ) {
@@ -130,7 +133,7 @@ internal class SubscriptionPurchaseProcessor(
         val cal = Calendar.getInstance().apply { timeInMillis = purchase.purchaseTime }
 
         val added = addIso8601Period(cal, billingPeriod)
-        return if (added) {
+        val expiry = if (added) {
             logd(mname, "billingPeriod=$billingPeriod (ISO parsed), expiry=${cal.timeInMillis}")
             cal.timeInMillis
         } else {
@@ -144,6 +147,14 @@ internal class SubscriptionPurchaseProcessor(
                 Long.MAX_VALUE
             }
         }
+        if (expiry == Long.MAX_VALUE) return expiry
+
+        if (expiry <= System.currentTimeMillis() && purchase.isAutoRenewing) {
+            logd(mname, "frozen first-period estimate (expiry=$expiry, autoRenewing=true) " +
+                "MAX_VALUE (unknown; Play is master)")
+            return Long.MAX_VALUE
+        }
+        return expiry
     }
 
     /**
@@ -198,7 +209,7 @@ internal class SubscriptionPurchaseProcessor(
             isAutoRenewing     = purchase.isAutoRenewing,
             accountId          = accountId,
             // Never store the real device ID in PurchaseDetail; use sentinel only.
-            deviceId           = if (getDeviceId().isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
+            deviceId           = if (getDeviceId(accountId).isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
             payload            = purchase.developerPayload,
             expiryTime         = expiryTime,
             status             = purchase.purchaseState.toSubscriptionStatusId(),
@@ -292,9 +303,13 @@ internal class SubscriptionPurchaseProcessor(
                 "threshold reached, calling server ack")
         try {
             val accountId = purchase.accountIdentifiers?.obfuscatedAccountId ?: ""
-            val deviceId  = getDeviceId()
-            if (accountId.isEmpty() || deviceId.isEmpty()) {
-                loge(mname, "accountId(${accountId.length})/deviceId(${deviceId.length}) empty")
+            // resolve the DID only when a server acknowledgement is required.
+            val deviceId = if (purchase.developerPayload.isEmpty()) mintDeviceId(accountId) else ""
+            if (purchase.developerPayload.isEmpty() && (accountId.isEmpty() || deviceId.isEmpty())) {
+                loge(mname, "identity unavailable for server ack (accountId=${accountId.length}, deviceId=${deviceId.length}); keeping purchase pending")
+                val pendingDetail = buildPurchaseDetail(purchase) ?: return
+                subscriptionStateMachine.completePurchase(pendingDetail)
+                return
             }
             val (ackOk, developerPayload) = if (purchase.developerPayload.isEmpty()) {
                 acknowledgePurchase(accountId, deviceId, purchase.purchaseToken, ProductType.SUBS)

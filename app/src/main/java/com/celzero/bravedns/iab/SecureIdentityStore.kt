@@ -21,6 +21,8 @@ import android.content.Context
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.EncryptionException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
@@ -94,6 +96,9 @@ class SecureIdentityStore(private val context: Context) {
         private const val KEY_DEVICE_ID          = "deviceId"
     }
 
+    /** Serializes store access to keep identity reads and writes consistent. */
+    private val storeMutex = Mutex()
+
     /**
      * Returns `true` when the legacy pre-env identity file (`identity.json`) is still
      * present on disk.  Use this as a cheap guard before calling [migrateFromLegacy].
@@ -149,16 +154,31 @@ class SecureIdentityStore(private val context: Context) {
      * - If the env-scoped file is absent or empty the legacy data is written into it.
      * - If the legacy file cannot be decrypted or is corrupt the legacy file is deleted
      *   with no env-scoped write so the next [refreshIdentity] fetches fresh IDs.
-     * - The legacy file is always deleted at the end, regardless of outcome, so this
-     *   method is safe to call multiple times (idempotent once the legacy file is gone).
+     * - The legacy file is deleted once migration succeeds or is deemed unnecessary, so
+     *   this method is safe to call multiple times (idempotent once the legacy file is
+     *   gone).  When the env-scoped write fails the legacy file is kept for retry and
+     *   the method returns `false`.
      *
      * @param env The environment ([Env.PROD] or [Env.TEST]) that the stored identity
      *            belongs to, determined by the caller from the live entitlement or
      *            [PersistentState.appTestMode] as a fallback.
+     * @return `true` when migration is complete or unnecessary (legacy file gone), or
+     *         `false` when the env-scoped write failed and the legacy file was kept so
+     *         the caller can retry later.
      */
-    suspend fun migrateFromLegacy(env: Env) = withContext(Dispatchers.IO) {
+    suspend fun migrateFromLegacy(env: Env): Boolean = storeMutex.withLock {
+        migrateFromLegacyLocked(env)
+    }
+
+    /**
+     * Migration body for [migrateFromLegacy]. Caller MUST hold [storeMutex].
+     *
+     * @return `true` when migration is complete or unnecessary, `false` when the
+     *         env-scoped save failed and the legacy file was kept for retry.
+     */
+    private suspend fun migrateFromLegacyLocked(env: Env): Boolean {
         val legacyFile = legacyIdentityFile()
-        if (!legacyFile.exists()) return@withContext  // already migrated or never existed
+        if (!legacyFile.exists()) return true  // already migrated or never existed
 
         val (legacyAcc, legacyDev) = readLegacy()
 
@@ -166,7 +186,7 @@ class SecureIdentityStore(private val context: Context) {
             // Legacy file is empty / corrupt — delete it, nothing to migrate.
             Logger.w(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy identity blank/corrupt; deleting legacy file")
             safeDeleteFile(legacyFile)
-            return@withContext
+            return true
         }
 
         // Only write to the env-scoped file if it does not already have valid data.
@@ -186,16 +206,22 @@ class SecureIdentityStore(private val context: Context) {
             false
         }
 
-        if (alreadyPresent) {
+        // The env-scoped identity is already valid, so the legacy copy can be removed.
+        return if (alreadyPresent) {
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: env-scoped file already has valid identity; legacy identity discarded")
-        } else {
-            save(env, legacyAcc, legacyDev)
+            safeDeleteFile(legacyFile)
+            Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy file deleted")
+            true
+        } else if (saveLocked(env, legacyAcc, legacyDev)) {
             Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: migrated legacy identity " +
                 "(accLen=${legacyAcc.length}, devLen=${legacyDev.length})")
+            safeDeleteFile(legacyFile)
+            Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy file deleted")
+            true
+        } else {
+            Logger.w(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: env write failed; legacy identity kept for retry")
+            false
         }
-
-        safeDeleteFile(legacyFile)
-        Logger.i(LOG_IAB, "$TAG migrateFromLegacy[${env.label}]: legacy file deleted")
     }
 
     private fun legacyIdentityFile(): File =
@@ -211,11 +237,16 @@ class SecureIdentityStore(private val context: Context) {
      * @param accountId   The customer account ID (CID) obtained from the server.
      * @param deviceId    The device ID (DID) obtained from the server.
      */
-    suspend fun save(env: Env, accountId: String, deviceId: String) = withContext(Dispatchers.IO) {
+    suspend fun save(env: Env, accountId: String, deviceId: String): Boolean = storeMutex.withLock {
+        saveLocked(env, accountId, deviceId)
+    }
+
+    /** Store body for [save]; true when the pair was persisted. Caller MUST hold [storeMutex]. */
+    private suspend fun saveLocked(env: Env, accountId: String, deviceId: String): Boolean = withContext(Dispatchers.IO) {
         if (accountId.isBlank() || deviceId.isBlank()) {
             Logger.w(LOG_IAB, "$TAG save[${env.label}]: skipping blank value(s) " +
                 "(accBlank=${accountId.isBlank()}, devBlank=${deviceId.isBlank()})")
-            return@withContext
+            return@withContext false
         }
         try {
             val json = JSONObject().apply {
@@ -227,10 +258,13 @@ class SecureIdentityStore(private val context: Context) {
             EncryptedFileManager.write(context, json.toString(), file)
             Logger.d(LOG_IAB, "$TAG save[${env.label}]: identity written " +
                 "(accLen=${accountId.length}, devLen=${deviceId.length})")
+            true
         } catch (e: EncryptionException) {
             Logger.e(LOG_IAB, "$TAG save[${env.label}]: encryption error ${e.message}", e)
+            false
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG save[${env.label}]: unexpected error ${e.message}", e)
+            false
         }
     }
 
@@ -244,7 +278,12 @@ class SecureIdentityStore(private val context: Context) {
      *
      * @param env The environment whose identity should be retrieved.
      */
-    suspend fun get(env: Env): Pair<String?, String?> = withContext(Dispatchers.IO) {
+    suspend fun get(env: Env): Pair<String?, String?> = storeMutex.withLock {
+        getLocked(env)
+    }
+
+    /** Store read body. Caller MUST hold [storeMutex]. */
+    private suspend fun getLocked(env: Env): Pair<String?, String?> = withContext(Dispatchers.IO) {
         val file = identityFile(env)
         if (!file.exists()) {
             Logger.d(LOG_IAB, "$TAG get[${env.label}]: identity file does not exist")
@@ -270,6 +309,11 @@ class SecureIdentityStore(private val context: Context) {
             Pair(accountId, deviceId)
         } catch (e: EncryptionException) {
             Logger.e(LOG_IAB, "$TAG get[${env.label}]: decryption failure ${e.message}", e)
+            // An undecryptable file can never become readable again (the keyset is
+            // gone); keep it and every future read would fail the same way. Delete it
+            // so the next save() starts fresh instead of the caller minting a new
+            // CID on every resolve while the dead file still claims the store.
+            safeDeleteFile(identityFile(env))
             Pair(null, null)
         } catch (e: org.json.JSONException) {
             Logger.e(LOG_IAB, "$TAG get[${env.label}]: JSON parse failure ${e.message}", e)
@@ -291,9 +335,11 @@ class SecureIdentityStore(private val context: Context) {
      *
      * @param env The environment whose identity should be cleared.
      */
-    suspend fun clear(env: Env) = withContext(Dispatchers.IO) {
-        safeDeleteFile(identityFile(env))
-        Logger.i(LOG_IAB, "$TAG clear[${env.label}]: identity file deleted")
+    suspend fun clear(env: Env) = storeMutex.withLock {
+        withContext(Dispatchers.IO) {
+            safeDeleteFile(identityFile(env))
+            Logger.i(LOG_IAB, "$TAG clear[${env.label}]: identity file deleted")
+        }
     }
 
     /**
@@ -302,12 +348,13 @@ class SecureIdentityStore(private val context: Context) {
      * Use only when a full identity reset is required (e.g. app data wipe or
      * unrecoverable keyset invalidation).  For a single-environment reset prefer [clear].
      */
-    @Suppress("unused")
-    suspend fun clearAll() = withContext(Dispatchers.IO) {
-        Env.entries.forEach { env ->
-            safeDeleteFile(identityFile(env))
+    suspend fun clearAll() = storeMutex.withLock {
+        withContext(Dispatchers.IO) {
+            Env.entries.forEach { env ->
+                safeDeleteFile(identityFile(env))
+            }
+            Logger.i(LOG_IAB, "$TAG clearAll: identity files deleted for all environments")
         }
-        Logger.i(LOG_IAB, "$TAG clearAll: identity files deleted for all environments")
     }
 
     private fun identityFile(env: Env): File {

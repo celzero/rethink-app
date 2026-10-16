@@ -34,21 +34,38 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import com.celzero.bravedns.shadows.ShadowBackend
 
+// Robolectric is required: TunFirewallManager and the rules managers it consults
+// touch android.os/android.util APIs and firestack's native Backend. ShadowBackend
+// suppresses the gojni native-library load (see IpRulesManagerWildcardTest).
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28], shadows = [ShadowBackend::class])
 class TunFirewallManagerTest : KoinTest {
 
-    private val persistentState = mockk<PersistentState>(relaxed = true)
-    private val appConfig = mockk<AppConfig>(relaxed = true)
-    private val rdb = mockk<RefreshDatabase>(relaxed = true)
-    private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
+    companion object {
+        // TunFirewallManager is a Kotlin object whose `by inject<>()` delegates are
+        // resolved once and cached, so these mocks must be shared across test
+        // instances (JUnit creates a new test-class instance per test method).
+        private val persistentState = mockk<PersistentState>(relaxed = true)
+        private val appConfig = mockk<AppConfig>(relaxed = true)
+        private val rdb = mockk<RefreshDatabase>(relaxed = true)
+        private val connectivityManager = mockk<ConnectivityManager>(relaxed = true)
+    }
+
     private val rethinkUid = 10000
 
     @Before
     fun setUp() {
+        // A failed @Before skips @After, so Koin from a previous test may still be running.
+        stopKoin()
         startKoin {
             modules(module {
                 single { persistentState }
@@ -56,7 +73,10 @@ class TunFirewallManagerTest : KoinTest {
                 single { rdb }
             })
         }
-        
+
+        // Reset per-test stubbing so answers don't leak between tests
+        clearMocks(persistentState, appConfig, rdb, connectivityManager)
+
         TunFirewallManager.setRethinkUidForTest(rethinkUid)
         mockkObject(FirewallManager)
         mockkObject(DomainRulesManager)
@@ -77,10 +97,7 @@ class TunFirewallManagerTest : KoinTest {
     @After
     fun tearDown() {
         stopKoin()
-        unmockkObject(FirewallManager)
-        unmockkObject(DomainRulesManager)
-        unmockkObject(IpRulesManager)
-        unmockkObject(Utilities)
+        unmockkAll()
     }
 
     private fun createConnInfo(
@@ -360,7 +377,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE1H - Bypass DNS Firewall`() = runTest {
         val uid = 10123
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassDnsFirewall() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
@@ -371,7 +388,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE1G - Isolate mode`() = runTest {
         val uid = 10123
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassDnsFirewall() } returns false
         every { appStatus.isolate() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
@@ -383,7 +400,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE2G - Bypass universal but DNS blocked`() = runTest {
         val uid = 10123
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassUniversal() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
@@ -394,7 +411,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE9 - Bypass universal allow when DNS proxied`() = runTest {
         val uid = 10123
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassUniversal() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
@@ -410,7 +427,7 @@ class TunFirewallManagerTest : KoinTest {
     @Test
     fun `RULE8 - Bypass universal allow`() = runTest {
         val uid = 10123
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassUniversal() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
@@ -553,7 +570,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Isolate Mode - App-Specific TRUSTED domain takes precedence`() = runTest {
         val uid = 10123
         val domains = "trusted.com"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.isolate() } returns true
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
@@ -568,7 +585,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Isolate Mode - App-Specific BLOCKED domain takes precedence`() = runTest {
         val uid = 10123
         val domains = "blocked.com"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.isolate() } returns true
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
@@ -583,7 +600,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Isolate Mode - Global TRUSTED domain is IGNORED`() = runTest {
         val uid = 10123
         val domains = "global-trusted.com"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.isolate() } returns true
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
@@ -599,7 +616,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Isolate Mode - No rules results in RULE1G`() = runTest {
         val uid = 10123
         val domains = "any.com"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.isolate() } returns true
         every { appStatus.bypassDnsFirewall() } returns false
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
@@ -615,7 +632,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Bypass DNS Firewall - App-Specific IP TRUSTED takes precedence`() = runTest {
         val uid = 10123
         val ip = "1.2.3.4"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassDnsFirewall() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         
@@ -629,7 +646,7 @@ class TunFirewallManagerTest : KoinTest {
     fun `Bypass Universal - Global TRUSTED domain overrides DNS block`() = runTest {
         val uid = 10123
         val domains = "trusted.com"
-        val appStatus = mockk<FirewallManager.FirewallStatus>()
+        val appStatus = mockk<FirewallManager.FirewallStatus>(relaxed = true)
         every { appStatus.bypassUniversal() } returns true
         coEvery { FirewallManager.appStatus(uid) } returns appStatus
         

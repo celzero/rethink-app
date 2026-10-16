@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
+    android:clipToPadding="false"
     android:fillViewport="true"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    app:layout_scrollFlags="scroll|enterAlways">
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/aad_rethink_warning_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/colorSurface"
+            android:background="?attr/background"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
@@ -26,11 +28,12 @@
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:alpha="0.7"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:alpha="0.85"
                 android:contentDescription="@string/app_info_rethink_warning_title"
-                android:src="@drawable/ic_loopback" />
+                android:src="@drawable/ic_loopback"
+                app:tint="?attr/primaryLightColorText" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/aad_rethink_warning_title"
@@ -40,7 +43,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/app_info_rethink_warning_title"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view"
+                android:textSize="@dimen/heading_font_text_view"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -52,25 +55,24 @@
                 android:text="@string/app_info_rethink_warning_desc"
                 android:textAlignment="center"
                 android:textColor="?attr/primaryLightColorText"
-                android:textSize="14sp" />
+                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/aad_rethink_warning_proceed"
-                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/rectangle_border_background"
+                android:background="@drawable/bg_plus_action_tile"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:paddingStart="25dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="25dp"
-                android:paddingBottom="10dp"
+                android:paddingStart="32dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="32dp"
+                android:paddingBottom="12dp"
                 android:text="@string/app_info_rethink_warning_proceed"
-                android:textColor="?attr/primaryTextColor"
+                android:textColor="?attr/accentGood"
                 android:textSize="@dimen/large_font_text_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -81,143 +83,128 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/aad_app_detail_rl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:padding="5dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/aad_app_detail_icon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_centerVertical="true"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="@null"
                     android:src="@drawable/default_app_icon" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/aad_app_detail_ll"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_toStartOf="@id/aad_icon_holder_ll"
-                    android:layout_toEndOf="@id/aad_app_detail_icon"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_app_detail_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/extra_large_font_text_view" />
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="2"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        tools:text="App Name" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_pkg_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:alpha="0.7"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:textColor="?primaryTextColor"
+                        android:layout_marginTop="2dp"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textIsSelectable="true"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="10023 · com.example.package" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_firewall_status"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:alpha="0.7"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:layout_marginTop="6dp"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/large_font_text_view"
+                        tools:text="Allowed · 2 min ago" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_data_usage_status"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginEnd="10dp"
-                        android:layout_toStartOf="@id/aad_proxy_details"
-                        android:alpha="0.7"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/aad_icon_holder_ll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_app_info_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="10dp"
-                        android:minWidth="24dp"
-                        android:minHeight="24dp"
-                        android:src="@drawable/ic_info_white" />
+                        android:layout_marginTop="2dp"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view"
+                        tools:text="↑ 12 MB ↓ 140 MB" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
-            </RelativeLayout>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/aad_app_info_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/about_settings_app_info"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_info_white"
+                    app:tint="?attr/primaryLightColorText" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/aad_aap_firewall_new_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.Material3.TitleSmall"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center_vertical"
-                    android:padding="5dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="@string/ada_firewall_title"
-                    android:textColor="?attr/colorOnBackground" />
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:textStyle="bold" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/aad_notes_chip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
+                    app:cardBackgroundColor="?attr/homeScreenBtnBackground"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="12dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:paddingStart="14dp"
                         android:paddingTop="8dp"
-                        android:paddingEnd="12dp"
+                        android:paddingEnd="14dp"
                         android:paddingBottom="8dp"
                         android:text="@string/lbl_notes"
-                        android:textColor="?attr/colorOnBackground"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view" />
                 </com.google.android.material.card.MaterialCardView>
 
@@ -225,17 +212,21 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/aad_app_settings_card"
+                style="@style/RethinkPlus.ContentCard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:clickable="false"
+                android:focusable="false">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
                     android:orientation="vertical"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="10dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/aad_app_settings_ll"
@@ -246,51 +237,53 @@
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:weightSum="1">
+                            android:orientation="horizontal">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_block_wifi"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_unmetered"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_wifi_on_grey" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_block_md"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_metered"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_isolate"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_isolate"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
 
@@ -299,103 +292,116 @@
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:gravity="center"
-                            android:weightSum="1">
+                            android:orientation="horizontal">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_bypass_dns_firewall"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_bypass_dns_firewall"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_bypass_univ"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_bypass_univ"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_app_settings_exclude"
                                 android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.333"
-                                android:drawablePadding="5dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="8dp"
                                 android:fontFamily="sans-serif-medium"
                                 android:gravity="center"
-                                android:padding="5dp"
+                                android:minHeight="72dp"
+                                android:padding="8dp"
                                 android:text="@string/ada_app_exclude"
-                                android:textColor="?primaryTextColor"
+                                android:textColor="?attr/primaryTextColor"
                                 android:textSize="@dimen/default_font_text_view"
                                 app:drawableTopCompat="@drawable/ic_firewall_exclude_off" />
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
+
                     </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="16dp"
+                        android:alpha="0.35"
+                        android:background="?attr/divider" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="1">
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp">
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/aad_ip_block_card"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="0.5">
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/homeScreenBtnBackground"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
 
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginEnd="10dp"
+                                android:gravity="center"
                                 android:orientation="vertical"
                                 android:paddingTop="10dp"
                                 android:paddingBottom="10dp">
 
-
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:id="@+id/aad_ip_block_header"
-                                    style="@style/TextAppearance.AppCompat.Subhead"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-smallcaps"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
-                                    android:paddingTop="5dp"
-                                    android:paddingBottom="5dp"
-                                    android:textColor="?attr/secondaryTextColor"
-                                    android:textSize="@dimen/heading_font_text_view"
-                                    android:textStyle="bold" />
+                                    android:textColor="?attr/accentGood"
+                                    android:textSize="@dimen/extra_large_font_text_view"
+                                    android:textStyle="bold"
+                                    tools:text="12" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:drawablePadding="5dp"
-                                    android:paddingTop="2dp"
-                                    android:paddingBottom="2dp"
+                                    android:layout_marginTop="2dp"
                                     android:text="@string/lbl_ip_rules"
+                                    android:textColor="?attr/primaryLightColorText"
                                     android:textSize="@dimen/default_font_text_view" />
 
                             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -405,93 +411,106 @@
                             android:id="@+id/aad_domain_block_card"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="10dp"
-                            android:layout_weight="0.5">
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/homeScreenBtnBackground"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
 
                             <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginEnd="10dp"
+                                android:gravity="center"
                                 android:orientation="vertical"
                                 android:paddingTop="10dp"
                                 android:paddingBottom="10dp">
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:id="@+id/aad_domain_block_header"
-                                    style="@style/TextAppearance.AppCompat.Subhead"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-smallcaps"
+                                    android:fontFamily="sans-serif-medium"
                                     android:gravity="center"
-                                    android:paddingTop="5dp"
-                                    android:paddingBottom="5dp"
-                                    android:textColor="?attr/secondaryTextColor"
-                                    android:textSize="@dimen/heading_font_text_view"
-                                    android:textStyle="bold" />
+                                    android:textColor="?attr/accentGood"
+                                    android:textSize="@dimen/extra_large_font_text_view"
+                                    android:textStyle="bold"
+                                    tools:text="4" />
 
                                 <androidx.appcompat.widget.AppCompatTextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:drawablePadding="5dp"
-                                    android:paddingTop="2dp"
-                                    android:paddingBottom="2dp"
+                                    android:layout_marginTop="2dp"
                                     android:text="@string/lbl_domain_rules"
+                                    android:textColor="?attr/primaryLightColorText"
                                     android:textSize="@dimen/default_font_text_view" />
 
                             </androidx.appcompat.widget.LinearLayoutCompat>
                         </com.google.android.material.card.MaterialCardView>
+
                     </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:alpha="0.35"
+                        android:background="?attr/divider" />
 
                     <RelativeLayout
                         android:id="@+id/exclude_proxy_rl"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
                         android:background="?android:attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:paddingTop="5dp">
+                        android:minHeight="64dp"
+                        android:paddingStart="16dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="10dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/exclude_proxy_icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_centerVertical="true"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_proxy_white" />
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="@string/exclude_apps_from_proxy"
+                            android:src="@drawable/ic_proxy_white"
+                            app:tint="?attr/primaryLightColorText" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
                             android:layout_toStartOf="@id/exclude_proxy_switch"
                             android:layout_toEndOf="@id/exclude_proxy_icon"
                             android:orientation="vertical">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/exclude_proxy_txt"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
                                 android:text="@string/exclude_apps_from_proxy"
-                                android:textSize="@dimen/large_font_text_view" />
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/aad_proxy_details"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:alpha="0.7"
+                                android:layout_marginTop="2dp"
+                                android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/default_font_text_view"
                                 android:visibility="gone" />
 
-                        </LinearLayout>
+                        </androidx.appcompat.widget.LinearLayoutCompat>
 
                         <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/exclude_proxy_switch"
@@ -499,61 +518,59 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:padding="10dp" />
+                            android:layout_centerVertical="true" />
                     </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/temp_allow_rl"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
                         android:background="?android:attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp">
+                        android:minHeight="64dp"
+                        android:paddingStart="16dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="10dp">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/temp_allow_icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_centerVertical="true"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:alpha="0.5"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_firewall_shield" />
+                            android:layout_marginEnd="16dp"
+                            android:alpha="0.6"
+                            android:contentDescription="@string/temp_allow_label"
+                            android:src="@drawable/ic_firewall_shield"
+                            app:tint="?attr/primaryLightColorText" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
                             android:layout_toStartOf="@id/temp_allow_switch"
                             android:layout_toEndOf="@id/temp_allow_icon"
                             android:orientation="vertical">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/temp_allow_txt"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
                                 android:text="@string/temp_allow_label"
-                                android:textSize="@dimen/large_font_text_view" />
+                                android:textColor="?attr/primaryTextColor"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/temp_allow_desc"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:alpha="0.7"
+                                android:layout_marginTop="2dp"
                                 android:text="@string/temp_allow_desc"
-                                android:textSize="@dimen/default_font_text_view"
-                                android:visibility="visible" />
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/default_font_text_view" />
 
-                        </LinearLayout>
+                        </androidx.appcompat.widget.LinearLayoutCompat>
 
                         <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/temp_allow_switch"
@@ -561,210 +578,1081 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:padding="10dp" />
+                            android:layout_centerVertical="true" />
                     </RelativeLayout>
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
             </com.google.android.material.card.MaterialCardView>
 
             <RelativeLayout
-                android:id="@+id/aad_active_conns_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:visibility="gone">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/aad_active_conns_title"
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_toStartOf="@id/aad_close_conns_chip"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/top_active_conns"
-                    android:textColor="?attr/colorOnBackground" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/aad_close_conns_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:layout_toStartOf="@id/aad_active_conns_chip"
-                    android:text="@string/close_all"
-                    android:textColor="?attr/chipTextNegative"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorNegative"
-                    app:chipSurfaceColor="@null" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/aad_active_conns_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/aad_active_conns_rv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
-            <RelativeLayout
-                android:id="@+id/aad_asn_rl"
+                android:id="@+id/aad_stats_header_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:visibility="gone">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_toStartOf="@id/aad_asn_chip"
-                    android:padding="5dp"
-                    android:text="@string/most_contacted_asn"
-                    android:textColor="?attr/colorOnBackground" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/aad_asn_chip"
-                    style="@style/ThinnerChip.Action"
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/aad_view_mode_toggle_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="14dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
+                    app:checkedButton="@id/aad_view_mode_list_btn"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/aad_view_mode_list_btn"
+                        style="@style/toggleButtonNoStyle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/cd_stats_switch_to_list"
+                        android:insetLeft="4dp"
+                        android:insetTop="4dp"
+                        android:insetBottom="4dp"
+                        android:minWidth="0dp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="2dp"
+                        app:icon="@drawable/ic_view_list"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconTint="?attr/defaultToggleBtnTxt" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/aad_view_mode_insights_btn"
+                        style="@style/toggleButtonNoStyle"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@string/cd_stats_switch_to_insights"
+                        android:insetTop="4dp"
+                        android:insetRight="4dp"
+                        android:insetBottom="4dp"
+                        android:minWidth="0dp"
+                        android:textAllCaps="false"
+                        app:cornerRadius="2dp"
+                        app:icon="@drawable/ic_view_chart"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconTint="?attr/defaultToggleBtnTxt" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/aad_asn_rv"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/aad_list_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@+id/aad_most_contacted_domain_rl"
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_active_conns_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/aad_active_conns_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/top_active_conns"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_close_conns_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:text="@string/close_all"
+                        android:textColor="?attr/chipTextNegative"
+                        app:chipBackgroundColor="?attr/chipBgColorNegative"
+                        app:chipSurfaceColor="@null" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_active_conns_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_active_conns_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_most_contacted_countries_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_most_contacted_countries_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_countries_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_most_contacted_countries_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_asn_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/most_contacted_asn"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_asn_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_asn_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_blocked_asn_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/most_blocked_asn"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_blocked_asn_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_blocked_asn_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_blocklist_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_blocklists_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_blocklist_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_blocklist_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_most_contacted_domain_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_most_contacted_domain_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_domains_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_most_contacted_domain_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_blocked_domains_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_most_blocked_domain_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_blocked_domains_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_blocked_domains_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_most_contacted_ips_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_most_contacted_ips_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_ips_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_most_contacted_ips_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/aad_blocked_ips_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/ssv_most_blocked_ips_heading"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/aad_blocked_ips_chip"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ssv_see_more"
+                        android:textColor="?attr/chipTextPositive"
+                        app:chipBackgroundColor="?attr/chipBgColorPositive"
+                        app:chipSurfaceColor="@null" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/aad_blocked_ips_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/aad_insights_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:orientation="vertical"
                 android:visibility="gone">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/aad_ia_active_conns_ll"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_toStartOf="@id/aad_domains_chip"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_contacted_domain_heading"
-                    android:textColor="?attr/colorOnBackground" />
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/aad_domains_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/top_active_conns"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_active_conns_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_active_conns_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_active_conns_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/top_active_conns" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_active_conns_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_countries_ll"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="14dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
 
-            </RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/aad_most_contacted_domain_rv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_contacted_countries_heading"
+                            android:textColor="?attr/colorOnBackground" />
 
-            <RelativeLayout
-                android:id="@+id/aad_most_contacted_ips_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:visibility="gone">
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_countries_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_countries_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.celzero.bravedns.ui.custom.CountryMapView
+                            android:id="@+id/aad_ia_countries_map"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:contentDescription="@string/cd_stats_country_map" />
+
+                        <LinearLayout
+                            android:id="@+id/aad_ia_countries_rows"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_asn_ll"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_toStartOf="@id/aad_ips_chip"
-                    android:padding="5dp"
-                    android:text="@string/ssv_most_contacted_ips_heading"
-                    android:textColor="?attr/colorOnBackground" />
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/aad_ips_chip"
-                    style="@style/ThinnerChip.Action"
-                    android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/most_contacted_asn"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_asn_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_asn_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_asn_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/most_contacted_asn" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_asn_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_blocked_asn_ll"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="14dp"
-                    android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextPositive"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:visibility="visible"
-                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                    app:chipSurfaceColor="@null" />
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
 
-            </RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/aad_most_contacted_ips_rv"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:nestedScrollingEnabled="false" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/most_blocked_asn"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_blocked_asn_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_blocked_asn_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_blocked_asn_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/most_blocked_asn" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_blocked_asn_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_blocklist_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_blocklists_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_blocklist_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.celzero.bravedns.ui.custom.DonutChartView
+                            android:id="@+id/aad_ia_blocklist_donut"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:contentDescription="@string/ssv_blocklists_heading" />
+
+                        <LinearLayout
+                            android:id="@+id/aad_ia_blocklist_rows"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_domains_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_contacted_domain_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_domains_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_domains_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_domains_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/ssv_most_contacted_domain_heading" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_domains_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_blocked_domains_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_blocked_domain_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_blocked_domains_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_blocked_domains_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_blocked_domains_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/ssv_most_blocked_domain_heading" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_blocked_domains_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_ips_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_contacted_ips_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_ips_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_ips_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_ips_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/ssv_most_contacted_ips_heading" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_ips_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/aad_ia_blocked_ips_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingVertical="4dp"
+                            android:text="@string/ssv_most_blocked_ips_heading"
+                            android:textColor="?attr/colorOnBackground" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/aad_ia_blocked_ips_chip"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ssv_see_more"
+                            android:textColor="?attr/chipTextPositive"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:chipBackgroundColor="?attr/chipBgColorPositive"
+                            app:chipSurfaceColor="@null" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/aad_ia_blocked_ips_body_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.celzero.bravedns.ui.custom.DonutChartView
+                                android:id="@+id/aad_ia_blocked_ips_donut"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:contentDescription="@string/ssv_most_blocked_ips_heading" />
+
+                            <LinearLayout
+                                android:id="@+id/aad_ia_blocked_ips_rows"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </LinearLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>

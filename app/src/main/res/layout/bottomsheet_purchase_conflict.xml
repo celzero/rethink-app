@@ -135,7 +135,7 @@
                         app:cardCornerRadius="6dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp"
-                        app:cardBackgroundColor="?attr/accentWarning">
+                        app:cardBackgroundColor="?attr/accentBad">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/tv_http_code"

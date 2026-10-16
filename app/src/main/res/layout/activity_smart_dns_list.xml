@@ -20,6 +20,16 @@
         android:text="@string/smart_dns"
         android:textColor="?attr/colorPrimary" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:padding="5dp"
+        android:textSize="@dimen/small_font_subheading_text"
+        android:text="@string/smart_dns_desc"
+        android:textColor="?attr/primaryLightColorText" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/smart_dns_list_fragment_container"
         android:layout_width="match_parent"

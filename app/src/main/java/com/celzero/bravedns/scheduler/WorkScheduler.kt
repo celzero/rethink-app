@@ -148,7 +148,7 @@ class WorkScheduler(val context: Context, val persistentState: PersistentState) 
     fun schedulePurgeConsoleLogs() {
         val purgeLogs =
             PeriodicWorkRequest.Builder(
-                PurgeConsoleLogs::class.java,
+                PurgeConsoleLogsAndPcap::class.java,
                 PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS,
                 TimeUnit.HOURS
             )

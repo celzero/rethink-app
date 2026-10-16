@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.activity
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -42,10 +43,12 @@ import com.celzero.bravedns.databinding.ListItemRpnBypassAppBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.chip.Chip
@@ -227,11 +230,60 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
                 }
             uiCtx {
                 allApps.clear()
-                allApps.addAll(apps.sortedBy { it.appName.lowercase() })
+                allApps.addAll(
+                    apps.sortedWith(
+                        compareBy(
+                            { categoryRank(it) },
+                            { appTypeRank(it) },
+                            { it.appName.lowercase() }
+                        )
+                    )
+                )
                 b.rpnBypassRefreshList.isEnabled = true
                 applyFilter()
             }
         }
+    }
+
+    /**
+     * Groups apps for display order: user-installed apps first, then system
+     * components (system UIDs outside the app range), then system apps.
+     * Matches the classification used by RefreshDatabase.
+     */
+    private fun appTypeRank(app: AppInfo): Int {
+        return when {
+            !app.isSystemApp -> 0
+            !AndroidUidConfig.isUidAppRange(app.uid) -> 1
+            else -> 2
+        }
+    }
+
+    /**
+     * Localized titles of the priority categories, in display order: video,
+     * audio, game, maps, social, image. All other categories ("the rest")
+     * rank after these. Titles are resolved through [ApplicationInfo.getCategoryTitle]
+     */
+    private val prioritizedCategoryTitles: List<String> by lazy {
+        if (isAtleastO()) {
+            listOf(
+                ApplicationInfo.CATEGORY_VIDEO,
+                ApplicationInfo.CATEGORY_AUDIO,
+                ApplicationInfo.CATEGORY_GAME,
+                ApplicationInfo.CATEGORY_MAPS,
+                ApplicationInfo.CATEGORY_SOCIAL,
+                ApplicationInfo.CATEGORY_IMAGE
+            ).map {
+                ApplicationInfo.getCategoryTitle(this, it)?.toString()?.replace("_", " ").orEmpty()
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun categoryRank(app: AppInfo): Int {
+        val cat = app.appCategory.trim()
+        val idx = prioritizedCategoryTitles.indexOfFirst { it.equals(cat, ignoreCase = true) }
+        return if (idx >= 0) idx else prioritizedCategoryTitles.size
     }
 
     private fun applyFilter() {

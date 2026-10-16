@@ -22,7 +22,13 @@ object WgHopManager: KoinComponent {
     private const val TAG = "WgHopMgr"
 
     init {
-        io { load(forceRefresh = false) }
+        io {
+            try {
+                load(forceRefresh = false)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG err loading hop maps during init: ${e.message}")
+            }
+        }
     }
 
     suspend fun load(forceRefresh: Boolean): Int {

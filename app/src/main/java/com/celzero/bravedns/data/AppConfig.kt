@@ -119,6 +119,7 @@ internal constructor(
                 Logger.w(LOG_TAG_VPN, "Pcap file path invalid or missing, resetting pcap mode to NONE")
                 persistentState.pcapMode = PcapMode.NONE.id
                 persistentState.pcapFilePath = ""
+                persistentState.pcapStartTime = 0L
                 pcapFilePath = ""
             }
         }
@@ -416,6 +417,9 @@ internal constructor(
             }
         persistentState.pcapMode = mode
         persistentState.pcapFilePath = pcapFilePath
+        // track when file capture began so long-running pcap can be stopped by the purge worker
+        persistentState.pcapStartTime =
+            if (PcapMode.getPcapType(mode) == PcapMode.EXTERNAL_FILE) System.currentTimeMillis() else 0L
     }
 
     fun getPcapFilePath(): String {

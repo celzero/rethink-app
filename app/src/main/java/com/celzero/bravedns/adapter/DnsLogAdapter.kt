@@ -45,12 +45,14 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.ListItemDnsLogBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -148,6 +150,11 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                 b.dnsStatusIndicator.visibility = View.VISIBLE
                 val color = fetchColor(context, R.attr.chipTextNeutral)
                 b.dnsStatusIndicator.setBackgroundColor(color)
+            } else if ((FirewallRuleset.shouldShowHint(log.blockedReason))) {
+                b.dnsStatusIndicator.visibility = View.VISIBLE
+                b.dnsStatusIndicator.setBackgroundColor(
+                    ContextCompat.getColor(context, R.color.primaryLightColorText)
+                )
             } else {
                 b.dnsStatusIndicator.visibility = View.INVISIBLE
             }
@@ -350,7 +357,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
         private fun getRethinkUnicode(log: DnsLog): String {
             // resolver check for rethink dns is done before calling this method
-            if (log.relayIP.endsWith(Backend.RPN) || log.relayIP == Backend.Auto) return context.getString(
+            if (log.relayIP.startsWith(Backend.RpnWin) || log.relayIP == Backend.Auto) return context.getString(
                 R.string.symbol_sparkle
             )
 

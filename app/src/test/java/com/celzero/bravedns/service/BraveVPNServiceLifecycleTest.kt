@@ -1,8 +1,10 @@
 package com.celzero.bravedns.service
 
 import android.content.Intent
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.shadows.LenientResourcesShadow
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.bravedns.util.OrbotHelper
 import io.mockk.every
@@ -21,11 +23,15 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 
+// SDK pinned: hermetic sandbox (see app/src/test/resources/robolectric.properties).
+// LenientResourcesShadow: without merged app resources, notification-channel
+// setup in onCreate() would throw Resources.NotFoundException.
 @RunWith(RobolectricTestRunner::class)
-@Config(shadows = [ShadowBackend::class])
+@Config(shadows = [ShadowBackend::class, LenientResourcesShadow::class], sdk = [28])
 class BraveVPNServiceLifecycleTest : KoinTest {
 
     private lateinit var serviceController: ServiceController<BraveVPNService>
@@ -34,9 +40,14 @@ class BraveVPNServiceLifecycleTest : KoinTest {
     private val persistentState = mockk<PersistentState>(relaxed = true)
     private val rdb = mockk<RefreshDatabase>(relaxed = true)
     private val netLogTracker = mockk<NetLogTracker>(relaxed = true)
+    private val eventLogger = mockk<EventLogger>(relaxed = true)
 
     @Before
     fun setup() {
+        // The service enqueues a SubscriptionCheckWorker during startup;
+        // WorkManager must be initialized (the manifest initializer is not
+        // active under Robolectric) or WorkManager.getInstance() throws.
+        WorkManagerTestInitHelper.initializeTestWorkManager(RuntimeEnvironment.getApplication())
         mockkObject(IpRulesManager)
         startKoin {
             modules(module {
@@ -45,6 +56,7 @@ class BraveVPNServiceLifecycleTest : KoinTest {
                 single { persistentState }
                 single { rdb }
                 single { netLogTracker }
+                single { eventLogger }
             })
         }
         mockkObject(VpnController)
@@ -73,11 +85,26 @@ class BraveVPNServiceLifecycleTest : KoinTest {
     @Test
     fun `onStartCommand with stop action should signal stop service`() {
         val service = serviceController.create().get()
+        // signalStopService() logs on Dispatchers.IO; the coroutine can outlive this
+        // test and run after tearDown() stops Koin. Pre-resolve the `by inject()`
+        // lazy here (while Koin is up) so the leaked coroutine uses the cached mock
+        // instead of throwing "KoinApplication has not been started" on an IO thread
+        // — which coroutines-test would attach to the *next* runTest in the suite.
+        preResolveEventLogger(service)
         val intent = Intent(service, BraveVPNService::class.java).apply {
             action = BraveVPNService.NOTIF_ACTION_MODE_STOP.toString()
         }
-        
+
         service.onStartCommand(intent, 0, 1)
+    }
+
+    private fun preResolveEventLogger(service: BraveVPNService) {
+        try {
+            val field = BraveVPNService::class.java.getDeclaredField("eventLogger\$delegate")
+            field.isAccessible = true
+            (field.get(service) as Lazy<*>).value
+        } catch (_: Exception) {
+        }
     }
 
     @Test

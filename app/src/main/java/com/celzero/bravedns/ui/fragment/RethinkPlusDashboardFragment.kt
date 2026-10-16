@@ -30,6 +30,7 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.databinding.FragmentRethinkPlusDashboardBinding
 import com.celzero.bravedns.iab.AckFailureInfo
+import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
@@ -38,6 +39,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver.PurchaseUiModel
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
@@ -71,6 +73,8 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private val b by viewBinding(FragmentRethinkPlusDashboardBinding::bind)
 
     private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
+
+    private val persistentState by inject<PersistentState>()
 
     /**
      * Activity-scoped ViewModel that owns the RPN reset coroutine so the IO work
@@ -120,9 +124,10 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         setDolphinSignature()
     }
 
-    /** Dolphin signature (at the end of the dashboard content.); random pairing, fresh on every visit. */
+    /** Dolphin signature: bottom overlay revealed at the end of the dashboard scroll. */
     private fun setDolphinSignature() {
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+        b.dolphinSignature.revealAtScrollEndOf(b.dashboardContainer)
     }
 
     override fun onResume() {
@@ -157,7 +162,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
         val fmt = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
         val model = SubscriptionUiStateResolver.resolve(state, sub)
 
-        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
+        val colorGood = UIUtils.fetchColor(requireContext(), R.attr.chipTextPositive)
         val colorBad = UIUtils.fetchColor(requireContext(), R.attr.accentBad)
         val colorDim = UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText)
 
@@ -351,6 +356,9 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                             when (state.result) {
                                 is RpnProxyManager.ResetResult.Success -> {
                                     Logger.i(LOG_TAG_UI, "$TAG.observeResetState: reset success")
+                                    // Reset worked; recover the signature if a
+                                    // previous failure flipped it to a sad dolphin.
+                                    b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
                                     showToastUiCentered(
                                         requireContext(),
                                         getString(R.string.rpn_restore_success),
@@ -359,6 +367,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                                 }
                                 is RpnProxyManager.ResetResult.Failure -> {
                                     Logger.w(LOG_TAG_UI, "$TAG.observeResetState: reset failed: ${state.result.reason}")
+                                    b.dolphinSignature.setContentForFailure()
                                     showToastUiCentered(
                                         requireContext(),
                                         getString(R.string.rpn_restore_failure, state.result.reason),
@@ -372,6 +381,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                         is ServerSelectionViewModel.ResetState.NoTunnel -> {
                             serverSelectionViewModel.onResetConsumed()
                             dismissRpnResetDialog()
+                            b.dolphinSignature.setContentForFailure()
                             showToastUiCentered(
                                 requireContext(),
                                 getString(R.string.ssv_toast_start_rethink),
@@ -508,36 +518,44 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
                 is ServerApiError.Unauthorized401 -> showDeviceAuthErrorBottomSheet(error)
                 is ServerApiError.DeviceNotRegistered -> showDeviceNotRegisteredBottomSheet(error)
                 is ServerApiError.GenericError -> showToastUiCentered(requireContext(), error.message, Toast.LENGTH_LONG)
-                is ServerApiError.NetworkError -> showToastUiCentered(
-                    requireContext(),
-                    error.message ?: getString(R.string.subscription_action_failed),
-                    Toast.LENGTH_LONG
-                )
+                is ServerApiError.NetworkError -> {
+                    b.dolphinSignature.setContentForFailure()
+                    showToastUiCentered(
+                        requireContext(),
+                        error.message ?: getString(R.string.subscription_action_failed),
+                        Toast.LENGTH_LONG
+                    )
+                }
                 is ServerApiError.None -> { /* no-op */ }
             }
         }
 
-        InAppBillingHandler.accountMismatchLiveData.observe(viewLifecycleOwner) {
-            if (!isAdded || !isResumed) return@observe
-            InAppBillingHandler.accountMismatchLiveData.value = null
-            Logger.w(LOG_TAG_UI, "$TAG account mismatch detected; showing warning")
-            showToastUiCentered(requireContext(), getString(R.string.account_mismatch_msg), Toast.LENGTH_LONG)
-        }
     }
 
     private fun showDeviceNotRegisteredBottomSheet(error: ServerApiError.DeviceNotRegistered) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceNotRegistered") != null) return
         DeviceNotRegisteredNotifier.cancel(requireContext())
         DeviceNotRegisteredBottomSheet.newInstance(error).show(childFragmentManager, "deviceNotRegistered")
     }
 
     private fun showDeviceAuthErrorBottomSheet(error: ServerApiError.Unauthorized401) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
+        if (childFragmentManager.findFragmentByTag("deviceAuthError401") != null) return
         DeviceAuthErrorBottomSheet.newInstance(error).show(childFragmentManager, "deviceAuthError401")
     }
 
     private fun showConflictBottomSheet(error: ServerApiError.Conflict409) {
-        if (!isAdded || isStateSaved) return
+        if (!isAdded || isStateSaved) {
+            deferServerError(error)
+            return
+        }
         if (childFragmentManager.findFragmentByTag("conflict409") != null) return
         PurchaseConflictNotifier.cancel(requireContext())
         val sheet = PurchaseConflictBottomSheet.newInstance(error)
@@ -547,6 +565,24 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             }
         }
         sheet.show(childFragmentManager, "conflict409")
+    }
+
+    /**
+     * Keeps the error available for the next observer and posts a system
+     * notification when the sheet cannot be shown.
+     */
+    private fun deferServerError(error: ServerApiError) {
+        InAppBillingHandler.serverApiErrorLiveData.value = error
+        val ctx = context?.applicationContext ?: return
+        when (error) {
+            is ServerApiError.Unauthorized401 ->
+                DeviceAuthErrorNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.DeviceNotRegistered ->
+                DeviceNotRegisteredNotifier.notify(ctx, error, persistentState.theme)
+            is ServerApiError.Conflict409 ->
+                PurchaseConflictNotifier.notify(ctx, error, persistentState.theme)
+            else -> Unit
+        }
     }
 
     private fun resolvePlanName(subscriptionData: SubscriptionStateMachineV2.SubscriptionData?): String {

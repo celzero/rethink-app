@@ -40,6 +40,10 @@ data class SmartDnsEndpoint(
             return mode == SmartDnsMode.SECURITY.mode
         }
 
+        fun isPrivacyMode(mode: Int): Boolean {
+            return mode == SmartDnsMode.PRIVACY.mode
+        }
+
         fun isFamilyMode(mode: Int): Boolean {
             return mode == SmartDnsMode.FAMILY.mode
         }

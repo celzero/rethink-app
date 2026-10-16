@@ -26,6 +26,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLogRepository
+import com.celzero.bravedns.database.DomainActivityRow
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.database.WindowCountRow
 import com.celzero.bravedns.databinding.BottomSheetLogActivityIntervalBinding
@@ -34,11 +35,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.adapter.AppActivityAdapter
 import com.celzero.bravedns.ui.adapter.AppActivityEntry
 import com.celzero.bravedns.ui.adapter.AppActivitySummary
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.convertLongToTime
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,9 +66,9 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
     private lateinit var adapter: AppActivityAdapter
 
-    // built at open time; the sheet starts from the caller-selected window
-    // when given (see newInstance(startMs, endMs)), else from the latest
-    // ten-minute window
+    // caller-selected window (e.g. a tapped heatmap cell); re-selecting the
+    // default chip must restore this exact interval, not the latest one
+    private var callerWindow: LogActivityWindow? = null
     private var currentWindow: LogActivityWindow =
         LogActivityWindow.fromPreset(0, System.currentTimeMillis())
     private var selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
@@ -129,11 +128,6 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         return b.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        dialog?.useTransparentNoDimBackground()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -151,7 +145,10 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         if (args != null) {
             val start = args.getLong(ARG_WINDOW_START_MS)
             val end = args.getLong(ARG_WINDOW_END_MS, start + LogActivityWindow.TEN_MINUTES_MS)
-            currentWindow = LogActivityWindow(start, end)
+            LogActivityWindow(start, end).also {
+                callerWindow = it
+                currentWindow = it
+            }
             // a wall cell spans one 10-minute interval == the default chip
             selectedPresetIndex = LogActivityWindow.defaultPresetIndex()
         } else {
@@ -161,7 +158,7 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
         setupRangeChips()
 
-        adapter = AppActivityAdapter { summary ->
+        adapter = AppActivityAdapter(persistentState.fetchFavIcon) { summary ->
             viewLifecycleOwner.lifecycleScope.launch { onAppExpandRequested(summary) }
         }
         b.bsLaiRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -211,7 +208,11 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun applyPreset(presetIndex: Int) {
         selectedPresetIndex = presetIndex
-        currentWindow = LogActivityWindow.fromPreset(presetIndex, System.currentTimeMillis())
+        // the default chip maps back to the interval the sheet was opened
+        // with (a tapped heatmap cell); only fall back to the latest window
+        // when there is no caller-selected interval
+        currentWindow = callerWindow?.takeIf { presetIndex == LogActivityWindow.defaultPresetIndex() }
+            ?: LogActivityWindow.fromPreset(presetIndex, System.currentTimeMillis())
         load(currentWindow)
     }
 
@@ -254,45 +255,26 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         val w = currentWindow
         val entries = withContext(Dispatchers.IO) {
             try {
-                (
-                    dnsLogRepository.getDnsLogsInWindowForUid(w.startMs, w.endMs, summary.uid, AppActivityAdapter.MAX_CHILD_ROWS)
-                        .map {
-                            AppActivityEntry(
-                                it.queryStr,
-                                convertLongToTime(it.time, TIME_FORMAT_1),
-                                it.isBlocked,
-                                it.time
-                            )
-                        } +
-                    connectionTrackerRepository.getConnectionsInWindowForUid(
+                mergeDomains(
+                    dnsLogRepository.getDomainActivityForUid(
                         w.startMs,
                         w.endMs,
                         summary.uid,
                         AppActivityAdapter.MAX_CHILD_ROWS
-                    ).map {
-                        AppActivityEntry(
-                            label(it.dnsQuery, it.ipAddress),
-                            convertLongToTime(it.timeStamp, TIME_FORMAT_1),
-                            it.isBlocked,
-                            it.timeStamp
+                    ) +
+                        connectionTrackerRepository.getDomainActivityForUid(
+                            w.startMs,
+                            w.endMs,
+                            summary.uid,
+                            AppActivityAdapter.MAX_CHILD_ROWS
+                        ) +
+                        rethinkLogRepository.getDomainActivityForUid(
+                            w.startMs,
+                            w.endMs,
+                            summary.uid,
+                            AppActivityAdapter.MAX_CHILD_ROWS
                         )
-                    } +
-                    rethinkLogRepository.getRethinkLogsInWindowForUid(
-                        w.startMs,
-                        w.endMs,
-                        summary.uid,
-                        AppActivityAdapter.MAX_CHILD_ROWS
-                    ).map {
-                        AppActivityEntry(
-                            label(it.dnsQuery, it.ipAddress),
-                            convertLongToTime(it.timeStamp, TIME_FORMAT_1),
-                            it.isBlocked,
-                            it.timeStamp
-                        )
-                    }
-                    ).sortedByDescending { it.timestampMs }
-                        .let { if (blockedOnly) it.filter { e -> e.blocked } + it.filter { e -> !e.blocked } else it }
-                        .take(AppActivityAdapter.MAX_CHILD_ROWS)
+                )
             } catch (e: Exception) {
                 emptyList()
             }
@@ -303,8 +285,41 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun label(primary: String?, fallback: String): String {
-        return primary?.takeIf { it.isNotBlank() } ?: fallback
+    // connection-tracker and rethink-log tables hold disjoint uid ranges, and
+    // dns-log labels never carry IPs, so a shared label across sources means
+    // the same domain; merging sums the counts and keeps the latest
+    // timestamp (and its flag)
+    private fun mergeDomains(rows: List<DomainActivityRow>): List<AppActivityEntry> {
+        val merged = LinkedHashMap<String, AppActivityEntry>()
+        for (row in rows) {
+            val existing = merged[row.label]
+            merged[row.label] =
+                if (existing == null) {
+                    AppActivityEntry(
+                        row.label,
+                        row.total - row.blocked,
+                        row.blocked,
+                        row.lastSeen,
+                        row.flag
+                    )
+                } else {
+                    // keep the flag of whichever source saw the domain last
+                    val flag = if (row.lastSeen > existing.lastSeenMs) row.flag else existing.flag
+                    AppActivityEntry(
+                        existing.label,
+                        existing.allowed + (row.total - row.blocked),
+                        existing.blocked + row.blocked,
+                        maxOf(existing.lastSeenMs, row.lastSeen),
+                        flag
+                    )
+                }
+        }
+        return merged.values.sortedByDescending { it.allowed + it.blocked }
+            .let {
+                if (blockedOnly) it.filter { e -> e.blocked > 0 } + it.filter { e -> e.blocked == 0L }
+                else it
+            }
+            .take(AppActivityAdapter.MAX_CHILD_ROWS)
     }
 
     private fun render(window: LogActivityWindow, d: SheetData) {

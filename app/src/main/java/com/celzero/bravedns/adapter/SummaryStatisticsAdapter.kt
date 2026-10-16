@@ -20,11 +20,13 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +51,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
@@ -67,12 +70,21 @@ class SummaryStatisticsAdapter(
     private val persistentState: PersistentState,
     private val appConfig: AppConfig,
     private val type: SummaryStatisticsType
-) :
-    PagingDataAdapter<AppConnection, SummaryStatisticsAdapter.AppNetworkActivityViewHolder>(
-        diffCallback(type)
-    ) {
+) : PagingDataAdapter<AppConnection, SummaryStatisticsAdapter.AppNetworkActivityViewHolder>(
+    diffCallback(type)
+),
+    AppDomainRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private var timeCategory = SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
+
+    // when set, the blocklist drill-down opened from row clicks is scoped to
+    // this uid (per-app screen); unset keeps it device-wide (stats screen).
+    // a uid also turns blocked-domain rows into block/trust sheet launchers
+    private var uid: Int = Constants.INVALID_UID
+
+    fun setUid(uid: Int) {
+        this.uid = uid
+    }
 
     // per-uid identity caches: FirewallManager lookups and icon resolution run
     // once per uid; every later bind (the common case while paging updates
@@ -83,6 +95,9 @@ class SummaryStatisticsAdapter(
 
     companion object {
         private const val PERCENTAGE_MULTIPLIER = 100
+
+        // shield glyph shown in the icon slot of blocklist rows
+        private const val BLOCKLIST_GLYPH = "\uD83D\uDEE1"
 
         private fun diffCallback(type: SummaryStatisticsType): DiffUtil.ItemCallback<AppConnection> =
             object : DiffUtil.ItemCallback<AppConnection>() {
@@ -112,6 +127,7 @@ class SummaryStatisticsAdapter(
                 SummaryStatisticsType.MOST_BLOCKED_ASN,
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS,
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> "name:${item.appOrDnsName.orEmpty()}"
+                SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> "blocklist:${item.appOrDnsName.orEmpty()}"
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> "flag:${item.flag}"
                 SummaryStatisticsType.MOST_CONTACTED_IPS,
                 SummaryStatisticsType.MOST_BLOCKED_IPS -> "ip:${item.uid}:${item.ipAddress}:${item.port}"
@@ -181,6 +197,20 @@ class SummaryStatisticsAdapter(
 
     fun setTimeCategory(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         this.timeCategory = timeCategory
+    }
+
+    /**
+     * Called when the domain rules bottom sheet (block/trust) is dismissed:
+     * the paged data must be reloaded so the refreshed rule status is shown.
+     * PagingDataAdapter does not support manual notifyItem* calls, so the
+     * only safe signal is a full refresh. Screens that present static
+     * PagingData (no backing Pager) simply ignore it.
+     */
+    override fun notifyDataset(position: Int) {
+        runCatching { refresh() }
+            .onFailure {
+                Logger.d(LOG_TAG_DNS, "refresh after domain rule change failed: ${it.message}")
+            }
     }
 
     inner class AppNetworkActivityViewHolder(
@@ -298,12 +328,16 @@ class SummaryStatisticsAdapter(
                     itemBinding.ssFlag.text =
                         if (appConnection.flag.isNotEmpty()) getFlag(appConnection.flag) else "--"
                 }
-                SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS,
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     // state flips run synchronously; Glide cancels the previous
-                    // per-view request when a new favicon request is bound
+                    // per-view request when a new favicon request is bound.
+                    // blocked-domain rows (blocklist drill-down included) get
+                    // the same favicon treatment as contacted ones, falling
+                    // back to the flag when no icon can be resolved
                     itemBinding.ssIcon.visibility = View.GONE
                     itemBinding.ssFlag.text = appConnection.flag
-                    val query = appConnection.appOrDnsName?.dropLastWhile { it == ',' }
+                    val query = appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                     if (query == null) {
                         hideFavIcon()
                         showFlag()
@@ -322,6 +356,13 @@ class SummaryStatisticsAdapter(
                         // error, do the duckduckgo url check in that case.
                         displayNextDnsFavIcon(query)
                     }
+                }
+                SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> {
+                    // blocklists have no app icon or flag; a shield glyph marks
+                    // the reserved slot in both the summary and show-all lists
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = BLOCKLIST_GLYPH
                 }
                 else -> {
                     // blocked domains, ips, countries: text-only flag
@@ -362,10 +403,27 @@ class SummaryStatisticsAdapter(
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
                     itemBinding.ssDataUsage.text = appConnection.ipAddress
                 }
+                SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> {
+                    itemBinding.ssContainer.visibility = View.VISIBLE
+                    itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    // flag carries the number of distinct tags attributed to
+                    // this list; show it as a subtitle next to the name
+                    val name = appConnection.appOrDnsName.orEmpty()
+                    val tags = appConnection.flag.toIntOrNull() ?: 0
+                    itemBinding.ssDataUsage.text =
+                        if (tags > 1) {
+                            context.getString(R.string.ssv_blocklist_summary, name, tags)
+                        } else {
+                            name
+                        }
+                }
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
                     val flag = getCountryNameFromFlag(appConnection.flag)
-                    if (flag.isNotEmpty() && flag != "--") {
+                    // getCountryNameFromFlag returns UNKNOWN_COUNTRY_FLAG ('---')
+                    // when the flag has no name; treat every-dash values as
+                    // unresolvable so the raw placeholder never renders
+                    if (flag.isNotEmpty() && !flag.all { it == '-' }) {
                         itemBinding.ssDataUsage.text = flag
                     } else {
                         itemBinding.ssDataUsage.text = context.getString(
@@ -418,6 +476,19 @@ class SummaryStatisticsAdapter(
         }
 
         private fun setupClickListeners(appConnection: AppConnection) {
+            itemBinding.ssIndicator.visibility = View.VISIBLE
+            // per-app blocked-domains rows expand a block/trust bottom sheet
+            // (down arrow) instead of navigating (right arrow); the device-wide
+            // stats screen keeps the app-list drill-down
+            val isDomainRulesRow =
+                type == SummaryStatisticsType.MOST_BLOCKED_DOMAINS && uid != Constants.INVALID_UID
+            itemBinding.ssIndicator.setImageResource(
+                if (isDomainRulesRow) {
+                    R.drawable.ic_arrow_down_small
+                } else {
+                    R.drawable.ic_right_arrow_white
+                }
+            )
             itemBinding.ssContainer.setOnClickListener {
                 when (type) {
                     SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
@@ -461,7 +532,14 @@ class SummaryStatisticsAdapter(
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN, true)
+                        if (uid != Constants.INVALID_UID) {
+                            showDomainRulesBottomSheet(appConnection)
+                        } else {
+                            startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN, true)
+                        }
+                    }
+                    SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> {
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.BLOCKLIST, true)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP)
@@ -500,6 +578,16 @@ class SummaryStatisticsAdapter(
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IP, appConnection.ipAddress)
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
                 }
+                DomainConnectionsActivity.InputType.BLOCKLIST -> {
+                    intent.putExtra(
+                        DomainConnectionsActivity.INTENT_EXTRA_BLOCKLIST,
+                        appConnection.appOrDnsName
+                    )
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
+                    if (uid != Constants.INVALID_UID) {
+                        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_UID, uid)
+                    }
+                }
             }
             intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, timeCategory.value)
             context.startActivity(intent)
@@ -509,6 +597,30 @@ class SummaryStatisticsAdapter(
             val intent = Intent(context, AppInfoActivity::class.java)
             intent.putExtra(AppInfoActivity.INTENT_UID, appConnection.uid)
             context.startActivity(intent)
+        }
+
+        /**
+         * Opens the block/trust domain rules sheet for this row's domain.
+         * The sheet applies per-app rules, so it needs the screen's uid;
+         * callers on uid-scoped screens (App Info) provide it, and the sheet
+         * dismisses itself when no uid is available.
+         */
+        private fun showDomainRulesBottomSheet(appConnection: AppConnection) {
+            if (context !is AppCompatActivity) {
+                Logger.d(LOG_TAG_DNS, "domain rules bottom sheet needs an activity context")
+                return
+            }
+
+            val bottomSheetFragment = AppDomainRulesBottomSheet()
+            val bundle = Bundle()
+            bundle.putInt(AppDomainRulesBottomSheet.UID, uid)
+            bundle.putString(AppDomainRulesBottomSheet.DOMAIN, appConnection.appOrDnsName.orEmpty())
+            bottomSheetFragment.arguments = bundle
+            bottomSheetFragment.dismissListener(
+                this@SummaryStatisticsAdapter,
+                RecyclerView.NO_POSITION
+            )
+            bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         private fun showDnsLogs(appConnection: AppConnection) {

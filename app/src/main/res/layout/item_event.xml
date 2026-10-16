@@ -12,7 +12,6 @@
     android:clickable="true"
     android:focusable="true"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
     app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

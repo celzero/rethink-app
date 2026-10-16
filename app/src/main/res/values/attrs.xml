@@ -72,6 +72,7 @@
     <attr name="serverHeaderGradientStart" format="color|reference" />
     <attr name="serverHeaderGradientCenter" format="color|reference" />
     <attr name="serverHeaderGradientEnd" format="color|reference" />
+    <attr name="heroWatermarkTint" format="color|reference" />
     <attr name="serverHeaderStrokeColor" format="color|reference" />
     <!-- VPN server list item chips (Apps / Relay / last-routed-app):
          background + stroke adapt per theme (white/accent in light themes). -->

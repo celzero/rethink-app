@@ -131,7 +131,8 @@ class WgConfigFiles {
             useOnlyOnMetered,
             isDeletable,
             ssidEnabled,
-            ssids
+            ssids,
+            false
         )
     }
 
@@ -167,5 +168,6 @@ data class WgConfigFilesImmutable(
     val useOnlyOnMetered: Boolean,
     val isDeletable: Boolean,
     val ssidEnabled: Boolean,
-    val ssids: String
+    val ssids: String,
+    val isSplitProxy: Boolean
 ) : java.io.Serializable

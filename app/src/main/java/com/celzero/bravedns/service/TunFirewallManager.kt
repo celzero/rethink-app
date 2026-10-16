@@ -51,7 +51,10 @@ object TunFirewallManager : KoinComponent {
     private val appConfig by inject<AppConfig>()
     private val rdb by inject<RefreshDatabase>()
 
-    private var rethinkUid: Int = Process.myUid()
+    // Sentinel meaning "not yet resolved". Resolved lazily via currentRethinkUid()
+    // because android.os.Process is unavailable on the JVM and must not run during
+    // class initialization (it breaks plain unit tests).
+    private var rethinkUid: Int = UNSET_RETHINK_UID
     private val settingUpOrbot: AtomicBoolean = AtomicBoolean(false)
 
     data class FirewallParameters(
@@ -82,6 +85,11 @@ object TunFirewallManager : KoinComponent {
         rethinkUid = uid
     }
 
+    private fun currentRethinkUid(): Int {
+        if (rethinkUid == UNSET_RETHINK_UID) rethinkUid = Process.myUid()
+        return rethinkUid
+    }
+
     private fun logd(msg: String) {
         Logger.d(LOG_TAG_VPN, "TunFirewallManager; $msg")
     }
@@ -90,8 +98,8 @@ object TunFirewallManager : KoinComponent {
         val connId = params.connInfo.connId
         val skipUnknownAppRule = params.forUpstreamAnswer && !persistentState.splitDns
         val res = try {
-            if (params.connInfo.uid == rethinkUid && !params.rinr) {
-                logd("firewall($connId): rethink uid, $rethinkUid, not processing firewall rules")
+            if (params.connInfo.uid == currentRethinkUid() && !params.rinr) {
+                logd("firewall($connId): rethink uid, ${currentRethinkUid()}, not processing firewall rules")
                 return FirewallRuleset.RULE0
             }
 
@@ -548,11 +556,15 @@ object TunFirewallManager : KoinComponent {
             } else {
                 isIfaceMetered(dst, underlyingNetworks, connectivityManager)
             }
+        } else if (curnet == null) {
+            // no underlying networks yet (e.g., VPN just started); fall back to
+            // the active network's metered state instead of assuming unmetered
+            connectivityManager.isActiveNetworkMetered
         } else {
             if (treatMobileAsMetered) {
-                curnet?.isActiveNetworkCellular == true
+                curnet.isActiveNetworkCellular
             } else {
-                curnet?.isActiveNetworkMetered == true
+                curnet.isActiveNetworkMetered
             }
         }
     }
@@ -684,4 +696,6 @@ object TunFirewallManager : KoinComponent {
 
     private fun io(scope: CoroutineScope, s: String, f: suspend () -> Unit) =
         scope.launch(CoroutineName(s) + Dispatchers.IO) { f() }
+
+    private const val UNSET_RETHINK_UID = Int.MIN_VALUE
 }

@@ -64,6 +64,8 @@ class WgSsidDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
+        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
+        UIUtils.capDialogWidth(this)
 
         window?.setGravity(Gravity.CENTER)
         window?.setBackgroundDrawableResource(android.R.color.transparent)
