@@ -1,9 +1,9 @@
-** v0.5.8** 
-- *New*: Tasker/MacroDroid intents for Advanced WireGuard start/stop/pause/resume.
-- *New*: Packet capture auto-off, auto-truncation & manual `.pcap` deletion.
-- *New*: System DNS for captive portal authentication.
-- *New*: IzzyOnDroid flavour with a separate package name.
-- *Improvement*: Power use reduced from 5–10% to 2–3%.
-- *Improvement*: Quick Setting to bypass apps from RPN.
-- *UI*: WireGuard peer warnings and clipping fixes.
-- *Fix*: RPN device authorization & purchase errors.
+** v0.5.8 **
+- New: Tasker/MacroDroid intents for Advanced WireGuard start/stop/pause/resume.
+- New: Packet capture auto-off, auto-truncation & manual .pcap deletion.
+- New: System DNS for captive portal authentication.
+- New: IzzyOnDroid flavour with a separate package name.
+- Improvement: Power use reduced from 5–10% to 2–3%.
+- Improvement: Quick Setting to bypass apps from RPN.
+- UI: WireGuard peer warnings and clipping fixes.
+- Fix: RPN device authorization & purchase errors.
