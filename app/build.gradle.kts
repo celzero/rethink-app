@@ -170,6 +170,12 @@ android {
         buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false")
     }
 
+    // do not include sdk dependency information in apks and bundle
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     signingConfigs {
         create("config") {
             keyAlias = keystoreProperties.getProperty("keyAlias", "")
@@ -246,12 +252,13 @@ android {
                     }
                 }
             }
+            // build unsigned when signing keys are unavailable
             signingConfig = if (isWebsiteDegoogled) {
-                logger.info("IzzyOnDroid build: using izzyondroid signing config")
                 signingConfigs.getByName("izzyondroid")
+                    .takeIf { !System.getenv("IZZYONDROID_KS_FILE").isNullOrEmpty() }
             } else {
-                logger.info("Normal build: using config signing config")
                 signingConfigs.getByName("config")
+                    .takeIf { keystorePropertiesFile.exists() && !keystoreProperties.getProperty("storeFile").isNullOrEmpty() }
             }
             // IzzyOnDroid builds ship as com.celzero.bravedns.izzy
             if (isIzzyBuild) {
@@ -269,6 +276,7 @@ android {
                 enable = true // Enables code and resource optimizations (AGP 9.3 DSL).
             }
             signingConfig = signingConfigs.getByName("alpha")
+                .takeIf { !System.getenv("ALPHA_KS_FILE").isNullOrEmpty() }
             resValue("string", "app_name", "Rethink(α)")
         }
         create("releaseDebug") {
@@ -393,6 +401,14 @@ kotlin {
         jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll("-Xwarning-level=SENSELESS_COMPARISON:disabled")
     }
+}
+
+// Robolectric-heavy tests (ConnectionMonitorTest, FirewallManagerTest, fuzz tests) exhaust
+// the default 512MB test-worker heap with OutOfMemoryError; org.gradle.jvmargs does not
+// apply to test workers, so raise the per-test-JVM heap explicitly.
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "3g"
+    jvmArgs("-XX:MaxMetaspaceSize=1g")
 }
 
 androidComponents {
