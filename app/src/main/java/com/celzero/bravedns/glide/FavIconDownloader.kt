@@ -20,6 +20,8 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Context
 import android.os.Process
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.HttpException
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.util.OrbotHelper
@@ -27,6 +29,8 @@ import com.celzero.bravedns.util.Utilities
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.io.File
+import java.io.IOException
+import java.util.concurrent.ExecutionException
 import javax.net.ssl.SSLException
 
 /**
@@ -90,7 +94,9 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         // value for key.
         if (failedFavIconUrls.getIfPresent(fdqnUrl) == null) {
             if (OrbotHelper.isOrbotProxyActive()) {
-                // when Orbot is active, use only onion servers for favicons.
+                // when Orbot is selected, use only onion servers for favicons.
+                // skip (do not cache) until Orbot exposes a usable endpoint.
+                if (OrbotHelper.getOrbotProxy() == null) return
                 fetchFromDuckDuckGoOnion(fdqnUrl)
             } else {
                 fetchFromNextDns(fdqnUrl)
@@ -100,10 +106,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         }
     }
 
-    // no fallback; failed requests are added to the failed cache.
+    // no fallback; definitive failures are added to the failed cache.
     private fun fetchFromDuckDuckGoOnion(url: String) {
         val subUrl = constructFavUrlDuckDuckGo(url)
-        val failure = downloadToCache(subUrl)
+        var failure = downloadToCache(subUrl)
         if (failure == null) {
             Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo onion $subUrl")
             return
@@ -111,10 +117,17 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         // .onion sites don't use normal CA certificates; Tor encrypts the connection.
         if (failure is SSLException && subUrl.startsWith("https://")) {
             val httpUrl = subUrl.replaceFirst("https://", "http://")
-            if (downloadToCache(httpUrl) == null) {
+            failure = downloadToCache(httpUrl)
+            if (failure == null) {
                 Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo onion over http $httpUrl")
                 return
             }
+        }
+        // transient io failures (tor/network not ready) are not cached so the favicon can be
+        // retried once connectivity is usable; definitive failures still go to the failed cache.
+        if (isTransientIoFailure(failure)) {
+            Logger.i(LOG_TAG_DNS, "Glide, transient onion failure for $subUrl, ${failure.message}")
+            return
         }
         // retry with the eTLD+1 domain; failed requests go to the failed cache.
         updateImage(url, getDomainUrlFromFdqnDuckduckgo(url), "", false)
@@ -138,6 +151,17 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         } finally {
             Glide.with(context.applicationContext).clear(futureTarget)
         }
+    }
+
+    // glide wraps fetch failures as execution-exception -> glide-exception; inspect the roots
+    private fun isTransientIoFailure(failure: Throwable): Boolean {
+        val roots =
+            (failure as? ExecutionException)
+                ?.let { (it.cause as? GlideException)?.rootCauses ?: listOfNotNull(it.cause) }
+                ?: listOf(failure)
+        // http status errors (eg 404) are http-exception, an io-exception subclass; not transient
+        if (roots.any { it is HttpException }) return false
+        return roots.any { it is IOException }
     }
 
     private fun fetchFromNextDns(url: String) {
