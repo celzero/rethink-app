@@ -1,4 +1,7 @@
 [versions]
+android-compileSdk = "37"
+android-minSdk = "23"
+android-targetSdk = "37"
 agp = "9.4.0"
 kotlin = "2.4.10"
 googleServices = "4.4.4"
@@ -26,7 +29,7 @@ glideCompiler = "5.0.9"
 shimmer = "0.5.0"
 koin = "4.2.2"
 krate = "2.0.0"
-viewbinding = "1.5.9"
+viewbinding = "2.0.4"
 work = "2.11.2"
 ipaddress = "5.6.2"
 junit = "4.13.2"
@@ -60,9 +63,6 @@ uiautomator = "2.3.0"
 ksp = "2.3.9"
 
 [libraries]
-androidToolsBuildGradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
-jetbrainsKotlinKotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-jetbrainsKotlinComposeCompilerGradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 googleGmsGoogleServices = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 googleFirebaseFirebaseCrashlyticsGradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
 googleGuavaGuava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -100,8 +100,7 @@ facebookShimmerShimmer = { module = "com.facebook.shimmer:shimmer", version.ref 
 insertKoinKoinCore = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 insertKoinKoinAndroid = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 huAutsoftKrate = { module = "hu.autsoft:krate", version.ref = "krate" }
-githubKirich1409Viewbindingpropertydelegate = { module = "com.github.kirich1409:viewbindingpropertydelegate", version.ref = "viewbinding" }
-githubKirich1409ViewbindingpropertydelegateNoreflection = { module = "com.github.kirich1409:viewbindingpropertydelegate-noreflection", version.ref = "viewbinding" }
+devAndroidbroadcastVbpd = { module = "dev.androidbroadcast.vbpd:vbpd", version.ref = "viewbinding" }
 androidxWorkWorkRuntimeKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 githubSeancfoleyIpaddress = { module = "com.github.seancfoley:ipaddress", version.ref = "ipaddress" }
 junitJunit = { module = "junit:junit", version.ref = "junit" }
@@ -159,4 +158,8 @@ androidxBenchmarkBenchmarkMacroJunit4 = { module = "androidx.benchmark:benchmark
 androidxTestUiautomatorUiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 
 [plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidTest = { id = "com.android.test", version.ref = "agp" }
+# Required by the TV flavor's Compose UI.
+kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

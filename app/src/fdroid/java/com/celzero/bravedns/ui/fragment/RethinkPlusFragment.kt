@@ -19,10 +19,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import dev.androidbroadcast.vbpd.viewBinding
 
 /**
  * F-Droid flavour, Rethink+ is not yet available on F-Droid.

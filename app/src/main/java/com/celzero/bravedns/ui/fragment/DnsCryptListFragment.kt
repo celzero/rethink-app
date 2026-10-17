@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
@@ -29,7 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsCryptEndpointAdapter
 import com.celzero.bravedns.adapter.DnsCryptRelayEndpointAdapter
@@ -40,12 +38,14 @@ import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
 import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.dialog.DnsCryptRelaysDialog
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.DnsCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DnsCryptRelayEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

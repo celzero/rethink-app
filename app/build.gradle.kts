@@ -1,17 +1,16 @@
 import com.android.build.api.variant.FilterConfiguration
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 import java.lang.reflect.Method
 
 plugins {
-    id("com.android.application")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.ksp)
     // rethink-tv fork: Compose Compiler plugin for the `tv` flavor's
     // Compose-for-TV UI. Safe to apply project-wide — phone variants
     // contain no @Composable and the plugin then no-ops.
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.kotlinCompose)
     // To generate a BOM in CycloneDX format:
     // ./gradlew cyclonedxBom
     // id("org.cyclonedx.bom") version "3.2.4"
@@ -91,7 +90,7 @@ logger.info("gradle alphaBuild? $alphaBuild, should split? $shouldSplit")
 if (!deGoogled) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
-    logger.info("app firebase plugins applied")
+    logger.warn("app firebase plugins applied")
 } else {
     logger.info("app firebase plugins SKIPPED (non-play build)")
 }
@@ -114,24 +113,24 @@ val gitVersion = providers.exec {
 }.standardOutput.asText.get().trim()
 
 fun getVersionCode(): Int {
-    var code = 0
-    try {
-        val envCode = System.getenv("VERSION_CODE")
-        if (!envCode.isNullOrEmpty()) {
-            code = envCode.toInt()
-            logger.info("env version code: $code")
-        }
-    } catch (ex: NumberFormatException) {
-        logger.info("missing env version code: ${ex.message}")
+    val envVersionCode = System.getenv("VERSION_CODE")
+    if (envVersionCode == null) {
+        logger.info("missing env version code")
     }
-    if (code == 0) {
-        code = project.properties["VERSION_CODE"]?.toString()?.toIntOrNull() ?: 0
-        logger.info("project properties version code: $code")
-    }
-    return code
+    val versionCodeValue = envVersionCode
+        ?: project.providers.gradleProperty("VERSION_CODE").orNull
+        ?: throw GradleException(
+            "VERSION_CODE is missing. Set it in the environment or as a Gradle property; it must be a positive integer."
+        )
+
+    return versionCodeValue.toIntOrNull()?.takeIf { it > 0 }
+        ?: throw GradleException(
+            "Invalid VERSION_CODE '$versionCodeValue': expected a positive integer greater than zero."
+        )
 }
 
 val appVersionCode = getVersionCode()
+logger.info("version code: $appVersionCode")
 
 try {
     if (keystorePropertiesFile.exists()) {
@@ -157,14 +156,14 @@ val hasTvReleaseSigningConfig =
         .all { value -> !value.isNullOrEmpty() }
 
 android {
-    compileSdk = 37
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     // https://developer.android.com/studio/build/configure-app-module
     namespace = "com.celzero.bravedns"
 
     defaultConfig {
         applicationId = "com.celzero.bravedns"
-        minSdk = 23
-        targetSdk = 37
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Defaults to false; the fdroid flavor overrides it via -PwebsiteDegoogled=true.
         buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false")
@@ -200,10 +199,10 @@ android {
     splits {
         abi {
             if (!shouldSplit) {
-                logger.info("universal apk only (splits disabled)")
+                logger.warn("universal apk only (splits disabled)")
                 isEnable = false
             } else {
-                logger.info("split apks and universal apk (splits enabled)")
+                logger.warn("split apks and universal apk (splits enabled)")
                 isEnable = true
                 reset()
                 // comma-separated list of ABIs to generate apks for
@@ -215,7 +214,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             // AGP 9.3 DSL: enables both code and resource optimization and
             // includes the default Android keep rules (equivalent to
             // proguard-android-optimize.txt, which the webview removal in #352
@@ -247,10 +246,10 @@ android {
                 }
             }
             signingConfig = if (isWebsiteDegoogled) {
-                logger.info("IzzyOnDroid build: using izzyondroid signing config")
+                logger.warn("IzzyOnDroid build: using izzyondroid signing config")
                 signingConfigs.getByName("izzyondroid")
             } else {
-                logger.info("Normal build: using config signing config")
+                logger.warn("Normal build: using config signing config")
                 signingConfigs.getByName("config")
             }
             // IzzyOnDroid builds ship as com.celzero.bravedns.izzy
@@ -258,11 +257,11 @@ android {
                 applicationIdSuffix = ".izzy"
             }
         }
-        create("leakCanary") {
+        register("leakCanary") {
             matchingFallbacks += listOf("debug")
             initWith(getByName("debug"))
         }
-        create("alpha") {
+        register("alpha") {
             // archive.is/y8uCB
             applicationIdSuffix = ".alpha"
             optimization {
@@ -271,7 +270,7 @@ android {
             signingConfig = signingConfigs.getByName("alpha")
             resValue("string", "app_name", "Rethink(α)")
         }
-        create("releaseDebug") {
+        register("releaseDebug") {
             initWith(getByName("release"))
             // set explicitly; initWith may not copy the optimization block
             optimization {
@@ -344,7 +343,7 @@ android {
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
             // for build type alpha, versionCode is set in env overriding gradle.properties
-            versionCode = getVersionCode()
+            versionCode = appVersionCode
             versionName = gitVersion
             buildConfigField("int", "BASE_VERSION_CODE", appVersionCode.toString())
             vectorDrawables.useSupportLibrary = true
@@ -352,7 +351,7 @@ android {
         create("tv") {
             dimension = "releaseType"
             applicationIdSuffix = ".tv"
-            versionCode = getVersionCode()
+            versionCode = appVersionCode
             versionName = gitVersion
             buildConfigField("int", "BASE_VERSION_CODE", appVersionCode.toString())
             vectorDrawables.useSupportLibrary = true
@@ -381,16 +380,17 @@ android {
             storePassword = tvKsStorePassphrase
         }
         buildTypes.getByName("release").signingConfig = tvRelease
-        println("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
+        logger.warn("rethink-tv: TV_RELEASE_KS_* env vars detected; 'release' build type will be signed with signingConfigs.tvRelease")
     } else {
-        println("rethink-tv: TV_RELEASE_KS_* env vars NOT set; using the configured release signing config")
+        logger.warn("rethink-tv: TV_RELEASE_KS_* env vars NOT set; using the configured release signing config")
     }
 }
 
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_3)
-        jvmTarget.set(JvmTarget.JVM_17)
+        languageVersion.set(
+            KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast("."))
+        )
         freeCompilerArgs.addAll("-Xwarning-level=SENSELESS_COMPARISON:disabled")
     }
 }
@@ -419,7 +419,7 @@ androidComponents {
     }
 }
 
-val download by configurations.creating {
+val download = configurations.create("download") {
     isTransitive = false
 }
 
@@ -502,8 +502,7 @@ dependencies {
     implementation(libs.huAutsoftKrate)
 
     // viewBinding without reflection
-    "fullImplementation"(libs.githubKirich1409Viewbindingpropertydelegate)
-    "fullImplementation"(libs.githubKirich1409ViewbindingpropertydelegateNoreflection)
+    "fullImplementation"(libs.devAndroidbroadcastVbpd)
 
     // add ":debug" suffix to the dependency to include debug symbols
     download(firestackDependency())
@@ -588,8 +587,7 @@ dependencies {
     "tvImplementation"(libs.githubBumptechGlideOkhttp3Integration) { exclude(group = "glide-parent") }
     "kspTv"(libs.githubBumptechGlideCompilerTv)
     "tvImplementation"(libs.facebookShimmerShimmer)
-    "tvImplementation"(libs.githubKirich1409Viewbindingpropertydelegate)
-    "tvImplementation"(libs.githubKirich1409ViewbindingpropertydelegateNoreflection)
+    "tvImplementation"(libs.devAndroidbroadcastVbpd)
     "tvImplementation"(libs.androidxNavigationNavigationFragmentKtx)
     "tvImplementation"(libs.androidxNavigationNavigationUiKtx)
     "tvImplementation"(libs.androidxBiometricBiometric)
