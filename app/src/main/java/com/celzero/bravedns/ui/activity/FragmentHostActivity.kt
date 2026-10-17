@@ -75,8 +75,6 @@ class FragmentHostActivity : BaseActivity(R.layout.activity_fragment_host) {
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
-        setContentView(R.layout.activity_fragment_host)
-
         // Retrieve fragment class name from savedInstanceState or intent
         fragmentClassName = savedInstanceState?.getString(STATE_FRAGMENT_CLASS_NAME)
             ?: intent.getStringExtra(EXTRA_FRAGMENT_CLASS_NAME)
