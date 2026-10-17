@@ -44,16 +44,17 @@ import org.koin.core.component.inject
  *  - [ACTION_WG_RESUME] - resume live wireguard proxy(es)
  *
  * Caller identity:
- *  - Android 14 (API 34) and above: resolved exclusively from the OS-provided
- *    [BroadcastReceiver.getSentFromPackage] / [BroadcastReceiver.getSentFromUid]; intent extras
- *    are never trusted, even when the OS identity is absent.
+ *  - Android 14 (API 34) and above: prefers the OS-provided
+ *    [BroadcastReceiver.getSentFromPackage] / [BroadcastReceiver.getSentFromUid]. When the OS
+ *    identity is unavailable, [EXTRA_SENDER] is used as a compatibility fallback. That extra is
+ *    sender-controlled and spoofable, so it is accepted only when it is allowlisted below.
  *  - Below Android 14: no OS-provided broadcast sender identity exists, so the legacy
- *    [EXTRA_SENDER] extra convention is honored instead. NOTE: that extra is sender-controlled
- *    and therefore spoofable on this path; it is kept solely to preserve automation support on
- *    older Android versions.
+ *    [EXTRA_SENDER] extra convention is honored instead. That extra is sender-controlled and
+ *    therefore spoofable on this path; it is kept solely to preserve automation support on older
+ *    Android versions.
  *
  * Extras:
- *  - [EXTRA_SENDER] (String, legacy, only honored below Android 14): calling package name
+ *  - [EXTRA_SENDER] (String, legacy or Android 14+ fallback): calling package name
  *  - [EXTRA_WG_IDS] (String, required for the WG_* actions): comma separated wireguard config
  *    ids, e.g. "1,3"
  *
@@ -66,7 +67,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     // seam for tests; executes validated wg commands
     internal var wgCommands: WgCommands = WgCommands()
 
-    // seam for tests; resolves the caller identity (never from untrusted extras on API 34+)
+    // seam for tests; resolves the caller identity, preferring the OS-provided identity
     internal var callerResolver: (Context, Intent) -> String? =
         { context, intent -> defaultCallerResolver(context, intent) }
 
@@ -214,8 +215,11 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
     internal fun defaultCallerResolver(context: Context, intent: Intent): String? {
         if (DEBUG) dumpIntent(intent)
 
-        // Android 14 (API 34) and above: the OS stamps the sender identity on every broadcast;
-        // only trust that, never sender-controlled extras
+        val senderExtra = intent.getStringExtra(EXTRA_SENDER)
+
+        // Android 14 (API 34) and above: prefer the OS-provided sender identity. Some external
+        // automation broadcasts do not carry it, so retain the sender extra as a compatibility
+        // fallback for the allowlist check in onReceive (the extra is sender-controlled).
         if (isAtleastU()) {
             val pkg = sentFromPackage
                 ?: context.packageManager.getPackagesForUid(sentFromUid)?.firstOrNull()
@@ -223,17 +227,24 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
                 Logger.i(LOG_TAG_VPN, "$TAG caller from OS-provided identity: $pkg")
                 return pkg
             }
-            Logger.w(LOG_TAG_VPN, "$TAG no OS-provided sender identity, rejecting intent")
-            return null
+            if (senderExtra != null) {
+                Logger.w(
+                    LOG_TAG_VPN,
+                    "$TAG no OS-provided sender identity, using sender extra fallback " +
+                        "(sender-controlled and spoofable): $senderExtra"
+                )
+            } else {
+                Logger.w(LOG_TAG_VPN, "$TAG no OS-provided sender identity or sender extra")
+            }
+            return senderExtra
         }
 
         // below Android 14 there is no OS-provided broadcast sender identity; fall back to the
         // legacy "sender" extra convention (spoofable on this path, accepted for automation)
-        val legacy = intent.getStringExtra(EXTRA_SENDER)
-        if (legacy != null) {
-            Logger.i(LOG_TAG_VPN, "$TAG caller from legacy extra: $legacy")
+        if (senderExtra != null) {
+            Logger.i(LOG_TAG_VPN, "$TAG caller from legacy extra: $senderExtra")
         }
-        return legacy
+        return senderExtra
     }
 
     fun dumpIntent(intent: Intent) {
