@@ -100,7 +100,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
             return
         }
 
-        val allowedPackages = persistentState.appTriggerPackages.split(",").map { it.trim() }.toSet()
+        val allowedPackages = persistentState.appTriggerPackages.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
         Logger.d(LOG_TAG_VPN, "$TAG Allowed packages: $allowedPackages")
         if (allowedPackages.isEmpty()) {
             Logger.i(LOG_TAG_VPN, "$TAG No allowed packages, ignoring intent")
@@ -108,8 +108,8 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
         }
 
         val callerPkg = getCallerPkg(context, intent)
-        if (callerPkg == null) {
-            Logger.w(LOG_TAG_VPN, "$TAG Received intent with null package name")
+        if (callerPkg.isNullOrBlank()) {
+            Logger.w(LOG_TAG_VPN, "$TAG Received intent with blank package name")
             return
         }
 
