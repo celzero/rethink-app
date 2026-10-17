@@ -325,6 +325,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     // avoids running multiple proxy checks at the same time.
     private val overlayRefreshInProgress = AtomicBoolean(false)
+    // set when a refresh is requested while a check is already in flight
+    private val overlayRefreshPending = AtomicBoolean(false)
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -3318,19 +3320,26 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
      * Runs off the serializer; state updates are handled by [onOverlayNetworkChanged].
      */
     private fun refreshOverlayNetworks(reason: String) {
+        overlayRefreshPending.set(true)
         if (!overlayRefreshInProgress.compareAndSet(false, true)) {
-            logd("refreshOverlayNetworks: already in flight, skip ($reason)")
+            logd("refreshOverlayNetworks: in progress, rerun ($reason)")
             return
         }
         io("proxyReach") {
             try {
-                val nw = vpnAdapter?.proxyReaches() ?: OverlayNetworks()
-                logd("refreshOverlayNetworks ($reason): $nw")
-                onOverlayNetworkChanged(nw)
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "$TAG err refreshing overlay networks ($reason): ${e.message}", e)
+                while (overlayRefreshPending.getAndSet(false)) {
+                    try {
+                        val nw = vpnAdapter?.proxyReaches() ?: OverlayNetworks()
+                        logd("refreshOverlayNetworks ($reason): $nw")
+                        onOverlayNetworkChanged(nw)
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_VPN, "$TAG err refreshing overlay networks ($reason): ${e.message}", e)
+                    }
+                }
             } finally {
                 overlayRefreshInProgress.set(false)
+                // a request may have arrived between the loop exit and the reset
+                if (overlayRefreshPending.get()) refreshOverlayNetworks("$reason+rerun")
             }
         }
     }
