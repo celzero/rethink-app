@@ -105,6 +105,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -2719,17 +2720,17 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun probeReaches(id: String, isRpn: Boolean, ips: String): Boolean {
         return try {
-            withTimeout(PROBE_TIMEOUT_MS.milliseconds) {
-                val router =
-                    if (isRpn) getWinByKey(id)?.router() else getProxies()?.getProxy(id)?.router()
-                if (router == null) {
-                    Logger.w(LOG_TAG_VPN, "$TAG proxy reaches($id): no router, treating unreachable")
-                    return@withTimeout false
-                }
-                val res = router.reaches(ips)
-                Logger.i(LOG_TAG_VPN, "$TAG proxy reaches($id) for ips($ips): $res")
-                res
+            val router =
+                if (isRpn) getWinByKey(id)?.router() else getProxies()?.getProxy(id)?.router()
+            if (router == null) {
+                Logger.w(LOG_TAG_VPN, "$TAG proxy reaches($id): no router, treating unreachable")
+                return false
             }
+            // detach the blocking jni call so the wait (not the call) is bounded
+            val call = externalScope.async(Dispatchers.IO) { router.reaches(ips) }
+            val res = withTimeoutOrNull(PROBE_TIMEOUT_MS.milliseconds) { call.await() } ?: false
+            Logger.i(LOG_TAG_VPN, "$TAG proxy reaches($id) for ips($ips): $res")
+            res
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err proxy reaches($id): ${e.message}")
             false
