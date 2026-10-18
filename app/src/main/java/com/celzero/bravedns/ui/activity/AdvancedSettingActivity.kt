@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
@@ -37,6 +36,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
 class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting) {
