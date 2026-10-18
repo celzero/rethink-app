@@ -396,7 +396,9 @@ android {
 
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_3)
+        languageVersion.set(
+            KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast("."))
+        )
         jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll("-Xwarning-level=SENSELESS_COMPARISON:disabled")
     }
