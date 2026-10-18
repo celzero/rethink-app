@@ -15,6 +15,26 @@ limitations under the License.
 */
 
 package com.celzero.bravedns.ui.activity
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.*
+import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.AndroidFragment
+import androidx.fragment.compose.rememberFragmentState
+import androidx.lifecycle.Lifecycle
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.controls.OriginalTabStrip
+import com.celzero.bravedns.ui.compose.themeColor
+import kotlinx.coroutines.launch
 
 import android.content.Context
 import android.content.Intent
@@ -22,10 +42,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -41,13 +59,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.tabs.TabLayoutMediator
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
-class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
-    private val b by viewBinding(ActivityNetworkLogsBinding::bind)
+class NetworkLogsActivity : BaseActivity() {
     private var fragmentIndex = 0
     private var searchParam = ""
     // to handle search navigation from universal firewall, to show only the search results
@@ -102,32 +116,32 @@ class NetworkLogsActivity : BaseActivity(R.layout.activity_network_logs) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun init() {
-
-        b.logsActViewpager.adapter =
-            object : FragmentStateAdapter(this) {
-                override fun createFragment(position: Int): Fragment {
-                    return getFragment(position)
-                }
-
-                override fun getItemCount(): Int {
-                    return getCount()
-                }
-            }
-
-        TabLayoutMediator(b.logsActTabLayout, b.logsActViewpager) { tab, position
-                -> // Styling each tab here
-                tab.text = getTabText(position)
-            }
-            .attach()
-
-        b.logsActViewpager.setCurrentItem(fragmentIndex, false)
-
         observeAppState()
-
-        b.appLogs.setOnClickListener {
-            openConsoleLogActivity()
-        }
+        setContent { RethinkTheme {
+            val count = getCount()
+            val pager = rememberPagerState(initialPage = fragmentIndex.coerceIn(0, count - 1), pageCount = { count })
+            val scope = rememberCoroutineScope()
+            val states = (0 until count).map { page -> key(page) { rememberFragmentState() } }
+            val specifications = remember(count) { List(count) { getFragment(it) } }
+            // Own insets above the pager so both tabs and every Fragment stay inside the
+            // status bar, cutout, navigation bar and keyboard without per-page spacers.
+            Column(Modifier.fillMaxSize().background(themeColor(R.attr.background)).safeDrawingPadding().testTag("network-logs-content")) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    OriginalTabStrip(pager.currentPage, List(count) { getTabText(it) },
+                        onSelect = { page -> scope.launch { pager.animateScrollToPage(page) } },
+                        modifier = Modifier.weight(1f), pageOffset = pager.currentPageOffsetFraction)
+                    IconButton(::openConsoleLogActivity, Modifier.padding(end = 15.dp, bottom = 5.dp)) { Icon(painterResource(R.drawable.ic_android_icon), stringResource(R.string.console_log_title), Modifier.alpha(.7f), tint = Color.Unspecified) }
+                }
+                HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth()) { page ->
+                    val specification = specifications[page]
+                    // Lifecycle-only boundary; each child Fragment renders real Compose content.
+                    AndroidFragment(clazz = specification.javaClass, modifier = Modifier.fillMaxSize(), fragmentState = states[page], arguments = specification.arguments ?: Bundle.EMPTY,
+                        maxLifecycle = if (pager.settledPage == page) Lifecycle.State.RESUMED else Lifecycle.State.STARTED)
+                }
+            }
+        } }
     }
 
     private fun openConsoleLogActivity() {
