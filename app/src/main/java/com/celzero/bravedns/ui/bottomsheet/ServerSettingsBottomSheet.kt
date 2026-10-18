@@ -15,13 +15,14 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import com.celzero.bravedns.ui.compose.rpn.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ValueAnimator
 import android.content.res.Configuration
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.DrawableWrapper
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,12 +30,10 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
-import androidx.core.graphics.withRotation
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetServerSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -45,7 +44,7 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,10 +59,7 @@ import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
  */
 class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetServerSettingsBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private lateinit var ui: RpnSettingsState
 
     private val persistentState by inject<PersistentState>()
 
@@ -73,7 +69,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
     private var isProxyStopped: Boolean = false
     /** Looping spin animator attached to the refresh button icon while a refresh is in progress. */
     private var refreshAnimator: ValueAnimator? = null
-    /** Original text of [binding.btnResetRpn] captured in [onViewCreated]; restored when reset finishes. */
+    /** Original text of [ui.btnResetRpn] captured in [onViewCreated]; restored when reset finishes. */
     private var originalResetBtnText: CharSequence = ""
     private var refreshAnimStartTime: Long = 0L
     private var minRefreshAnimJob: Job? = null
@@ -171,13 +167,13 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         isProxyStopped = arguments?.getBoolean(ARG_PROXY_STOPPED, false) ?: false
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetServerSettingsBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        ui = RpnSettingsState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_settings_compose
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnSettingsContent(ui) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -199,11 +195,11 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         setupExcludeCountriesRow()
         setDolphinSignature()
 
-        binding.btnResetRpn.setOnClickListener {
+        ui.btnResetRpn.setOnClickListener {
             if (!VpnController.hasTunnel()) {
                 Logger.w(LOG_TAG_UI, "$TAG: reset tapped but no VPN tunnel, showing hint")
                 if (isAdded) {
-                    binding.dolphinSignature.setContentForFailure()
+                    ui.dolphinSignature.setContentForFailure()
                     Utilities.showToastUiCentered(
                         requireContext(),
                         getString(R.string.ssv_toast_start_rethink),
@@ -214,10 +210,10 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
             }
             showResetConfirmationDialog()
         }
-        binding.refreshBtn.setOnClickListener { doRefreshServers() }
+        ui.refreshBtn.setOnClickListener { doRefreshServers() }
 
         // Capture original reset button text before any state observer can change it.
-        originalResetBtnText = binding.btnResetRpn.text
+        originalResetBtnText = ui.btnResetRpn.text
 
         observeRefreshState()
         observeResetState()
@@ -240,22 +236,18 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         listener = null // prevent fragment leak via callback reference
-        _binding = null
+
     }
 
     /** Starts a continuous (infinite) clockwise spin on the refresh button icon. */
     private fun startRefreshAnimation() {
-        refreshAnimator?.cancel()
-
-        val raw = binding.refreshBtn.icon
-        val spinning: RotatingDrawable = raw as? RotatingDrawable ?: RotatingDrawable(raw ?: return).also { binding.refreshBtn.icon = it }
-        spinning.rotation = 0f
+        ui.refreshBtn.rotation = 0f
         refreshAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
             duration = 700L
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             interpolator = LinearInterpolator()
-            addUpdateListener { spinning.rotation = it.animatedValue as Float }
+            addUpdateListener { ui.refreshBtn.rotation = it.animatedValue as Float }
             start()
         }
     }
@@ -267,11 +259,10 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
     private fun stopRefreshAnimation() {
         refreshAnimator?.cancel()
         refreshAnimator = null
-        val icon = binding.refreshBtn.icon as? RotatingDrawable ?: return
-        ValueAnimator.ofFloat(icon.rotation, 0f).apply {
+        ValueAnimator.ofFloat(ui.refreshBtn.rotation, 0f).apply {
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
-            addUpdateListener { icon.rotation = it.animatedValue as Float }
+            addUpdateListener { ui.refreshBtn.rotation = it.animatedValue as Float }
             start()
         }
     }
@@ -285,7 +276,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
                 serverSelectionViewModel.refreshState.collect { state ->
                     when (state) {
                         is ServerSelectionViewModel.RefreshState.InProgress -> {
-                            binding.refreshBtn.isClickable = false
+                            ui.refreshBtn.isClickable = false
                             if (refreshAnimator == null) {
                                 startRefreshAnimation()
                                 refreshAnimStartTime = System.currentTimeMillis()
@@ -305,7 +296,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
                                     delay((MIN_REFRESH_ANIM_MS - elapsed).milliseconds)
                                 }
                                 if (isAdded) {
-                                    binding.refreshBtn.isClickable = !isProxyStopped
+                                    ui.refreshBtn.isClickable = !isProxyStopped
                                     stopRefreshAnimation()
                                 }
                             }
@@ -334,19 +325,19 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
                 serverSelectionViewModel.resetState.collect { state ->
                     val resetInProgress = state is ServerSelectionViewModel.ResetState.InProgress
                     if (resetInProgress) {
-                        binding.btnResetRpn.isEnabled   = false
-                        binding.btnResetRpn.alpha        = 0.55f
-                        binding.btnResetRpn.text         = getString(R.string.rpn_restore_in_progress_btn)
+                        ui.btnResetRpn.isEnabled   = false
+                        ui.btnResetRpn.alpha        = 0.55f
+                        ui.btnResetRpn.text         = getString(R.string.rpn_restore_in_progress_btn)
                         // Block refresh during reset — they both touch server registration
-                        binding.refreshBtn.isClickable  = false
+                        ui.refreshBtn.isClickable  = false
                         stopRefreshAnimation()
                     } else {
-                        binding.btnResetRpn.isEnabled   = !isProxyStopped
-                        binding.btnResetRpn.alpha        = if (isProxyStopped) 0.55f else 1f
-                        binding.btnResetRpn.text         = originalResetBtnText
+                        ui.btnResetRpn.isEnabled   = !isProxyStopped
+                        ui.btnResetRpn.alpha        = if (isProxyStopped) 0.55f else 1f
+                        ui.btnResetRpn.text         = originalResetBtnText
                         // Restore refresh only if a refresh itself isn't also running
                         val refreshRunning = serverSelectionViewModel.refreshState.value is ServerSelectionViewModel.RefreshState.InProgress
-                        binding.refreshBtn.isClickable  = !isProxyStopped && !refreshRunning
+                        ui.refreshBtn.isClickable  = !isProxyStopped && !refreshRunning
                     }
                 }
             }
@@ -358,7 +349,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         if (!VpnController.hasTunnel()) {
             Logger.w(LOG_TAG_UI, "$TAG.doRefreshServers: no VPN tunnel, showing hint")
             if (isAdded) {
-                binding.dolphinSignature.setContentForFailure()
+                ui.dolphinSignature.setContentForFailure()
                 Utilities.showToastUiCentered(
                     requireContext(),
                     getString(R.string.ssv_toast_start_rethink),
@@ -369,7 +360,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         }
         if (refreshAnimator == null) {
             refreshAnimStartTime = System.currentTimeMillis()
-            binding.refreshBtn.isClickable = false
+            ui.refreshBtn.isClickable = false
             startRefreshAnimation()
         }
         serverSelectionViewModel.refresh()
@@ -390,7 +381,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      */
     /** Dolphin signature (at the end of the sheet content.); random pairing, fresh on every visit. */
     private fun setDolphinSignature() {
-        binding.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+        ui.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun setupDnsSection() {
@@ -405,21 +396,21 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         updateDnsFilterDesc(activeModes)
 
         val splitEnabled = persistentState.splitDns
-        binding.splitDnsBanner.visibility = if (splitEnabled) View.GONE else View.VISIBLE
+        ui.splitDnsBanner.visibility = if (splitEnabled) View.GONE else View.VISIBLE
         setDnsCheckboxesEnabled(splitEnabled && !isProxyStopped)
 
-        binding.splitDnsEnableBtn.setOnClickListener {
+        ui.splitDnsEnableBtn.setOnClickListener {
             if (!isAtleastR()) {
                 persistentState.enableDnsAlg = true
             }
             persistentState.splitDns = true
-            binding.splitDnsBanner.animate()
+            ui.splitDnsBanner.animate()
                 .alpha(0f)
                 .setDuration(200)
                 .withEndAction {
                     if (isAdded) {
-                        binding.splitDnsBanner.visibility = View.GONE
-                        binding.splitDnsBanner.alpha = 1f
+                        ui.splitDnsBanner.visibility = View.GONE
+                        ui.splitDnsBanner.alpha = 1f
                         setDnsCheckboxesEnabled(!isProxyStopped)
                     }
                 }
@@ -427,9 +418,9 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         }
 
         val rows = listOf(
-            binding.dnsRowPrivacy  to binding.cbDnsPrivacy,
-            binding.dnsRowFamily   to binding.cbDnsFamily,
-            binding.dnsRowSecurity to binding.cbDnsSecurity,
+            ui.dnsRowPrivacy  to ui.cbDnsPrivacy,
+            ui.dnsRowFamily   to ui.cbDnsFamily,
+            ui.dnsRowSecurity to ui.cbDnsSecurity,
         )
 
         rows.forEach { (row, checkbox) ->
@@ -439,14 +430,14 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
             }
         }
 
-        val changeListener = { _: android.widget.CompoundButton, _: Boolean ->
+        val changeListener = { _: RpnControlState, _: Boolean ->
             if (persistentState.splitDns && !isProxyStopped) {
                 onDnsCheckboxChanged()
             }
         }
-        binding.cbDnsPrivacy .setOnCheckedChangeListener(changeListener)
-        binding.cbDnsFamily  .setOnCheckedChangeListener(changeListener)
-        binding.cbDnsSecurity.setOnCheckedChangeListener(changeListener)
+        ui.cbDnsPrivacy .setOnCheckedChangeListener(changeListener)
+        ui.cbDnsFamily  .setOnCheckedChangeListener(changeListener)
+        ui.cbDnsSecurity.setOnCheckedChangeListener(changeListener)
     }
 
     /**
@@ -483,9 +474,9 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      */
     private fun buildSelectedModes(): Set<RpnProxyManager.DnsMode> {
         val result = mutableSetOf<RpnProxyManager.DnsMode>()
-        if (binding.cbDnsPrivacy .isChecked) result += RpnProxyManager.DnsMode.PRIVACY
-        if (binding.cbDnsFamily  .isChecked) result += RpnProxyManager.DnsMode.PARENTAL
-        if (binding.cbDnsSecurity.isChecked) result += RpnProxyManager.DnsMode.SECURITY
+        if (ui.cbDnsPrivacy .isChecked) result += RpnProxyManager.DnsMode.PRIVACY
+        if (ui.cbDnsFamily  .isChecked) result += RpnProxyManager.DnsMode.PARENTAL
+        if (ui.cbDnsSecurity.isChecked) result += RpnProxyManager.DnsMode.SECURITY
         return result
     }
 
@@ -495,13 +486,13 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      * avoid spurious emissions).
      */
     private fun setCheckboxesQuietly(modes: Set<RpnProxyManager.DnsMode>) {
-        binding.cbDnsPrivacy .setOnCheckedChangeListener(null)
-        binding.cbDnsFamily  .setOnCheckedChangeListener(null)
-        binding.cbDnsSecurity.setOnCheckedChangeListener(null)
+        ui.cbDnsPrivacy .setOnCheckedChangeListener(null)
+        ui.cbDnsFamily  .setOnCheckedChangeListener(null)
+        ui.cbDnsSecurity.setOnCheckedChangeListener(null)
 
-        binding.cbDnsPrivacy .isChecked = RpnProxyManager.DnsMode.PRIVACY  in modes
-        binding.cbDnsFamily  .isChecked = RpnProxyManager.DnsMode.PARENTAL in modes
-        binding.cbDnsSecurity.isChecked = RpnProxyManager.DnsMode.SECURITY in modes
+        ui.cbDnsPrivacy .isChecked = RpnProxyManager.DnsMode.PRIVACY  in modes
+        ui.cbDnsFamily  .isChecked = RpnProxyManager.DnsMode.PARENTAL in modes
+        ui.cbDnsSecurity.isChecked = RpnProxyManager.DnsMode.SECURITY in modes
         // Listeners are wired in setupDnsSection() after this call.
     }
 
@@ -525,17 +516,17 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      * The container alpha provides a clear disabled affordance without hiding controls.
      */
     private fun setDnsCheckboxesEnabled(enabled: Boolean) {
-        binding.dnsCheckboxContainer.alpha = if (enabled) 1f else 0.38f
+        ui.dnsCheckboxContainer.alpha = if (enabled) 1f else 0.38f
         listOf(
-            binding.dnsRowPrivacy,
-            binding.dnsRowFamily,  binding.dnsRowSecurity,
+            ui.dnsRowPrivacy,
+            ui.dnsRowFamily,  ui.dnsRowSecurity,
         ).forEach {
             it.isClickable = enabled
             it.isFocusable  = enabled
         }
         listOf(
-            binding.cbDnsPrivacy,
-            binding.cbDnsFamily,  binding.cbDnsSecurity,
+            ui.cbDnsPrivacy,
+            ui.cbDnsFamily,  ui.cbDnsSecurity,
         ).forEach { it.isEnabled = enabled }
     }
 
@@ -561,7 +552,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
                 }
             getString(R.string.server_settings_dns_desc_includes, names)
         }
-        binding.tvDnsFilterDesc.text = text
+        ui.tvDnsFilterDesc.text = text
     }
 
     private fun setupConfigHandlingSection() {
@@ -569,19 +560,19 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
         // Initialize toggle without firing the listener
         val initialChecked = if (isManual) R.id.btn_config_manual else R.id.btn_config_auto
-        binding.configModeToggle.check(initialChecked)
+        ui.configModeToggle.check(initialChecked)
         applyManualModeUi(isManual, animate = false)
 
         // Initialize child toggle states from persisted values
-        binding.identitySwitch.isChecked = persistentState.rpnAlwaysChangeIdentity
+        ui.identitySwitch.isChecked = persistentState.rpnAlwaysChangeIdentity
         updatePortValueLabel(persistentState.rpnPort)
-        binding.permanentConfigSwitch.isChecked = persistentState.rpnUsePermanentConfig
+        ui.permanentConfigSwitch.isChecked = persistentState.rpnUsePermanentConfig
 
         // Set initial toggle text colors
         updateToggleTextColors(isManual)
 
         // AUTO / MANUAL toggle
-        binding.configModeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        ui.configModeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (!isChecked) return@addOnButtonCheckedListener
             val manual = checkedId == R.id.btn_config_manual
             persistentState.rpnConfigHandlingManual = manual
@@ -591,20 +582,20 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         }
 
         // Always Change Identity
-        binding.identitySwitch.setOnCheckedChangeListener { _, isChecked ->
+        ui.identitySwitch.setOnCheckedChangeListener { _, isChecked ->
             if (!persistentState.rpnConfigHandlingManual) return@setOnCheckedChangeListener
             persistentState.rpnAlwaysChangeIdentity = isChecked
             Logger.i(LOG_TAG_UI, "$TAG: alwaysChangeIdentity → $isChecked")
         }
 
         // Port row (opens selection dialog)
-        binding.portRow.setOnClickListener {
+        ui.portRow.setOnClickListener {
             if (!persistentState.rpnConfigHandlingManual) return@setOnClickListener
             showPortSelectionDialog()
         }
 
         // Permanent Configuration
-        binding.permanentConfigSwitch.setOnCheckedChangeListener { _, isChecked ->
+        ui.permanentConfigSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (!persistentState.rpnConfigHandlingManual) return@setOnCheckedChangeListener
             persistentState.rpnUsePermanentConfig = isChecked
             Logger.i(LOG_TAG_UI, "$TAG: permanentConfig → $isChecked")
@@ -619,8 +610,8 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
     private fun updateToggleTextColors(isManual: Boolean) {
         val selectedColor = UIUtils.fetchColor(requireContext(), R.attr.invertedPrimaryTextColor)
         val unselectedColor = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
-        binding.btnConfigManual.setTextColor(if (isManual) selectedColor else unselectedColor)
-        binding.btnConfigAuto.setTextColor(if (isManual) unselectedColor else selectedColor)
+        ui.btnConfigManual.setTextColor(if (isManual) selectedColor else unselectedColor)
+        ui.btnConfigAuto.setTextColor(if (isManual) unselectedColor else selectedColor)
     }
 
     /**
@@ -630,7 +621,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      */
     private fun applyManualModeUi(isManual: Boolean, animate: Boolean) {
         // Update hint text
-        binding.tvConfigModeHint.text = getString(
+        ui.tvConfigModeHint.text = getString(
             if (isManual) R.string.server_settings_config_manual_hint
             else R.string.server_settings_config_auto_hint
         )
@@ -640,40 +631,40 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
         // Identity row
         if (animate) {
-            binding.identityRow.animate()
+            ui.identityRow.animate()
                 .alpha(targetAlpha)
                 .setDuration(duration)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
         } else {
-            binding.identityRow.alpha = targetAlpha
+            ui.identityRow.alpha = targetAlpha
         }
-        binding.identitySwitch.isEnabled = isManual
+        ui.identitySwitch.isEnabled = isManual
 
         // Port row
         if (animate) {
-            binding.portRow.animate()
+            ui.portRow.animate()
                 .alpha(targetAlpha)
                 .setDuration(duration)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
         } else {
-            binding.portRow.alpha = targetAlpha
+            ui.portRow.alpha = targetAlpha
         }
-        binding.portRow.isClickable = isManual
-        binding.portRow.isFocusable = isManual
+        ui.portRow.isClickable = isManual
+        ui.portRow.isFocusable = isManual
 
         // Permanent config row
         if (animate) {
-            binding.permanentConfigRow.animate()
+            ui.permanentConfigRow.animate()
                 .alpha(targetAlpha)
                 .setDuration(duration)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
         } else {
-            binding.permanentConfigRow.alpha = targetAlpha
+            ui.permanentConfigRow.alpha = targetAlpha
         }
-        binding.permanentConfigSwitch.isEnabled = isManual
+        ui.permanentConfigSwitch.isEnabled = isManual
     }
 
     /**
@@ -691,18 +682,18 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
         updateExcludeCcSubtitle()
 
-        binding.excludeCountriesRow.setOnClickListener {
+        ui.excludeCountriesRow.setOnClickListener {
             if (parentFragmentManager.findFragmentByTag(AutoExcludeCountriesBottomSheet.TAG) != null) {
                 return@setOnClickListener
             }
 
             // Subtle scale-pop to indicate navigation
-            binding.excludeCountriesRow.animate()
+            ui.excludeCountriesRow.animate()
                 .scaleX(0.97f).scaleY(0.97f)
                 .setDuration(80)
                 .withEndAction {
                     if (isAdded) {
-                        binding.excludeCountriesRow.animate()
+                        ui.excludeCountriesRow.animate()
                             .scaleX(1f).scaleY(1f)
                             .setDuration(100)
                             .setInterpolator(AccelerateDecelerateInterpolator())
@@ -736,7 +727,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
         val count = stored.split(",")
             .map { it.trim() }
             .count { it.isNotEmpty() }
-        binding.tvExcludeCcDesc.text = if (count == 0) {
+        ui.tvExcludeCcDesc.text = if (count == 0) {
             getString(R.string.auto_exclude_cc_none)
         } else {
             getString(R.string.auto_exclude_cc_count, count)
@@ -760,7 +751,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
             if (it < 0) 0 else it  // fall back to random if stored value is unknown
         }
 
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.server_settings_port_dialog_title))
             .setSingleChoiceItems(portLabels, selectedIndex) { dialog, which ->
                 val newPort = PORT_VALUES[which]
@@ -775,7 +766,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
 
     /** Updates the port display label in the port row. */
     private fun updatePortValueLabel(port: Int) {
-        binding.tvPortValue.text = if (port == 0) {
+        ui.tvPortValue.text = if (port == 0) {
             // Use lbl_random ("(random)"), strip the parentheses, and display in caps → "RANDOM"
             getString(R.string.lbl_random).trim('(', ')').capitalizeWords()
         } else {
@@ -788,7 +779,7 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      */
     private fun showResetConfirmationDialog() {
         if (!isAdded) return
-        MaterialAlertDialogBuilder(requireContext())
+        WgAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.rpn_restore_confirm_title))
             .setMessage(getString(R.string.rpn_restore_confirm_message))
             .setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { dialog, _ ->
@@ -805,18 +796,4 @@ class ServerSettingsBottomSheet : BaseBottomSheetDialogFragment() {
      * A [DrawableWrapper] that applies a canvas rotation around its own center
      * during [draw], leaving the host view's background and tint untouched.
      */
-    private class RotatingDrawable(drawable: Drawable) : DrawableWrapper(drawable.mutate()) {
-        var rotation: Float = 0f
-            set(value) {
-                field = value
-                invalidateSelf()
-            }
-
-        override fun draw(canvas: Canvas) {
-            val b = bounds
-            canvas.withRotation(rotation, b.exactCenterX(), b.exactCenterY()) {
-                super.draw(this)
-            }
-        }
-    }
 }
