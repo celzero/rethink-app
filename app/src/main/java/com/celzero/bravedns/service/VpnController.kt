@@ -43,6 +43,13 @@ import com.celzero.firestack.intra.Controller
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.Socket
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 object VpnController : KoinComponent {
 
@@ -53,6 +60,28 @@ object VpnController : KoinComponent {
     @Volatile private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
     private const val URL4 = "IPv4"
     private const val URL6 = "IPv6"
+
+    // ---- restart watchdog: restarts the vpn every WD_INTERVAL_MS while it is on ----
+    private const val WD_INTERVAL_MS = 5000L
+    @Volatile private var wdOn = false
+    private var wdJob: Job? = null
+    private val wdScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    private fun startWatchdog(context: Context) {
+        if (wdJob?.isActive == true) return
+        val app = context.applicationContext
+        wdJob = wdScope.launch {
+            while (isActive) {
+                delay(WD_INTERVAL_MS)
+                if (!wdOn || isAppPaused() || !hasTunnel()) continue
+                Logger.i(LOG_TAG_VPN, "watchdog: restarting vpn")
+                stop("watchdog", app, userInitiated = false)
+                delay(1500)
+                start(app)
+            }
+        }
+    }
+    // ---- end watchdog ----
 
     @Volatile private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
 
@@ -66,6 +95,9 @@ object VpnController : KoinComponent {
 
         // store app start time, used in HomeScreenBottomSheet
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
+
+        wdOn = true
+        startWatchdog(b)
     }
 
     fun onVpnDestroyed() {
@@ -148,6 +180,7 @@ object VpnController : KoinComponent {
     }
 
     fun stop(reason: String, context: Context, userInitiated: Boolean = true) {
+        if (userInitiated) wdOn = false
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         vpnState = null
         onConnectionStateChanged(null)
