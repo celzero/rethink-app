@@ -66,6 +66,8 @@ class DnsSettingsState {
     val dcSplitDnsRl = DnsControl()
     val dcSplitDnsSwitch = DnsControl()
     val dcSplitDnsTxt = DnsControl()
+    val dcCaptivePortalRl = DnsControl()
+    val dcCaptivePortalSwitch = DnsControl()
     val dcUndelegatedDomainsRl = DnsControl()
     val dcUndelegatedDomainsSwitch = DnsControl()
     val dividerLocalBlocklist = DnsControl()
@@ -78,5 +80,5 @@ class DnsSettingsState {
     val restoreOrder get() = listOf(networkDnsRb, customDnsRb, rethinkPlusDnsRb, smartDnsRb,
         dcDownloaderSwitch, dcCheckUpdateSwitch, dcAlgSwitch, dcSplitDnsSwitch, dcFaviconSwitch,
         dcEnableCacheSwitch, dcProxyDnsSwitch, dcPreventDnsLeaksSwitch, dcBlockUnknownSwitch,
-        dcUndelegatedDomainsSwitch)
+        dcUndelegatedDomainsSwitch, dcCaptivePortalSwitch)
 }

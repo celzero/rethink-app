@@ -82,6 +82,8 @@ fun DnsSettingsScreen(b: DnsSettingsState, onRestore: () -> Unit, onCopySystemDn
                 if (b.dcBlockHeadingRl.visible) HorizontalDivider(Modifier.padding(start = 60.dp), color = themeColor(R.attr.primaryLightColorText).copy(alpha = .12f))
                 DnsSettingRow("dcUndelegatedDomainsRl", b.dcUndelegatedDomainsRl, R.string.dc_use_sys_dns_undelegated_heading, stringResource(R.string.dc_use_sys_dns_undelegated_desc), R.drawable.ic_undelegated_domain, b.dcUndelegatedDomainsSwitch)
                 if (b.dcUndelegatedDomainsRl.visible) HorizontalDivider(Modifier.padding(start = 60.dp), color = themeColor(R.attr.primaryLightColorText).copy(alpha = .12f))
+                DnsSettingRow("dcCaptivePortalRl", b.dcCaptivePortalRl, R.string.dc_use_sys_dns_captive_heading, stringResource(R.string.dc_use_sys_dns_captive_desc), R.drawable.ic_captive_portal_setting, b.dcCaptivePortalSwitch)
+                if (b.dcCaptivePortalRl.visible) HorizontalDivider(Modifier.padding(start = 60.dp), color = themeColor(R.attr.primaryLightColorText).copy(alpha = .12f))
                 DnsSettingRow("dcBlockFreeDnsRl", b.dcBlockFreeDnsRl, R.string.bfdm_heading, b.dcBlockFreeDnsDesc.text.ifEmpty { "" }, R.drawable.ic_use_fallback_bypass, null)
             }
         }
@@ -137,6 +139,7 @@ fun DnsSettingsScreen(b: DnsSettingsState, onRestore: () -> Unit, onCopySystemDn
 }
 
 private val dnsSwitchSources = mapOf(
+    "dcCaptivePortalRl" to "dc_captive_portal_switch",
     "dcDownloaderRl" to "dc_downloader_switch",
     "dcCheckUpdateRl" to "dc_check_update_switch",
     "dcAlgRl" to "dc_alg_switch",

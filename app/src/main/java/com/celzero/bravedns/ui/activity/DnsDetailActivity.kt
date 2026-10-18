@@ -19,25 +19,17 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityDnsDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.compose.settings.setSingleSettingsContent
 import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.tabs.TabLayoutMediator
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
-class DnsDetailActivity : BaseActivity(R.layout.activity_dns_detail) {
-    private val b by viewBinding(ActivityDnsDetailBinding::bind)
-
+class DnsDetailActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
@@ -67,29 +59,7 @@ class DnsDetailActivity : BaseActivity(R.layout.activity_dns_detail) {
     }
 
     private fun init() {
-
-        b.dnsDetailActViewpager.adapter =
-            object : FragmentStateAdapter(this) {
-                override fun createFragment(position: Int): Fragment {
-                    return when (position) {
-                        Tabs.CONFIGURE.screen -> DnsSettingsFragment.newInstance()
-                        else -> DnsSettingsFragment.newInstance()
-                    }
-                }
-
-                override fun getItemCount(): Int {
-                    return Tabs.getCount()
-                }
-            }
-
-        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position ->
-                tab.text =
-                    when (position) {
-                        Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
-                        else -> getString(R.string.dns_act_configure_tab)
-                    }
-            }
-            .attach()
+        setSingleSettingsContent(DnsSettingsFragment::class.java)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
