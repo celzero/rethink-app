@@ -15,6 +15,11 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.networksettings.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -28,15 +33,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Spinner
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState as CompoundButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
@@ -47,8 +46,6 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.DialogSetProxyBinding
-import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
@@ -77,19 +74,17 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RouterStats
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.networksettings.NetworkAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
-    private val b by viewBinding(FragmentProxyConfigureBinding::bind)
+class ProxySettingsActivity : BaseActivity() {
+    private val b by lazy { ProxySettingsState(this) }
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -107,6 +102,16 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         private const val ANIMATION_END_DEGREE = 360.0f
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        b.saveChecks(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             UI_MODE_NIGHT_YES
@@ -115,7 +120,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        setContent { RethinkTheme { NetworkSettingsScreen(b.layout, b.refreshing.toMap()) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -324,10 +329,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         }
     }
 
-    private fun refresh(iv: AppCompatImageView) {
+    private fun refresh(iv: WgControlState) {
         iv.isEnabled = false
-        iv.animation = animation
-        iv.startAnimation(animation)
+        b.startRefresh(iv, animation)
         io {
             if (RpnProxyManager.isRpnActive()) {
                 VpnController.refreshRpnProxy(Backend.RpnWin)
@@ -338,7 +342,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             if (isFinishing) return@delay
 
             iv.isEnabled = true
-            iv.clearAnimation()
+            b.stopRefresh(iv)
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
     }
@@ -803,9 +807,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         appNames: List<String>,
         appName: String,
     ) {
-        val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
+        val dialogBinding = ProxyEditorState(this)
         val builder =
-            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
+            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setContent { NetworkContent(dialogBinding.layout, scrollContainer = false) }
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         lp.copyFrom(dialog.window?.attributes)
@@ -815,21 +819,21 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         dialog.setCancelable(false)
         dialog.window?.attributes = lp
 
-        val headerTxt: TextView = dialogBinding.dialogProxyHeader
-        val headerDesc: TextView = dialogBinding.dialogProxyHeaderDesc
-        val lockdownDesc: TextView = dialogBinding.dialogProxyHeaderLockdownDesc
+        val headerTxt: WgControlState = dialogBinding.dialogProxyHeader
+        val headerDesc: WgControlState = dialogBinding.dialogProxyHeaderDesc
+        val lockdownDesc: WgControlState = dialogBinding.dialogProxyHeaderLockdownDesc
         val applyURLBtn = dialogBinding.dialogProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
-        val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
-        val ipAddressEditText: EditText = dialogBinding.dialogProxyEditIp
-        val portEditText: EditText = dialogBinding.dialogProxyEditPort
-        val errorTxt: TextView = dialogBinding.dialogProxyErrorText
-        val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
-        val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
-        val udpBlockLayout: LinearLayout = dialogBinding.dialogProxyUdpHeader
-        val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
-        val excludeAppLayout: LinearLayout = dialogBinding.dialogProxyExcludeAppsHeader
-        val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
+        val appNameSpinner: NetworkSpinnerState = dialogBinding.dialogProxySpinnerAppname
+        val ipAddressEditText: WgControlState = dialogBinding.dialogProxyEditIp
+        val portEditText: WgControlState = dialogBinding.dialogProxyEditPort
+        val errorTxt: WgControlState = dialogBinding.dialogProxyErrorText
+        val userNameEditText: WgControlState = dialogBinding.dialogProxyEditUsername
+        val passwordEditText: WgControlState = dialogBinding.dialogProxyEditPassword
+        val udpBlockLayout: WgControlState = dialogBinding.dialogProxyUdpHeader
+        val udpBlockCheckBox: WgControlState = dialogBinding.dialogProxyUdpCheck
+        val excludeAppLayout: WgControlState = dialogBinding.dialogProxyExcludeAppsHeader
+        val excludeAppCheckBox: WgControlState = dialogBinding.dialogProxyExcludeAppsCheck
 
         headerDesc.visibility = View.GONE
         udpBlockCheckBox.isChecked = persistentState.getUdpBlocked()
@@ -841,9 +845,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             excludeAppCheckBox.alpha = 0.5f
         }
 
-        val proxySpinnerAdapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
-        appNameSpinner.adapter = proxySpinnerAdapter
+        appNameSpinner.items = appNames
         if (!endpoint.proxyIP.isNullOrBlank()) {
             ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
             portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
@@ -1024,9 +1026,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     ) {
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
-        val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
+        val dialogBinding = ProxyEditorState(this)
         val builder =
-            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
+            MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setContent { NetworkContent(dialogBinding.layout, scrollContainer = false) }
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -1041,21 +1043,21 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         // otherwise stretch the dialog edge-to-edge on foldables/tablets.
         UIUtils.capDialogWidth(dialog)
 
-        val headerTxt: TextView = dialogBinding.dialogProxyHeader
-        val headerDesc: TextView = dialogBinding.dialogProxyHeaderDesc
-        val lockdownDesc: TextView = dialogBinding.dialogProxyHeaderLockdownDesc
+        val headerTxt: WgControlState = dialogBinding.dialogProxyHeader
+        val headerDesc: WgControlState = dialogBinding.dialogProxyHeaderDesc
+        val lockdownDesc: WgControlState = dialogBinding.dialogProxyHeaderLockdownDesc
         val applyURLBtn = dialogBinding.dialogProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
-        val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
-        val ipAddressEditText: EditText = dialogBinding.dialogProxyEditIp
-        val portLl: LinearLayout = dialogBinding.dialogProxyPortHeader
-        val portEditText: EditText = dialogBinding.dialogProxyEditPort
-        val errorTxt: TextView = dialogBinding.dialogProxyErrorText
-        val userNameLl: LinearLayout = dialogBinding.dialogProxyUsernameHeader
-        val passwordLl: LinearLayout = dialogBinding.dialogProxyPasswordHeader
-        val udpBlockLl: LinearLayout = dialogBinding.dialogProxyUdpHeader
-        val excludeAppLayout: LinearLayout = dialogBinding.dialogProxyExcludeAppsHeader
-        val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
+        val appNameSpinner: NetworkSpinnerState = dialogBinding.dialogProxySpinnerAppname
+        val ipAddressEditText: WgControlState = dialogBinding.dialogProxyEditIp
+        val portLl: WgControlState = dialogBinding.dialogProxyPortHeader
+        val portEditText: WgControlState = dialogBinding.dialogProxyEditPort
+        val errorTxt: WgControlState = dialogBinding.dialogProxyErrorText
+        val userNameLl: WgControlState = dialogBinding.dialogProxyUsernameHeader
+        val passwordLl: WgControlState = dialogBinding.dialogProxyPasswordHeader
+        val udpBlockLl: WgControlState = dialogBinding.dialogProxyUdpHeader
+        val excludeAppLayout: WgControlState = dialogBinding.dialogProxyExcludeAppsHeader
+        val excludeAppCheckBox: WgControlState = dialogBinding.dialogProxyExcludeAppsCheck
 
         // do not show the UDP block option for HTTP proxy
         udpBlockLl.visibility = View.GONE
@@ -1083,9 +1085,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             )
         }
 
-        val proxySpinnerAdapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
-        appNameSpinner.adapter = proxySpinnerAdapter
+        appNameSpinner.items = appNames
         if (!endpoint.proxyIP.isNullOrBlank()) {
             ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
             portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
