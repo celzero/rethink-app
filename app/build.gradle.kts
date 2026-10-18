@@ -1,8 +1,7 @@
 import com.android.build.api.variant.FilterConfiguration
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 import java.lang.reflect.Method
 
 plugins {

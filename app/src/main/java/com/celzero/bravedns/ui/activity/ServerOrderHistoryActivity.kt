@@ -15,13 +15,10 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
@@ -29,7 +26,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ServerOrderHistoryAdapter
 import com.celzero.bravedns.databinding.ActivityServerOrderHistoryBinding
@@ -39,6 +35,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.bottomsheet.EntitlementDetailBottomSheet
+import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.isActivityLightTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -46,13 +45,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ServerOrderHistoryViewModel
 import com.facebook.shimmer.Shimmer
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
-import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 
 /**
  * Shows the user's raw purchase / order records fetched live from the billing

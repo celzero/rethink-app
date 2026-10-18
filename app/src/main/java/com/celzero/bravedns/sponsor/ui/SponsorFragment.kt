@@ -22,7 +22,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentSponsorBinding
 import com.celzero.bravedns.sponsor.billing.SponsorPurchaseResult
@@ -31,6 +30,7 @@ import com.celzero.bravedns.sponsor.viewmodel.SponsorViewModel
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
