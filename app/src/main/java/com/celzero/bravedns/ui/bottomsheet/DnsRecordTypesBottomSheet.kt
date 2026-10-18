@@ -21,21 +21,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomSheetDnsRecordTypesBinding
-import com.celzero.bravedns.databinding.ItemDnsRecordTypeBinding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.about.DnsRecordTypesState
+import com.celzero.bravedns.ui.compose.about.DnsRecordTypesContent
+import com.celzero.bravedns.ui.compose.about.DnsRecordRowState
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.google.android.material.button.MaterialButton
 import org.koin.android.ext.android.inject
 
 class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetDnsRecordTypesBinding? = null
+    private var _binding: DnsRecordTypesState? = null
     private val b
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
@@ -59,8 +61,12 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetDnsRecordTypesBinding.inflate(inflater, container, false)
-        return b.root
+        val state = DnsRecordTypesState(inflater.context)
+        _binding = state
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DnsRecordTypesContent(state) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,6 +82,16 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
         super.onDismiss(dialog)
         // Notify parent fragment to update UI
         parentFragmentManager.setFragmentResult("dns_record_types_updated", android.os.Bundle())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        _binding?.saveMode(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) b.restoreMode(savedInstanceState)
     }
 
     override fun onDestroyView() {
@@ -119,8 +135,7 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
         })
 
         adapter = DnsRecordTypesAdapter(sortedTypes, manuallySelectedTypes, isAutoMode)
-        b.drbsRecycler.layoutManager = LinearLayoutManager(requireContext())
-        b.drbsRecycler.adapter = adapter
+        adapter.notifyDataSetChanged()
 
         // Update UI based on Auto mode state
         updateAutoModeUI(isAutoMode, animate = false)
@@ -129,11 +144,11 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
     private fun setupAutoModeCard() {
         // Set initial checked button based on mode
         if (isAutoMode) {
-            b.drbsModeToggleGroup.check(b.drbsAutoModeBtn.id)
+            b.drbsModeToggleGroup.check(R.id.drbs_auto_mode_btn)
             selectToggleBtnUi(b.drbsAutoModeBtn)
             unselectToggleBtnUi(b.drbsManualModeBtn)
         } else {
-            b.drbsModeToggleGroup.check(b.drbsManualModeBtn.id)
+            b.drbsModeToggleGroup.check(R.id.drbs_manual_mode_btn)
             selectToggleBtnUi(b.drbsManualModeBtn)
             unselectToggleBtnUi(b.drbsAutoModeBtn)
         }
@@ -143,7 +158,7 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             when (checkedId) {
-                b.drbsAutoModeBtn.id -> {
+                R.id.drbs_auto_mode_btn -> {
                     // Switch to Auto mode
                     isAutoMode = true
                     selectToggleBtnUi(b.drbsAutoModeBtn)
@@ -153,7 +168,7 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
                     adapter.updateAutoMode(true)
                     adapter.notifyDataSetChanged()
                 }
-                b.drbsManualModeBtn.id -> {
+                R.id.drbs_manual_mode_btn -> {
                     // Switch to Manual mode
                     isAutoMode = false
                     selectToggleBtnUi(b.drbsManualModeBtn)
@@ -168,50 +183,29 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun selectToggleBtnUi(b: MaterialButton) {
+    private fun selectToggleBtnUi(b: WgControlState) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.accentGood))
         b.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(b: MaterialButton) {
+    private fun unselectToggleBtnUi(b: WgControlState) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg))
         b.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
     }
 
     private fun updateAutoModeUI(autoMode: Boolean, animate: Boolean) {
-        if (autoMode) {
-            // Auto mode is ACTIVE - dim and disable manual section
-            if (animate) {
-                b.drbsManualSection.animate()
-                    .alpha(0.4f)
-                    .setDuration(200)
-                    .start()
-            } else {
-                b.drbsManualSection.alpha = 0.4f
-            }
-            b.drbsManualSection.isEnabled = false
-
-        } else {
-            // Manual mode is ACTIVE - enable manual section
-            if (animate) {
-                b.drbsManualSection.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
-            } else {
-                b.drbsManualSection.alpha = 1f
-            }
-            b.drbsManualSection.isEnabled = true
-        }
+        b.animateMode = animate
+        b.drbsManualSection.alpha = if (autoMode) 0.4f else 1f
+        b.drbsManualSection.isEnabled = !autoMode
     }
 
     inner class DnsRecordTypesAdapter(
         private var types: List<ResourceRecordTypes>,
         private val selected: MutableSet<String>,
         private var autoMode: Boolean
-    ) : RecyclerView.Adapter<DnsRecordTypesAdapter.ViewHolder>() {
+    ) {
 
         fun updateAutoMode(newAutoMode: Boolean) {
             autoMode = newAutoMode
@@ -230,72 +224,29 @@ class DnsRecordTypesBottomSheet : BaseBottomSheetDialogFragment() {
             })
         }
 
-        inner class ViewHolder(private val itemBinding: ItemDnsRecordTypeBinding) :
-            RecyclerView.ViewHolder(itemBinding.root) {
+        fun notifyDataSetChanged() {
+            b.rows = types.map { type ->
+                DnsRecordRowState(type.name, type.desc,
+                    selected = autoMode || selected.contains(type.name), locked = autoMode,
+                    onSelect = {
+                        if (!autoMode) {
+                            val isChecked = !selected.contains(type.name)
+                            if (isChecked) {
+                                selected.add(type.name)
+                            } else {
+                                selected.remove(type.name)
+                            }
 
-            fun bind(type: ResourceRecordTypes, isLocked: Boolean) {
-                itemBinding.itemDnsRecordTypeName.text = type.name
-                itemBinding.itemDnsRecordTypeDesc.text = type.desc
+                            // Save manual selection
+                            persistentState.setAllowedDnsRecordTypes(selected)
 
-                if (isLocked) {
-                    // Auto mode - all items are checked and locked
-                    itemBinding.itemDnsRecordTypeCheckbox.isChecked = true
-                    itemBinding.itemDnsRecordTypeCheckbox.isEnabled = false
-                    itemBinding.root.isClickable = false
-                    itemBinding.root.alpha = 0.6f
-
-                    // Disable ripple effect
-                    itemBinding.root.background = null
-                } else {
-                    // Manual mode - items are selectable
-                    itemBinding.itemDnsRecordTypeCheckbox.isChecked = selected.contains(type.name)
-                    itemBinding.itemDnsRecordTypeCheckbox.isEnabled = true
-                    itemBinding.root.isClickable = true
-                    itemBinding.root.alpha = 1f
-
-                    // Re-enable ripple effect
-                    val typedValue = android.util.TypedValue()
-                    itemBinding.root.context.theme.resolveAttribute(
-                        android.R.attr.selectableItemBackground,
-                        typedValue,
-                        true
-                    )
-                    itemBinding.root.setBackgroundResource(typedValue.resourceId)
-
-                    itemBinding.root.setOnClickListener {
-                        val isChecked = !itemBinding.itemDnsRecordTypeCheckbox.isChecked
-                        itemBinding.itemDnsRecordTypeCheckbox.isChecked = isChecked
-
-                        if (isChecked) {
-                            selected.add(type.name)
-                        } else {
-                            selected.remove(type.name)
+                            // Re-sort and refresh the list to show selected items at top
+                            sortBySelection()
+                            notifyDataSetChanged()
                         }
-
-                        // Save manual selection
-                        persistentState.setAllowedDnsRecordTypes(selected)
-
-                        // Re-sort and refresh the list to show selected items at top
-                        sortBySelection()
-                        notifyDataSetChanged()
                     }
-                }
+                )
             }
         }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = ItemDnsRecordTypeBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-            return ViewHolder(binding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(types[position], autoMode)
-        }
-
-        override fun getItemCount(): Int = types.size
     }
 }
