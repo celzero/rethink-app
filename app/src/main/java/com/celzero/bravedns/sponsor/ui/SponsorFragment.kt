@@ -17,27 +17,48 @@ package com.celzero.bravedns.sponsor.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentSponsorBinding
 import com.celzero.bravedns.sponsor.billing.SponsorPurchaseResult
 import com.celzero.bravedns.sponsor.viewmodel.SponsorUiState
 import com.celzero.bravedns.sponsor.viewmodel.SponsorViewModel
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class SponsorFragment : Fragment(R.layout.fragment_sponsor) {
+class SponsorFragment : Fragment() {
 
-    private val b by viewBinding(FragmentSponsorBinding::bind)
+    private lateinit var b: SponsorUiStateModel
     private val viewModel: SponsorViewModel by inject()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = SponsorUiStateModel(requireContext())
+        return ComposeView(requireContext()).apply {
+            id = R.id.sponsor_scroll_view
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { SponsorScreen(b) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (::b.isInitialized) saveUtilityControls(outState, b.savedControls)
+        super.onSaveInstanceState(outState)
+    }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        restoreUtilityControls(savedInstanceState, b.savedControls)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
