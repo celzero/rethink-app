@@ -15,189 +15,52 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DohEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
-import com.celzero.bravedns.databinding.FragmentDohListBinding
-import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dns.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import java.net.MalformedURLException
 import java.net.URL
 
-class DohListFragment : Fragment(R.layout.fragment_doh_list) {
-    private val b by viewBinding(FragmentDohListBinding::bind)
-
+class DohListFragment : Fragment() {
     private val appConfig by inject<AppConfig>()
-
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var dohRecyclerAdapter: DohEndpointAdapter? = null
     private val viewModel: DoHEndpointViewModel by viewModel()
+    companion object { fun newInstance() = DohListFragment() }
 
-    companion object {
-        fun newInstance() = DohListFragment()
-
-        private val dpToPx: Float by lazy {
-            Resources.getSystem().displayMetrics.density
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
-
-        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        initClickListeners()
-        applyEdgeToEdge()
-    }
-
-    private fun initView() {
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerDohConnections.layoutManager = layoutManager
-        b.recyclerDohConnections.addItemDecoration(
-            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
-        )
-
-        dohRecyclerAdapter = DohEndpointAdapter(requireContext(), get())
-        viewModel.dohEndpointList.observe(viewLifecycleOwner) {
-            dohRecyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-        b.recyclerDohConnections.adapter = dohRecyclerAdapter
-
-        dohRecyclerAdapter!!.addLoadStateListener { loadStates ->
-            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
-                    dohRecyclerAdapter!!.itemCount == 0
-            val isLoading = loadStates.source.refresh is LoadState.Loading
-
-            b.dohEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
-            b.dohLoadingIndicator.visibility = if (isLoading && dohRecyclerAdapter!!.itemCount == 0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            b.recyclerDohConnections.visibility = if (isLoading && dohRecyclerAdapter!!.itemCount == 0) {
-                View.GONE
-            } else {
-                View.VISIBLE
-            }
-        }
-    }
-
-    private fun initClickListeners() {
-        // see CustomIpFragment#setupClickListeners#bringToFront()
-        b.dohFabAddServerIcon.bringToFront()
-        b.dohFabAddServerIcon.setOnClickListener { showAddCustomDohDialog() }
-    }
-
-    private fun applyEdgeToEdge() {
-        // absolute padding from a captured base so repeated inset dispatches stay idempotent
-        val basePaddingBottom = b.recyclerDohConnections.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDohConnections) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
-                basePaddingBottom + systemBars.bottom
-            )
-            insets
-        }
-        // some OEMs skip the initial inset dispatch on attach
-        ViewCompat.requestApplyInsets(b.recyclerDohConnections)
-    }
-
-    /**
-     * Shows dialog for custom DNS endpoint configuration If entered DNS end point is valid, then
-     * the DNS queries are forwarded to that end point else, it will revert back to default end
-     * point
-     */
-    private fun showAddCustomDohDialog() {
-        val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        // resize the dialog when the keyboard opens, so that the buttons
-        // remain visible on smaller screens (instead of panning the window)
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val heading = dialogBinding.dialogCustomUrlTop
-        val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
-        val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
-        val customName = dialogBinding.dialogCustomNameEditText
-        val customURL = dialogBinding.dialogCustomUrlEditText
-        val customIp = dialogBinding.dialogCustomIpEditText
-        val progressBar = dialogBinding.dialogCustomUrlLoading
-        val errorTxt = dialogBinding.dialogCustomUrlFailureText
-        val checkBox = dialogBinding.dialogSecureCheckbox
-
-        heading.text = getString(R.string.cd_doh_dialog_heading)
-
-        // fetch the count from repository and increment by 1 to show the
-        // next doh name in the dialog
-        io {
-            val nextIndex = appConfig.getDohCount().plus(1)
-            uiCtx {
-                customName.setText(
-                    getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
-                    TextView.BufferType.EDITABLE
-                )
-            }
-        }
-
-        customName.setText(
-            getString(R.string.cd_custom_doh_url_name_default),
-            TextView.BufferType.EDITABLE
-        )
-        applyURLBtn.setOnClickListener {
-            val url = customURL.text.toString()
-            val name = customName.text.toString()
-            val ip = customIp.text?.toString()?.trim().orEmpty()
-            val isSecure = !checkBox.isChecked
-
-            if (checkUrl(url)) {
-                insertDoHEndpoint(name, url, ip, isSecure)
-                dialog.dismiss()
-            } else {
-                errorTxt.text = resources.getString(R.string.custom_url_error_invalid_url)
-                errorTxt.visibility = View.VISIBLE
-                cancelURLBtn.visibility = View.VISIBLE
-                applyURLBtn.visibility = View.VISIBLE
-                progressBar.visibility = View.INVISIBLE
-            }
-        }
-
-        cancelURLBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        val owner = viewLifecycleOwner
+        (view as ComposeView).setContent { RethinkTheme {
+            val presenter = remember(owner) { DnsEndpointPresenter(requireContext(), owner, appConfig) }
+            // Ordinary dialogs are transient; recreation dismisses them as in the baseline.
+            var adding by remember { mutableStateOf(false) }
+            DnsEndpointScreen(viewModel.dohEndpointList, presenter::doh, R.string.doh_empty_state_title, R.string.doh_empty_state_desc, { adding = true })
+            if (adding) DnsServerEditor(DnsServerKind.DOH, { getString(R.string.cd_custom_doh_url_name, appConfig.getDohCount().plus(1).toString()) },
+                onApply = { name, url, ip, _, secure ->
+                        if (checkUrl(url)) { insertDoHEndpoint(name, url, ip, secure); adding = false; null }
+                        else getString(R.string.custom_url_error_invalid_url)
+                }, onDismiss = { adding = false })
+        } }
     }
 
     private fun insertDoHEndpoint(name: String, url: String, ip: String, isSecure: Boolean) {
@@ -225,8 +88,6 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         }
     }
 
-    // Check that the URL is a plausible DOH server: https with a domain, a path (at least "/"),
-    // and no query parameters or fragment.
     private fun checkUrl(url: String): Boolean {
         return try {
             val parsed = URL(url)
@@ -244,11 +105,4 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            if (isAdded && view != null) {
-                f()
-            }
-        }
-    }
 }

@@ -15,262 +15,119 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import android.widget.ArrayAdapter
-import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dns.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.compose.material3.*
+import androidx.compose.ui.res.stringResource
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
-import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
-    private val b by viewBinding(FragmentDnsProxyListBinding::bind)
-
+class DnsProxyListFragment : Fragment() {
     private val appConfig by inject<AppConfig>()
     private val rdb by inject<RefreshDatabase>()
     private val persistentState by inject<PersistentState>()
-
-    private lateinit var dnsProxyRecyclerAdapter: DnsProxyEndpointAdapter
-    private var dnsProxyLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsProxyViewModel: DnsProxyEndpointViewModel by viewModel()
+    companion object { fun newInstance() = DnsProxyListFragment() }
 
-    companion object {
-        fun newInstance() = DnsProxyListFragment()
-
-        private val dpToPx: Float by lazy {
-            Resources.getSystem().displayMetrics.density
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
-
-        private val spacing4dp: Int by lazy { (4 * dpToPx).toInt() }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
-        initClickListeners()
-        applyEdgeToEdge()
-    }
-
-    private fun init() {
-        dnsProxyLayoutManager = LinearLayoutManager(requireContext())
-        b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
-        b.recyclerDnsProxyConnections.addItemDecoration(
-            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
-        )
-
-        dnsProxyRecyclerAdapter =
-            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get(), persistentState)
-        dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
-            dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-        b.recyclerDnsProxyConnections.adapter = dnsProxyRecyclerAdapter
-
-        dnsProxyRecyclerAdapter.addLoadStateListener { loadStates ->
-            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
-                    dnsProxyRecyclerAdapter.itemCount == 0
-            val isLoading = loadStates.source.refresh is LoadState.Loading
-
-            b.dnsProxyEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
-            b.dnsProxyLoadingIndicator.visibility = if (isLoading && dnsProxyRecyclerAdapter.itemCount == 0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            b.recyclerDnsProxyConnections.visibility = if (isLoading && dnsProxyRecyclerAdapter.itemCount == 0) {
-                View.GONE
-            } else {
-                View.VISIBLE
-            }
-        }
-    }
-
-    private fun initClickListeners() {
-        b.dohFabAddServerIcon.bringToFront()
-        b.dohFabAddServerIcon.setOnClickListener {
-            io {
-                // initiate the refresh database, so that newly added apps can be listed
-                rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
-                val appNames: MutableList<String> = ArrayList()
-                appNames.add(getString(R.string.settings_app_list_default_app))
-                appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(requireContext()))
-                // fetch the count from repository and increment by 1 to show the
-                // next doh name in the dialog
-                val nextIndex = appConfig.getDnsProxyCount().plus(1)
-                uiCtx { showAddDnsProxyDialog(appNames, nextIndex) }
-            }
-        }
-    }
-
-    private fun applyEdgeToEdge() {
-        // absolute padding from a captured base so repeated inset dispatches stay idempotent
-        val basePaddingBottom = b.recyclerDnsProxyConnections.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDnsProxyConnections) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
-                basePaddingBottom + systemBars.bottom
-            )
-            insets
-        }
-        // some OEMs skip the initial inset dispatch on attach
-        ViewCompat.requestApplyInsets(b.recyclerDnsProxyConnections)
-    }
-
-    private fun showAddDnsProxyDialog(appNames: List<String>, nextIndex: Int) {
-        val dialogBinding = DialogSetDnsProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        // resize the dialog when the keyboard opens, so that the buttons
-        // remain visible on smaller screens (instead of panning the window)
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn
-        val cancelURLBtn = dialogBinding.dialogDnsProxyCancelBtn
-        val lockdownDesc = dialogBinding.dialogDnsProxyLockdownDesc
-        val proxyNameEditText = dialogBinding.dialogDnsProxyEditName
-        val appNameSpinner = dialogBinding.dialogProxySpinnerAppname
-        val ipAddressEditText = dialogBinding.dialogDnsProxyEditIp
-        val portEditText = dialogBinding.dialogDnsProxyEditPort
-        val errorTxt = dialogBinding.dialogDnsProxyErrorText
-        val excludeAppCheckBox = dialogBinding.dialogDnsProxyExcludeAppsCheck
-
-        excludeAppCheckBox.isChecked = !persistentState.excludeAppsInProxy
-        excludeAppCheckBox.isEnabled = !VpnController.isVpnLockdown()
-        lockdownDesc.visibility = if (VpnController.isVpnLockdown()) View.VISIBLE else View.GONE
-        if (VpnController.isVpnLockdown()) {
-            excludeAppCheckBox.alpha = 0.5f
-        }
-        proxyNameEditText.setText(
-            getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
-            TextView.BufferType.EDITABLE
-        )
-        ipAddressEditText.setText(
-            getString(R.string.cd_custom_dns_proxy_default_ip),
-            TextView.BufferType.EDITABLE
-        )
-        val proxySpinnerAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
-        appNameSpinner.adapter = proxySpinnerAdapter
-
-        lockdownDesc.setOnClickListener {
-            dialog.dismiss()
-            UIUtils.openVpnProfile(requireContext())
-        }
-
-        applyURLBtn.setOnClickListener {
-            var port = 0
-            var isPortValid: Boolean
-            val name = proxyNameEditText.text.toString()
-            val mode = getString(R.string.cd_dns_proxy_mode_external)
-            val ipInput = ipAddressEditText.text.toString()
-
-            val appName = appNameSpinner.selectedItem.toString()
-
-            // Split comma-separated IP addresses and trim whitespace
-            val ipAddresses = ipInput.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-
-            if (ipAddresses.isEmpty()) {
-                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1)
-                return@setOnClickListener
-            }
-
-            // Validate all IP addresses (both IPv4 and IPv6)
-            val invalidIps = mutableListOf<String>()
-            val validIps = mutableListOf<String>()
-
-            for (ip in ipAddresses) {
-                if (IPAddressString(ip).isIPAddress) {
-                    validIps.add(ip)
-                } else {
-                    invalidIps.add(ip)
-                }
-            }
-
-            if (invalidIps.isNotEmpty()) {
-                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1) + ": ${invalidIps.joinToString(", ")}"
-                return@setOnClickListener
-            }
-
-            try {
-                port = portEditText.text.toString().toInt() // can cause NumberFormatException
-
-                // Validate port for each valid IP (check if LAN IP)
-                isPortValid = true
-                for (ip in validIps) {
-                    if (Utilities.isLanIpv4(ip)) {
-                        if (!Utilities.isValidLocalPort(port)) {
-                            isPortValid = false
-                            break
-                        }
+        val owner = viewLifecycleOwner
+        (view as ComposeView).setContent { RethinkTheme {
+            val presenter = remember(owner) { DnsEndpointPresenter(requireContext(), owner, appConfig, persistentState) }
+            var adding by remember { mutableStateOf(false) }
+            var appNames by remember { mutableStateOf<List<String>>(emptyList()) }
+            var initialName by remember { mutableStateOf("") }
+            DnsEndpointScreen(dnsProxyViewModel.dnsProxyEndpointList, presenter::proxy,
+                R.string.dns_proxy_empty_state_title, R.string.dns_proxy_empty_state_desc,
+                { appNames = emptyList(); adding = true })
+            if (adding) {
+                LaunchedEffect(Unit) {
+                    val result = withContext(Dispatchers.IO) {
+                        rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
+                        val names = mutableListOf(getString(R.string.settings_app_list_default_app))
+                        names.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(requireContext()))
+                        names.toList() to appConfig.getDnsProxyCount().plus(1)
                     }
+                    initialName = getString(R.string.cd_custom_dns_proxy_name, result.second.toString())
+                    appNames = result.first
                 }
-
-                if (!isPortValid) {
-                    errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
-                }
-            } catch (e: NumberFormatException) {
-                Logger.w(Logger.LOG_TAG_UI, "Error: ${e.message}", e)
-                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
-                isPortValid = false
+                if (appNames.isNotEmpty()) DnsProxyEditor(appNames, initialName,
+                    !persistentState.excludeAppsInProxy, VpnController.isVpnLockdown(),
+                    onVpnSettings = { adding = false; UIUtils.openVpnProfile(requireContext()) },
+                    onApply = { name, app, ips, port, forwardApps ->
+                        val error = applyProxy(name, app, ips, port, forwardApps)
+                        if (error == null) adding = false
+                        error
+                    }, onDismiss = { adding = false })
             }
+        } }
+    }
 
-            if (isPortValid && validIps.isNotEmpty()) {
-                // Store all valid IPs as comma-separated string in one endpoint
-                val ipString = validIps.joinToString(",")
-                Logger.d(Logger.LOG_TAG_UI, "new values inserted into DNSProxy: $name with ${validIps.size} IPs")
-                io {
-                    insertDNSProxyEndpointDB(mode, name, appName, ipString, port)
-                }
-                persistentState.excludeAppsInProxy = !excludeAppCheckBox.isChecked
-                dialog.dismiss()
-            } else {
-                Logger.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
-            }
+    private fun applyProxy(name: String, appName: String, ipInput: String, portInput: String, forwardApps: Boolean): String? {
+        var port = 0
+        var isPortValid: Boolean
+        var error: String? = null
+        val mode = getString(R.string.cd_dns_proxy_mode_external)
+        val ipAddresses = ipInput.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        if (ipAddresses.isEmpty()) return getString(R.string.cd_dns_proxy_error_text_1)
+        val invalidIps = mutableListOf<String>()
+        val validIps = mutableListOf<String>()
+        for (ip in ipAddresses) {
+            if (IPAddressString(ip).isIPAddress) validIps.add(ip) else invalidIps.add(ip)
         }
-
-        cancelURLBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        if (invalidIps.isNotEmpty()) return getString(R.string.cd_dns_proxy_error_text_1) + ": ${invalidIps.joinToString(", ")}"
+        try {
+            port = portInput.toInt()
+            isPortValid = true
+            for (ip in validIps) {
+                if (Utilities.isLanIpv4(ip)) {
+                    if (!Utilities.isValidLocalPort(port)) { isPortValid = false; break }
+                }
+            }
+            if (!isPortValid) error = getString(R.string.cd_dns_proxy_error_text_2)
+        } catch (e: NumberFormatException) {
+            Logger.w(Logger.LOG_TAG_UI, "Error: ${e.message}", e)
+            error = getString(R.string.cd_dns_proxy_error_text_3)
+            isPortValid = false
+        }
+        if (isPortValid && validIps.isNotEmpty()) {
+            val ipString = validIps.joinToString(",")
+            Logger.d(Logger.LOG_TAG_UI, "new values inserted into DNSProxy: $name with ${validIps.size} IPs")
+            io { insertDNSProxyEndpointDB(mode, name, appName, ipString, port) }
+            persistentState.excludeAppsInProxy = !forwardApps
+            return null
+        }
+        Logger.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
+        return error
     }
 
     private suspend fun insertDNSProxyEndpointDB(
@@ -318,11 +175,4 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            if (isAdded && view != null) {
-                f()
-            }
-        }
-    }
 }
