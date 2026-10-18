@@ -148,6 +148,7 @@ internal val originalCompoundSpecs = mapOf(
     "fragment_dns_configure:dc_prevent_dns_leaks_switch" to OriginalCompoundSpec(R.style.OriginalCompound_fragment_dns_configure_dc_prevent_dns_leaks_switch, OriginalCompoundKind.MaterialSwitch, 0f, 0f, false),
     "fragment_dns_configure:dc_block_unknown_switch" to OriginalCompoundSpec(R.style.OriginalCompound_fragment_dns_configure_dc_block_unknown_switch, OriginalCompoundKind.MaterialSwitch, 0f, 0f, false),
     "fragment_dns_configure:dc_undelegated_domains_switch" to OriginalCompoundSpec(R.style.OriginalCompound_fragment_dns_configure_dc_undelegated_domains_switch, OriginalCompoundKind.MaterialSwitch, 0f, 0f, false),
+    "fragment_dns_configure:dc_captive_portal_switch" to OriginalCompoundSpec(R.style.OriginalCompound_fragment_dns_configure_dc_undelegated_domains_switch, OriginalCompoundKind.MaterialSwitch, 0f, 0f, false),
     "item_bug_report_file:item_file_checkbox" to OriginalCompoundSpec(R.style.OriginalCompound_item_bug_report_file_item_file_checkbox, OriginalCompoundKind.AppCompatCheckBox, 0f, 0f, false),
     "item_dns_record_type:item_dns_record_type_checkbox" to OriginalCompoundSpec(R.style.OriginalCompound_item_dns_record_type_item_dns_record_type_checkbox, OriginalCompoundKind.AppCompatCheckBox, 0f, 0f, false),
     "item_network_policy:radioButton" to OriginalCompoundSpec(R.style.OriginalCompound_item_network_policy_radioButton, OriginalCompoundKind.AppCompatRadioButton, 0f, 0f, false),

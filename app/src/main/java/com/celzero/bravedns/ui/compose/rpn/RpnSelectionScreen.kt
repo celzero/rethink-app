@@ -128,11 +128,6 @@ fun RpnSelectionScreen(ui: RpnSelectionState, anchors: HomeTourAnchors) {
                     Text(stringResource(R.string.server_selection_tap_to_select), Modifier.padding(top = 12.dp), fontSize = 16.sp)
                     Text(stringResource(R.string.server_selection_max_info), Modifier.padding(top = 6.dp).alpha(.7f), fontSize = 11.sp)
                 } }
-                if (ui.locationCapacityIndicator.isVisible) Row(Modifier.fillMaxWidth().rpnMotion(ui.locationCapacityIndicator).padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally)) {
-                    listOf(ui.capacityDotOne, ui.capacityDotTwo, ui.capacityDotThree, ui.capacityDotFour, ui.capacityDotFive).forEach { dot ->
-                        Box(Modifier.size(16.dp, 6.dp).rpnMotion(dot).background(dot.backgroundTintList?.defaultColor?.let(::Color) ?: themeColor(R.attr.accentGood), RoundedCornerShape(3.dp)))
-                    }
-                }
                 if (ui.searchCard.isVisible) OriginalCardSurface(
                     Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 10.dp)
                         .onGloballyPositioned { searchY = it.positionInParent().y.toInt() }.rpnMotion(ui.searchCard),

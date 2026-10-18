@@ -18,11 +18,6 @@ class RpnSelectionState(context: Context) {
     var focusSearchRequest by mutableStateOf(0)
     var onHeatmapTap: (Float, Float) -> Unit = { _, _ -> }
     val avatarRow = RpnControlState()
-    val capacityDotFive = RpnControlState() .apply { alpha = 0.25f ; backgroundTintList = android.content.res.ColorStateList.valueOf(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.primaryLightColorText)) }
-    val capacityDotFour = RpnControlState() .apply { alpha = 0.25f ; backgroundTintList = android.content.res.ColorStateList.valueOf(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.primaryLightColorText)) }
-    val capacityDotOne = RpnControlState() .apply { backgroundTintList = android.content.res.ColorStateList.valueOf(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.accentGood)) }
-    val capacityDotThree = RpnControlState() .apply { backgroundTintList = android.content.res.ColorStateList.valueOf(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.accentGood)) }
-    val capacityDotTwo = RpnControlState() .apply { backgroundTintList = android.content.res.ColorStateList.valueOf(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.accentGood)) }
     val emptySelectionCard = RpnControlState()
     val errorHint = RpnControlState() .apply { text = context.getString(R.string.server_selection_error_hint); alpha = 0.8f ; setTextColor(com.celzero.bravedns.util.UIUtils.fetchColor(context, R.attr.primaryLightColorText)); textSizeSp = 14f }
     val errorIllustration = RpnControlState() .apply { contentDescription = context.getString(R.string.server_selection_error_title); setImageResource(R.drawable.dolphin_sad_1) }
@@ -36,7 +31,6 @@ class RpnSelectionState(context: Context) {
     val frequentChipGroup = RpnControlState()
     val frequentCountriesSection = RpnControlState() .apply { visibility = View.GONE }
     val fxOverlay = RpnControlState() .apply { isClickable = false; isFocusable = false }
-    val locationCapacityIndicator = RpnControlState()
     val locationContent = RpnControlState()
     val qsBypassAppsState = RpnControlState()
     val qsBypassAppsTile = RpnControlState() .apply { isClickable = true; isFocusable = true }

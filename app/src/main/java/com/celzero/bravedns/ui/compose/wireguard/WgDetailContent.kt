@@ -88,6 +88,7 @@ import com.celzero.bravedns.R
                 }
                 WgCard(b.mobileSsidSettingsCard, contentPadding = PaddingValues(bottom = 20.dp)) {
                     WgText(b.msWgHeaderTv)
+                    if (b.msWgTaskerManagedTv.isVisible) WgText(b.msWgTaskerManagedTv, Modifier.padding(horizontal = 15.dp).padding(top = 4.dp))
                     WgSetting("use_mobile_check", b.useMobileRl, b.useMobileTitleTv, stringResource(R.string.wg_setting_use_on_mobile_desc), b.useMobileCheck)
                     WgSetting("ssid_check", b.ssidFilterRl, b.ssidTitleTv, b.ssidDescTv.text.toString(), b.ssidCheck)
                     if (b.ssidEditGroup.isVisible) Row {

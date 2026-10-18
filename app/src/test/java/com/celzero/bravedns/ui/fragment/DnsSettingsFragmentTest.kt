@@ -16,6 +16,9 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [35], application = Application::class, qualifiers = "en-rUS-w360dp-h800dp")
 class DnsSettingsFragmentTest : SafeDnsHostTest() {
+    @Test fun captivePortalPreferenceRemainsAvailableAfterMigration() {
+        compose.onNodeWithTag("dns-switch-dcCaptivePortalRl").performScrollTo().assertIsOff()
+    }
     @Test fun testDnsSettingsDisplay() {
         compose.onNodeWithTag("dns-choice-network").performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("dns-choice-custom").performScrollTo().assertIsDisplayed()

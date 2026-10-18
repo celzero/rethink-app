@@ -1020,7 +1020,6 @@ class ServerSelectionFragment : Fragment(),
             ui.emptySelectionCard.isVisible = false
             ui.rvSelectedServers.isVisible = false
             ui.frequentCountriesSection.isVisible = false
-            ui.locationCapacityIndicator.isVisible = false
             ui.errorStateContainer.isVisible = false
 
             // Disable search bar and action icons while data is loading
@@ -1509,103 +1508,6 @@ class ServerSelectionFragment : Fragment(),
     private fun isLightTheme(): Boolean =
         (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) !=
             Configuration.UI_MODE_NIGHT_YES
-
-    /**
-     * Updates the minimalist "N of M" capacity indicator: the capacity
-     * pills below the connection list mirror the number of active
-     * (non-AUTO) locations visually.
-     */
-    private fun updateCapacityIndicator() {
-        if (!isAdded) return
-        val filled = selectedServers.count { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
-            .coerceIn(0, MAX_SELECTIONS)
-        if (!isLoading && !isProxyStopped) {
-            if (!ui.locationCapacityIndicator.isVisible) {
-                animateSectionIn(ui.locationCapacityIndicator, forceShow = true)
-            }
-        } else {
-            ui.locationCapacityIndicator.isVisible = false
-        }
-        val dots = listOf(
-            ui.capacityDotOne, ui.capacityDotTwo, ui.capacityDotThree,
-            ui.capacityDotFour, ui.capacityDotFive
-        )
-        dots.forEachIndexed { index, dot ->
-            if (index < filled) {
-                dot.alpha = 1f
-                dot.backgroundTintList =
-                    ColorStateList.valueOf(resolveAttrColor(R.attr.accentGood))
-            } else {
-                // Theme-aware "empty" tint: white is invisible on the light theme's
-                // background, so use the adaptive on-surface-variant color instead.
-                dot.alpha = 0.25f
-                dot.backgroundTintList =
-                    ColorStateList.valueOf(resolveAttrColor(R.attr.primaryLightColorText))
-            }
-        }
-        // Pop the newly-filled pill when a location was added (never on load,
-        // removal, or when the scale itself is hidden). lastFilledCapacity is
-        // -1 right after a (re)load, suppressing the pop until the next user
-        // action changes the count.
-        if (lastFilledCapacity in 0..<filled &&
-            filled in 1..dots.size &&
-            ui.locationCapacityIndicator.isVisible &&
-            !isLoading
-        ) {
-            popCapacityDot(dots[filled - 1])
-            emitCapacityBubbles(dots[filled - 1])
-        }
-        lastFilledCapacity = filled
-    }
-
-    /** Small overshoot pop on a capacity pill that just filled. */
-    private fun popCapacityDot(dot: RpnControlState) {
-        if (isReducedMotionPreferred()) return
-        dot.animate().cancel()
-        dot.scaleX = 0.4f
-        dot.scaleY = 0.4f
-        dot.animate()
-            .scaleX(1f).scaleY(1f)
-            .setDuration(260)
-            .setInterpolator(OvershootInterpolator(1.6f))
-            .start()
-    }
-
-    /**
-     * Emits a couple of tiny accent bubbles that drift up and fade from a
-     * just-filled capacity pill.
-     */
-    private fun emitCapacityBubbles(dot: RpnControlState) {
-        if (isReducedMotionPreferred()) return
-        val overlay = ui.fxOverlay
-        if (overlay.width <= 0 || overlay.height <= 0) return
-        val color = resolveAttrColor(R.attr.accentGood)
-        val loc = IntArray(2)
-        dot.getLocationInWindow(loc)
-        val rootLoc = IntArray(2)
-        overlay.getLocationInWindow(rootLoc)
-        val baseX = loc[0] + dot.width / 2f - rootLoc[0]
-        val baseY = (loc[1] - rootLoc[1]).toFloat()
-
-        repeat(CAPACITY_BUBBLE_COUNT) { i ->
-            val bubble = RpnControlState().apply {
-                setBackgroundColor(color)
-                alpha = 0.7f
-            }
-            val size = dpPx(4)
-            bubble.width = size; bubble.height = size
-            overlay.children.add(bubble)
-            bubble.translationX = baseX - size / 2f + (i - (CAPACITY_BUBBLE_COUNT - 1) / 2f) * dpPx(6)
-            bubble.translationY = baseY
-            bubble.animate()
-                .translationY(baseY - dpPx(14))
-                .alpha(0f)
-                .setStartDelay(60L * i)
-                .setDuration(520)
-                .withEndAction { if (isAdded) overlay.children.remove(bubble) }
-                .start()
-        }
-    }
 
     private fun animateHeaderEntry() {
         if (!isAdded) return
@@ -2352,7 +2254,6 @@ class ServerSelectionFragment : Fragment(),
         // Hero summary: stopped state, no avatars, no duration.
         ui.tvActiveDuration.text = ""
         populateAvatarRow(emptyList())
-        ui.locationCapacityIndicator.isVisible = false
 
         val stoppedAlpha = 0.5f
         ui.rvServers.alpha         = stoppedAlpha
@@ -2545,7 +2446,6 @@ class ServerSelectionFragment : Fragment(),
         ui.rvSelectedServers.isVisible = false
         ui.emptySelectionCard.isVisible = false
         ui.frequentCountriesSection.isVisible = false
-        ui.locationCapacityIndicator.isVisible = false
 
         // Update content: the sad-dolphin artwork is full-colour, so it is
         // rendered untinted and reads correctly in both light and dark themes.
@@ -2648,7 +2548,6 @@ class ServerSelectionFragment : Fragment(),
         updateVpnStatus()
         ui.searchCard.isEnabled = true
         ui.searchBar.isEnabled = true
-        if (!isProxyStopped) updateCapacityIndicator()
     }
 
     /**

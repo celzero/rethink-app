@@ -366,7 +366,7 @@ class WgConfigDetailActivity : BaseActivity() {
         }
     }
 
-    private fun setAutomationRowEnabled(row: View, toggle: View, enabled: Boolean) {
+    private fun setAutomationRowEnabled(row: WgControlState, toggle: WgControlState, enabled: Boolean) {
         row.isEnabled = enabled
         row.alpha = if (enabled) 1.0f else 0.5f
         toggle.isEnabled = enabled
