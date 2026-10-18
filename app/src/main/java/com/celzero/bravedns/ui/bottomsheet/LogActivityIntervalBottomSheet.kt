@@ -15,20 +15,24 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.home.LogIntervalPresentation
+import com.celzero.bravedns.ui.compose.home.LogIntervalContent
+import com.celzero.bravedns.ui.compose.home.IntervalRangeGroup
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.DomainActivityRow
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.database.WindowCountRow
-import com.celzero.bravedns.databinding.BottomSheetLogActivityIntervalBinding
 import com.celzero.bravedns.service.LogActivityWindow
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.adapter.AppActivityAdapter
@@ -37,7 +41,6 @@ import com.celzero.bravedns.ui.adapter.AppActivitySummary
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.Utilities.convertLongToTime
-import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,7 +55,7 @@ import org.koin.android.ext.android.inject
  */
 class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomSheetLogActivityIntervalBinding? = null
+    private var _binding: LogIntervalPresentation? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -123,8 +126,11 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetLogActivityIntervalBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = LogIntervalPresentation(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { LogIntervalContent(b) } }
+        }
     }
 
     override fun onDestroyView() {
@@ -160,7 +166,6 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         adapter = AppActivityAdapter(persistentState.fetchFavIcon) { summary ->
             viewLifecycleOwner.lifecycleScope.launch { onAppExpandRequested(summary) }
         }
-        b.bsLaiRecycler.layoutManager = LinearLayoutManager(requireContext())
         b.bsLaiRecycler.adapter = adapter
 
         selectChipForPreset()
@@ -179,7 +184,7 @@ class LogActivityIntervalBottomSheet : BaseBottomSheetDialogFragment() {
         b.bsLaiChip1h.text = getString(R.string.ci_desc, "1", getString(R.string.lbl_hour))
         b.bsLaiChip24h.text = getString(R.string.ci_desc, "24", getString(R.string.lbl_hour))
         val listener =
-            MaterialButtonToggleGroup.OnButtonCheckedListener { _, buttonId, isChecked ->
+            IntervalRangeGroup.OnButtonCheckedListener { _, buttonId, isChecked ->
                 if (!isChecked) return@OnButtonCheckedListener
                 val idx = when (buttonId) {
                     R.id.bs_lai_chip_10m -> 0
