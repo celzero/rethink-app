@@ -15,6 +15,10 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import com.celzero.bravedns.ui.compose.rpn.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.animation.ObjectAnimator
@@ -27,8 +31,6 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CountryConfig
-import com.celzero.bravedns.databinding.BottomsheetServerRemovalNotificationBinding
-import com.celzero.bravedns.databinding.ItemRemovedServerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
@@ -44,10 +46,7 @@ import org.koin.android.ext.android.inject
  */
 class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetServerRemovalNotificationBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private lateinit var ui: RpnRemovalState
     private val persistentState by inject<PersistentState>()
 
     private var removedServers: List<CountryConfig> = emptyList()
@@ -80,13 +79,13 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetServerRemovalNotificationBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        ui = RpnRemovalState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_removal_compose
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnRemovalContent(ui) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -113,53 +112,32 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
     private fun setupUI() {
         // Update title and subtitle based on count
         if (removedServers.size == 1) {
-            binding.notificationTitle.text = getString(R.string.server_removal_title)
-            binding.notificationSubtitle.text = getString(R.string.server_removal_subtitle)
+            ui.notificationTitle.text = getString(R.string.server_removal_title)
+            ui.notificationSubtitle.text = getString(R.string.server_removal_subtitle)
         } else {
-            binding.notificationTitle.text = getString(R.string.server_removal_title).replace("Location", "Locations")
-            binding.notificationSubtitle.text = "${removedServers.size} locations are no longer available"
+            ui.notificationTitle.text = getString(R.string.server_removal_title).replace("Location", "Locations")
+            ui.notificationSubtitle.text = "${removedServers.size} locations are no longer available"
         }
 
-        // Populate removed servers list
-        binding.removedServersContainer.removeAllViews()
+        ui.rows.clear()
         removedServers.forEachIndexed { index, server ->
-            val itemBinding = ItemRemovedServerBinding.inflate(
-                layoutInflater,
-                binding.removedServersContainer,
-                false
-            )
-
-            // Set server details
-            itemBinding.serverFlag.text = server.flagEmoji
-            itemBinding.serverName.text = server.countryName
-            itemBinding.serverLocation.text = server.serverLocation
-
-            // Add to container
-            binding.removedServersContainer.addView(itemBinding.root)
-
-            // Animate item entry with stagger
-            itemBinding.root.alpha = 0f
-            itemBinding.root.translationY = 20f
-            itemBinding.root.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setStartDelay((index * 80L))
-                .setDuration(400)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .start()
+            val row = RpnControlState().apply { alpha = 0f; translationY = 20f }
+            ui.rows.add(server to row)
+            row.animate().alpha(1f).translationY(0f).setStartDelay(index * 80L)
+                .setDuration(400).setInterpolator(AccelerateDecelerateInterpolator()).start()
         }
 
         // Setup action button
-        binding.btnUnderstand.setOnClickListener {
+        ui.btnUnderstand.setOnClickListener {
             animateExitAndDismiss()
         }
     }
 
     private fun animateEntry() {
         // Animate icon
-        binding.iconContainer.scaleX = 0f
-        binding.iconContainer.scaleY = 0f
-        binding.iconContainer.animate()
+        ui.iconContainer.scaleX = 0f
+        ui.iconContainer.scaleY = 0f
+        ui.iconContainer.animate()
             .scaleX(1f)
             .scaleY(1f)
             .setDuration(500)
@@ -167,16 +145,16 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
             .start()
 
         // Rotate icon slightly for attention
-        ObjectAnimator.ofFloat(binding.notificationIcon, "rotation", 0f, 360f).apply {
+        ObjectAnimator.ofFloat(ui.notificationIcon, "rotation", 0f, 360f).apply {
             duration = 800
             interpolator = AccelerateDecelerateInterpolator()
             start()
         }
 
         // Animate title
-        binding.notificationTitle.alpha = 0f
-        binding.notificationTitle.translationX = -30f
-        binding.notificationTitle.animate()
+        ui.notificationTitle.alpha = 0f
+        ui.notificationTitle.translationX = -30f
+        ui.notificationTitle.animate()
             .alpha(1f)
             .translationX(0f)
             .setStartDelay(200)
@@ -185,9 +163,9 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
             .start()
 
         // Animate subtitle
-        binding.notificationSubtitle.alpha = 0f
-        binding.notificationSubtitle.translationX = -30f
-        binding.notificationSubtitle.animate()
+        ui.notificationSubtitle.alpha = 0f
+        ui.notificationSubtitle.translationX = -30f
+        ui.notificationSubtitle.animate()
             .alpha(1f)
             .translationX(0f)
             .setStartDelay(300)
@@ -196,10 +174,10 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
             .start()
 
         // Animate button
-        binding.btnUnderstand.alpha = 0f
-        binding.btnUnderstand.scaleX = 0.9f
-        binding.btnUnderstand.scaleY = 0.9f
-        binding.btnUnderstand.animate()
+        ui.btnUnderstand.alpha = 0f
+        ui.btnUnderstand.scaleX = 0.9f
+        ui.btnUnderstand.scaleY = 0.9f
+        ui.btnUnderstand.animate()
             .alpha(1f)
             .scaleX(1f)
             .scaleY(1f)
@@ -211,10 +189,10 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun animateExitAndDismiss() {
         // Disable button to prevent double tap
-        binding.btnUnderstand.isEnabled = false
+        ui.btnUnderstand.isEnabled = false
 
         // Animate card out
-        binding.notificationCard.animate()
+        ui.notificationCard.animate()
             .alpha(0f)
             .scaleX(0.95f)
             .scaleY(0.95f)
@@ -234,7 +212,7 @@ class ServerRemovalNotificationBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+
     }
 
     /**
