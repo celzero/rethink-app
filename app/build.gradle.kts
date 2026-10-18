@@ -157,14 +157,14 @@ val hasTvReleaseSigningConfig =
         .all { value -> !value.isNullOrEmpty() }
 
 android {
-    compileSdk = 37
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     // https://developer.android.com/studio/build/configure-app-module
     namespace = "com.celzero.bravedns"
 
     defaultConfig {
         applicationId = "com.celzero.bravedns"
-        minSdk = 23
-        targetSdk = 37
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Defaults to false; the fdroid flavor overrides it via -PwebsiteDegoogled=true.
         buildConfigField("boolean", "IS_WEBSITE_DEGOOGLD_BUILD", "false")
