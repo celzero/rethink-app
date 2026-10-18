@@ -16,31 +16,25 @@
 package com.celzero.bravedns.ui.bottomsheet
 
 import android.content.res.Configuration
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.blocklists.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
-import com.celzero.bravedns.databinding.BottomSheetRethinkPlusFilterBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.viewmodel.RethinkBlocklistViewModel
 import com.celzero.bravedns.util.Themes
-import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
 class RethinkPlusFilterBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomSheetRethinkPlusFilterBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var state = BlocklistFilterState()
 
     private val persistentState by inject<PersistentState>()
 
@@ -74,8 +68,11 @@ class RethinkPlusFilterBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetRethinkPlusFilterBinding.inflate(inflater, container, false)
-        return b.root
+        state = BlocklistFilterState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { BlocklistFilterScreen(state) } }
+        }
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -100,57 +97,33 @@ class RethinkPlusFilterBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun makeChipSubGroup(ft: List<FileTag>) {
-        b.rpfFilterChipSubGroup.removeAllViews()
-        ft.distinctBy { it.subg }
-            .forEach {
-                if (it.subg.isBlank()) return@forEach
-
-                val checked = filters?.subGroups?.contains(it.subg) == true
-                b.rpfFilterChipSubGroup.addView(remakeChipSubgroup(it.subg, checked))
-            }
+        state.chips.clear()
+        ft.distinctBy { it.subg }.forEach {
+            if (it.subg.isBlank()) return@forEach
+            val checked = filters?.subGroups?.contains(it.subg) == true
+            state.chips.add(BlocklistFilterChip(it.subg, checked) { selected ->
+                if (selected) applySubgroupFilter(it.subg) else removeSubgroupFilter(it.subg)
+            })
+        }
     }
 
     private fun initClickListeners() {
-        b.rpfApply.setOnClickListener {
+        state.apply = apply@{
             this.dismiss()
-            if (filters == null) return@setOnClickListener
+            if (filters == null) return@apply
 
             fragmentActivity?.filterObserver()?.postValue(filters)
         }
 
-        b.rpfClear.setOnClickListener {
+        state.clear = {
             fragmentActivity?.filterObserver()?.postValue(RethinkBlocklistViewModel.Filters())
             this.dismiss()
         }
     }
 
-    private fun remakeChipSubgroup(label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = label
-        chip.text = label
-        chip.isChecked = checked
 
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applySubgroupFilter(button.tag as String)
-                colorUpChipIcon(chip)
-            } else {
-                removeSubgroupFilter(button.tag as String)
-            }
-        }
 
-        return chip
-    }
 
-    private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter =
-            PorterDuffColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.primaryText),
-                PorterDuff.Mode.SRC_IN
-            )
-        chip.checkedIcon?.colorFilter = colorFilter
-        chip.chipIcon?.colorFilter = colorFilter
-    }
 
     private fun applySubgroupFilter(tag: String) {
         if (filters == null) {
@@ -163,8 +136,4 @@ class RethinkPlusFilterBottomSheet : BaseBottomSheetDialogFragment() {
         filters?.subGroups?.remove(tag)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }
