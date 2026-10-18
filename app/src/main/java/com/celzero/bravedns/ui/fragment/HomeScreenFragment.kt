@@ -114,8 +114,6 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.LogActivityIntervalBottomSheet
 import com.celzero.bravedns.ui.custom.AppHistogramView
-import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_FAST_ROTATION_MS
-import com.celzero.bravedns.ui.fragment.HomeScreenFragment.Companion.BORDER_SLOW_ROTATION_MS
 import com.celzero.bravedns.ui.tour.GuidedTourManager
 import com.celzero.bravedns.ui.tour.TourOverlayController
 import com.celzero.bravedns.util.Constants
