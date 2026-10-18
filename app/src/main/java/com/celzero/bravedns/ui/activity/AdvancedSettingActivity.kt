@@ -19,12 +19,15 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.widget.SeekBar
+import com.celzero.bravedns.ui.compose.settings.SettingsSeekBar
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.AdvancedSettingsState
+import com.celzero.bravedns.ui.compose.settings.AdvancedSettingsContent
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.tour.GuidedTourManager
@@ -35,13 +38,12 @@ import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import org.koin.android.ext.android.inject
 
-class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting) {
+class AdvancedSettingActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
-    private val b by viewBinding(ActivityAdvancedSettingBinding::bind)
+    private val b by lazy { AdvancedSettingsState(this) }
     private val memoryValues = arrayOf(32, 64, 128, 256, 512, 1024)
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -62,6 +64,17 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
         }
         initView()
         setupClickListeners()
+        setContent { RethinkTheme { AdvancedSettingsContent(b) } }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        b.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     private fun initView() {
@@ -114,7 +127,7 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
             if (idx == -1) 0 else idx + 1
         }
 
-        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle("Protocol Translation Mode")
             .setSingleChoiceItems(items, checkedItem) { dialog, which ->
                 dialog.dismiss()
@@ -172,8 +185,8 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
         }
 
         b.goMaxMemorySeekbar.setOnSeekBarChangeListener(
-            object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            object : SettingsSeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SettingsSeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
                         val maxMemMb = memoryValues[progress]
                         val maxMemBytes = maxMemMb.toLong() * 1024 * 1024
@@ -183,9 +196,9 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
                     }
                 }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStartTrackingTouch(seekBar: SettingsSeekBar?) {}
 
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SettingsSeekBar?) {}
             }
         )
     }
@@ -201,7 +214,7 @@ class AdvancedSettingActivity : BaseActivity(R.layout.activity_advanced_setting)
     }
 
     /*private fun clearResidueAfterConfirmation() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = WgAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.clear_residue_dialog_heading))
         alertBuilder.setMessage(getString(R.string.clear_residue_dialog_desc))
         alertBuilder.setCancelable(false)
