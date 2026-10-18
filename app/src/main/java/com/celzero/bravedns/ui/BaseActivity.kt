@@ -52,7 +52,7 @@ import org.koin.android.ext.android.inject
  *
  * Example:
  * ```
- * class MyActivity : BaseActivity(R.layout.activity_my) {
+ * class MyActivity : BaseActivity() {
  *     override fun onCreate(savedInstanceState: Bundle?) {
  *         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
  *         super.onCreate(savedInstanceState)
@@ -109,16 +109,9 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
      * Caps the app content to [MAX_CONTENT_WIDTH_DP] and centers it horizontally on
      * expanded windows (foldables in the open state, tablets, split-screen).
      *
-     * The width cap is applied by mutating the existing content view's LayoutParams inside
-     * [android.R.id.content] (a FrameLayout), **not** by re-parenting it into a wrapper
-     * view. Re-parenting breaks bind-mode `ViewBinding` delegates
-     * (`viewBinding(Binding::bind)`): they resolve `android.R.id.content`'s child lazily
-     * on first binding access (which may happen in `onResume` or later, i.e. after
-     * [onPostCreate]) and hard-cast it to the layout's declared root type — an inserted
-     * wrapper view at index 0 turns that cast into a `ClassCastException`
-     * (cr: `MaxWidthFrameLayout cannot be cast to CoordinatorLayout` in
-     * `WgConfigEditorActivity`). Keeping the content view's identity intact avoids the
-     * crash for every activity without per-screen workarounds.
+     * The width cap updates the existing content view's LayoutParams inside
+     * [android.R.id.content] without re-parenting the Compose root. Keeping its
+     * identity and owners intact preserves composition and saved-state ownership.
      *
      * Windows narrower than the cap (regular phones) keep `MATCH_PARENT` width; wider
      * windows cap the child to [MAX_CONTENT_WIDTH_DP] and center it, so the window

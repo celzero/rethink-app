@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fallback only; field call sites provide their existing localized validation message. -->
+    <string name="compose_field_invalid_input">Invalid input</string>
+</resources>
