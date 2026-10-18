@@ -22,7 +22,6 @@ import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityRpnWinProxyDetailBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -35,17 +34,20 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnWinState
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnWinContent
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class RpnWinProxyDetailsActivity: BaseActivity(R.layout.activity_rpn_win_proxy_detail) {
+class RpnWinProxyDetailsActivity: BaseActivity() {
 
-    private val b by viewBinding(ActivityRpnWinProxyDetailBinding::bind)
+    private val b = RpnWinState()
     private val persistentState by inject<PersistentState>()
 
     private lateinit var cc: String
@@ -73,6 +75,11 @@ class RpnWinProxyDetailsActivity: BaseActivity(R.layout.activity_rpn_win_proxy_d
             window.isNavigationBarContrastEnforced = false
         }
 
+        setContentView(ComposeView(this).apply {
+            id = android.R.id.primary
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnWinContent(b) } }
+        })
         initViews()
         initClickListeners()
     }
