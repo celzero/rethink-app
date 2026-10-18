@@ -15,6 +15,11 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.networksettings.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
@@ -27,8 +32,7 @@ import android.os.Bundle
 import android.os.LocaleList
 import android.provider.Settings
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.LinearLayout
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState as CompoundButton
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -48,7 +52,6 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.EventLogger
@@ -87,10 +90,7 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.networksettings.NetworkAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -103,9 +103,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
-    PcapFilesBottomSheet.PcapModeSelectListener {
-    private val b by viewBinding(ActivityMiscSettingsBinding::bind)
+class MiscSettingsActivity : BaseActivity(), PcapFilesBottomSheet.PcapModeSelectListener {
+    private val b by lazy { MiscSettingsState(this) }
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -157,7 +156,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        setContent { RethinkTheme { NetworkSettingsScreen(b.layout) } }
         if (savedInstanceState != null) {
             isThemeChanged = savedInstanceState.getBoolean(KEY_THEME_CHANGE, false)
         }
@@ -178,7 +177,13 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        b.saveChecks(outState)
         outState.putBoolean(KEY_THEME_CHANGE, isThemeChanged)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     private fun setupOnBackPressed() {
@@ -230,7 +235,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
             if (goLogLevel == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else goLogLevel
         b.genSettingsGoLogDesc.text =
             Logger.LoggerLevel.fromId(goLogLevelDisplay)?.name?.lowercase()
-                ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
+                ?.replaceFirstChar(Char::titlecase)?.replace("_", " ").orEmpty()
         // set log lifespan name in the description
         b.genSettingsLogLifespanDesc.text = LogLifespan.getLifespanString(persistentState.logLifespan, this)
 
@@ -654,7 +659,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
             if (isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                 }
             }
             logEvent("Auto start on boot set to $b")
@@ -832,11 +837,11 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
             updateConfigLevel(persistentState.goLoggerLevel)
             val logLevel = if (persistentState.goLoggerLevel.toInt() == GO_LOG_LEVEL_EXTREME) GO_LOG_LEVEL_EXTREME_DISPLAY else persistentState.goLoggerLevel.toInt()
             b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel)?.name?.lowercase()
-                    ?.replaceFirstChar(Char::titlecase)?.replace("_", " ")
+                    ?.replaceFirstChar(Char::titlecase)?.replace("_", " ").orEmpty()
             logEvent("Go log level set to ${Logger.LoggerLevel.fromId(logLevel)?.name}")
         }
 
-        val cb = MaterialCheckBox(this)
+        val cb = WgControlState(this, checkable = true)
         cb.text = getString(R.string.console_log_include_file_trace)
         cb.isChecked = persistentState.includeFileTrace
         cb.setOnCheckedChangeListener { _, isChecked ->
@@ -847,17 +852,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
             )
             logEvent("File trace set to $isChecked")
         }
-        val density = resources.displayMetrics.density
-        val margin = (20 * density).toInt()
-        val container = LinearLayout(this)
-        val params =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        params.setMargins(margin, 0, margin, 0)
-        container.addView(cb, params)
-        alertBuilder.setView(container)
+        alertBuilder.setContent { NetworkCheckRow(cb) }
 
         alertBuilder.create().show()
     }
@@ -928,6 +923,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
 
     private fun invokeChangeLocaleDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        alertBuilder.setMaxHeightFraction(0.6f)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -1348,7 +1344,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
                 PackageManager.PERMISSION_GRANTED
     }
 
-    private fun enableAfterDelay(ms: Long, vararg views: View) {
+    private fun enableAfterDelay(ms: Long, vararg views: WgControlState) {
         for (v in views) v.isEnabled = false
 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
