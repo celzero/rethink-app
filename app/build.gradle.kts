@@ -220,7 +220,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             // AGP 9.3 DSL: enables both code and resource optimization and
             // includes the default Android keep rules (equivalent to
             // proguard-android-optimize.txt, which the webview removal in #352
@@ -264,11 +264,11 @@ android {
                 applicationIdSuffix = ".izzy"
             }
         }
-        create("leakCanary") {
+        register("leakCanary") {
             matchingFallbacks += listOf("debug")
             initWith(getByName("debug"))
         }
-        create("alpha") {
+        register("alpha") {
             // archive.is/y8uCB
             applicationIdSuffix = ".alpha"
             optimization {
@@ -278,7 +278,7 @@ android {
                 .takeIf { !System.getenv("ALPHA_KS_FILE").isNullOrEmpty() }
             resValue("string", "app_name", "Rethink(α)")
         }
-        create("releaseDebug") {
+        register("releaseDebug") {
             initWith(getByName("release"))
             // set explicitly; initWith may not copy the optimization block
             optimization {
