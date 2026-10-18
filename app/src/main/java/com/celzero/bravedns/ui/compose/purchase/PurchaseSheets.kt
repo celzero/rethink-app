@@ -17,11 +17,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
 import com.celzero.bravedns.R
+import com.celzero.bravedns.ui.compose.NoDimDialogWindow
 import com.celzero.bravedns.ui.compose.themeColor
 
 internal class DeviceErrorState {
     var accountId by mutableStateOf("")
     var deviceId by mutableStateOf("")
+    var resetVisible by mutableStateOf(false)
+    var resetInFlight by mutableStateOf(false)
+    var confirmReset by mutableStateOf(false)
 }
 internal class ConflictState {
     var title by mutableStateOf("")
@@ -65,7 +69,7 @@ internal fun PurchaseSheet(title: String, showHandle: Boolean = true, header: @C
         SelectionContainer { Text(value, style = MaterialTheme.typography.bodyMedium) }
     }
 }
-@Composable internal fun DeviceErrorContent(state: DeviceErrorState, unregistered: Boolean, onSupport: () -> Unit, onDismiss: () -> Unit) {
+@Composable internal fun DeviceErrorContent(state: DeviceErrorState, unregistered: Boolean, onSupport: () -> Unit, onReset: () -> Unit, onDismiss: () -> Unit) {
     PurchaseSheet(stringResource(if (unregistered) R.string.device_not_registered_title else R.string.device_auth_error_title), header = {
         Icon(painterResource(R.drawable.ic_device_lock), null, Modifier.size(72.dp).align(Alignment.CenterHorizontally), tint = themeColor(R.attr.accentBad))
     }) {
@@ -79,8 +83,38 @@ internal fun PurchaseSheet(title: String, showHandle: Boolean = true, header: @C
             Text(stringResource(R.string.device_not_registered_what_this_means), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.device_not_registered_what_this_means_desc))
         }
-        OriginalButton(if (unregistered) "bottomsheet_device_not_registered:btn_email_support" else "bottomsheet_device_auth_error:btn_email_support", onClick = onSupport, modifier = Modifier.fillMaxWidth().testTag("device_support")) { Text(stringResource(R.string.device_auth_error_btn_email)) }
-        OriginalButton(if (unregistered) "bottomsheet_device_not_registered:btn_dismiss" else "bottomsheet_device_auth_error:btn_dismiss", onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.lbl_cancel)) }
+        OriginalButton(if (unregistered) "bottomsheet_device_not_registered:btn_email_support" else "bottomsheet_device_auth_error:btn_email_support", onClick = onSupport, enabled = !state.resetInFlight, modifier = Modifier.fillMaxWidth().testTag("device_support")) { Text(stringResource(R.string.device_auth_error_btn_email)) }
+        if (state.resetVisible) {
+            // The reset action uses the same text-button styling as Dismiss, with the
+            // warning color used by the original reset button.
+            OriginalButton(if (unregistered) "bottomsheet_device_not_registered:btn_dismiss" else "bottomsheet_device_auth_error:btn_dismiss",
+                onClick = { state.confirmReset = true }, enabled = !state.resetInFlight,
+                contentColor = themeColor(R.attr.accentBad), modifier = Modifier.fillMaxWidth().testTag("device_reset")) {
+                Text(stringResource(if (unregistered) R.string.server_selection_error_retry else R.string.device_auth_error_btn_reset))
+            }
+        }
+        OriginalButton(if (unregistered) "bottomsheet_device_not_registered:btn_dismiss" else "bottomsheet_device_auth_error:btn_dismiss", onClick = onDismiss, enabled = !state.resetInFlight, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.lbl_cancel)) }
+    }
+    if (state.confirmReset) {
+        AlertDialog(
+            onDismissRequest = { state.confirmReset = false },
+            title = {
+                NoDimDialogWindow()
+                Text(stringResource(if (unregistered) R.string.server_selection_error_retry else R.string.device_auth_error_btn_reset))
+            },
+            text = { Text(stringResource(R.string.device_not_registered_reset_confirm_msg)) },
+            confirmButton = {
+                OriginalButton("@dialog_positive", onClick = { state.confirmReset = false; onReset() },
+                    enabled = !state.resetInFlight, modifier = Modifier.testTag("device_reset_confirm")) {
+                    Text(stringResource(R.string.lbl_proceed))
+                }
+            },
+            dismissButton = {
+                OriginalButton("@dialog_negative", onClick = { state.confirmReset = false }) {
+                    Text(stringResource(R.string.lbl_cancel))
+                }
+            }
+        )
     }
 }
 @Composable internal fun ConflictContent(state: ConflictState, onRefund: () -> Unit, onSupport: () -> Unit, onDismiss: () -> Unit) {

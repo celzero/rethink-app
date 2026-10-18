@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -23,10 +27,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetPurchaseConflictBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseMutationResult
 import com.celzero.bravedns.iab.ServerApiError
@@ -56,10 +58,9 @@ import org.koin.android.ext.android.inject
  */
 class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetPurchaseConflictBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var refundAction: (() -> Unit)? = null
+    private var presentation: ConflictState? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     /** Called on the main thread when a refund completes (success or failure). */
     var onRefundResult: ((success: Boolean, message: String) -> Unit)? = null
@@ -111,13 +112,12 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetPurchaseConflictBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = ConflictState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ConflictContent(ui, onRefund = { refundAction?.invoke() }, onSupport = { CustomerSupportActivity.start(requireContext()) }, onDismiss = { dismissAllowingStateLoss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -141,7 +141,8 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
+        refundAction = null
     }
 
     private fun applyContent(
@@ -149,42 +150,26 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
         endpoint: String,
         serverMsg: String?
     ) {
-        binding.tvTitle.text = titleFor(operation)
-        binding.tvDescription.text = descriptionFor(operation)
-        binding.tvEndpoint.text = endpoint
-        binding.tvHttpCode.text = "409"
+        ui.title = titleFor(operation)
+        ui.description = descriptionFor(operation)
+        ui.endpoint = endpoint
+        ui.httpCode = "409"
 
         if (!serverMsg.isNullOrBlank()) {
-            binding.serverMessageRow.isVisible = true
-            binding.tvServerMessage.isVisible = true
-            binding.tvServerMessage.text = serverMsg
+            ui.serverMessageVisible = true
+            ui.serverMessage = serverMsg
         }
 
-        binding.btnRefund.isVisible = operation.canRefund
+        ui.refundVisible = operation.canRefund
         if (operation.canRefund) {
-            binding.btnRefund.text = getString(R.string.conflict_btn_refund)
+            ui.refundLabel = getString(R.string.conflict_btn_refund)
         } else {
-            binding.btnRefund.isVisible = false
+            ui.refundVisible = false
         }
     }
 
-    private fun setupButtons(
-        operation: ServerApiError.Operation,
-        accountId: String,
-        purchaseToken: String,
-        sku: String
-    ) {
-        binding.btnRefund.setOnClickListener {
-            initiateRefund(accountId, purchaseToken, sku)
-        }
-
-        binding.btnContactSupport.setOnClickListener {
-            CustomerSupportActivity.start(requireContext())
-        }
-
-        binding.btnDismiss.setOnClickListener {
-            dismissAllowingStateLoss()
-        }
+    private fun setupButtons(operation: ServerApiError.Operation, accountId: String, purchaseToken: String, sku: String) {
+        refundAction = { initiateRefund(accountId, purchaseToken, sku) }
     }
 
     private fun initiateRefund(accountId: String, purchaseToken: String, sku: String) {
@@ -243,7 +228,7 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
                     // instead of echoing the raw status text.
                     val isRejected = result is PurchaseMutationResult.Unauthorized ||
                         result is PurchaseMutationResult.Conflict
-                    if (!isRejected) binding.btnRefund.text = getString(R.string.conflict_btn_refund_retry)
+                    if (!isRejected) ui.refundLabel = getString(R.string.conflict_btn_refund_retry)
                     showToastUiCentered(
                         ctx,
                         if (isRejected) getString(R.string.subscription_action_failed)
@@ -257,10 +242,10 @@ class PurchaseConflictBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun setRefundInFlight(inFlight: Boolean) {
-        binding.progressRefund.isVisible = inFlight
-        binding.btnRefund.isEnabled = !inFlight
-        binding.btnContactSupport.isEnabled  = !inFlight
-        binding.btnDismiss.isEnabled = !inFlight
+        ui.inFlight = inFlight
+        ui.refundEnabled = !inFlight
+        ui.supportEnabled  = !inFlight
+        ui.dismissEnabled = !inFlight
         isCancelable = !inFlight
     }
 

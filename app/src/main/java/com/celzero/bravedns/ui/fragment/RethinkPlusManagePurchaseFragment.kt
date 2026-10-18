@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
+import com.celzero.bravedns.ui.compose.rpn.RpnControlState
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +33,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
-import com.celzero.bravedns.databinding.FragmentRethinkPlusManagePurchaseBinding
 import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
@@ -55,8 +58,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ManagePurchaseViewModel
 import com.celzero.bravedns.viewmodel.ManagePurchaseViewModel.OperationState
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,8 +67,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plus_manage_purchase) {
-    private val b by viewBinding(FragmentRethinkPlusManagePurchaseBinding::bind)
+class RethinkPlusManagePurchaseFragment : Fragment() {
+    private var b = ManagePurchaseState()
 
     private val subscriptionStatusRepository by inject<SubscriptionStatusRepository>()
     private val persistentState by inject<com.celzero.bravedns.service.PersistentState>()
@@ -79,6 +80,16 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
 
         fun newInstance(): RethinkPlusManagePurchaseFragment {
             return RethinkPlusManagePurchaseFragment()
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = ManagePurchaseState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ManagePurchaseContent(b, onConfirm = { isCancel ->
+                if (isCancel) viewModel.cancelSubscription() else viewModel.revokeSubscription()
+            }) } }
         }
     }
 
@@ -103,7 +114,6 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     /** Dolphin signature: bottom overlay revealed at the end of the content scroll. */
     private fun setDolphinSignature() {
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
-        b.dolphinSignature.revealAtScrollEndOf(b.managePurchaseScroll)
     }
 
     override fun onResume() {
@@ -270,7 +280,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
         b.dividerManagePlay.isVisible = !isOneTimePurchase
     }
 
-    private fun setRowAvailability(row: View, enabled: Boolean) {
+    private fun setRowAvailability(row: RpnControlState, enabled: Boolean) {
         row.isEnabled = enabled
         row.alpha = if (enabled) 1f else ROW_DISABLED_ALPHA
         if (!enabled) row.contentDescription = getString(R.string.rpn_unavailable_without_plan)
@@ -364,15 +374,7 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     }
 
     private fun showDialogConfirmCancelOrRevoke(isCancel: Boolean) {
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setTitle(if (isCancel) getString(R.string.confirm_cancel_title) else getString(R.string.confirm_revoke_title))
-            .setMessage(if (isCancel) getString(R.string.confirm_cancel_message) else getString(R.string.confirm_revoke_message))
-            .setPositiveButton(if (isCancel) getString(R.string.cancel_subscription) else getString(R.string.revoke_subscription)) { _, _ ->
-                if (isCancel) viewModel.cancelSubscription() else viewModel.revokeSubscription()
-            }
-            .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .setCancelable(true)
-            .show()
+        b.confirmCancel = isCancel
     }
 
     private fun showPurchaseAlreadyEndedDialog() {
@@ -422,36 +424,9 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             getString(R.string.manage_sub_cancelling)
         else
             getString(R.string.manage_sub_revoking)
-
         b.tvLoadingMessage.text = opLabel
         b.tvLoadingSubMessage.text = getString(R.string.progress_do_not_close)
-
-        val currentOrdinal = state.step.ordinal
-        data class StepViews(val icon: AppCompatImageView, val label: AppCompatTextView)
-
-        val steps = listOf(
-            StepViews(b.stepIconValidating, b.stepLabelValidating),
-            StepViews(b.stepIconServer,     b.stepLabelServer),
-            StepViews(b.stepIconLocal,      b.stepLabelLocal),
-            StepViews(b.stepIconRefresh,    b.stepLabelRefresh)
-        )
-
-        val colorDone    = UIUtils.fetchColor(requireContext(), R.attr.accentGood)
-        val colorPending = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
-
-        steps.forEachIndexed { index, sv ->
-            val isDone    = index < currentOrdinal
-            val isCurrent = index == currentOrdinal
-            val tint      = if (isDone || isCurrent) colorDone else colorPending
-            sv.icon.setColorFilter(tint)
-            if (isDone || isCurrent) {
-                sv.label.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
-                sv.label.alpha = 1f
-            } else {
-                sv.label.setTextColor(colorPending)
-                sv.label.alpha = 0.5f
-            }
-        }
+        b.operationStep = state.step.ordinal
     }
 
     private fun hideProgressOverlay() {

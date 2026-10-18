@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -26,14 +30,12 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
-import com.celzero.bravedns.databinding.BottomsheetDeviceAuthErrorBinding
 import com.celzero.bravedns.iab.DeviceAuthErrorNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,14 +47,11 @@ import org.koin.android.ext.android.inject
  */
 class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetDeviceAuthErrorBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var supportAction: (() -> Unit)? = null
+    private var presentation: DeviceErrorState? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private var entitlementCid: String = ""
-
-    private var resetInFlight: Boolean = false
 
     private val persistentState by inject<PersistentState>()
 
@@ -91,13 +90,12 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetDeviceAuthErrorBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = DeviceErrorState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DeviceErrorContent(ui, unregistered = false, onSupport = { supportAction?.invoke() }, onReset = { resetIdentity() }, onDismiss = { dismissAllowingStateLoss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,23 +110,24 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
 
         populateDetails(entitlementCid, deviceIdPrefix)
         setupButtons(entitlementCid, deviceIdPrefix)
-        binding.btnResetIdentity.visibility = View.VISIBLE
+        ui.resetVisible = true
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
+        supportAction = null
     }
 
     private fun populateDetails(accountId: String, deviceIdPrefix: String) {
         // Show masked account ID (first 12 + last 4 chars); fall back to a placeholder
         // if blank so the layout never appears empty.
-        binding.tvAccountId.text = maskCid(accountId).ifBlank {
+        ui.accountId = maskCid(accountId).ifBlank {
             getString(R.string.device_auth_error_id_unavailable)
         }
 
         // Show first 8 chars of device ID followed by "…" to indicate truncation.
-        binding.tvDeviceIdPrefix.text = if (deviceIdPrefix.isNotBlank()) {
+        ui.deviceId = if (deviceIdPrefix.isNotBlank()) {
             deviceIdPrefix
         } else {
             getString(R.string.device_auth_error_id_unavailable)
@@ -146,36 +145,13 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun setupButtons(accountId: String, deviceIdPrefix: String) {
-        binding.btnEmailSupport.setOnClickListener {
-            openCustomerSupport(accountId, deviceIdPrefix)
-        }
-
-        binding.btnResetIdentity.setOnClickListener {
-            confirmIdentityReset()
-        }
-
-        binding.btnDismiss.setOnClickListener {
-            dismissAllowingStateLoss()
-        }
-    }
-
-    private fun confirmIdentityReset() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setTitle(R.string.device_auth_error_btn_reset)
-            .setMessage(R.string.device_not_registered_reset_confirm_msg)
-            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
-                resetIdentity()
-            }
-            .setNegativeButton(R.string.lbl_cancel, null)
-            .show()
+        supportAction = { openCustomerSupport(accountId, deviceIdPrefix) }
     }
 
     private fun resetIdentity() {
-        if (resetInFlight) return
-        resetInFlight = true
+        if (ui.resetInFlight || !ui.resetVisible) return
+        ui.resetInFlight = true
         isCancelable = false
-        binding.btnResetIdentity.isEnabled = false
-        binding.btnEmailSupport.isEnabled = false
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val claimCid = try {
                 InAppBillingHandler.primaryPurchaseCid().ifBlank { entitlementCid }
@@ -207,10 +183,8 @@ class DeviceAuthErrorBottomSheet : BaseBottomSheetDialogFragment() {
                         Toast.LENGTH_LONG).show()
                     dismissAllowingStateLoss()
                 } else {
-                    resetInFlight = false
+                    ui.resetInFlight = false
                     isCancelable = true
-                    binding.btnResetIdentity.isEnabled = true
-                    binding.btnEmailSupport.isEnabled = true
                     Toast.makeText(ctx, R.string.device_not_registered_reset_failed,
                         Toast.LENGTH_LONG).show()
                 }
