@@ -16,12 +16,12 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
 import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
+import com.celzero.bravedns.ui.compose.wireguard.WgConfigRowState
+import com.celzero.bravedns.ui.compose.wireguard.WgOneConfigRowState
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgHopMap
 import com.celzero.bravedns.net.doh.Transaction
@@ -70,6 +70,7 @@ import java.util.Optional
 @RunWith(RobolectricTestRunner::class)
 @org.robolectric.annotation.Config(
     sdk = [28],
+    application = android.app.Application::class,
     shadows = [com.celzero.bravedns.shadows.ShadowRouterStats::class]
 )
 class WgConfigAdapterTest : KoinTest {
@@ -78,7 +79,6 @@ class WgConfigAdapterTest : KoinTest {
     private val testScope = TestScope(testDispatcher)
 
     private lateinit var context: Context
-    private lateinit var mockParent: ViewGroup
     private lateinit var realAdapter: WgConfigAdapter
     private lateinit var realOneWgAdapter: OneWgConfigAdapter
 
@@ -107,9 +107,6 @@ class WgConfigAdapterTest : KoinTest {
 
         // Use real Android context from Robolectric
         context = ApplicationProvider.getApplicationContext()
-
-        // Create real ViewGroup
-        mockParent = LinearLayout(context)
 
         // Mock static dependencies to prevent native library loading
         mockkObject(ProxyManager)
@@ -155,8 +152,6 @@ class WgConfigAdapterTest : KoinTest {
 
         // Setup mock adapter behavior
         every { mockAdapter.itemCount } returns 0
-        every { mockAdapter.onCreateViewHolder(any(), any()) } returns mockViewHolder
-        every { mockAdapter.onBindViewHolder(any(), any()) } just Runs
 
         // Setup mock ViewHolder
         every { mockViewHolder.update(any()) } just Runs
@@ -242,33 +237,24 @@ class WgConfigAdapterTest : KoinTest {
     }
 
     @Test
-    fun `test view holder creation`() {
-        val viewHolder = mockAdapter.onCreateViewHolder(mockParent, 0)
-        assertNotNull("ViewHolder should not be null", viewHolder)
-
-        verify { mockAdapter.onCreateViewHolder(mockParent, 0) }
+    fun `test native row presenter creation`() {
+        val presenter = realAdapter.WgInterfaceViewHolder(WgConfigRowState(context))
+        assertNotNull("Native row presenter should be created", presenter)
+        presenter.cancelJobIfAny()
     }
 
     @Test
-    fun `test real view holder creation`() {
-        // Simplify the test to avoid complex ViewHolder constructor mocking
-        try {
-            val viewHolder = realAdapter.onCreateViewHolder(mockParent, 0)
-            assertNotNull("Real ViewHolder should not be null", viewHolder)
-        } catch (e: Exception) {
-            // If ViewHolder creation fails due to resource/layout issues in test environment,
-            // just verify the attempt was made and pass the test
-            assertTrue(
-                "ViewHolder creation attempted but failed due to test environment limitations: ${e.message}",
-                true
-            )
-        }
+    fun `test real one-config row presenter creation`() {
+        val presenter = realOneWgAdapter.WgInterfaceViewHolder(WgOneConfigRowState(context))
+        assertNotNull("One-config native presenter should be created", presenter)
+        presenter.cancelJobIfAny()
     }
 
     @Test
-    fun `test bind view holder`() = testScope.runTest {
-        mockAdapter.onBindViewHolder(mockViewHolder, 0)
-        verify { mockAdapter.onBindViewHolder(mockViewHolder, 0) }
+    fun `test native row binding dispatch`() = testScope.runTest {
+        val config = createTestWgConfigFiles(id = 1, name = "Binding")
+        mockViewHolder.update(config)
+        verify(exactly = 1) { mockViewHolder.update(config) }
     }
 
     @Test
@@ -579,14 +565,14 @@ class WgConfigAdapterTest : KoinTest {
 
         // Test the complete workflow with proper error handling
         try {
-            val viewHolder = realAdapter.onCreateViewHolder(mockParent, 0)
+            val viewHolder = realAdapter.WgInterfaceViewHolder(WgConfigRowState(context))
             assertNotNull("ViewHolder created", viewHolder)
 
             // Test update (would normally trigger UI updates)
             viewHolder.update(config)
 
             // Test cleanup
-            realAdapter.onViewDetachedFromWindow(viewHolder)
+            viewHolder.cancelJobIfAny()
         } catch (e: Exception) {
             // If the integration test fails due to resource loading issues in test environment,
             // verify that the adapter was at least initialized correctly

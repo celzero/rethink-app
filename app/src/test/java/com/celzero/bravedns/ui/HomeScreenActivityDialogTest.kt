@@ -1,346 +1,107 @@
-/*
- * Copyright 2025 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Copyright 2025 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.ui
 
-import android.app.AlertDialog
-import android.content.Context
-import android.widget.Button
-import androidx.test.core.app.ApplicationProvider
-import io.mockk.unmockkAll
-import org.junit.After
-import org.junit.Before
+import android.app.Application
+import android.view.MotionEvent
+import androidx.compose.ui.test.*
+import com.celzero.bravedns.R
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.ui.fixture.SafeRootHostTest
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowAlertDialog
-import org.robolectric.shadows.ShadowLooper
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.robolectric.annotation.GraphicsMode
+import org.robolectric.shadows.ShadowDialog
 
-/**
- * Unit tests for HomeScreenActivity's showDownloadDialog() method
- * Uses Robolectric to test dialog behavior
- *
- * These tests validate the dialog logic implementation:
- * - Modal behavior for update dialogs (setCancelable(false))
- * - Button configuration (positive/negative buttons)
- * - Dismissibility for informational dialogs
- */
+/** The eight original update-dialog cases now invoke the actual Home controller and native window. */
 @RunWith(RobolectricTestRunner::class)
-@Config(
-    sdk = [33],
-    qualifiers = "en-rUS"
-)
-class HomeScreenActivityDialogTest {
-
-    private lateinit var context: Context
-
-    @Before
-    fun setUp() {
-        context = ApplicationProvider.getApplicationContext<Context>()
-        ShadowAlertDialog.reset()
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [35], application = Application::class, qualifiers = "en-rUS-w360dp-h800dp")
+class HomeScreenActivityDialogTest : SafeRootHostTest() {
+    private fun show(source: AppUpdater.InstallSource, title: Int, message: Int) {
+        launch()
+        compose.runOnIdle {
+            HomeScreenActivity::class.java.getDeclaredMethod("showDownloadDialog", AppUpdater.InstallSource::class.java, String::class.java, String::class.java)
+                .apply { isAccessible = true }.invoke(activity, source, activity.getString(title), activity.getString(message))
+        }
+        compose.onNodeWithTag("root_dialog_positive").assertIsDisplayed()
     }
-
-    @After
-    fun tearDown() {
-        // Dismiss any showing dialogs to prevent resource leaks
-        val shownDialogs = ShadowAlertDialog.getShownDialogs()
-        shownDialogs.forEach { dialog ->
-            if (dialog?.isShowing == true) {
-                dialog.dismiss()
+    private fun update(source: AppUpdater.InstallSource = AppUpdater.InstallSource.OTHER) =
+        show(source, R.string.download_update_dialog_title, R.string.download_update_dialog_message)
+    private fun outsideTouch() {
+        compose.runOnIdle {
+            val dialog = checkNotNull(ShadowDialog.getLatestDialog())
+            // Compose 1.12 tracks an outside press/release pair, not ACTION_OUTSIDE.
+            // Exercise the actual window callback without directly dismissing the dialog.
+            for ((action, time) in listOf(MotionEvent.ACTION_DOWN to 0L, MotionEvent.ACTION_UP to 16L)) {
+                val event = MotionEvent.obtain(0, time, action, -100f, -100f, 0)
+                try { dialog.onTouchEvent(event) } finally { event.recycle() }
             }
         }
-        ShadowAlertDialog.reset()
-        unmockkAll()
     }
 
-    @Test
-    fun `test update available dialog is modal and has correct buttons for website`() {
-        // Given
-        val title = "New Update!"
-        val message = "A new version of the app is available for download from the website. Do you want to proceed?"
-
-        // When - Create dialog simulating showDownloadDialog behavior
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(false) // Modal - key behavior we're testing
-
-        // Website version buttons
-        builder.setPositiveButton("Visit website") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog, "Dialog should be shown")
-
-        val shadowDialog = shadowOf(latestDialog)
-        assertEquals(title, shadowDialog.title.toString())
-
-        // Verify dialog is modal
-        assertFalse(shadowDialog.isCancelable, "Update dialog should be modal (not cancelable)")
-
-        // Verify both buttons exist using findViewById
-        val positiveButton = latestDialog.findViewById<Button>(android.R.id.button1)
-        val negativeButton = latestDialog.findViewById<Button>(android.R.id.button2)
-
-        assertNotNull(positiveButton, "Positive button should exist")
-        assertNotNull(negativeButton, "Negative button should exist")
-        assertEquals("Visit website", positiveButton.text.toString())
-        assertEquals("Remind me later", negativeButton.text.toString())
+    @Test fun `test update available dialog is modal and has correct buttons for website`() {
+        update()
+        compose.onNodeWithTag("root_dialog_positive").assertTextEquals(activity.getString(R.string.hs_download_positive_website))
+        compose.onNodeWithTag("root_dialog_negative").assertTextEquals(activity.getString(R.string.hs_download_negative_default))
+        outsideTouch()
+        compose.onNodeWithTag("root_dialog_positive").assertIsDisplayed()
+        assertNull(shadowOf(activity).nextStartedActivity)
     }
-
-    @Test
-    fun `test update available dialog is modal and has correct buttons for Play Store`() {
-        // Given
-        val title = "New Update!"
-        val customMessage = "A new version is available. Please update from Play Store."
-
-        // When
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(customMessage)
-        builder.setCancelable(false) // Modal
-
-        // Play Store version buttons
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog, "Dialog should be shown")
-
-        val shadowDialog = shadowOf(latestDialog)
-        assertEquals(title, shadowDialog.title.toString())
-
-        // Verify dialog is modal
-        assertFalse(shadowDialog.isCancelable, "Update dialog should be modal")
-
-        // Verify both buttons exist using findViewById
-        val positiveButton = latestDialog.findViewById<Button>(android.R.id.button1)
-        val negativeButton = latestDialog.findViewById<Button>(android.R.id.button2)
-
-        assertNotNull(positiveButton, "Positive button should exist")
-        assertNotNull(negativeButton, "Negative button should exist")
+    @Test fun `test update available dialog is modal and has correct buttons for Play Store`() {
+        update(AppUpdater.InstallSource.STORE)
+        compose.onNodeWithText("A new version is available. Please update from Play Store.").assertIsDisplayed()
+        compose.onNodeWithTag("root_dialog_positive").assertTextEquals(activity.getString(R.string.hs_download_positive_default))
+        compose.onNodeWithTag("root_dialog_negative").assertIsDisplayed()
+        compose.onNodeWithTag("root_dialog_positive").performClick()
+        assertEquals(1, calls.count { it == "complete-update" })
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
-
-    @Test
-    fun `test up-to-date dialog is dismissible with only OK button`() {
-        // Given
-        val title = "Up-to-date!"
-        val message = "You are already on the latest version."
-
-        // When
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true) // Dismissible - key difference from update dialog
-
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog, "Dialog should be shown")
-
-        val shadowDialog = shadowOf(latestDialog)
-        assertEquals(title, shadowDialog.title.toString())
-
-        // Verify dialog is dismissible
-        assertTrue(shadowDialog.isCancelable, "Up-to-date dialog should be dismissible")
-
-        // Verify only positive button exists using findViewById
-        val positiveButton = latestDialog.findViewById<Button>(android.R.id.button1)
-        assertNotNull(positiveButton, "Positive button should exist")
-        assertEquals("ok", positiveButton.text.toString())
+    @Test fun `test up-to-date dialog is dismissible with only OK button`() {
+        show(AppUpdater.InstallSource.OTHER, R.string.download_update_dialog_message_ok_title, R.string.download_update_dialog_message_ok)
+        compose.onNodeWithTag("root_dialog_positive").assertTextEquals(activity.getString(R.string.hs_download_positive_default))
+        compose.onNodeWithTag("root_dialog_negative").assertDoesNotExist()
+        compose.onNodeWithTag("root_dialog_positive").performClick()
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
-
-    @Test
-    fun `test error dialog is dismissible`() {
-        // Given
-        val title = "Something went wrong!"
-        val message = "Either our servers are down or connection could not be established."
-
-        // When
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true) // Dismissible
-
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog, "Dialog should be shown")
-
-        val shadowDialog = shadowOf(latestDialog)
-
-        // Verify dialog is dismissible
-        assertTrue(shadowDialog.isCancelable, "Error dialog should be dismissible")
+    @Test fun `test error dialog is dismissible`() {
+        show(AppUpdater.InstallSource.OTHER, R.string.download_update_dialog_failure_title, R.string.download_update_dialog_failure_message)
+        compose.onNodeWithTag("root_dialog_negative").assertDoesNotExist()
+        outsideTouch()
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
-
-    @Test
-    fun `test quota exceeded dialog is dismissible`() {
-        // Given
-        val title = "Can't update right now"
-        val message = "The update cannot be executed right now, please try again later."
-
-        // When
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true) // Dismissible
-
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog, "Dialog should be shown")
-
-        val shadowDialog = shadowOf(latestDialog)
-
-        // Verify dialog is dismissible
-        assertTrue(shadowDialog.isCancelable, "Quota exceeded dialog should be dismissible")
+    @Test fun `test quota exceeded dialog is dismissible`() {
+        show(AppUpdater.InstallSource.OTHER, R.string.download_update_dialog_trylater_title, R.string.download_update_dialog_trylater_message)
+        compose.onNodeWithTag("root_dialog_negative").assertDoesNotExist()
+        outsideTouch()
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
-
-    @Test
-    fun `test modal dialog cannot be dismissed by tapping outside`() {
-        // Given
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("New Update!")
-        builder.setMessage("Update available")
-        builder.setCancelable(false) // Modal - this is what we're testing
-
-        builder.setPositiveButton("Visit website") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog)
-
-        val shadowDialog = shadowOf(latestDialog)
-
-        // Verify cannot dismiss by tapping outside or pressing back
-        assertFalse(shadowDialog.isCancelable, "Modal dialog should not be cancelable")
-
-        // Verify dialog is still showing
-        assertTrue(latestDialog.isShowing, "Dialog should still be showing")
+    @Test fun `test modal dialog cannot be dismissed by tapping outside`() {
+        update()
+        outsideTouch()
+        compose.onNodeWithTag("root_dialog_positive").assertIsDisplayed()
+        compose.onNodeWithTag("root_dialog_negative").performClick()
+        assertEquals(1, calls.count { it == "postpone-update" })
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
-
-    @Test
-    fun `test dismissible dialog can be dismissed by tapping outside`() {
-        // Given
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Up-to-date!")
-        builder.setMessage("You are already on the latest version.")
-        builder.setCancelable(true) // Can dismiss by tapping outside
-
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        assertNotNull(latestDialog)
-
-        val shadowDialog = shadowOf(latestDialog)
-
-        // Verify can dismiss by tapping outside
-        assertTrue(shadowDialog.isCancelable, "Dismissible dialog should be cancelable")
+    @Test fun `test dismissible dialog can be dismissed by tapping outside`() {
+        show(AppUpdater.InstallSource.OTHER, R.string.download_update_dialog_message_ok_title, R.string.download_update_dialog_message_ok)
+        outsideTouch()
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
+        assertFalse(calls.contains("complete-update"))
+        assertFalse(calls.contains("postpone-update"))
     }
-
-    @Test
-    fun `test button clicks work correctly`() {
-        // Given
-        var positiveClicked = false
-
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("New Update!")
-        builder.setMessage("Update available")
-        builder.setCancelable(false)
-
-        builder.setPositiveButton("Visit website") { dialogInterface, _ ->
-            positiveClicked = true
-            dialogInterface.dismiss()
-        }
-        builder.setNegativeButton("Remind me later") { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-        ShadowLooper.idleMainLooper()
-
-        val latestDialog = ShadowAlertDialog.getLatestDialog()
-        val positiveButton = latestDialog?.findViewById<Button>(android.R.id.button1)
-
-        // When - Click positive button
-        positiveButton?.performClick()
-        ShadowLooper.idleMainLooper()
-
-        // Then
-        assertTrue(positiveClicked, "Positive button click should be registered")
+    @Test fun `test button clicks work correctly`() {
+        update()
+        compose.onNodeWithTag("root_dialog_positive").performClick()
+        val intent = shadowOf(activity).nextStartedActivity
+        assertNotNull(intent)
+        assertEquals(android.content.Intent.ACTION_VIEW, intent.action)
+        assertEquals(com.celzero.bravedns.util.Constants.RETHINK_APP_DOWNLOAD_LINK, intent.data.toString())
+        assertNull(shadowOf(activity).nextStartedActivity)
+        compose.onNodeWithTag("root_dialog_positive").assertDoesNotExist()
     }
 }

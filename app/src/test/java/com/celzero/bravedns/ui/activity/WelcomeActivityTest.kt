@@ -1,427 +1,217 @@
-/*
- * Copyright 2025 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Copyright 2025 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.ui.activity
 
-import android.content.Context
-import android.view.View
-import android.widget.Button
-import androidx.test.core.app.ApplicationProvider
-import androidx.viewpager2.widget.ViewPager2
+import android.app.Application
+import android.content.res.Configuration
+import android.os.Bundle
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Logger
+import io.mockk.*
+import org.junit.*
+import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import org.mockito.Mockito
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
+/**
+ * The original sixteen onboarding obligations, on the actual Activity and native UI.
+ * A plain Application and strict, memory-only PersistentState replace production startup.
+ * Robolectric records the Home Intent; HomeScreenActivity is never created. No permissions,
+ * services, manager, database, account, worker, tunnel or network boundary is installed.
+ */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [35], application = Application::class, qualifiers = "en-rUS-w360dp-h800dp")
 class WelcomeActivityTest {
-    private lateinit var mockPersistentState: PersistentState
-    private lateinit var context: Context
+    @get:Rule val compose = createEmptyComposeRule()
+    private lateinit var persistent: PersistentState
+    private var controller: ActivityController<WelcomeActivity>? = null
+    private var firstLaunch = true
+    private var themeId = Themes.LIGHT.id
+    private val writes = mutableListOf<Boolean>()
 
-    @Before
-    fun setUp() {
-        try {
-            stopKoin()
-        } catch (_: Exception) {
-            // Ignore if no Koin instance exists
+    @Before fun setUp() {
+        stopKoin()
+        persistent = mockk()
+        every { persistent.theme } answers { themeId }
+        every { persistent.firstTimeLaunch } answers { firstLaunch }
+        every { persistent.firstTimeLaunch = any() } answers {
+            firstLaunch = firstArg(); writes += firstArg<Boolean>()
         }
-
-        context = ApplicationProvider.getApplicationContext()
-        mockPersistentState = Mockito.mock(PersistentState::class.java)
-        Mockito.`when`(mockPersistentState.firstTimeLaunch).thenReturn(true)
-        Mockito.`when`(mockPersistentState.theme).thenReturn(0)
-
-        startKoin {
-            modules(module {
-                single<PersistentState> { mockPersistentState }
-            })
-        }
+        startKoin { modules(module { single { persistent } }) }
+        mockkObject(Logger)
+        every { Logger.d(any(), any()) } just Runs
+        every { Logger.v(any(), any()) } just Runs
     }
 
-    @After
-    fun tearDown() {
-        try {
-            stopKoin()
-        } catch (_: Exception) {
-            // Ignore if Koin is already stopped
-        }
+    @After fun tearDown() { closeHost(); unmockkObject(Logger); stopKoin() }
+
+    private fun launch(saved: Bundle? = null): WelcomeActivity {
+        check(controller == null)
+        val next = Robolectric.buildActivity(WelcomeActivity::class.java)
+        controller = next
+        next.create(saved).start().resume().visible()
+        compose.waitForIdle()
+        return next.get()
     }
-
-    @Test
-    fun testPersistentState_MockBehavior() {
-        assertTrue("Mock should return true for firstTimeLaunch", mockPersistentState.firstTimeLaunch)
-
-        Mockito.`when`(mockPersistentState.firstTimeLaunch).thenReturn(false)
-        assertFalse("Mock should return false for firstTimeLaunch", mockPersistentState.firstTimeLaunch)
-
-        Mockito.verify(mockPersistentState, Mockito.atLeast(2)).firstTimeLaunch
+    private fun closeHost() {
+        controller?.let { it.pause().stop().destroy() }
+        controller = null
     }
-
-    @Test
-    fun testWelcomeActivity_CanBeCreated() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().get()
-
-            assertNotNull("Activity should be created successfully", activity)
-            assertEquals("Activity class should match", WelcomeActivity::class.java, activity.javaClass)
-        } catch (e: Exception) {
-            assertTrue(
-                "Expected resource-related exception, got: ${e.message}",
-                e is android.content.res.Resources.NotFoundException ||
-                    e is IllegalStateException ||
-                    e.message?.contains("Resource") == true
-            )
+    private fun next(times: Int = 1) {
+        repeat(times) { compose.onNodeWithTag("welcome.next").performClick(); compose.waitForIdle() }
+    }
+    private fun assertPage(index: Int) {
+        compose.onNodeWithContentDescription("${index + 1} / 4").assertIsSelected()
+        (0..3).filter { it != index }.forEach {
+            compose.onNodeWithContentDescription("${it + 1} / 4").assertIsNotSelected()
         }
     }
-
-    @Test
-    fun testWelcomeActivity_KoinIntegration() {
-        val persistentStateFromKoin = GlobalContext.get().get<PersistentState>()
-        assertNotNull("PersistentState should be available from Koin", persistentStateFromKoin)
-        assertSame("Should be the same mock instance", mockPersistentState, persistentStateFromKoin)
+    private fun assertCompletion(activity: WelcomeActivity) {
+        assertEquals(listOf(false), writes)
+        assertFalse(firstLaunch)
+        assertTrue(activity.isFinishing)
+        val intent = shadowOf(activity).nextStartedActivity
+        assertNotNull("Completion must dispatch Home", intent)
+        assertEquals(HomeScreenActivity::class.java.name, intent.component?.className)
+        assertEquals(activity.packageName, intent.`package`)
+        assertNull("Completion must not dispatch a second destination", shadowOf(activity).nextStartedActivity)
     }
 
-    @Test
-    fun testLaunchHomeScreen() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val launchHomeScreenMethod =
-                WelcomeActivity::class.java.getDeclaredMethod("launchHomeScreen")
-            launchHomeScreenMethod.isAccessible = true
-            launchHomeScreenMethod.invoke(activity)
-
-            Mockito.verify(mockPersistentState, Mockito.times(1)).firstTimeLaunch = false
-
-            val shadowActivity = Shadows.shadowOf(activity)
-            val nextIntent = shadowActivity.nextStartedActivity
-            if (nextIntent != null) {
-                assertNotNull("HomeScreenActivity intent should be started", nextIntent)
-            }
-        } catch (e: Exception) {
-            val isResourceError =
-                e.message?.contains("Resource") == true ||
-                    e is android.content.res.Resources.NotFoundException ||
-                    e.cause is android.content.res.Resources.NotFoundException ||
-                    e is IllegalStateException
-            assertTrue("Test failed due to expected resource issues: ${e.message}", isResourceError)
+    @Test fun testPersistentState_MockBehavior() {
+        launch()
+        assertTrue(persistent.firstTimeLaunch)
+        assertTrue("Opening onboarding must not mark completion", writes.isEmpty())
+    }
+    @Test fun testWelcomeActivity_CanBeCreated() {
+        val activity = launch()
+        assertEquals(WelcomeActivity::class.java, activity.javaClass)
+        assertFalse(activity.isFinishing)
+        compose.onNodeWithTag("welcome.pager").assertIsDisplayed()
+    }
+    @Test fun testWelcomeActivity_KoinIntegration() {
+        launch()
+        assertSame(persistent, GlobalContext.get().get<PersistentState>())
+        verify(atLeast = 1) { persistent.theme }
+    }
+    @Test fun testLaunchHomeScreen() {
+        val activity = launch()
+        WelcomeActivity::class.java.getDeclaredMethod("launchHomeScreen")
+            .apply { isAccessible = true }.invoke(activity)
+        assertCompletion(activity)
+    }
+    @Test fun testIsDarkThemeOn() {
+        val activity = launch()
+        val actual = WelcomeActivity::class.java.getDeclaredMethod("isDarkThemeOn")
+            .apply { isAccessible = true }.invoke(activity)
+        val expected = activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        assertEquals(expected, actual)
+    }
+    @Test fun testWelcomeActivity_MockInteractions() {
+        launch(); next(3)
+        assertTrue(firstLaunch)
+        assertTrue("Page changes are not completion", writes.isEmpty())
+        verify(exactly = 0) { persistent.firstTimeLaunch = any() }
+    }
+    @Test fun testLayoutsArray() {
+        launch()
+        (1..4).forEach { compose.onNodeWithContentDescription("$it / 4").assertExists() }
+        compose.onNodeWithContentDescription("5 / 4").assertDoesNotExist()
+    }
+    @Test fun testPersistentStateInjection() {
+        themeId = Themes.DARK.id
+        launch()
+        assertSame(persistent, GlobalContext.get().get<PersistentState>())
+        verify(atLeast = 1) { persistent.theme }
+        assertEquals(Themes.DARK.id, persistent.theme)
+    }
+    @Test fun testBackPressHandling() {
+        val activity = launch()
+        compose.runOnIdle { activity.onBackPressedDispatcher.onBackPressed() }
+        assertCompletion(activity)
+    }
+    @Test fun testPageChangeListener_LastPageBehavior() {
+        launch(); next(3); assertPage(3)
+        compose.onNodeWithTag("welcome.next").assertTextEquals(controller!!.get().getString(R.string.finish))
+        compose.onNodeWithTag("welcome.skip").assertDoesNotExist()
+    }
+    @Test fun testViewPager2_ButtonVisibilityOnLastPage() {
+        launch(); next(3)
+        compose.onNodeWithTag("welcome.next").assertIsDisplayed().assertHasClickAction()
+        compose.onNodeWithTag("welcome.skip").assertDoesNotExist()
+        assertTrue(writes.isEmpty())
+    }
+    @Test fun testViewPager2_ButtonVisibilityOnFirstPage() {
+        val activity = launch(); assertPage(0)
+        compose.onNodeWithTag("welcome.next").assertIsDisplayed().assertTextEquals(activity.getString(R.string.next))
+        compose.onNodeWithTag("welcome.skip").assertIsDisplayed().assertTextEquals(activity.getString(R.string.skip))
+    }
+    @Test fun testSkipButton_LaunchesHomeScreen() {
+        val activity = launch()
+        compose.onNodeWithTag("welcome.skip").performClick()
+        assertCompletion(activity)
+    }
+    @Test fun testNextButton_AdvancesPage() {
+        launch(); assertPage(0)
+        for (page in 1..3) { next(); assertPage(page) }
+        assertTrue(writes.isEmpty())
+    }
+    @Test fun testNextButton_OnLastPage_LaunchesHomeScreen() {
+        val activity = launch(); next(3)
+        assertTrue(writes.isEmpty()); next()
+        assertCompletion(activity)
+    }
+    @Test fun testWelcomePagerAdapter_ItemCount() {
+        launch()
+        compose.onAllNodes(hasContentDescription("1 / 4") or hasContentDescription("2 / 4") or
+            hasContentDescription("3 / 4") or hasContentDescription("4 / 4")).assertCountEquals(4)
+        assertPage(0)
+    }
+    @Test fun actualActivitySaveRestoreRetainsPageWithoutCompleting() {
+        launch(); next(2)
+        val saved = Bundle()
+        controller!!.pause().saveInstanceState(saved).stop().destroy(); controller = null
+        assertEquals(2, saved.getInt("welcome.page"))
+        launch(saved); assertPage(2)
+        assertTrue(writes.isEmpty())
+        next(); assertPage(3)
+    }
+    @Test fun allStoredThemesRecreateTheActualHostAndRetainOnboardingPage() {
+        launch(); next()
+        for (theme in Themes.entries) {
+            val saved = Bundle()
+            controller!!.pause().saveInstanceState(saved).stop().destroy(); controller = null
+            themeId = theme.id
+            launch(saved); assertPage(1)
+            compose.onNodeWithTag("welcome.next").assertHasClickAction()
+            assertTrue(writes.isEmpty())
         }
     }
-
-    @Test
-    fun testIsDarkThemeOn() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().get()
-
-            val isDarkThemeOnMethod =
-                WelcomeActivity::class.java.getDeclaredMethod("isDarkThemeOn")
-            isDarkThemeOnMethod.isAccessible = true
-            val isDarkTheme = isDarkThemeOnMethod.invoke(activity) as Boolean
-
-            assertTrue("isDarkThemeOn should return a boolean", isDarkTheme is Boolean)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
+    // Original device suite contracts merged here to capture, rather than launch, Home.
+    @Test fun testWelcomeOnboardingFlow() {
+        val activity = launch()
+        compose.onNodeWithTag("welcome.next").assertTextEquals(activity.getString(R.string.next))
+        for (page in 1..3) { next(); assertPage(page) }
+        compose.onNodeWithTag("welcome.next").assertTextEquals(activity.getString(R.string.finish))
+        assertTrue(writes.isEmpty())
+    }
+    @Test fun testSkipButton() {
+        val activity = launch()
+        compose.onNodeWithTag("welcome.skip").assertIsDisplayed().performClick()
+        assertCompletion(activity)
     }
 
-    @Test
-    fun testWelcomeActivity_MockInteractions() {
-        val isFirstTime = mockPersistentState.firstTimeLaunch
-        assertTrue("Should be first time launch", isFirstTime)
-
-        Mockito.doNothing().`when`(mockPersistentState).firstTimeLaunch = false
-        mockPersistentState.firstTimeLaunch = false
-
-        Mockito.verify(mockPersistentState, Mockito.atLeastOnce()).firstTimeLaunch
-    }
-
-    @Test
-    fun testLayoutsArray() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().get()
-
-            val layoutsField = WelcomeActivity::class.java.getDeclaredField("layouts")
-            layoutsField.isAccessible = true
-            val layouts = layoutsField.get(activity) as IntArray
-
-            assertEquals("Should have 4 layout resources", 4, layouts.size)
-            layouts.forEach { layoutId ->
-                assertTrue("Layout ID should be valid", layoutId > 0)
-            }
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testPersistentStateInjection() {
-        val persistentStateFromKoin = GlobalContext.get().get<PersistentState>()
-        assertNotNull("PersistentState should be injected", persistentStateFromKoin)
-        assertSame("Should be the same mock instance", mockPersistentState, persistentStateFromKoin)
-
-        val theme = mockPersistentState.theme
-        assertEquals("Theme should be 0 (default)", 0, theme)
-    }
-
-    @Test
-    fun testBackPressHandling() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            activity.onBackPressedDispatcher.onBackPressed()
-
-            val shadowActivity = Shadows.shadowOf(activity)
-            val nextIntent = shadowActivity.nextStartedActivity
-            if (nextIntent != null) {
-                assertNotNull("Intent should be started on back press", nextIntent)
-            }
-
-            assertTrue("Back press handling test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testPageChangeListener_LastPageBehavior() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val layoutsField = WelcomeActivity::class.java.getDeclaredField("layouts")
-            layoutsField.isAccessible = true
-            val layouts = layoutsField.get(activity) as IntArray
-
-            assertEquals("Should have 4 layouts", 4, layouts.size)
-            assertEquals("Last page index should be 3", 3, layouts.size - 1)
-        } catch (_: Exception) {
-            val layouts = intArrayOf(
-                R.layout.welcome_slide1, R.layout.welcome_slide2,
-                R.layout.welcome_slide3, R.layout.welcome_slide4
-            )
-            assertEquals("Should have 4 layouts", 4, layouts.size)
-            assertEquals("Last page index should be 3", 3, layouts.size - 1)
-        }
-    }
-
-    @Test
-    fun testViewPager2_ButtonVisibilityOnLastPage() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val viewPager = try {
-                activity.findViewById<ViewPager2>(R.id.view_pager)
-            } catch (_: Exception) { null }
-
-            viewPager?.let { pager ->
-                pager.currentItem = 3
-
-                val btnNext = try { activity.findViewById<Button>(R.id.btn_next) } catch (_: Exception) { null }
-                val btnSkip = try { activity.findViewById<Button>(R.id.btn_skip) } catch (_: Exception) { null }
-
-                btnNext?.let { next ->
-                    btnSkip?.let { skip ->
-                        assertEquals(
-                            "Next button should show 'finish' text",
-                            context.getString(R.string.finish),
-                            next.text.toString()
-                        )
-                        assertEquals(
-                            "Skip button should be invisible",
-                            View.INVISIBLE,
-                            skip.visibility
-                        )
-                    }
-                }
-            }
-
-            assertTrue("Last page behavior test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testViewPager2_ButtonVisibilityOnFirstPage() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val viewPager = try {
-                activity.findViewById<ViewPager2>(R.id.view_pager)
-            } catch (_: Exception) { null }
-
-            viewPager?.let { pager ->
-                pager.currentItem = 0
-
-                val btnNext = try { activity.findViewById<Button>(R.id.btn_next) } catch (_: Exception) { null }
-                val btnSkip = try { activity.findViewById<Button>(R.id.btn_skip) } catch (_: Exception) { null }
-
-                btnNext?.let { next ->
-                    btnSkip?.let { skip ->
-                        assertEquals(
-                            "Next button should show 'next' text",
-                            context.getString(R.string.next),
-                            next.text.toString()
-                        )
-                        assertEquals(
-                            "Skip button should be visible",
-                            View.VISIBLE,
-                            skip.visibility
-                        )
-                    }
-                }
-            }
-
-            assertTrue("First page behavior test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testSkipButton_LaunchesHomeScreen() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val btnSkip = try {
-                activity.findViewById<Button>(R.id.btn_skip)
-            } catch (_: Exception) { null }
-
-            if (btnSkip != null) {
-                btnSkip.performClick()
-
-                val shadowActivity = Shadows.shadowOf(activity)
-                val nextIntent = shadowActivity.nextStartedActivity
-                if (nextIntent != null) {
-                    assertNotNull("Intent should be started when skip is clicked", nextIntent)
-                }
-            }
-
-            assertTrue("Skip button test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testNextButton_AdvancesPage() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val viewPager = try {
-                activity.findViewById<ViewPager2>(R.id.view_pager)
-            } catch (_: Exception) { null }
-
-            val btnNext = try {
-                activity.findViewById<Button>(R.id.btn_next)
-            } catch (_: Exception) { null }
-
-            if (viewPager != null && btnNext != null) {
-                viewPager.currentItem = 0
-                val initialItem = viewPager.currentItem
-                btnNext.performClick()
-
-                val newItem = viewPager.currentItem
-                assertTrue(
-                    "Should advance to next page or stay same due to constraints",
-                    newItem >= initialItem
-                )
-            }
-
-            assertTrue("Next button advance page test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testNextButton_OnLastPage_LaunchesHomeScreen() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().start().resume().get()
-
-            val viewPager = try {
-                activity.findViewById<ViewPager2>(R.id.view_pager)
-            } catch (_: Exception) { null }
-
-            val btnNext = try {
-                activity.findViewById<Button>(R.id.btn_next)
-            } catch (_: Exception) { null }
-
-            if (viewPager != null && btnNext != null) {
-                viewPager.currentItem = 3
-                btnNext.performClick()
-
-                val shadowActivity = Shadows.shadowOf(activity)
-                val nextIntent = shadowActivity.nextStartedActivity
-                if (nextIntent != null) {
-                    assertNotNull("Intent should be started", nextIntent)
-                }
-
-                Mockito.verify(mockPersistentState, Mockito.atLeastOnce()).firstTimeLaunch = false
-            }
-
-            assertTrue("Next button on last page test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
-
-    @Test
-    fun testWelcomePagerAdapter_ItemCount() {
-        try {
-            val controller = Robolectric.buildActivity(WelcomeActivity::class.java)
-            val activity = controller.create().get()
-
-            val viewPager = try {
-                activity.findViewById<ViewPager2>(R.id.view_pager)
-            } catch (_: Exception) { null }
-
-            viewPager?.adapter?.let { adapter ->
-                assertEquals("Adapter should return 4 pages", 4, adapter.itemCount)
-            }
-
-            assertTrue("WelcomePagerAdapter item count test completed", true)
-        } catch (_: Exception) {
-            assertTrue("Test completed with expected resource constraints", true)
-        }
-    }
 }
