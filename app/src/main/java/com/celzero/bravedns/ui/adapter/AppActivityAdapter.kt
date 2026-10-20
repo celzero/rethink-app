@@ -155,6 +155,16 @@ class AppActivityAdapter(
         }
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        holder.itemView.clearFocus()
+        super.onViewRecycled(holder)
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        holder.itemView.clearFocus()
+        super.onViewDetachedFromWindow(holder)
+    }
+
     // compact count rendering shared by the app headers and the child rows;
     // mirrors HomeScreenFragment's fhs card counts (1.5K instead of 999+)
     private fun formatCount(n: Long): String {
