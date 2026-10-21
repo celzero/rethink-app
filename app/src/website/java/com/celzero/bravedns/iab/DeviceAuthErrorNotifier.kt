@@ -83,7 +83,8 @@ object DeviceAuthErrorNotifier {
                 context,
                 tapIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_IAB_DEVICE_AUTH_ERROR
             )
 
             // Ensure the channel exists (idempotent: safe to call on every notification)

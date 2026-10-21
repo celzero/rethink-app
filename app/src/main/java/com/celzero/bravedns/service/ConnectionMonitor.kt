@@ -481,7 +481,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 context,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_SSID_LOCATION_PERMISSION
             )
 
         var builder: NotificationCompat.Builder

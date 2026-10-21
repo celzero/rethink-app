@@ -83,7 +83,8 @@ object DeviceNotRegisteredNotifier {
                 context,
                 tapIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_IAB_DEVICE_NOT_REGISTERED
             )
 
             // Ensure the notification channel exists (idempotent).
