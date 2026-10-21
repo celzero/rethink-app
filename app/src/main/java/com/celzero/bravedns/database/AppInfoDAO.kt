@@ -278,4 +278,12 @@ interface AppInfoDAO {
             "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
     )
     fun clearAllExpiredTempAllows(now: Long, modifiedTs: Long): Int
+
+    @Query(
+        "select uid, tempAllowExpiryTime from AppInfo " +
+            "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
+    )
+    fun getExpiredTempAllows(now: Long): List<ExpiredTempAllow>
 }
+
+data class ExpiredTempAllow(val uid: Int, val tempAllowExpiryTime: Long)

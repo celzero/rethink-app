@@ -345,7 +345,9 @@ object FirewallManager : KoinComponent {
                 if (notification.cause == RemovalCause.EXPIRED) {
                     tempAllowDbExecutor.execute {
                         runCatching {
-                            db.clearTempAllowByUidIfExpiryBlocking(uid, expiry)
+                            if (db.clearTempAllowByUidIfExpiryBlocking(uid, expiry) > 0) {
+                                closeConnectionsForExpiredTempAllows(listOf(uid))
+                            }
                         }.onFailure { t ->
                             Logger.e(LOG_TAG_FIREWALL, "err clearing expired temp allow: ${t.message}", t as? Exception)
                         }
@@ -412,7 +414,9 @@ object FirewallManager : KoinComponent {
             val expiry = ai.tempAllowExpiryTime
             if (expiry <= now) {
                 try {
-                    db.clearTempAllowByUidIfExpiry(ai.uid, expiry)
+                    if (db.clearTempAllowByUidIfExpiry(ai.uid, expiry) > 0) {
+                        closeConnectionsForExpiredTempAllows(listOf(ai.uid))
+                    }
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_FIREWALL, "err clearing stale temp allow: ${e.message}", e)
                 }
@@ -934,11 +938,19 @@ object FirewallManager : KoinComponent {
             return
         }
         tempAllowCache.invalidate(uid)
+        closeConnectionsForExpiredTempAllows(listOf(uid))
 
         // schedule/cancel based on remaining entries (DB is source of truth)
         scheduleTempAllowExpiryIfPossible()
 
         Logger.i(LOG_TAG_FIREWALL, "Temporary allow reverted for uid: $uid")
+    }
+
+    fun closeConnectionsForExpiredTempAllows(uids: List<Int>) {
+        uids.forEach { uid ->
+            tempAllowCache.invalidate(uid) // explicit removal, does not re-trigger the EXPIRED listener
+            VpnController.closeConnectionsIfNeeded(uid, "temp-allow-expired-close")
+        }
     }
 
     suspend fun isTempAllowed(uid: Int): Boolean {

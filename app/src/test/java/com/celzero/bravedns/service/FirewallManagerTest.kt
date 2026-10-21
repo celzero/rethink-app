@@ -31,6 +31,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -886,5 +887,36 @@ class FirewallManagerTest : KoinTest {
         assertNotNull("connectionStatus should return a valid status", status1)
         assertNotNull("connectionStatus should return a valid status", status2)
         assertEquals(FirewallManager.ConnectionStatus.ALLOW, statusInvalid) // Invalid UID should return ALLOW
+    }
+
+    // Temp-allow expiry must close the uid's active connections (bug: expired sockets stayed open)
+    @Test
+    fun testCloseConnectionsForExpiredTempAllows_closesPerUid() {
+        FirewallManager.closeConnectionsForExpiredTempAllows(listOf(testUid1, testUid2))
+
+        verify { VpnController.closeConnectionsIfNeeded(testUid1, "temp-allow-expired-close") }
+        verify { VpnController.closeConnectionsIfNeeded(testUid2, "temp-allow-expired-close") }
+    }
+
+    @Test
+    fun testCloseConnectionsForExpiredTempAllows_invalidatesCache() = runBlocking {
+        FirewallManager.updateTempAllowStatus(testUid1, 15)
+        assertTrue(FirewallManager.isTempAllowed(testUid1))
+
+        FirewallManager.closeConnectionsForExpiredTempAllows(listOf(testUid1))
+
+        verify(exactly = 1) { VpnController.closeConnectionsIfNeeded(testUid1, "temp-allow-expired-close") }
+        assertFalse(FirewallManager.isTempAllowed(testUid1))
+    }
+
+    @Test
+    fun testRevertTempAllow_closesConnections() = runBlocking {
+        FirewallManager.updateTempAllowStatus(testUid1, 15)
+        assertTrue(FirewallManager.isTempAllowed(testUid1))
+
+        FirewallManager.updateTempAllow(testUid1, false)
+
+        verify { VpnController.closeConnectionsIfNeeded(testUid1, "temp-allow-expired-close") }
+        assertFalse(FirewallManager.isTempAllowed(testUid1))
     }
 }
