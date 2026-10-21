@@ -100,7 +100,8 @@ object PurchaseConflictNotifier {
                 context,
                 tapIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_IAB_CONFLICT
             )
 
             // Ensure the channel exists (idempotent: safe to call on every notification)

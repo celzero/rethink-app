@@ -93,6 +93,7 @@ internal constructor(
         const val ACTION_INSERT_NEW_APP = ACTION_BASE + 5
         const val PENDING_INTENT_REQUEST_CODE_ALLOW = 0x10000000
         const val PENDING_INTENT_REQUEST_CODE_DENY = 0x20000000
+        private const val PENDING_INTENT_REQUEST_CODE_BULK_NEW_APP = 0x30000000
     }
 
     private val randomNotifId: Random = Random
@@ -730,7 +731,13 @@ internal constructor(
         )
 
         val pendingIntent =
-            getActivityPendingIntent(ctx, intent, PendingIntent.FLAG_ONE_SHOT, mutable = false)
+            getActivityPendingIntent(
+                ctx,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT,
+                mutable = false,
+                requestCode = PENDING_INTENT_REQUEST_CODE_BULK_NEW_APP
+            )
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -815,7 +822,8 @@ internal constructor(
                 ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = app.uid
             )
 
         val builder: NotificationCompat.Builder
