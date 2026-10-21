@@ -60,9 +60,6 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
         private const val DEFAULT_MTU = "-1"
-        // when dns is set to auto, the default dns is set to 1.1.1.1. this differs from official
-        // wireguard for android, because rethink requires a dns to be set in "Simple" mode
-        private const val DEFAULT_DNS = "1.1.1.1"
         private const val DEFAULT_LISTEN_PORT = "0"
     }
 
@@ -166,7 +163,7 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
             val addresses = b.addressesLabelText.text.toString()
             val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
             val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
-            val dnsServers = b.dnsServersText.text.toString().ifEmpty { DEFAULT_DNS }
+            val dnsServers = b.dnsServersText.text.toString().ifEmpty { WgInterface.DEFAULT_DNS }
             val privateKey = b.privateKeyText.text.toString()
             io {
                 val isInterfaceAdded =
