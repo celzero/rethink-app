@@ -75,6 +75,18 @@ class WgInterfaceTest {
     }
 
     @Test
+    fun `userspace string keeps search domains alongside numeric resolvers`() {
+        val wgInterface =
+            newInterface {
+                parseAddresses("10.0.101.3/32")
+                parseDnsServers("8.8.8.8,example.internal")
+            }
+        val userspace = wgInterface.toWgUserspaceString(true)
+        assertTrue(userspace.contains("dns=8.8.8.8,example.internal\n"))
+        assertFalse(userspace.contains(WgInterface.DEFAULT_DNS))
+    }
+
+    @Test
     fun `quick string is unaffected by the userspace dns fallback`() {
         val wgInterface = newInterface { parseAddresses("10.0.101.3/32") }
         assertFalse(wgInterface.toWgQuickString().contains("DNS"))
