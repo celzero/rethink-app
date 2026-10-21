@@ -108,6 +108,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -137,6 +139,11 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var isNotesSaveInFlight: Boolean = false
     private var notesDialog: AlertDialog? = null
     private var notesEditText: EditText? = null
+
+    // ticks the temp-allow countdown label until expiry
+    private var tempAllowTickerJob: Job? = null
+    private var tempAllowExpiryMs: Long = 0L
+    private var suppressTempAllowListener: Boolean = false
 
     // current presentation mode of the network-log sections; mirrors the stats
     // screen's persisted preference so both surfaces stay in sync
@@ -196,6 +203,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val TEMP_ALLOW_DURATION_MINUTES = 15
         private const val MILLIS_PER_MINUTE = 60
         private const val MILLIS_PER_SECOND = 1000L
+        private const val TEMP_ALLOW_TICK_INTERVAL_MS = 30_000L
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
         private const val MAX_NOTE_LENGTH = 500
@@ -357,7 +365,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 
                 // Set temporary allow toggle state
                 val isTempAllowed = FirewallManager.isTempAllowed(appInfo.uid)
-                b.tempAllowSwitch.isChecked = isTempAllowed
+                if (b.tempAllowSwitch.isChecked != isTempAllowed) {
+                    suppressTempAllowListener = true
+                    b.tempAllowSwitch.isChecked = isTempAllowed
+                }
                 updateTempAllowDescription(isTempAllowed, appInfo.tempAllowExpiryTime)
                 
                 displayDataUsage()
@@ -924,6 +935,24 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // ticker is cancelled in onPause; re-render (or lapse) and restart it here
+        if (tempAllowExpiryMs > 0L) {
+            if (System.currentTimeMillis() >= tempAllowExpiryMs) {
+                onTempAllowExpiredOrDisabled()
+            } else {
+                renderTempAllowLabel()
+                startTempAllowTicker()
+            }
+        }
+    }
+
+    override fun onPause() {
+        stopTempAllowTicker()
+        super.onPause()
+    }
+
     override fun onDestroy() {
         // detach snapshot observers before the view tree goes away so nothing
         // holds a reference to the (dying) adapters or row containers
@@ -1185,6 +1214,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         b.tempAllowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressTempAllowListener) {
+                suppressTempAllowListener = false
+                return@setOnCheckedChangeListener
+            }
             updateTempAllowStatus(isChecked)
         }
 
@@ -1259,22 +1292,55 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun updateTempAllowDescription(isAllowed: Boolean, expiryTime: Long) {
-        if (isAllowed && expiryTime > 0) {
-            val now = System.currentTimeMillis()
-            if (expiryTime > now) {
-                val relativeTime = DateUtils.getRelativeTimeSpanString(
-                    expiryTime,
-                    now,
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
-                b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
-            } else {
-                b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
-            }
+        if (isAllowed && expiryTime > System.currentTimeMillis()) {
+            tempAllowExpiryMs = expiryTime
+            renderTempAllowLabel()
+            startTempAllowTicker()
         } else {
-            b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+            onTempAllowExpiredOrDisabled()
         }
+    }
+
+    private fun renderTempAllowLabel() {
+        val relativeTime = DateUtils.getRelativeTimeSpanString(
+            tempAllowExpiryMs,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+        b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
+    }
+
+    private fun onTempAllowExpiredOrDisabled() {
+        stopTempAllowTicker()
+        tempAllowExpiryMs = 0L
+        if (b.tempAllowSwitch.isChecked) {
+            suppressTempAllowListener = true
+            b.tempAllowSwitch.isChecked = false
+        }
+        b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+    }
+
+    // ticks only while resumed (cancelled in onPause); refreshes the countdown label
+    // and resets the toggle ui when the window lapses
+    private fun startTempAllowTicker() {
+        if (tempAllowTickerJob?.isActive == true) return
+        tempAllowTickerJob = lifecycleScope.launch(Dispatchers.Main) {
+            while (isActive) {
+                delay(TEMP_ALLOW_TICK_INTERVAL_MS)
+                if (tempAllowExpiryMs <= 0L) break
+                if (System.currentTimeMillis() >= tempAllowExpiryMs) {
+                    onTempAllowExpiredOrDisabled()
+                    break
+                }
+                renderTempAllowLabel()
+            }
+        }
+    }
+
+    private fun stopTempAllowTicker() {
+        tempAllowTickerJob?.cancel()
+        tempAllowTickerJob = null
     }
 
     private fun openAppWiseDomainLogsActivity(
