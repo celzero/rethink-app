@@ -29,7 +29,6 @@ import com.celzero.bravedns.util.GoReportingHandler
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP
 import com.google.firebase.FirebaseApp
-import androidx.work.Configuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,12 +39,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
-class RethinkDnsApplicationPlay : Application(), Configuration.Provider {
-
-    // on-demand init: WorkManager self-initializes even if the
-    // androidx.startup initializer never ran on this device
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder().build()
+class RethinkDnsApplicationPlay : Application() {
 
     override fun onCreate() {
         super.onCreate()
