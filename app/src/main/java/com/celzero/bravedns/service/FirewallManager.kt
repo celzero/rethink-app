@@ -953,12 +953,13 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    suspend fun isTempAllowed(uid: Int): Boolean {
+    // cached expiry for an active temp-allow rule; 0 when none is active
+    suspend fun getTempAllowExpiry(uid: Int): Long {
         val now = System.currentTimeMillis()
 
         val cachedExpiry = tempAllowCache.getIfPresent(uid)
         if (cachedExpiry != null) {
-            return now < cachedExpiry
+            return if (now < cachedExpiry) cachedExpiry else 0L
         }
 
         // Cache miss: consult DB (source of truth) and warm cache if still valid.
@@ -970,13 +971,15 @@ object FirewallManager : KoinComponent {
 
         if (ai?.tempAllowEnabled == true && ai.tempAllowExpiryTime > now) {
             tempAllowCache.put(uid, ai.tempAllowExpiryTime)
-            return true
+            return ai.tempAllowExpiryTime
         }
 
         // If DB says expired/disabled, ensure cache doesn't keep it.
         tempAllowCache.invalidate(uid)
-        return false
+        return 0L
     }
+
+    suspend fun isTempAllowed(uid: Int): Boolean = getTempAllowExpiry(uid) > 0L
 
     suspend fun updateTempAllow(uid: Int, enabled: Boolean) {
         if (enabled) {

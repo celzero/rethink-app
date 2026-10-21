@@ -919,4 +919,18 @@ class FirewallManagerTest : KoinTest {
         verify { VpnController.closeConnectionsIfNeeded(testUid1, "temp-allow-expired-close") }
         assertFalse(FirewallManager.isTempAllowed(testUid1))
     }
+
+    @Test
+    fun testGetTempAllowExpiry_matchesActiveRule() = runBlocking {
+        assertEquals(0L, FirewallManager.getTempAllowExpiry(testUid1))
+
+        FirewallManager.updateTempAllowStatus(testUid1, 15)
+        val expiry = FirewallManager.getTempAllowExpiry(testUid1)
+        assertTrue(expiry > System.currentTimeMillis())
+        assertTrue(FirewallManager.isTempAllowed(testUid1))
+
+        FirewallManager.closeConnectionsForExpiredTempAllows(listOf(testUid1))
+        assertEquals(0L, FirewallManager.getTempAllowExpiry(testUid1))
+        assertFalse(FirewallManager.isTempAllowed(testUid1))
+    }
 }

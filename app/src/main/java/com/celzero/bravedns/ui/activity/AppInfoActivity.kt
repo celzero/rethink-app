@@ -364,12 +364,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 
                 // Set temporary allow toggle state
-                val isTempAllowed = FirewallManager.isTempAllowed(appInfo.uid)
+                val tempAllowExpiry = FirewallManager.getTempAllowExpiry(appInfo.uid)
+                val isTempAllowed = tempAllowExpiry > 0L
                 if (b.tempAllowSwitch.isChecked != isTempAllowed) {
                     suppressTempAllowListener = true
                     b.tempAllowSwitch.isChecked = isTempAllowed
                 }
-                updateTempAllowDescription(isTempAllowed, appInfo.tempAllowExpiryTime)
+                updateTempAllowDescription(isTempAllowed, tempAllowExpiry)
                 
                 displayDataUsage()
                 displayProxyStatus()
