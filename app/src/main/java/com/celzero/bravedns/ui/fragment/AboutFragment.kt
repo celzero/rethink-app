@@ -1340,14 +1340,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val procScrollView    = makeScrollableSpannable(otherSpan)
         val metricsContent = buildString {
-            appendLine("Memory Metrics")
             appendLine(memMetrics)
             appendLine()
             appendLine(formatedMetrics.orEmpty())
         }
         val metricsScrollView = makeScrollableText(metricsContent)
 
-        val tabProc    = makeTabButton("Threads / Proc / Mem")
+        val tabProc    = makeTabButton("Threads / Proc")
         val tabMetrics = makeTabButton("Metrics")
 
         fun selectTab(showProc: Boolean) {
