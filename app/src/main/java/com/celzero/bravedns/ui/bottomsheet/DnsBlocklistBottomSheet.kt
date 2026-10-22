@@ -32,6 +32,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -47,6 +48,7 @@ import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
@@ -143,6 +145,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         // Setup basic UI immediately (lightweight operations)
         b.dnsBlockUrl.text = log?.queryStr.orEmpty()
         b.dnsBlockIpAddress.text = getResponseIp()
+        setupResponseIpsArrow()
         b.dnsBlockConnectionFlag.text = log?.flag.orEmpty()
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log?.ttl?.toString().orEmpty())
         if (log?.blockedTarget?.isEmpty() == true) {
@@ -247,6 +250,58 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     private fun getResponseIp(): String {
         val ips = log?.response?.split(",") ?: return ""
         return ips.firstOrNull() ?: ""
+    }
+
+    private fun setupResponseIpsArrow() {
+        val currentLog = log ?: return
+        val ips = currentLog.responseIps.split(",")
+        if (ips.count() <= 1) return
+        b.dnsBlockIpArrow.visibility = View.VISIBLE
+        // the selectable ip text consumes taps, so it needs its own listener
+        b.dnsBlockIpAddress.setOnClickListener { showIpsDialog() }
+        b.dnsBlockIpHeader.setOnClickListener { showIpsDialog() }
+    }
+
+    private fun showIpsDialog() {
+        val currentLog = log
+        if (currentLog == null) {
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, not showing dialog")
+            return
+        }
+
+        val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
+
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
+        UIUtils.capDialogWidth(dialog)
+
+        if (b.dnsBlockFavIcon.isVisible) {
+            dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
+        } else {
+            dialogBinding.ipDetailsFavIcon.visibility = View.GONE
+        }
+
+        dialogBinding.ipDetailsFqdnTxt.text = currentLog.queryStr
+        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(currentLog.responseIps)
+
+        dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun formatIps(ips: String): Spanned {
+        var text = ""
+        ips.split(",").forEach {
+            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..1)), it)
+        }
+        return htmlToSpannedText(text)
     }
 
     private fun updateRulesUi(domain: String) {
