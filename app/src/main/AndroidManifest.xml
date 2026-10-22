@@ -35,6 +35,9 @@
 
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
+    <!-- required by Window#setHideOverlayWindows (API 31+) on some builds -->
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
+
     <!-- https://github.com/celzero/rethink-app/issues/786 set memtagMode to off -->
     <application
         android:name=".RethinkDnsApplication"

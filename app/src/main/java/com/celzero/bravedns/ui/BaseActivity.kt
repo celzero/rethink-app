@@ -27,6 +27,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -163,7 +165,11 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
      */
     private fun applyOverlayWindowGuard() {
         if (!isAtleastS()) return
-        window.setHideOverlayWindows(true)
+        try {
+            window.setHideOverlayWindows(true)
+        } catch (e: SecurityException) {
+            Logger.e(LOG_TAG_UI, "err hiding overlay windows: ${e.message}", e)
+        }
     }
 
     /**
