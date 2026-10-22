@@ -48,6 +48,11 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
+# R8 (AGP 9.x) strips IdnaMappingTable's constructor from <clinit>, leaving the
+# sections/ranges/mappings fields null and crashing the first HttpUrl.parse on
+# some devices. ref: square/okhttp#8574, okhttp PR #8994.
+-keep class okhttp3.internal.idn.** { *; }
+
 # Guava: LocalCache uses reflection and Unsafe to access some of its members,
 # which can lead to AssertionError in R8 full mode if not kept properly.
 -keep class com.google.common.cache.LocalCache$Segment { *; }
