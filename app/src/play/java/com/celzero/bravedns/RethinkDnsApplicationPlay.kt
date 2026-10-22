@@ -24,7 +24,6 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.PlayInAppMessageProvider
 import com.celzero.bravedns.util.FirebaseErrorReporting
-import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP
@@ -74,8 +73,6 @@ class RethinkDnsApplicationPlay : Application(), Configuration.Provider {
 
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-        // Initialize exception handlers
-        GlobalExceptionHandler.initialize(this)
         appScope.launch(Dispatchers.IO) {
             try {
                 FirebaseApp.initializeApp(this@RethinkDnsApplicationPlay)
