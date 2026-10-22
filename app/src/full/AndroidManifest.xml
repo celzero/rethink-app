@@ -183,6 +183,9 @@
         <activity
             android:name=".ui.activity.PingTestActivity"
             android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ConnectionCheckActivity"
+            android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.FragmentHostActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"

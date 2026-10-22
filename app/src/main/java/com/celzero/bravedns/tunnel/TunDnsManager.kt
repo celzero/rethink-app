@@ -47,7 +47,75 @@ import java.time.Duration
 
 object TunDnsManager: KoinComponent {
     private const val TAG = "TunDnsManager"
+
+    // branch labels attached to [DnsDecision]; surfaced by the connection simulator ui
+    internal const val BRANCH_CAPTIVE_PORTAL = "captive-portal"
+    internal const val BRANCH_RETHINK_UID = "rethink-uid"
+    internal const val BRANCH_FALLBACK = "unknown-mode-fallback"
+    internal const val BRANCH_APP_TRUSTED = "app-trusted"
+    internal const val BRANCH_APP_BLOCKED = "app-blocked"
+    internal const val BRANCH_GLOBAL_TRUSTED = "global-trusted"
+    internal const val BRANCH_GLOBAL_BLOCKED = "global-blocked"
+    internal const val BRANCH_DEFAULT = "default"
+    internal const val BRANCH_FORCE_BYPASS = "force-bypass"
+    internal const val BRANCH_PROTECTED_UID = "protected-uid"
+    internal const val BRANCH_NO_UID_BYPASS = "no-uid-bypass"
+    internal const val BRANCH_NO_UID_TRUSTED = "no-uid-trusted"
+    internal const val BRANCH_NO_UID_GLOBAL_BLOCK = "no-uid-global-block"
+    internal const val BRANCH_NO_UID_UNKNOWN_BLOCK = "no-uid-unknown-block"
+    internal const val BRANCH_NO_UID_DEFAULT = "no-uid-default"
+    internal const val BRANCH_TEMP_ALLOWED = "temp-allowed"
+    internal const val BRANCH_CONN_BLOCKED = "conn-blocked"
+    internal const val BRANCH_BYPASS_DNS = "bypass-dns-firewall"
+    internal const val BRANCH_APP_TRUSTED_DF = "app-trusted-df"
+    internal const val BRANCH_APP_BLOCKED_DF = "app-blocked-df"
+    internal const val BRANCH_GLOBAL_TRUSTED_DF = "global-trusted-df"
+    internal const val BRANCH_DEFAULT_DF = "default-df"
+    internal const val BRANCH_QTYPE_BLOCK = "qtype-block"
+
+    internal const val BRANCH_UA_INVALID_UID = "upstream-invalid-uid"
+    internal const val BRANCH_UA_CAPTIVE_PORTAL = "upstream-captive-portal"
+    internal const val BRANCH_UA_PORT_RULE = "upstream-port-rule"
+    internal const val BRANCH_UA_EMPTY_IPCSV = "upstream-empty-ipcsv"
+    internal const val BRANCH_UA_DNS_MODE = "upstream-dns-mode"
+    internal const val BRANCH_UA_FIXED_TRANSPORT = "upstream-fixed-transport"
+    internal const val BRANCH_UA_UNKNOWN_APP = "upstream-unknown-app"
+    internal const val BRANCH_UA_FIREWALL_BLOCKED = "upstream-firewall-blocked"
+    internal const val BRANCH_UA_ISOLATE_TRUSTED = "upstream-isolate-trusted"
+    internal const val BRANCH_UA_BYPASS = "upstream-bypass"
+    internal const val BRANCH_UA_NO_ACTION = "upstream-no-action"
+
+    enum class UpstreamAction { KEEP_PREVIOUS, BLOCK, BYPASS }
+
+    // structured result of the upstream-answer stage: keep the previously returned dns
+    // options, block them, or swap in bypass transports. the live onUpstreamAnswer path
+    // converts this to DNSOpts; the connection simulator consumes it as-is
+    data class UpstreamDecision(
+        val action: UpstreamAction,
+        val branch: String,
+        val rule: FirewallRuleset? = null,
+        // bypass transports (BYPASS only), raw (no cache prefix, no proxy ids)
+        val tid: Pair<String, String> = Pair("", ""),
+        val pidcsv: String = "",
+        // BYPASS: reuse the received transports as-is (no bypass transport needed)
+        val sameTid: Boolean = false
+    )
+
     data class DnsParams(val origin: String, val uidStr: String?, val fqdn: String, val qtype: Long, val isLockdown: Boolean, val ssid: String?, val isIfaceCellular: Boolean, val isCaptivePortal: Boolean = false)
+
+    // structured result of the dns-stage decision: transport id(s) and the local-blocklist
+    // bypass flag, tagged with the branch that produced it. the live onQuery path converts
+    // this to DNSOpts via [toNsOpts]; the connection simulator consumes it as-is
+    data class DnsDecision(
+        val uid: Int,
+        val tid: Pair<String, String>,
+        val domain: String,
+        val noblock: Boolean,
+        val isIfaceCellular: Boolean,
+        val ssid: String?,
+        val branch: String,
+        val qtypeBlocked: Boolean = false
+    )
 
     data class UpstreamAnswerParams(
         val scope: CoroutineScope,
@@ -141,16 +209,16 @@ object TunDnsManager: KoinComponent {
     }
 
     suspend fun handleOnQuery(d: DnsParams): DNSOpts {
-        return handleOnQueryInternal(d)
+        return decideQuery(d).toNsOpts()
     }
 
-    private suspend fun handleOnQueryInternal(d: DnsParams): DNSOpts {
+    // dry-run entry: resolves the dns-stage decision for the given params without
+    // constructing DNSOpts; shared by the live onQuery path and the connection simulator
+    internal suspend fun decideQuery(d: DnsParams): DnsDecision {
         // uid: $uid
         logd("onQuery: rcvd params: $d")
-        val uidStr = d.uidStr.orEmpty()
-        var result: DNSOpts?
 
-        val uid = getUid(uidStr)
+        val uid = getUid(d.uidStr.orEmpty())
         val rinr = persistentState.routeRethinkInRethink
         val appMode = appConfig.getBraveMode()
 
@@ -161,25 +229,21 @@ object TunDnsManager: KoinComponent {
         // continue to apply (see checkUserAllowedDnsQtypes below)
         if (d.isCaptivePortal) {
             logw("onQuery: captive portal active, routing ${d.fqdn} to system dns")
-            val r = makeNsOpts(uid, Pair(Backend.System, ""), d.fqdn, true, d.isIfaceCellular, d.ssid)
-            return checkUserAllowedDnsQtypes(r, uid, d.fqdn, d.qtype, d.isIfaceCellular, d.ssid)
+            val r = makeDecision(uid, Pair(Backend.System, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_CAPTIVE_PORTAL)
+            return checkUserAllowedDnsQtypes(r, d.qtype)
         }
 
         logd("onQuery: appConfig.getBraveMode for ${d.fqdn}")
         if (appMode.isDnsMode()) {
-            result = getTransportIdForDnsMode(uid, d.fqdn, rinr, d.isLockdown, d.isIfaceCellular, d.ssid)
-            logd("onQuery: getTransportIdForDnsMode for ${d.fqdn}, dnsx: $result")
-            val r = checkUserAllowedDnsQtypes(result, uid, d.fqdn, d.qtype, d.isIfaceCellular, d.ssid)
-            logd("onQuery: checkUserAllowedDnsQtypes (Dns) for ${d.fqdn}")
-            return r
+            val r = getTransportIdForDnsMode(uid, d.fqdn, rinr, d.isLockdown, d.isIfaceCellular, d.ssid)
+            logd("onQuery: getTransportIdForDnsMode for ${d.fqdn}, decision: $r")
+            return checkUserAllowedDnsQtypes(r, d.qtype)
         }
 
         if (appMode.isDnsFirewallMode()) {
-            result = getTransportIdForDnsFirewallMode(uid, d.fqdn, d.origin, rinr = rinr, d.isLockdown, d.isIfaceCellular, d.ssid)
-            logd("onQuery: getTransportIdForDnsFirewallMode for ${d.fqdn}, dnsx: $result")
-            val r = checkUserAllowedDnsQtypes(result, uid, d.fqdn, d.qtype, d.isIfaceCellular, d.ssid)
-            logd("onQuery: checkUserAllowedDnsQtypes (Dns+Firewall) for ${d.fqdn}")
-            return r
+            val r = getTransportIdForDnsFirewallMode(uid, d.fqdn, d.origin, rinr = rinr, isLockdown = d.isLockdown, isIfaceCellular = d.isIfaceCellular, ssid = d.ssid)
+            logd("onQuery: getTransportIdForDnsFirewallMode for ${d.fqdn}, decision: $r")
+            return checkUserAllowedDnsQtypes(r, d.qtype)
         }
 
         val smartDnsEnabled = appConfig.isSmartDnsEnabled()
@@ -189,22 +253,20 @@ object TunDnsManager: KoinComponent {
         } else {
             Backend.Preferred
         }
-        result = makeNsOpts(uid, Pair(tid, ""), d.fqdn, false, d.isIfaceCellular, d.ssid) // should not reach here
-        logd("onQuery: makeNsOpts (fallback) for ${d.fqdn}, dnsx: $result")
-        loge("onQuery: unknown mode ${appMode}, ${d.fqdn}, returning $result")
-        val r = checkUserAllowedDnsQtypes(result, uid, d.fqdn, d.qtype, d.isIfaceCellular, d.ssid)
-        logd("onQuery: checkUserAllowedDnsQtypes (fallback) for ${d.fqdn}")
-        return r
+        val r = makeDecision(uid, Pair(tid, ""), d.fqdn, false, d.isIfaceCellular, d.ssid, BRANCH_FALLBACK) // should not reach here
+        logd("onQuery: makeDecision (fallback) for ${d.fqdn}, decision: $r")
+        loge("onQuery: unknown mode ${appMode}, ${d.fqdn}, returning $r")
+        return checkUserAllowedDnsQtypes(r, d.qtype)
     }
 
-    // function to decide which transport id to return on Dns only mode
-    private suspend fun getTransportIdForDnsMode(uid: Int, fqdn: String, rinr: Boolean, isLockdown: Boolean, isIfaceCellular: Boolean, ssid: String?): DNSOpts {
+    // function to decide the dns-stage decision on Dns only mode
+    private suspend fun getTransportIdForDnsMode(uid: Int, fqdn: String, rinr: Boolean, isLockdown: Boolean, isIfaceCellular: Boolean, ssid: String?): DnsDecision {
         val tid = determineDnsTransportIdForDnsMode(isLockdown)
         logd("onQuery: determineDnsTransportIdForDnsMode for $fqdn")
 
         if (uid == rethinkUid && !rinr) {
-            val r = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(rethink) for $fqdn, return $r")
+            val r = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_RETHINK_UID)
+            logd("onQuery: makeDecision(rethink) for $fqdn, return $r")
             return r
         }
 
@@ -212,15 +274,15 @@ object TunDnsManager: KoinComponent {
             when (DomainRulesManager.getDomainRule(fqdn, uid)) {
                 DomainRulesManager.Status.TRUST -> {
                     logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) is trusted")
-                    val r = makeNsOpts(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-trusted) for $fqdn, return $r")
+                    val r = makeDecision(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED)
+                    logd("onQuery: makeDecision(app-trusted) for $fqdn, return $r")
                     return r
                 }
 
                 DomainRulesManager.Status.BLOCK -> {
                     logd("onQuery: DomainRulesManager.getDomainRule($fqdn, uid=$uid) is blocked")
-                    val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-blocked) for $fqdn, return $r")
+                    val r = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_APP_BLOCKED)
+                    logd("onQuery: makeDecision(app-blocked) for $fqdn, return $r")
                     return r
                 }
 
@@ -234,14 +296,14 @@ object TunDnsManager: KoinComponent {
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             DomainRulesManager.Status.TRUST -> {
                 logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is trusted")
-                val r = makeNsOpts(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(global-trusted) for $fqdn, return $r")
+                val r = makeDecision(uid, getTransportIdToBypass(tid, isLockdown), fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED)
+                logd("onQuery: makeDecision(global-trusted) for $fqdn, return $r")
                 return r
             }
             DomainRulesManager.Status.BLOCK -> {
                 logd("onQuery: DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is blocked")
-                val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(global-blocked) for $fqdn, return $r")
+                val r = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_GLOBAL_BLOCKED)
+                logd("onQuery: makeDecision(global-blocked) for $fqdn, return $r")
                 return r
             }
             else -> {
@@ -249,8 +311,8 @@ object TunDnsManager: KoinComponent {
             }
         }
 
-        val r = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-        logd("onQuery: makeNsOpts for $fqdn, return $r")
+        val r = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_DEFAULT)
+        logd("onQuery: makeDecision for $fqdn, return $r")
         return r
     }
 
@@ -262,18 +324,18 @@ object TunDnsManager: KoinComponent {
     // done for that particular query in onUpstreamAnswer based on the fqdn and uid, so that we can
     // avoid the possibility of dns leak for the trusted queries / app which is set to bypass
     // dns + firewall rule
-    private suspend fun getTransportIdForDnsFirewallMode(uid: Int, fqdn: String, origin: String?, rinr: Boolean, isLockdown: Boolean, isIfaceCellular: Boolean, ssid: String?): DNSOpts {
+    private suspend fun getTransportIdForDnsFirewallMode(uid: Int, fqdn: String, origin: String?, rinr: Boolean, isLockdown: Boolean, isIfaceCellular: Boolean, ssid: String?): DnsDecision {
         val tid = determineDnsTransportIdForDFMode(uid, fqdn, origin, isLockdown, isIfaceCellular, ssid)
         val forceBypassLocalBlocklists = VpnController.isAppPaused() && isLockdown
 
         if (uid == rethinkUid && !rinr) {
-            val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(rethink-df) for $fqdn")
+            val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_RETHINK_UID)
+            logd("onQuery: makeDecision(rethink-df) for $fqdn")
             return opts
         }
         if (forceBypassLocalBlocklists) {
-            val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(force-bypass) for $fqdn")
+            val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_FORCE_BYPASS)
+            logd("onQuery: makeDecision(force-bypass) for $fqdn")
             return opts
         }
 
@@ -284,8 +346,8 @@ object TunDnsManager: KoinComponent {
         // In that case, we can apply the app-specific rules.
         val isProtectedUid = uid == AndroidUidConfig.ANDROID.uid || uid == AndroidUidConfig.DNS.uid || uid == rethinkUid
         if (isAtleastR() && isProtectedUid && !persistentState.splitDns) {
-            val opts = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(protected-uid) for $fqdn")
+            val opts = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_PROTECTED_UID)
+            logd("onQuery: makeDecision(protected-uid) for $fqdn")
             return opts
         }
 
@@ -293,31 +355,31 @@ object TunDnsManager: KoinComponent {
             val anyAppBypass = FirewallManager.isAnyAppBypassesDns()
             logd("onQuery: FirewallManager.isAnyAppBypassesDns for $fqdn")
             if (anyAppBypass) {
-                val opts = makeNsOpts(uid, transportIdsAlg(tid), fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(no-uid-bypass) for $fqdn")
+                val opts = makeDecision(uid, transportIdsAlg(tid), fqdn, true, isIfaceCellular, ssid, BRANCH_NO_UID_BYPASS)
+                logd("onQuery: makeDecision(no-uid-bypass) for $fqdn")
                 return opts
             }
             val domainTrusted = DomainRulesManager.isDomainTrusted(fqdn)
             logd("onQuery: DomainRulesManager.isDomainTrusted for $fqdn")
             if (domainTrusted) {
-                val opts = makeNsOpts(uid, transportIdsAlg(tid), fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(no-uid-trusted) for $fqdn")
+                val opts = makeDecision(uid, transportIdsAlg(tid), fqdn, true, isIfaceCellular, ssid, BRANCH_NO_UID_TRUSTED)
+                logd("onQuery: makeDecision(no-uid-trusted) for $fqdn")
                 return opts
             }
             val globalBlock = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first == DomainRulesManager.Status.BLOCK
             logd("onQuery: getDomainRule(UID_EVERYBODY) for $fqdn")
             if (globalBlock) {
-                val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(no-uid-global-block) for $fqdn")
+                val opts = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_NO_UID_GLOBAL_BLOCK)
+                logd("onQuery: makeDecision(no-uid-global-block) for $fqdn")
                 return opts
             }
             if (isUidPresentInAnyDnsRequest && persistentState.getBlockUnknownConnections()) {
-                val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(no-uid-unknown-block) for $fqdn")
+                val opts = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_NO_UID_UNKNOWN_BLOCK)
+                logd("onQuery: makeDecision(no-uid-unknown-block) for $fqdn")
                 return opts
             }
-            val opts = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(no-uid-default) for $fqdn")
+            val opts = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_NO_UID_DEFAULT)
+            logd("onQuery: makeDecision(no-uid-default) for $fqdn")
             return opts
         } else {
             if (!isUidPresentInAnyDnsRequest && uid != AndroidUidConfig.DNS.uid) {
@@ -327,23 +389,23 @@ object TunDnsManager: KoinComponent {
             val isTempAllowed = FirewallManager.isTempAllowed(uid)
             logd("onQuery: FirewallManager.isTempAllowed for $fqdn")
             if (isTempAllowed) {
-                val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(temp-allowed) for $fqdn")
+                val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_TEMP_ALLOWED)
+                logd("onQuery: makeDecision(temp-allowed) for $fqdn")
                 return opts
             }
             val connectionStatus = FirewallManager.connectionStatus(uid)
             logd("onQuery: FirewallManager.connectionStatus for $fqdn")
             if (connectionStatus.blocked()) {
-                val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(conn-blocked) for $fqdn")
+                val opts = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_CONN_BLOCKED)
+                logd("onQuery: makeDecision(conn-blocked) for $fqdn")
                 return opts
             }
 
             val appStatus = FirewallManager.appStatus(uid)
             logd("onQuery: FirewallManager.appStatus for $fqdn")
             if (appStatus.bypassDnsFirewall()) {
-                val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-                logd("onQuery: makeNsOpts(bypass-dns) for $fqdn")
+                val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_BYPASS_DNS)
+                logd("onQuery: makeDecision(bypass-dns) for $fqdn")
                 return opts
             }
 
@@ -351,13 +413,13 @@ object TunDnsManager: KoinComponent {
             logd("onQuery: getDomainRule($fqdn, uid=$uid) for $fqdn")
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-trusted-df) for $fqdn")
+                    val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED_DF)
+                    logd("onQuery: makeDecision(app-trusted-df) for $fqdn")
                     return opts
                 }
                 DomainRulesManager.Status.BLOCK -> {
-                    val opts = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-                    logd("onQuery: makeNsOpts(app-blocked-df) for $fqdn")
+                    val opts = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_APP_BLOCKED_DF)
+                    logd("onQuery: makeDecision(app-blocked-df) for $fqdn")
                     return opts
                 }
                 DomainRulesManager.Status.NONE -> {}
@@ -370,8 +432,8 @@ object TunDnsManager: KoinComponent {
                 logd("onQuery: getDomainRule($fqdn, UID_EVERYBODY) for $fqdn")
                 when (globalDomainRule) {
                     DomainRulesManager.Status.TRUST -> {
-                        val opts = makeNsOpts(uid, tid, fqdn, true, isIfaceCellular, ssid)
-                        logd("onQuery: makeNsOpts(global-trusted-df) for $fqdn")
+                        val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED_DF)
+                        logd("onQuery: makeDecision(global-trusted-df) for $fqdn")
                         return opts
                     }
 
@@ -381,8 +443,8 @@ object TunDnsManager: KoinComponent {
                 }
             }
 
-            val opts = makeNsOpts(uid, tid, fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: makeNsOpts(default-df) for $fqdn")
+            val opts = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_DEFAULT_DF)
+            logd("onQuery: makeDecision(default-df) for $fqdn")
             return opts
         }
     }
@@ -498,30 +560,39 @@ object TunDnsManager: KoinComponent {
         }
     }
 
-    private suspend fun checkUserAllowedDnsQtypes(result: DNSOpts, uid: Int, fqdn: String, qtype: Long, isIfaceCellular: Boolean, ssid: String?): DNSOpts {
-        if (isAlreadyBlocked(result.tidcsv)) {
-            logd("onQuery: [checkUserAllowedDnsQtypes] already blocked for $fqdn")
+    private suspend fun checkUserAllowedDnsQtypes(result: DnsDecision, qtype: Long): DnsDecision {
+        if (isAlreadyBlocked(result.tid.first)) {
+            logd("onQuery: [checkUserAllowedDnsQtypes] already blocked for ${result.domain}")
             return result
         }
         val allowedTypes = persistentState.getAllowedDnsRecordTypesAsEnum()
         if (!ResourceRecordTypes.isQtypeAllowed(qtype.toInt(), allowedTypes)) {
-            val r = makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid)
-            logd("onQuery: [checkUserAllowedDnsQtypes] qtype blocked for $fqdn, qtype: $qtype")
-            return r
+            val r = makeDecision(result.uid, Pair(Backend.BlockAll, ""), result.domain, false, result.isIfaceCellular, result.ssid, BRANCH_QTYPE_BLOCK)
+            logd("onQuery: [checkUserAllowedDnsQtypes] qtype blocked for ${result.domain}, qtype: $qtype")
+            return r.copy(qtypeBlocked = true)
         } else {
-            logd("onQuery: [checkUserAllowedDnsQtypes] qtype allowed for $fqdn")
+            logd("onQuery: [checkUserAllowedDnsQtypes] qtype allowed for ${result.domain}")
             return result
         }
     }
 
-    private suspend fun makeNsOpts(
+    private suspend fun makeDecision(
         uid: Int,
         tid: Pair<String, String>,
         domain: String,
         bypassLocalBlocklists: Boolean = false,
         isIfaceCellular: Boolean,
-        ssid: String?
-    ): DNSOpts {
+        ssid: String?,
+        branch: String
+    ): DnsDecision {
+        return DnsDecision(uid, tid, domain, bypassLocalBlocklists, isIfaceCellular, ssid, branch)
+    }
+
+    internal suspend fun decisionToDnsOpts(decision: DnsDecision): DNSOpts {
+        return decision.toNsOpts()
+    }
+
+    private suspend fun DnsDecision.toNsOpts(): DNSOpts {
         val opts = DNSOpts()
         opts.uid = uid.toString()
         opts.ipcsv = "" // as of now, no suggested ips
@@ -540,7 +611,7 @@ object TunDnsManager: KoinComponent {
 
         opts.tidcsv =  buildTidCsv(tidCsv, pidcsv)
         opts.tidseccsv = buildTidCsv(secCsv, pidcsv)
-        opts.noblock = bypassLocalBlocklists
+        opts.noblock = noblock
         log("onQuery: for $uid, $domain, returning $opts")
         return opts
     }
@@ -865,6 +936,44 @@ object TunDnsManager: KoinComponent {
     }
 
     suspend fun handleOnUpstreamAnswer(params: UpstreamAnswerParams): DNSOpts {
+        val decision = decideUpstreamAnswer(params)
+        logd("onUpstreamAnswer: decision: $decision")
+        return when (decision.action) {
+            UpstreamAction.KEEP_PREVIOUS -> dnsOptsFactory()
+            UpstreamAction.BLOCK -> {
+                if (decision.rule != null) {
+                    trackDnsFilterReason(params.smm.fid, decision.rule.id)
+                }
+                dnsOptsFactory().apply {
+                    tidcsv = Backend.BlockAll
+                    noblock = false
+                }
+            }
+            UpstreamAction.BYPASS -> {
+                if (decision.rule != null) {
+                    trackDnsFilterReason(params.smm.fid, decision.rule.id)
+                }
+                dnsOptsFactory().apply {
+                    if (decision.sameTid) {
+                        tidcsv = decision.tid.first
+                        tidseccsv = decision.tid.second
+                    } else {
+                        val tid = decision.tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+                        val tidSec = if (decision.tid.second.isEmpty()) "" else decision.tid.second.split(",")
+                            .joinToString(",") { appendDnsCacheIfNeeded(it) }
+                        tidcsv = buildTidCsv(tid, decision.pidcsv)
+                        tidseccsv = buildTidCsv(tidSec, decision.pidcsv)
+                    }
+                    noblock = true
+                }
+            }
+        }
+    }
+
+    // dry-run entry: resolves the upstream-answer stage decision for the given params
+    // without constructing DNSOpts or recording filter reasons; shared by the live
+    // onUpstreamAnswer path and the connection simulator
+    internal suspend fun decideUpstreamAnswer(params: UpstreamAnswerParams, dryRun: Boolean = false): UpstreamDecision {
         // There are scenarios that need to be handled before this is safe.
         //
         // For example, an app may have a port-based allow rule while also being
@@ -883,21 +992,21 @@ object TunDnsManager: KoinComponent {
                 LOG_TAG_VPN,
                 "onUpstreamAnswer: invalid uid ${params.smm.uid}, error: ${e.message}"
             )
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_INVALID_UID)
         }
 
         // keep the previous DNS options for captive portals, using Dnsx.System and noBlock is
         // set to true
         if (params.isCaptivePortal) {
             Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: captive portal, returning prev DNSOpts()")
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_CAPTIVE_PORTAL)
         }
 
         val isAnyPortRule = IpRulesManager.isPortRuleSetForIp(params.ipcsv, uid) ||
             IpRulesManager.isPortRuleSetForIp(params.ipcsv, UID_EVERYBODY)
         if (isAnyPortRule) {
             Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: port-based rule exists for ip: ${params.ipcsv}, returning prev DNSOpts()")
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_PORT_RULE)
         }
         Logger.vv(
             LOG_TAG_VPN,
@@ -905,30 +1014,26 @@ object TunDnsManager: KoinComponent {
         )
         if (params.ipcsv.isEmpty()) {
             Logger.w(LOG_TAG_VPN, "onUpstreamAnswer: empty ipcsv, returning prev DNSOpts()")
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_EMPTY_IPCSV)
         }
         if (appConfig.getBraveMode().isDnsMode()) {
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_DNS_MODE)
         }
 
         val isTransportDnsFixed =
             params.rcvdDnsOpts.tidcsv.contains(Backend.Fixed) || params.rcvdDnsOpts.tidseccsv.contains(Backend.Fixed)
         if (isTransportDnsFixed) {
             Logger.i(LOG_TAG_VPN, "onUpstreamAnswer: fixed transport, returning prev DNSOpts()")
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_FIXED_TRANSPORT)
         }
 
         if (uid == INVALID_UID && persistentState.blockDnsForUnknownApp) {
             val id = Pair(params.rcvdDnsOpts.tidcsv, params.rcvdDnsOpts.tidseccsv)
-            val result = dnsOptsFactory().apply {
-                tidcsv = Backend.BlockAll
-                noblock = false
-                Logger.vv(
-                    LOG_TAG_VPN,
-                    "onUpstreamAnswer: block dns for unknown app, original tid: $id, bypass tid: [$tidcsv, $tidseccsv], ipcsv: ${params.ipcsv}"
-                )
-            }
-            return result
+            Logger.vv(
+                LOG_TAG_VPN,
+                "onUpstreamAnswer: block dns for unknown app, original tid: $id, bypass tid: [${Backend.BlockAll}, ], ipcsv: ${params.ipcsv}"
+            )
+            return UpstreamDecision(UpstreamAction.BLOCK, BRANCH_UA_UNKNOWN_APP)
         }
 
         val firstDestIp = params.ipcsv.split(",").firstOrNull()
@@ -937,7 +1042,7 @@ object TunDnsManager: KoinComponent {
                 LOG_TAG_VPN,
                 "onUpstreamAnswer: empty rdata for ${params.smm.qName}, ipcsv: ${params.ipcsv} uid: $uid"
             )
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_EMPTY_IPCSV)
         }
         val userId = FirewallManager.userId(uid)
         val srcIp = ""
@@ -992,17 +1097,14 @@ object TunDnsManager: KoinComponent {
             accessibilityServiceFunctional = params.accessibilityServiceFunctional,
             onAccessibilityFailure = params.onAccessibilityFailure,
             keyguardManager = params.keyguardManager,
-            connectivityManager = params.connectivityManager
+            connectivityManager = params.connectivityManager,
+            dryRun = dryRun
         )
         val rule = TunFirewallManager.firewall(firewallParams)
         val blocked = FirewallRuleset.ground(rule)
         if (blocked) {
-            trackDnsFilterReason(params.smm.fid, rule.id)
             logd("onUpstreamAnswer: blocked by firewall, rule: $rule, connInfo: $connInfo, ipcsv: ${params.ipcsv}")
-            return dnsOptsFactory().apply {
-                tidcsv = Backend.BlockAll
-                noblock = false
-            }
+            return UpstreamDecision(UpstreamAction.BLOCK, BRANCH_UA_FIREWALL_BLOCKED, rule)
         }
         // special case: in case of bypass rule for domain or ip, if the app is set to isolate
         // that should be treated as allowed rule instead of bypass rule, so no need to use
@@ -1014,50 +1116,34 @@ object TunDnsManager: KoinComponent {
         val isDmnOrIpTrusted = rule == FirewallRuleset.RULE2F || rule == FirewallRuleset.RULE2B
         if (isAppIsolated && isDmnOrIpTrusted) {
             logd("onUpstreamAnswer: app is isolate and domain/ip is trusted, treat as allowed, rule: $rule, connInfo: $connInfo, ipcsv: ${params.ipcsv}")
-            return dnsOptsFactory()
+            return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_ISOLATE_TRUSTED, rule)
         }
         val isBypass = FirewallRuleset.isDnsBypassRule(rule)
         if (isBypass) {
-            trackDnsFilterReason(params.smm.fid, rule.id)
             // use the same pid for non-blocking case, as the decision is already made in onQuery
             // and the same pid will be used in tunnel for the upstream query
             // For tid, based on the useFallbackDnsToBypass settings, the blockfree, default
             // will be used, else the same tid from onQuery will be used
-            val result = dnsOptsFactory().apply {
-                val id = Pair(params.rcvdDnsOpts.tidcsv, params.rcvdDnsOpts.tidseccsv)
-                val tidPair = getTransportIdToBypass(id, params.isLockdown)
-                if (tidPair == id) {
-                    logd("onUpstreamAnswer: no bypass transport needed, rule: $rule")
-                    val r = dnsOptsFactory().apply {
-                        tidcsv = tidPair.first
-                        tidseccsv = tidPair.second
-                        noblock = true
-                    }
-                    return r
-                }
-                val tid = tidPair.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
-                val tidSec = if (tidPair.second.isEmpty()) "" else tidPair.second.split(",")
-                    .joinToString(",") { appendDnsCacheIfNeeded(it) }
-                val mark = params.determineProxyDetails(
-                    connInfo,
-                    persistentState.routeRethinkInRethink,
-                    true
-                )
-                val pidCsv = mark.pidcsv
-                tidcsv = buildTidCsv(tid, pidCsv)
-                tidseccsv = buildTidCsv(tidSec, pidCsv)
-
-                noblock = true
-                Logger.vv(
-                    LOG_TAG_VPN,
-                    "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [$tidcsv], [$tidseccsv], pid: $pidCsv connInfo: $connInfo, ipcsv: ${params.ipcsv}"
-                )
+            val id = Pair(params.rcvdDnsOpts.tidcsv, params.rcvdDnsOpts.tidseccsv)
+            val tidPair = getTransportIdToBypass(id, params.isLockdown)
+            if (tidPair == id) {
+                logd("onUpstreamAnswer: no bypass transport needed, rule: $rule")
+                return UpstreamDecision(UpstreamAction.BYPASS, BRANCH_UA_BYPASS, rule, tidPair, sameTid = true)
             }
-            return result
+            val mark = params.determineProxyDetails(
+                connInfo,
+                persistentState.routeRethinkInRethink,
+                true
+            )
+            Logger.vv(
+                LOG_TAG_VPN,
+                "onUpstreamAnswer: bypass rule: $rule, original tid: $id, bypass tid: [${tidPair.first}], [${tidPair.second}], pid: ${mark.pidcsv} connInfo: $connInfo, ipcsv: ${params.ipcsv}"
+            )
+            return UpstreamDecision(UpstreamAction.BYPASS, BRANCH_UA_BYPASS, rule, tidPair, mark.pidcsv)
         }
 
         if (DEBUG) logd("onUpstreamAnswer: ${params.smm}, ipcsv: ${params.ipcsv}")
         logd("onUpstreamAnswer: no action needed, default DNSOpts")
-        return dnsOptsFactory()
+        return UpstreamDecision(UpstreamAction.KEEP_PREVIOUS, BRANCH_UA_NO_ACTION)
     }
 }
