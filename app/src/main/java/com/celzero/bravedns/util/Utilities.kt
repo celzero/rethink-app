@@ -52,6 +52,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
@@ -941,6 +942,17 @@ object Utilities {
             val sFlag = flag or PendingIntent.FLAG_IMMUTABLE
             PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
         }
+    }
+
+    // no-op below API 31; on S+ the action fires only after the device is unlocked
+    fun getNotificationAction(
+        title: String,
+        intent: PendingIntent,
+        authRequired: Boolean = false
+    ): NotificationCompat.Action {
+        return NotificationCompat.Action.Builder(0, title, intent)
+            .setAuthenticationRequired(authRequired)
+            .build()
     }
 
     fun getRemoteBlocklistStamp(url: String): String {

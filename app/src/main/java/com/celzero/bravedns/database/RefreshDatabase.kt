@@ -868,16 +868,16 @@ internal constructor(
                 PENDING_INTENT_REQUEST_CODE_DENY
             )
         val notificationAction: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.allow).uppercase(),
-                openIntent1
+                openIntent1,
+                authRequired = true
             )
         val notificationAction2: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
-                openIntent2
+                openIntent2,
+                authRequired = true
             )
         builder.addAction(notificationAction)
         builder.addAction(notificationAction2)
@@ -978,10 +978,10 @@ internal constructor(
             .setAutoCancel(true)
 
         val clearAction: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.db_corruption_action_clear),
-                clearIntent
+                clearIntent,
+                authRequired = true
             )
         val dismissAction: NotificationCompat.Action =
             NotificationCompat.Action(
