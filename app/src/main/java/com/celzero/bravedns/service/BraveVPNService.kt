@@ -4454,7 +4454,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         stats.append("DomainRules:\n${domainRulesStats()}\n")
         stats.append("Proxy:\n${proxyStats()}\n")
         stats.append("WireGuard:\n${wireguardStats()}\n")
-        stats.append("RPN Wg:\n${rpnStats()}\n")
+        stats.append("RPN:\n${rpnStats()}\n")
         return stats.toString()
     }
 
