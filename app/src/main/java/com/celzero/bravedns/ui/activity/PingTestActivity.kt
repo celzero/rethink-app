@@ -35,9 +35,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PingTestHistoryAdapter
-import com.celzero.bravedns.databinding.ActivityPingTestBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.PingTestOutcome
 import com.celzero.bravedns.service.PersistentState
@@ -48,7 +50,6 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,8 +57,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.milliseconds
 
-class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
-    private val b by viewBinding(ActivityPingTestBinding::bind)
+class PingTestActivity : BaseActivity() {
+    private val b by lazy { PingUiState(this) }
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -68,7 +69,8 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     private var isTesting = false
     private var testStartTime: Long = 0
     private var dolphinSwimAnim: AnimatorSet? = null
-    private val historyAdapter by lazy { PingTestHistoryAdapter(this) }
+
+    private val historyAdapter by lazy { PingTestHistoryAdapter() }
 
     /**
      * False when the VPN or RPN proxy is inactive: custom target entry is then
@@ -89,6 +91,8 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         initView()
         setupClickListeners()
         setupHistory()
+        restoreUtilityControls(savedInstanceState, b.savedControls)
+        setContent { RethinkTheme { PingScreen(b, historyAdapter) } }
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -111,7 +115,6 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     /** Dolphin signature: bottom overlay revealed at the end of the history scroll. */
     private fun setDolphinSignature() {
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
-        b.dolphinSignature.revealAtScrollEndOf(b.historyScrollView)
     }
 
     private fun setupClickListeners() {
@@ -130,9 +133,6 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
     }
 
     private fun setupHistory() {
-        b.historyRecycler.layoutManager = LinearLayoutManager(this)
-        b.historyRecycler.adapter = historyAdapter
-        b.historyRecycler.addItemDecoration(historyDividerDecoration())
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -148,25 +148,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
      * Hairline dividers between history rows, inset to align with the row text
      * (16dp start padding + 32dp icon + 13dp gap), mirroring the results card.
      */
-    private fun historyDividerDecoration(): RecyclerView.ItemDecoration {
-        val density = resources.displayMetrics.density
-        val paint = Paint().apply {
-            color = UIUtils.fetchColor(this@PingTestActivity, R.attr.colorSurfaceVariant)
-            alpha = 102 // ~40% for a subtle hairline
-            strokeWidth = density
-        }
-        return object : RecyclerView.ItemDecoration() {
-            override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-                val start = (density * 61f).toInt()
-                for (i in 0 until parent.childCount - 1) {
-                    val child = parent.getChildAt(i)
-                    val params = child.layoutParams as RecyclerView.LayoutParams
-                    val top = (child.bottom + params.bottomMargin).toFloat()
-                    c.drawLine(start.toFloat(), top, parent.width.toFloat(), top, paint)
-                }
-            }
-        }
-    }
+
 
     private fun showReadyState() {
         stopDolphinSwim()
@@ -301,9 +283,7 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
         b.reachInputLayout.error = null
 
         // Dismiss keyboard and clear focus
-        b.reachInput.clearFocus()
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(b.reachInput.windowToken, 0)
+        b.keyboardRequest++
 
         showTestingState()
 
@@ -380,13 +360,13 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
      */
     private fun animateDolphinSwim() {
         stopDolphinSwim()
-        val bob = ObjectAnimator.ofFloat(b.statusIcon, View.TRANSLATION_Y, 0f, -16f, 0f, 16f, 0f).apply {
+        val bob = ObjectAnimator.ofFloat(b.statusIcon, "translationY", 0f, -16f, 0f, 16f, 0f).apply {
             duration = 1200
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.RESTART
             interpolator = AccelerateDecelerateInterpolator()
         }
-        val rock = ObjectAnimator.ofFloat(b.statusIcon, View.ROTATION, -8f, 8f, -8f).apply {
+        val rock = ObjectAnimator.ofFloat(b.statusIcon, "rotation", -8f, 8f, -8f).apply {
             duration = 1200
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.RESTART
@@ -438,6 +418,8 @@ class PingTestActivity : BaseActivity(R.layout.activity_ping_test) {
             start()
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) { saveUtilityControls(outState, b.savedControls); super.onSaveInstanceState(outState) }
 
     override fun onDestroy() {
         stopDolphinSwim()

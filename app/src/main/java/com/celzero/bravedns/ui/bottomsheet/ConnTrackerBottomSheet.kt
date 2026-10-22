@@ -15,6 +15,11 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import android.content.Intent
@@ -29,7 +34,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -38,8 +42,6 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
@@ -50,7 +52,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
@@ -60,7 +61,7 @@ import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
@@ -74,11 +75,8 @@ import java.util.Locale
 
 class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
 
-    private var _binding: BottomSheetConnTrackBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var presentation: ConnectionDetailsState? = null
+    private val b get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private var info: ConnectionTracker? = null
 
@@ -87,18 +85,17 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
         const val INSTANCE_OBJ_RETHINKLOG = "RETHINKLOG"
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomSheetConnTrackBinding.inflate(inflater, container, false)
-        return b.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = ConnectionDetailsState(requireContext())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ConnectionDetailsContent(b) } }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
     }
 
     override fun getTheme(): Int =
@@ -527,7 +524,7 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
                         ?: info?.appName?.takeIf { it.isNotBlank() }
                         ?: getString(R.string.lbl_app_rules)
                 val dialog =
-                    MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+                    WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                         .setTitle(title)
                         .setSingleChoiceItems(labels, appRuleLabelIndex(a, c)) { d, which ->
                             d.dismiss()
@@ -583,17 +580,17 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
      * the ip/domain rows pass a color attr so the verdict is visible at a
      * glance (light for no-rule, negative for block, positive for trust).
      */
-    private fun renderRuleState(view: TextView, text: String, colorAttr: Int = R.attr.primaryLightColorText) {
+    private fun renderRuleState(view: LogControlState, text: String, colorAttr: Int = R.attr.primaryLightColorText) {
         view.text = text
         view.setTextColor(fetchColor(requireContext(), colorAttr))
     }
 
     /** Switch glyph for an ip rule; bypass-universal is surfaced read-only. */
-    private fun ipRuleSwitchState(rule: IpRulesManager.IpRuleStatus): RuleStateSwitch.SwitchState {
+    private fun ipRuleSwitchState(rule: IpRulesManager.IpRuleStatus): LogRuleGlyph {
         return when (rule) {
-            IpRulesManager.IpRuleStatus.BLOCK -> RuleStateSwitch.SwitchState.OFF
-            IpRulesManager.IpRuleStatus.TRUST -> RuleStateSwitch.SwitchState.ON
-            else -> RuleStateSwitch.SwitchState.NEUTRAL
+            IpRulesManager.IpRuleStatus.BLOCK -> LogRuleGlyph.OFF
+            IpRulesManager.IpRuleStatus.TRUST -> LogRuleGlyph.ON
+            else -> LogRuleGlyph.NEUTRAL
         }
     }
 
@@ -719,9 +716,9 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
         renderRuleState(b.bsConnDomainRuleState, text, colorAttr)
         val switchState =
             when (status) {
-                DomainRulesManager.Status.BLOCK -> RuleStateSwitch.SwitchState.OFF
-                DomainRulesManager.Status.TRUST -> RuleStateSwitch.SwitchState.ON
-                DomainRulesManager.Status.NONE -> RuleStateSwitch.SwitchState.NEUTRAL
+                DomainRulesManager.Status.BLOCK -> LogRuleGlyph.OFF
+                DomainRulesManager.Status.TRUST -> LogRuleGlyph.ON
+                DomainRulesManager.Status.NONE -> LogRuleGlyph.NEUTRAL
             }
         b.bsConnDomainRuleSwitch.setRuleState(switchState)
     }
@@ -729,25 +726,6 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
     private fun showFirewallRulesDialog(blockedRule: String?) {
         if (blockedRule == null) return
 
-        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        dialog.show()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val heading = dialogBinding.infoRulesDialogRulesTitle
-        val okBtn = dialogBinding.infoRulesDialogCancelImg
-        val desc = dialogBinding.infoRulesDialogRulesDesc
-        val icon = dialogBinding.infoRulesDialogRulesIcon
-        icon.visibility = View.VISIBLE
         val headingText: String
         var descText: Spanned
 
@@ -794,14 +772,7 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
             descText = htmlToSpannedText(tempDesc)
         }
 
-        desc.text = descText
-        heading.text = headingText
-        icon.setImageDrawable(
-            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule))
-        )
-
-        okBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        b.infoDialog = LogInfoDialogState(headingText, descText, FirewallRuleset.getRulesIcon(blockedRule))
     }
 
     private fun formatText(groupNames: Multimap<String, String>): Spanned {

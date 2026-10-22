@@ -22,7 +22,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.widget.CompoundButton
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -32,7 +32,10 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityUniversalFirewallSettingsBinding
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.UniversalFirewallState
+import com.celzero.bravedns.ui.compose.settings.UniversalFirewallContent
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
@@ -45,9 +48,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -55,8 +56,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class UniversalFirewallSettingsActivity :
-    BaseActivity(R.layout.activity_universal_firewall_settings) {
-    private val b by viewBinding(ActivityUniversalFirewallSettingsBinding::bind)
+    BaseActivity() {
+    private val b = UniversalFirewallState()
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
     private val connTrackerRepository by inject<ConnectionTrackerRepository>()
@@ -70,7 +71,7 @@ class UniversalFirewallSettingsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -80,6 +81,17 @@ class UniversalFirewallSettingsActivity :
             window.isNavigationBarContrastEnforced = false
         }
         init()
+        setContent { RethinkTheme { UniversalFirewallContent(b) } }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        b.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -118,7 +130,7 @@ class UniversalFirewallSettingsActivity :
         }
 
         b.firewallUnknownConnectionModeCheck.setOnCheckedChangeListener {
-            _: CompoundButton,
+            _: WgControlState,
             checked: Boolean ->
             persistentState.setBlockUnknownConnections(checked)
             logEvent("Univ firewall unknown connection mode changed toggled to $checked")
@@ -130,7 +142,7 @@ class UniversalFirewallSettingsActivity :
         }
 
         b.firewallUdpConnectionModeCheck.setOnCheckedChangeListener {
-            _: CompoundButton,
+            _: WgControlState,
             checked: Boolean ->
             persistentState.setUdpBlocked(checked)
             logEvent("Univ firewall UDP connection mode changed toggled to $checked")
@@ -327,7 +339,7 @@ class UniversalFirewallSettingsActivity :
     }
 
     private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.alert_permission_accessibility)
         builder.setMessage(R.string.alert_firewall_accessibility_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->

@@ -1,346 +1,246 @@
-/*
- * Copyright 2024 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Copyright 2024 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.ui.tour
 
-import com.celzero.bravedns.util.Logger
+import androidx.compose.ui.platform.LocalLocale
+import com.celzero.bravedns.ui.compose.controls.*
 import android.app.Activity
 import android.graphics.Rect
-import android.util.TypedValue
-import android.view.LayoutInflater
+import android.graphics.RectF
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
+import kotlin.math.pow
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect as ComposeRect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.*
 import androidx.core.view.doOnLayout
 import com.celzero.bravedns.R
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
+import com.celzero.bravedns.ui.compose.home.HomeTourAnchors
+import com.celzero.bravedns.util.Logger
+import kotlinx.coroutines.*
+import java.util.Locale
 
-/**
- * Orchestrates the guided tour experience for a single Activity.
- *
- * ## Lifecycle
- * 1. Call [start] after the host Fragment's views are laid out.
- * 2. The controller attaches a [SpotlightOverlayView] + tooltip card to the DecorView.
- * 3. It walks through the [steps] list on Next/Skip; on the last step it fires [onComplete].
- * 4. When [onComplete] fires, the overlay is already removed, no manual cleanup needed.
- *
- * ## Thread safety
- * Must be constructed and used entirely on the main thread.
- *
- * @param activity   Host activity, used only to attach/detach views.
- * @param steps      Ordered list of [TourStep]s produced by [GuidedTourManager.homeScreenSteps].
- * @param onComplete Invoked once when the user completes or skips the entire tour.
- */
+/** Native Compose spotlight/tooltip; the DecorView is only a platform host. */
 class TourOverlayController(
     private val activity: Activity,
     private val steps: List<TourStep>,
     private val onComplete: () -> Unit,
+    private val composeAnchor: (Int) -> RectF? = HomeTourAnchors.forActivity(activity)::find,
 ) {
-    companion object {
-        private const val TAG = "TourOverlayController"
-
-        /** Minimum screen pixels below the spotlight before we flip the tooltip to ABOVE. */
-        private const val MIN_SPACE_BELOW_PX = 280
-        /** Vertical gap between spotlight edge and tooltip card edge, in pixels. */
-        private const val TOOLTIP_MARGIN_PX  = 16
-        /** Dot indicator size, in dp. */
-        private const val DOT_SIZE_DP = 6f
-        /** Dot spacing, in dp. */
-        private const val DOT_SPACING_DP = 5f
-
-        /**
-         * Resolves a theme colour attribute (e.g. `R.attr.colorGolden`) to an integer color.
-         * Falls back to [fallback] if the attribute is not found in the theme.
-         */
-        private fun Activity.resolveAttrColor(attrRes: Int, fallback: Int): Int {
-            val tv = TypedValue()
-            return if (theme.resolveAttribute(attrRes, tv, true)) {
-                if (tv.type >= TypedValue.TYPE_FIRST_COLOR_INT &&
-                    tv.type <= TypedValue.TYPE_LAST_COLOR_INT) {
-                    tv.data
-                } else {
-                    try {
-                        resources.getColor(tv.resourceId, theme)
-                    } catch (_: Exception) { fallback }
-                }
-            } else fallback
-        }
-    }
-
-    private var currentStepIndex = 0
+    private val decorRoot = activity.window.decorView.rootView as ViewGroup
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var currentStepIndex by mutableIntStateOf(0)
+    private var targetRect by mutableStateOf<RectF?>(null)
+    private var closing by mutableStateOf(false)
     private var isAttached = false
+    private var terminal = false
+    private var host: ComposeView? = null
+    private var positionJob: Job? = null
 
-    // Views
-    private val decorRoot: FrameLayout =
-        activity.window.decorView.rootView as FrameLayout
-
-    private val overlayView = SpotlightOverlayView(activity)
-    private val tooltipView: View = LayoutInflater.from(activity)
-        .inflate(R.layout.view_tour_tooltip, decorRoot, false)
-
-    // Tooltip child refs
-    private val tvCounter: AppCompatTextView = tooltipView.findViewById(R.id.tour_step_counter)
-    private val tvTitle: AppCompatTextView   = tooltipView.findViewById(R.id.tour_title)
-    private val tvDesc: AppCompatTextView    = tooltipView.findViewById(R.id.tour_desc)
-    private val btnNext: MaterialButton      = tooltipView.findViewById(R.id.tour_next_btn)
-    private val btnSkip: AppCompatTextView   = tooltipView.findViewById(R.id.tour_skip_btn)
-    private val btnClose: View               = tooltipView.findViewById(R.id.tour_close_btn)
-    private val dotsContainer: ViewGroup     = tooltipView.findViewById(R.id.tour_dots_container)
-    private val premiumBadge: View           = tooltipView.findViewById(R.id.tour_premium_badge)
-    private val tooltipCard: MaterialCardView =
-        tooltipView.findViewById(R.id.tour_tooltip_card)
-
-    /** Default card stroke color, cached once so we can restore it on non-premium steps. */
-    private val defaultStrokeColor: Int by lazy { tooltipCard.strokeColorStateList?.defaultColor ?: 0 }
-    /** Golden color resolved from the current theme, used for the premium step card border. */
-    private val goldenColor: Int by lazy { activity.resolveAttrColor(R.attr.colorGolden, 0xFFC9A000.toInt()) }
-
-    /** Attaches the overlay to the DecorView and shows the first step. */
     fun start() {
         if (steps.isEmpty()) { onComplete(); return }
         if (isAttached) return
         isAttached = true
-
-        // Layer order: overlay (dim + cutout) beneath tooltip card
-        decorRoot.addView(
-            overlayView,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            ),
-        )
-        decorRoot.addView(
-            tooltipView,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-            ),
-        )
-
-        // Tooltip is invisible until it knows where to position itself
-        tooltipView.alpha = 0f
-
-        buildDots()
-        bindClickListeners()
+        host = ComposeView(activity).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            setContent { RethinkTheme { TourOverlay() } }
+        }.also { decorRoot.addView(it, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)) }
         showStep(0)
     }
 
-    // -----------------------------------------------------------------------
-    // Step navigation
-    // -----------------------------------------------------------------------
-
     private fun showStep(index: Int) {
+        if (terminal) return
         if (index >= steps.size) { completeTour(); return }
-
         currentStepIndex = index
         val step = steps[index]
-
-        // Bind text content
-        tvCounter.text = activity.getString(R.string.tour_step_counter, step.position, step.total)
-        tvTitle.text   = activity.getString(step.titleRes)
-        tvDesc.text    = activity.getString(step.descRes)
-        btnNext.text   = activity.getString(
-            if (step.isLastStep) R.string.tour_btn_finish else R.string.next
-        )
-        updateDots(index)
-
-        // Premium-step UI: show golden badge + golden card border; restore defaults otherwise
-        if (step.isPremium) {
-            premiumBadge.visibility = View.VISIBLE
-            tooltipCard.strokeColor = goldenColor
-            tooltipCard.strokeWidth = activity.resources.displayMetrics.density.times(1.5f).toInt()
-        } else {
-            premiumBadge.visibility = View.GONE
-            tooltipCard.strokeColor = defaultStrokeColor
-            tooltipCard.strokeWidth = activity.resources.displayMetrics.density.times(0.5f).toInt()
-        }
-
-        // Find the target view; if it's not laid out yet, wait for the global layout pass
-        val target = activity.findViewById<View>(step.targetViewId)
-        if (target == null) {
-            Logger.w("TourOverlay", "$TAG: target view ${step.targetViewId} not found, skipping step")
-            showStep(index + 1)
-            return
-        }
-
-        target.doOnLayout {
-            target.post {
-                if (isAttached && currentStepIndex == index) {
-                    positionOnView(target, step)
+        positionJob?.cancel()
+        positionJob = scope.launch {
+            // Compose anchors may live below a scroll viewport. This uses only
+            // the local UI's bring-into-view request and never runs card actions.
+            HomeTourAnchors.forActivity(activity).reveal(step.targetViewId)
+            yield()
+            val nativeBounds = composeAnchor(step.targetViewId)
+            if (nativeBounds != null && !nativeBounds.isEmpty) {
+                positionOnRect(nativeBounds)
+                return@launch
+            }
+            // Fallback is exclusively for retained platform/host UI. Never
+            // create hidden proxy Views for a native Compose element.
+            val target = activity.findViewById<View>(step.targetViewId)
+            if (target == null) {
+                Logger.w("TourOverlay", "TourOverlayController: target view ${step.targetViewId} not found, skipping step")
+                showStep(index + 1)
+                return@launch
+            }
+            target.doOnLayout {
+                target.post {
+                    if (isAttached && !terminal && currentStepIndex == index) positionOnView(target)
                 }
             }
         }
     }
 
-    private fun positionOnView(target: View, step: TourStep) {
-        // Targets inside scrolling containers (e.g. the RPN dashboard's
-        // NestedScrollView) can sit partially below the fold. getGlobalVisibleRect
-        // then returns only the clipped portion and the spotlight lands on the
-        // wrong area, so bring the target fully on-screen before measuring it.
-        bringTargetIntoView(target)
+    private fun positionOnRect(windowBounds: RectF) {
+        val location = IntArray(2)
+        host?.getLocationInWindow(location)
+        targetRect = RectF(windowBounds).apply { offset(-location[0].toFloat(), -location[1].toFloat()) }
+    }
 
-        val targetRect = target.globalVisibleRect() ?: run {
-            Logger.w("TourOverlay", "$TAG: target not visible on screen, skipping")
+    private fun positionOnView(target: View) {
+        if (target.width > 0 && target.height > 0) target.requestRectangleOnScreen(Rect(0, 0, target.width, target.height), true)
+        val bounds = Rect()
+        if (!target.getGlobalVisibleRect(bounds) || bounds.isEmpty) {
+            Logger.w("TourOverlay", "TourOverlayController: target not visible on screen, skipping")
             showStep(currentStepIndex + 1)
             return
         }
-
-        // Animate spotlight; premium steps additionally get the golden glow ring
-        overlayView.setPremiumGlow(step.isPremium)
-        overlayView.animateTo(targetRect, step.spotlightShape)
-
-        // Tap inside spotlight → advance; tap outside → same as next
-        overlayView.onSpotlightTap = { _ -> advanceOrComplete() }
-
-        // Position tooltip after it is measured
-        tooltipView.doOnLayout {
-            placeTooltip(targetRect, step.tooltipSide)
-        }
-        tooltipView.requestLayout()
-    }
-
-    /**
-     * Scrolls the target fully into view (instantly, no smooth animation) by
-     * asking ancestor scroll containers to reveal its full bounds. No-op for
-     * already-visible targets. Uses the synchronous variant so the very next
-     * [View.getGlobalVisibleRect] call reflects the new scroll position.
-     */
-    private fun bringTargetIntoView(target: View) {
-        if (target.width == 0 || target.height == 0) return
-        val visible = Rect()
-        val fullyVisible = target.getGlobalVisibleRect(visible) &&
-                visible.height() >= target.height &&
-                visible.width() >= target.width
-        if (fullyVisible) return
-        target.requestRectangleOnScreen(Rect(0, 0, target.width, target.height), true)
+        val screen = IntArray(2)
+        val window = IntArray(2)
+        target.getLocationOnScreen(screen)
+        target.getLocationInWindow(window)
+        positionOnRect(RectF(bounds).apply { offset((window[0] - screen[0]).toFloat(), (window[1] - screen[1]).toFloat()) })
     }
 
     private fun advanceOrComplete() {
-        if (currentStepIndex < steps.lastIndex) showStep(currentStepIndex + 1)
-        else completeTour()
+        if (terminal) return
+        if (currentStepIndex < steps.lastIndex) showStep(currentStepIndex + 1) else completeTour()
     }
 
-    private fun skipTour() {
-        completeTour()
-    }
+    private fun skipTour() = completeTour()
 
     private fun completeTour() {
-        overlayView.dismiss {
-            detachViews()
+        if (terminal) return
+        terminal = true
+        closing = true
+        scope.launch {
+            delay(180)
+            host?.let { decorRoot.removeView(it) }
+            host = null
+            isAttached = false
             onComplete()
+            scope.cancel()
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Tooltip positioning
-    // -----------------------------------------------------------------------
-
-    /**
-     * Positions the tooltip card above or below the spotlight rect.
-     *
-     * [TooltipSide.AUTO] picks [TooltipSide.BELOW] unless there isn't enough room below,
-     * in which case it flips to [TooltipSide.ABOVE].
-     */
-    private fun placeTooltip(spotlightRect: Rect, requestedSide: TooltipSide) {
-        val screenHeight = decorRoot.height
-        val tooltipH     = tooltipView.measuredHeight.takeIf { it > 0 } ?: return
-
-        val spaceBelow = screenHeight - spotlightRect.bottom
-        val resolvedSide = when (requestedSide) {
-            TooltipSide.AUTO  -> if (spaceBelow >= MIN_SPACE_BELOW_PX) TooltipSide.BELOW else TooltipSide.ABOVE
-            else               -> requestedSide
-        }
-
-        val topY = when (resolvedSide) {
-            TooltipSide.BELOW -> (spotlightRect.bottom + TOOLTIP_MARGIN_PX).toFloat()
-            else              -> (spotlightRect.top - tooltipH - TOOLTIP_MARGIN_PX).toFloat()
-                                    .coerceAtLeast(TOOLTIP_MARGIN_PX.toFloat())
-        }
-
-        val params = tooltipView.layoutParams as FrameLayout.LayoutParams
-        params.topMargin = topY.toInt()
-        tooltipView.layoutParams = params
-
-        // Fade the tooltip in once positioned
-        if (tooltipView.alpha == 0f) {
-            tooltipView.animate().alpha(1f).setDuration(180).start()
-        }
-    }
-
-    // -----------------------------------------------------------------------
-    // Dot indicators
-    // -----------------------------------------------------------------------
-
-    private fun buildDots() {
-        dotsContainer.removeAllViews()
-        val density = activity.resources.displayMetrics.density
-        val sizePx  = (DOT_SIZE_DP * density).toInt()
-        val margin  = (DOT_SPACING_DP * density).toInt()
-
-        repeat(steps.size) { i ->
-            val dot = View(activity).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(sizePx, sizePx).also {
-                    it.marginStart = if (i == 0) 0 else margin
-                }
-                setBackgroundResource(R.drawable.ic_circle)
-                alpha = if (i == 0) 1f else 0.3f
+    @Composable
+    private fun TourOverlay() {
+        val step = steps.getOrNull(currentStepIndex) ?: return
+        val target = targetRect
+        val density = LocalDensity.current
+        val fade = remember { Animatable(0f) }
+        val movement = remember { Animatable(1f) }
+        var from by remember { mutableStateOf<RectF?>(null) }
+        var destination by remember { mutableStateOf<RectF?>(null) }
+        LaunchedEffect(target) {
+            if (target != null) {
+                from = destination ?: RectF(target.centerX(), target.centerY(), target.centerX(), target.centerY())
+                destination = target
+                movement.snapTo(0f)
+                movement.animateTo(1f, tween(220, easing = Easing { 1f - (1f - it).pow(3.6f) }))
             }
-            dotsContainer.addView(dot)
         }
-    }
-
-    private fun updateDots(activeIndex: Int) {
-        for (i in 0 until dotsContainer.childCount) {
-            dotsContainer.getChildAt(i).animate()
-                .alpha(if (i == activeIndex) 1f else 0.3f)
-                .setDuration(150)
-                .start()
+        LaunchedEffect(closing, target != null) { fade.animateTo(if (closing || target == null) 0f else 1f, tween(180)) }
+        val overlay = themeColor(R.attr.tourOverlayColor)
+        val stroke = themeColor(R.attr.tourStrokeColor).copy(alpha = 140 / 255f)
+        val gold = themeColor(R.attr.colorGolden)
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            var tooltipHeight by remember { mutableIntStateOf(0) }
+            val screenHeight = constraints.maxHeight
+            val targetForTooltip = destination
+            val top = targetForTooltip?.let { rect ->
+                val side = if (step.tooltipSide == TooltipSide.AUTO) { if (screenHeight - rect.bottom >= 280) TooltipSide.BELOW else TooltipSide.ABOVE } else step.tooltipSide
+                if (side == TooltipSide.BELOW) rect.bottom + 16f else (rect.top - tooltipHeight - 16f).coerceAtLeast(16f)
+            } ?: 16f
+            Canvas(Modifier.fillMaxSize().alpha(fade.value).pointerInput(currentStepIndex, terminal) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    down.consume()
+                    // Baseline consumes both cutout and outside touches and
+                    // advances on touch-down. Neither invokes the target.
+                    advanceOrComplete()
+                    do { val event = awaitPointerEvent(); event.changes.forEach { it.consume() } } while (event.changes.any { it.pressed })
+                }
+            }) {
+                val start = from
+                val end = destination
+                if (start == null || end == null) { drawRect(overlay); return@Canvas }
+                val f = movement.value
+                fun mix(a: Float, b: Float) = a + (b - a) * f
+                val pad = 8.dp.toPx()
+                val rect = ComposeRect(mix(start.left, end.left) - pad, mix(start.top, end.top) - pad, mix(start.right, end.right) + pad, mix(start.bottom, end.bottom) + pad)
+                val spotlight = Path().apply {
+                    if (step.spotlightShape == SpotlightShape.CIRCLE) {
+                        val radius = maxOf(rect.width, rect.height) / 2
+                        addOval(ComposeRect(rect.center.x - radius, rect.center.y - radius, rect.center.x + radius, rect.center.y + radius))
+                    } else addRoundRect(RoundRect(rect, CornerRadius(16.dp.toPx())))
+                }
+                clipPath(spotlight, ClipOp.Difference) { drawRect(overlay) }
+                if (step.isPremium) {
+                    drawPath(spotlight, gold.copy(alpha = 40 / 255f), style = Stroke(6.dp.toPx()))
+                    drawPath(spotlight, gold.copy(alpha = 150 / 255f), style = Stroke(2.dp.toPx()))
+                }
+                drawPath(spotlight, stroke, style = Stroke(1.5.dp.toPx()))
+            }
+            val tooltipMaxHeight = with(density) { (screenHeight - top.toInt()).coerceAtLeast(48).toDp() }
+            Column(Modifier.align(Alignment.TopCenter).offset { IntOffset(0, top.toInt()) }.widthIn(max = 600.dp).fillMaxWidth().padding(horizontal = 20.dp).heightIn(max = tooltipMaxHeight)
+                .onSizeChanged { tooltipHeight = it.height }.alpha(if (closing) 1f else fade.value)
+                .clip(RoundedCornerShape(16.dp)).background(themeColor(R.attr.tourTooltipBackground))
+                .border(if (step.isPremium) 1.5.dp else .5.dp, if (step.isPremium) gold else themeColor(R.attr.border), RoundedCornerShape(16.dp))
+                .verticalScroll(rememberScrollState()).padding(start = 20.dp, top = 18.dp, end = 20.dp, bottom = 16.dp)) {
+                if (step.isPremium) Row(Modifier.fillMaxWidth().padding(bottom = 12.dp).clip(RoundedCornerShape(6.dp)).background(gold.copy(alpha = .12f)).padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(R.drawable.ic_rethink_plus_sparkle), null, Modifier.size(14.dp), tint = gold)
+                    Text(stringResource(R.string.tour_premium_badge_label).uppercase(LocalLocale.current.platformLocale), Modifier.padding(start = 6.dp), color = gold, fontSize = 10.sp, fontWeight = FontWeight.Medium)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.tour_step_counter, step.position, step.total).uppercase(LocalLocale.current.platformLocale), Modifier.weight(1f), color = themeColor(R.attr.primaryTextColor).copy(alpha = .55f), fontSize = 11.sp)
+                    IconButton(onClick = ::skipTour, modifier = Modifier.size(32.dp)) { Icon(painterResource(R.drawable.ic_cross), stringResource(R.string.tour_btn_skip), Modifier.size(24.dp), tint = themeColor(R.attr.primaryLightColorText)) }
+                }
+                Text(stringResource(step.titleRes), Modifier.padding(top = 8.dp), color = themeColor(R.attr.primaryTextColor), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(step.descRes), Modifier.padding(top = 6.dp), color = themeColor(R.attr.primaryTextColor).copy(alpha = .8f), fontSize = 13.sp)
+                HorizontalDivider(Modifier.padding(top = 14.dp, bottom = 2.dp), color = themeColor(R.attr.primaryTextColor).copy(alpha = .15f))
+                FlowRow(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OriginalButton("view_tour_tooltip:tour_skip_btn", onClick = ::skipTour) { Text(stringResource(R.string.tour_btn_skip), color = themeColor(R.attr.primaryTextColor).copy(alpha = .55f), fontSize = 13.sp) }
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        steps.indices.forEach { index -> Box(Modifier.size(6.dp).background(themeColor(R.attr.primaryTextColor).copy(alpha = if (index == currentStepIndex) 1f else .3f), CircleShape)) }
+                    }
+                    OriginalButton("view_tour_tooltip:tour_next_btn", onClick = ::advanceOrComplete) {
+                        Text(stringResource(if (step.isLastStep) R.string.tour_btn_finish else R.string.next), fontSize = 13.sp)
+                    }
+                }
+            }
         }
-    }
-
-    // -----------------------------------------------------------------------
-    // Click listeners
-    // -----------------------------------------------------------------------
-
-    private fun bindClickListeners() {
-        btnNext.setOnClickListener  { advanceOrComplete() }
-        btnSkip.setOnClickListener  { skipTour() }
-        btnClose.setOnClickListener { skipTour() }
-    }
-
-    // -----------------------------------------------------------------------
-    // Cleanup
-    // -----------------------------------------------------------------------
-
-    private fun detachViews() {
-        runCatching { decorRoot.removeView(tooltipView) }
-        runCatching { decorRoot.removeView(overlayView) }
-        isAttached = false
-    }
-
-    // -----------------------------------------------------------------------
-    // Extension helpers
-    // -----------------------------------------------------------------------
-
-    /** Returns the global (screen-absolute) visible rect for this view, or null if not visible. */
-    private fun View.globalVisibleRect(): Rect? {
-        val r = Rect()
-        return if (getGlobalVisibleRect(r) && !r.isEmpty) r else null
     }
 }
-
-

@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
+import com.celzero.bravedns.ui.compose.firewallapps.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
 
 import android.content.res.Configuration
 import android.graphics.PorterDuff
@@ -26,7 +28,6 @@ import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomSheetFirewallSortFilterBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppListActivity
@@ -38,11 +39,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetFirewallSortFilterBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private val b = FirewallFilterState()
 
     private val persistentState by inject<PersistentState>()
     private val filters = AppListActivity.Filters()
@@ -50,14 +47,11 @@ class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
     override fun getTheme(): Int =
         Themes.getBottomSheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomSheetFirewallSortFilterBinding.inflate(inflater, container, false)
-        return b.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        androidx.compose.ui.platform.ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { FirewallFilterContent(b) } }
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,18 +106,9 @@ class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun setFilter(
-        topLevelFilter: AppListActivity.TopLevelFilter,
-        categories: MutableSet<String>
-    ) {
-        val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id) ?: return
-        b.ffaParentChipGroup.check(topView.id)
-        colorUpChipIcon(topView)
-
-        categories.forEach {
-            val childCategory: Chip = b.ffaChipGroup.findViewWithTag(it) ?: return
-            b.ffaChipGroup.check(childCategory.id)
-        }
+    private fun setFilter(topLevelFilter: AppListActivity.TopLevelFilter, categories: MutableSet<String>) {
+        b.selectParent(topLevelFilter.id)
+        categories.forEach { if (it !in b.categories) return; b.selectCategory(it, true) }
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -131,98 +116,24 @@ class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+
 
     private fun remakeParentFilterChipsUi() {
-        b.ffaParentChipGroup.removeAllViews()
-
-        val all =
-            makeParentChip(AppListActivity.TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
-        val allowed =
-            makeParentChip(
-                AppListActivity.TopLevelFilter.INSTALLED.id,
-                getString(R.string.fapps_filter_parent_installed),
-                false
-            )
-        val blocked =
-            makeParentChip(
-                AppListActivity.TopLevelFilter.SYSTEM.id,
-                getString(R.string.fapps_filter_parent_system),
-                false
-            )
-
-        b.ffaParentChipGroup.addView(all)
-        b.ffaParentChipGroup.addView(allowed)
-        b.ffaParentChipGroup.addView(blocked)
+        b.parent = AppListActivity.TopLevelFilter.ALL.id
+        b.onParent = { applyParentFilter(it) }
+        b.onCategory = { tag, show -> applyChildFilter(tag, show) }
     }
 
-    private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
 
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applyParentFilter(button.tag)
-                colorUpChipIcon(chip)
-            } else {
-                // no-op
-                // no action needed for checkState: false
-            }
-        }
-
-        return chip
-    }
 
     private fun remakeSortChipsUi() {
-        b.fsSortChipGroup.removeAllViews()
-        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.NAME, getString(R.string.fapps_filter_sort_name)))
-        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.PACKAGE, getString(R.string.fapps_filter_sort_package)))
-        b.fsSortChipGroup.addView(makeSortChip(AppListActivity.SortOption.UID, getString(R.string.fapps_filter_sort_uid)))
+        b.sort = filters.sort
+        b.onSort = { filters.sort = it }
     }
 
-    private fun makeSortChip(
-        value: AppListActivity.SortOption,
-        label: String
-    ): Chip {
-        val chip =
-            layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
 
-        chip.id = View.generateViewId()
-        chip.tag = value
-        chip.text = label
-        chip.isChecked = filters.sort == value
 
-        if (chip.isChecked) {
-            colorUpChipIcon(chip)
-        }
 
-        chip.setOnCheckedChangeListener { _, isSelected: Boolean ->
-            if (isSelected) {
-                filters.sort = value
-                colorUpChipIcon(chip)
-            } else {
-                chip.checkedIcon?.colorFilter = null
-                chip.chipIcon?.colorFilter = null
-            }
-        }
-
-        return chip
-    }
-
-    private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter =
-            PorterDuffColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.primaryText),
-                PorterDuff.Mode.SRC_IN
-            )
-        chip.checkedIcon?.colorFilter = colorFilter
-        chip.chipIcon?.colorFilter = colorFilter
-    }
 
     private fun applyParentFilter(tag: Any) {
         when (tag) {
@@ -251,30 +162,12 @@ class FirewallAppFilterBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun remakeChildFilterChipsUi(categories: List<String>) {
-        b.ffaChipGroup.removeAllViews()
-        for (c in categories) {
-            if (filters.categoryFilters.contains(c)) {
-                // if the category is already selected, check the chip
-                b.ffaChipGroup.addView(makeChildChip(c, true))
-            } else {
-                b.ffaChipGroup.addView(makeChildChip(c, false))
-            }
-        }
+        b.categories = categories
+        b.selectedCategories.clear()
+        b.selectedCategories.addAll(categories.filter { filters.categoryFilters.contains(it) })
     }
 
-    private fun makeChildChip(title: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.text = title
-        chip.tag = title
-        chip.isChecked = checked
-        if (checked) colorUpChipIcon(chip)
 
-        chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
-            applyChildFilter(compoundButton.tag, isSelected)
-            colorUpChipIcon(chip)
-        }
-        return chip
-    }
 
     private fun applyChildFilter(tag: Any, show: Boolean) {
         if (show) {

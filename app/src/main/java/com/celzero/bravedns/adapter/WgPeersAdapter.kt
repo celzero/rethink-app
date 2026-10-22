@@ -15,23 +15,24 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import android.app.Activity
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemWgPeersBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.wireguard.Peer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,25 +42,31 @@ class WgPeersAdapter(
     private var themeId: Int,
     private val configId: Int,
     private var peers: MutableList<Peer>
-) : RecyclerView.Adapter<WgPeersAdapter.WgPeersViewHolder>() {
+) : WgListContent {
 
-    override fun onBindViewHolder(holder: WgPeersViewHolder, position: Int) {
-        val peer: Peer = peers[position]
-        holder.update(peer)
+
+
+
+
+
+
+    private var revision by mutableIntStateOf(0)
+    fun notifyDataSetChanged() { revision++ }
+    @Composable override fun Content(modifier: Modifier) {
+        val version = revision
+        Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            peers.forEachIndexed { index, peer ->
+                key(index, version) {
+                    val state = remember { WgPeerRowState(context) }
+                    val holder = remember { WgPeersViewHolder(state) }
+                    LaunchedEffect(peer) { holder.update(peer) }
+                    WgPeerRow(state)
+                }
+            }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgPeersViewHolder {
-        val itemBinding =
-            ListItemWgPeersBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return WgPeersViewHolder(itemBinding)
-    }
-
-    override fun getItemCount(): Int {
-        return peers.size
-    }
-
-    inner class WgPeersViewHolder(private val b: ListItemWgPeersBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class WgPeersViewHolder(private val b: WgPeerRowState) {
 
         fun update(wgPeer: Peer) {
             if (wgPeer.getEndpoint().isPresent) {

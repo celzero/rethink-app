@@ -32,13 +32,14 @@ import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.system.Os
 import android.system.OsConstants
-import android.text.method.LinkMovementMethod
-import android.view.GestureDetector
-import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.about.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,9 +59,6 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.databinding.DialogWhatsnewBinding
-import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper
@@ -106,8 +104,6 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -126,8 +122,18 @@ import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.milliseconds
 
-class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
-    private val b by viewBinding(FragmentAboutBinding::bind)
+class AboutFragment : Fragment(), KoinComponent {
+    private var _presentation: AboutState? = null
+    private val b get() = checkNotNull(_presentation) { "Presentation accessed outside of view lifecycle" }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val state = AboutState(inflater.context)
+        _presentation = state
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { AboutContent(state) } }
+        }
+    }
 
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
@@ -220,6 +226,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     override fun onDestroyView() {
         super.onDestroyView()
         profileScope.cancel()
+        _presentation = null
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -247,82 +254,57 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         
         b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
-        b.fhsTitleRethink.setOnClickListener(this)
-        b.aboutSponsor.setOnClickListener(this)
-        b.aboutSponsorAgain.setOnClickListener(this)
-        b.aboutManageRpn.setOnClickListener(this)
-        b.aboutWebsite.setOnClickListener(this)
-        b.aboutTwitter.setOnClickListener(this)
-        b.aboutGithub.setOnClickListener(this)
-        b.aboutBlog.setOnClickListener(this)
-        b.aboutPrivacyPolicy.setOnClickListener(this)
-        b.aboutTermsOfService.setOnClickListener(this)
-        b.aboutLicense.setOnClickListener(this)
-        b.aboutMail.setOnClickListener(this)
-        b.aboutTelegram.setOnClickListener(this)
-        b.aboutReddit.setOnClickListener(this)
-        b.aboutMastodon.setOnClickListener(this)
-        b.aboutElement.setOnClickListener(this)
-        b.aboutFaq.setOnClickListener(this)
-        b.mozillaImg.setOnClickListener(this)
-        b.fossImg.setOnClickListener(this)
-        b.flossFundsImg.setOnClickListener(this)
-        b.aboutAppUpdate.setOnClickListener(this)
-        b.aboutAppInfo.setOnClickListener(this)
-        b.aboutAppNotification.setOnClickListener(this)
-        b.aboutVpnProfile.setOnClickListener(this)
-        b.aboutCrashLog.setOnClickListener(this)
-        b.aboutAppVersion.setOnClickListener(this)
-        b.aboutAppContributors.setOnClickListener(this)
-        b.aboutAppTranslate.setOnClickListener(this)
-        b.aboutStats.setOnClickListener(this)
-        b.aboutProc.setOnClickListener(this)
-        b.aboutStackTrace.setOnClickListener(this)
-        b.aboutMemoryProfile.setOnClickListener(this)
-        b.aboutDbStats.setOnClickListener(this)
-        b.tokenTextView.setOnClickListener(this)
-        b.aboutConsoleLogs.setOnClickListener(this)
-        b.aboutEventLogs.setOnClickListener(this)
+        b.fhsTitleRethink.setOnClickListener(::onClick)
+        b.aboutSponsor.setOnClickListener(::onClick)
+        b.aboutSponsorAgain.setOnClickListener(::onClick)
+        b.aboutManageRpn.setOnClickListener(::onClick)
+        b.aboutWebsite.setOnClickListener(::onClick)
+        b.aboutTwitter.setOnClickListener(::onClick)
+        b.aboutGithub.setOnClickListener(::onClick)
+        b.aboutBlog.setOnClickListener(::onClick)
+        b.aboutPrivacyPolicy.setOnClickListener(::onClick)
+        b.aboutTermsOfService.setOnClickListener(::onClick)
+        b.aboutLicense.setOnClickListener(::onClick)
+        b.aboutMail.setOnClickListener(::onClick)
+        b.aboutTelegram.setOnClickListener(::onClick)
+        b.aboutReddit.setOnClickListener(::onClick)
+        b.aboutMastodon.setOnClickListener(::onClick)
+        b.aboutElement.setOnClickListener(::onClick)
+        b.aboutFaq.setOnClickListener(::onClick)
+        b.mozillaImg.setOnClickListener(::onClick)
+        b.fossImg.setOnClickListener(::onClick)
+        b.flossFundsImg.setOnClickListener(::onClick)
+        b.aboutAppUpdate.setOnClickListener(::onClick)
+        b.aboutAppInfo.setOnClickListener(::onClick)
+        b.aboutAppNotification.setOnClickListener(::onClick)
+        b.aboutVpnProfile.setOnClickListener(::onClick)
+        b.aboutCrashLog.setOnClickListener(::onClick)
+        b.aboutAppVersion.setOnClickListener(::onClick)
+        b.aboutAppContributors.setOnClickListener(::onClick)
+        b.aboutAppTranslate.setOnClickListener(::onClick)
+        b.aboutStats.setOnClickListener(::onClick)
+        b.aboutProc.setOnClickListener(::onClick)
+        b.aboutStackTrace.setOnClickListener(::onClick)
+        b.aboutMemoryProfile.setOnClickListener(::onClick)
+        b.aboutDbStats.setOnClickListener(::onClick)
+        b.tokenTextView.setOnClickListener(::onClick)
+        b.aboutConsoleLogs.setOnClickListener(::onClick)
+        b.aboutEventLogs.setOnClickListener(::onClick)
 
-        val gestureDetector = GestureDetector(
-            requireContext(),
-            object : GestureDetector.SimpleOnGestureListener() {
-                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                    val text = persistentState.firebaseUserToken
-                    val ctx = context ?: return false
-                    val clipboard =
-                        getSystemService(ctx, ClipboardManager::class.java)
-                    val clip = ClipData.newPlainText("token", text)
-                    clipboard?.setPrimaryClip(clip)
-
-                    Toast.makeText(ctx, "Copied to clipboard", Toast.LENGTH_SHORT)
-                        .show()
-                    return true
-                }
-
-                override fun onDoubleTap(e: MotionEvent): Boolean {
-                    if (isFdroidFlavour()) return true
-
-                    val newToken = generateNewToken()
-                    b.tokenTextView.text = newToken
-                    val ctx = context ?: return true
-                    Toast.makeText(
-                        ctx,
-                        getString(R.string.config_add_success_toast),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return true
-                }
-            })
-
-        // suppress the warning about setting a touch listener
-        b.tokenTextView.setOnTouchListener { v, event ->
-            if (gestureDetector.onTouchEvent(event)) {
-                v.performClick() // important to call this
-                true
-            } else {
-                false // allow text selection
-            }
+        b.tokenSingleTap = singleTap@{
+            val text = persistentState.firebaseUserToken
+            val ctx = context ?: return@singleTap
+            val clipboard = getSystemService(ctx, ClipboardManager::class.java)
+            val clip = ClipData.newPlainText("token", text)
+            clipboard?.setPrimaryClip(clip)
+            Toast.makeText(ctx, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+        }
+        b.tokenDoubleTap = doubleTap@{
+            if (isFdroidFlavour()) return@doubleTap
+            val newToken = generateNewToken()
+            b.tokenTextView.text = newToken
+            val ctx = context ?: return@doubleTap
+            Toast.makeText(ctx, getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -452,7 +434,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         return getString(R.string.build__flavor_website)
     }
 
-    override fun onClick(view: View?) {
+    private fun onClick(view: WgControlState?) {
         when (view) {
             b.fhsTitleRethink -> {
                 handleTitleClick()
@@ -923,7 +905,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     ) {
         if (!isAdded) return
         val ctx = requireContext()
-        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
 
         val clipText = buildString {
             appendLine("=== JVM STACK ===")
@@ -933,107 +914,24 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             appendLine(goStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) })
         }
 
-        fun makeTabButton(text: String): android.widget.Button {
-            return android.widget.Button(ctx, null, android.R.attr.borderlessButtonStyle).apply {
-                this.text = text
-                textSize = 12f
-                layoutParams = android.widget.LinearLayout.LayoutParams(
-                    0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                isAllCaps = false
-            }
-        }
-
-        // use recycler as using textview with large stack traces causes OOM and ANR issues
-        fun makeLineRecyclerView(content: String): androidx.recyclerview.widget.RecyclerView {
-            val lines = content.ifBlank { ctx.getString(R.string.lbl_not_available_short) }
-                .split('\n')
-            return androidx.recyclerview.widget.RecyclerView(ctx).apply {
-                layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
-                setHasFixedSize(false)
-                adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<
-                        androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
-
-                    override fun getItemCount() = lines.size
-
-                    override fun onCreateViewHolder(
-                        parent: android.view.ViewGroup,
-                        viewType: Int
-                    ): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-                        val tv = android.widget.TextView(ctx).apply {
-                            setPadding(pad, 1, pad, 1)
-                            typeface = android.graphics.Typeface.MONOSPACE
-                            textSize = 11.5f
-                            // deliberately not selectable — avoids ActionMode/touch conflicts
-                            isFocusable = false
-                        }
-                        return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
-                    }
-
-                    override fun onBindViewHolder(
-                        holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
-                        position: Int
-                    ) {
-                        (holder.itemView as android.widget.TextView).text = lines[position]
-                    }
-                }
-            }
-        }
-
-        val jvmRv = makeLineRecyclerView(jvmStackTrace)
-        val goRv     = makeLineRecyclerView(goStackTrace)
-
-        val tabJvm = makeTabButton("JVM Stack")
-        val tabGo     = makeTabButton("Go Stack")
-
-        fun selectTab(showJvm: Boolean) {
-            jvmRv.visibility = if (showJvm)  View.VISIBLE else View.GONE
-            goRv.visibility     = if (!showJvm) View.VISIBLE else View.GONE
-            tabJvm.alpha = if (showJvm)  1f else 0.45f
-            tabGo.alpha     = if (!showJvm) 1f else 0.45f
-            if (showJvm) jvmRv.scrollToPosition(0)
-            else            goRv.scrollToPosition(0)
-        }
-
-        tabJvm.setOnClickListener { selectTab(true) }
-        tabGo.setOnClickListener     { selectTab(false) }
-
-        val tabRow = android.widget.LinearLayout(ctx).apply {
-            orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabJvm)
-            addView(tabGo)
-        }
-
-        val container = android.widget.LinearLayout(ctx).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            addView(tabRow)
-            addView(jvmRv, android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-            addView(goRv, android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-        }
-
-        // Start on JVM Stack tab
-        selectTab(true)
-
-        val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+        val tabs = DiagnosticTabsState(listOf(
+            "JVM Stack" to jvmStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) },
+            "Go Stack" to goStackTrace.ifBlank { ctx.getString(R.string.lbl_not_available_short) }
+        ))
+        AboutDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Stacktrace")
-            .setView(container)
+            .setContent { DiagnosticTabsContent(tabs) }
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
                 copyToClipboard("stack_trace", clipText)
                 showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
             }
-            .setNeutralButton("Refresh", null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
-                dialog.dismiss()
+            .setNeutralButton("Refresh") { d, _ ->
+                d.dismiss()
                 openStackTraceDialog()
             }
-        }
-
-        dialog.show()
+            .create()
+            .show()
     }
 
     private fun openEventLogs() {
@@ -1067,12 +965,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun openStatsDialog() {
         if (!isAdded) return
         val ctx = requireContext()
-        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
         val notAvailable = ctx.getString(R.string.lbl_not_available_short)
 
-        val progressDialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+        val progressDialog = AboutDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.title_statistics))
-            .setView(android.widget.ProgressBar(ctx).apply { isIndeterminate = true })
+            .setContent { AboutProgressContent() }
             .setCancelable(true)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .create()
@@ -1103,67 +1000,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 isViewAlive = { isAdded && view != null },
                 dismissProgress = { progressDialog.dismiss() },
                 showResults = {
-                    val selectedPositions = mutableSetOf<Int>()
-                    val highlightColor = UIUtils.fetchColor(ctx, android.R.attr.colorControlHighlight)
+                    val selection = DiagnosticSelectionState(lines, clipText)
 
-                    // use recycler as using textview with large stats causes OOM and ANR issues
-                    val recyclerView = androidx.recyclerview.widget.RecyclerView(ctx).apply {
-                        layoutManager = androidx.recyclerview.widget.LinearLayoutManager(ctx)
-                        setHasFixedSize(true)
-                        adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<
-                                androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
-                            override fun getItemCount() = lines.size
-                            override fun onCreateViewHolder(
-                                parent: android.view.ViewGroup,
-                                viewType: Int
-                            ): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-                                val tv = android.widget.TextView(ctx).apply {
-                                    setPadding(pad, 1, pad, 1)
-                                    typeface = android.graphics.Typeface.MONOSPACE
-                                    textSize = 11.5f
-                                }
-                                return object : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv) {}
-                            }
-                            override fun onBindViewHolder(
-                                holder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
-                                position: Int
-                            ) {
-                                val tv = holder.itemView as android.widget.TextView
-                                tv.text = lines[position]
-                                if (selectedPositions.contains(position)) {
-                                    tv.setBackgroundColor(highlightColor)
-                                } else {
-                                    tv.background = null
-                                }
-
-                                tv.setOnClickListener {
-                                    if (selectedPositions.contains(position)) {
-                                        selectedPositions.remove(position)
-                                    } else {
-                                        selectedPositions.add(position)
-                                    }
-                                    notifyItemChanged(position)
-                                }
-                            }
-                        }
-                    }
-
-                    val container = android.widget.LinearLayout(ctx).apply {
-                        orientation = android.widget.LinearLayout.VERTICAL
-                        addView(recyclerView, android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-                    }
-
-                    MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                    AboutDialogBuilder(ctx, R.style.App_Dialog_NoDim)
                         .setTitle(getString(R.string.title_statistics))
-                        .setView(container)
+                        .setContent { DiagnosticSelectionContent(selection) }
                         .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                         .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                            val textToCopy = if (selectedPositions.isEmpty()) {
-                                clipText
-                            } else {
-                                selectedPositions.sorted().joinToString("\n") { lines[it] }
-                            }
+                            val textToCopy = selection.textToCopy()
                             copyToClipboard("stats_dump", textToCopy)
                             showToastUiCentered(
                                 ctx,
@@ -1217,7 +1061,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     ) {
         if (!isAdded) return
         val ctx = requireContext()
-        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
 
         val colorHint = ContextCompat.getColor(ctx, android.R.color.darker_gray)
 
@@ -1300,105 +1143,31 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             appendLine(formatedMetrics.orEmpty())
         }
 
-        fun makeTabButton(text: String): android.widget.Button {
-            return android.widget.Button(ctx, null, android.R.attr.borderlessButtonStyle).apply {
-                this.text = text
-                textSize = 12f
-                layoutParams = android.widget.LinearLayout.LayoutParams(0,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                isAllCaps = false
-            }
-        }
-
-        fun makeScrollableSpannable(spannable: android.text.SpannableStringBuilder): android.widget.ScrollView {
-            val tv = android.widget.TextView(ctx).apply {
-                setPadding(pad, pad / 2, pad, pad)
-                setText(spannable, android.widget.TextView.BufferType.SPANNABLE)
-                setTextIsSelectable(true)
-                typeface = android.graphics.Typeface.MONOSPACE
-                textSize = 11.5f
-            }
-            return android.widget.ScrollView(ctx).apply {
-                addView(tv)
-                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
-            }
-        }
-
-        fun makeScrollableText(content: String?): android.widget.ScrollView {
-            val tv = android.widget.TextView(ctx).apply {
-                setPadding(pad, pad / 2, pad, pad)
-                text = content ?: requireContext().getString(R.string.lbl_not_available_short)
-                setTextIsSelectable(true)
-                typeface = android.graphics.Typeface.MONOSPACE
-                textSize = 11.5f
-            }
-            return android.widget.ScrollView(ctx).apply {
-                addView(tv)
-                scrollBarStyle = android.widget.ScrollView.SCROLLBARS_INSIDE_OVERLAY
-            }
-        }
-
-        val procScrollView    = makeScrollableSpannable(otherSpan)
         val metricsContent = buildString {
             appendLine("Memory Metrics")
             appendLine(memMetrics)
             appendLine()
             appendLine(formatedMetrics.orEmpty())
         }
-        val metricsScrollView = makeScrollableText(metricsContent)
-
-        val tabProc    = makeTabButton("Threads / Proc / Mem")
-        val tabMetrics = makeTabButton("Metrics")
-
-        fun selectTab(showProc: Boolean) {
-            procScrollView.visibility    = if (showProc)  View.VISIBLE else View.GONE
-            metricsScrollView.visibility = if (!showProc) View.VISIBLE else View.GONE
-            tabProc.alpha    = if (showProc)  1f else 0.45f
-            tabMetrics.alpha = if (!showProc) 1f else 0.45f
-            if (showProc) procScrollView.post    { procScrollView.scrollTo(0, 0) }
-            else          metricsScrollView.post { metricsScrollView.scrollTo(0, 0) }
-        }
-
-        tabProc.setOnClickListener    { selectTab(true) }
-        tabMetrics.setOnClickListener { selectTab(false) }
-
-        val tabRow = android.widget.LinearLayout(ctx).apply {
-            orientation = android.widget.LinearLayout.HORIZONTAL
-            addView(tabMetrics)
-            addView(tabProc)
-        }
-
-        val container = android.widget.LinearLayout(ctx).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            addView(tabRow)
-            addView(procScrollView, android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-            addView(metricsScrollView, android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-        }
-
-        // Start on the Proc / Mem tab
-        selectTab(false)
-
-        val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+        // The original dialog starts on Metrics despite its old comment saying Proc.
+        val tabs = DiagnosticTabsState(listOf(
+            "Metrics" to metricsContent,
+            "Threads / Proc / Mem" to otherSpan
+        ), selectableText = true)
+        AboutDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Proc")
-            .setView(container)
+            .setContent { DiagnosticTabsContent(tabs) }
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
                 copyToClipboard("proc_analysis", clipText)
                 showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
             }
-            .setNeutralButton("Refresh", null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setOnClickListener {
-                dialog.dismiss()
+            .setNeutralButton("Refresh") { d, _ ->
+                d.dismiss()
                 openProcDialog()
             }
-        }
-
-        dialog.show()
+            .create()
+            .show()
     }
 
     private fun copyToClipboard(label: String, text: String): ClipboardManager? {
@@ -1418,27 +1187,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 }
                 val appended = mutableSetOf<String>()
                 val ctx = requireContext()
-                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
-                val tv = android.widget.TextView(ctx)
-                tv.setPadding(pad, pad, pad, pad)
-                tv.text = "Select a table to load its dump"
-                tv.setTextIsSelectable(true)
-                tv.typeface = android.graphics.Typeface.MONOSPACE
-                val scroll = android.widget.ScrollView(ctx)
-                scroll.addView(tv)
+                val tv = DatabaseDumpState()
 
-                val listView = android.widget.ListView(ctx)
-                val listHeight = (resources.displayMetrics.heightPixels * 0.30).toInt()
-                listView.layoutParams = android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    listHeight
-                )
-                val adapter = android.widget.ArrayAdapter(ctx, android.R.layout.simple_list_item_1, tables)
-                listView.adapter = adapter
-
-                // load + append dump when a table is tapped
-                listView.onItemClickListener =
-                    android.widget.AdapterView.OnItemClickListener { _, _, position, _ ->
+                // Load + append through the same controller callback; content never queries a DB.
+                val onTableSelected: (Int) -> Unit = tableSelected@{ position ->
                         val table = tables[position]
                         if (appended.contains(table)) {
                             showToastUiCentered(
@@ -1446,7 +1198,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                                 getString(R.string.config_add_success_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            return@OnItemClickListener
+                            return@tableSelected
                         }
                         appended.add(table)
                         tv.append("\nLoading $table ...\n")
@@ -1462,14 +1214,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                         }
                     }
 
-                val container = android.widget.LinearLayout(ctx)
-                container.orientation = android.widget.LinearLayout.VERTICAL
-                container.addView(listView)
-                container.addView(scroll)
-
-                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
+                AboutDialogBuilder(ctx, R.style.App_Dialog_NoDim)
                     .setTitle(getString(R.string.title_database_dump))
-                    .setView(container)
+                    .setContent { DatabaseDumpContent(tables, tv, onTableSelected) }
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
                         copyToClipboard("db_dump", tv.text.toString())
@@ -1671,7 +1418,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun showNoLogDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = AboutDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
         builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
@@ -1707,15 +1454,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     // unused, remove after removing the string
     private fun showNewFeaturesDialog() {
-        val binding =
-            DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        binding.desc.movementMethod = LinkMovementMethod.getInstance()
-        binding.desc.text = htmlToSpannedText(getString(R.string.whats_new_version_update))
+        val desc = htmlToSpannedText(getString(R.string.whats_new_version_update))
         // replace the version name in the title
         val v = getVersionName().slice(0..6)
         val title = getString(R.string.about_whats_new, v)
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setView(binding.root)
+        AboutDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setContent { AboutRichTextContent(desc) }
             .setTitle(title)
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
@@ -1729,40 +1473,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun showContributors() {
-        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val heading = dialogBinding.infoRulesDialogRulesTitle
-        val okBtn = dialogBinding.infoRulesDialogCancelImg
-        val descText = dialogBinding.infoRulesDialogRulesDesc
-        dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
-
-        heading.text = getString(R.string.contributors_dialog_title)
-        heading.setCompoundDrawablesWithIntrinsicBounds(
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors),
-            null,
-            null,
-            null
-        )
-
-        heading.gravity = Gravity.CENTER
-        descText.gravity = Gravity.CENTER
-
-        descText.movementMethod = LinkMovementMethod.getInstance()
-        descText.text = htmlToSpannedText(getString(R.string.contributors_list))
-
-        okBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        val desc = htmlToSpannedText(getString(R.string.contributors_list))
+        AboutDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.contributors_dialog_title))
+            .setIcon(R.drawable.ic_authors)
+            .setContent { AboutRichTextContent(desc, centered = true) }
+            .setCancelable(true)
+            .setCloseButton()
+            .create()
+            .show()
     }
 
     private fun promptCrashLogAction() {

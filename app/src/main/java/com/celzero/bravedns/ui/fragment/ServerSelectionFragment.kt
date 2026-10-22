@@ -15,6 +15,12 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import com.celzero.bravedns.ui.compose.rpn.*
+import com.celzero.bravedns.ui.compose.home.HomeTourAnchors
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.chrome.navigationOverlapBottomPx
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
@@ -26,41 +32,30 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Path
-import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
 import android.text.format.DateUtils
-import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
@@ -70,7 +65,6 @@ import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
-import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.BraveVPNService
@@ -99,11 +93,7 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.celzero.firestack.backend.Backend
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -126,7 +116,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Fragment for selecting VPN servers from a list.
  */
-class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
+class ServerSelectionFragment : Fragment(),
     VpnServerAdapter.ServerSelectionListener,
     CountryServerAdapter.CitySelectionListener {
 
@@ -137,7 +127,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private val dnsLogDAO by inject<DnsLogDAO>()
     private val rethinkLogDao by inject<RethinkLogDao>()
     private val persistentState by inject<PersistentState>()
-    private val b by viewBinding(FragmentServerSelectionBinding::bind)
+    private lateinit var tourAnchors: HomeTourAnchors
+    private lateinit var ui: RpnSelectionState
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        tourAnchors = HomeTourAnchors.forActivity(requireActivity())
+        ui = RpnSelectionState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            id = R.id.root
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnSelectionScreen(ui, tourAnchors) } }
+        }
+    }
     private val serverSelectionViewModel: ServerSelectionViewModel by activityViewModel()
 
     private lateinit var serverAdapter: CountryServerAdapter
@@ -373,35 +374,39 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
         isProxyStopped = RpnProxyManager.rpnMode().isNone()
 
-        val density = resources.displayMetrics.density
-        // 16dp baseline margin for FABs.
-        val fabMarginPx = (16f * density + 0.5f).toInt()
-
-        ViewCompat.setOnApplyWindowInsetsListener(b.root) { _, insets ->
-            val navBarBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            val fabBottom = navBarBottom + fabMarginPx
-            Logger.d(LOG_TAG_UI, "$TAG.onViewCreated: navBarBottom=$navBarBottom, fabBottom=$fabBottom")
-
-            // Apply margins to both FABs so they clear the nav bar inset.
-            listOf(b.fabStopProxy, b.fabStartProxy).forEach { fab ->
-                (fab.layoutParams as? android.view.ViewGroup.MarginLayoutParams)?.let { lp ->
-                    lp.bottomMargin = fabBottom
-                    lp.marginEnd    = fabMarginPx
-                    fab.layoutParams = lp
-                }
+        var navBarBottom = 0
+        val viewLocation = IntArray(2)
+        fun updateNavigationClearance() {
+            val bounds = tourAnchors.find(R.id.nav_view)
+            view.getLocationInWindow(viewLocation)
+            // The Home shell reserves the entire bar, including system insets. Only
+            // actual viewport overlap needs padding; standalone hosts retain their inset.
+            val overlap = if (bounds != null) {
+                navigationOverlapBottomPx(viewLocation[1] + view.height, bounds.top)
+            } else navBarBottom
+            ui.fabBottomPx = overlap + dpPx(16)
+            ui.scrollBottomPx = if (bounds != null) overlap + dpPx(24) else 0
+        }
+        val reposition = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateNavigationClearance()
+        }
+        view.addOnLayoutChangeListener(reposition)
+        val stopObservingNavigation = tourAnchors.observeBounds(R.id.nav_view) {
+            updateNavigationClearance()
+        }
+        viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                stopObservingNavigation()
+                view.removeOnLayoutChangeListener(reposition)
+                owner.lifecycle.removeObserver(this)
             }
+        })
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            navBarBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            updateNavigationClearance()
             insets
         }
-
-        // FAB position is handled exclusively via bottomMargin in the listener above.
-        ViewCompat.setOnApplyWindowInsetsListener(b.fabStopProxy)  { _, _ -> WindowInsetsCompat.CONSUMED }
-        ViewCompat.setOnApplyWindowInsetsListener(b.fabStartProxy) { _, _ -> WindowInsetsCompat.CONSUMED }
-
-        // Force inset dispatch, needed on some OEM devices where the system does not
-        // automatically re-dispatch insets after the fragment view is attached.
-        ViewCompat.requestApplyInsets(b.root)
-
-        applyScrollPadding()
+        ViewCompat.requestApplyInsets(view)
 
         setupNavigationButtons()
         setupSearchBar()
@@ -421,30 +426,15 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupSwipeToRefresh()
         loadRpnHeatmap()
         // Center the QS pill row once its real (measured) width is known.
-        b.quickSettingsPills.post { if (isAdded) alignQuickSettingsPills() }
 
         // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
             applyProxyStoppedUi()
-            b.fabStopProxy.visibility  = View.GONE
-            b.fabStartProxy.visibility = View.VISIBLE
+            ui.fabStopProxy.visibility  = View.GONE
+            ui.fabStartProxy.visibility = View.VISIBLE
         } else {
-            b.fabStopProxy.visibility  = View.VISIBLE
-            b.fabStartProxy.visibility = View.GONE
-        }
-
-        // Apply bottom padding so the last list item is not hidden behind the
-        // BottomNavigationView (which floats over the fragment container).
-        requireActivity().findViewById<View>(R.id.nav_view)?.let { navView ->
-            navView.post {
-                if (!isAdded) return@post
-                b.serversScrollView.setPadding(
-                    b.serversScrollView.paddingLeft,
-                    b.serversScrollView.paddingTop,
-                    b.serversScrollView.paddingRight,
-                    navView.height + dpPx(24)
-                )
-            }
+            ui.fabStopProxy.visibility  = View.VISIBLE
+            ui.fabStartProxy.visibility = View.GONE
         }
 
         animateHeaderEntry()
@@ -498,7 +488,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Initial load still in progress (shimmer, registration, server fetch).
         if (isLoading) return false
         // Error or empty state visible — the retry path may still recover.
-        if (b.errorStateContainer.isVisible) return false
+        if (ui.errorStateContainer.isVisible) return false
         return true
     }
 
@@ -508,6 +498,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             TourOverlayController(
                 activity   = host,
                 steps      = RpnOnboardingManager.rpnOnboardingSteps(),
+                composeAnchor = tourAnchors::find,
                 onComplete = {
                     RpnOnboardingManager.markCompleted(persistentState)
                     Logger.v(LOG_TAG_UI, "$TAG: RPN onboarding tour completed")
@@ -518,16 +509,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
     }
 
-    private fun applyScrollPadding() {
-        b.serversScrollView.post {
-            b.serversScrollView.setPadding(
-                b.serversScrollView.paddingLeft,
-                0,
-                b.serversScrollView.paddingRight,
-                b.serversScrollView.paddingBottom
-            )
-        }
-    }
+
 
     /**
      * pull-to-refresh on the whole screen.
@@ -535,18 +517,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * or a stopped proxy is active.
      */
     private fun setupSwipeToRefresh() {
-        // Require a deliberate, hard pull before the refresh fires (the
-        // framework default of ~64dp triggers on small accidental swipes),
-        // and cap the slingshot so the spinner stays put during deep drags.
-        val density = resources.displayMetrics.density
-        b.swipeRefresh.setDistanceToTriggerSync((SWIPE_REFRESH_TRIGGER_DP * density).toInt())
-        b.swipeRefresh.setSlingshotDistance((SWIPE_REFRESH_SLINGSHOT_DP * density).toInt())
-        b.swipeRefresh.setOnRefreshListener {
+        ui.swipeRefresh.onRefresh = {
             Logger.i(LOG_TAG_UI, "$TAG.setupSwipeToRefresh: pull-to-refresh triggered")
             handleSwipeRefresh()
         }
-        // Pull is meaningless until the initial list has loaded.
-        b.swipeRefresh.isEnabled = !isLoading
+        ui.swipeRefresh.isEnabled = !isLoading
     }
 
     /**
@@ -560,7 +535,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Coalesce: ignore a second pull while one refresh is already running.
         if (swipeRefreshInFlight) return
         swipeRefreshInFlight = true
-        b.swipeRefresh.isRefreshing = true
+        ui.swipeRefresh.isRefreshing = true
         startRefreshSwim()
 
         io {
@@ -585,7 +560,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 swipeRefreshInFlight = false
                 stopRefreshSwim()
                 if (!isAdded) return@uiCtx
-                b.swipeRefresh.isRefreshing = false
+                ui.swipeRefresh.isRefreshing = false
                 if (refreshed) {
                     showToast(getString(R.string.dc_refresh_toast))
                 } else {
@@ -698,7 +673,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         super.onStart()
         blinkAnimator?.let { if (it.isPaused) it.resume() }
         errorDolphinAnimator?.let { if (it.isPaused) it.resume() }
-        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+        listOf(ui.shimmerHeader, ui.shimmerServerList, ui.shimmerSubscriptionBanner).forEach {
             if (it.isVisible) it.startShimmer()
         }
         setupHeaderUI()
@@ -707,7 +682,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     override fun onStop() {
         blinkAnimator?.pause()
         errorDolphinAnimator?.pause()
-        listOf(b.shimmerHeader, b.shimmerServerList, b.shimmerSubscriptionBanner).forEach {
+        listOf(ui.shimmerHeader, ui.shimmerServerList, ui.shimmerSubscriptionBanner).forEach {
             if (it.isVisible) it.stopShimmer()
         }
         statusUpdateJob?.cancel()
@@ -779,17 +754,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             // Always disable FABs while reset is running so the user
                             // cannot start/stop the proxy mid-operation.
                             if (isAdded && view != null) {
-                                b.fabStopProxy.isClickable  = false
-                                b.fabStartProxy.isClickable = false
+                                ui.fabStopProxy.isClickable  = false
+                                ui.fabStartProxy.isClickable = false
                                 // Block pull-to-refresh while a reset is in flight.
-                                b.swipeRefresh.isEnabled = false
+                                ui.swipeRefresh.isEnabled = false
                             }
                             if (resetDialogDismissedByUser) {
                                 // User explicitly dismissed the dialog; show inline bar
                                 // as a subtle indicator; the dialog will NOT re-appear.
                                 Logger.i(LOG_TAG_UI, "$TAG.observeResetState: InProgress, dialog dismissed, showing inline bar")
                                 if (isAdded && view != null) {
-                                    b.registrationProgressBar.show()
+                                    ui.registrationProgressBar.show()
                                     // Disable search and action icons while reset is in progress
                                     setSearchAndActionsEnabled(false)
                                 }
@@ -806,10 +781,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             resetDialogDismissedByUser = false
                             dismissRpnResetDialog()
                             if (isAdded && view != null) {
-                                b.registrationProgressBar.hide()
-                                b.fabStopProxy.isClickable  = true
-                                b.fabStartProxy.isClickable = true
-                                b.swipeRefresh.isEnabled = true
+                                ui.registrationProgressBar.hide()
+                                ui.fabStopProxy.isClickable  = true
+                                ui.fabStartProxy.isClickable = true
+                                ui.swipeRefresh.isEnabled = true
                                 // Restore search and action icons now that reset is done
                                 setSearchAndActionsEnabled(true)
                             }
@@ -821,10 +796,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                             resetDialogDismissedByUser = false
                             dismissRpnResetDialog()
                             if (isAdded && view != null) {
-                                b.registrationProgressBar.hide()
-                                b.fabStopProxy.isClickable  = true
-                                b.fabStartProxy.isClickable = true
-                                b.swipeRefresh.isEnabled = true
+                                ui.registrationProgressBar.hide()
+                                ui.fabStopProxy.isClickable  = true
+                                ui.fabStartProxy.isClickable = true
+                                ui.swipeRefresh.isEnabled = true
                                 // Restore search and action icons
                                 setSearchAndActionsEnabled(true)
                             }
@@ -833,9 +808,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         is ServerSelectionViewModel.ResetState.Idle -> {
                             // Ensure FABs are interactive when no reset is active.
                             if (isAdded && view != null) {
-                                b.fabStopProxy.isClickable  = true
-                                b.fabStartProxy.isClickable = true
-                                b.swipeRefresh.isEnabled = !isLoading
+                                ui.fabStopProxy.isClickable  = true
+                                ui.fabStartProxy.isClickable = true
+                                ui.swipeRefresh.isEnabled = !isLoading
                             }
                         }
                     }
@@ -986,15 +961,11 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             fabLoadingAnimator = null
             blinkAnimator?.cancel()
             blinkAnimator = null
-            b.fabStopProxy.animate().cancel()
-            b.fabStartProxy.animate().cancel()
-            b.statusIndicator.animate().cancel()
-            b.statusCard.animate().cancel()
-            b.searchCard.animate().cancel()
-        }
-        runCatching {
-            b.rvServers.suppressLayout(false)
-            b.rvSelectedServers.suppressLayout(false)
+            ui.fabStopProxy.animate().cancel()
+            ui.fabStartProxy.animate().cancel()
+            ui.statusIndicator.animate().cancel()
+            ui.statusCard.animate().cancel()
+            ui.searchCard.animate().cancel()
         }
         statusUpdateJob?.cancel()
         statusUpdateJob = null
@@ -1010,7 +981,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     /** Slides/fades a section in; hidden views are skipped unless [forceShow]. */
-    private fun animateSectionIn(view: View, delayMs: Long = 0L, forceShow: Boolean = false) {
+    private fun animateSectionIn(view: RpnControlState, delayMs: Long = 0L, forceShow: Boolean = false) {
         if (!isAdded) return
         if (!view.isVisible && !forceShow) return
         view.alpha = 0f
@@ -1033,50 +1004,50 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (loading) {
             // Header shimmer
             if (!skipHeader) {
-                b.shimmerHeader.isVisible = true
-                b.shimmerHeader.startShimmer()
-                b.locationContent.isVisible = false
+                ui.shimmerHeader.isVisible = true
+                ui.shimmerHeader.startShimmer()
+                ui.locationContent.isVisible = false
             } else {
-                b.shimmerHeader.stopShimmer()
-                b.shimmerHeader.isVisible = false
-                b.locationContent.isVisible = true
+                ui.shimmerHeader.stopShimmer()
+                ui.shimmerHeader.isVisible = false
+                ui.locationContent.isVisible = true
             }
 
             // hide real list and hint cards
-            b.shimmerServerList.isVisible = true
-            b.shimmerServerList.startShimmer()
-            b.rvServers.isVisible = false
-            b.emptySelectionCard.isVisible = false
-            b.rvSelectedServers.isVisible = false
-            b.frequentCountriesSection.isVisible = false
-            b.errorStateContainer.isVisible = false
+            ui.shimmerServerList.isVisible = true
+            ui.shimmerServerList.startShimmer()
+            ui.rvServers.isVisible = false
+            ui.emptySelectionCard.isVisible = false
+            ui.rvSelectedServers.isVisible = false
+            ui.frequentCountriesSection.isVisible = false
+            ui.errorStateContainer.isVisible = false
 
             // Disable search bar and action icons while data is loading
             setSearchAndActionsEnabled(false)
             // Pull-to-refresh is meaningless during the initial load.
-            b.swipeRefresh.isEnabled = false
-            b.swipeRefresh.isRefreshing = false
+            ui.swipeRefresh.isEnabled = false
+            ui.swipeRefresh.isRefreshing = false
         } else {
             // Stop and hide header shimmer, reveal real content
-            b.shimmerHeader.stopShimmer()
-            b.shimmerHeader.isVisible = false
-            b.locationContent.isVisible = true
+            ui.shimmerHeader.stopShimmer()
+            ui.shimmerHeader.isVisible = false
+            ui.locationContent.isVisible = true
 
             // Stop and hide list shimmer, reveal real list
-            b.shimmerServerList.stopShimmer()
-            b.shimmerServerList.isVisible = false
-            b.rvServers.isVisible = true
+            ui.shimmerServerList.stopShimmer()
+            ui.shimmerServerList.isVisible = false
+            ui.rvServers.isVisible = true
 
             // Coordinated settle cascade; silent reloads skip it.
             if (wasLoading) {
-                animateSectionIn(b.locationContent, forceShow = true)
-                animateSectionIn(b.rvSelectedServers, CONTENT_STAGGER_MS)
-                animateSectionIn(b.rvServers, CONTENT_STAGGER_MS, forceShow = true)
+                animateSectionIn(ui.locationContent, forceShow = true)
+                animateSectionIn(ui.rvSelectedServers, CONTENT_STAGGER_MS)
+                animateSectionIn(ui.rvServers, CONTENT_STAGGER_MS, forceShow = true)
             }
 
             // Re-enable search bar and action icons once data is ready
             setSearchAndActionsEnabled(true)
-            b.swipeRefresh.isEnabled = true
+            ui.swipeRefresh.isEnabled = true
         }
     }
 
@@ -1089,15 +1060,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setSearchAndActionsEnabled(enabled: Boolean) {
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
-        b.searchCard.alpha = alpha
-        b.searchCard.isEnabled = enabled
-        b.searchBar.isEnabled = enabled
-        b.searchBar.isFocusable = enabled
-        b.searchBar.isFocusableInTouchMode = enabled
-        b.settingsBtn.alpha = alpha
-        b.settingsBtn.isEnabled = enabled
-        b.searchFilterBtn.alpha = alpha
-        b.searchFilterBtn.isEnabled = enabled
+        ui.searchCard.alpha = alpha
+        ui.searchCard.isEnabled = enabled
+        ui.searchBar.isEnabled = enabled
+        ui.searchBar.isFocusable = enabled
+        ui.settingsBtn.alpha = alpha
+        ui.settingsBtn.isEnabled = enabled
+        ui.searchFilterBtn.alpha = alpha
+        ui.searchFilterBtn.isEnabled = enabled
         setQuickSettingsEnabled(enabled)
     }
 
@@ -1213,8 +1183,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 // then start a short-lived polling job to clear them as they come up.
                 selectedAdapter.setLoadingTunnelKeys(pendingTunnelKeys)
                 if (pendingTunnelKeys.isNotEmpty()) startTunnelWatchJob(pendingTunnelKeys)
-                b.rvServers.post { b.rvServers.requestLayout() }
-                b.rvSelectedServers.post { b.rvSelectedServers.requestLayout() }
                 // Show frequently-selected countries as quick-pick chips
                 if (!isProxyStopped) loadAndShowFrequentChips()
             }
@@ -1291,7 +1259,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     if (!isAdded) return@uiCtx
                     val since = stats?.since ?: 0L
                     if (since <= 0L) {
-                        b.tvActiveDuration.text = ""
+                        ui.tvActiveDuration.text = ""
                         return@uiCtx
                     }
                     // returns a string describing 'since' as a time relative to 'now'
@@ -1301,7 +1269,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                         DateUtils.MINUTE_IN_MILLIS,
                         DateUtils.FORMAT_ABBREV_RELATIVE
                     )
-                    b.tvActiveDuration.text = getString(
+                    ui.tvActiveDuration.text = getString(
                         R.string.two_argument_space,
                         getString(R.string.lbl_separator_dot),
                         relative.toString()
@@ -1319,8 +1287,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyTunnelGatedVisibility() {
         if (!isAdded) return
         val tunnelUp = VpnController.hasTunnel()
-        b.quickSettingsRow.isVisible = tunnelUp
-        b.searchCard.isVisible = tunnelUp
+        ui.quickSettingsRow.isVisible = tunnelUp
+        ui.searchCard.isVisible = tunnelUp
     }
 
     private fun updateConnectionStatus(uiState: ConnectionUiState) {
@@ -1328,12 +1296,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         applyTunnelGatedVisibility()
         when (uiState) {
             ConnectionUiState.CONNECTED -> {
-                b.tvConnectionStatus.text = getString(R.string.lbl_active)
+                ui.tvConnectionStatus.text = getString(R.string.lbl_active)
                 // attr-based lookup so every app theme variant supplies its own accent
-                b.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.chipTextPositive))
-                b.statusIndicator.backgroundTintList =
+                ui.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.chipTextPositive))
+                ui.statusIndicator.backgroundTintList =
                     ColorStateList.valueOf(resolveAttrColor(R.attr.chipTextPositive))
-                b.tvActiveDuration.alpha = 1f
+                ui.tvActiveDuration.alpha = 1f
                 startStatusBlink()
                 // a fresh CONNECTED transition (after CONNECTING/REGISTERING) pulses
                 // the dot once; repeat calls from the status poller stay silent
@@ -1344,36 +1312,36 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 }
             }
             ConnectionUiState.CONNECTING -> {
-                b.tvConnectionStatus.text = getString(R.string.lbl_connecting)
-                b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
-                b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
+                ui.tvConnectionStatus.text = getString(R.string.lbl_connecting)
+                ui.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
+                ui.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
                 stopStatusBlink()
                 // Pulse animation to indicate in-progress state
-                b.statusIndicator.animate().scaleX(1.2f).scaleY(1.2f).setDuration(600).withEndAction {
-                    if (isAdded) b.statusIndicator.animate().scaleX(0.8f).scaleY(0.8f).setDuration(600).withEndAction {
-                        if (isAdded) b.statusIndicator.animate().scaleX(1f).scaleY(1f).setDuration(300).start()
+                ui.statusIndicator.animate().scaleX(1.2f).scaleY(1.2f).setDuration(600).withEndAction {
+                    if (isAdded) ui.statusIndicator.animate().scaleX(0.8f).scaleY(0.8f).setDuration(600).withEndAction {
+                        if (isAdded) ui.statusIndicator.animate().scaleX(1f).scaleY(1f).setDuration(300).start()
                     }.start()
                 }.start()
             }
             ConnectionUiState.REGISTERING -> {
-                b.tvConnectionStatus.text = getString(R.string.rpn_restore_dialog_status_registering)
-                b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
-                b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
-                b.tvActiveDuration.alpha = 1f
+                ui.tvConnectionStatus.text = getString(R.string.rpn_restore_dialog_status_registering)
+                ui.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAmber_900))
+                ui.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
+                ui.tvActiveDuration.alpha = 1f
                 startStatusBlink()
             }
             ConnectionUiState.FAILED -> {
-                b.tvConnectionStatus.text = getString(R.string.ping_status_failed)
-                b.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.accentBad))
-                b.statusIndicator.backgroundTintList =
+                ui.tvConnectionStatus.text = getString(R.string.ping_status_failed)
+                ui.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.accentBad))
+                ui.statusIndicator.backgroundTintList =
                     ColorStateList.valueOf(resolveAttrColor(R.attr.accentBad))
                 stopStatusBlink()
-                b.tvActiveDuration.text = ""
+                ui.tvActiveDuration.text = ""
             }
             ConnectionUiState.DISCONNECTED -> {
-                b.tvConnectionStatus.text = getString(R.string.lbl_inactive)
-                b.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.accentBad))
-                b.statusIndicator.backgroundTintList =
+                ui.tvConnectionStatus.text = getString(R.string.lbl_inactive)
+                ui.tvConnectionStatus.setTextColor(resolveAttrColor(R.attr.accentBad))
+                ui.statusIndicator.backgroundTintList =
                     ColorStateList.valueOf(resolveAttrColor(R.attr.accentBad))
                 stopStatusBlink()
             }
@@ -1385,8 +1353,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun startStatusBlink() {
         if (!isAdded) return
         if (blinkAnimator?.isRunning == true) return
-        b.statusIndicator.alpha = 1f
-        blinkAnimator = ObjectAnimator.ofFloat(b.statusIndicator, View.ALPHA, 1f, 0.25f).apply {
+        ui.statusIndicator.alpha = 1f
+        blinkAnimator = ObjectAnimator.ofFloat(ui.statusIndicator, "alpha", 1f, 0.25f).apply {
             duration = 2000L
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.REVERSE
@@ -1398,7 +1366,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun stopStatusBlink() {
         blinkAnimator?.cancel()
         blinkAnimator = null
-        if (isAdded) b.statusIndicator.alpha = 1f
+        if (isAdded) ui.statusIndicator.alpha = 1f
     }
 
     /**
@@ -1407,7 +1375,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun updateHeaderSummary() {
         if (!isAdded) return
-        b.locationContent.visibility = View.VISIBLE
+        ui.locationContent.visibility = View.VISIBLE
 
         val nonAutoServers = selectedServers.filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
         val distinctCountries = nonAutoServers.distinctBy { it.cc }
@@ -1421,42 +1389,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun populateAvatarRow(countries: List<CountryConfig>) {
         if (!isAdded) return
-        val row = b.avatarRow
-        row.removeAllViews()
-        val density = resources.displayMetrics.density
-        countries.take(MAX_SELECTIONS).forEachIndexed { index, config ->
-            if (config.cc.isBlank()) return@forEachIndexed
-            val avatar = FrameLayout(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    (38f * density).toInt(), (38f * density).toInt()
-                ).apply { marginStart = if (index == 0) 0 else -(10f * density).toInt() }
-                background = AppCompatResources.getDrawable(requireContext(), R.drawable.bg_avatar_circle)
-                clipChildren = false
-            }
-            val flag = AppCompatTextView(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                gravity = Gravity.CENTER
-                textSize = 22f
-                alpha = 0.75f
-                text = config.flagEmoji
-            }
-            val iso = AppCompatTextView(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                gravity = Gravity.CENTER
-                textSize = 10f
-                setTypeface(typeface, Typeface.BOLD)
-                setTextColor(Color.WHITE)
-                setShadowLayer(2f * density, 0f, 1f * density, Color.argb(128, 0, 0, 0))
-                text = config.cc.uppercase(Locale.US)
-            }
-            avatar.addView(flag)
-            avatar.addView(iso)
-            row.addView(avatar)
-        }
+        ui.avatars = countries.take(MAX_SELECTIONS)
     }
 
     private fun loadRpnHeatmap() {
@@ -1516,45 +1449,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun renderRpnHeatmap(counts: LongArray) {
         if (!isAdded || view == null) return
-        val grid = b.rpnHeatmapGrid
-        grid.removeAllViews()
-
-        val ctx = requireContext()
-        val base = UIUtils.fetchColor(ctx, R.attr.primaryLightColorText)
-        // higher alpha in light mode for readability (mirrors HomeScreenFragment)
-        val alphas =
-            if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
-            else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
-        val gap = (2f * resources.displayMetrics.density).toInt()
-        val cellBase = RPN_HEATMAP_DOT_SIZE_DP * resources.displayMetrics.density
-
-        for (i in 0 until RPN_HEATMAP_SLOTS) {
-            // chronological index -> (hour column, 10-min row within the hour)
-            val hourCol = i / RPN_HEATMAP_ROWS_PER_HOUR
-            val rowInHour = i % RPN_HEATMAP_ROWS_PER_HOUR
-            val lvl = rpnHeatmapIntensityLevel(counts[i])
-            val frac = RPN_HEATMAP_CELL_SIZE_FRACTION[lvl]
-            val cell = View(ctx)
-            cell.background =
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(ColorUtils.setAlphaComponent(base, alphas[lvl]))
-                }
-            cell.isClickable = false
-            cell.isFocusable = false
-            cell.layoutParams =
-                GridLayout.LayoutParams().apply {
-                    width = (cellBase * frac).toInt()
-                    height = (cellBase * frac).toInt()
-                    // column = the clock hour this bucket belongs to
-                    columnSpec = GridLayout.spec(hourCol, 1f)
-                    // row = the 10-minute interval within that hour
-                    rowSpec = GridLayout.spec(rowInHour)
-                    setMargins(gap, gap, gap, gap)
-                    setGravity(Gravity.CENTER)
-                }
-            grid.addView(cell)
-        }
+        ui.heatmap = counts.copyOf()
     }
 
     // logarithmic scale so skewed traffic distributions stay visually
@@ -1575,18 +1470,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     @SuppressLint("ClickableViewAccessibility")
     private fun setupRpnHeatmapClicks() {
-        b.rpnHeatmapGrid.setOnTouchListener { _, event ->
-            lastHeatmapTouchX = event.x
-            lastHeatmapTouchY = event.y
-            false
+        ui.onHeatmapTap = { x, y ->
+            lastHeatmapTouchX = x
+            lastHeatmapTouchY = y
+            openRpnHeatmapDetails()
         }
-        b.rpnHeatmapGrid.setOnClickListener { openRpnHeatmapDetails() }
     }
 
     private fun openRpnHeatmapDetails() {
         if (!isAdded) return
         if (heatmapWindowEndMs <= 0L) return
-        val grid = b.rpnHeatmapGrid
+        val grid = ui.rpnHeatmapGrid
         if (grid.width <= 0 || grid.height <= 0) return
 
         // GridLayout mirrors column order in RTL (oldest hour renders on the
@@ -1617,10 +1511,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
     private fun animateHeaderEntry() {
         if (!isAdded) return
-        b.statusCard.alpha = 0f
-        b.statusCard.scaleX = 0.9f
-        b.statusCard.scaleY = 0.9f
-        b.statusCard.animate()
+        ui.statusCard.alpha = 0f
+        ui.statusCard.scaleX = 0.9f
+        ui.statusCard.scaleY = 0.9f
+        ui.statusCard.animate()
             .alpha(1f).scaleX(1f).scaleY(1f)
             .setDuration(400)
             .setInterpolator(AccelerateDecelerateInterpolator())
@@ -1648,30 +1542,29 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun playConnectArc() {
         if (!isAdded || view == null) return
         if (isReducedMotionPreferred()) return
-        val overlay = b.fxOverlay
+        val overlay = ui.fxOverlay
         if (overlay.width <= 0 || overlay.height <= 0) return
 
         connectArcAnimator?.cancel()
 
         val rootLoc = IntArray(2)
-        overlay.getLocationOnScreen(rootLoc)
+        overlay.getLocationInWindow(rootLoc)
         val from = IntArray(2)
-        b.rvSelectedServers.getLocationOnScreen(from)
+        ui.rvSelectedServers.getLocationInWindow(from)
         val to = IntArray(2)
-        b.statusIndicator.getLocationOnScreen(to)
+        ui.statusIndicator.getLocationInWindow(to)
 
-        val startX = from[0] + b.rvSelectedServers.width / 2f - rootLoc[0]
+        val startX = from[0] + ui.rvSelectedServers.width / 2f - rootLoc[0]
         val startY = (from[1] + dpPx(28) - rootLoc[1]).toFloat()
-        val endX = to[0] + b.statusIndicator.width / 2f - rootLoc[0]
-        val endY = (to[1] + b.statusIndicator.height / 2f - rootLoc[1]).toFloat()
+        val endX = to[0] + ui.statusIndicator.width / 2f - rootLoc[0]
+        val endY = (to[1] + ui.statusIndicator.height / 2f - rootLoc[1]).toFloat()
 
-        val dolphin = AppCompatImageView(requireContext()).apply {
+        val dolphin = RpnControlState().apply {
             setImageResource(R.drawable.dolphin_secure)
-            layoutParams = FrameLayout.LayoutParams(dpPx(28), dpPx(22))
+            width = dpPx(28); height = dpPx(22)
             alpha = 0f
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
-        overlay.addView(dolphin)
+        overlay.children.add(dolphin)
         dolphin.translationX = startX
         dolphin.translationY = startY
 
@@ -1688,14 +1581,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
         val swim = ObjectAnimator.ofFloat(
             dolphin,
-            View.TRANSLATION_X,
-            View.TRANSLATION_Y,
+            "translationX",
+            "translationY",
             swimPath
         ).apply {
             duration = CONNECT_ARC_DURATION_MS
             interpolator = PathInterpolator(0.2f, 0.7f, 0.3f, 1f)
         }
-        val fadeIn = ObjectAnimator.ofFloat(dolphin, View.ALPHA, 0f, 0.9f).apply {
+        val fadeIn = ObjectAnimator.ofFloat(dolphin, "alpha", 0f, 0.9f).apply {
             duration = CONNECT_ARC_DURATION_MS / 3
         }
 
@@ -1710,7 +1603,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
                 override fun onAnimationEnd(animation: Animator) {
                     connectArcAnimator = null
-                    if (isAdded) overlay.removeView(dolphin)
+                    if (isAdded) overlay.children.remove(dolphin)
                     if (!cancelled && isAdded) pulseStatusDot()
                 }
             })
@@ -1721,16 +1614,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** One-shot pulse on the hero status dot (arrival beat of the connect arc). */
     private fun pulseStatusDot() {
         if (!isAdded || isReducedMotionPreferred()) return
-        b.statusIndicator.animate().cancel()
-        b.statusIndicator.scaleX = 1f
-        b.statusIndicator.scaleY = 1f
-        b.statusIndicator.animate()
+        ui.statusIndicator.animate().cancel()
+        ui.statusIndicator.scaleX = 1f
+        ui.statusIndicator.scaleY = 1f
+        ui.statusIndicator.animate()
             .scaleX(1.9f).scaleY(1.9f)
             .setDuration(140)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .withEndAction {
                 if (isAdded) {
-                    b.statusIndicator.animate()
+                    ui.statusIndicator.animate()
                         .scaleX(1f).scaleY(1f)
                         .setDuration(200)
                         .setInterpolator(OvershootInterpolator(1.2f))
@@ -1748,27 +1641,26 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!isAdded || view == null) return
         if (isReducedMotionPreferred()) return
         if (refreshSwimAnimator?.isRunning == true) return
-        val overlay = b.fxOverlay
+        val overlay = ui.fxOverlay
         if (overlay.width <= 0 || overlay.height <= 0) return
 
-        val dolphin = AppCompatImageView(requireContext()).apply {
+        val dolphin = RpnControlState().apply {
             setImageResource(EmbeddedDolphinContent.DOLPHINS.random())
-            layoutParams = FrameLayout.LayoutParams(dpPx(36), dpPx(30))
+            width = dpPx(36); height = dpPx(30)
             alpha = 0.75f
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
-        overlay.addView(dolphin)
+        overlay.children.add(dolphin)
 
         val heroLoc = IntArray(2)
-        b.statusCard.getLocationOnScreen(heroLoc)
+        ui.statusCard.getLocationInWindow(heroLoc)
         val rootLoc = IntArray(2)
-        overlay.getLocationOnScreen(rootLoc)
-        val baseY = (heroLoc[1] + b.statusCard.height - rootLoc[1]) + dpPx(10)
+        overlay.getLocationInWindow(rootLoc)
+        val baseY = (heroLoc[1] + ui.statusCard.height - rootLoc[1]) + dpPx(10)
         val fromX = -dpPx(40).toFloat()
         val toX = overlay.width + dpPx(40).toFloat()
 
         dolphin.translationY = baseY.toFloat()
-        val travel = ObjectAnimator.ofFloat(dolphin, View.TRANSLATION_X, fromX, toX).apply {
+        val travel = ObjectAnimator.ofFloat(dolphin, "translationX", fromX, toX).apply {
             duration = REFRESH_SWIM_DURATION_MS
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.RESTART
@@ -1776,7 +1668,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
         val bob = ObjectAnimator.ofFloat(
             dolphin,
-            View.TRANSLATION_Y,
+            "translationY",
             baseY.toFloat(),
             (baseY - dpPx(6)).toFloat()
         ).apply {
@@ -1789,7 +1681,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     refreshSwimAnimator = null
-                    if (isAdded) overlay.removeView(dolphin)
+                    if (isAdded) overlay.children.remove(dolphin)
                 }
             })
             start()
@@ -1803,12 +1695,12 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun setupNavigationButtons() {
-        b.supportBtn.setOnClickListener { openAccount() }
-        b.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
-        b.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
-        b.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
+        ui.supportBtn.setOnClickListener { openAccount() }
+        ui.settingsBtn.setOnClickListener { showServerSettingsBottomSheet() }
+        ui.fabStopProxy.setOnClickListener  { onToggleProxyFabClicked() }
+        ui.fabStartProxy.setOnClickListener { onToggleProxyFabClicked() }
         // Status chip: open settings when running, show a hint when stopped
-        b.statusChip.setOnClickListener {
+        ui.statusChip.setOnClickListener {
             if (isProxyStopped) {
                 showToast(getString(R.string.server_settings_proxy_stopped))
             } else {
@@ -1836,18 +1728,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun focusLocationSearch() {
-        if (!isAdded || !b.searchCard.isEnabled) return
-        b.serversScrollView.smoothScrollTo(0, b.searchCard.top)
-        // Expanding an iconified SearchView focuses its query editor.
-        b.searchBar.isIconified = false
-        // Focus alone doesn't raise the keyboard; ask the IME explicitly once
-        // the scroll has settled.
-        b.searchBar.post {
-            if (!isAdded) return@post
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
-                as? InputMethodManager
-            imm?.showSoftInput(b.searchBar, InputMethodManager.SHOW_IMPLICIT)
-        }
+        if (!isAdded || !ui.searchCard.isEnabled) return
+        ui.focusSearchRequest++
     }
 
     /**
@@ -1855,13 +1737,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * Bypass apps and Stats. Mirrors the Android quick-settings tile look.
      */
     private fun setupQuickSettings() {
-        b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
-        b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
+        ui.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
+        ui.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
         refreshQuickSettingCaptions()
     }
 
     private fun setupStatsChip() {
-        b.qsStatsTile.setOnClickListener { showStatsSheet() }
+        ui.qsStatsTile.setOnClickListener { showStatsSheet() }
         refreshStatsChipState()
     }
 
@@ -1877,17 +1759,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * Center the pills when they fit; start-align when they overflow so the
      * scroll view can still reach the first pill.
      */
-    private fun alignQuickSettingsPills() {
-        val row = b.quickSettingsRow
-        val pills = b.quickSettingsPills
-        val lp = pills.layoutParams as? FrameLayout.LayoutParams ?: return
-        val fits = pills.measuredWidth in 1..row.width
-        val gravity = if (fits) Gravity.CENTER_HORIZONTAL else Gravity.START
-        if (lp.gravity != gravity) {
-            lp.gravity = gravity
-            pills.layoutParams = lp
-        }
-    }
+
 
     /** Compact RPN connection count for the Stats chip (e.g. "812", "2.4K"). */
     private fun refreshStatsChipState() {
@@ -1901,7 +1773,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
             uiCtx {
                 if (!isAdded) return@uiCtx
-                b.qsStatsState.text = formatCompactCount(connCount)
+                ui.qsStatsState.text = formatCompactCount(connCount)
             }
         }
     }
@@ -1940,7 +1812,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             val bypassed = apps.count { it.isProxyExcluded }
             uiCtx {
                 if (!isAdded) return@uiCtx
-                b.qsBypassAppsState.text =
+                ui.qsBypassAppsState.text =
                     String.format(Locale.US, "%d/%d", bypassed, total)
             }
         }
@@ -1980,17 +1852,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyRelayTileUi(relayOnCount: Int, totalCount: Int) {
         if (!isAdded) return
         val caption = String.format(Locale.US, "%d/%d", relayOnCount, totalCount)
-        b.qsRelayState.text = caption
+        ui.qsRelayState.text = caption
         // pop the count when it actually changes so the eye is drawn to the
         // new state (skipped on first bind, reloads, and reduced motion)
         if (lastRelayCaption != null &&
             caption != lastRelayCaption &&
             !isReducedMotionPreferred()
         ) {
-            b.qsRelayState.animate().cancel()
-            b.qsRelayState.scaleX = 0.7f
-            b.qsRelayState.scaleY = 0.7f
-            b.qsRelayState.animate()
+            ui.qsRelayState.animate().cancel()
+            ui.qsRelayState.scaleX = 0.7f
+            ui.qsRelayState.scaleY = 0.7f
+            ui.qsRelayState.animate()
                 .scaleX(1f).scaleY(1f)
                 .setDuration(220)
                 .setInterpolator(OvershootInterpolator(1.5f))
@@ -2000,18 +1872,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val allOn = totalCount > 0 && relayOnCount == totalCount
         if (allOn) {
             val onColor = resolveAttrColor(R.attr.chipTextPositive)
-            b.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
+            ui.qsRelayIcon.imageTintList = ColorStateList.valueOf(onColor)
             // full-strength icon so the accent tint reads clearly in the on state
-            b.qsRelayIcon.alpha = 1f
-            b.qsRelayLabel.setTextColor(onColor)
-            b.qsRelayState.setTextColor(onColor)
+            ui.qsRelayIcon.alpha = 1f
+            ui.qsRelayLabel.setTextColor(onColor)
+            ui.qsRelayState.setTextColor(onColor)
         } else {
             val offColor = resolveAttrColor(R.attr.primaryLightColorText)
-            b.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
+            ui.qsRelayIcon.imageTintList = ColorStateList.valueOf(offColor)
             // match the resting alpha of the other quick-setting tile icons
-            b.qsRelayIcon.alpha = 0.5f
-            b.qsRelayLabel.setTextColor(offColor)
-            b.qsRelayState.setTextColor(offColor)
+            ui.qsRelayIcon.alpha = 0.5f
+            ui.qsRelayLabel.setTextColor(offColor)
+            ui.qsRelayState.setTextColor(offColor)
         }
     }
 
@@ -2063,7 +1935,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Confirmation dialog shown when AUTO automation (mobileOnly/ssidBased) is active. */
     private fun showRelayAutomationDialog(onProceed: () -> Unit) {
         if (!isAdded || isStateSaved) return
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val dialog = WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.qs_relay_automation_dialog_title))
             .setMessage(getString(R.string.qs_relay_automation_dialog_message))
             .setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> onProceed() }
@@ -2117,14 +1989,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     /** Small overshoot pop on the relay tile (result-landed beat). */
     private fun popRelayTile() {
         if (!isAdded || isReducedMotionPreferred()) return
-        b.qsRelayTile.animate().cancel()
-        b.qsRelayTile.animate()
+        ui.qsRelayTile.animate().cancel()
+        ui.qsRelayTile.animate()
             .scaleX(1.1f).scaleY(1.1f)
             .setDuration(120)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .withEndAction {
                 if (isAdded) {
-                    b.qsRelayTile.animate()
+                    ui.qsRelayTile.animate()
                         .scaleX(1f).scaleY(1f)
                         .setDuration(200)
                         .setInterpolator(OvershootInterpolator(1.4f))
@@ -2151,8 +2023,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setQuickSettingsEnabled(enabled: Boolean) {
         if (!isAdded) return
         val alpha = if (enabled) 1f else 0.5f
-        b.quickSettingsRow.alpha = alpha
-        listOf(b.qsRelayTile, b.qsBypassAppsTile).forEach { tile ->
+        ui.quickSettingsRow.alpha = alpha
+        listOf(ui.qsRelayTile, ui.qsBypassAppsTile).forEach { tile ->
             tile.isEnabled = enabled
         }
     }
@@ -2191,8 +2063,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun onToggleProxyFabClicked() {
         if (toggleProxyInFlight) return
         toggleProxyInFlight = true
-        b.fabStopProxy.isClickable  = false
-        b.fabStartProxy.isClickable = false
+        ui.fabStopProxy.isClickable  = false
+        ui.fabStartProxy.isClickable = false
         applyFabLoadingState()
         if (isProxyStopped) doStartProxy() else doStopProxy()
     }
@@ -2205,7 +2077,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Determine the currently visible FAB and reset it to a known state so
         // any previously-running ViewPropertyAnimator is cleanly cancelled before
         // we take over with the ObjectAnimator pulse.
-        val activeFab: View = if (isProxyStopped) b.fabStartProxy else b.fabStopProxy
+        val activeFab: RpnControlState = if (isProxyStopped) ui.fabStartProxy else ui.fabStopProxy
         activeFab.animate().cancel()
         activeFab.alpha  = 1f
         activeFab.scaleX = 1f
@@ -2228,18 +2100,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         fabLoadingAnimator = null
 
         // Re-enable interaction immediately.
-        b.fabStopProxy.isClickable  = true
-        b.fabStartProxy.isClickable = true
+        ui.fabStopProxy.isClickable  = true
+        ui.fabStartProxy.isClickable = true
         toggleProxyInFlight = false
 
         if (isAdded) {
             // Cancel any ViewPropertyAnimator still running on either FAB and reset
             // all transform properties to their resting state so the subsequent
             // applyFabRunningState / applyFabStoppedState swap animations start clean.
-            b.fabStopProxy.animate().cancel()
-            b.fabStartProxy.animate().cancel()
-            b.fabStopProxy.alpha  = 1f; b.fabStopProxy.scaleX  = 1f; b.fabStopProxy.scaleY  = 1f
-            b.fabStartProxy.alpha = 1f; b.fabStartProxy.scaleX = 1f; b.fabStartProxy.scaleY = 1f
+            ui.fabStopProxy.animate().cancel()
+            ui.fabStartProxy.animate().cancel()
+            ui.fabStopProxy.alpha  = 1f; ui.fabStopProxy.scaleX  = 1f; ui.fabStopProxy.scaleY  = 1f
+            ui.fabStartProxy.alpha = 1f; ui.fabStartProxy.scaleX = 1f; ui.fabStartProxy.scaleY = 1f
         }
     }
 
@@ -2247,25 +2119,25 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyFabRunningState() {
         if (!isAdded) return
         // Cancel any running animation so we start from a clean resting state.
-        b.fabStartProxy.animate().cancel()
-        b.fabStartProxy.scaleX = 1f
-        b.fabStartProxy.scaleY = 1f
-        b.fabStartProxy.alpha  = 1f
+        ui.fabStartProxy.animate().cancel()
+        ui.fabStartProxy.scaleX = 1f
+        ui.fabStartProxy.scaleY = 1f
+        ui.fabStartProxy.alpha  = 1f
         // Shrink + fade the start FAB out.
-        b.fabStartProxy.animate()
+        ui.fabStartProxy.animate()
             .scaleX(0f).scaleY(0f).alpha(0f)
             .setDuration(200)
             .setInterpolator(AccelerateDecelerateInterpolator())
-            .withEndAction { if (isAdded) b.fabStartProxy.visibility = View.GONE }
+            .withEndAction { if (isAdded) ui.fabStartProxy.visibility = View.GONE }
             .start()
         // Pop the stop FAB in with a short delay so both animations overlap and the
         // screen is never empty
-        b.fabStopProxy.scaleX = 0f
-        b.fabStopProxy.scaleY = 0f
-        b.fabStopProxy.alpha  = 0f
-        b.fabStopProxy.visibility = View.VISIBLE
-        b.fabStopProxy.animate().cancel()
-        b.fabStopProxy.animate()
+        ui.fabStopProxy.scaleX = 0f
+        ui.fabStopProxy.scaleY = 0f
+        ui.fabStopProxy.alpha  = 0f
+        ui.fabStopProxy.visibility = View.VISIBLE
+        ui.fabStopProxy.animate().cancel()
+        ui.fabStopProxy.animate()
             .scaleX(1f).scaleY(1f).alpha(1f)
             .setStartDelay(80)
             .setDuration(240)
@@ -2277,24 +2149,24 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyFabStoppedState() {
         if (!isAdded) return
         // Cancel any running animation so we start from a clean resting state.
-        b.fabStopProxy.animate().cancel()
-        b.fabStopProxy.scaleX = 1f
-        b.fabStopProxy.scaleY = 1f
-        b.fabStopProxy.alpha  = 1f
+        ui.fabStopProxy.animate().cancel()
+        ui.fabStopProxy.scaleX = 1f
+        ui.fabStopProxy.scaleY = 1f
+        ui.fabStopProxy.alpha  = 1f
         // Shrink + fade the stop FAB out.
-        b.fabStopProxy.animate()
+        ui.fabStopProxy.animate()
             .scaleX(0f).scaleY(0f).alpha(0f)
             .setDuration(200)
             .setInterpolator(AccelerateDecelerateInterpolator())
-            .withEndAction { if (isAdded) b.fabStopProxy.visibility = View.GONE }
+            .withEndAction { if (isAdded) ui.fabStopProxy.visibility = View.GONE }
             .start()
         // Pop the start FAB in with overlap.
-        b.fabStartProxy.scaleX = 0f
-        b.fabStartProxy.scaleY = 0f
-        b.fabStartProxy.alpha  = 0f
-        b.fabStartProxy.visibility = View.VISIBLE
-        b.fabStartProxy.animate().cancel()
-        b.fabStartProxy.animate()
+        ui.fabStartProxy.scaleX = 0f
+        ui.fabStartProxy.scaleY = 0f
+        ui.fabStartProxy.alpha  = 0f
+        ui.fabStartProxy.visibility = View.VISIBLE
+        ui.fabStartProxy.animate().cancel()
+        ui.fabStartProxy.animate()
             .scaleX(1f).scaleY(1f).alpha(1f)
             .setStartDelay(80)
             .setDuration(240)
@@ -2371,45 +2243,45 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyProxyStoppedUi() {
         if (!isAdded) return
 
-        b.tvConnectionStatus.text = getString(R.string.server_settings_proxy_stopped)
-        b.tvConnectionStatus.setTextColor(
+        ui.tvConnectionStatus.text = getString(R.string.server_settings_proxy_stopped)
+        ui.tvConnectionStatus.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.colorAmber_900)
         )
         stopStatusBlink()
-        b.statusIndicator.backgroundTintList =
+        ui.statusIndicator.backgroundTintList =
             ContextCompat.getColorStateList(requireContext(), R.color.colorAmber_900)
 
         // Hero summary: stopped state, no avatars, no duration.
-        b.tvActiveDuration.text = ""
+        ui.tvActiveDuration.text = ""
         populateAvatarRow(emptyList())
 
         val stoppedAlpha = 0.5f
-        b.rvServers.alpha         = stoppedAlpha
-        b.rvSelectedServers.alpha = stoppedAlpha
+        ui.rvServers.alpha         = stoppedAlpha
+        ui.rvSelectedServers.alpha = stoppedAlpha
         // Disable search bar and action icons while proxy is stopped
         setSearchAndActionsEnabled(false)
         // Also disable pull-to-refresh: re-fetching server status is not
         // meaningful while the proxy is stopped.
-        b.swipeRefresh.isEnabled = false
+        ui.swipeRefresh.isEnabled = false
 
         // Adapters replace click handlers so tapping any server item opens the
         // settings sheet instead of selecting/deselecting or opening detail.
         selectedAdapter.setProxyStopped(true)
         serverAdapter.setProxyStopped(true)
 
-        b.errorStateContainer.visibility = View.GONE
+        ui.errorStateContainer.visibility = View.GONE
 
-        b.errorRetryBtn.isEnabled = false
-        b.errorRetryBtn.isClickable = false
-        b.errorRetryBtn.setOnClickListener(null)
-        b.errorResetBtn.isEnabled = false
-        b.errorResetBtn.isClickable = false
-        b.errorResetBtn.setOnClickListener(null)
+        ui.errorRetryBtn.isEnabled = false
+        ui.errorRetryBtn.isClickable = false
+        ui.errorRetryBtn.setOnClickListener(null)
+        ui.errorResetBtn.isEnabled = false
+        ui.errorResetBtn.isClickable = false
+        ui.errorResetBtn.setOnClickListener(null)
 
-        b.serverCountLayout.isVisible = false
+        ui.serverCountLayout.isVisible = false
 
         // Hide frequent chips while proxy is stopped
-        b.frequentCountriesSection.isVisible = false
+        ui.frequentCountriesSection.isVisible = false
 
         // FAB: switch to "Start" (green VPN icon)
         applyFabStoppedState()
@@ -2418,23 +2290,23 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun applyProxyRunningUi() {
         if (!isAdded) return
 
-        b.rvServers.alpha              = 1f
-        b.rvSelectedServers.alpha      = 1f
+        ui.rvServers.alpha              = 1f
+        ui.rvSelectedServers.alpha      = 1f
         // Re-enable search bar and action icons when proxy resumes
         setSearchAndActionsEnabled(true)
         // Re-enable pull-to-refresh (unless the initial load is still running;
         // setLoadingState() owns the enabled state in that case).
-        b.swipeRefresh.isEnabled = !isLoading
+        ui.swipeRefresh.isEnabled = !isLoading
 
         selectedAdapter.setProxyStopped(false)
         serverAdapter.setProxyStopped(false)
 
-        b.errorRetryBtn.isEnabled = true
-        b.errorRetryBtn.isClickable = true
-        b.errorResetBtn.isEnabled = true
-        b.errorResetBtn.isClickable = true
+        ui.errorRetryBtn.isEnabled = true
+        ui.errorRetryBtn.isClickable = true
+        ui.errorResetBtn.isEnabled = true
+        ui.errorResetBtn.isClickable = true
 
-        b.serverCountLayout.isVisible = true
+        ui.serverCountLayout.isVisible = true
 
         updateConnectionStatus(deriveConnectionUiState())
 
@@ -2482,54 +2354,33 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun setupRecyclerViews() {
-        b.rvServers.layoutManager = LinearLayoutManager(requireContext())
         serverAdapter = CountryServerAdapter(buildCountries(unselectedServers), this)
-        b.rvServers.adapter = serverAdapter
-        b.rvServers.itemAnimator?.apply { changeDuration = 200; moveDuration = 200; addDuration = 200; removeDuration = 200 }
-
-        // Selected locations render as half-width cards, two per row, with a
-        // trailing "Add location" tile managed by the adapter itself.
-        b.rvSelectedServers.layoutManager = GridLayoutManager(requireContext(), 2)
+        ui.countryAdapter = serverAdapter
         selectedAdapter = VpnServerAdapter(requireContext(), buildSelectedServerGroups(selectedServers), this)
-        b.rvSelectedServers.adapter = selectedAdapter
-        b.rvSelectedServers.itemAnimator?.apply { changeDuration = 200; moveDuration = 200; addDuration = 200; removeDuration = 200 }
+        ui.selectedAdapter = selectedAdapter
     }
 
     private fun setupSearchBar() {
-        // The SearchView's internal editor defaults to a large text size, which
-        // inflates the bar's height; slim it down to match the card's density.
-        b.searchBar.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
-            textSize = 14f
-            includeFontPadding = false
-            setPadding(0, 0, 0, 0)
-        }
-        b.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterServers(newText.orEmpty())
-                return true
-            }
-
-            override fun onQueryTextSubmit(query: String?): Boolean = true
-        })
-        b.searchFilterBtn.setOnClickListener { showFilterDialog() }
-        b.tvActiveFilterSummary.setOnClickListener { clearFilters() }
-        b.searchBar.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            b.searchCard.animate().scaleX(if (hasFocus) 1.02f else 1f).scaleY(if (hasFocus) 1.02f else 1f).setDuration(150).start()
+        ui.searchBar.onQueryChanged = { filterServers(it) }
+        ui.searchFilterBtn.setOnClickListener { showFilterDialog() }
+        ui.tvActiveFilterSummary.setOnClickListener { clearFilters() }
+        ui.searchBar.onFocusChanged = { hasFocus ->
+            ui.searchCard.animate().scaleX(if (hasFocus) 1.02f else 1f).scaleY(if (hasFocus) 1.02f else 1f).setDuration(150).start()
         }
     }
 
     private fun updateSelectedSectionVisibility() {
         if (!isAdded) return
         val hasSelection = selectedServers.isNotEmpty()
-        b.rvSelectedServers.isVisible = hasSelection
+        ui.rvSelectedServers.isVisible = hasSelection
 
-        b.emptySelectionCard.isVisible = !hasSelection && !isLoading
+        ui.emptySelectionCard.isVisible = !hasSelection && !isLoading
     }
 
     private fun updateAllServersCount() {
         if (!isAdded) return
         val count = unselectedServers.distinctBy { it.key }.size
-        b.tvServerCount.text = if (count == 0) ""
+        ui.tvServerCount.text = if (count == 0) ""
         else resources.getQuantityString(R.plurals.server_count, count, count)
     }
 
@@ -2577,47 +2428,47 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         noTunnel: Boolean = false
     ) {
         if (!isAdded) return
-        b.rvServers.isVisible = false
-        b.searchCard.isVisible = true
-        b.searchCard.isEnabled = false
-        b.searchCard.alpha = 0.5f
-        b.searchBar.isEnabled = false
+        ui.rvServers.isVisible = false
+        ui.searchCard.isVisible = true
+        ui.searchCard.isEnabled = false
+        ui.searchCard.alpha = 0.5f
+        ui.searchBar.isEnabled = false
 
-        b.supportBtn.isVisible = true
-        b.settingsBtn.isVisible = true
+        ui.supportBtn.isVisible = true
+        ui.settingsBtn.isVisible = true
 
         // Keep the status card visible but update it for a premium feel.
-        b.statusCard.isVisible = true
+        ui.statusCard.isVisible = true
         updateConnectionStatus(if (isError) ConnectionUiState.FAILED else ConnectionUiState.DISCONNECTED)
         populateAvatarRow(emptyList())
 
-        b.serverCountLayout.isVisible = false
-        b.rvSelectedServers.isVisible = false
-        b.emptySelectionCard.isVisible = false
-        b.frequentCountriesSection.isVisible = false
+        ui.serverCountLayout.isVisible = false
+        ui.rvSelectedServers.isVisible = false
+        ui.emptySelectionCard.isVisible = false
+        ui.frequentCountriesSection.isVisible = false
 
         // Update content: the sad-dolphin artwork is full-colour, so it is
         // rendered untinted and reads correctly in both light and dark themes.
-        b.errorIllustration.setImageResource(illustration)
-        b.errorIllustration.imageTintList = null
-        b.errorTitle.text = title
-        b.errorHint.text = hint
-        b.errorHint.isVisible = hint.isNotEmpty()
+        ui.errorIllustration.setImageResource(illustration)
+        ui.errorIllustration.imageTintList = null
+        ui.errorTitle.text = title
+        ui.errorHint.text = hint
+        ui.errorHint.isVisible = hint.isNotEmpty()
 
         // Animate the container sliding up from below
-        b.errorStateContainer.visibility = View.VISIBLE
-        b.errorStateContainer.alpha = 0f
-        b.errorStateContainer.translationY = 60f
-        b.errorStateContainer.animate()
+        ui.errorStateContainer.visibility = View.VISIBLE
+        ui.errorStateContainer.alpha = 0f
+        ui.errorStateContainer.translationY = 60f
+        ui.errorStateContainer.animate()
             .alpha(1f).translationY(0f)
             .setDuration(450)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
 
-        b.errorIllustration.alpha = 0f
-        b.errorIllustration.scaleX = 0.6f
-        b.errorIllustration.scaleY = 0.6f
-        b.errorIllustration.animate()
+        ui.errorIllustration.alpha = 0f
+        ui.errorIllustration.scaleX = 0.6f
+        ui.errorIllustration.scaleY = 0.6f
+        ui.errorIllustration.animate()
             .alpha(1f).scaleX(1f).scaleY(1f)
             .setStartDelay(180)
             .setDuration(500)
@@ -2627,49 +2478,49 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         startErrorDolphinAnimation()
 
         if (noTunnel) {
-            b.errorRetryBtn.isVisible = true
-            b.errorRetryBtn.isEnabled = true
-            b.errorRetryBtn.isClickable = true
-            b.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
-            b.errorRetryBtn.setOnClickListener { startRethinkFromErrorCard() }
-            b.errorResetBtn.isVisible = false
-            b.errorReportBtn.isVisible = true
-            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
+            ui.errorRetryBtn.isVisible = true
+            ui.errorRetryBtn.isEnabled = true
+            ui.errorRetryBtn.isClickable = true
+            ui.errorRetryBtn.text = getString(R.string.ssv_toast_start_rethink)
+            ui.errorRetryBtn.setOnClickListener { startRethinkFromErrorCard() }
+            ui.errorResetBtn.isVisible = false
+            ui.errorReportBtn.isVisible = true
+            ui.errorReportBtn.setOnClickListener { openHelpAndSupport() }
         } else if (isError) {
-            b.errorRetryBtn.isVisible = true
-            b.errorRetryBtn.isEnabled = true
-            b.errorRetryBtn.isClickable = true
-            b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
-            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+            ui.errorRetryBtn.isVisible = true
+            ui.errorRetryBtn.isEnabled = true
+            ui.errorRetryBtn.isClickable = true
+            ui.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            ui.errorRetryBtn.setOnClickListener { retryLoadingServers() }
 
-            b.errorResetBtn.isVisible = false
-            b.errorResetBtn.isEnabled = true
-            b.errorResetBtn.isClickable = true
-            b.errorResetBtn.setOnClickListener {
+            ui.errorResetBtn.isVisible = false
+            ui.errorResetBtn.isEnabled = true
+            ui.errorResetBtn.isClickable = true
+            ui.errorResetBtn.setOnClickListener {
                 serverSelectionViewModel.reset()
                 showRpnResetDialog()
             }
 
-            b.errorReportBtn.isVisible = true
-            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
+            ui.errorReportBtn.isVisible = true
+            ui.errorReportBtn.setOnClickListener { openHelpAndSupport() }
 
             // Show reset only if proxy test passes
             io {
                 val shouldShowReset = VpnController.testRpnProxy()
                 uiCtx {
-                    if (isAdded && b.errorStateContainer.isVisible && isError) {
-                        b.errorResetBtn.isVisible = shouldShowReset
+                    if (isAdded && ui.errorStateContainer.isVisible && isError) {
+                        ui.errorResetBtn.isVisible = shouldShowReset
                     }
                 }
             }
         } else {
             // Empty state (no servers found)
-            b.errorRetryBtn.isVisible = true
-            b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
-            b.errorRetryBtn.setOnClickListener { retryLoadingServers() }
-            b.errorResetBtn.isVisible = false
-            b.errorReportBtn.isVisible = true
-            b.errorReportBtn.setOnClickListener { openHelpAndSupport() }
+            ui.errorRetryBtn.isVisible = true
+            ui.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+            ui.errorRetryBtn.setOnClickListener { retryLoadingServers() }
+            ui.errorResetBtn.isVisible = false
+            ui.errorReportBtn.isVisible = true
+            ui.errorReportBtn.setOnClickListener { openHelpAndSupport() }
         }
     }
 
@@ -2680,23 +2531,23 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         stopErrorDolphinAnimation()
         errorTunnelWaitJob?.cancel()
         errorTunnelWaitJob = null
-        if (b.errorStateContainer.isVisible) {
-            b.errorStateContainer.animate()
+        if (ui.errorStateContainer.isVisible) {
+            ui.errorStateContainer.animate()
                 .alpha(0f).translationY(-40f)
                 .setDuration(250)
                 .setInterpolator(AccelerateDecelerateInterpolator())
-                .withEndAction { if (isAdded) b.errorStateContainer.visibility = View.GONE }
+                .withEndAction { if (isAdded) ui.errorStateContainer.visibility = View.GONE }
                 .start()
         }
-        b.rvServers.isVisible = true
-        b.searchCard.isVisible = true
-        b.searchCard.alpha = 1f
-        b.supportBtn.isVisible = true
-        b.settingsBtn.isVisible = true
-        b.statusCard.isVisible = true
+        ui.rvServers.isVisible = true
+        ui.searchCard.isVisible = true
+        ui.searchCard.alpha = 1f
+        ui.supportBtn.isVisible = true
+        ui.settingsBtn.isVisible = true
+        ui.statusCard.isVisible = true
         updateVpnStatus()
-        b.searchCard.isEnabled = true
-        b.searchBar.isEnabled = true
+        ui.searchCard.isEnabled = true
+        ui.searchBar.isEnabled = true
     }
 
     /**
@@ -2710,7 +2561,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (isReducedMotionPreferred()) return
         val bobPx = ERROR_DOLPHIN_BOB_DP * resources.displayMetrics.density
         errorDolphinAnimator = ObjectAnimator.ofFloat(
-            b.errorIllustration, View.TRANSLATION_Y, 0f, -bobPx
+            ui.errorIllustration, "translationY", 0f, -bobPx
         ).apply {
             duration = ERROR_DOLPHIN_BOB_HALF_MS
             repeatCount = ObjectAnimator.INFINITE
@@ -2723,7 +2574,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun stopErrorDolphinAnimation() {
         errorDolphinAnimator?.cancel()
         errorDolphinAnimator = null
-        if (isAdded) b.errorIllustration.translationY = 0f
+        if (isAdded) ui.errorIllustration.translationY = 0f
     }
 
     /**
@@ -2741,9 +2592,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // request when the service is alive without a tunnel
         VpnController.start(requireContext())
 
-        b.errorRetryBtn.isEnabled = false
-        b.errorRetryBtn.isClickable = false
-        b.errorRetryBtn.text = getString(R.string.lbl_connecting)
+        ui.errorRetryBtn.isEnabled = false
+        ui.errorRetryBtn.isClickable = false
+        ui.errorRetryBtn.text = getString(R.string.lbl_connecting)
         updateConnectionStatus(ConnectionUiState.CONNECTING)
 
         errorTunnelWaitJob = viewLifecycleOwner.lifecycleScope.launch {
@@ -2796,16 +2647,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             return
         }
 
-        b.errorRetryBtn.isEnabled = false
-        b.errorResetBtn.isEnabled = false
-        b.errorRetryBtn.text = getString(R.string.lbl_connecting)
+        ui.errorRetryBtn.isEnabled = false
+        ui.errorResetBtn.isEnabled = false
+        ui.errorRetryBtn.text = getString(R.string.lbl_connecting)
 
         SnackbarHelper.dismiss()
 
         // Hide error container and show shimmer for immediate visual feedback.
-        b.errorStateContainer.animate()
+        ui.errorStateContainer.animate()
             .alpha(0f).setDuration(200)
-            .withEndAction { if (isAdded) b.errorStateContainer.visibility = View.GONE }
+            .withEndAction { if (isAdded) ui.errorStateContainer.visibility = View.GONE }
             .start()
 
         updateConnectionStatus(ConnectionUiState.CONNECTING)
@@ -2836,9 +2687,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
 
             uiCtx {
                 if (!isAdded) return@uiCtx
-                b.errorRetryBtn.isEnabled = true
-                b.errorResetBtn.isEnabled = true
-                b.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
+                ui.errorRetryBtn.isEnabled = true
+                ui.errorResetBtn.isEnabled = true
+                ui.errorRetryBtn.text = getString(R.string.server_selection_error_retry)
                 when {
                     // WIN not yet registered or server list still empty; check tunnel first.
                     (!isWinRegistered || !hasRealServers) && RpnProxyManager.isRpnActive() -> {
@@ -2912,7 +2763,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun refreshUnselectedList() {
         if (!isAdded) return
-        val q = b.searchBar.query?.toString()?.trim()?.lowercase().orEmpty()
+        val q = ui.searchBar.query?.toString()?.trim()?.lowercase().orEmpty()
         val filtered = unselectedServers.filter { matchesFilters(it, q) }
         serverAdapter.updateCountries(buildCountries(filtered))
         updateFilterButtonState()
@@ -2968,14 +2819,14 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val active = isFilterActive()
         val accent = resolveAttrColor(R.attr.accentGood)
 
-        b.searchFilterBtn.iconTint = ColorStateList.valueOf(
+        ui.searchFilterBtn.iconTint = ColorStateList.valueOf(
             resolveAttrColor(if (active) R.attr.accentGood else R.attr.primaryTextColor)
         )
-        b.searchFilterBtn.backgroundTintList = ColorStateList.valueOf(
+        ui.searchFilterBtn.backgroundTintList = ColorStateList.valueOf(
             if (active) ColorUtils.setAlphaComponent(accent, 0x33)
             else resolveAttrColor(R.attr.colorSurfaceVariant)
         )
-        b.searchFilterBtn.contentDescription = if (active) {
+        ui.searchFilterBtn.contentDescription = if (active) {
             getString(
                 R.string.server_selection_filter_active_desc,
                 describeActiveFilter().orEmpty()
@@ -2992,16 +2843,16 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!isAdded) return
         val summary = describeActiveFilter()
         if (summary == null || isProxyStopped) {
-            b.tvActiveFilterSummary.isVisible = false
+            ui.tvActiveFilterSummary.isVisible = false
             return
         }
         // Re-tint the pill's translucent shape with the accent so its wash
         // matches the accent text/icon instead of the unrelated positive hue.
-        b.tvActiveFilterSummary.backgroundTintList = ColorStateList.valueOf(
+        ui.tvActiveFilterSummary.backgroundTintList = ColorStateList.valueOf(
             ColorUtils.setAlphaComponent(resolveAttrColor(R.attr.accentGood), 0x33)
         )
-        b.tvActiveFilterSummary.text = summary
-        b.tvActiveFilterSummary.isVisible = true
+        ui.tvActiveFilterSummary.text = summary
+        ui.tvActiveFilterSummary.isVisible = true
     }
 
     /** Resets all filters to their defaults and refreshes all indicators. */
@@ -3027,97 +2878,28 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun showFilterDialog() {
         if (!isAdded) return
-        val density = resources.displayMetrics.density
-
-        val container = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(
-                (22f * density).toInt(), (6f * density).toInt(),
-                (22f * density).toInt(), 0
-            )
-        }
-
-        val loadLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_by_load))
-        container.addView(loadLabel)
-
-        val loadTiers = listOf(LoadFilter.ALL, LoadFilter.LOW, LoadFilter.MEDIUM, LoadFilter.HIGH)
-        val loadGroup = ChipGroup(requireContext()).apply {
-            isSingleSelection = true
-            isSelectionRequired = true
-        }
-        val loadChipsById = mutableMapOf<LoadFilter, Chip>()
-        loadTiers.forEach { tier ->
-            val label =
-                if (tier == LoadFilter.ALL) getString(R.string.server_selection_filter_load_any)
-                else tier.label
-            val chip = createFilterChip(label, isChecked = loadFilter == tier)
-            loadChipsById[tier] = chip
-            loadGroup.addView(chip)
-        }
-        container.addView(loadGroup)
-
-        val speedLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_by_speed))
-        container.addView(speedLabel)
-
-        // Offer one chip per distinct speed present in the server list (e.g. "Any",
-        // "1 Gbps", "10 Gbps", "20 Gbps") so users only ever see speeds that exist.
-        val speedOptions = distinctSpeedOptions()
-        val speedGroup = ChipGroup(requireContext()).apply {
-            isSingleSelection = true
-            isSelectionRequired = true
-        }
-        val speedChipsByValue = mutableMapOf<Int, Chip>()
-        val anyChip = createFilterChip(
-            getString(R.string.server_selection_filter_load_any), isChecked = speedFilter == 0
-        )
-        speedChipsByValue[0] = anyChip
-        speedGroup.addView(anyChip)
-        speedOptions.forEach { linkMbps ->
-            val chip = createFilterChip(
-                formatLinkSpeed(linkMbps), isChecked = speedFilter == linkMbps
-            )
-            speedChipsByValue[linkMbps] = chip
-            speedGroup.addView(chip)
-        }
-        container.addView(speedGroup)
-
-        val favLabel = buildDialogTitleLabel(getString(R.string.server_selection_filter_favourites))
-        container.addView(favLabel)
-
-        val favChip = createFilterChip(
-            getString(R.string.server_selection_filter_favourites_only),
-            isChecked = favouritesOnly
-        )
-        container.addView(favChip)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.server_selection_filter_locations))
-            .setView(container)
-            .setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-                loadFilter = loadChipsById.entries
-                    .firstOrNull { it.value.isChecked }?.key ?: LoadFilter.ALL
-                speedFilter = speedChipsByValue.entries
-                    .firstOrNull { it.value.isChecked }?.key ?: 0
-                favouritesOnly = favChip.isChecked
+        val tiers = listOf(LoadFilter.ALL, LoadFilter.LOW, LoadFilter.MEDIUM, LoadFilter.HIGH)
+        val speeds = listOf(0) + distinctSpeedOptions()
+        rpnFilterDialog(
+            requireActivity(),
+            tiers.map { if (it == LoadFilter.ALL) getString(R.string.server_selection_filter_load_any) else it.label },
+            tiers.indexOf(loadFilter),
+            speeds.map { if (it == 0) getString(R.string.server_selection_filter_load_any) else formatLinkSpeed(it) },
+            speeds.indexOf(speedFilter),
+            favouritesOnly,
+            onApply = { load, speed, favourite ->
+                loadFilter = tiers.getOrElse(load) { LoadFilter.ALL }
+                speedFilter = speeds.getOrElse(speed) { 0 }
+                favouritesOnly = favourite
                 refreshUnselectedList()
-            }
-            .setNeutralButton(getString(R.string.lbl_reset)) { _, _ ->
+            },
+            onReset = {
                 loadFilter = LoadFilter.ALL
                 speedFilter = 0
                 favouritesOnly = false
                 refreshUnselectedList()
             }
-            .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .create()
-        dialog.show()
-        UIUtils.capDialogWidth(dialog)
-        // Same accent as the checked chips, so the whole filter flow reads as
-        // one colour story instead of mixed palettes.
-        val accent = resolveAttrColor(R.attr.accentGood)
-        val neutral = resolveAttrColor(R.attr.primaryLightColorText)
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(accent)
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(neutral)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(neutral)
+        )
     }
 
     /**
@@ -3154,62 +2936,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * so every app theme (dark / light / black / plus variants) gets correct contrast
      * without any hard-coded values.
      */
-    private fun createFilterChip(label: String, isChecked: Boolean): Chip {
-        val density = resources.displayMetrics.density
-        // One accent carries the whole filter feature: the chips, the Apply
-        // button and the summary pill all use this single hue.
-        val accent = resolveAttrColor(R.attr.accentGood)
-        return Chip(requireContext()).apply {
-            text = label
-            isCheckable = true
-            this.isChecked = isChecked
-            // The color + stroke contrast carries the selection state; the default
-            // checkmark would be redundant (and low-contrast on some themes).
-            isCheckedIconVisible = false
-            chipBackgroundColor = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(
-                    ColorUtils.setAlphaComponent(accent, 0x33),
-                    resolveAttrColor(R.attr.background)
-                )
-            )
-            setTextColor(
-                ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(
-                        accent,
-                        resolveAttrColor(R.attr.primaryTextColor)
-                    )
-                )
-            )
-            chipStrokeColor = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                intArrayOf(accent, Color.TRANSPARENT)
-            )
-            chipStrokeWidth = 1f * density
-            // Compact but accessible touch target, matching the frequent-country chips.
-            chipMinHeight = 40f * density
-            chipStartPadding = 12f * density
-            chipEndPadding = 12f * density
-        }
-    }
+
 
     /**
      * Builds the small all-caps section label used inside the filter dialog,
      * mirroring the `RethinkPlus.SectionLabel` style used across this screen.
      */
-    private fun buildDialogTitleLabel(text: String): AppCompatTextView {
-        return AppCompatTextView(requireContext()).apply {
-            this.text = text
-            textSize = 10.5f
-            setAllCaps(true)
-            letterSpacing = 0.13f
-            typeface = Typeface.create("sans-serif-black", Typeface.NORMAL)
-            setTextColor(resolveAttrColor(R.attr.primaryLightColorText))
-            val density = resources.displayMetrics.density
-            setPadding(0, (10f * density).toInt(), 0, (6f * density).toInt())
-        }
-    }
+
 
 
     private fun onServerSelected(server: CountryConfig, isEnabled: Boolean) {
@@ -3390,7 +3123,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             showToast(getString(R.string.server_selection_auto_always_on))
             return
         }
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        val dialog = WgAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.server_selection_remove_title))
             .setMessage(getString(R.string.server_selection_remove_message, group.countryName, group.cityName))
             .setPositiveButton(getString(R.string.lbl_remove)) { _, _ ->
@@ -3465,8 +3198,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun populateFrequentChips(topCcs: List<String>) {
         if (!isAdded) return
-        val chipGroup = b.frequentChipGroup
-        chipGroup.removeAllViews()
+        val chipGroup = ui.frequentChipGroup
+        chipGroup.children.clear()
 
         val selectedCcs = selectedServers.map { it.cc }.toSet()
 
@@ -3474,24 +3207,24 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         for (cc in topCcs) {
             if (cc in selectedCcs) continue
             val rep = allServers.firstOrNull { it.cc == cc && !it.id.equals(AUTO_SERVER_ID, true) } ?: continue
-            chipGroup.addView(buildFrequentChip(rep))
+            chipGroup.children.add(buildFrequentChip(rep))
             visibleCount++
         }
 
         val show = visibleCount > 0
-        if (show && !b.frequentCountriesSection.isVisible) {
+        if (show && !ui.frequentCountriesSection.isVisible) {
             // Animate the strip sliding in from below.
-            b.frequentCountriesSection.alpha = 0f
-            b.frequentCountriesSection.translationY = 12f
-            b.frequentCountriesSection.isVisible = true
-            b.frequentCountriesSection.animate()
+            ui.frequentCountriesSection.alpha = 0f
+            ui.frequentCountriesSection.translationY = 12f
+            ui.frequentCountriesSection.isVisible = true
+            ui.frequentCountriesSection.animate()
                 .alpha(1f)
                 .translationY(0f)
                 .setDuration(250)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
         } else if (!show) {
-            b.frequentCountriesSection.isVisible = false
+            ui.frequentCountriesSection.isVisible = false
         }
         // If already visible and chips changed, no animation needed — the chip group
         // was just rebuilt in-place (removeAllViews + addView) which is already fast.
@@ -3504,34 +3237,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      * is starred (favourite) has no effect on chip appearance — the star is managed
      * exclusively by the full country list in [CountryServerAdapter].
      */
-    private fun buildFrequentChip(server: CountryConfig): Chip {
-        val density = resources.displayMetrics.density
-
-        val chip = Chip(requireContext())
+    private fun buildFrequentChip(server: CountryConfig): RpnControlState {
+        val chip = RpnControlState()
         chip.text = getString(R.string.two_argument_space, server.flagEmoji, server.countryName)
-        chip.isClickable = true
-        chip.isCheckable = false
-        chip.isCloseIconVisible = false
-
-        // Neutral surface styling: these chips are navigation shortcuts, not
-        // status indicators, so the positive (green) accents are reserved for
-        // genuinely connected states elsewhere on the screen.
-        val bgColor = UIUtils.fetchColor(requireContext(), R.attr.colorSurfaceVariant)
-        chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(bgColor)
-
-        val textColor = UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor)
-        chip.setTextColor(textColor)
-        chip.textSize = 13f
-
-        val strokeColor = UIUtils.fetchColor(requireContext(), R.attr.border)
-        chip.chipStrokeWidth = 1f * density
-        chip.chipStrokeColor = android.content.res.ColorStateList.valueOf(strokeColor)
-
-        // Compact but accessible sizing.
-        chip.chipMinHeight = 40f * density
-        chip.chipStartPadding = 12f * density
-        chip.chipEndPadding = 12f * density
-
         chip.setOnClickListener {
             if (isProxyStopped) {
                 showToast(getString(R.string.server_settings_proxy_stopped))
@@ -3548,20 +3256,20 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun observeSubscription() {
         // Show shimmer banner while data hasn't arrived yet
-        b.shimmerSubscriptionBanner.visibility = View.VISIBLE
-        b.shimmerSubscriptionBanner.startShimmer()
-        b.subscriptionBanner.visibility = View.GONE
+        ui.shimmerSubscriptionBanner.visibility = View.VISIBLE
+        ui.shimmerSubscriptionBanner.startShimmer()
+        ui.subscriptionBanner.visibility = View.GONE
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 subscriptionStatusDao.observeCurrentSubscription().collectLatest { sub ->
                     if (!isAdded) return@collectLatest
                     uiCtx {
-                        b.shimmerSubscriptionBanner.stopShimmer()
-                        b.shimmerSubscriptionBanner.visibility = View.GONE
+                        ui.shimmerSubscriptionBanner.stopShimmer()
+                        ui.shimmerSubscriptionBanner.visibility = View.GONE
                         // Subscription details belong to the account surface, not the
                         // compact RPN connection header.
-                        b.subscriptionBanner.visibility = View.GONE
+                        ui.subscriptionBanner.visibility = View.GONE
                         maybeShowResubscribePrompt(sub)
                     }
                 }
@@ -3574,7 +3282,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
      */
     private fun updateSubscriptionBanner(sub: SubscriptionStatus?) {
         if (sub == null || sub.purchaseToken.isEmpty()) {
-            b.subscriptionBanner.visibility = View.GONE
+            ui.subscriptionBanner.visibility = View.GONE
             return
         }
 
@@ -3610,17 +3318,17 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         if (!showDateRow) {
-            b.tvExpiryLabel.text = getString(R.string.lbl_plan)
-            b.tvExpiryDate.text  = sub.planId.capitalizeWords()
-            b.tvDaysRemaining.isVisible = false
+            ui.tvExpiryLabel.text = getString(R.string.lbl_plan)
+            ui.tvExpiryDate.text  = sub.planId.capitalizeWords()
+            ui.tvDaysRemaining.isVisible = false
         } else if (!hasExpiry) {
             // Date row needed but expiry not yet known
-            b.tvExpiryDate.text = "-"
-            b.tvExpiryLabel.text = if (isOneTime)
+            ui.tvExpiryDate.text = "-"
+            ui.tvExpiryLabel.text = if (isOneTime)
                 getString(R.string.lbl_expires_on)
             else
                 getString(R.string.server_selection_sub_ends_on)
-            b.tvDaysRemaining.isVisible = false
+            ui.tvDaysRemaining.isVisible = false
         } else {
             val dateStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
                 .format(Date(billingExpiry))
@@ -3633,36 +3341,36 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                     R.string.server_selection_sub_ends_on
                 else -> R.string.server_selection_sub_ends_on
             }
-            b.tvExpiryLabel.text = getString(expiryLabelRes)
-            b.tvExpiryDate.text  = dateStr
+            ui.tvExpiryLabel.text = getString(expiryLabelRes)
+            ui.tvExpiryDate.text  = dateStr
 
             if (!isEffectivelyExpired) {
                 val daysLeft = TimeUnit.MILLISECONDS.toDays(billingExpiry - now)
                 if (daysLeft >= 0) {
-                    b.tvDaysRemaining.text = if (daysLeft == 0L)
+                    ui.tvDaysRemaining.text = if (daysLeft == 0L)
                         getString(R.string.server_selection_sub_expires_today)
                     else
                         getString(R.string.server_selection_sub_days_left, daysLeft)
-                    b.tvDaysRemaining.setTextColor(
+                    ui.tvDaysRemaining.setTextColor(
                         if (daysLeft <= 7)
                             resolveAttrColor(R.attr.colorGolden)
                         else
                             resolveAttrColor(R.color.primaryText)
                     )
-                    b.tvDaysRemaining.isVisible = true
+                    ui.tvDaysRemaining.isVisible = true
                 } else {
-                    b.tvDaysRemaining.isVisible = false
+                    ui.tvDaysRemaining.isVisible = false
                 }
             } else {
-                b.tvDaysRemaining.isVisible = false
+                ui.tvDaysRemaining.isVisible = false
             }
         }
 
         // Animate banner in if it was previously hidden
-        if (!b.subscriptionBanner.isVisible) {
-            b.subscriptionBanner.alpha = 0f
-            b.subscriptionBanner.visibility = View.VISIBLE
-            b.subscriptionBanner.animate()
+        if (!ui.subscriptionBanner.isVisible) {
+            ui.subscriptionBanner.alpha = 0f
+            ui.subscriptionBanner.visibility = View.VISIBLE
+            ui.subscriptionBanner.animate()
                 .alpha(1f).setDuration(300)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
@@ -3818,10 +3526,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
 
         setLoadingState(true, skipHeader = true)
-        b.registrationProgressBar.show()
+        ui.registrationProgressBar.show()
         // Prevent start/stop proxy FAB taps while registration is in progress.
-        b.fabStopProxy.isClickable  = false
-        b.fabStartProxy.isClickable = false
+        ui.fabStopProxy.isClickable  = false
+        ui.fabStartProxy.isClickable = false
 
         Logger.i(
             LOG_TAG_UI,
@@ -3909,9 +3617,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         serverLoadingJob = null
         runCatching {
             if (isAdded && view != null) {
-                b.registrationProgressBar.hide()
-                b.fabStopProxy.isClickable  = true
-                b.fabStartProxy.isClickable = true
+                ui.registrationProgressBar.hide()
+                ui.fabStopProxy.isClickable  = true
+                ui.fabStartProxy.isClickable = true
                 updateVpnStatus()
             }
         }
@@ -3925,21 +3633,18 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         }
         dismissRpnResetDialog()
 
-        val dialogView = layoutInflater.inflate(R.layout.dialog_server_loading, null)
-        val tvTitle    = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_title)
-        val tvStatus   = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_status)
-        val tvHint     = dialogView.findViewById<android.widget.TextView>(R.id.tv_server_loading_hint)
-        val timeoutBar = dialogView.findViewById<LinearProgressIndicator>(R.id.server_loading_timeout_bar)
+        val progress = RpnProgressState(requireContext())
+        val tvTitle = progress.title
+        val tvStatus = progress.status
+        val tvHint = progress.hint
+        val timeoutBar = progress.timeout
 
         tvTitle.text  = getString(R.string.rpn_restore_dialog_title)
         tvHint.text   = getString(R.string.rpn_restore_dialog_hint)
         timeoutBar.max = LOADING_DIALOG_TIMEOUT_MS.toInt()
         timeoutBar.setProgressCompat(0, false)
 
-        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setView(dialogView)
-            .setCancelable(true)
-            .create()
+        val dialog = rpnProgressDialog(requireActivity(), progress)
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
         UIUtils.capDialogWidth(dialog)
@@ -3947,7 +3652,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             Logger.i(LOG_TAG_UI, "$TAG: reset dialog dismissed by user, switching to inline bar")
             resetDialogDismissedByUser = true
             dismissRpnResetDialog()
-            if (isAdded && view != null) b.registrationProgressBar.show()
+            if (isAdded && view != null) ui.registrationProgressBar.show()
         }
         rpnResetDialog = dialog
 

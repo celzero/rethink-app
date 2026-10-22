@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -33,7 +38,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseCountriesAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ActivityAppWiseIpLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -43,12 +47,9 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -57,13 +58,12 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AppWiseIpLogsActivity :
-    BaseActivity(R.layout.activity_app_wise_ip_logs), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityAppWiseIpLogsBinding::bind)
+    BaseActivity(), SearchView.OnQueryTextListener {
+    private val b = AppLogsState()
 
     private val persistentState by inject<PersistentState>()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
     private var uid: Int = INVALID_UID
-    private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
     private var isAsn = false
     private var isCountry = false
@@ -82,7 +82,7 @@ class AppWiseIpLogsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        setContent { RethinkTheme { AppLogsContent(b) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -122,6 +122,17 @@ class AppWiseIpLogsActivity :
         setClickListener()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("compose-log-time", b.selectedTime)
+        outState.putString("compose-log-query", b.awlSearch.query)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        selectTime(savedInstanceState.getInt("compose-log-time", 2))
+        b.awlSearch.setQuery(savedInstanceState.getString("compose-log-query").orEmpty(), false)
+    }
+
     override fun onResume() {
         super.onResume()
         // fix for #1939, OEM-specific bug, especially on heavily customized Android
@@ -132,7 +143,7 @@ class AppWiseIpLogsActivity :
         b.awlSearch.clearFocus()
 
         val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.awlSearch)
+        imm.restartInput(window.decorView)
     }
 
     private fun init() {
@@ -166,43 +177,37 @@ class AppWiseIpLogsActivity :
         b.tbWeeklyToggleBtn.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
     }
 
-    private val listViewToggleListener =
-        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-            val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
-            if (isChecked) {
-                selectToggleBtnUi(mb)
-                val tcValue = (mb.tag as String).toIntOrNull() ?: 2 // "2" tag is for 7 days
-                val timeCategory =
-                    AppConnectionsViewModel.TimeCategory.fromValue(tcValue)
-                        ?: AppConnectionsViewModel.TimeCategory.SEVEN_DAYS
-                networkLogsViewModel.timeCategoryChanged(timeCategory, isDomain = false)
-                return@OnButtonCheckedListener
-            }
+    private fun selectTime(index: Int) {
+        if (b.selectedTime == index) return
+        val old = b.timeButtons[b.selectedTime]
+        b.selectedTime = index
+        val mb = b.timeButtons[index]
+        selectToggleBtnUi(mb)
+        val timeCategory = AppConnectionsViewModel.TimeCategory.fromValue(index)
+            ?: AppConnectionsViewModel.TimeCategory.SEVEN_DAYS
+        networkLogsViewModel.timeCategoryChanged(timeCategory, isDomain = false)
+        unselectToggleBtnUi(old)
+    }
 
-            unselectToggleBtnUi(mb)
-        }
-
-    private fun selectToggleBtnUi(mb: MaterialButton) {
+    private fun selectToggleBtnUi(mb: WgControlState) {
         mb.backgroundTintList =
             ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(this, R.color.accentGood))
         mb.setTextColor(UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(mb: MaterialButton) {
+    private fun unselectToggleBtnUi(mb: WgControlState) {
         mb.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
         mb.backgroundTintList =
             ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
     }
 
     private fun highlightToggleBtn() {
-        val timeCategory = "2" // default is 7 days, "2" tag is for 7 days
-        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
-        btn.isChecked = true
-        selectToggleBtnUi(btn)
+        b.selectedTime = 2
+        selectToggleBtnUi(b.tbWeeklyToggleBtn)
     }
 
     private fun setClickListener() {
-        b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+        b.onTime = ::selectTime
         b.awlDelete.setOnClickListener { showDeleteConnectionsDialog() }
         b.awlSearch.setOnQueryTextListener(this)
     }
@@ -219,76 +224,35 @@ class AppWiseIpLogsActivity :
         }
     }
 
-    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+    private fun displayIcon(drawable: Drawable?, mIconImageView: WgControlState) {
         if (isFinishing || isDestroyed) return
-        Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
+        mIconImageView.drawable = drawable ?: Utilities.getDefaultIcon(this)
     }
 
     private fun setAdapter() {
         networkLogsViewModel.setUid(uid)
-        b.awlRecyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this)
-        b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.appIpLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        /*recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
-                    return@addLoadStateListener
-                }
-                if (recyclerAdapter.itemCount < 1) {
-                    showNoRulesUi()
-                    hideRulesUi()
-                } else {
-                    hideNoRulesUi()
-                    showRulesUi()
-                }
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }*/
+
     }
 
     private fun setAsnAdapter() {
         networkLogsViewModel.setUid(uid)
-        b.awlRecyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this)
-        b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isAsn = true)
         networkLogsViewModel.asnLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        /*recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
-                    return@addLoadStateListener
-                }
-                if (recyclerAdapter.itemCount < 1) {
-                    showNoRulesUi()
-                    hideRulesUi()
-                } else {
-                    hideNoRulesUi()
-                    showRulesUi()
-                }
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }*/
+
     }
 
     private fun setCountriesAdapter() {
         networkLogsViewModel.setUid(uid)
-        b.awlRecyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this)
-        b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseCountriesAdapter(this, this)
         networkLogsViewModel.countryLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
@@ -298,32 +262,13 @@ class AppWiseIpLogsActivity :
 
     private fun setRethinkAdapter() {
         networkLogsViewModel.setUid(uid)
-        b.awlRecyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this)
-        b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseIpsAdapter(this, this, uid)
         networkLogsViewModel.rinrIpLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        /*recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
-                    return@addLoadStateListener
-                }
-                if (recyclerAdapter.itemCount < 1) {
-                    showNoRulesUi()
-                    hideRulesUi()
-                } else {
-                    hideNoRulesUi()
-                    showRulesUi()
-                }
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }*/
+
     }
 
     private fun updateAppNameInSearchHint(appName: String) {
@@ -350,29 +295,10 @@ class AppWiseIpLogsActivity :
             }
         }
         b.awlSearch.queryHint = hint
-        b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
-            14f
         return
     }
 
-    // commenting for now, see if we can remove this later
-    /*private fun showNoRulesUi() {
-        b.awlNoRulesRl.visibility = View.VISIBLE
-    }
 
-    private fun hideRulesUi() {
-        b.awlCardViewTop.visibility = View.GONE
-        b.awlRecyclerConnection.visibility = View.GONE
-    }
-
-    private fun hideNoRulesUi() {
-        b.awlNoRulesRl.visibility = View.GONE
-    }
-
-    private fun showRulesUi() {
-        b.awlCardViewTop.visibility = View.VISIBLE
-        b.awlRecyclerConnection.visibility = View.VISIBLE
-    }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
@@ -403,7 +329,7 @@ class AppWiseIpLogsActivity :
     }
 
     private fun showDeleteConnectionsDialog() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)

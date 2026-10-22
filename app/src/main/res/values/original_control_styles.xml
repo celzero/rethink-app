@@ -1,0 +1,1678 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from 23cb6dd; style attributes only. No layouts are inflated. -->
+<resources>
+    <style name="OriginalControl_activity_app_details_aad_active_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_asn_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_blocked_asn_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_blocked_domains_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_blocked_ips_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_blocklist_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_close_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextNegative</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorNegative</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_countries_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_domains_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_active_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_asn_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_blocked_asn_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_blocked_domains_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_blocked_ips_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_blocklist_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_countries_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_domains_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ia_ips_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_ips_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_rethink_warning_proceed" parent="">
+        <item name="android:background">@drawable/bg_plus_action_tile</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">32dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_view_mode_insights_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetRight">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">2dp</item>
+        <item name="icon">@drawable/ic_view_chart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">?attr/defaultToggleBtnTxt</item>
+    </style>
+    <style name="OriginalControl_activity_app_details_aad_view_mode_list_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:insetLeft">4dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">2dp</item>
+        <item name="icon">@drawable/ic_view_list</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">?attr/defaultToggleBtnTxt</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_domain_logs_tb_daily_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_domain_logs_tb_recent_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_domain_logs_tb_weekly_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_ip_logs_tb_daily_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_ip_logs_tb_recent_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_app_wise_ip_logs_tb_weekly_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_all" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_dns_proxy" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_dnscrypt" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_doh" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_dot" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_odoh" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_block_free_dns_bfd_chip_rethink" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_activity_checkout_proxy__anonymous_" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+    </style>
+    <style name="OriginalControl_activity_checkout_proxy_payment_button" parent="">
+        <item name="android:backgroundTint">?attr/accentGood</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalControl_activity_checkout_proxy_payment_failed_button" parent="">
+        <item name="android:backgroundTint">?attr/accentGood</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalControl_activity_checkout_proxy_payment_success_button" parent="">
+        <item name="android:backgroundTint">?attr/accentGood</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalControl_activity_checkout_proxy_restore_button" parent="">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_btn_send_email" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="iconPadding">8dp</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_activation" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_connectivity" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_moneyback" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_other" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_payment" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_customer_support_chip_refund" parent="@style/Widget.Material3.Chip.Filter">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_activity_ping_test_ping_button" parent="">
+        <item name="android:backgroundTint">?attr/serverHeaderGradientEnd</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">26dp</item>
+    </style>
+    <style name="OriginalControl_activity_purchase_history_btn_retry" parent="@style/Widget.Material3.Button.OutlinedButton" />
+    <style name="OriginalControl_activity_rpn_config_detail_chip_hero_stats" parent="">
+        <item name="android:textSize">11sp</item>
+        <item name="chipBackgroundColor">?attr/background</item>
+        <item name="chipCornerRadius">8dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+    <style name="OriginalControl_activity_rpn_config_detail_refresh_chip" parent="">
+        <item name="android:textSize">11sp</item>
+        <item name="chipBackgroundColor">?attr/background</item>
+        <item name="chipCornerRadius">8dp</item>
+        <item name="chipIcon">@drawable/ic_refresh_white</item>
+        <item name="chipMinHeight">28dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+    <style name="OriginalControl_activity_rpn_config_detail_ssid_location_error_action" parent="">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalControl_activity_rpn_config_detail_ssid_permission_error_action" parent="">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalControl_activity_rpn_win_proxy_detail_open_app_selector" parent="@style/Widget.Material3.Button">
+        <item name="android:icon">@drawable/ic_loop_back_app</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_activity_server_order_history_btn_retry" parent="@style/App.AlertDialog.PositiveButton" />
+    <style name="OriginalControl_activity_server_order_history_chip_entitlement" parent="@style/ThinnerChip.Action">
+        <item name="android:padding">5dp</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="android:textColor">?attr/chipTextPositive</item>
+    </style>
+    <style name="OriginalControl_activity_server_order_history_chip_payment_history" parent="@style/ThinnerChip.Action">
+        <item name="android:padding">5dp</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="android:textColor">?attr/chipTextPositive</item>
+    </style>
+    <style name="OriginalControl_activity_tcp_proxy_tcp_proxy_add_apps" parent="">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="rippleColor">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_activity_tunnel_settings_settings_activity_ping_ips_btn" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingTop">7dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingBottom">7dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_activity_welcome_btn_next" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+    <style name="OriginalControl_activity_welcome_btn_skip" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_activity_wg_config_editor_dismiss_btn" parent="@style/TextAppearance.Material3.BodyLarge">
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+    </style>
+    <style name="OriginalControl_activity_wg_config_editor_save_tunnel" parent="@style/TextAppearance.Material3.BodyLarge">
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+    </style>
+    <style name="OriginalControl_activity_wg_detail_delete_btn" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalControl_activity_wg_detail_edit_btn" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalControl_activity_wg_detail_ssid_location_error_action" parent="">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalControl_activity_wg_detail_ssid_permission_error_action" parent="">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalControl_activity_wireguard_main_one_wg_toggle_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_activity_wireguard_main_wg_general_toggle_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_bug_report_files_brbs_send_button" parent="@style/toggleButtonNoStyle">
+        <item name="android:padding">10dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="icon">@drawable/ic_mail</item>
+        <item name="iconPadding">10dp</item>
+        <item name="iconTint">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_conn_track_bs_conn_track_port_detail_chip" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_dns_log_dns_record_type_chip" parent="">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_dns_record_types_drbs_auto_mode_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_dns_record_types_drbs_manual_mode_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_firewall_sort_filter_fs_apply" parent="">
+        <item name="android:background">@drawable/rounded_corners_button_accent</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/chipTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_firewall_sort_filter_fs_clear" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_log_activity_interval_bs_lai_chip_10m" parent="@style/ActivityTimeSegment">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_log_activity_interval_bs_lai_chip_1h" parent="@style/ActivityTimeSegment">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_log_activity_interval_bs_lai_chip_24h" parent="@style/ActivityTimeSegment">
+        <item name="android:checkable">true</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_orbot_bs_orbot_app" parent="">
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_orbot_include_applications" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="rippleColor">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_rethink_plus_filter_rpf_apply" parent="">
+        <item name="android:background">@drawable/rounded_corners_button_accent</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_rethink_plus_filter_rpf_clear" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_apps_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_blocklist_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_countries_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_domains_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_ips_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_fss_filter_providers_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_ssfc_apply" parent="">
+        <item name="android:background">@drawable/rounded_corners_button_accent</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:textColor">?attr/chipTextColor</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottom_sheet_summary_stats_filter_ssfc_select_all" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_auto_exclude_countries_btn_done" parent="">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_device_auth_error_btn_dismiss" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_device_auth_error_btn_email_support" parent="@style/Widget.Material3.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="icon">@drawable/ic_mail</item>
+        <item name="iconPadding">10dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="backgroundTint">?attr/accentBad</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_device_not_registered_btn_dismiss" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_device_not_registered_btn_email_support" parent="@style/Widget.Material3.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="icon">@drawable/ic_mail</item>
+        <item name="iconPadding">10dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="backgroundTint">?attr/accentWarning</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_entitlement_detail_btn_dismiss" parent="">
+        <item name="cornerRadius">12dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_entitlement_detail_btn_restore" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">25dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">25dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_purchase_conflict_btn_contact_support" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="strokeColor">?attr/divider</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_purchase_conflict_btn_dismiss" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_purchase_conflict_btn_refund" parent="@style/Widget.Material3.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_purchase_processing_action_button" parent="@style/Widget.Material3.Button.ElevatedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="android:backgroundTint">?attr/accentGood</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_purchase_processing_secondary_button" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_rinr_warning_btn_exempt_rethink" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">25dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">25dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_rinr_warning_btn_understand" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">25dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">25dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_rpn_stats_rpn_stats_view_logs" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="icon">@drawable/ic_logs</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconTint">?attr/accentGood</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_removal_notification_btn_understand" parent="">
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_settings_btn_config_auto" parent="@style/ActivityTimeSegment">
+        <item name="android:minWidth">60dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textColor">?attr/invertedPrimaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_settings_btn_config_manual" parent="@style/ActivityTimeSegment">
+        <item name="android:minWidth">70dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textColor">?attr/invertedPrimaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_settings_btn_reset_rpn" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="icon">@drawable/ic_refresh</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+        <item name="strokeColor">?attr/primaryTextColor</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_settings_refresh_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="backgroundTint">?attr/chipBgColorPositive</item>
+        <item name="cornerRadius">19dp</item>
+        <item name="icon">@drawable/ic_refresh_white</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">22dp</item>
+        <item name="iconTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_bottomsheet_server_settings_split_dns_enable_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">11sp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_domain_dacd_block_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_domain_dacd_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_domain_dacd_domain_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconTint">?attr/primaryTextColor</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+        <item name="chipIconSize">15dp</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_domain_dacd_trust_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_domain_dacd_wildcard_chip" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconTint">?attr/primaryTextColor</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+        <item name="chipIconSize">15dp</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_ip_daci_block_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_ip_daci_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_add_custom_ip_daci_trust_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_custom_lan_ip_auto_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_custom_lan_ip_manual_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_custom_lan_ip_reset_button" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalControl_dialog_custom_lan_ip_save_button" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalControl_dialog_dnscrypt_relays_custom_dialog_ok_button" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_import_confirm_dic_action_label" parent="">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_dialog_import_confirm_dic_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_import_confirm_dic_import_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_info_rules_layout_info_rules_dialog_ok_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalControl_dialog_input_ips_auto_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_dialog_input_ips_manual_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_dialog_input_ips_reset_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_dialog_input_ips_save_button" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_input_ips_test_button" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_rpn_ssid_add_ssid_btn" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="elevation">0dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_dialog_rpn_ssid_cancel_btn" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+    <style name="OriginalControl_dialog_rpn_ssid_save_btn" parent="">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">?attr/accentGood</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+    <style name="OriginalControl_dialog_set_custom_doh_dialog_custom_url_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_custom_doh_dialog_custom_url_ok_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_custom_odoh_dialog_custom_url_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_custom_odoh_dialog_custom_url_ok_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_dns_crypt_dialog_dns_crypt_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_dns_crypt_dialog_dns_crypt_ok_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_dns_proxy_dialog_dns_proxy_apply_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_dns_proxy_dialog_dns_proxy_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_dialog_set_dns_proxy_dialog_dns_proxy_lockdown_desc" parent="">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyMedium</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_dialog_set_proxy_dialog_proxy_apply_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_set_proxy_dialog_proxy_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_sponsor_info_dialog_sponsor_info_sponsor" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_add_peer_custom_dialog_dismiss_button" parent="@style/TextAppearance.Material3.BodyLarge">
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_add_peer_custom_dialog_ok_button" parent="@style/TextAppearance.Material3.BodyLarge">
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_hop_wg_hop_dialog_ok_button" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_ssid_addSsidBtn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_ssid_cancelBtn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_dialog_wg_ssid_saveBtn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_about_about_crash_log" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_about_about_manage_rpn" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_about_about_sponsor" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_about_about_sponsor_again" parent="">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelSmall</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+    <style name="OriginalControl_fragment_about_about_telegram" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_dns_crypt_list_add_relay_btn" parent="">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyMedium</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_home_screen_fhs_dns_on_off_btn" parent="">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:letterSpacing">0.15</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">?attr/invertedPrimaryTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+    <style name="OriginalControl_fragment_home_screen_fhs_logs_enable_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:checkable">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
+        <item name="chipEndPadding">4dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">4dp</item>
+        <item name="chipStrokeColor">@color/chip_toggle_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_adv_toggle_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_blocklist_apply_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_blocklist_cancel_btn" parent="@style/Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_cancel_download_btn" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">40dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_download_btn" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">?attr/chipTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_blocklist_lb_simple_toggle_btn" parent="@style/toggleButtonStyle">
+        <item name="android:minWidth">125dp</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_list_bslb_check_update_btn" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipEndPadding">5dp</item>
+        <item name="chipStartPadding">5dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_list_bslb_redownload_btn" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipEndPadding">5dp</item>
+        <item name="chipStartPadding">5dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_list_bslb_update_available_btn" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipEndPadding">5dp</item>
+        <item name="chipStartPadding">5dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_list_lb_version" parent="@style/ThinnerChip.Action">
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipEndPadding">5dp</item>
+        <item name="chipStartPadding">5dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.LargeComponent</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_btn_contact_support" parent="">
+        <item name="android:padding">6dp</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_btn_contact_support_error" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="icon">@drawable/ic_rethink_plus</item>
+        <item name="iconSize">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_btn_one_time" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="checkedIcon">@null</item>
+        <item name="cornerRadius">22dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_btn_subscription" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="checkedIcon">@null</item>
+        <item name="cornerRadius">22dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_cancel_policy" parent="">
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_retry_button" parent="">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_subscribe_button" parent="">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/homeScreenBtnBackground</item>
+        <item name="iconSize">20dp</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+    <style name="OriginalControl_fragment_rethink_plus_premium_terms_text" parent="">
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_error_report_btn" parent="@style/Widget.Material3.Button.TextButton">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_error_reset_btn" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">28dp</item>
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">22dp</item>
+        <item name="elevation">0dp</item>
+        <item name="icon">@drawable/ic_refresh</item>
+        <item name="iconPadding">10dp</item>
+        <item name="iconTint">?attr/accentBad</item>
+        <item name="strokeColor">?attr/accentBad</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_error_retry_btn" parent="@style/Widget.Material3.Button">
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">28dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="backgroundTint">?attr/accentBad</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="elevation">0dp</item>
+        <item name="icon">@drawable/ic_refresh</item>
+        <item name="iconPadding">10dp</item>
+        <item name="iconTint">@android:color/white</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_search_filter_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">?attr/colorSurfaceVariant</item>
+        <item name="cornerRadius">18dp</item>
+        <item name="icon">@drawable/ic_filter</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">18dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_settings_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="icon">@drawable/ic_settings</item>
+        <item name="iconSize">22dp</item>
+        <item name="iconTint">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_fragment_server_selection_support_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="icon">@drawable/ic_user_icon</item>
+        <item name="iconSize">22dp</item>
+        <item name="iconTint">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalControl_fragment_sponsor_chip_10" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_fragment_sponsor_chip_25" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_fragment_sponsor_chip_5" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_fragment_sponsor_chip_50" parent="@style/Widget.Material3.Chip.Filter" />
+    <style name="OriginalControl_fragment_sponsor_pay_with_stripe_link" parent="">
+        <item name="android:padding">6dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalControl_fragment_sponsor_support_button" parent="@style/Widget.Material3.Button">
+        <item name="android:textAppearance">@style/TextAppearance.Material3.TitleMedium</item>
+        <item name="icon">@drawable/ic_heart</item>
+        <item name="iconPadding">12dp</item>
+    </style>
+    <style name="OriginalControl_fragment_sponsor_success_continue_button" parent="@style/Widget.Material3.Button.OutlinedButton">
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.TitleMedium</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_active_apps_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_app_info_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_app_info_chip_second" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_asn_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_asn_chip_second" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_blocklist_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_close_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextNegative</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorNegative</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_countries_logs_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_dns_logs_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_dns_logs_chip_second" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_filter_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:insetLeft">4dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetRight">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="backgroundTint">?attr/colorSurfaceContainerHighest</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="icon">@drawable/ic_filter</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_active_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_allowed_apps_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_asn_allowed_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_asn_blocked_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_blocked_apps_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_blocklists_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_close_conns_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextNegative</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorNegative</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_countries_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_domains_allowed_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_domains_blocked_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_ips_allowed_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_ia_ips_blocked_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_network_logs_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_network_logs_chip_second" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_view_mode_insights_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetRight">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">2dp</item>
+        <item name="icon">@drawable/ic_view_chart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">?attr/defaultToggleBtnTxt</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_fss_view_mode_list_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:insetLeft">4dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">2dp</item>
+        <item name="icon">@drawable/ic_view_list</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconTint">?attr/defaultToggleBtnTxt</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_tb_daily_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_tb_recent_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_summary_statistics_tb_weekly_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_wg_nw_stats_tb_daily_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_wg_nw_stats_tb_recent_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_fragment_wg_nw_stats_tb_weekly_toggle_btn" parent="@style/toggleButtonNoStyle">
+        <item name="android:minWidth">100dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/defaultToggleBtnTxt</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    <style name="OriginalControl_item_allowed_app_allowed_remove_btn" parent="">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">34dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+        <item name="cornerRadius">17dp</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
+    </style>
+    <style name="OriginalControl_item_blocked_app_blocked_app_allow_btn" parent="">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">34dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+        <item name="cornerRadius">17dp</item>
+        <item name="iconPadding">6dp</item>
+        <item name="iconSize">16dp</item>
+        <item name="iconTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalControl_item_bug_report_file_item_file_delete_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="icon">@drawable/ic_delete</item>
+        <item name="android:padding">5dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconTint">?attr/accentBad</item>
+    </style>
+    <style name="OriginalControl_item_bug_report_file_item_file_view_btn" parent="@style/Widget.Material3.Button.IconButton">
+        <item name="icon">@drawable/ic_visibility</item>
+        <item name="android:padding">5dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconTint">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalControl_item_chip_filter__anonymous_" parent="@style/ThinnerChip.Large">
+        <item name="android:padding">2dp</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="checkedIconTint">?attr/primaryTextColor</item>
+        <item name="chipBackgroundColor">@drawable/bg_chip_state_list</item>
+        <item name="chipIconSize">15dp</item>
+    </style>
+    <style name="OriginalControl_item_event_event_type_chip" parent="@style/Widget.Material3.Chip.Assist">
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelSmall</item>
+        <item name="chipCornerRadius">16dp</item>
+        <item name="chipMinHeight">24dp</item>
+    </style>
+    <style name="OriginalControl_item_removed_server_removal_badge" parent="">
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorNegative</item>
+        <item name="chipCornerRadius">8dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+    <style name="OriginalControl_item_server_group_chip_link_speed" parent="">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?attr/homeScreenHeaderTextColor</item>
+        <item name="chipBackgroundColor">?attr/chipColorBgNormal</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">8dp</item>
+        <item name="chipEndPadding">8dp</item>
+    </style>
+    <style name="OriginalControl_list_item_block_free_dns_bfd_item_type_chip" parent="">
+        <item name="android:checkable">false</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">10sp</item>
+        <item name="chipCornerRadius">6dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">8dp</item>
+        <item name="chipEndPadding">8dp</item>
+    </style>
+    <style name="OriginalControl_list_item_custom_all_domain_custom_domain_see_more_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_list_item_custom_all_ip_custom_ip_see_more_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/chipTextPositive</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/chipBgColorPositive</item>
+        <item name="chipSurfaceColor">@null</item>
+    </style>
+    <style name="OriginalControl_list_item_purchase_history_tv_state_badge" parent="">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+    </style>
+    <style name="OriginalControl_list_item_rethink_blocklist_adv_crp_desc_entries_tv" parent="@style/ThinnerChip.Action" />
+    <style name="OriginalControl_list_item_server_order_tv_status_chip" parent="">
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:backgroundTint">?attr/chipBgColorPositive</item>
+        <item name="android:textColor">?attr/chipTextPositive</item>
+    </style>
+    <style name="OriginalControl_list_item_server_order_tv_test_badge" parent="">
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:backgroundTint">?attr/chipBgColorNegative</item>
+    </style>
+    <style name="OriginalControl_list_item_server_order_tv_type_badge" parent="">
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:background">@drawable/rectangle_border_background</item>
+        <item name="android:backgroundTint">?attr/chipBgColorPositive</item>
+        <item name="android:textColor">?attr/chipTextPositive</item>
+    </style>
+    <style name="OriginalControl_list_item_vpn_server_apps_action" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/serverChipTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_list_item_vpn_server_last_routed_app_action" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="OriginalControl_list_item_vpn_server_relay_action" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">?attr/serverChipTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_chip_amnezia" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_chip_hop_src" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_chip_hopping" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_chip_properties" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_chip_split_tunnel" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_protocol_info_chip_ipv4" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_general_interface_protocol_info_chip_ipv6" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_amnezia" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_hop_src" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_hopping" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_ipv4" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_ipv6" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_properties" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_hop_chip_split_tunnel" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_one_interface_chip_split_tunnel" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_one_interface_protocol_info_chip_ipv4" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_list_item_wg_one_interface_protocol_info_chip_ipv6" parent="@style/ThinnerChip.Action">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipStrokeColor">?attr/accentGood</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+    </style>
+    <style name="OriginalControl_view_home_logs_activity_fhs_logs_allowed_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/chip_toggle_text</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
+        <item name="chipEndPadding">4dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">4dp</item>
+        <item name="chipStrokeColor">@color/chip_toggle_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_view_home_logs_activity_fhs_logs_blocked_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/chip_toggle_text</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
+        <item name="chipEndPadding">4dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">4dp</item>
+        <item name="chipStrokeColor">@color/chip_toggle_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_view_home_logs_apps_fhs_top_apps_allowed_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/chip_toggle_text</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
+        <item name="chipEndPadding">4dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">4dp</item>
+        <item name="chipStrokeColor">@color/chip_toggle_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_view_home_logs_apps_fhs_top_apps_blocked_chip" parent="@style/ThinnerChip.Action">
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/chip_toggle_text</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
+        <item name="chipEndPadding">4dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="chipStartPadding">4dp</item>
+        <item name="chipStrokeColor">@color/chip_toggle_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    <style name="OriginalControl_view_tour_tooltip_tour_next_btn" parent="@style/Widget.Material3.Button">
+        <item name="android:backgroundTint">?attr/tourButtonBackground</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:textColor">?attr/tourButtonTextColor</item>
+        <item name="android:textSize">13sp</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+    <style name="OriginalControl_view_tour_tooltip_tour_skip_btn" parent="">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalControl_rpn_filter" parent="">
+        <item name="chipMinHeight">40dp</item>
+        <item name="chipStartPadding">12dp</item>
+        <item name="chipEndPadding">12dp</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@color/original_rpn_filter_fill</item>
+        <item name="chipStrokeColor">@color/original_rpn_filter_stroke</item>
+        <item name="android:textColor">@color/original_rpn_filter_text</item>
+    </style>
+    <style name="OriginalControl_rpn_frequent" parent="">
+        <item name="chipMinHeight">40dp</item>
+        <item name="chipStartPadding">12dp</item>
+        <item name="chipEndPadding">12dp</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">?attr/border</item>
+        <item name="chipBackgroundColor">?attr/colorSurfaceVariant</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+        <item name="checkedIconVisible">false</item>
+    </style>
+</resources>

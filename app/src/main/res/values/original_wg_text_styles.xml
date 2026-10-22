@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pinned source 23cb6dd98805445174bd83b7237ad5f5d2c24ac9. Typography only; no retained layout inflation. -->
+    <style name="OriginalWgText_activity_wireguard_main_wg_no_config_text" parent="">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wireguard_main_wg_wireguard_disclaimer" parent="">
+        <item name="android:alpha">0.7</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_config_editor_interface_title" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_config_editor_amz_props" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_config_editor_dismiss_btn" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:alpha">0.7</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_config_editor_save_tunnel" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_interface_flag_text" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Headline</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_config_name_text" parent="">
+        <item name="android:ellipsize">none</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_config_id_text" parent="">
+        <item name="android:alpha">0.7</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_status_text" parent="">
+        <item name="android:textStyle">italic</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_public_key_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_public_key_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_addresses_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_addresses_text" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_dns_servers_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_dns_servers_text" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_dns_search_domains_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_dns_search_domains_text" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_listen_port_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_listen_port_text" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_mtu_label" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_mtu_text" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_label_client_info" parent="">
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_value_ipv4" parent="">
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_value_ipv6" parent="">
+        <item name="android:lineSpacingExtra">3dp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_edit_btn" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_delete_btn" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">@dimen/heading_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_anonymous_37" parent="">
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_apps_label" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_hop_label" parent="">
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_anonymous_49" parent="">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_wg_header_tv" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_lockdown_title_tv" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_anonymous_56" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_catch_all_title_tv" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_anonymous_61" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_one_wg_info_tv" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ms_wg_header_tv" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_use_mobile_title_tv" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_anonymous_70" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_title_tv" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_desc_tv" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_value_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_permission_error_text" parent="">
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_permission_error_action" parent="">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_location_error_text" parent="">
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_wg_detail_ssid_location_error_action" parent="">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_add_peer_peer_title" parent="">
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_add_peer_keep_alive_hint" parent="">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_anonymous_3" parent="">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_descriptionTextView" parent="">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_emptyStateView" parent="">
+        <item name="android:alpha">0.6</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_ssidConditionHeading" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_radioEqual" parent="">
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_radioNotEqual" parent="">
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_anonymous_12" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_radioExact" parent="">
+    </style>
+    <style name="OriginalWgText_dialog_wg_ssid_radioWildcard" parent="">
+    </style>
+    <style name="OriginalWgText_dialog_wg_hop_wg_hop_dialog_heading" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_apps_wg_include_app_dialog_heading" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_apps_wg_include_app_dialog_chip_group" parent="">
+        <item name="singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_apps_wg_include_app_bulk_check" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_wg_apps_wg_include_app_deselect_all_check" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_flag_text" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Headline</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_id_text" parent="">
+        <item name="android:alpha">0.7</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_name_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_protocol_info_chip_group" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_protocol_info_chip_ipv4" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_protocol_info_chip_ipv6" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_chip_split_tunnel" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_chip_amnezia" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_chip_hop_src" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_chip_hopping" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_chip_properties" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_status" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_apps_count" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_active_uptime" parent="">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_general_interface_interface_active_rx_tx" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_flag_text" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Headline</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_id_text" parent="">
+        <item name="android:alpha">0.7</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_name_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_protocol_info_chip_group" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_protocol_info_chip_ipv4" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_protocol_info_chip_ipv6" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_chip_split_tunnel" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_status" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_apps_count" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_active_uptime" parent="">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_interface_active_rx_tx" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_one_interface_one_wg_check" parent="">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_include_apps_wg_include_app_list_apk_label_tv" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_include_apps_wg_include_app_app_desc_tv" parent="">
+        <item name="android:alpha">0.75</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_include_apps_wg_include_app_list_checkbox" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_peer_title" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_public_key_label" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_public_key_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_pre_shared_key_label" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_pre_shared_key_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_allowed_ips_label" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_allowed_ips_text" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_endpoint_label" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_endpoint_text" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_persistent_keepalive_label" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_peers_persistent_keepalive_text" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_wg_hop_list_name_tv" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_wg_hop_list_desc_tv" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_group" parent="">
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_ipv4" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_ipv6" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_split_tunnel" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_amnezia" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_hop_src" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_hopping" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_chip_properties" parent="ThinnerChip.Action">
+        <item name="android:alpha">0.8</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/small_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_wg_hop_wg_hop_list_checkbox" parent="">
+    </style>
+    <style name="OriginalWgText_fragment_wg_nw_stats_tb_logs_disabled_tv" parent="">
+        <item name="android:gravity">top|center</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_fragment_wg_nw_stats_fss_unmetered_data_usage" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+    </style>
+    <style name="OriginalWgText_fragment_wg_nw_stats_fss_total_data_usage" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+    </style>
+    <style name="OriginalWgText_fragment_wg_nw_stats_fss_metered_data_usage" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+    </style>
+    <style name="OriginalWgText_list_item_statistics_summary_ss_flag" parent="">
+        <item name="android:ellipsize">none</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_statistics_summary_ss_data_usage" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_list_item_statistics_summary_ss_name" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/small_font_subheading_text</item>
+    </style>
+    <style name="OriginalWgText_list_item_statistics_summary_ss_count" parent="">
+        <item name="android:alpha">0.85</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_bottom_sheet_proxies_list_anonymous_1" parent="">
+    </style>
+    <style name="OriginalWgText_bottom_sheet_proxies_list_ip_domain_info" parent="">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_bottom_sheet_proxies_list_title" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_proxy_cc_wg_proxy_icon_cc" parent="">
+        <item name="android:alpha">0.75</item>
+        <item name="android:ellipsize">none</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Headline</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_proxy_cc_wg_proxy_name_cc" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_proxy_cc_wg_proxy_desc_cc" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_list_item_proxy_cc_wg_proxy_radio_cc" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalWgText_activity_rpn_bypass_apps_rpn_bypass_heading" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_bypass_apps_rpn_bypass_count" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/large_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_bypass_apps_rpn_bypass_bulk_check" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_bypass_apps_rpn_bypass_deselect_all_check" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_bypass_apps_rpn_bypass_chip_group" parent="">
+        <item name="singleLine">true</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_config_name_text" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_tv_hero_city" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_refresh_chip" parent="">
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_chip_hero_stats" parent="">
+        <item name="android:alpha">0.85</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_addl_info" parent="">
+        <item name="android:alpha">0.75</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_tv_hero_pub" parent="">
+        <item name="android:alpha">0.75</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_status" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_24" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_since" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_rx" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_tx" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_last_ok" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_last_open" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_label_ipv4" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_value_ipv4" parent="">
+        <item name="android:lineSpacingExtra">3dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_45" parent="">
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_apps_label" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_hop_label" parent="">
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_60" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">@dimen/default_font_text_view</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_64" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_hop_title_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_68" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_lockdown_title_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_73" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_catch_all_title_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_78" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_82" parent="">
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_use_mobile_title_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_anonymous_86" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_title_tv" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_desc_tv" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_value_tv" parent="">
+        <item name="android:lineSpacingExtra">2dp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_permission_error_text" parent="">
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_permission_error_action" parent="">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_location_error_text" parent="">
+        <item name="android:textColor">?attr/accentBad</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_activity_rpn_config_detail_ssid_location_error_action" parent="">
+        <item name="android:textColor">?attr/accentGood</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_dialog_title" parent="">
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_description_text_view" parent="">
+        <item name="android:alpha">0.8</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_input_section_title" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_anonymous_14" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_radio_equal" parent="">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_radio_not_equal" parent="">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_anonymous_19" parent="">
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_radio_exact" parent="">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_radio_wildcard" parent="">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_list_section_title" parent="">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OriginalWgText_dialog_rpn_ssid_anonymous_28" parent="">
+        <item name="android:alpha">0.6</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_rpn_bypass_app_rpn_bypass_app_name" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+    <style name="OriginalWgText_list_item_rpn_bypass_app_rpn_bypass_app_package" parent="">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:alpha">0.6</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OriginalWgText_item_ssid_ssidNameText" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+    <style name="OriginalWgText_item_ssid_ssidTypeText" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/primaryLightColorText</item>
+    </style>
+    <style name="OriginalWgProgress_activity_server_order_history_fetch_progress" parent="">
+        <item name="android:indeterminate">true</item>
+        <item name="trackColor">?attr/chipBgColorPositive</item>
+        <item name="indicatorColor">?attr/accentGood</item>
+        <item name="trackThickness">3dp</item>
+        <item name="trackCornerRadius">0dp</item>
+    </style>
+    <style name="OriginalWgProgress_dialog_server_loading_server_loading_spinner" parent="">
+        <item name="android:indeterminate">true</item>
+        <item name="indicatorSize">56dp</item>
+        <item name="trackThickness">4dp</item>
+    </style>
+    <style name="OriginalWgProgress_dialog_server_loading_server_loading_timeout_bar" parent="">
+        <item name="android:indeterminate">false</item>
+        <item name="android:progress">0</item>
+        <item name="trackCornerRadius">4dp</item>
+        <item name="trackThickness">3dp</item>
+    </style>
+    <style name="OriginalWgProgress_list_item_wg_hop_wg_hop_list_progress" parent="">
+        <item name="android:indeterminate">true</item>
+        <item name="indicatorColor">?attr/chipTextPositive</item>
+        <item name="trackColor">?attr/background</item>
+        <item name="trackCornerRadius">4dp</item>
+        <item name="trackThickness">2dp</item>
+    </style>
+    <style name="OriginalWgProgress_list_item_statistics_summary_ss_progress" parent="">
+        <item name="trackColor">?attr/background</item>
+        <item name="trackCornerRadius">2dp</item>
+        <item name="trackThickness">3dp</item>
+    </style>
+    <style name="OriginalWgProgress_fragment_wg_nw_stats_fss_progress_bar" parent="">
+        <item name="android:max">100</item>
+        <item name="android:progress">50</item>
+        <item name="android:secondaryProgress">80</item>
+    </style>
+</resources>

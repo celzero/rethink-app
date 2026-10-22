@@ -28,6 +28,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.BubbleAllowedAppsAdapter
 import com.celzero.bravedns.adapter.BubbleBlockedAppsAdapter
@@ -36,7 +39,6 @@ import com.celzero.bravedns.data.BlockedAppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.databinding.ActivityBubbleBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -45,10 +47,8 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.AllowedAppsBubbleViewModel
 import com.celzero.bravedns.viewmodel.BlockedAppsBubbleViewModel
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,8 +73,8 @@ import org.koin.android.ext.android.inject
  * - Material Design 3 UI
  * - Works with Android's system bubble framework (not custom overlays)
  */
-class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
-    private val b by viewBinding(ActivityBubbleBinding::bind)
+class BubbleActivity : BaseActivity() {
+    private val b by lazy { BubbleUiState(this) }
 
     private val persistentState by inject<PersistentState>()
     private val connectionTrackerDAO by inject<ConnectionTrackerDAO>()
@@ -101,7 +101,7 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        setContent { RethinkTheme { BubbleScreen(b) } }
 
         Logger.d(TAG, "BubbleActivity onCreate, taskId: $taskId")
 
@@ -290,50 +290,10 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
     }
 
     private fun setupRecyclerViews() {
-        // Setup blocked apps RecyclerView
-        blockedAdapter = BubbleBlockedAppsAdapter { blockedApp ->
-            allowApp(blockedApp)
-        }
-        b.bubbleRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@BubbleActivity)
-            adapter = blockedAdapter
-            if (!recyclerDecorationsAdded) {
-                addItemDecoration(object :
-                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                    override fun getItemOffsets(
-                        outRect: android.graphics.Rect,
-                        view: View,
-                        parent: androidx.recyclerview.widget.RecyclerView,
-                        state: androidx.recyclerview.widget.RecyclerView.State
-                    ) {
-                        outRect.bottom = ITEM_SPACING_DP // 4dp
-                    }
-                })
-            }
-        }
-
-        // Setup allowed apps RecyclerView
-        allowedAdapter = BubbleAllowedAppsAdapter { allowedApp ->
-            removeAllowedApp(allowedApp)
-        }
-        b.bubbleAllowedRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@BubbleActivity)
-            adapter = allowedAdapter
-            if (!recyclerDecorationsAdded) {
-                addItemDecoration(object :
-                    androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-                    override fun getItemOffsets(
-                        outRect: android.graphics.Rect,
-                        view: View,
-                        parent: androidx.recyclerview.widget.RecyclerView,
-                        state: androidx.recyclerview.widget.RecyclerView.State
-                    ) {
-                        outRect.bottom = ITEM_SPACING_DP // 4dp
-                    }
-                })
-                recyclerDecorationsAdded = true
-            }
-        }
+        blockedAdapter = BubbleBlockedAppsAdapter { blockedApp -> allowApp(blockedApp) }
+        allowedAdapter = BubbleAllowedAppsAdapter { allowedApp -> removeAllowedApp(allowedApp) }
+        b.blockedAdapter = blockedAdapter
+        b.allowedAdapter = allowedAdapter
     }
 
     private fun setupLoadStateListeners() {
@@ -423,7 +383,7 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
     }
 
     private fun setupQuickFixes() {
-        b.bubbleQuickFixesContainer.removeAllViews()
+        b.quickFixes.clear()
 
         // 1. Proxy Lockdown
         addQuickFixIcon(
@@ -553,33 +513,7 @@ class BubbleActivity : BaseActivity(R.layout.activity_bubble) {
     }
 
     private fun addQuickFixIcon(drawableId: Int, tooltipId: Int, isActive: Boolean, onClick: () -> Unit) {
-        val imageView = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_size),
-                resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_size)
-            ).apply {
-                marginEnd = resources.getDimensionPixelSize(R.dimen.bubble_quick_fix_icon_margin)
-            }
-            setImageDrawable(ContextCompat.getDrawable(this@BubbleActivity, drawableId))
-
-            // Tint based on state
-            if (isActive) {
-                setColorFilter(UIUtils.fetchColor(this@BubbleActivity, R.attr.accentGood))
-                alpha = 1.0f
-            } else {
-                setColorFilter(UIUtils.fetchColor(this@BubbleActivity, R.attr.primaryLightColorText))
-                alpha = 0.4f
-            }
-
-            contentDescription = getString(tooltipId)
-            TooltipCompat.setTooltipText(this, getString(tooltipId))
-            setBackgroundResource(R.drawable.bg_card_ripple)
-            setPadding(8, 8, 8, 8)
-            setOnClickListener {
-                onClick()
-            }
-        }
-        b.bubbleQuickFixesContainer.addView(imageView)
+        b.quickFixes.add(BubbleQuickFix(drawableId, tooltipId, isActive, onClick))
     }
 
     private fun io(f: suspend () -> Unit) {

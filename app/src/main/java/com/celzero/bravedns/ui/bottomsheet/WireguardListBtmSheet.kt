@@ -1,7 +1,15 @@
 package com.celzero.bravedns.ui.bottomsheet
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
@@ -11,15 +19,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.databinding.BottomSheetProxiesListBinding
-import com.celzero.bravedns.databinding.ListItemProxyCcWgBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -34,7 +38,7 @@ import org.koin.android.ext.android.inject
 
 class WireguardListBtmSheet :
     BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetProxiesListBinding? = null
+    private var _binding: WgProxySelectorState? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -100,8 +104,11 @@ class WireguardListBtmSheet :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetProxiesListBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = WgProxySelectorState(requireContext())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { WgProxySelectionContent(b) } }
+        }
     }
 
     override fun onDestroyView() {
@@ -142,11 +149,11 @@ class WireguardListBtmSheet :
         when (type) {
             InputType.DOMAIN -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
-                b.ipDomainInfo.text = cd?.domain
+                b.ipDomainInfo.text = cd?.domain.orEmpty()
             }
             InputType.IP -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
-                b.ipDomainInfo.text = ci?.ipAddress
+                b.ipDomainInfo.text = ci?.ipAddress.orEmpty()
             }
             InputType.APP -> {
                 // initApp()
@@ -154,7 +161,6 @@ class WireguardListBtmSheet :
         }
 
         val lst = confs.map { it }
-        b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = RecyclerViewAdapter(lst) { conf ->
             Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${conf?.name ?: "None"}")
             when (type) {
@@ -230,22 +236,23 @@ class WireguardListBtmSheet :
     inner class RecyclerViewAdapter(
         private val data: List<WgConfigFilesImmutable?>,
         private val onItemClicked: (WgConfigFilesImmutable?) -> Unit
-    ) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+    ) : WgListContent {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view =
-                ListItemProxyCcWgBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return ViewHolder(view)
+        private var revision by mutableIntStateOf(0)
+        fun notifyDataSetChanged() { revision++ }
+        @Composable override fun Content(modifier: Modifier) {
+            val version = revision
+            LazyColumn(modifier) {
+                items(data.size) { index ->
+                    val state = remember(index) { WgProxyRowState(requireContext()) }
+                    val holder = remember(state) { ViewHolder(state) }
+                    LaunchedEffect(data[index], version) { holder.bind(data[index]) }
+                    WgProxyRow(state)
+                }
+            }
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(data[position])
-        }
-
-        override fun getItemCount(): Int = data.size
-
-        inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
-            RecyclerView.ViewHolder(bb.root) {
+        inner class ViewHolder(private val bb: WgProxyRowState) {
 
             fun bind(conf: WgConfigFilesImmutable?) {
                 if (conf == null) {

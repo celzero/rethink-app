@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -22,8 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetEntitlementDetailBinding
-import com.celzero.bravedns.databinding.LayoutEntitlementRowBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
@@ -40,8 +42,8 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
 
 class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _b: BottomsheetEntitlementDetailBinding? = null
-    private val b get() = checkNotNull(_b) { "Binding accessed outside of view lifecycle" }
+    private var presentation: EntitlementUiState? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private val persistentState by inject<PersistentState>()
     private val viewModel: EntitlementDetailViewModel by activityViewModel()
@@ -54,13 +56,12 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _b = BottomsheetEntitlementDetailBinding.inflate(inflater, container, false)
-        return b.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = EntitlementUiState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { EntitlementContent(ui, onRestore = { viewModel.reset() }, onDismiss = { dismiss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,9 +83,7 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        b.btnDismiss.setOnClickListener { dismiss() }
         setDolphinSignature()
-        b.btnRestore.setOnClickListener { viewModel.reset() }
 
         // Fetch happens on the ViewModel scope (survives sheet dismissal); the
         // sheet only observes the state. Reset first so a result from a previous
@@ -96,7 +95,7 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
 
     /** Dolphin signature (above the dismiss action.); random pairing, fresh on every visit. */
     private fun setDolphinSignature() {
-        b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
+        ui.signature.setContent(EmbeddedDolphinContent.random())
     }
 
     private fun observeEntitlementState() {
@@ -130,21 +129,21 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
             viewModel.resetState.collect { state ->
                 when (state) {
                     is EntitlementDetailViewModel.ResetState.InProgress -> {
-                        b.btnRestore.isEnabled = false
-                        b.btnRestore.alpha = 0.55f
-                        b.btnRestore.text = getString(R.string.rpn_restore_in_progress_btn)
+                        ui.restoreEnabled = false
+                        ui.restoreAlpha = 0.55f
+                        ui.restoreLabel = getString(R.string.rpn_restore_in_progress_btn)
                     }
                     is EntitlementDetailViewModel.ResetState.Done -> {
-                        b.btnRestore.isEnabled = true
-                        b.btnRestore.alpha = 1f
-                        b.btnRestore.text = getString(R.string.rpn_restore_confirm_title)
+                        ui.restoreEnabled = true
+                        ui.restoreAlpha = 1f
+                        ui.restoreLabel = getString(R.string.rpn_restore_confirm_title)
                         handleResetResult(state.result)
                         viewModel.onResetConsumed()
                     }
                     is EntitlementDetailViewModel.ResetState.NoTunnel -> {
-                        b.btnRestore.isEnabled = true
-                        b.btnRestore.alpha = 1f
-                        b.btnRestore.text = getString(R.string.rpn_restore_confirm_title)
+                        ui.restoreEnabled = true
+                        ui.restoreAlpha = 1f
+                        ui.restoreLabel = getString(R.string.rpn_restore_confirm_title)
                         showToastUiCentered(requireContext(), getString(R.string.ssv_toast_start_rethink), android.widget.Toast.LENGTH_SHORT)
                         viewModel.onResetConsumed()
                     }
@@ -172,9 +171,9 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         var everythingSame = true
         var canRestore = false
 
-        setupRow(b.rowRpnActive, "RPN Active Status", RpnProxyManager.isRpnActive().toString().capitalizeWords())
+        setupRow(ui.rowRpnActive, "RPN Active Status", RpnProxyManager.isRpnActive().toString().capitalizeWords())
 
-        fun compareAndSet(row: LayoutEntitlementRowBinding, label: String, val1: String?, val2: String?, same: Boolean, triggerRestore: Boolean = false, showDivider: Boolean = true) {
+        fun compareAndSet(row: EntitlementRowState, label: String, val1: String?, val2: String?, same: Boolean, triggerRestore: Boolean = false, showDivider: Boolean = true) {
             val v1 = if (val1.isNullOrBlank()) "N/A" else val1
             val v2 = if (val2.isNullOrBlank()) "N/A" else val2
             if (activeEntitlement != null && !same) {
@@ -189,21 +188,21 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         // Status
         val status1 = entitlement.status()
         val status2 = activeEntitlement?.status()
-        compareAndSet(b.rowStatus, "Status", status1.capitalizeWords(), status2?.capitalizeWords(), valuesEqual(status1, status2))
+        compareAndSet(ui.rowStatus, "Status", status1.capitalizeWords(), status2?.capitalizeWords(), valuesEqual(status1, status2))
 
         // CID: compare the full strings, truncate only for display. A mismatch here
         // warrants a restore.
         val fullCid1 = entitlement.cid()
         val fullCid2 = activeEntitlement?.cid()
-        compareAndSet(b.rowCid, "Client ID", fullCid1.take(12), fullCid2?.take(12), valuesEqual(fullCid1, fullCid2), triggerRestore = true)
+        compareAndSet(ui.rowCid, "Client ID", fullCid1.take(12), fullCid2?.take(12), valuesEqual(fullCid1, fullCid2), triggerRestore = true)
 
         // DID: compare the full strings, truncate only for display. A mismatch here
         // warrants a restore.
         val fullDid1 = entitlement.did()
         val fullDid2 = activeEntitlement?.did()
-        compareAndSet(b.rowDid, "Device ID", fullDid1.take(4), fullDid2?.take(4), valuesEqual(fullDid1, fullDid2), triggerRestore = true)
+        compareAndSet(ui.rowDid, "Device ID", fullDid1.take(4), fullDid2?.take(4), valuesEqual(fullDid1, fullDid2), triggerRestore = true)
 
-        setupRow(b.rowWho, "Identifier", who)
+        setupRow(ui.rowWho, "Identifier", who)
 
         // Expiry: compare the raw timestamps, format only for display. Comparing the
         // formatted relative strings would miss small but real differences (both would
@@ -212,30 +211,30 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         val exp1 = UIUtils.formatToRelativeTime(requireContext(), entitlement.expiry())
         val exp2 = activeExpiry?.let { UIUtils.formatToRelativeTime(requireContext(), it) }
         val expSame = entitlement.expiry() == activeExpiry
-        compareAndSet(b.rowExpiry, "Expiry", exp1, exp2, expSame, triggerRestore = true)
+        compareAndSet(ui.rowExpiry, "Expiry", exp1, exp2, expSame, triggerRestore = true)
 
         // Provider ID
         val provider1 = entitlement.providerID()
         val provider2 = activeEntitlement?.providerID()
-        compareAndSet(b.rowProvider, "Provider ID", provider1, provider2, valuesEqual(provider1, provider2))
+        compareAndSet(ui.rowProvider, "Provider ID", provider1, provider2, valuesEqual(provider1, provider2))
 
         // Token: expected to differ after a refresh, so it is excluded from the
         // comparison; show only the (masked) stored value.
         val token = entitlement.token()
         val maskedToken = if (token.length > 8) token.take(4) + "..." + token.takeLast(4) else token
-        setupRow(b.rowToken, "Token", maskedToken)
+        setupRow(ui.rowToken, "Token", maskedToken)
 
         // Allow Restore
         val allowRestore1 = entitlement.allowRestore().toString()
         val allowRestore2 = activeEntitlement?.allowRestore()?.toString()
-        compareAndSet(b.rowAllowRestore, "Allow Restore", allowRestore1.capitalizeWords(), allowRestore2?.capitalizeWords(), valuesEqual(allowRestore1, allowRestore2))
+        compareAndSet(ui.rowAllowRestore, "Allow Restore", allowRestore1.capitalizeWords(), allowRestore2?.capitalizeWords(), valuesEqual(allowRestore1, allowRestore2))
 
         // Is Test
         val test1 = entitlement.test().toString()
         val test2 = activeEntitlement?.test()?.toString()
-        compareAndSet(b.rowTest, "Is Test", test1.capitalizeWords(), test2?.capitalizeWords(), valuesEqual(test1, test2), showDivider = false)
+        compareAndSet(ui.rowTest, "Is Test", test1.capitalizeWords(), test2?.capitalizeWords(), valuesEqual(test1, test2), showDivider = false)
 
-        b.restoreCv.visibility = if (canRestore) View.VISIBLE else View.GONE
+        ui.restoreVisible = canRestore
     }
 
     /**
@@ -253,20 +252,15 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun setupRow(
-        rowBinding: LayoutEntitlementRowBinding,
-        label: String,
-        value: String?,
-        showDivider: Boolean = true
-    ) {
-        rowBinding.tvLabel.text = label
-        rowBinding.tvValue.text = if (value.isNullOrBlank()) "N/A" else value
-        rowBinding.divider.visibility = if (showDivider) View.VISIBLE else View.GONE
+    private fun setupRow(rowBinding: EntitlementRowState, label: String, value: String?, showDivider: Boolean = true) {
+        rowBinding.label = label
+        rowBinding.value = if (value.isNullOrBlank()) "N/A" else value
+        rowBinding.divider = showDivider
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _b = null
+        presentation = null
     }
 
     companion object {

@@ -26,11 +26,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomSheetBugReportFilesBinding
-import com.celzero.bravedns.databinding.ItemBugReportFileBinding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.about.BugReportFilesState
+import com.celzero.bravedns.ui.compose.about.BugReportFilesContent
+import com.celzero.bravedns.ui.compose.about.BugReportRowState
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
@@ -38,7 +41,7 @@ import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,7 +57,7 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetBugReportFilesBinding? = null
+    private var _binding: BugReportFilesState? = null
     private val b
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
@@ -89,8 +92,12 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetBugReportFilesBinding.inflate(inflater, container, false)
-        return b.root
+        val state = BugReportFilesState(inflater.context)
+        _binding = state
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { BugReportFilesContent(state) } }
+        }
     }
 
     // full-height frame so the file list scrolls within the expanded sheet
@@ -112,6 +119,16 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
         loadBugReportFiles()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        _binding?.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) b.restoreChecks(savedInstanceState)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -119,15 +136,13 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun initView() {
         adapter = BugReportFilesAdapter(bugReportFiles)
-        b.brbsRecycler.layoutManager = LinearLayoutManager(requireContext())
-        b.brbsRecycler.adapter = adapter
 
         b.brbsSelectAllCheckbox.setOnCheckedChangeListener { _, isChecked ->
             updateSelectAllState(isChecked)
         }
 
         b.brbsSelectAllText.setOnClickListener {
-            b.brbsSelectAllCheckbox.toggle()
+            b.brbsSelectAllCheckbox.performClick()
         }
 
         b.brbsProcInfoCheckbox.setOnCheckedChangeListener { _, isChecked ->
@@ -460,60 +475,31 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
         return SimpleDateFormat("MMM d, yyyy HH:mm", Locale.US).format(Date(timestamp))
     }
 
-    inner class BugReportFilesAdapter(
-        private val files: List<BugReportFile>
-    ) : RecyclerView.Adapter<BugReportFilesAdapter.ViewHolder>() {
-
-        inner class ViewHolder(private val itemBinding: ItemBugReportFileBinding) :
-            RecyclerView.ViewHolder(itemBinding.root) {
-
-            fun bind(fileItem: BugReportFile) {
-                itemBinding.itemFileName.text = fileItem.name
-                itemBinding.itemFileDetails.text = "${formatFileSize(fileItem.file.length())} - ${formatDate(fileItem.file.lastModified())}"
-                itemBinding.itemFileCheckbox.isChecked = fileItem.isSelected
-
-                // file icon based on type
-                val iconRes = when (fileItem.type) {
-                    FileType.ZIP -> R.drawable.ic_backup
-                    FileType.TEXT -> R.drawable.ic_logs
-                }
-                itemBinding.itemFileIcon.setImageResource(iconRes)
-
-                itemBinding.itemFileCheckbox.setOnCheckedChangeListener { _, isChecked ->
+    inner class BugReportFilesAdapter(private val files: List<BugReportFile>) {
+        fun notifyDataSetChanged() {
+            b.rows = files.map { fileItem ->
+                val checkbox = WgControlState(checkable = true).apply { isChecked = fileItem.isSelected }
+                checkbox.setOnCheckedChangeListener { _, isChecked ->
                     fileItem.isSelected = isChecked
                     updateSelectAllCheckboxState()
                     updateTotalSize()
                     updateSendButtonState()
                 }
-
-                itemBinding.root.setOnClickListener {
-                    itemBinding.itemFileCheckbox.toggle()
+                val iconRes = when (fileItem.type) {
+                    FileType.ZIP -> R.drawable.ic_backup
+                    FileType.TEXT -> R.drawable.ic_logs
                 }
-
-                itemBinding.itemFileViewBtn.setOnClickListener {
-                    openFile(fileItem.file)
-                }
-
-                itemBinding.itemFileDeleteBtn.setOnClickListener {
-                    showDeleteConfirmationDialog(fileItem)
-                }
+                BugReportRowState(
+                    key = fileItem.file.absolutePath,
+                    name = fileItem.name,
+                    details = "${formatFileSize(fileItem.file.length())} - ${formatDate(fileItem.file.lastModified())}",
+                    icon = iconRes,
+                    checkbox = checkbox,
+                    onOpen = { openFile(fileItem.file) },
+                    onDelete = { showDeleteConfirmationDialog(fileItem) }
+                )
             }
         }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = ItemBugReportFileBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-            return ViewHolder(binding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(files[position])
-        }
-
-        override fun getItemCount(): Int = files.size
 
         private fun updateSelectAllCheckboxState() {
             val allSelected = files.all { it.isSelected }
@@ -533,7 +519,7 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun showDeleteConfirmationDialog(fileItem: BugReportFile) {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
+        val dialog = WgAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.lbl_delete))
             .setMessage(getString(R.string.bug_report_delete_confirmation, fileItem.name))
             .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->

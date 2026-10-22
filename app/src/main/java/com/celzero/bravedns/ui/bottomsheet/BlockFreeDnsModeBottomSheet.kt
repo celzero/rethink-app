@@ -21,7 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomSheetBlockFreeDnsModeBinding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.BlockFreeModeState
+import com.celzero.bravedns.ui.compose.settings.BlockFreeModeContent
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastR
@@ -29,7 +33,7 @@ import org.koin.android.ext.android.inject
 
 class BlockFreeDnsModeBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomSheetBlockFreeDnsModeBinding? = null
+    private var _binding: BlockFreeModeState? = null
     private val b
         get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
 
@@ -63,8 +67,11 @@ class BlockFreeDnsModeBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetBlockFreeDnsModeBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = BlockFreeModeState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { BlockFreeModeContent(b) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,6 +81,16 @@ class BlockFreeDnsModeBottomSheet : BaseBottomSheetDialogFragment() {
         }
         initView()
         initClickListeners()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        _binding?.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) b.restoreChecks(savedInstanceState)
     }
 
     override fun onDestroyView() {

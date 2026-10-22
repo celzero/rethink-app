@@ -21,11 +21,9 @@ import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.adapter.GenericHopAdapter
 import com.celzero.bravedns.adapter.HopItem
-import com.celzero.bravedns.databinding.DialogWgHopBinding
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.UIUtils
 
 /**
@@ -41,16 +39,15 @@ open class GenericHopDialog(
     private val onHopChanged: ((Int) -> Unit)? = null
 ) : Dialog(activity, themeID) {
 
-    private lateinit var b: DialogWgHopBinding
-    private var mLayoutManager: RecyclerView.LayoutManager? = null
+    private lateinit var b: WgHopState
     private lateinit var adapter: GenericHopAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = DialogWgHopBinding.inflate(layoutInflater)
-        setContentView(b.root)
+        b = WgHopState(context)
+        setWgContent(activity) { WgHopContent(b) }
         initView()
     }
 
@@ -62,7 +59,6 @@ open class GenericHopDialog(
         // keep the dialog within the app's max width on expanded windows (foldables/tablets)
         UIUtils.capDialogWidth(this)
 
-        mLayoutManager = LinearLayoutManager(activity)
 
         adapter = GenericHopAdapter(
             activity,
@@ -73,7 +69,6 @@ open class GenericHopDialog(
             onHopChanged
         )
 
-        b.wgHopRecyclerView.layoutManager = mLayoutManager
         b.wgHopRecyclerView.adapter = adapter
 
         b.wgHopDialogOkButton.setOnClickListener {

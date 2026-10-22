@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.trafficlogs.*
 
 import android.content.Context
 import android.content.Intent
@@ -27,24 +30,19 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import androidx.paging.filter
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.database.RpnLogRepository
-import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.WorkScheduler
@@ -52,7 +50,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
@@ -65,9 +62,6 @@ import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
-import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,10 +73,9 @@ import org.koin.android.ext.android.inject
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchView.OnQueryTextListener {
+class ConsoleLogActivity : BaseActivity() {
 
-    private val b by viewBinding(ActivityConsoleLogBinding::bind)
-    private var layoutManager: RecyclerView.LayoutManager? = null
+    private val b = ConsoleLogsState()
     private val persistentState by inject<PersistentState>()
 
     private val viewModel by inject<ConsoleLogViewModel>()
@@ -131,7 +124,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -143,6 +136,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
         initView()
         setupClickListener()
         setQueryFilter()
+        setContent { RethinkTheme { recyclerAdapter?.let { ConsoleLogsScreen(b, it, ::selectLogLevel, ::setFileTrace) } } }
     }
 
     @OptIn(FlowPreview::class)
@@ -169,13 +163,20 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
         // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
         // causing SearchView to stop receiving input events
         // this is a workaround to restart the IME process
-        b.searchView.setQuery("", false)
-        b.searchView.clearFocus()
+        b.logs.search.setQuery("", false)
+        b.logs.resumeGeneration++
 
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         restoreFrost(themeId)
-        val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.searchView)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("traffic.search", b.logs.search.query)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.getString("traffic.search")?.let { b.logs.search.setQuery(it) }
     }
 
     private fun initView() {
@@ -199,7 +200,8 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             }
         }
         b.fabShareLog.text = getString(R.string.about_email).capitalizeWords()
-        b.searchView.setOnQueryTextListener(this)
+        b.logs.search.listener = { onQueryTextChange(it) }
+        b.logs.search.submitListener = { onQueryTextSubmit(it) }
         val logLevel = Logger.uiLogLevel.toInt()
         if (logLevel >= Logger.LoggerLevel.ERROR.id) {
             showFilterDialog()
@@ -210,43 +212,11 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
 
     private fun setAdapter() {
         try {
-            b.consoleLogList.setHasFixedSize(true)
-            // disable all animations to prevent state inconsistencies
-            b.consoleLogList.itemAnimator = null
-
-            // Set a custom layout manager that handles errors gracefully
-            layoutManager = object : LinearLayoutManager(this@ConsoleLogActivity) {
-                override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
-                    try {
-                        super.onLayoutChildren(recycler, state)
-                    } catch (e: IndexOutOfBoundsException) {
-                        Logger.w(LOG_TAG_UI, "err(console) layout children: ${e.message}")
-                    }
-                }
-            }
-            // Disable RecyclerView's GapWorker-driven item prefetch on this list.
-            // The console log is updated at very high frequency by background logging
-            // coroutines (Paging 3 inserts), and prefetch races with the paging
-            // update path to produce the IndexOutOfBoundsException in ConsoleLogAdapter
-            // reported as #2591 ("v055u: IndexOutOfBoundsException ConsoleLogAdapter").
-            // The existing try/catch above SWALLOWS the exception when it does fire;
-            // this prevents the race that causes it.
-            //
-            // Note: ConnectionTrackerFragment / DnsLogFragment elsewhere in this app
-            // explicitly enable prefetch (lm.isItemPrefetchEnabled = true). The
-            // console log has a fundamentally higher write rate so the default needs
-            // to differ.
-            (layoutManager as? LinearLayoutManager)?.isItemPrefetchEnabled = false
-
-            b.consoleLogList.layoutManager = layoutManager
             recyclerAdapter = ConsoleLogAdapter(this)
-            b.consoleLogList.adapter = recyclerAdapter
             currentMinLevel = Logger.uiLogLevel.toInt()
             viewModel.setLogLevel(Logger.uiLogLevel)
             observeLog()
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "err setting up console, recycler: ${e.message}")
-        }
+        } catch (e: Exception) { Logger.e(LOG_TAG_UI, "err setting up console, recycler: ${e.message}") }
     }
 
     private fun observeLog() {
@@ -377,9 +347,12 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     }
 
     private fun showFilterDialog() {
-        // show dialog with level filter
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(getString(R.string.console_log_title))
+        b.level = Logger.uiLogLevel.toInt()
+        b.fileTrace = persistentState.includeFileTrace
+        b.filterOpen = true
+    }
+    private fun selectLogLevel(which: Int) {
+        b.level = which
         val items = arrayOf(
             getString(R.string.settings_gologger_dialog_option_0),
             getString(R.string.settings_gologger_dialog_option_1),
@@ -390,33 +363,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             getString(R.string.settings_gologger_dialog_option_6),
             getString(R.string.settings_gologger_dialog_option_7),
         )
-        val checkedItem = Logger.uiLogLevel.toInt()
 
-        // Combining setSingleChoiceItems() with setView() stacks the list panel,
-        // the custom panel and the button bar vertically without any scrollable
-        // wrapper. On short screens (foldables in the folded state, small phones)
-        // the dialog overflows and the positive/neutral buttons end up off-screen.
-        // Instead, render the choices in a single height-capped ListView (which
-        // scrolls internally) plus the checkbox inside the custom view, so the
-        // dialog never grows past the window and the buttons always stay visible.
-        val density = resources.displayMetrics.density
-        val margin = (20 * density).toInt()
-        val spacing = (8 * density).toInt()
-
-        val maxListHeightPx = (resources.displayMetrics.heightPixels * MAX_LIST_HEIGHT_FRACTION).toInt()
-        val listView = object : ListView(this) {
-            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-                val capped =
-                    MeasureSpec.makeMeasureSpec(maxListHeightPx, MeasureSpec.AT_MOST)
-                super.onMeasure(widthMeasureSpec, capped)
-            }
-        }
-        listView.choiceMode = ListView.CHOICE_MODE_SINGLE
-        listView.divider = null
-        listView.adapter =
-            ArrayAdapter(this, android.R.layout.simple_list_item_single_choice, items)
-        listView.setItemChecked(checkedItem, true)
-        listView.setOnItemClickListener { _, _, which, _ ->
             Logger.uiLogLevel = which.toLong()
             GoVpnAdapter.setLogLevel(
                 persistentState.goLoggerLevel.toInt(),
@@ -435,12 +382,11 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
                 consoleLogRepository.setStartTimestamp(System.currentTimeMillis())
             }
             Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which]}")
-        }
 
-        val cb = MaterialCheckBox(this)
-        cb.text = getString(R.string.console_log_include_file_trace)
-        cb.isChecked = persistentState.includeFileTrace
-        cb.setOnCheckedChangeListener { _, isChecked ->
+    }
+    private fun setFileTrace(isChecked: Boolean) {
+        b.fileTrace = isChecked
+
             persistentState.includeFileTrace = isChecked
             GoVpnAdapter.setLogLevel(
                 persistentState.goLoggerLevel.toInt(),
@@ -454,35 +400,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
                 viewModel.setLogLevel(Logger.uiLogLevel)
             }
             Logger.i(LOG_TAG_BUG_REPORT, "File trace set to $isChecked")
-        }
 
-        val container = LinearLayout(this)
-        container.orientation = LinearLayout.VERTICAL
-        val listParams =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        container.addView(listView, listParams)
-        val cbParams =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        cbParams.setMargins(margin, spacing, margin, spacing)
-        container.addView(cb, cbParams)
-        builder.setView(container)
-
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
     }
 
     private fun handleShareLogs(filePath: String) {
@@ -649,7 +567,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
 
     val searchQuery = MutableStateFlow("")
     @OptIn(FlowPreview::class)
-    override fun onQueryTextSubmit(query: String): Boolean {
+    fun onQueryTextSubmit(query: String): Boolean {
         if (query == CRASH_CODE) {
             // 0: default, 1: don't panic
             // 0: will crash, gowtf
@@ -665,7 +583,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     }
 
     @OptIn(FlowPreview::class)
-    override fun onQueryTextChange(query: String): Boolean {
+    fun onQueryTextChange(query: String): Boolean {
         if (query == CRASH_CODE) {
             // 0: default, 1: don't panic
             // 0: will crash, gowtf

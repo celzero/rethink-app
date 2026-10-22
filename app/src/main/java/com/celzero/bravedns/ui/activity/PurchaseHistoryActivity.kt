@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.PurchaseHistoryAdapter
-import com.celzero.bravedns.databinding.ActivityPurchaseHistoryBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
@@ -38,8 +37,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.PurchaseHistoryViewModel
-import com.facebook.shimmer.Shimmer
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,9 +48,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * the SubscriptionStateHistory table, loaded in pages of 30 rows at a time
  * (using Paging 3) to avoid an ANR on devices with thousands of records.
  */
-class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history) {
+class PurchaseHistoryActivity : BaseActivity() {
 
-    private val b by viewBinding(ActivityPurchaseHistoryBinding::bind)
+    private val b = HistoryScreenState()
     private val viewModel: PurchaseHistoryViewModel by viewModel()
     private lateinit var adapter: PurchaseHistoryAdapter
     private val persistentState by inject<PersistentState>()
@@ -92,6 +89,13 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
         loadHeroSubtitle()
         applyScrollPadding()
         setDolphinSignature()
+        setContent { RethinkTheme {
+            HistoryScreen(b, server = false, count = adapter.itemCount,
+                key = { index -> adapter.key(index) },
+                onBack = { onBackPressedDispatcher.onBackPressed() },
+                onFetchHidden = { if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) b.fetchProgress.isVisible = false },
+                row = { index -> adapter.Row(index) })
+        } }
     }
 
     /** Dolphin signature (at the bottom of the content.); random pairing, fresh on every visit. */
@@ -99,16 +103,7 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
-    private fun applyScrollPadding() {
-        b.contentContainer.post {
-            b.contentContainer.setPadding(
-                b.contentContainer.paddingLeft,
-                0,
-                b.contentContainer.paddingRight,
-                b.contentContainer.paddingBottom
-            )
-        }
-    }
+    private fun applyScrollPadding() { /* LazyColumn follows the native app bar. */ }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -116,38 +111,11 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
     }
 
     private fun setupToolbar() {
-        b.collapsingToolbar.title = getString(R.string.payment_history_title)
-        setSupportActionBar(b.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         b.tvHeroSubtitle.text = ""
     }
 
     private fun setupRecyclerView() {
         adapter = PurchaseHistoryAdapter(this)
-        adapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-        b.rvHistory.apply {
-            val lm = LinearLayoutManager(this@PurchaseHistoryActivity)
-            lm.isItemPrefetchEnabled = true
-            layoutManager = lm
-            adapter = this@PurchaseHistoryActivity.adapter
-            setHasFixedSize(true)
-        }
-
-        // Once the first batch of items has been bound, allow state restoration on
-        // config changes (matches DnsLogFragment's pattern).
-        b.rvHistory.post {
-            try {
-                if (adapter.itemCount > 0) {
-                    adapter.stateRestorationPolicy =
-                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                }
-            } catch (_: Exception) {
-                Logger.e(LOG_TAG_UI, "$TAG: err setting recycler restoration policy")
-            }
-        }
     }
 
     /**
@@ -196,10 +164,7 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
 
                     if (!isEmpty && !listFirstShown) {
                         listFirstShown = true
-                        adapter.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                        b.rvHistory.alpha = 0f
-                        b.rvHistory.animate().alpha(1f).setDuration(300).start()
+                        b.listEpoch++
                     }
                 }
             }
@@ -235,19 +200,11 @@ class PurchaseHistoryActivity : BaseActivity(R.layout.activity_purchase_history)
     }
 
     private fun startShimmer() {
-        if (b.shimmer.isShimmerStarted) return
-        val shimmer = Shimmer.AlphaHighlightBuilder()
-            .setDuration(1500)
-            .setBaseAlpha(0.85f)
-            .setDropoff(1f)
-            .setHighlightAlpha(0.35f)
-            .build()
-        b.shimmer.setShimmer(shimmer)
-        b.shimmer.startShimmer()
+        b.shimmerRunning = true
     }
 
     private fun stopShimmer() {
-        if (b.shimmer.isShimmerStarted) b.shimmer.stopShimmer()
+        b.shimmerRunning = false
     }
 
     override fun onPause() {

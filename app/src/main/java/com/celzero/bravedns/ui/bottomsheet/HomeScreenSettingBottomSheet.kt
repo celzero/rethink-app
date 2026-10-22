@@ -25,7 +25,7 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import androidx.lifecycle.lifecycleScope
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -36,7 +36,11 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.HomeModeState
+import com.celzero.bravedns.ui.compose.settings.HomeModeContent
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
@@ -57,7 +61,7 @@ import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenSettingBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetHomeScreenBinding? = null
+    private var _binding: HomeModeState? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -91,8 +95,21 @@ class HomeScreenSettingBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = HomeModeState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { HomeModeContent(b) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        _binding?.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) b.restoreChecks(savedInstanceState)
     }
 
     override fun onDestroyView() {
@@ -154,19 +171,19 @@ class HomeScreenSettingBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun initializeClickListeners() {
-        b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean
+        b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean
             ->
             handleDnsMode(isSelected)
         }
 
         b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener {
-            _: CompoundButton,
+            _: WgControlState,
             isSelected: Boolean ->
             handleFirewallMode(isSelected)
         }
 
         b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener {
-            _: CompoundButton,
+            _: WgControlState,
             isSelected: Boolean ->
             handleDnsFirewallMode(isSelected)
         }

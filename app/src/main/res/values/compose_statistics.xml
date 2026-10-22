@@ -1,0 +1,8 @@
+<resources>
+    <string name="statistics_expanded">Expanded</string>
+    <string name="statistics_collapsed">Collapsed</string>
+    <item name="summary_statistics_compose" type="id" />
+    <item name="summary_filter_compose" type="id" />
+    <item name="rpn_log_interval_compose" type="id" />
+    <item name="rpn_statistics_compose" type="id" />
+</resources>

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
@@ -36,7 +38,6 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
@@ -53,11 +54,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener {
-    private var _binding: BottomSheetAppConnectionsBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private val b = AppRuleSheetState()
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
@@ -98,19 +95,13 @@ class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmS
         position = pos
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomSheetAppConnectionsBinding.inflate(inflater, container, false)
-        return b.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        androidx.compose.ui.platform.ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { AppRuleSheetContent(b) } }
+        }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -199,9 +190,6 @@ class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmS
 
         val list = domains.split(",").toTypedArray()
 
-        b.bsacDomainList.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.bsacDomainList.layoutManager = layoutManager
 
         val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)
         b.bsacDomainList.adapter = recyclerAdapter

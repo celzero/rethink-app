@@ -23,17 +23,24 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import android.view.View
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.compose.ActivityFragmentContainer
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import org.koin.android.ext.android.inject
 
-class FragmentHostActivity : BaseActivity(R.layout.activity_fragment_host) {
+class FragmentHostActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -87,31 +94,37 @@ class FragmentHostActivity : BaseActivity(R.layout.activity_fragment_host) {
 
         handleOnBackPressed()
 
-        if (savedInstanceState == null) {
-            // Only create fragment on first launch, not on recreation
+        // A restored Fragment (and any nested back stack) remains owned by FragmentManager.
+        // Resolve only a genuinely new instance here, retaining the original invalid-class path.
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container) ?: try {
             val arguments = intent.getBundleExtra(EXTRA_FRAGMENT_ARGUMENTS)
-
-            try {
-                // Instantiate fragment from class name
-                val fragment = supportFragmentManager.fragmentFactory.instantiate(
-                    classLoader,
-                    fragmentClassName!!
-                ).apply {
-                    if (arguments != null) this.arguments = arguments
-                    Logger.i(LOG_TAG_UI, "Loading fragment: $fragmentClassName with arguments: $arguments")
-                }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit()
-            } catch (e: Exception) {
-                Logger.e(LOG_TAG_UI, "Error instantiating fragment: $fragmentClassName", e)
-                finish()
+            supportFragmentManager.fragmentFactory.instantiate(classLoader, fragmentClassName!!).apply {
+                if (arguments != null) this.arguments = arguments
+                Logger.i(LOG_TAG_UI, "Loading fragment: $fragmentClassName with arguments: $arguments")
             }
-        } else {
-            // Fragment will be automatically restored by FragmentManager
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "Error instantiating fragment: $fragmentClassName", e)
+            finish()
+            return
+        }
+        if (savedInstanceState != null) {
             Logger.i(LOG_TAG_UI, "Restoring fragment: $fragmentClassName from savedInstanceState")
         }
+        setContentView(ComposeView(this).apply {
+            // The nested Fragment ComposeView handles its own system-bar/IME insets.
+            consumeWindowInsets = false
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                RethinkTheme {
+                    ActivityFragmentContainer(
+                        fragmentManager = supportFragmentManager,
+                        containerId = R.id.fragment_container,
+                        modifier = Modifier.fillMaxSize(),
+                        createFragment = { fragment },
+                    )
+                }
+            }
+        })
     }
 
     private fun handleOnBackPressed() {

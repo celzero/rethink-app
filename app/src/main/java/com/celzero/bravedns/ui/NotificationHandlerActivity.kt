@@ -24,6 +24,8 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.provider.Settings
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
@@ -54,7 +56,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import org.koin.android.ext.android.inject
 
 class NotificationHandlerActivity: BaseActivity() {
@@ -93,7 +95,10 @@ class NotificationHandlerActivity: BaseActivity() {
         handleFrostEffectIfNeeded(persistentState.theme)
 
         // This is a trampoline activity that shows dialogs but no actual UI
-        setContentView(android.R.layout.activity_list_item)
+        setContentView(ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {}
+        })
         window.decorView.alpha = 0f // Make it invisible
 
         if (isAtleastQ()) {
@@ -364,7 +369,7 @@ class NotificationHandlerActivity: BaseActivity() {
     }
 
     private fun handleAccessibilitySettings() {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lbl_action_required)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
@@ -385,7 +390,7 @@ class NotificationHandlerActivity: BaseActivity() {
     }
 
     private fun showAppPauseDialog(trampolineType: TrampolineType, intent: Intent) {
-        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
         builder.setMessage(R.string.notif_dialog_pause_dialog_message)

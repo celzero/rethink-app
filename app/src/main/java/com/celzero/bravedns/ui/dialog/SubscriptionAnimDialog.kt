@@ -1,4 +1,9 @@
 package com.celzero.bravedns.ui.dialog
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.SubscriptionCelebration
 
 import android.graphics.Color
 import android.os.Bundle
@@ -8,8 +13,6 @@ import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DialogSubscriptionAnimBinding
-import dev.androidbroadcast.vbpd.viewBinding
 import nl.dionsegijn.konfetti.core.Angle
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -20,7 +23,9 @@ import nl.dionsegijn.konfetti.core.models.Size
 import java.util.concurrent.TimeUnit
 
 class SubscriptionAnimDialog : DialogFragment() {
-    private val b by viewBinding(DialogSubscriptionAnimBinding::bind)
+    private var parties by mutableStateOf<List<Party>>(emptyList())
+    private var title by mutableStateOf("")
+    private var message by mutableStateOf("")
 
     companion object {
         // Dialog display duration
@@ -78,11 +83,12 @@ class SubscriptionAnimDialog : DialogFragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.dialog_subscription_anim, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        parties = emptyList()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { SubscriptionCelebration(title, message, parties) } }
+        }
     }
 
     override fun onStart() {
@@ -91,17 +97,17 @@ class SubscriptionAnimDialog : DialogFragment() {
         dialog?.setCancelable(true)
 
         // Apply optional title/message passed via arguments
-        arguments?.getString(ARG_TITLE)?.let { b.tvTitle.text = it }
-        arguments?.getString(ARG_MESSAGE)?.let { b.tvMessage.text = it }
+        arguments?.getString(ARG_TITLE)?.let { title = it }
+        arguments?.getString(ARG_MESSAGE)?.let { message = it }
 
-        b.konfettiView.start(festive())
+        parties = festive()
         // post delayed auto-dismiss safely
-        b.konfettiView.postDelayed(autoDismissRunnable, DIALOG_DISPLAY_DURATION_MS)
+        view?.postDelayed(autoDismissRunnable, DIALOG_DISPLAY_DURATION_MS)
     }
 
     override fun onDestroyView() {
         // cancel pending auto-dismiss runnable to avoid running after view/state is gone
-        b.konfettiView.removeCallbacks(autoDismissRunnable)
+        view?.removeCallbacks(autoDismissRunnable)
         super.onDestroyView()
     }
 

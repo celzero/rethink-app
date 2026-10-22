@@ -15,6 +15,9 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import com.celzero.bravedns.ui.compose.wireguard.*
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -28,13 +31,10 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
@@ -43,7 +43,6 @@ import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.IpRulesManager
@@ -72,7 +71,6 @@ import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -80,8 +78,7 @@ import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import inet.ipaddr.HostName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -93,15 +90,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
-class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
-    private val b by viewBinding(ActivityWgDetailBinding::bind)
+class WgConfigDetailActivity : BaseActivity() {
+    private lateinit var b: WgDetailState
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
 
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     private var wgPeersAdapter: WgPeersAdapter? = null
-    private var layoutManager: LinearLayoutManager? = null
 
     private var configId: Int = INVALID_CONF_ID
     private var wgInterface: WgInterface? = null
@@ -175,7 +171,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        b = WgDetailState(this)
+        setContent { RethinkTheme { WgDetailContent(b) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -369,7 +366,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         }
     }
 
-    private fun setAutomationRowEnabled(row: View, toggle: View, enabled: Boolean) {
+    private fun setAutomationRowEnabled(row: WgControlState, toggle: WgControlState, enabled: Boolean) {
         row.isEnabled = enabled
         row.alpha = if (enabled) 1.0f else 0.5f
         toggle.isEnabled = enabled
@@ -728,11 +725,11 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                 } else {
                     dns
                 }
-            b.dnsServersText.text = dns
+            b.dnsServersText.text = dns.orEmpty()
         } else {
             b.publicKeyLabel.visibility = View.VISIBLE
             b.publicKeyText.visibility = View.VISIBLE
-            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64().orEmpty()
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE
         }
@@ -861,7 +858,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             if (b.useMobileCheck.isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                 }
             }
         }
@@ -1171,8 +1168,6 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     }
 
     private fun setPeersAdapter() {
-        layoutManager = LinearLayoutManager(this)
-        b.peersList.layoutManager = layoutManager
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         wgPeersAdapter = WgPeersAdapter(this, themeId, configId, peers)
         b.peersList.adapter = wgPeersAdapter
@@ -1207,7 +1202,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         val sw = b.ssidCheck
         val editGroup = b.ssidEditGroup
         val displayGroup = b.ssidDisplayGroup
-        val editBtn: AppCompatImageView = b.ssidEditBtn
+        val editBtn: WgControlState = b.ssidEditBtn
         val valueTv = b.ssidValueTv
         val layout = b.ssidFilterRl
         val permissionErrorLayout = b.ssidPermissionErrorLayout
@@ -1282,7 +1277,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
             if (isChecked) {
                 // Enable experimental-dependent settings when experimental features are enabled
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                 }
 
                 // An empty saved list means all SSIDs and needs no location access.
@@ -1341,12 +1336,12 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         }
     }
 
-    private fun hideSsidExtras(editGroup: LinearLayout, displayGroup: LinearLayout) {
+    private fun hideSsidExtras(editGroup: WgControlState, displayGroup: WgControlState) {
         editGroup.visibility = View.GONE
         displayGroup.visibility = View.GONE
     }
 
-    private fun showSsidDisplay(editGroup: LinearLayout, displayGroup: LinearLayout) {
+    private fun showSsidDisplay(editGroup: WgControlState, displayGroup: WgControlState) {
         editGroup.visibility = View.GONE
         displayGroup.visibility = View.VISIBLE
     }
@@ -1446,8 +1441,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         hasPermissions: Boolean,
         isLocationEnabled: Boolean,
         hasConfiguredSsids: Boolean,
-        permissionErrorLayout: LinearLayout,
-        locationErrorLayout: LinearLayout
+        permissionErrorLayout: WgControlState,
+        locationErrorLayout: WgControlState
     ) {
         val sw = b.ssidCheck
 
@@ -1468,8 +1463,8 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     }
 
     private fun hideErrorLayouts(
-        permissionErrorLayout: LinearLayout,
-        locationErrorLayout: LinearLayout
+        permissionErrorLayout: WgControlState,
+        locationErrorLayout: WgControlState
     ) {
         Logger.vv(LOG_TAG_UI, "Hiding all SSID error layouts")
         permissionErrorLayout.visibility = View.GONE

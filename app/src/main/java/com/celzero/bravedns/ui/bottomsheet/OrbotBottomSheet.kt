@@ -18,26 +18,24 @@ package com.celzero.bravedns.ui.bottomsheet
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.Animation
 import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.ui.compose.networksheets.showOrbotInfoDialog
+import com.celzero.bravedns.ui.compose.networksheets.OrbotSheetState
+import com.celzero.bravedns.ui.compose.networksheets.OrbotSheetContent
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -48,11 +46,10 @@ import com.celzero.bravedns.ui.activity.WgIncludeAppsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,7 +61,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Integration from the settings page.
  */
 class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetOrbotBinding? = null
+    private var _binding: OrbotSheetState? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -76,26 +73,26 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     private val eventLogger by inject<EventLogger>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
-    companion object {
-        // Animation constants
-        private const val ROTATION_START_DEGREES = 0.0f
-        private const val ROTATION_END_DEGREES = 360.0f
-        private const val ROTATION_MULTIPLIER = 4f
-        private const val ROTATION_Z_DEPTH = 20f
-        private const val ANIMATION_DURATION_SECONDS = 2L
-        private const val ANIMATION_DURATION_MS_MULTIPLIER = 1000L
-
-        // UI dimension constants
-        private const val ORBOT_ICON_WIDTH_DIP = 40f
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = OrbotSheetState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { OrbotSheetContent(b) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        _binding?.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     override fun onDestroyView() {
@@ -433,28 +430,9 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
         animateOrbotIcon()
     }
 
-    /** Circular animation for the Orbot Icon. */
+    /** The Compose icon mirrors the original accelerating four-turn Y-axis animation. */
     private fun animateOrbotIcon() {
-        // In some cases, the width of orbotIcon is 0 - For both width and measuredWidth.
-        // Convert the width(40dp) to pixel and add to animation parameter in case of 0
-        var width = b.orbotIcon.measuredWidth
-        if (width == 0) {
-            width = getCalculatedWidth()
-        }
-        val rotation = Rotate3dAnimation(ROTATION_START_DEGREES, ROTATION_END_DEGREES * ROTATION_MULTIPLIER, width / 2f, width / 2f, ROTATION_Z_DEPTH, true)
-        rotation.fillAfter = true
-        rotation.interpolator = AccelerateInterpolator()
-        rotation.duration = ANIMATION_DURATION_SECONDS * ANIMATION_DURATION_MS_MULTIPLIER
-        rotation.repeatCount = Animation.INFINITE
-        b.orbotIcon.startAnimation(rotation)
-    }
-
-    // ref: https://stackoverflow.com/questions/4605527/converting-pixels-to-dp
-    // Calculate the width of the icon manually.
-    // Invoke this method when the width of the Orbot icon is returned as 0 by viewBinder.
-    private fun getCalculatedWidth(): Int {
-        val r: Resources = resources
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ORBOT_ICON_WIDTH_DIP, r.displayMetrics).toInt()
+        b.animating = true
     }
 
     private fun disableLoading() {
@@ -467,7 +445,7 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
         b.bsOrbotRadioHttp.isClickable = true
         b.bsOrbotRadioBoth.isClickable = true
         b.bsOrbotRadioNone.isClickable = true
-        b.orbotIcon.clearAnimation()
+        b.animating = false
     }
 
     /** Stop the Orbot - Calls the Orbot helper to initiate the stop orbot call. */
@@ -532,7 +510,7 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun showStopOrbotDialog(isOrbotDns: Boolean) {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
 
         builder.setCancelable(true)
@@ -576,34 +554,10 @@ class OrbotBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun showDialogForInfo() {
-        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        dialog.show()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        val okBtn = dialogBinding.infoRulesDialogCancelImg
-        val descText = dialogBinding.infoRulesDialogRulesDesc
-        val titleText = dialogBinding.infoRulesDialogRulesTitle
-
         var text = getString(R.string.orbot_explanation)
         text = text.replace("\n", "<br /><br />")
         val styledText = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        descText.text = styledText
-        titleText.text = getString(R.string.orbot_title)
-        titleText.setCompoundDrawablesRelative(null, null, null, null)
-
-        okBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        showOrbotInfoDialog(requireActivity(), requireContext(), getString(R.string.orbot_title), styledText)
     }
 
     private fun logEvent(msg: String, details: String) {
