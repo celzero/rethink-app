@@ -36,6 +36,7 @@ import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.BOOTSTRAP_DNS_IF_NET_DNS_EMPTY
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.data.SsidItem
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
@@ -92,6 +93,7 @@ import com.celzero.firestack.backend.RpnOps
 import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.backend.RpnServer
 import com.celzero.firestack.backend.RpnServers
+import com.celzero.firestack.backend.Server
 import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
@@ -1952,6 +1954,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun closeTun() {
+        remoteSvc = null
         try {
             if (tunnel.isConnected) {
                 // this is not the only place where tunnel is disconnected
@@ -3155,21 +3158,69 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun rpnRemoteService() {
+    data class RemoteServiceInfo(val id: String, val addr: String, val port: String)
+
+    private var remoteSvc: Server? = null
+
+    suspend fun startRemoteService(): RemoteServiceInfo? {
+        if (!DEBUG) return null
         if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
-            return
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start remote service")
+            return null
         }
 
-        val server = tunnel.services?.addServer("", "", "")
-        val bri = tunnel.services?.bridge(server?.id(), "wg1-id")
-        // server?.hop() does the same thing as bridge but requires object
-        // remove the server
-        tunnel.services?.removeServer(server?.id())
-        // remove the bridge
-        tunnel.services?.bridge(server?.id(), "")
+        return try {
+            // bridge requires the rpn win id; the service is useless without it
+            val win = tunnel.proxies.rpn().win()?.id()
+            if (win.isNullOrEmpty()) {
+                Logger.e(LOG_TAG_VPN, "$TAG no win(rpn) id, skip start remote service")
+                return null
+            }
+            val type = "svcsocks5" // "svchttp"
+            val id = "rpnRmtSvc"
+            val socks5Url = constructSocks5ProxyUrl(null, null, "", port = 0) // use constructSocks5ProxyUrl?
+            val httpUrl = "http://" // use constructHttpProxyUrl?
+            // username, pwd, port (empty port lets go pick one)
+            val server = tunnel.services?.addServer(type, win, socks5Url)
+            val sid = server?.id().orEmpty()
+            if (sid.isEmpty()) {
+                Logger.e(LOG_TAG_VPN, "$TAG addServer returned no id, skip start remote service")
+                return null
+            }
+            tunnel.services?.bridge(sid, win)
+            remoteSvc = server
+            val addr = server?.addr.orEmpty()
+            Logger.i(LOG_TAG_VPN, "$TAG remote service started: $sid, addr: $addr, win: $win")
+            RemoteServiceInfo(sid, addr, addr.substringAfterLast(':', missingDelimiterValue = ""))
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err start remote service: ${e.message}", e)
+            logEvent(Severity.HIGH, "remote service start error", "error starting remote service, reason: ${e.message}")
+            null
+        }
+    }
 
-        server?.status()
+    suspend fun stopRemoteService() {
+        val sid = remoteSvc?.id().orEmpty()
+        if (sid.isEmpty()) return
+        try {
+            if (tunnel.isConnected) {
+                tunnel.services?.bridge(sid, "")
+                tunnel.services?.removeServer(sid)
+            }
+            Logger.i(LOG_TAG_VPN, "$TAG remote service stopped: $sid")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err stop remote service: ${e.message}", e)
+        }
+        remoteSvc = null
+    }
+
+    suspend fun remoteServiceStatus(): Int? {
+        return try {
+            remoteSvc?.status()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err get remote service status: ${e.message}")
+            null
+        }
     }
 
     suspend fun getWinByKey(key: String): Proxy? {

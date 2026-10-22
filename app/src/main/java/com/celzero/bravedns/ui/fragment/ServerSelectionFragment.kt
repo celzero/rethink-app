@@ -62,6 +62,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.CountryConfig
@@ -81,6 +82,7 @@ import com.celzero.bravedns.ui.activity.RpnBypassAppsActivity
 import com.celzero.bravedns.ui.adapter.CountryServerAdapter
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
 import com.celzero.bravedns.ui.bottomsheet.RpnLogActivityIntervalBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.RpnRemoteServiceBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.RpnStatsBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerRemovalNotificationBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.ServerSettingsBottomSheet
@@ -692,6 +694,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         loadRpnHeatmap()
         // Same for the Stats chip: connections logged while away.
         refreshStatsChipState()
+        // DEBUG-only laptop tile: the service may have been started/stopped elsewhere.
+        refreshRemoteServiceTileState()
     }
 
     override fun onStart() {
@@ -1857,7 +1861,38 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     private fun setupQuickSettings() {
         b.qsRelayTile.setOnClickListener { onRelayQuickSettingClicked() }
         b.qsBypassAppsTile.setOnClickListener { openRpnBypassApps() }
+        setupRemoteServiceTile()
         refreshQuickSettingCaptions()
+    }
+
+    private fun setupRemoteServiceTile() {
+        if (!DEBUG) return
+        b.qsRemoteServiceTile.isVisible = true
+        b.qsRemoteServiceTile.setOnClickListener { showRemoteServiceSheet() }
+        refreshRemoteServiceTileState()
+    }
+
+    private fun refreshRemoteServiceTileState() {
+        if (!DEBUG) return
+        io {
+            val status = try {
+                VpnController.remoteServiceStatus()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_UI, "$TAG.refreshRemoteServiceTileState: ${e.message}")
+                null
+            }
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                b.qsRemoteServiceState.text =
+                    if (status != null && status != -2) getString(R.string.lbl_on) else getString(R.string.lbl_off)
+            }
+        }
+    }
+
+    private fun showRemoteServiceSheet() {
+        if (!isAdded || isStateSaved) return
+        if (parentFragmentManager.findFragmentByTag(RpnRemoteServiceBottomSheet.TAG) != null) return
+        RpnRemoteServiceBottomSheet.newInstance().show(parentFragmentManager, RpnRemoteServiceBottomSheet.TAG)
     }
 
     private fun setupStatsChip() {

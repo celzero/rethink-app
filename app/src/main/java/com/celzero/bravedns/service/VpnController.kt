@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.RpnLog
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
@@ -229,6 +230,18 @@ object VpnController : KoinComponent {
 
     suspend fun getProxyAddrById(id: String): String? {
         return rvpn?.getProxyAddrById(id)
+    }
+
+    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.startRemoteService()
+    }
+
+    suspend fun stopRemoteService() {
+        rvpn?.stopRemoteService()
+    }
+
+    suspend fun remoteServiceStatus(): Int? {
+        return rvpn?.remoteServiceStatus()
     }
 
     suspend fun getProxyStats(id: String): RouterStats? {
