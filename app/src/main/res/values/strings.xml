@@ -2981,6 +2981,22 @@
     <string name="qs_relay_automation_dialog_title" translatable="true">Automation warning</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">Since all other active locations will be relayed through Auto, its automation will be applied to all other locations. Do you want to proceed?</string>
 
+    <!-- DEBUG-only: connect a laptop to the on-device proxy (Server Selection) -->
+    <string name="qs_remote_service_label" translatable="false">Laptop</string>
+    <string name="rpn_remote_service_title" translatable="false">Connect your laptop (debug)</string>
+    <string name="rpn_remote_service_desc" translatable="false">Runs a proxy on this phone through the Rethink tunnel. Connect from a laptop on the same Wi-Fi network.</string>
+    <string name="rpn_remote_service_addr_hint" translatable="false">Address</string>
+    <string name="rpn_remote_service_start" translatable="false">Start service</string>
+    <string name="rpn_remote_service_stop" translatable="false">Stop</string>
+    <string name="rpn_remote_service_waiting" translatable="false">Waiting for connection…</string>
+    <string name="rpn_remote_service_connected" translatable="false">Connected</string>
+    <string name="rpn_remote_service_not_ok" translatable="false">Not reachable</string>
+    <string name="rpn_remote_service_no_tunnel" translatable="false">Start Rethink first</string>
+    <string name="rpn_remote_service_start_failure" translatable="false">Failed to start service</string>
+    <string name="rpn_remote_service_copied" translatable="false">Address copied</string>
+    <string name="rpn_remote_service_no_addr" translatable="false">Could not determine address</string>
+
+
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>
     <string name="rpn_bypass_apps_none" translatable="true">No apps bypassed</string>
@@ -3057,4 +3073,17 @@
     <string name="dolphin_quote_lost_we_meant_it" translatable="false">Lost? We meant to do that.</string>
     <string name="dolphin_quote_nothing_suspicious" translatable="false">Nothing suspicious. Just swimming.</string>
 
+    <string name="connection_check_title" translatable="false">Connection check</string>
+    <string name="connection_check_subtitle" translatable="false">Simulate how a domain or app is treated by the current DNS \u0026amp; firewall settings, and find out why it is blocked or allowed.</string>
+    <string name="connection_check_domain_hint" translatable="false">Domain (e.g. example.com)</string>
+    <string name="connection_check_ip_hint" translatable="false">IP address (optional; enables firewall rules)</string>
+    <string name="connection_check_app_hint" translatable="false">App</string>
+    <string name="connection_check_simulate" translatable="false">Simulate</string>
+    <string name="connection_check_running" translatable="false">Checking…</string>
+    <string name="connection_check_verdict_blocked" translatable="false">Blocked</string>
+    <string name="connection_check_verdict_allowed" translatable="false">Allowed</string>
+    <string name="connection_check_config_heading" translatable="false">Effective configuration</string>
+    <string name="connection_check_steps_heading" translatable="false">Reason chain</string>
+    <string name="connection_check_err_domain" translatable="false">Enter a domain to check</string>
+    <string name="connection_check_err_ip" translatable="false">Enter a valid IP address</string>
 </resources>

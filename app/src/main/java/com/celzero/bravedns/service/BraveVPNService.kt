@@ -490,6 +490,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getPlusTransportById(transportId)
     }
 
+    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
+        if (!DEBUG) return null
+        return vpnAdapter?.startRemoteService()
+    }
+
+    suspend fun stopRemoteService() {
+        vpnAdapter?.stopRemoteService()
+    }
+
+    suspend fun remoteServiceStatus(): Int? {
+        return vpnAdapter?.remoteServiceStatus()
+    }
+
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long, addrPort: String): Boolean {
         val res = try {
             net.bindSocket(pfd.fileDescriptor)
@@ -864,6 +877,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         notificationManager.createNotificationChannel(channel)
     }
 
+    // bare notification for the initial foreground promotion; must not resolve Koin
+    // singletons, which can block behind some slow operations
+    private fun buildStartupNotification(): Notification {
+        ensureNotificationChannelExists()
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, AppLockActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                mutable = false
+            )
+        return NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentIntent(pendingIntent)
+            .setContentTitle(resources.getString(R.string.app_name))
+            .build()
+    }
+
     private fun updateNotificationBuilder(): Notification {
         val pendingIntent =
             Utilities.getActivityPendingIntent(
@@ -921,10 +952,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 val openIntent1 =
                     makeVpnIntent(NOTIF_ACTION_MODE_STOP, Constants.NOTIF_ACTION_STOP_VPN)
                 val notificationAction1 =
-                    NotificationCompat.Action(
-                        0,
+                    Utilities.getNotificationAction(
                         resources.getString(R.string.notification_action_stop_vpn),
-                        openIntent1
+                        openIntent1,
+                        authRequired = true
                     )
                     builder.addAction(notificationAction1)
 
@@ -932,20 +963,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     val openIntent2 =
                         makeVpnIntent(NOTIF_ACTION_MODE_RESUME, Constants.NOTIF_ACTION_RESUME_VPN)
                     val notificationAction2 =
-                        NotificationCompat.Action(
-                            0,
+                        Utilities.getNotificationAction(
                             resources.getString(R.string.notification_action_resume_vpn),
-                            openIntent2
+                            openIntent2,
+                            authRequired = true
                         )
                     builder.addAction(notificationAction2)
                 } else {
                     val openIntent2 =
                         makeVpnIntent(NOTIF_ACTION_MODE_PAUSE, Constants.NOTIF_ACTION_PAUSE_VPN)
                     val notificationAction2 =
-                        NotificationCompat.Action(
-                            0,
+                        Utilities.getNotificationAction(
                             resources.getString(R.string.notification_action_pause_vpn),
-                            openIntent2
+                            openIntent2,
+                            authRequired = true
                         )
                     builder.addAction(notificationAction2)
                 }
@@ -960,16 +991,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                         Constants.NOTIF_ACTION_DNS_FIREWALL_VPN
                     )
                 val notificationAction: NotificationCompat.Action =
-                    NotificationCompat.Action(
-                        0,
+                    Utilities.getNotificationAction(
                         resources.getString(R.string.notification_action_dns_mode),
-                        openIntent1
+                        openIntent1,
+                        authRequired = true
                     )
                 val notificationAction2: NotificationCompat.Action =
-                    NotificationCompat.Action(
-                        0,
+                    Utilities.getNotificationAction(
                         resources.getString(R.string.notification_action_dns_firewall_mode),
-                        openIntent2
+                        openIntent2,
+                        authRequired = true
                     )
                 builder.addAction(notificationAction)
                 builder.addAction(notificationAction2)
@@ -1050,7 +1081,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 this,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_ACCESSIBILITY_FAILURE
             )
 
         var builder: NotificationCompat.Builder
@@ -1157,17 +1189,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         // startForeground should always be called within 5 secs of onStartCommand invocation
         // https://developer.android.com/guide/components/fg-service-types
+        // start with a bare notification so no Koin resolution can delay the foreground call
         // Call startForeground synchronously (NOT via ui{}): the system validates the foreground
         // notification asynchronously after startForeground() returns, and crashes the process
         // with CannotPostForegroundServiceNotificationException ("Bad notification for
         // startForeground") if validation fails.
         // TODO: can remove multiple startForegroundService calls if we decide to remove
         // multiple catch blocks for API 31 and above
+        val startupNotif = buildStartupNotification()
         if (isAtleastU()) {
-            var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+            var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED, startupNotif)
             if (!ok) {
                 Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
-                ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+                ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE, startupNotif)
             }
             if (!ok) {
                 Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
@@ -1175,12 +1209,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 return START_STICKY
             }
         } else {
-            val ok = startForegroundService()
+            val ok = startForegroundService(startupNotif)
             if (!ok) {
                 Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
                 signalStopService("startFg2", userInitiated = false) // notify and stop
                 return START_STICKY
             }
+        }
+
+        // swap in the rich notification; the foreground contract is already satisfied
+        try {
+            notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err updating fg notification: ${e.message}", e)
         }
 
         ui {
@@ -1352,13 +1393,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     @SuppressLint("ForegroundServiceType")
     @RequiresApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
-    private fun startForegroundService(serviceType: Int): Boolean {
+    private fun startForegroundService(
+        serviceType: Int,
+        notif: Notification = updateNotificationBuilder()
+    ): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         try {
             ServiceCompat.startForeground(
                 this,
                 SERVICE_ID,
-                updateNotificationBuilder(),
+                notif,
                 serviceType
             )
             return true
@@ -1379,11 +1423,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     @SuppressLint("ForegroundServiceType")
-    private fun startForegroundService(): Boolean {
+    private fun startForegroundService(notif: Notification = updateNotificationBuilder()): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         if (isAtleastS()) {
             try {
-                startForeground(SERVICE_ID, updateNotificationBuilder())
+                startForeground(SERVICE_ID, notif)
                 return true
             } catch (e: ForegroundServiceStartNotAllowedException) { // API 31 and above
                 Logger.e(LOG_TAG_VPN, "startForeground failed, start not allowed exception", e)
@@ -1392,7 +1436,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
         } else {
             try {
-                startForeground(SERVICE_ID, updateNotificationBuilder())
+                startForeground(SERVICE_ID, notif)
                 return true
             } catch (e: Exception) { // no exception expected for API < 31
                 Logger.e(LOG_TAG_VPN, "startForeground failed", e)

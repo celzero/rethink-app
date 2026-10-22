@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical"
+    android:paddingBottom="18dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="10dp"
+        android:alpha="0.5"
+        android:background="?attr/border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/rpn_remote_service_title"
+        android:textColor="?attr/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.8"
+        android:text="@string/rpn_remote_service_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="13sp" />
+
+    <!-- Address card: LAN IP : port -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/rmt_addr_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:letterSpacing="0.08"
+                    android:text="@string/rpn_remote_service_addr_hint"
+                    android:textAllCaps="true"
+                    android:textSize="10sp"
+                    android:textColor="?attr/primaryLightColorText" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/rmt_addr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="192.168.1.23:43117" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rmt_copy"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="2dp"
+                android:src="@drawable/ic_copy"
+                android:tint="?attr/primaryLightColorText" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- No-tunnel / failure hint shown in place of the address card -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rmt_no_tunnel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.8"
+        android:text="@string/rpn_remote_service_no_tunnel"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <!-- Status row: dot + text -->
+    <LinearLayout
+        android:id="@+id/rmt_status_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <View
+            android:id="@+id/rmt_status_dot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/dot_yellow" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/rmt_status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/rpn_remote_service_waiting"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/rmt_start_stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/rpn_remote_service_start"
+        app:backgroundTint="?attr/accentGood"
+        app:cornerRadius="14dp" />
+
+</LinearLayout>
