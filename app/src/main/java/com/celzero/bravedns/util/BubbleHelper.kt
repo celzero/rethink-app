@@ -382,9 +382,11 @@ object BubbleHelper {
             )
             // Also add a explicit dismiss action that turns off the toggle
             builder.addAction(
-                0,
-                context.getString(R.string.firewall_bubble_action_dismiss),
-                disableIntent
+                Utilities.getNotificationAction(
+                    context.getString(R.string.firewall_bubble_action_dismiss),
+                    disableIntent,
+                    authRequired = true
+                )
             )
         }
 
@@ -511,7 +513,13 @@ object BubbleHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setOnlyAlertOnce(true)
                 .setDeleteIntent(buildBubbleDeletePendingIntent(context))
-                .addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
+                .addAction(
+                    Utilities.getNotificationAction(
+                        context.getString(R.string.firewall_bubble_action_disable),
+                        disableIntent,
+                        authRequired = true
+                    )
+                )
                 .build()
 
             nm.notify(BUBBLE_NOTIFICATION_ID, notification)
