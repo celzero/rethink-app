@@ -364,7 +364,13 @@ object BubbleHelper {
         if (eligible) {
             // Actual bubble: content opens BubbleActivity, swipe/delete disables feature.
             builder.setContentIntent(bubblePendingIntent)
-            builder.addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
+            builder.addAction(
+                Utilities.getNotificationAction(
+                    context.getString(R.string.firewall_bubble_action_disable),
+                    disableIntent,
+                    authRequired = true
+                )
+            )
         } else {
             // Fallback prompt: content + "Enable bubbles" action open settings.
             val enableBubblesPendingIntent = buildEnableBubblesPendingIntent(context)
