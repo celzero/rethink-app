@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Hub
 import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,10 +41,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * Settings last (matching every Android TV launcher's convention of
  * parking Settings at the bottom).
  *
- * Paid RPN destinations (Checkout / PurchaseHistory / Customer
- * Support / RpnConfigDetail / RpnWinProxyDetails) are intentionally
- * excluded from the TV nav — the v1 TV release targets the F-Droid
- * channel which cannot ship billing.
+ * RPN is a full destination on play/website builds (server selection,
+ * per-location detail, purchase + manage). The fdroid channel cannot
+ * ship billing, so [Rpn] must be filtered out of the rail by the
+ * scaffold (see TvNavScaffold's flavor gate) — the enum entry stays so
+ * sub-routes keep a stable parent.
  */
 enum class TvDestination(
     val route: String,
@@ -56,6 +58,7 @@ enum class TvDestination(
     Apps("apps", "Apps", Icons.Filled.Apps),
     Rules("rules", "Rules", Icons.AutoMirrored.Filled.Rule),
     Proxy("proxy", "Proxy", Icons.Filled.Hub),
+    Rpn("rpn", "RPN", Icons.Filled.Public),
     Logs("logs", "Logs", Icons.AutoMirrored.Filled.Article),
     Stats("stats", "Stats", Icons.Filled.Insights),
     Settings("settings", "Settings", Icons.Filled.Settings),

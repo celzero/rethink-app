@@ -60,6 +60,18 @@ import com.celzero.bravedns.tv.ui.proxy.ProxyScreen
 import com.celzero.bravedns.tv.ui.proxy.WgDetailScreen
 import com.celzero.bravedns.tv.ui.proxy.WgImportScreen
 import com.celzero.bravedns.tv.ui.proxy.WgIncludeAppsScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnAddLocationScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnAppsScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnExcludeCountriesScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnHomeScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnIntervalScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnLocationDetailScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnManagePurchaseScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnPlusDashboardScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnPurchaseRoute
+import com.celzero.bravedns.tv.ui.rpn.RpnSettingsScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnStatsScreen
+import com.celzero.bravedns.tv.ui.rpn.RpnSupportScreen
 import com.celzero.bravedns.tv.ui.rules.RulesScreen
 import com.celzero.bravedns.tv.ui.settings.AntiCensorshipScreen
 import com.celzero.bravedns.tv.ui.settings.PauseVpnScreen
@@ -68,6 +80,7 @@ import com.celzero.bravedns.tv.ui.stats.StatsDetailKind
 import com.celzero.bravedns.tv.ui.stats.StatsDetailScreen
 import com.celzero.bravedns.tv.ui.stats.StatsScreen
 import com.celzero.bravedns.tv.ui.theme.RethinkTvTheme
+import com.celzero.bravedns.util.Utilities
 
 /**
  * Root Compose entry-point for the TV launcher.
@@ -96,7 +109,15 @@ fun TvNavScaffold() {
             val navController = rememberNavController()
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
-            val destinations = remember { TvDestination.entries }
+            // fdroid cannot ship billing, so the RPN destination (and
+            // its purchase flows) are removed from the rail entirely.
+            val destinations = remember {
+                if (Utilities.isFdroidFlavour()) {
+                    TvDestination.entries.filter { it != TvDestination.Rpn }
+                } else {
+                    TvDestination.entries.toList()
+                }
+            }
 
             // Park initial focus on the drawer's first item so the
             // user's first D-pad press is always interpreted as
@@ -120,7 +141,7 @@ fun TvNavScaffold() {
             // top-level destination UX — so this preserves the
             // ten-foot rail navigation pattern.
             val railFocusRequesters = remember {
-                TvDestination.entries.associateWith { FocusRequester() }
+                destinations.associateWith { FocusRequester() }
             }
             LaunchedEffect(Unit) {
                 runCatching { firstItemFocus.requestFocus() }
@@ -173,7 +194,7 @@ fun TvNavScaffold() {
                         startDestination = TvDestination.Home.route,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        composable(TvDestination.Home.route) { HomeScreen() }
+                        composable(TvDestination.Home.route) { HomeScreen(navController) }
                         composable(TvDestination.Dns.route) { DnsScreen(navController) }
                         composable("dns/odoh/add") { OdohAddScreen(navController) }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
@@ -217,6 +238,52 @@ fun TvNavScaffold() {
                         composable("proxy/http") { ProxyEditorScreen(kind = ProxyEditorKind.HTTP) }
                         composable("proxy/rpn-bypass") { RpnBypassAppsScreen() }
                         composable("wg/import") { WgImportScreen(navController) }
+                        composable(TvDestination.Rpn.route) { RpnHomeScreen(navController) }
+                        composable("rpn/add") { RpnAddLocationScreen(navController) }
+                        composable(
+                            route = "rpn/location/{key}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("key") {
+                                    type = androidx.navigation.NavType.StringType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val key = backStackEntry.arguments?.getString("key").orEmpty()
+                            RpnLocationDetailScreen(key = key, navController = navController)
+                        }
+                        composable(
+                            route = "rpn/apps/{key}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("key") {
+                                    type = androidx.navigation.NavType.StringType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val key = backStackEntry.arguments?.getString("key").orEmpty()
+                            RpnAppsScreen(key = key)
+                        }
+                        composable("rpn/settings") { RpnSettingsScreen(navController) }
+                        composable("rpn/settings/exclude") { RpnExcludeCountriesScreen() }
+                        composable("rpn/stats") { RpnStatsScreen(navController) }
+                        composable(
+                            route = "rpn/heatmap/{start}/{end}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("start") {
+                                    type = androidx.navigation.NavType.LongType
+                                },
+                                androidx.navigation.navArgument("end") {
+                                    type = androidx.navigation.NavType.LongType
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val start = backStackEntry.arguments?.getLong("start") ?: 0L
+                            val end = backStackEntry.arguments?.getLong("end") ?: 0L
+                            RpnIntervalScreen(start = start, end = end)
+                        }
+                        composable("rpn/plus") { RpnPlusDashboardScreen(navController) }
+                        composable("rpn/plus/purchase") { RpnPurchaseRoute(navController) }
+                        composable("rpn/plus/manage") { RpnManagePurchaseScreen(navController) }
+                        composable("rpn/plus/support") { RpnSupportScreen(navController) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen(navController) }
                         composable(

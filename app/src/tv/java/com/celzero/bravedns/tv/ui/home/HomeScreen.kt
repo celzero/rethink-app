@@ -31,7 +31,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -40,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.tv.material3.Button
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -47,12 +51,18 @@ import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.Text
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.tv.ui.rpn.FocusableActionCard
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.common.WelcomeBanner
 import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
 import com.celzero.bravedns.tv.ui.common.rememberOnboardingState
+import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 /**
@@ -87,7 +97,7 @@ import org.koin.compose.koinInject
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController? = null) {
     val context = LocalContext.current
     val persistentState: PersistentState = koinInject()
     val appConfig: AppConfig = koinInject()
@@ -194,14 +204,58 @@ fun HomeScreen() {
                 blockedCount = blockedCount,
                 isOn = isOn,
             )
+            if (!Utilities.isFdroidFlavour()) {
+                RpnHomeCard(
+                    onClick = if (navController != null) {
+                        { navController.navigate("rpn") }
+                    } else {
+                        null
+                    },
+                )
+            }
         }
     }
 }
 
+/**
+ * RPN entry card, mirroring the phone home screen's proxy-card
+ * routing: shown when the device has (or had) an RPN subscription.
+ * Status is polled every 5s — RPN state has no observable to bind.
+ */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun StatusRow(
-    isOn: Boolean,
+private fun RpnHomeCard(onClick: (() -> Unit)?) {
+    var tick by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(5000)
+            tick++
+        }
+    }
+    val pair by produceState(initialValue = false to false, tick) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                RpnProxyManager.hasValidSubscription() to RpnProxyManager.isRpnActive()
+            }.getOrDefault(false to false)
+        }
+    }
+    val (subscribed, active) = pair
+    if (!subscribed && !active) return
+    FocusableActionCard(
+        title = "Rethink Private Network",
+        subtitle = if (active) {
+            "RPN is active — traffic exits via your selected locations."
+        } else {
+            "Subscription active, RPN not running."
+        },
+        valueText = "Manage ›",
+        onClick = onClick,
+    )
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun StatusRow(    isOn: Boolean,
     mode: AppConfig.BraveMode,
     connectedDns: String,
 ) {
