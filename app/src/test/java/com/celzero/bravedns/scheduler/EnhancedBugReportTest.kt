@@ -115,14 +115,20 @@ class EnhancedBugReportTest {
         assertEquals(ExceptionParser.TraceType.GO, parsed.type)
 
         val t = parsed.toThrowable(context = "${reportType(fileName)} $fileName")
-        assertEquals("[GoCrash $fileName] database is full", t.message)
+        // message = the source location line after `created by` (no prefix to shorten here)
+        assertEquals("/workspace/tunnel/start.go:41", t.message)
         val st = t.stackTrace
-        // `created by` (no trailing parens) is not a frame in the ExceptionParser dialect.
-        assertEquals(1, st.size)
-        assertEquals("github.com/celzero/firestack/tunnel.(*Writer)", st[0].className)
-        assertEquals("write", st[0].methodName)
-        assertEquals("/workspace/tunnel/writer.go", st[0].fileName)
-        assertEquals(87, st[0].lineNumber)
+        // synthetic top frame carries the go-panic headline for the Crashlytics issue title
+        assertEquals(2, st.size)
+        assertEquals("go-panic: database is full", st[0].className)
+        assertEquals("", st[0].methodName)
+        assertNull(st[0].fileName)
+        assertEquals(-1, st[0].lineNumber)
+        // real frame of the panicking goroutine; `created by` is not a frame
+        assertEquals("github.com/celzero/firestack/tunnel.(*Writer)", st[1].className)
+        assertEquals("write", st[1].methodName)
+        assertEquals("/workspace/tunnel/writer.go", st[1].fileName)
+        assertEquals(87, st[1].lineNumber)
     }
 
     // -- Legacy fallback path (no frames → RuntimeException with 2 KB preview) -------------

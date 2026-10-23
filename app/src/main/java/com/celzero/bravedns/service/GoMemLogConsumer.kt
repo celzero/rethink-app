@@ -33,7 +33,6 @@ import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.database.RpnLogRepository
-import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Daemons
@@ -44,9 +43,7 @@ import com.celzero.firestack.backend.LogConsumer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.io.BufferedOutputStream
 import java.io.FileDescriptor
-import java.io.FileOutputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -78,16 +75,12 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
     private val rpnLogRepository by inject<RpnLogRepository>()
 
     // Single-thread background dispatcher; all buffer processing is serialized here so
-    // prevLogLevel and tombstoneStream need no additional synchronization.
+    // prevLogLevel needs no additional synchronization.
     private val processor = Daemons.make("goMemLog")
 
     // Inherited log level for continuation lines that carry no level prefix.
     // Mutated only on [processor].
     private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.INFO
-
-    // Tombstone file stream opened lazily on first stacktrace slot, closed in onClose().
-    // Accessed only on [processor].
-    private var tombstoneStream: BufferedOutputStream? = null
 
     // @Volatile: drain() runs on Go JNI callback threads and concurrent drains
     // (buffer A and B can be consumed in parallel from separate goroutines) can
@@ -121,16 +114,12 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
 
             val goMem = GoMemLogConsumer(appContext, scope, slotSize)
 
-            scope.launch {
-                goMem.ensureTombstoneStreamReady()
-            }
-
             return goMem
         }
 
     }
 
-    // drain work items; Close keeps tombstone teardown FIFO-ordered after all in-flight drains
+    // drain work items
     private sealed interface DrainMsg
     private class DrainData(val buffer: ByteArray, val bytesRead: Int) : DrainMsg
     private object DrainClose : DrainMsg
@@ -144,25 +133,19 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
     }
 
     private suspend fun consumeDrains() {
-        try {
-            for (msg in drains) {
-                when (msg) {
-                    is DrainData -> {
-                        try {
-                            processBuffer(msg.buffer, msg.bytesRead)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            Logger.e(LOG_TAG_BUG_REPORT, "$TAG consumeDrains: processBuffer failed: ${e.message}", e)
-                        }
+        for (msg in drains) {
+            when (msg) {
+                is DrainData -> {
+                    try {
+                        processBuffer(msg.buffer, msg.bytesRead)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Logger.e(LOG_TAG_BUG_REPORT, "$TAG consumeDrains: processBuffer failed: ${e.message}", e)
                     }
-                    // tombstone teardown is handled by the finally block so it also
-                    // runs when the channel is closed with queued items remaining
-                    DrainClose -> return
                 }
+                DrainClose -> return
             }
-        } finally {
-            closeTombstoneStream()
         }
     }
 
@@ -259,8 +242,9 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
      * ```
      *
      * Normal-level rows are appended to [consoleBatch] or [rpnBatch] depending on whether the
-     * payload is RPN-related; stacktrace / user-level slots are handled purely side-effectually
-     * (tombstone file write / notification + VPN stop) and append nothing.
+     * payload is RPN-related; stacktrace slots are dropped (crash traces persist via the
+     * Console channel) and user-level slots trigger a notification + VPN stop. Neither
+     * appends anything.
      */
     private fun processSlot(
         buffer: ByteArray,
@@ -297,9 +281,8 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
 
         when {
             level.stacktrace() -> {
-                // Write level byte + payload bytes directly no String created.
-                ensureTombstoneStreamReady()
-                writeBytesToTombstone(buffer, offset, newlinePos - offset)
+                // crash traces are persisted via the Console channel (GoReportingHandler
+                // writes gocrash_ files); drop the slot here to avoid duplicate reports
                 return
             }
             level.user() -> {
@@ -381,49 +364,6 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
         cachedFd = fd
         cachedFdInt = fdInt
         return fd
-    }
-
-    /**
-     * Opens the tombstone [BufferedOutputStream] lazily on the first stacktrace slot.
-     * Subsequent calls are no-ops once [tombstoneStream] is non-null.
-     */
-    private fun ensureTombstoneStreamReady() {
-        if (tombstoneStream != null) return
-        val file = EnhancedBugReport.newGoLogFile(appContext) ?: run {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG ensureTombstoneStreamReady: newGoLogFile returned null")
-            return
-        }
-        try {
-            tombstoneStream = BufferedOutputStream(FileOutputStream(file, /* append= */ true))
-            Logger.d(LOG_TAG_BUG_REPORT, "$TAG ensureTombstoneStreamReady: ${file.absolutePath}")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG ensureTombstoneStreamReady: open failed: ${e.message}", e)
-        }
-    }
-
-    /**
-     * Writes [buffer][offset, offset+length) followed by a newline to the tombstone stream
-     * and flushes immediately so data survives a process crash mid-session.
-     * No [String] is allocated.
-     */
-    private fun writeBytesToTombstone(buffer: ByteArray, offset: Int, length: Int) {
-        try {
-            val bos = tombstoneStream ?: run {
-                Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeBytesToTombstone: stream null, bytes dropped")
-                return
-            }
-            bos.write(buffer, offset, length)
-            bos.write('\n'.code)
-            bos.flush()
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeBytesToTombstone: write failed: ${e.message}", e)
-        }
-    }
-
-    private fun closeTombstoneStream() {
-        try { tombstoneStream?.flush() } catch (_: Exception) {}
-        try { tombstoneStream?.close() } catch (_: Exception) {}
-        tombstoneStream = null
     }
 
     private fun showNwEngineNotification(msg: String) {

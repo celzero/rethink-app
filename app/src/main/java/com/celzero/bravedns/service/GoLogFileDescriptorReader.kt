@@ -27,7 +27,6 @@ import android.os.ParcelFileDescriptor
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Themes
@@ -39,20 +38,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 
 /**
  * Reads Go runtime logs from a file descriptor, line by line.
  *
  * The first byte of each line is the Go log level (see [Logger.LoggerLevel.fromChar]);
- * the remainder is the message payload.  Stacktrace-level lines are persisted to a
- * timestamped file under the tombstone directory; all other lines are forwarded to
- * the in-process logger.
+ * the remainder is the message payload.  Stacktrace-level lines are dropped (crash traces
+ * persist via the Console channel); all other lines are forwarded to the in-process
+ * logger.
  *
  * Owns a dup() of the Go-provided fd (via [FdHelper.duplicate]) so closing this reader
  * never closes Go's write end.
@@ -64,7 +59,6 @@ class GoLogFileDescriptorReader(
     private var appContext: Context? = null
 
     @Volatile private var prevLogLevel: Logger.LoggerLevel = Logger.LoggerLevel.INFO
-    private var writer: BufferedWriter? = null
 
     companion object {
         private const val TAG = "GoLogFd"
@@ -92,7 +86,6 @@ class GoLogFileDescriptorReader(
         Logger.d(LOG_TAG_BUG_REPORT, "$TAG start: fd duplicated, launching read loop")
 
         scope.launch(CoroutineName("goLogFd") + dispatcher) {
-            createCrashFile()
             readLoop(ownedFd)
         }
         return true
@@ -112,7 +105,6 @@ class GoLogFileDescriptorReader(
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BUG_REPORT, "$TAG readLoop: error: ${e.message}", e)
         } finally {
-            closeWriter()
             try { reader.close() } catch (_: Exception) {}
             try { pfd.close() } catch (_: Exception) {}
             Logger.d(LOG_TAG_BUG_REPORT, "$TAG readLoop: cleaned up")
@@ -138,7 +130,8 @@ class GoLogFileDescriptorReader(
         }
 
         if (level.stacktrace()) {
-            writeLine(line)
+            // crash traces are persisted via the Console channel (GoReportingHandler
+            // writes gocrash_ files); drop the line here to avoid duplicate reports
         } else if (level.user()) {
             val ctx = appContext
             if (ctx == null) {
@@ -177,53 +170,5 @@ class GoLogFileDescriptorReader(
         builder.color = ContextCompat.getColor(ctx, getAccentColor(Themes.SYSTEM_DEFAULT.id))
         notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "nw eng notification: $msg")
-    }
-
-    /**
-     * Appends [line] to the session file, creating the file lazily on first call.
-     */
-    private fun writeLine(line: String) {
-        try {
-            if (writer == null && createCrashFile() == null) {
-                Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeLine: failed to create log file, line dropped")
-                return
-            }
-            writer!!.write(line)
-            writer!!.newLine()
-            writer!!.flush() // flush per line so data survives a process crash mid-session
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG writeLine: write failed: ${e.message}", e)
-        }
-    }
-
-    private fun closeWriter() {
-        try { writer?.flush() } catch (_: Exception) {}
-        try { writer?.close() } catch (_: Exception) {}
-        writer = null
-    }
-
-    /**
-     * Creates a new golog_<ts>.txt file and opens a [BufferedWriter] in append mode.
-     * Sets [writer] on success.  Returns the [File] on success, null on any failure.
-     */
-    private fun createCrashFile(): File? {
-        val ctx = appContext ?: run {
-            Logger.w(LOG_TAG_BUG_REPORT, "$TAG createCrashFile: missing app context")
-            return null
-        }
-        val file = EnhancedBugReport.newGoLogFile(ctx) ?: run {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile: newGoLogFile returned null")
-            return null
-        }
-        return try {
-            writer = BufferedWriter(
-                OutputStreamWriter(FileOutputStream(file, /* append= */ true), Charsets.UTF_8)
-            )
-            Logger.d(LOG_TAG_BUG_REPORT, "$TAG createCrashFile: ${file.absolutePath}")
-            file
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "$TAG createCrashFile: failed to open writer: ${e.message}", e)
-            null
-        }
     }
 }
