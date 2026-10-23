@@ -1590,6 +1590,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 io("preventDnsLeaks") { setTunMode() }
             }
 
+            PersistentState.CUSTOM_SOCKS5_ENABLED -> {
+                io("socks5") {
+                    handleCustomSocks5Change()
+                }
+                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+            }
+
             PersistentState.PROXY_TYPE -> {
                 io("proxy") {
                     handleProxyChange()
@@ -1926,17 +1933,26 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
 
             AppConfig.ProxyProvider.CUSTOM -> {
-                // custom either means socks5 or http proxy
-                // socks5 proxy requires app to be excluded from vpn, so restart vpn
-                val isSocks5 = tunProxyMode == AppConfig.TunProxyMode.SOCKS5
-                val reason = if (isSocks5) {
-                    "customProxy: ${appConfig.getSocks5ProxyDetails()}"
-                } else {
-                    "customProxy: ${appConfig.getHttpProxyDetails()}"
-                }
+                // custom provider is the http proxy; custom socks5 has its own flag, see
+                // handleCustomSocks5Change. the proxy app may need to be excluded from vpn,
+                // so restart vpn
+                val reason = "customProxy: ${appConfig.getHttpProxyDetails()}"
                 vpnRestartTrigger.value = reason
                 vpnAdapter?.setCustomProxy(tunProxyMode)
             }
+        }
+    }
+
+    private suspend fun handleCustomSocks5Change() {
+        val enabled = appConfig.isCustomSocks5Enabled()
+        Logger.i(LOG_TAG_VPN, "handle custom socks5 change, enabled? $enabled")
+        // the socks5 forwarder app is excluded from the vpn while socks5 is on, so restart vpn
+        val ep = appConfig.getSocks5ProxyDetails()
+        vpnRestartTrigger.value = "customSocks5: $enabled, ${ep?.proxyIP}:${ep?.proxyPort}"
+        if (enabled) {
+            vpnAdapter?.readdSocks5Proxy()
+        } else {
+            vpnAdapter?.removeCustomSocks5Proxy()
         }
     }
 
@@ -4020,6 +4036,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     suspend fun readdSocks5Proxy() {
         logd("readd socks5 proxy")
         vpnAdapter?.readdSocks5Proxy()
+    }
+
+    // the forwarder app is excluded when the tunnel is built, so a new one needs a restart
+    fun onCustomSocks5ForwarderChanged() {
+        logd("custom socks5 forwarder changed")
+        io("socks5Fwdr") { handleCustomSocks5Change() }
     }
 
     suspend fun readdHttpProxy() {

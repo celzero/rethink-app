@@ -1162,16 +1162,20 @@ class GoVpnAdapter : KoinComponent {
         setHttpProxyIfNeeded(appConfig.getTunProxyMode())
     }
 
+    // orbot socks5 lives in the provider slot while custom socks5 has its own flag, so the two
+    // are registered independently (as ID_ORBOT_BASE and ID_S5_BASE)
     private suspend fun setSocks5TunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
-        val socksEnabled = AppConfig.ProxyType.of(appConfig.getProxyType()).isSocks5Enabled()
-        if (!socksEnabled) return
+        val orbotSocks5 = tunProxyMode.isTunProxyOrbot() &&
+            AppConfig.ProxyType.of(appConfig.getProxyType()).isSocks5Enabled()
+        if (orbotSocks5) {
+            addSocks5Endpoint(tunProxyMode, appConfig.getConnectedOrbotProxy())
+        }
+        if (appConfig.isCustomSocks5Enabled()) {
+            addSocks5Endpoint(AppConfig.TunProxyMode.SOCKS5, appConfig.getSocks5ProxyDetails())
+        }
+    }
 
-        val socks5: ProxyEndpoint? =
-            if (tunProxyMode.isTunProxyOrbot()) {
-                appConfig.getConnectedOrbotProxy()
-            } else {
-                appConfig.getSocks5ProxyDetails()
-            }
+    private suspend fun addSocks5Endpoint(tunProxyMode: AppConfig.TunProxyMode, socks5: ProxyEndpoint?) {
         if (socks5 == null) {
             Logger.w(
                 LOG_TAG_VPN,
@@ -1187,6 +1191,22 @@ class GoVpnAdapter : KoinComponent {
             socks5.proxyPort
         )
         Logger.i(LOG_TAG_VPN, "$TAG Socks5 mode set: " + socks5.proxyIP + "," + socks5.proxyPort)
+    }
+
+    suspend fun removeCustomSocks5Proxy() {
+        if (!tunnel.isConnected) {
+            Logger.w(LOG_TAG_VPN, "$TAG no tunnel, skip remove socks5")
+            return
+        }
+        try {
+            getProxies()?.removeProxy(ProxyManager.ID_S5_BASE)
+            // the proxy is no longer in the tunnel, do not re-add it
+            GlobalProxyHandler.untrack(ProxyManager.ID_S5_BASE)
+            logEvent(Severity.LOW, "remove socks5 proxy", "removed custom socks5 proxy")
+            Logger.i(LOG_TAG_VPN, "$TAG removed custom socks5 proxy")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err removing socks5 proxy: ${e.message}", e)
+        }
     }
 
     suspend fun getProxyStatusById(id: String): Pair<Int?, String> {

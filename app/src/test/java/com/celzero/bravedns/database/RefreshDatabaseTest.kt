@@ -76,6 +76,7 @@ class RefreshDatabaseTest {
         coEvery { FirewallManager.load() } returns 0
         coEvery { IpRulesManager.load() } returns 0
         coEvery { ProxyManager.load() } returns 0
+        coEvery { ProxyManager.migrateCustomSocks5IfNeeded() } just Runs
         coEvery { WireguardManager.load(any()) } returns 0
         coEvery { WgHopManager.load(any()) } returns 0
         coEvery { RpnProxyManager.load() } returns 0

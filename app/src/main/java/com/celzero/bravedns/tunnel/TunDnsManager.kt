@@ -638,9 +638,10 @@ object TunDnsManager: KoinComponent {
         val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, "", 0, domain, usesCellularNw, ssid) else emptyList()
 
         val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
-        return if (appConfig.isCustomSocks5Enabled()) {
+        // custom socks5 routes only the apps mapped to it; other apps fall through
+        return if (appConfig.isCustomSocks5Enabled() && ProxyManager.isAppRoutedViaSocks5(uid)) {
             val id = proxyIdBuilder(ProxyManager.ID_S5_BASE, emptyOrDefault)
-            logd("(onQuery-pid)customSocks5 enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
+            logd("(onQuery-pid)customSocks5 enabled for app, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
             rpnIds.plus(id).joinToString(":")
         } else if (appConfig.isCustomHttpProxyEnabled()) {
             val id = proxyIdBuilder(ProxyManager.ID_HTTP_BASE, emptyOrDefault)

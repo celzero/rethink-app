@@ -47,6 +47,8 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.SmartDnsEndpoint
 import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.EventLogger
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
@@ -1060,28 +1062,46 @@ internal constructor(
             return
         }
 
-        // If add proxy request is custom proxy (either http/socks5), check if the other
-        // proxy is already set. if yes, then make the proxy type as HTTP_SOCKS5.
-        val currentProxyType = ProxyType.of(getProxyType())
-        if (proxyType.isProxyTypeHttp()) {
-            if (currentProxyType.isProxyTypeSocks5()) {
-                setProxy(ProxyType.HTTP_SOCKS5, provider)
-                return
-            }
-            setProxy(ProxyType.HTTP, provider)
-            return
+        // custom socks5 does not occupy the provider slot; it runs alongside wireguard,
+        // orbot or the custom http proxy and routes only the apps mapped to it
+        if (proxyType.isSocks5Enabled()) {
+            setCustomSocks5(true)
         }
 
-        if (proxyType.isProxyTypeSocks5()) {
-            if (currentProxyType.isProxyTypeHttp()) {
-                setProxy(ProxyType.HTTP_SOCKS5, provider)
-                return
-            }
-            setProxy(ProxyType.SOCKS5, provider)
-            return
+        if (proxyType.isProxyTypeHasHttp()) {
+            setProxy(ProxyType.HTTP, provider)
         }
     }
 
+    private fun setCustomSocks5(enabled: Boolean) {
+        if (persistentState.customSocks5Enabled == enabled) return
+        persistentState.customSocks5Enabled = enabled
+        persistentState.updateProxyStatus()
+    }
+
+    // moves the pre-0.5.8 CUSTOM/SOCKS5 provider state over to customSocks5Enabled. back then
+    // socks5 routed every app, so all apps not already routed via another proxy are mapped to
+    // it to keep the behaviour. must run after FirewallManager and ProxyManager are loaded.
+    suspend fun migrateCustomSocks5IfNeeded() {
+        if (persistentState.customSocks5Migrated) return
+
+        val provider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        val type = ProxyType.of(persistentState.proxyType)
+        if (provider.isProxyProviderCustom() && type.isSocks5Enabled()) {
+            if (type.isProxyTypeHttpSocks5()) {
+                setProxy(ProxyType.HTTP, ProxyProvider.CUSTOM)
+            } else {
+                setProxy(ProxyType.NONE, ProxyProvider.NONE)
+            }
+            ProxyManager.setProxyIdForUnselectedApps(ProxyManager.ID_S5_BASE, ProxyType.SOCKS5.name)
+            setCustomSocks5(true)
+            Logger.i(LOG_TAG_VPN, "migrated custom socks5 from provider slot, type: $type")
+        }
+        persistentState.customSocks5Migrated = true
+    }
+
+    // resets the provider slot (wireguard, orbot, tcp, custom http); custom socks5 is left
+    // as is, see removeProxy(SOCKS5, CUSTOM) to turn it off
     fun removeAllProxies() {
         removeOrbot()
         persistentState.proxyProvider = ProxyProvider.NONE.name
@@ -1094,6 +1114,11 @@ internal constructor(
     }
 
     fun removeProxy(removeType: ProxyType, removeProvider: ProxyProvider) {
+        if (removeProvider.isProxyProviderCustom() && removeType.isProxyTypeSocks5()) {
+            setCustomSocks5(false)
+            return
+        }
+
         val currentProxyType = ProxyType.of(getProxyType())
 
         if (currentProxyType.isProxyTypeHttpSocks5()) {
@@ -1153,8 +1178,8 @@ internal constructor(
                 return TunProxyMode.SOCKS5
             }
             ProxyType.HTTP_SOCKS5.name -> {
-                // FIXME: tunnel does not support both http and socks5 at once.
-                return TunProxyMode.SOCKS5
+                // only reachable for orbot (handled above) or un-migrated custom state
+                return TunProxyMode.HTTPS
             }
         }
         return TunProxyMode.NONE
@@ -1170,12 +1195,7 @@ internal constructor(
     }
 
     fun isCustomSocks5Enabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        // return false if the proxy provider is not custom
-        if (!proxyProvider.isProxyProviderCustom()) return false
-
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isProxyTypeSocks5() || proxyType.isProxyTypeHttpSocks5()
+        return persistentState.customSocks5Enabled
     }
 
     fun isOrbotProxyEnabled(): Boolean {
@@ -1189,6 +1209,8 @@ internal constructor(
     }
 
     fun isProxyEnabled(): Boolean {
+        if (isCustomSocks5Enabled()) return true
+
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         if (proxyProvider.isProxyProviderNone()) return false
 
@@ -1200,10 +1222,9 @@ internal constructor(
         return !getBraveMode().isDnsMode()
     }
 
+    // custom socks5 can run with any provider (wireguard, orbot, http)
     fun canEnableSocks5Proxy(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return !getBraveMode().isDnsMode()
     }
 
     fun canEnableWireguardProxy(): Boolean {
@@ -1238,10 +1259,26 @@ internal constructor(
         return proxyEndpointRepository.getConnectedHttpProxy()
     }
 
+    // saves the endpoint and turns custom socks5 on
     suspend fun updateCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
+        val wasEnabled = isCustomSocks5Enabled()
+        saveCustomSocks5Endpoint(proxyEndpoint)
+        if (!wasEnabled) addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
+    }
+
+    // saves the endpoint without changing the on/off state; a running socks5 picks it up now
+    suspend fun saveCustomSocks5Endpoint(proxyEndpoint: ProxyEndpoint) {
+        val prevFwdr = getSocks5ProxyDetails()?.proxyAppName.orEmpty()
         proxyEndpointRepository.update(proxyEndpoint)
         customSocks5Endpoint = proxyEndpoint
-        addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
+        if (!isCustomSocks5Enabled()) return
+
+        // the flag does not change, so the pref listener won't fire; re-add directly
+        if (prevFwdr != proxyEndpoint.proxyAppName.orEmpty()) {
+            VpnController.onCustomSocks5ForwarderChanged()
+        } else {
+            VpnController.readdSocks5Proxy()
+        }
     }
 
     suspend fun updateOrbotProxy(proxyEndpoint: ProxyEndpoint) {

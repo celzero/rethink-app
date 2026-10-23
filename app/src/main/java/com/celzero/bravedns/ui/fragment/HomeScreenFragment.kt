@@ -574,7 +574,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             when {
                 isRpnOwned && appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY)
                 isRpnOwned -> openRpnServerSelection()
-                appConfig.isWireGuardEnabled() -> startActivity(ScreenType.PROXY_WIREGUARD)
+                // with socks5 also on, land on the combined screen that shows both
+                appConfig.isWireGuardEnabled() && !appConfig.isCustomSocks5Enabled() ->
+                    startActivity(ScreenType.PROXY_WIREGUARD)
                 else -> startActivity(ScreenType.PROXY)
             }
             logEvent(
@@ -1115,11 +1117,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // get proxy type from app config
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
 
-        if (proxyType.isProxyTypeWireguard() || RpnProxyManager.isRpnActive()) {
+        // custom socks5 can run alongside wireguard / rpn, so it is counted with them
+        val isSocks5 = appConfig.isCustomSocks5Enabled()
+        if (proxyType.isProxyTypeWireguard() || RpnProxyManager.isRpnActive() || isSocks5) {
             withContext(Dispatchers.IO) {
                 if (view == null || !isAdded) return@withContext
 
-                val proxies = WireguardManager.getActiveConfigs()
+                val proxies =
+                    if (proxyType.isProxyTypeWireguard()) WireguardManager.getActiveConfigs() else emptyList()
                 val rpnProxies = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getEnabledConfigs() else emptyList()
                 var active = 0
                 var failing = 0
@@ -1128,7 +1133,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 Logger.v(LOG_TAG_UI, "$TAG active proxies; wg: ${proxies.size}, rpn: ${rpnProxies.size}")
 
                 // If no proxies are configured but WireGuard/rpn is enabled, show appropriate message
-                if (proxies.isEmpty() && rpnProxies.isEmpty()) {
+                if (proxies.isEmpty() && rpnProxies.isEmpty() && !isSocks5) {
                     // counts are pending, but the RPN stopped flag is
                     // independent of them
                     val stoppedCount =
@@ -1159,8 +1164,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     idle = triple.third
                     Logger.v(LOG_TAG_UI, "$TAG rpn proxy status: act: $active, fail: $failing, idle: $idle")
                 }
+                if (isSocks5) {
+                    val triple = getProxyStatus(ProxyManager.ID_S5_BASE, now, active, failing, idle)
+                    active = triple.first
+                    failing = triple.second
+                    idle = triple.third
+                    Logger.v(LOG_TAG_UI, "$TAG socks5 proxy status: act: $active, fail: $failing, idle: $idle")
+                }
 
                 val isBoth = proxies.isNotEmpty() && rpnProxies.isNotEmpty()
+                // headline lists every kind of proxy that is on, e.g. "WireGuard / SOCKS5"
+                val headlines = buildList {
+                    if (rpnProxies.isNotEmpty()) add(getString(R.string.rpn_title))
+                    if (proxies.isNotEmpty()) add(getString(R.string.lbl_wireguard))
+                    if (isSocks5) add(getString(R.string.lbl_socks5))
+                }
 
                 val isRpnStopped = RpnProxyManager.hasValidSubscription() && !RpnProxyManager.isRpnActive()
                 val rpnStoppedCount = if (isRpnStopped) RpnProxyManager.getEnabledConfigs().size else 0
@@ -1185,7 +1203,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         Logger.w(LOG_TAG_UI, "$TAG proxy status empty but proxies exist, health row shows no state")
                     }
 
-                    if (isBoth) {
+                    if (isSocks5 && headlines.size > 1) {
+                        b.fhsCardOtherProxyCount.isSelected = true
+                        b.fhsCardOtherProxyCount.setTextAnimated(headlines.joinToString(" / "))
+                    } else if (isSocks5) {
+                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_socks5))
+                    } else if (isBoth) {
                         b.fhsCardOtherProxyCount.isSelected = true
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.two_argument, getString(R.string.rpn_title), getString(R.string.lbl_wireguard)))
                     } else if (rpnProxies.isNotEmpty()) {
@@ -1259,7 +1282,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         var idle = i
         Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
 
-        val isRpn = proxyId.startsWith(Backend.RpnWin)
+        // socks5 has neither a per-proxy dns nor a wireguard handshake, so it is judged by
+        // its status the same way rpn is
+        val isRpn = proxyId.startsWith(Backend.RpnWin) || proxyId == ProxyManager.ID_S5_BASE
 
         val stats = VpnController.getProxyStats(proxyId)
         val statusPair = VpnController.getProxyStatusById(proxyId)
@@ -3589,12 +3614,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
             } else if (
-                (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) &&
+                appConfig.isCustomSocks5Enabled() &&
+                (appConfig.isCustomHttpProxyEnabled() || appConfig.isWireGuardEnabled()) &&
                 isPrivateDnsActive(requireContext())
-            ) { // SOCKS5 + Http + PrivateDns
+            ) { // SOCKS5 + (Http or WireGuard) + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
-            } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
+            } else if (
+                appConfig.isCustomSocks5Enabled() &&
+                (appConfig.isCustomHttpProxyEnabled() || appConfig.isWireGuardEnabled())
+            ) {
                 statusId = R.string.status_protected_with_proxy
             } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_socks5_private_dns

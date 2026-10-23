@@ -1354,12 +1354,8 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                         }
                     }
                     CheckType.SOCKS5 -> {
-                        if (!proxiesRemoved) {
-                            val pt = AppConfig.ProxyType.valueOf(appConfig.getProxyType())
-                            val pp = AppConfig.ProxyProvider.valueOf(appConfig.getProxyProvider())
-                            appConfig.removeProxy(pt, pp)
-                            proxiesRemoved = true
-                        }
+                        // custom socks5 is independent of the provider slot, turn off only it
+                        appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                     }
                     CheckType.ANTI_CENSORSHIP -> {
                         // Set anti-censorship to the lockdown-compatible "hybrid" state:

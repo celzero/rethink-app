@@ -419,11 +419,57 @@ class ProxyManagerTest : KoinTest {
     // ========================================================================
 
     @Test
-    fun `app can belong to multiple WG tunnels simultaneously`() = runBlocking {
+    fun `app routed via one WG tunnel cannot be added to another`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, ""))
+        assertTrue(ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0"))
+        assertFalse(ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId1, "T1"))
+        assertEquals(setOf(wgProxyId0), ProxyManager.getProxyIdsForApp(uid1))
+    }
+
+    @Test
+    fun `WG and custom socks5 share one exclusive app assignment`() = runBlocking {
+        val s5 = ProxyManager.ID_S5_BASE
+        loadMappings(pam(uid1, pkg1, ""), pam(uid2, pkg2, ""))
+        assertTrue(ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0"))
+        assertTrue(ProxyManager.addProxyToApp(uid2, pkg2, s5, "SOCKS5"))
+
+        assertFalse(ProxyManager.addProxyToApp(uid1, pkg1, s5, "SOCKS5"))
+        assertFalse(ProxyManager.addProxyToApp(uid2, pkg2, wgProxyId0, "T0"))
+        assertEquals(wgProxyId0, ProxyManager.getExclusiveOwner(uid1, pkg1, s5))
+        assertEquals(s5, ProxyManager.getExclusiveOwner(uid2, pkg2, wgProxyId1))
+        assertTrue(ProxyManager.isAppRoutedViaSocks5(uid2))
+        assertFalse(ProxyManager.isAppRoutedViaSocks5(uid1))
+    }
+
+    @Test
+    fun `exclusive owner is released when the app is removed from it`() = runBlocking {
         loadMappings(pam(uid1, pkg1, ""))
         ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")
-        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId1, "T1")
-        assertTrue(ProxyManager.getProxyIdsForApp(uid1).containsAll(listOf(wgProxyId0, wgProxyId1)))
+        ProxyManager.removeProxyFromApp(uid1, pkg1, wgProxyId0)
+        assertTrue(ProxyManager.addProxyToApp(uid1, pkg1, ProxyManager.ID_S5_BASE, "SOCKS5"))
+    }
+
+    @Test
+    fun `rpn still chains with an exclusive WG assignment`() = runBlocking {
+        loadMappings(pam(uid1, pkg1, ""))
+        ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0")
+        assertTrue(ProxyManager.addProxyToApp(uid1, pkg1, rpnProxyId, rpnServerKey))
+        assertTrue(ProxyManager.getProxyIdsForApp(uid1).containsAll(listOf(wgProxyId0, rpnProxyId)))
+    }
+
+    @Test
+    fun `setProxyIdForAllApps skips apps owned by another exclusive proxy`() = runBlocking {
+        val s5 = ProxyManager.ID_S5_BASE
+        loadMappings(pam(uid1, pkg1, ""), pam(uid2, pkg2, ""), pam(uid1, pkg1, wgProxyId0))
+        coEvery { FirewallManager.getAllApps() } returns
+            setOf(FirewallManager.AppInfoTuple(uid1, pkg1), FirewallManager.AppInfoTuple(uid2, pkg2))
+        coEvery { FirewallManager.getAppInfoByUidAndPackage(uid1, pkg1) } returns appInfo1
+        coEvery { FirewallManager.getAppInfoByUidAndPackage(uid2, pkg2) } returns appInfo2
+
+        ProxyManager.setProxyIdForAllApps(s5, "SOCKS5")
+
+        assertFalse(ProxyManager.getProxyIdsForApp(uid1).contains(s5))
+        assertTrue(ProxyManager.getProxyIdsForApp(uid2).contains(s5))
     }
 
     @Test

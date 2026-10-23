@@ -89,6 +89,9 @@
             android:name=".ui.activity.ProxySettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.activity.Socks5ConfigActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.activity.MiscSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
