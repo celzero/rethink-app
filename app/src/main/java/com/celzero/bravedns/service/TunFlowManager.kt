@@ -1278,8 +1278,9 @@ object TunFlowManager : KoinComponent {
             }
         }
 
-        // app-mapped socks5 traffic is returned before wireguard (see above); here only the
-        // socks5 forwarder app is handled, apps not mapped to socks5 fall through
+        // app-mapped socks5 traffic is returned before wireguard (see above); here the
+        // socks5 forwarder app is handled, and in simple mode every app wireguard and orbot
+        // did not take goes to socks5
         if (appConfig.isCustomSocks5Enabled()) {
             val endpoint = appConfig.getSocks5ProxyDetails()
             if (endpoint == null) {
@@ -1294,6 +1295,11 @@ object TunFlowManager : KoinComponent {
                 }
                 logd("flow/upstream: socks5 $splAppProxy for $packageName, $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
                 return persistAndConstructFlowResponse(ctx, connTracker, splAppProxy, connId, uid, forUpstreamAnswer)
+            }
+            if (appConfig.isCustomSocks5AllApps()) {
+                val pids = (rpnIds + ProxyManager.ID_S5_BASE).joinToString(",")
+                logd("flow/upstream: socks5 (all apps) for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}, returning $pids")
+                return persistAndConstructFlowResponse(ctx, connTracker, pids, connId, uid, forUpstreamAnswer)
             }
         }
 

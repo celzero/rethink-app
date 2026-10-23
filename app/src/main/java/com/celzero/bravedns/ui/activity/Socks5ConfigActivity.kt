@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -43,6 +44,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_S5_BASE
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
@@ -52,11 +54,13 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.backend.RouterStats
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -68,8 +72,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Custom SOCKS5 proxy screen, opened from proxy settings the same way a WireGuard config is.
- * Holds the on/off state, the apps routed via SOCKS5 (shared, exclusive picker), the server
- * endpoint and the forwarder app options.
+ * Holds the on/off state, the mode (simple: all apps, advanced: the apps picked in the shared,
+ * exclusive picker), the server endpoint and the forwarder app options.
  */
 class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
     private val b by viewBinding(ActivitySocks5ConfigBinding::bind)
@@ -92,6 +96,9 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
 
     private val enableListener =
         CompoundButton.OnCheckedChangeListener { _, checked -> onEnableToggled(checked) }
+
+    private val loopbackListener =
+        CompoundButton.OnCheckedChangeListener { _, checked -> onLoopbackToggled(checked) }
 
     companion object {
         private const val STATS_POLL_MS = 2_000L
@@ -190,12 +197,17 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
         }
     }
 
-    // on/off switch, lockdown hints, app count; everything that may change outside this screen
+    // on/off switch, mode, lockdown hints, app count; everything that may change outside this screen
     private fun refreshStateUi() {
         setEnableSwitch(appConfig.isCustomSocks5Enabled())
+        showMode(persistentState.customSocks5AllApps)
 
+        // in android's vpn lockdown the forwarder can't be kept out of the tunnel (see
+        // BraveVPNService), so it is always looped back; show that instead of the setting
         val vpnLockdown = VpnController.isVpnLockdown()
-        b.loopbackSwitch.isChecked = !persistentState.excludeAppsInProxy
+        b.loopbackSwitch.setOnCheckedChangeListener(null)
+        b.loopbackSwitch.isChecked = vpnLockdown || !persistentState.excludeAppsInProxy
+        b.loopbackSwitch.setOnCheckedChangeListener(loopbackListener)
         b.loopbackSwitch.isEnabled = !vpnLockdown
         b.loopbackRl.alpha = if (vpnLockdown) 0.5f else 1f
         b.lockdownDesc.visibility = if (vpnLockdown) View.VISIBLE else View.GONE
@@ -211,11 +223,66 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
             val count = ProxyManager.getAppCountForProxy(ID_S5_BASE)
             uiCtx {
                 b.appsLabel.text = getString(R.string.settings_socks5_apps_btn, count.toString())
-                b.noAppsHint.visibility =
-                    if (count == 0 && appConfig.isCustomSocks5Enabled()) View.VISIBLE
-                    else View.GONE
+                val noApps =
+                    count == 0 &&
+                        appConfig.isCustomSocks5Enabled() &&
+                        !persistentState.customSocks5AllApps
+                b.noAppsHint.visibility = if (noApps) View.VISIBLE else View.GONE
             }
         }
+    }
+
+    // simple mode routes all apps, so there is nothing to pick
+    private fun showMode(allApps: Boolean) {
+        if (allApps) {
+            selectToggleBtnUi(b.simpleToggleBtn)
+            unselectToggleBtnUi(b.advancedToggleBtn)
+            b.appsBtn.visibility = View.GONE
+            b.appsDescText.text = getString(R.string.socks5_simple_desc)
+        } else {
+            selectToggleBtnUi(b.advancedToggleBtn)
+            unselectToggleBtnUi(b.simpleToggleBtn)
+            b.appsBtn.visibility = View.VISIBLE
+            b.appsDescText.text = getString(R.string.socks5_apps_desc)
+        }
+    }
+
+    private fun selectToggleBtnUi(btn: MaterialButton) {
+        btn.backgroundTintList =
+            ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.accentGood))
+        btn.setTextColor(fetchColor(this, R.attr.homeScreenHeaderTextColor))
+    }
+
+    private fun unselectToggleBtnUi(btn: MaterialButton) {
+        btn.backgroundTintList =
+            ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
+        btn.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+    }
+
+    // one-wg and catch-all wireguard also take every app; only one of them can
+    private fun isWireguardRoutingAllApps(): Boolean {
+        return WireguardManager.oneWireGuardEnabled() ||
+            WireguardManager.getActiveCatchAllConfig().isNotEmpty()
+    }
+
+    private fun onModePicked(allApps: Boolean) {
+        if (allApps == persistentState.customSocks5AllApps) {
+            showMode(allApps)
+            return
+        }
+        if (allApps && isWireguardRoutingAllApps()) {
+            showToastUiCentered(
+                this,
+                getString(R.string.socks5_all_apps_wg_conflict),
+                Toast.LENGTH_LONG,
+            )
+            showMode(false)
+            return
+        }
+        persistentState.customSocks5AllApps = allApps
+        showMode(allApps)
+        refreshAppCount()
+        logEvent("Custom SOCKS5 mode changed", "custom SOCKS5 all apps: $allApps")
     }
 
     private fun setEnableSwitch(checked: Boolean) {
@@ -226,6 +293,9 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
 
     private fun setupClickListeners() {
         b.enableSwitch.setOnCheckedChangeListener(enableListener)
+
+        b.simpleToggleBtn.setOnClickListener { onModePicked(allApps = true) }
+        b.advancedToggleBtn.setOnClickListener { onModePicked(allApps = false) }
 
         b.appsBtn.setOnClickListener { openAppsPicker() }
 
@@ -246,17 +316,18 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
             if (b.loopbackSwitch.isEnabled) b.loopbackSwitch.isChecked = !b.loopbackSwitch.isChecked
         }
 
-        b.loopbackSwitch.setOnCheckedChangeListener { _, checked ->
-            if (persistentState.excludeAppsInProxy != !checked) {
-                persistentState.excludeAppsInProxy = !checked
-                logEvent(
-                    "loopback proxy forwarder apps SOCKS5 Proxy toggled",
-                    "loopback proxy forwarder apps in SOCKS5 proxy: $checked",
-                )
-            }
-        }
+        b.loopbackSwitch.setOnCheckedChangeListener(loopbackListener)
 
         b.lockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
+    }
+
+    private fun onLoopbackToggled(checked: Boolean) {
+        if (persistentState.excludeAppsInProxy == !checked) return
+        persistentState.excludeAppsInProxy = !checked
+        logEvent(
+            "loopback proxy forwarder apps SOCKS5 Proxy toggled",
+            "loopback proxy forwarder apps in SOCKS5 proxy: $checked",
+        )
     }
 
     private fun onEnableToggled(checked: Boolean) {
@@ -272,6 +343,16 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
                 this,
                 getString(R.string.settings_lock_down_proxy_desc),
                 Toast.LENGTH_SHORT,
+            )
+            setEnableSwitch(false)
+            return
+        }
+
+        if (persistentState.customSocks5AllApps && isWireguardRoutingAllApps()) {
+            showToastUiCentered(
+                this,
+                getString(R.string.socks5_all_apps_wg_conflict),
+                Toast.LENGTH_LONG,
             )
             setEnableSwitch(false)
             return
@@ -391,8 +472,8 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
                         Toast.LENGTH_SHORT,
                     )
                 }
-                // socks5 routes no app until some are picked
-                if (enable && noApps) openAppsPicker()
+                // in advanced mode socks5 routes no app until some are picked
+                if (enable && noApps && !persistentState.customSocks5AllApps) openAppsPicker()
             }
         }
     }
@@ -556,17 +637,13 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
 
         val baseText =
             getString(UIUtils.getProxyStatusStringRes(status.id)).replaceFirstChar(Char::titlecase)
-        val lastOk = stats?.lastOK ?: 0L
-        if (lastOk == 0L) return baseText
+        // firestack reports a socks5 lastOK of "now" on every read, so show the uptime instead
+        val since = stats?.since ?: 0L
+        val upMs = System.currentTimeMillis() - since
+        if (since <= 0L || upMs < 0L) return baseText
 
-        val since =
-            DateUtils.getRelativeTimeSpanString(
-                lastOk,
-                System.currentTimeMillis(),
-                DateUtils.MINUTE_IN_MILLIS,
-                DateUtils.FORMAT_ABBREV_RELATIVE,
-            )
-        return getString(R.string.about_version_install_source, baseText, since.toString())
+        val uptime = DateUtils.formatElapsedTime(upMs / DateUtils.SECOND_IN_MILLIS)
+        return getString(R.string.socks5_uptime, baseText, uptime)
     }
 
     private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {

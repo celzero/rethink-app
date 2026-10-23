@@ -83,6 +83,7 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -97,9 +98,11 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     private val eventLogger by inject<EventLogger>()
     private val rdb by inject<RefreshDatabase>()
     private lateinit var animation: Animation
+    private var statusJob: Job? = null
 
     companion object {
         private const val REFRESH_TIMEOUT: Long = 4000
+        private const val STATUS_POLL_MS = 2_000L
         private const val ANIMATION_DURATION = 750L
         private const val ANIMATION_REPEAT_COUNT = -1
         private const val ANIMATION_PIVOT_VALUE = 0.5f
@@ -151,6 +154,26 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         displayRpnUi()
         // socks5 may have changed in its own screen
         refreshSocks5Status()
+        startStatusPolling()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        statusJob?.cancel()
+        statusJob = null
+    }
+
+    // keeps the wireguard / socks5 status lines (and their "x ago" times) current
+    private fun startStatusPolling() {
+        statusJob?.cancel()
+        statusJob =
+            lifecycleScope.launch {
+                while (true) {
+                    kotlinx.coroutines.delay(STATUS_POLL_MS)
+                    displayWireguardUi()
+                    refreshSocks5Status()
+                }
+            }
     }
 
     private fun initView() {
@@ -597,7 +620,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 DateUtils.getRelativeTimeSpanString(
                         stats.lastOK,
                         now,
-                        DateUtils.MINUTE_IN_MILLIS,
+                        DateUtils.SECOND_IN_MILLIS,
                         DateUtils.FORMAT_ABBREV_RELATIVE,
                     )
                     .toString()

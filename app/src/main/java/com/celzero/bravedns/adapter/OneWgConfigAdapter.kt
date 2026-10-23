@@ -465,7 +465,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             return DateUtils.getRelativeTimeSpanString(
                 stats.lastOK,
                 now,
-                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.SECOND_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
         }
@@ -509,6 +509,19 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     Utilities.showToastUiCentered(
                         context,
                         context.getString(R.string.wireguard_dns_mode_conflict),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            if (WireguardManager.isSocks5AllAppsOn()) {
+                Logger.i(LOG_TAG_PROXY, "socks5 routes all apps, cannot enable one-wg")
+                uiCtx {
+                    b.oneWgCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.wireguard_socks5_all_apps_conflict),
                         Toast.LENGTH_LONG
                     )
                 }

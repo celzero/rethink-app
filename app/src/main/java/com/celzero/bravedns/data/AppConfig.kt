@@ -47,7 +47,6 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.SmartDnsEndpoint
 import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.EventLogger
-import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -1080,8 +1079,7 @@ internal constructor(
     }
 
     // moves the pre-0.5.8 CUSTOM/SOCKS5 provider state over to customSocks5Enabled. back then
-    // socks5 routed every app, so all apps not already routed via another proxy are mapped to
-    // it to keep the behaviour. must run after FirewallManager and ProxyManager are loaded.
+    // socks5 routed every app, so it is migrated in simple (all apps) mode to keep the behaviour.
     suspend fun migrateCustomSocks5IfNeeded() {
         if (persistentState.customSocks5Migrated) return
 
@@ -1093,7 +1091,7 @@ internal constructor(
             } else {
                 setProxy(ProxyType.NONE, ProxyProvider.NONE)
             }
-            ProxyManager.setProxyIdForUnselectedApps(ProxyManager.ID_S5_BASE, ProxyType.SOCKS5.name)
+            persistentState.customSocks5AllApps = true
             setCustomSocks5(true)
             Logger.i(LOG_TAG_VPN, "migrated custom socks5 from provider slot, type: $type")
         }
@@ -1196,6 +1194,11 @@ internal constructor(
 
     fun isCustomSocks5Enabled(): Boolean {
         return persistentState.customSocks5Enabled
+    }
+
+    // custom socks5 is on in simple mode, see PersistentState#customSocks5AllApps
+    fun isCustomSocks5AllApps(): Boolean {
+        return persistentState.customSocks5Enabled && persistentState.customSocks5AllApps
     }
 
     fun isOrbotProxyEnabled(): Boolean {

@@ -14,6 +14,38 @@
         android:orientation="vertical"
         android:paddingBottom="30dp">
 
+        <!-- simple: socks5 for all apps; advanced: only the picked apps (same as wireguard) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/mode_toggle_group"
+            style="@style/toggleButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/simple_toggle_btn"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="125dp"
+                android:text="@string/rt_list_simple_btn_txt"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/advanced_toggle_btn"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="125dp"
+                android:text="@string/lbl_advanced"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                app:cornerRadius="16dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/status_card"
             android:layout_width="match_parent"
@@ -138,6 +170,7 @@
                     android:textStyle="bold" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/apps_desc_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
@@ -149,14 +182,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
+                    android:orientation="horizontal">
 
                     <LinearLayout
                         android:id="@+id/apps_btn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_weight="1"
                         android:background="@drawable/rectangle_border_background"
                         android:foreground="?attr/selectableItemBackground"
@@ -193,7 +225,6 @@
                         android:id="@+id/logs_btn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
                         android:layout_weight="1"
                         android:background="@drawable/rectangle_border_background"
                         android:foreground="?attr/selectableItemBackground"
@@ -528,8 +559,8 @@
                     android:layout_marginEnd="15dp"
                     android:background="?attr/selectableItemBackground"
                     android:paddingTop="10dp"
-                    android:text="@string/settings_lock_down_mode_desc"
-                    android:textColor="?attr/accentBad"
+                    android:text="@string/socks5_lockdown_loopback"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view"
                     android:visibility="gone" />
             </LinearLayout>

@@ -258,6 +258,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // alongside wireguard (or any other provider); see AppConfig#isCustomSocks5Enabled
     var customSocks5Enabled by booleanPref(CUSTOM_SOCKS5_ENABLED).withDefault<Boolean>(false)
 
+    // simple mode: custom socks5 takes every app no wireguard config routes, instead of only
+    // the apps picked for it (advanced mode)
+    var customSocks5AllApps by booleanPref("proxy_custom_socks5_all_apps").withDefault<Boolean>(false)
+
     // set once the legacy CUSTOM/SOCKS5 provider state has been moved to customSocks5Enabled
     var customSocks5Migrated by booleanPref("proxy_custom_socks5_migrated").withDefault<Boolean>(false)
 

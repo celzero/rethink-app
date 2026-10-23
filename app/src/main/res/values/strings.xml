@@ -113,13 +113,19 @@
     <string name="socks5_options_title" translatable="true">Options</string>
     <string name="socks5_apps_desc" translatable="true">Only the apps you pick use SOCKS5. Apps already routed via a WireGuard config are greyed out.</string>
     <string name="socks5_forwarder_title" translatable="true">Forwarder app</string>
-    <string name="socks5_forwarder_desc" translatable="true">The app that runs the SOCKS5 server on this device. It is kept out of the proxy so its traffic is not looped back.</string>
+    <string name="socks5_forwarder_desc" translatable="true">The app that runs the SOCKS5 server on this device. Its own traffic is never sent back into SOCKS5.</string>
     <string name="socks5_forwarder_value" translatable="true">Forwarder app: %1$s</string>
     <string name="socks5_unsaved" translatable="true">Unsaved changes</string>
     <string name="socks5_revert" translatable="true">Revert</string>
     <string name="socks5_saved_toast" translatable="true">SOCKS5 settings saved</string>
     <string name="socks5_discard_title" translatable="true">Discard unsaved changes?</string>
     <string name="socks5_discard" translatable="true">Discard</string>
+    <string name="socks5_simple_desc" translatable="true">All apps use SOCKS5, except apps routed via a WireGuard config.</string>
+    <string name="socks5_all_apps_label" translatable="true">All apps</string>
+    <string name="socks5_all_apps_wg_conflict" translatable="true">WireGuard is routing all apps (Simple mode or a config set to all apps). Turn that off first to send all apps via SOCKS5.</string>
+    <string name="wireguard_socks5_all_apps_conflict" translatable="true">SOCKS5 is routing all apps. Switch SOCKS5 to Advanced first.</string>
+    <string name="socks5_uptime" translatable="true">%1$s · up %2$s</string>
+    <string name="socks5_lockdown_loopback" translatable="true">Always on while Android\'s \"Block connections without VPN\" is on: Android blocks apps outside the VPN, so the forwarder app\'s traffic goes through Rethink. <u>See VPN settings</u>.</string>
     <string name="lbl_fast" translatable="true">fast</string>
     <string name="lbl_slow" translatable="true">slow</string>
     <string name="lbl_very" translatable="true">very</string>
