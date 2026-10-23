@@ -86,11 +86,15 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
             if (l.stacktrace()) {
                 // disable crash logging for now
                 if (false) Logger.crash(LOG_GO_LOGGER_V1, msg) // write to in-mem db
-                if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
                 val token = if (isWebsiteDegoogledFlavour()) "website-degoogled"
                             else if (isFdroidFlavour()) "fdroid"
                             else persistentState.firebaseUserToken
-                EnhancedBugReport.writeLogsToFile(ctx, token, msg)
+                val file = EnhancedBugReport.writeGoCrashToFile(ctx, token, msg)
+                // report immediately; mark the tombstone as reported so the startup pass
+                // does not send the same crash a second time
+                if (!isFdroidFlavour() && file != null && CrashReporter.recordGoCrash(msg)) {
+                    persistentState.lastReportedTombstoneFile = file.name
+                }
             } else if (l.user()) {
                 showNwEngineNotification(msg)
                 // consider all the notifications from go as failure and stop the service

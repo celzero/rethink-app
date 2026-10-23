@@ -88,10 +88,6 @@ object EnhancedBugReport : KoinComponent {
         Log.d(LOG_TAG_BUG_REPORT, "tombstone active: $fileName")
     }
 
-    /** Returns a new File for a Go log session (golog_<ts>.txt), creating the folder if needed. */
-    fun newGoLogFile(context: Context): File? =
-        newTombstoneFile(context, PREFIX_GO_LOG)
-
     /** Returns a new File for a Go crash dump (gocrash_<ts>.txt). */
     fun newGoCrashFile(context: Context): File? =
         newTombstoneFile(context, PREFIX_GO_CRASH)
@@ -118,6 +114,31 @@ object EnhancedBugReport : KoinComponent {
                 enforceMaxFiles(context, justWritten = file)
             } catch (e: Exception) {
                 Log.e(LOG_TAG_BUG_REPORT, "err writing kotlin crash: ${e.message}", e)
+            }
+        }
+    }
+
+    /** Returns the written gocrash_<ts>.txt file, or null when it could not be created. */
+    suspend fun writeGoCrashToFile(context: Context?, token: String, logs: String): File? {
+        return mutex.withLock {
+            if (context == null) {
+                Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write go crash to file")
+                return@withLock null
+            }
+            try {
+                val file = newGoCrashFile(context) ?: run {
+                    Log.e(LOG_TAG_BUG_REPORT, "failed to create go crash file")
+                    return@withLock null
+                }
+                val time =
+                    Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
+                file.writeText("$time\nToken: $token\n$logs\n", Charset.defaultCharset())
+                Log.i(LOG_TAG_BUG_REPORT, "go crash written: ${file.name} (${file.length()} B)")
+                enforceMaxFiles(context, justWritten = file)
+                file
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_BUG_REPORT, "err writing go crash: ${e.message}", e)
+                null
             }
         }
     }
@@ -208,9 +229,13 @@ object EnhancedBugReport : KoinComponent {
         // activeSessionFiles is populated the instant a file is created (in newTombstoneFile),
         // so this exclusion is safe even when the reporter and the readers run concurrently.
         val snapshot = activeSessionFileNames.toSet()
-        val previousSessionFiles = nonEmptyFiles.filter { f ->
+        var previousSessionFiles = nonEmptyFiles.filter { f ->
             !snapshot.contains(f.name)
         }
+
+        // Drop crashes captured by an older release; they cannot be reported anymore and
+        // would otherwise evict newer files from the MAX_TOTAL_FILES cap.
+        previousSessionFiles = purgeStaleTombstones(context, previousSessionFiles)
 
         Log.d(LOG_TAG_BUG_REPORT,
             "tombstone startup: total=${nonEmptyFiles.size}, active=${snapshot.size}, candidates=${previousSessionFiles.size}")
@@ -237,6 +262,25 @@ object EnhancedBugReport : KoinComponent {
             }
             enforceFileCountCap(previousSessionFiles, justWritten = null)
         }
+    }
+
+    /**
+     * Deletes tombstone files created before the current install's last update; crashes from
+     * an older release are never reported. Files with an unparsable timestamp are kept.
+     */
+    private fun purgeStaleTombstones(context: Context, files: List<File>): List<File> {
+        val updatedTs = Utilities.getSelfLastUpdateTime(context)
+        if (updatedTs <= 0L) return files
+
+        val (stale, fresh) = files.partition { f ->
+            val ts = extractTimestampFromName(f.name)
+            ts in 1 until updatedTs
+        }
+        stale.forEach { f ->
+            val deleted = f.delete()
+            Log.i(LOG_TAG_BUG_REPORT, "tombstone stale (pre-update), deleted: ${f.name}, ok=$deleted")
+        }
+        return fresh
     }
 
     /**
@@ -336,9 +380,11 @@ object EnhancedBugReport : KoinComponent {
 
             val parsed = ExceptionParser.parse(content)
             if (parsed.frames.isEmpty()) {
-                // nothing parsable as a stack trace: keep the legacy reporting behaviour.
+                // nothing parsable as a stack trace: report class + message only, without
+                // the reporter call-site stack.
                 val messagePreview = content.take(2 * 1024)
                 val ex = RuntimeException("[$type] ${file.name}\n$messagePreview")
+                ex.stackTrace = emptyArray()
 
                 // log rest content in 8 KB chunks so nothing is lost.
                 content.chunked(8 * 1024).forEachIndexed { idx, chunk ->

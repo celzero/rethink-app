@@ -447,6 +447,25 @@ object Utilities {
         }
     }
 
+    // 0 when the update time cannot be read
+    fun getSelfLastUpdateTime(ctx: Context): Long {
+        return try {
+            val info =
+                if (isAtleastT()) {
+                    ctx.packageManager.getPackageInfo(
+                        ctx.packageName,
+                        PackageManager.PackageInfoFlags.of(0)
+                    )
+                } else {
+                    ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+                }
+            info.lastUpdateTime
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_APP_DB, "err reading lastUpdateTime: ${e.message}")
+            0L
+        }
+    }
+
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun copy(from: String, to: String): Boolean {
         try {

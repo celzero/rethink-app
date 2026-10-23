@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import com.celzero.bravedns.util.Logger.LOG_GO_LOGGER_V1
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 
 object CrashReporter {
@@ -22,30 +23,39 @@ object CrashReporter {
     private const val MAX_MESSAGE_LENGTH = 1500
     // limit per log line for Crashlytics
     private const val MAX_LOG_LENGTH = 4000
-    // splitter
-    private const val LOG_SPLITTER = "<===>"
 
     /**
-     * Report a Go-level crash string to Firebase.
+     * Report a Go-level crash string to Firebase. Returns true when the exception was
+     * recorded (or reporting is intentionally skipped for the flavour), false on failure.
+     *
+     * The crash is parsed by [ExceptionParser] (firestack envelope or plain panic dump),
+     * so Crashlytics shows the captured title as the issue title and the panicking
+     * goroutine's real frames — not this reporting call-site.
      */
-    fun recordGoCrash(message: String) {
-        if (isFdroidFlavour()) return
-        val msg = message.split(LOG_SPLITTER)
-        val safeType = msg.getOrNull(0) ?: "No type"
-        val safeMessage = msg.getOrNull(1)?.take(MAX_MESSAGE_LENGTH) ?: "No message"
-        val stackTrace = msg.getOrNull(2) ?: "No stack trace"
-
-        // Create a synthetic exception to preserve context
-        val syntheticException = RuntimeException("$safeType \n $safeMessage")
-
-        // Record it as non-fatal
-        FirebaseErrorReporting.recordException(syntheticException)
-
-        // Log stack trace in chunks to avoid truncation
-        stackTrace.let { trace ->
-            trace.chunked(MAX_LOG_LENGTH).forEachIndexed { index, chunk ->
+    fun recordGoCrash(message: String): Boolean {
+        if (isFdroidFlavour()) return true
+        return try {
+            val parsed = ExceptionParser.parse(message)
+            // log the full raw content first so it sits above the exception in the
+            // Crashlytics log tab (64 KB ring buffer; chunk to keep entries intact).
+            message.chunked(MAX_LOG_LENGTH).forEachIndexed { index, chunk ->
                 FirebaseErrorReporting.log("trace[$index]: $chunk")
             }
+            if (parsed.frames.isEmpty()) {
+                // nothing parsable: fallback without the reporter call-site stack
+                val fallback = RuntimeException("GoCrash\n${message.take(MAX_MESSAGE_LENGTH)}")
+                fallback.stackTrace = emptyArray()
+                FirebaseErrorReporting.recordException(fallback)
+            } else {
+                if (!parsed.createdBy.isNullOrBlank()) {
+                    Logger.e(LOG_GO_LOGGER_V1, "go crash: ${parsed.message}, ${parsed.createdBy}")
+                }
+                FirebaseErrorReporting.recordException(parsed.toThrowable(context = "GoCrash"))
+            }
+            true
+        } catch (e: Exception) {
+            Logger.w(LOG_GO_LOGGER_V1, "err recording go crash: ${e.message}")
+            false
         }
     }
 }
