@@ -33,6 +33,9 @@ enum class EventType {
     TUN_CLOSED,
     TUN_UPDATE,
 
+    // Network Events
+    NW_CONNECTIVITY_FAIL,
+
     // DNS Events
     DNS_QUERY,
     DNS_FAIL,

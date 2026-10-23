@@ -323,6 +323,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     @Volatile
     var overlayNetworks: OverlayNetworks = OverlayNetworks()
 
+    // last logged overlay-vs-underlay mismatch state per family; true = mismatch active.
+    // mutated only on the serializer (see onNetworkChange)
+    private var overlayMismatch4 = false
+    private var overlayMismatch6 = false
+
     // avoids running multiple proxy checks at the same time.
     private val overlayRefreshInProgress = AtomicBoolean(false)
     // set when a refresh is requested while a check is already in flight
@@ -2431,6 +2436,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 onNetworkDisconnected(networks, forceRestart)
             }
 
+            logOverlayConnectivityMismatchIfNeeded(networks)
+
             // underlying networks changed, re-run the proxy connectivity checks to
             // refresh the overlay network state (routes/mtu) for the new underlay
             refreshOverlayNetworks("nwChg")
@@ -2445,6 +2452,38 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     override suspend fun onNetworkRegistrationFailed() = withContext(serializer) {
         Logger.i(LOG_TAG_VPN, "recd nw reg failed, stop vpn service with notification")
         signalStopService("nwRegFail", userInitiated = false)
+    }
+
+    // log when the overlay claims a family but the underlay connectivity check (see
+    // ConnectionMonitor#repopulateTrackedNetworks) produced no usable networks for it.
+    // logged on state transition only to avoid spamming the event log
+    private fun logOverlayConnectivityMismatchIfNeeded(networks: ConnectionMonitor.UnderlyingNetworks) {
+        val overlay = overlayNetworks
+        val mismatch4 = overlay.has4 && !overlay.failOpen && networks.ipv4Net.isEmpty()
+        val mismatch6 = overlay.has6 && !overlay.failOpen && networks.ipv6Net.isEmpty()
+        val details = "overlay: $overlay, underlay v4: ${networks.ipv4Net.size}, v6: ${networks.ipv6Net.size}, useActive: ${networks.useActive}, lockdown: ${networks.vpnLockdown}"
+
+        if (mismatch4 && !overlayMismatch4) {
+            eventLogger.logMedium(
+                EventType.NW_CONNECTIVITY_FAIL,
+                "overlay claims ipv4 but connectivity check failed",
+                EventSource.SERVICE,
+                details = details
+            )
+        }
+        if (mismatch6 && !overlayMismatch6) {
+            eventLogger.logMedium(
+                EventType.NW_CONNECTIVITY_FAIL,
+                "overlay claims ipv6 but connectivity check failed",
+                EventSource.SERVICE,
+                details = details
+            )
+        }
+        if (mismatch4 || mismatch6) {
+            Logger.i(LOG_TAG_VPN, "$TAG overlay-uw mismatch, v4? $mismatch4, v6? $mismatch6, $details")
+        }
+        overlayMismatch4 = mismatch4
+        overlayMismatch6 = mismatch6
     }
 
     override suspend fun maybeNetworkStall() {
