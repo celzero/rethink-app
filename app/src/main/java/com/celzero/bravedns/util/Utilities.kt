@@ -969,7 +969,7 @@ object Utilities {
         intent: PendingIntent,
         authRequired: Boolean = false
     ): NotificationCompat.Action {
-        return NotificationCompat.Action.Builder(0, title, intent)
+        return NotificationCompat.Action.Builder(R.drawable.ic_notification_icon, title, intent)
             .setAuthenticationRequired(authRequired)
             .build()
     }
