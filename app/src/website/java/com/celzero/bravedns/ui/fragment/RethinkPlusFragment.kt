@@ -150,7 +150,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         setupRecyclerView()
         setupTermsAndPolicy()
         setupProductTypeToggle()
-        adjustCtaBottomMargin()
         startHeaderAnimations()
 
         if (viewModel.extendMode) {
@@ -201,14 +200,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             movementMethod = LinkMovementMethod.getInstance()
             highlightColor = Color.TRANSPARENT
             setLinkTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText))
-        }
-    }
-
-    private fun adjustCtaBottomMargin() {
-        if (activity is FragmentHostActivity) {
-            val lp = b.ctaInnerContainer.layoutParams as? android.view.ViewGroup.MarginLayoutParams
-            lp?.bottomMargin = 0
-            b.ctaInnerContainer.layoutParams = lp
         }
     }
 
