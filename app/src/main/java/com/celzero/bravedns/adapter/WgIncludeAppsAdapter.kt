@@ -22,6 +22,7 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -34,6 +35,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
@@ -116,6 +118,15 @@ class WgIncludeAppsAdapter(
                 val proxyIdsForApp =
                     ProxyManager.getProxyIdsForApp(mapping.uid, mapping.packageName)
                 val isIncludedInCurrent = proxyIdsForApp.contains(itemProxyId)
+                // wireguard configs and socks5 share one app assignment; an app routed via
+                // another of them is shown grayed out with the owner's name
+                val ownerName =
+                    if (!isIncludedInCurrent && ProxyManager.isExclusiveProxyId(itemProxyId)) {
+                        ProxyManager.getExclusiveOwner(itemUid, itemProxyId)
+                            ?.let { ProxyManager.proxyDisplayName(it) }
+                    } else {
+                        null
+                    }
                 val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(itemUid)
                 val hasInternetPerm = mapping.hasInternetPermission(packageManager)
                 val iconDrawable = getIcon(context, itemPackageName, itemAppName)
@@ -142,11 +153,19 @@ class WgIncludeAppsAdapter(
                         return@uiCtx
                     }
 
+                    val isOwnedByOther = ownerName != null
                     if (isProxyExcluded) {
                         b.wgIncludeAppListContainer.isEnabled = false
                         b.wgIncludeAppListCheckbox.isChecked = false
                         b.wgIncludeCard.isClickable = false
                         b.wgIncludeCard.isFocusable = false
+                        b.wgIncludeAppListCheckbox.isClickable = false
+                        b.wgIncludeAppListCheckbox.isFocusable = false
+                    } else if (isOwnedByOther) {
+                        // card stays clickable to explain why the app cannot be selected
+                        b.wgIncludeAppListContainer.isEnabled = false
+                        b.wgIncludeCard.isClickable = true
+                        b.wgIncludeCard.isFocusable = true
                         b.wgIncludeAppListCheckbox.isClickable = false
                         b.wgIncludeAppListCheckbox.isFocusable = false
                     } else {
@@ -156,18 +175,42 @@ class WgIncludeAppsAdapter(
                         b.wgIncludeAppListCheckbox.isClickable = true
                         b.wgIncludeAppListCheckbox.isFocusable = true
                     }
+                    b.wgIncludeAppListCheckbox.isEnabled = !isOwnedByOther
+                    b.wgIncludeAppListContainer.alpha = if (isOwnedByOther) 0.5f else 1.0f
 
                     b.wgIncludeAppListApkLabelTv.text = itemAppName
                     b.wgIncludeAppListApkLabelTv.alpha = if (hasInternetPerm) 1.0f else 0.4f
+
+                    if (isOwnedByOther) {
+                        b.wgIncludeAppAppDescTv.text =
+                            context.getString(R.string.proxy_app_routed_via, ownerName)
+                        b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
+                    } else {
+                        b.wgIncludeAppAppDescTv.visibility = View.GONE
+                    }
 
                     // checkbox state purely based on membership in this proxyId
                     b.wgIncludeAppListCheckbox.isChecked = isIncludedInCurrent && !isProxyExcluded
                     setCardBackground(isIncludedInCurrent && !isProxyExcluded)
 
-                    // description text logic: show only other proxies (exclude current proxyId)
-                    setupClickListeners(mapping, isProxyExcluded)
+                    if (isOwnedByOther) {
+                        setupOwnedClickListener(itemAppName, ownerName)
+                    } else {
+                        setupClickListeners(mapping, isProxyExcluded)
+                    }
                     displayIcon(iconDrawable)
                 }
+            }
+        }
+
+        private fun setupOwnedClickListener(appName: String, ownerName: String?) {
+            b.wgIncludeAppListCheckbox.setOnClickListener(null)
+            b.wgIncludeCard.setOnClickListener {
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.proxy_app_owned_by_other_toast, appName, ownerName),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -239,8 +282,9 @@ class WgIncludeAppsAdapter(
         private fun updateProxyIdForApp(mapping: ProxyApplicationMapping, include: Boolean) {
             io {
                 if (include) {
-                    addProxyToApp(mapping.uid, mapping.packageName, proxyId, proxyName)
-                    Logger.i(LOG_TAG_PROXY, "Included app: ${mapping.uid}, $proxyId, $proxyName")
+                    val added = addProxyToApp(mapping.uid, mapping.packageName, proxyId, proxyName)
+                    if (!added) showOwnedByOtherToast(mapping.uid, mapping.appName)
+                    Logger.i(LOG_TAG_PROXY, "Included app: ${mapping.uid}, $proxyId, $proxyName, added? $added")
                 } else {
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
                     Logger.i(LOG_TAG_PROXY, "Removed app: ${mapping.uid}, $proxyId, $proxyName")
@@ -249,6 +293,19 @@ class WgIncludeAppsAdapter(
                 uiCtx {
                     refresh()
                 }
+            }
+        }
+
+        // raced with another picker / proxy assigning the same app
+        private suspend fun showOwnedByOtherToast(uid: Int, appName: String) {
+            val owner = ProxyManager.getExclusiveOwner(uid, proxyId) ?: return
+            val ownerName = ProxyManager.proxyDisplayName(owner)
+            uiCtx {
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.proxy_app_owned_by_other_toast, appName, ownerName),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -294,21 +351,26 @@ class WgIncludeAppsAdapter(
                     io {
                         val packageNames: List<String> =
                             FirewallManager.getPackageNamesByUid(mapping.uid)
+                        var refused: AppInfo? = null
                         packageNames.forEach { pkgName: String ->
                             val appInfo = FirewallManager.getAppInfoByPackage(pkgName)
                             if (appInfo != null) {
                                 if (included) {
-                                    addProxyToApp(
-                                        appInfo.uid,
-                                        appInfo.packageName,
-                                        proxyId,
-                                        proxyName
-                                    )
+                                    val added =
+                                        addProxyToApp(
+                                            appInfo.uid,
+                                            appInfo.packageName,
+                                            proxyId,
+                                            proxyName
+                                        )
+                                    if (!added && refused == null) refused = appInfo
                                 } else {
                                     removeProxyFromApp(appInfo.uid, appInfo.packageName, proxyId)
                                 }
                             }
                         }
+                        // the uid's packages share one owner, so one message covers them
+                        refused?.let { showOwnedByOtherToast(it.uid, it.appName) }
                         notifyAppModified()
                         uiCtx {
                             refresh()

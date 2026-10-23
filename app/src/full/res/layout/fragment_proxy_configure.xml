@@ -220,6 +220,7 @@
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_wireguard_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -387,11 +388,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/settings_activity_socks5_switch"
+                        android:layout_toStartOf="@id/settings_activity_socks5_img"
                         android:layout_toEndOf="@id/settings_activity_socks5_icon"
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_socks5_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -407,24 +409,16 @@
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/settings_activity_socks5_switch"
-                        style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
+                    <!-- opens the socks5 screen, like a wireguard config -->
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_activity_socks5_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp" />
-
-                    <ProgressBar
-                        android:id="@+id/settings_activity_socks5_progress"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:padding="10dp" />
+                        android:layout_marginEnd="10dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_right_arrow_white" />
                 </RelativeLayout>
 
                 <RelativeLayout

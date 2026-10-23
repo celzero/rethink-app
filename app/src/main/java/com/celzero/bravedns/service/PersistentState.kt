@@ -56,6 +56,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
         const val LOCAL_BLOCK_LIST_UPDATE = "local_block_list_downloaded_time"
         const val PROXY_TYPE = "proxy_proxytype"
+        const val CUSTOM_SOCKS5_ENABLED = "proxy_custom_socks5_enabled"
         const val NETWORK = "add_all_networks_to_vpn"
         const val NOTIFICATION_ACTION = "notification_action"
         const val DNS_CHANGE = "connected_dns_name"
@@ -252,6 +253,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by
         stringPref("proxy_proxyprovider").withDefault<String>(AppConfig.ProxyProvider.NONE.name)
+
+    // custom socks5 is tracked apart from proxyProvider/proxyType so that it can run
+    // alongside wireguard (or any other provider); see AppConfig#isCustomSocks5Enabled
+    var customSocks5Enabled by booleanPref(CUSTOM_SOCKS5_ENABLED).withDefault<Boolean>(false)
+
+    // simple mode: custom socks5 takes every app no wireguard config routes, instead of only
+    // the apps picked for it (advanced mode)
+    var customSocks5AllApps by booleanPref("proxy_custom_socks5_all_apps").withDefault<Boolean>(false)
+
+    // set once the legacy CUSTOM/SOCKS5 provider state has been moved to customSocks5Enabled
+    var customSocks5Migrated by booleanPref("proxy_custom_socks5_migrated").withDefault<Boolean>(false)
 
     // the last collected app exit info's timestamp
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp").withDefault<Long>(INIT_TIME_MS)
@@ -693,6 +705,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                     -1
                 }
             }
+        // custom socks5 runs independent of the provider slot, so fold it into the label
+        if (customSocks5Enabled) {
+            status =
+                when (status) {
+                    -1 -> R.string.lbl_socks5
+                    R.string.lbl_wireguard -> R.string.lbl_wireguard_socks5
+                    R.string.lbl_http -> R.string.lbl_http_socks5
+                    else -> status
+                }
+        }
         // work around for now to check RPN proxy as well
         if (status == -1) {
             if (RpnProxyManager.isRpnActive()) {

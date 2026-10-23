@@ -638,9 +638,15 @@ object TunDnsManager: KoinComponent {
         val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, "", 0, domain, usesCellularNw, ssid) else emptyList()
 
         val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
-        return if (appConfig.isCustomSocks5Enabled()) {
+        // custom socks5 routes the apps mapped to it, or in simple mode every app no wireguard
+        // config routes; other apps fall through
+        val viaSocks5 =
+            appConfig.isCustomSocks5Enabled() &&
+                (ProxyManager.isAppRoutedViaSocks5(uid) ||
+                    isSocks5AllAppsFor(pkgName, uid, domain, usesCellularNw, ssid))
+        return if (viaSocks5) {
             val id = proxyIdBuilder(ProxyManager.ID_S5_BASE, emptyOrDefault)
-            logd("(onQuery-pid)customSocks5 enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
+            logd("(onQuery-pid)customSocks5 enabled for app, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
             rpnIds.plus(id).joinToString(":")
         } else if (appConfig.isCustomHttpProxyEnabled()) {
             val id = proxyIdBuilder(ProxyManager.ID_HTTP_BASE, emptyOrDefault)
@@ -674,6 +680,21 @@ object TunDnsManager: KoinComponent {
                 proxyIds.joinToString(":")
             }
         }
+    }
+
+    private suspend fun isSocks5AllAppsFor(
+        pkgName: String,
+        uid: Int,
+        domain: String,
+        usesCellularNw: Boolean,
+        ssid: String,
+    ): Boolean {
+        if (!appConfig.isCustomSocks5AllApps()) return false
+        // the forwarder app's own queries must not loop back into socks5
+        if (appConfig.getSocks5ProxyDetails()?.proxyAppName == pkgName) return false
+        // same order as flows: a wireguard config that routes the app wins (Block included)
+        val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, usesCellularNw, ssid, "")
+        return wgs.none { it == Backend.Block || it.startsWith(ID_WG_BASE, ignoreCase = true) }
     }
 
     private fun proxyIdBuilder(id: String, emptyOrDefault: String): String {

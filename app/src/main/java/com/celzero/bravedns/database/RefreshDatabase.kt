@@ -169,6 +169,8 @@ internal constructor(
             val hm = WgHopManager.load(forceRefresh = false)
             // val tm = TcpProxyHelper.load() // no need to load tcp-proxy mapping now (055v)
             val rm = RpnProxyManager.load()
+            // needs firewall and proxy mappings loaded
+            ProxyManager.migrateCustomSocks5IfNeeded()
 
             Logger.i(
                 LOG_TAG_APP_DB,

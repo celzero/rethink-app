@@ -1188,6 +1188,19 @@ object TunFlowManager : KoinComponent {
             return persistAndConstructFlowResponse(ctx, connTracker, baseOrAutoOrExit, connId, uid, forUpstreamAnswer)
         }
 
+        // custom socks5 routes only the apps mapped to it. an explicit app mapping takes
+        // precedence over wireguard catch-all / one-wg, so check it before wireguard.
+        if (appConfig.isCustomSocks5Enabled() && ProxyManager.isAppRoutedViaSocks5(uid)) {
+            val endpoint = appConfig.getSocks5ProxyDetails()
+            val packageName = FirewallManager.getPackageNameByUid(uid)
+            // the app forwarding to the socks5 proxy must not be looped back into it
+            if (endpoint?.proxyAppName != packageName) {
+                val pids = (rpnIds + ProxyManager.ID_S5_BASE).joinToString(",")
+                logd("flow/upstream: socks5 (app-mapped) for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}, returning $pids")
+                return persistAndConstructFlowResponse(ctx, connTracker, pids, connId, uid, forUpstreamAnswer)
+            }
+        }
+
         val defProxy = if (rpnIds.isNotEmpty() || isGlobalLockdown) "" else baseOrAutoOrExit
         val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query.orEmpty(), usesMobileNw, ssid, defProxy)
         if (wgs.isNotEmpty() && wgs.first() != baseOrAutoOrExit) {
@@ -1265,17 +1278,15 @@ object TunFlowManager : KoinComponent {
             }
         }
 
-        // chose socks5 proxy over http proxy
+        // app-mapped socks5 traffic is returned before wireguard (see above); here the
+        // socks5 forwarder app is handled, and in simple mode every app wireguard and orbot
+        // did not take goes to socks5
         if (appConfig.isCustomSocks5Enabled()) {
             val endpoint = appConfig.getSocks5ProxyDetails()
             if (endpoint == null) {
                 Logger.e(LOG_TAG_VPN, "flow/upstream: socks5 proxy enabled but endpoint is null $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
             }
             val packageName = FirewallManager.getPackageNameByUid(uid)
-            if (endpoint == null) {
-                Logger.e(LOG_TAG_VPN, "flow/upstream: socks5 proxy enabled but endpoint is null $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
-            }
-            logd("flow/upstream: socks5 proxy is enabled, src: $packageName, ${endpoint?.proxyAppName}, $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
             if (endpoint?.proxyAppName == packageName) {
                 if (splAppProxy == Backend.Block) {
@@ -1285,21 +1296,11 @@ object TunFlowManager : KoinComponent {
                 logd("flow/upstream: socks5 $splAppProxy for $packageName, $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
                 return persistAndConstructFlowResponse(ctx, connTracker, splAppProxy, connId, uid, forUpstreamAnswer)
             }
-
-            val pids = if (rpnIds.isNotEmpty()) {
-                rpnIds.plus(ProxyManager.ID_S5_BASE).joinToString(",")
-            } else {
-                ProxyManager.ID_S5_BASE
+            if (appConfig.isCustomSocks5AllApps()) {
+                val pids = (rpnIds + ProxyManager.ID_S5_BASE).joinToString(",")
+                logd("flow/upstream: socks5 (all apps) for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}, returning $pids")
+                return persistAndConstructFlowResponse(ctx, connTracker, pids, connId, uid, forUpstreamAnswer)
             }
-            logd("flow/upstream: socks5 proxy for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}, returning $pids")
-            return persistAndConstructFlowResponse(
-                ctx,
-                connTracker,
-                pids,
-                connId,
-                uid,
-                forUpstreamAnswer
-            )
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {

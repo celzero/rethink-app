@@ -663,7 +663,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         return DateUtils.getRelativeTimeSpanString(
             stats.lastOK,
             now,
-            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.SECOND_IN_MILLIS,
             DateUtils.FORMAT_ABBREV_RELATIVE
         )
     }
@@ -990,6 +990,19 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
                     Utilities.showToastUiCentered(
                         this,
                         getString(R.string.wireguard_one_wg_active_conflict),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+            if (enabled && WireguardManager.isSocks5AllAppsOn()) {
+                Logger.i(LOG_TAG_PROXY, "socks5 routes all apps, cannot enable catch-all")
+                uiCtx {
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        getString(R.string.wireguard_socks5_all_apps_conflict),
                         Toast.LENGTH_LONG
                     )
                 }

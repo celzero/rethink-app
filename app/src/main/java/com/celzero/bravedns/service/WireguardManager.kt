@@ -396,6 +396,11 @@ object WireguardManager : KoinComponent {
         return appConfig.canEnableProxy()
     }
 
+    // socks5 in simple mode already takes every app, so one-wg and catch-all can't be turned on
+    fun isSocks5AllAppsOn(): Boolean {
+        return appConfig.isCustomSocks5AllApps()
+    }
+
     fun canEnableProxy(id: Int): Boolean {
         if (!canEnableProxy()) return false
 
