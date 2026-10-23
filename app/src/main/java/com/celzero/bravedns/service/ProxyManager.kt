@@ -127,11 +127,11 @@ object ProxyManager : KoinComponent {
         return pid == ID_S5_BASE || WireguardManager.isWgProxyId(pid)
     }
 
-    // returns the exclusive proxy (other than exceptPid) the app is already routed via, if any
-    fun getExclusiveOwner(uid: Int, packageName: String, exceptPid: String): String? {
+    // returns the exclusive proxy (other than exceptPid) the app is already routed via, if any.
+    // routing is per uid, so a mapping on any package sharing the uid counts
+    fun getExclusiveOwner(uid: Int, exceptPid: String): String? {
         return pamSet.firstOrNull {
             it.uid == uid &&
-                it.packageName == packageName &&
                 it.proxyId != exceptPid &&
                 isExclusiveProxyId(it.proxyId)
         }?.proxyId
@@ -192,7 +192,7 @@ object ProxyManager : KoinComponent {
                 ensureBaseRow(app.uid, app.packageName, ai.appName)
                 // leave apps routed via another wireguard / socks5 proxy untouched
                 if (isExclusiveProxyId(proxyId) &&
-                    getExclusiveOwner(app.uid, app.packageName, proxyId) != null
+                    getExclusiveOwner(app.uid, proxyId) != null
                 ) {
                     return@forEach
                 }
@@ -552,7 +552,7 @@ object ProxyManager : KoinComponent {
             val tuple = ProxyAppMapTuple(uid, packageName, proxyId)
             if (pamSet.contains(tuple)) return true
             if (isExclusiveProxyId(proxyId)) {
-                val owner = getExclusiveOwner(uid, packageName, proxyId)
+                val owner = getExclusiveOwner(uid, proxyId)
                 if (owner != null) {
                     Logger.w(LOG_TAG_PROXY, "app $packageName($uid) already routed via $owner, skip $proxyId")
                     return false

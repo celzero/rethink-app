@@ -435,9 +435,22 @@ class ProxyManagerTest : KoinTest {
 
         assertFalse(ProxyManager.addProxyToApp(uid1, pkg1, s5, "SOCKS5"))
         assertFalse(ProxyManager.addProxyToApp(uid2, pkg2, wgProxyId0, "T0"))
-        assertEquals(wgProxyId0, ProxyManager.getExclusiveOwner(uid1, pkg1, s5))
-        assertEquals(s5, ProxyManager.getExclusiveOwner(uid2, pkg2, wgProxyId1))
+        assertEquals(wgProxyId0, ProxyManager.getExclusiveOwner(uid1, s5))
+        assertEquals(s5, ProxyManager.getExclusiveOwner(uid2, wgProxyId1))
         assertTrue(ProxyManager.isAppRoutedViaSocks5(uid2))
+        assertFalse(ProxyManager.isAppRoutedViaSocks5(uid1))
+    }
+
+    @Test
+    fun `packages sharing a uid share one exclusive owner`() = runBlocking {
+        val s5 = ProxyManager.ID_S5_BASE
+        val sharedPkg = "com.example.shared"
+        loadMappings(pam(uid1, pkg1, ""), pam(uid1, sharedPkg, ""))
+        assertTrue(ProxyManager.addProxyToApp(uid1, pkg1, wgProxyId0, "T0"))
+
+        // the other package of the uid would be routed via wg0 anyway
+        assertFalse(ProxyManager.addProxyToApp(uid1, sharedPkg, s5, "SOCKS5"))
+        assertEquals(wgProxyId0, ProxyManager.getExclusiveOwner(uid1, s5))
         assertFalse(ProxyManager.isAppRoutedViaSocks5(uid1))
     }
 

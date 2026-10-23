@@ -122,7 +122,7 @@ class WgIncludeAppsAdapter(
                 // another of them is shown grayed out with the owner's name
                 val ownerName =
                     if (!isIncludedInCurrent && ProxyManager.isExclusiveProxyId(itemProxyId)) {
-                        ProxyManager.getExclusiveOwner(itemUid, itemPackageName, itemProxyId)
+                        ProxyManager.getExclusiveOwner(itemUid, itemProxyId)
                             ?.let { ProxyManager.proxyDisplayName(it) }
                     } else {
                         null
@@ -283,7 +283,7 @@ class WgIncludeAppsAdapter(
             io {
                 if (include) {
                     val added = addProxyToApp(mapping.uid, mapping.packageName, proxyId, proxyName)
-                    if (!added) showOwnedByOtherToast(mapping.uid, mapping.packageName, mapping.appName)
+                    if (!added) showOwnedByOtherToast(mapping.uid, mapping.appName)
                     Logger.i(LOG_TAG_PROXY, "Included app: ${mapping.uid}, $proxyId, $proxyName, added? $added")
                 } else {
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
@@ -297,8 +297,8 @@ class WgIncludeAppsAdapter(
         }
 
         // raced with another picker / proxy assigning the same app
-        private suspend fun showOwnedByOtherToast(uid: Int, packageName: String, appName: String) {
-            val owner = ProxyManager.getExclusiveOwner(uid, packageName, proxyId) ?: return
+        private suspend fun showOwnedByOtherToast(uid: Int, appName: String) {
+            val owner = ProxyManager.getExclusiveOwner(uid, proxyId) ?: return
             val ownerName = ProxyManager.proxyDisplayName(owner)
             uiCtx {
                 showToastUiCentered(
@@ -370,7 +370,7 @@ class WgIncludeAppsAdapter(
                             }
                         }
                         // the uid's packages share one owner, so one message covers them
-                        refused?.let { showOwnedByOtherToast(it.uid, it.packageName, it.appName) }
+                        refused?.let { showOwnedByOtherToast(it.uid, it.appName) }
                         notifyAppModified()
                         uiCtx {
                             refresh()
