@@ -209,8 +209,8 @@ class EntitlementDetailBottomSheet : BaseBottomSheetDialogFragment() {
         // formatted relative strings would miss small but real differences (both would
         // render as e.g. "in 2 days"). A mismatch here warrants a restore.
         val activeExpiry = activeEntitlement?.expiry()
-        val exp1 = UIUtils.formatToRelativeTime(requireContext(), entitlement.expiry())
-        val exp2 = activeExpiry?.let { UIUtils.formatToRelativeTime(requireContext(), it) }
+        val exp1 = UIUtils.formatEntitlementExpiry(requireContext(), entitlement.expiry())
+        val exp2 = activeExpiry?.let { UIUtils.formatEntitlementExpiry(requireContext(), it) }
         val expSame = entitlement.expiry() == activeExpiry
         compareAndSet(b.rowExpiry, "Expiry", exp1, exp2, expSame, triggerRestore = true)
 

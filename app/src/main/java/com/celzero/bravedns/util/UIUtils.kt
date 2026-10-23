@@ -66,6 +66,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.snackbar.Snackbar
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -167,6 +168,27 @@ object UIUtils {
         } else {
             relativeTimeSpanString(timestamp, DateUtils.MINUTE_IN_MILLIS).toString()
         }
+    }
+
+    // relative phrase + absolute timestamp, e.g. "in 29 days (Nov 21, 2026, 00:00)"
+    fun formatEntitlementExpiry(context: Context, timestamp: Long): String {
+        if (timestamp <= 0L) return "N/A"
+        val absolute = SimpleDateFormat("MMM d, yyyy, HH:mm", Locale.getDefault()).format(Date(timestamp))
+        val now = System.currentTimeMillis()
+        val future = timestamp > now
+        val days = if (future) {
+            val d = (timestamp - now + DateUtils.DAY_IN_MILLIS - 1) / DateUtils.DAY_IN_MILLIS
+            maxOf(d, 1L).toInt()
+        } else {
+            maxOf((now - timestamp) / DateUtils.DAY_IN_MILLIS, 1L).toInt()
+        }
+        val relative = when {
+            DateUtils.isToday(timestamp) -> context.getString(R.string.relative_time_today)
+            isYesterday(Date(timestamp)) -> context.getString(R.string.relative_time_yesterday)
+            future -> if (days == 1) "in 1 day" else "in $days days"
+            else -> if (days == 1) "1 day ago" else "$days days ago"
+        }
+        return "$relative ($absolute)"
     }
 
     fun getRelativeTimeSpan(t: Long?): CharSequence? {
