@@ -1412,7 +1412,7 @@ class GoVpnAdapter : KoinComponent {
                 logEvent(Severity.MEDIUM, "close conns error", "err closing connections for diff: $diff, reason: ${e.message}")
             }
         } else {
-            logEvent(Severity.MEDIUM, "no conns closed", "close all connections called but no conns closed, connIds: $connIds, isUid: $isUid reason: $reason, res: ${closedConns.size}")
+            logEvent(Severity.LOW, "close conns", "closed all requested connections, connIds: $connIds, isUid: $isUid, reason: $reason, closed: ${closedConns.size}")
             Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, reason: $reason")
         }
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
