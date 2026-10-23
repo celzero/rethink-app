@@ -268,7 +268,7 @@
                         android:layout_height="14dp"
                         android:layout_marginStart="8dp"
                         android:alpha="0.5"
-                        android:contentDescription="@string/bsdl_open_domain_connections"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/ic_right_arrow_small"
                         android:visibility="gone"
                         app:tint="?attr/primaryLightColorText" />

@@ -540,13 +540,16 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:alpha="0.5"
+                        android:letterSpacing="0.02"
                         android:ellipsize="end"
-                        android:fontFamily="monospace"
                         android:maxLines="1"
                         android:text="@string/hsf_proxy_off_indicator"
                         android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/extra_large_font_text_view"
-                        android:textStyle="bold"
+                        android:textSize="@dimen/default_font_text_view"
+                        app:autoSizeMaxTextSize="12sp"
+                        app:autoSizeMinTextSize="8sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform"
                         android:visibility="gone" />
                 </com.google.android.material.card.MaterialCardView>
 
