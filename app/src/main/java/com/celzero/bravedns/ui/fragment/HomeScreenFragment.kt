@@ -1134,7 +1134,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         (if (isRpnStoppedEarly()) RpnProxyManager.getEnabledConfigs().size else 0) +
                             getStoppedWgCount()
                     uiCtx {
-                        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                        showProxyCardHeader()
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                         updateStoppedSlot(isStoppedSlotVisible())
                         b.fhsProxyStoppedCount.text = stoppedCount.toString()
@@ -1166,7 +1166,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val stoppedCount = getStoppedWgCount() + rpnStoppedCount
 
                 uiCtx {
-                    b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                    showProxyCardHeader()
                     // Colored scheme is reserved for RPN (also when RPN and
                     // WireGuard are both active); WireGuard-only or any other
                     // proxy renders monochrome.
@@ -1211,7 +1211,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 showProxyInactive()
                 return
             }
-            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            showProxyCardHeader()
             val headline =
                 if (RpnProxyManager.isRpnActive() && !appConfig.isProxyEnabled()) {
                     getString(R.string.rpn_title)
@@ -1237,7 +1237,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         uiCtx {
             if (view == null || !isAdded) return@uiCtx
 
-            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            showProxyCardHeader()
             b.fhsCardOtherProxyCount.alpha = 1f
             b.fhsCardOtherProxyCount.isSelected = true
             b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.rpn_title))
@@ -1397,15 +1397,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         Logger.w(LOG_TAG_UI, "$TAG proxy inactive, showing compact indicator")
-        b.fhsCardOtherProxyCount.text = getString(R.string.hsf_proxy_off_indicator)
-        b.fhsCardOtherProxyCount.alpha = 0.65f
+        b.fhsCardOtherProxyCount.visibility = View.GONE
+        b.fhsProxyHeaderSpace.visibility = View.GONE
+        b.fhsProxyInactiveTxt.visibility = View.VISIBLE
         b.fhsProxyHealthContainer.isVisible = false
+    }
+
+    private fun showProxyCardHeader() {
+        b.fhsProxyInactiveTxt.visibility = View.GONE
+        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+        b.fhsProxyHeaderSpace.visibility = View.VISIBLE
     }
 
     /** Restores the proxy card to full emphasis for a running proxy. */
     private fun showProxyActiveIndicator() {
         if (view == null || !isAdded) return
 
+        showProxyCardHeader()
         b.fhsProxyHealthContainer.isVisible = true
         b.fhsCardOtherProxyCount.alpha = 1f
         // Provisional scheme until the proxy poll computes the exact one:
@@ -3542,31 +3550,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         if (canRethinkBlockItself) {
-            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.attr.accentWarning))
             b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).capitalizeWords()
             return
         }
         val vpnState = VpnController.state()
         // Change status and explanation text
         var statusId: Int
-        var colorId: Int
         val privateDnsMode: Utilities.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (vpnState.on) {
-            colorId = fetchTextColor(R.color.accentGood)
             statusId = if (appConfig.getBraveMode().isFirewallMode()) {
                 UIUtils.getDnsStatusStringRes(Transaction.Status.COMPLETE.id)
             } else {
                 R.string.status_protected
             }
         } else if (isVpnActivated) {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_waiting
         } else if (isAnotherVpnActive()) {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_exposed
         } else {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId =
                 when (privateDnsMode) {
                     Utilities.PrivateDnsMode.STRICT -> R.string.status_strict
@@ -3579,12 +3581,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 statusId = R.string.status_protected_with_rpn
             } else if (appConfig.getBraveMode().isDnsMode() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.getBraveMode().isDnsMode()) {
                 statusId = R.string.status_protected
             } else if (appConfig.isOrbotProxyEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_tor_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
             } else if (
@@ -3592,27 +3592,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 isPrivateDnsActive(requireContext())
             ) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_proxy
             } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_socks5_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (
                 appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(requireContext())
             ) {
                 statusId = R.string.status_protected_with_http_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_http
             } else if (appConfig.isCustomSocks5Enabled()) {
                 statusId = R.string.status_protected_with_socks5
             } else if (isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isWireGuardEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_wg_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isWireGuardEnabled()) {
                 statusId = R.string.status_protected_with_wg
             }
@@ -3621,16 +3616,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (persistentState.wgGlobalLockdown) {
             val stat = getString(statusId).lowercase()
             val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown), true).capitalizeWords()
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = s
         } else {
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
             val s = getString(statusId).capitalizeWords()
             b.fhsProtectionLevelTxt.text = s
         }
         val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
         if (isUnderlyingVpnNwEmpty) {
-            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentBad))
             b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network).capitalizeWords()
         }
         updateActiveSinceUi()
@@ -3657,25 +3649,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.e(LOG_TAG_VPN, "err checking VPN status: ${e.message}", e)
             false
         }
-    }
-
-    private fun fetchTextColor(attr: Int): Int {
-        val attributeFetch =
-            when (attr) {
-                R.color.accentGood -> {
-                    R.attr.accentGood
-                }
-                R.color.accentBad -> {
-                    R.attr.accentBad
-                }
-                R.color.accentWarning -> {
-                    R.attr.accentWarning
-                }
-                else -> {
-                    R.attr.colorOnSurfaceVariant
-                }
-            }
-        return UIUtils.fetchColor(requireContext(), attributeFetch)
     }
 
     /**
