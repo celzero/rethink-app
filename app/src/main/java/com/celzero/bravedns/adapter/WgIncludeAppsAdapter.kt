@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
@@ -282,7 +283,7 @@ class WgIncludeAppsAdapter(
             io {
                 if (include) {
                     val added = addProxyToApp(mapping.uid, mapping.packageName, proxyId, proxyName)
-                    if (!added) showOwnedByOtherToast(mapping)
+                    if (!added) showOwnedByOtherToast(mapping.uid, mapping.packageName, mapping.appName)
                     Logger.i(LOG_TAG_PROXY, "Included app: ${mapping.uid}, $proxyId, $proxyName, added? $added")
                 } else {
                     removeProxyFromApp(mapping.uid, mapping.packageName, proxyId)
@@ -296,13 +297,13 @@ class WgIncludeAppsAdapter(
         }
 
         // raced with another picker / proxy assigning the same app
-        private suspend fun showOwnedByOtherToast(mapping: ProxyApplicationMapping) {
-            val owner = ProxyManager.getExclusiveOwner(mapping.uid, mapping.packageName, proxyId) ?: return
+        private suspend fun showOwnedByOtherToast(uid: Int, packageName: String, appName: String) {
+            val owner = ProxyManager.getExclusiveOwner(uid, packageName, proxyId) ?: return
             val ownerName = ProxyManager.proxyDisplayName(owner)
             uiCtx {
                 showToastUiCentered(
                     context,
-                    context.getString(R.string.proxy_app_owned_by_other_toast, mapping.appName, ownerName),
+                    context.getString(R.string.proxy_app_owned_by_other_toast, appName, ownerName),
                     Toast.LENGTH_SHORT
                 )
             }
@@ -350,21 +351,26 @@ class WgIncludeAppsAdapter(
                     io {
                         val packageNames: List<String> =
                             FirewallManager.getPackageNamesByUid(mapping.uid)
+                        var refused: AppInfo? = null
                         packageNames.forEach { pkgName: String ->
                             val appInfo = FirewallManager.getAppInfoByPackage(pkgName)
                             if (appInfo != null) {
                                 if (included) {
-                                    addProxyToApp(
-                                        appInfo.uid,
-                                        appInfo.packageName,
-                                        proxyId,
-                                        proxyName
-                                    )
+                                    val added =
+                                        addProxyToApp(
+                                            appInfo.uid,
+                                            appInfo.packageName,
+                                            proxyId,
+                                            proxyName
+                                        )
+                                    if (!added && refused == null) refused = appInfo
                                 } else {
                                     removeProxyFromApp(appInfo.uid, appInfo.packageName, proxyId)
                                 }
                             }
                         }
+                        // the uid's packages share one owner, so one message covers them
+                        refused?.let { showOwnedByOtherToast(it.uid, it.packageName, it.appName) }
                         notifyAppModified()
                         uiCtx {
                             refresh()

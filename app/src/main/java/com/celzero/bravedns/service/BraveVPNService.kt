@@ -315,6 +315,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     // used to handle app observer to exclude apps from the tunnel
     private val excludeAppsMutex = Mutex()
 
+    // serializes custom socks5 on/off handling, see handleCustomSocks5Change
+    private val socks5Mutex = Mutex()
+
     private var excludedApps: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     // post underlying networks as live data
@@ -1943,16 +1946,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         }
     }
 
+    // quick on/off toggles each launch this; the flag is read under the lock so that
+    // whichever call runs last applies the final state, whatever order they finish in
     private suspend fun handleCustomSocks5Change() {
-        val enabled = appConfig.isCustomSocks5Enabled()
-        Logger.i(LOG_TAG_VPN, "handle custom socks5 change, enabled? $enabled")
-        // the socks5 forwarder app is excluded from the vpn while socks5 is on, so restart vpn
-        val ep = appConfig.getSocks5ProxyDetails()
-        vpnRestartTrigger.value = "customSocks5: $enabled, ${ep?.proxyIP}:${ep?.proxyPort}"
-        if (enabled) {
-            vpnAdapter?.readdSocks5Proxy()
-        } else {
-            vpnAdapter?.removeCustomSocks5Proxy()
+        socks5Mutex.withLock {
+            val enabled = appConfig.isCustomSocks5Enabled()
+            Logger.i(LOG_TAG_VPN, "handle custom socks5 change, enabled? $enabled")
+            // the socks5 forwarder app is excluded from the vpn while socks5 is on, so restart vpn
+            val ep = appConfig.getSocks5ProxyDetails()
+            vpnRestartTrigger.value = "customSocks5: $enabled, ${ep?.proxyIP}:${ep?.proxyPort}"
+            if (enabled) {
+                vpnAdapter?.readdSocks5Proxy()
+            } else {
+                vpnAdapter?.removeCustomSocks5Proxy()
+            }
         }
     }
 
@@ -4035,7 +4042,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun readdSocks5Proxy() {
         logd("readd socks5 proxy")
-        vpnAdapter?.readdSocks5Proxy()
+        // a turn-off may have run since the caller checked the flag
+        socks5Mutex.withLock {
+            if (appConfig.isCustomSocks5Enabled()) vpnAdapter?.readdSocks5Proxy()
+        }
     }
 
     // the forwarder app is excluded when the tunnel is built, so a new one needs a restart
