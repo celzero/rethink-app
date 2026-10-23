@@ -129,6 +129,15 @@ object InAppBillingHandler : KoinComponent {
 
     const val TAG = "IABHandler"
 
+    /** Server-entitlement refresh is due when the stored entitlement file is older than this, even if still unexpired (the local copy cannot reveal server-side rotation). */
+    private const val LOCAL_ENTITLEMENT_MAX_AGE_MS = 3L * 24 * 60 * 60 * 1000
+
+    /** Minimum gap between age-based entitlement refresh attempts (per process). */
+    private const val AGE_REFRESH_MIN_GAP_MS = 60L * 60 * 1000
+
+    @Volatile
+    private var lastAgeBasedRefreshAtMs = 0L
+
     private val persistentState by inject<PersistentState>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val secureIdentityStore by inject<SecureIdentityStore>()
@@ -1454,12 +1463,36 @@ object InAppBillingHandler : KoinComponent {
 
     private suspend fun validatePayloadAndFetchIfRequired(purchaseDtl: PurchaseDetail): PurchaseDetail {
         val mname = this::validatePayloadAndFetchIfRequired.name
-        val now = System.currentTimeMillis()
-        val tunnelExpiry: Long? = getExpiryFromPayload(purchaseDtl.payload)
-        if (tunnelExpiry != null && tunnelExpiry > now) {
+        // Play no longer returns developerPayload; gate the fetch on the stored entitlement
+        val localEntitlementValid = try {
+            RpnProxyManager.isLocalEntitlementValid()
+        } catch (e: Exception) {
+            Logger.i(mname, "local entitlement check failed: ${e.message}; fetching from server")
+            false
+        }
+        if (localEntitlementValid) {
+            // detect server-side rotation behind a still-valid local copy; throttled, success-only
+            val refreshDue = try {
+                RpnProxyManager.isLocalEntitlementFileOlderThan(LOCAL_ENTITLEMENT_MAX_AGE_MS)
+            } catch (e: Exception) {
+                Logger.i(mname, "entitlement file age check failed: ${e.message}")
+                false
+            }
+            if (refreshDue) {
+                val now = System.currentTimeMillis()
+                if (now - lastAgeBasedRefreshAtMs > AGE_REFRESH_MIN_GAP_MS) {
+                    Logger.i(mname, "Local entitlement older than ${LOCAL_ENTITLEMENT_MAX_AGE_MS / (60 * 60 * 1000)}d; refreshing from server")
+                    val (cid, did) = identityForPurchase(purchaseDtl)
+                    val refreshed = queryEntitlementFromServer(cid, did, purchaseDtl)
+                    if (refreshed.payload.isNotEmpty() && RpnProxyManager.isPayloadEntitlementCurrent(refreshed.payload)) {
+                        lastAgeBasedRefreshAtMs = now
+                    }
+                    return refreshed
+                }
+            }
             return purchaseDtl
         }
-        Logger.i(mname, "Payload validation failed or expired for token=${purchaseDtl.purchaseToken.take(8)}; fetching updated entitlement from server")
+        Logger.i(mname, "Local entitlement missing or expired for token=${purchaseDtl.purchaseToken.take(8)}; fetching updated entitlement from server")
         val (cid, did) = identityForPurchase(purchaseDtl)
         return queryEntitlementFromServer(cid, did, purchaseDtl)
     }

@@ -994,6 +994,142 @@ class RpnProxyManagerTest : KoinTest {
     }
 
     // =========================================================================
+    // 9b. Local entitlement freshness (isWsBytesEntitlementCurrent)
+    // =========================================================================
+
+    private fun isoUtc(epochMs: Long): String {
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        return fmt.format(java.util.Date(epochMs)) + ".000Z"
+    }
+
+    private fun wsJson(token: String = "tok1", expiryMs: Long? = null, status: String? = null): ByteArray {
+        val fields = mutableListOf<String>()
+        if (token.isNotEmpty()) fields.add("\"sessiontoken\":\"$token\"")
+        if (expiryMs != null) fields.add("\"expiry\":\"${isoUtc(expiryMs)}\"")
+        if (status != null) fields.add("\"status\":\"$status\"")
+        return """{"cid":"cid1",${fields.joinToString(",")}}""".toByteArray()
+    }
+
+    @Test
+    fun `ws entitlement current with future expiry`() {
+        val bytes = wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L)
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with zulu expiry and no fraction is current`() {
+        val futureIso = isoUtc(System.currentTimeMillis() + 86_400_000L).removeSuffix(".000Z") + "Z"
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"$futureIso"}""".toByteArray()
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with positive offset expiry is parsed`() {
+        // "+05:30" decodes a UTC-naive stamp 11h ahead of now to ~now+5h30m (current)
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val naive = fmt.format(java.util.Date(System.currentTimeMillis() + 11 * 60 * 60 * 1000L))
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"${naive}+05:30"}""".toByteArray()
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with fraction and positive offset keeps the offset`() {
+        // the offset must survive fraction stripping
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val naive = fmt.format(java.util.Date(System.currentTimeMillis() + 11 * 60 * 60 * 1000L))
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"$naive.123+05:30"}""".toByteArray()
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with fraction and negative offset keeps the offset`() {
+        // "-05:00" decodes the UTC-naive stamp 6h ahead of now to ~now+11h (current)
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val naive = fmt.format(java.util.Date(System.currentTimeMillis() + 6 * 60 * 60 * 1000L))
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"$naive.123-05:00"}""".toByteArray()
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with fraction and offset in the past is not current`() {
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val naive = fmt.format(java.util.Date(System.currentTimeMillis() - 86_400_000L))
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"$naive.123+05:30"}""".toByteArray()
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement negative offset flips a past naive stamp to current`() {
+        // discriminates the offset-first parse: dropping the offset decodes this to now-2h (expired)
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US)
+        fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        val naive = fmt.format(java.util.Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000L))
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"$naive.000-05:00"}""".toByteArray()
+        assertTrue(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with zero expiry is not current`() {
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"1970-01-01T00:00:00.000Z"}""".toByteArray()
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement expired with past expiry`() {
+        val bytes = wsJson(expiryMs = System.currentTimeMillis() - 86_400_000L)
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with expired status is not current even if expiry is future`() {
+        val bytes = wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L, status = "expired")
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement without sessiontoken is not current`() {
+        val bytes = wsJson(token = "", expiryMs = System.currentTimeMillis() + 86_400_000L)
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement without expiry is not current`() {
+        val bytes = wsJson()
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement with malformed expiry is not current`() {
+        val bytes = """{"cid":"cid1","sessiontoken":"tok1","expiry":"not-a-date"}""".toByteArray()
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(bytes))
+    }
+
+    @Test
+    fun `ws entitlement malformed json is not current`() {
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent("not-json".toByteArray()))
+    }
+
+    @Test
+    fun `ws entitlement null or empty bytes are not current`() {
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(null))
+        assertFalse(RpnProxyManager.isWsBytesEntitlementCurrent(ByteArray(0)))
+    }
+
+    @Test
+    fun `payload entitlement current resolves shape-1 payload`() {
+        val futureIso = isoUtc(System.currentTimeMillis() + 86_400_000L)
+        val innerWs = """{"ws":{"sessiontoken":"tok1","expiry":"$futureIso"}}"""
+        val payload = """{"developerPayload":"${innerWs.replace("\"", "\\\"")}"}"""
+        assertTrue(RpnProxyManager.isPayloadEntitlementCurrent(payload))
+        assertFalse(RpnProxyManager.isPayloadEntitlementCurrent(""))
+    }
+
+    // =========================================================================
     // 10. Win Servers Cache
     // =========================================================================
 
