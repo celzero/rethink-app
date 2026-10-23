@@ -1400,7 +1400,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     @RequiresApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun startForegroundService(
         serviceType: Int,
-        notif: Notification = updateNotificationBuilder()
+        notif: Notification
     ): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         try {
@@ -1428,7 +1428,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     }
 
     @SuppressLint("ForegroundServiceType")
-    private fun startForegroundService(notif: Notification = updateNotificationBuilder()): Boolean {
+    private fun startForegroundService(notif: Notification): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         if (isAtleastS()) {
             try {
