@@ -477,7 +477,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         val versionName = appVersionName()
 
         sb.append(heavy)
-        sb.append("  RETHINK PLUS SUPPORT DIAGNOSTIC REPORT\n")
+        sb.append("  RPN DIAGNOSTIC REPORT\n")
         sb.append(heavy)
         sb.append("Generated   : $now\n")
         sb.append("App version : $versionName\n")
@@ -583,7 +583,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         sb.append("\n")
         sb.append("Subscription status, state history, proxy statistics, and available recent console logs\n")
         sb.append("are included in the attached diagnostic ZIP.\n\n")
-        sb.append("--\nSent via Rethink Plus Support")
+        sb.append("--\nSent via RPN Support")
 
         return sb.toString()
     }
@@ -787,7 +787,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         // Subject is kept minimal: no user data or subscription details in the subject line.
         // All diagnostic data lives in the attachment.
         val catPart = if (category != null) " [$category]" else ""
-        return "Rethink Plus Support Request: $catPart"
+        return "RPN Support Request: $catPart"
     }
 
     /** Returns the app version name, falling back to "?" on error. */
