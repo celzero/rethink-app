@@ -511,6 +511,12 @@ internal constructor(
             insertUnknownApp(uid)
             logEvent(Severity.MEDIUM, "new unknown app installed", "inserted unknown app, uid: $uid")
         }
+        // self-insert is exempted (see insertApp); no need to prompt about the app itself
+        if (pkg == ctx.packageName) return
+
+        // non-app uids and system components are exempted from block-on-insert; do not notify
+        if (ai == null || isSystemComponent(ai)) return
+
         showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
     }
 
@@ -712,7 +718,11 @@ internal constructor(
         // need not notify if "block newly installed apps" is off: insertApp() & insertUnkownApp()
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
-        val appCount = apps.count()
+        // exclude self-insert; the app is exempted (see insertApp) and must not notify about itself
+        val others = apps.filter { it.packageName != ctx.packageName }
+        if (others.isEmpty()) return
+
+        val appCount = others.count()
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
         if (appCount > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
             showNewAppsBulkNotificationIfNeeded(appCount)
@@ -720,7 +730,7 @@ internal constructor(
         }
 
         // show notification for particular app (less than NEW_APP_BULK_CHECK_COUNT)
-        apps.forEach { showNewAppNotificationIfNeeded(it) }
+        others.forEach { showNewAppNotificationIfNeeded(it) }
     }
 
     private fun showNewAppsBulkNotificationIfNeeded(appSize: Int) {
