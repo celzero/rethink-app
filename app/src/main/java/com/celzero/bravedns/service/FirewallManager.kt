@@ -1184,11 +1184,14 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun exemptRethinkApp(rethinkUid: Int) {
-        try {
+        val rows = try {
             db.exemptRethinkApp()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_FIREWALL, "exemptRethinkApp db failed for uid $rethinkUid", e)
             return
+        }
+        if (rows == 0) {
+            Logger.w(LOG_TAG_FIREWALL, "exemptRethinkApp matched no rows (app not scanned yet?)")
         }
         mutex.withLock {
             val appInfo = appInfos[rethinkUid].firstOrNull()
