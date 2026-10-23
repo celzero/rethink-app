@@ -165,8 +165,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
 
-    suspend fun exemptRethinkApp() {
-        appInfoDAO.exemptRethinkApp()
+    suspend fun exemptRethinkApp(): Int {
+        return appInfoDAO.exemptRethinkApp()
     }
 
     /**

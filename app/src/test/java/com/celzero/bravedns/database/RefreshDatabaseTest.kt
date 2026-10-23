@@ -127,6 +127,44 @@ class RefreshDatabaseTest {
     }
 
     @Test
+    fun `insertApp should exempt rethink app statuses for own package`() = runTest {
+        val uid = 10123
+        val packageName = "com.celzero.bravedns"
+        every { context.packageName } returns packageName
+        val applicationInfo = ApplicationInfo().apply {
+            this.uid = uid
+            this.packageName = packageName
+        }
+
+        coEvery { Utilities.isMissingOrInvalidUid(uid) } returns false
+        coEvery { FirewallManager.hasUid(uid) } returns false
+        coEvery { FirewallManager.isTombstone(packageName) } returns false
+        every { packageManager.getPackagesForUid(uid) } returns arrayOf(packageName)
+        every { packageManager.getApplicationInfo(packageName, any<Int>()) } returns applicationInfo
+        every { packageManager.getApplicationLabel(any()) } returns "Rethink"
+        every { Utilities.getApplicationInfo(any(), any()) } returns applicationInfo
+
+        coEvery { FirewallManager.persistAppInfo(any()) } just Runs
+        coEvery { ProxyManager.addNewApp(any()) } just Runs
+        coEvery { FirewallManager.getAllApps() } returns
+            setOf(FirewallManager.AppInfoTuple(uid, packageName))
+
+        val action = RefreshDatabase.Action(RefreshDatabase.ACTION_INSERT_NEW_APP, uid)
+        refreshDatabase.process(action)
+
+        coVerify {
+            FirewallManager.persistAppInfo(
+                match {
+                    it.packageName == packageName &&
+                        it.firewallStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id &&
+                        it.connectionStatus == FirewallManager.ConnectionStatus.ALLOW.id &&
+                        it.isProxyExcluded
+                }
+            )
+        }
+    }
+
+    @Test
     fun `process ACTION_REFRESH_AUTO should tombstone uninstalled apps when tombstone is enabled`() = runTest {
         val trackedUid = 10555
         val trackedPackage = "com.uninstalled.app"

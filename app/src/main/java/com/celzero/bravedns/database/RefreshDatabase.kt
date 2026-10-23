@@ -696,6 +696,13 @@ internal constructor(
 
         entry.appCategory = determineAppCategory(ai)
 
+        // self-exempt on insert; startup migration is a no-op until the app scan populates AppInfo
+        if (ai.packageName == ctx.packageName) {
+            entry.firewallStatus = FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id
+            entry.isProxyExcluded = true
+        }
+
         Logger.i(LOG_TAG_APP_DB, "insert app: $ai")
         FirewallManager.persistAppInfo(entry)
         ProxyManager.addNewApp(entry)
