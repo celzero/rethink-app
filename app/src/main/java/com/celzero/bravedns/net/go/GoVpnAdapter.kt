@@ -1379,6 +1379,7 @@ class GoVpnAdapter : KoinComponent {
         if (connIds.isEmpty()) {
             val res = tunnel.closeConns("") // closes all connections
             Logger.i(LOG_TAG_VPN, "$TAG close all connections($connIds), res: $res")
+            logEvent(Severity.LOW, "close conns", "close all connections, reason: $reason, res: $res")
             return
         }
 
@@ -1400,6 +1401,7 @@ class GoVpnAdapter : KoinComponent {
                     connTrackerDb.closeConnectionForUids(uids, reason)
                     // event for closed conns is not needed, as bulk update triggers unnecessary events
                     Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids, reason: $reason")
+                    logEvent(Severity.LOW, "close conns", "close connections for uid $uids, reason: $reason, res: ${closedConns.size}")
                 } else {
                     connTrackerDb.closeConnections(diff, reason)
                     logEvent(Severity.LOW, "close conns", "close all connections, res: ${closedConns.size}")
@@ -1409,6 +1411,9 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "$TAG err closing connections: ${e.message}")
                 logEvent(Severity.MEDIUM, "close conns error", "err closing connections for diff: $diff, reason: ${e.message}")
             }
+        } else {
+            logEvent(Severity.MEDIUM, "no conns closed", "close all connections called but no conns closed, connIds: $connIds, isUid: $isUid reason: $reason, res: ${closedConns.size}")
+            Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, reason: $reason")
         }
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
     }
