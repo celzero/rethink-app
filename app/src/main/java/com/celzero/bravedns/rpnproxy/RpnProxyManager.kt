@@ -1395,18 +1395,20 @@ object RpnProxyManager : KoinComponent {
                 return@withLock
             }
             val label = if (registered) "refresh" else "first"
+            var unregisterFailed = false
             if (registered) {
                 try {
                     VpnController.unregisterWin()
                     Logger.i(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): unregistered stale WIN")
                 } catch (e: Exception) {
+                    unregisterFailed = true
                     Logger.w(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): unregister failed (non-fatal): ${e.message}")
                 }
             }
             val stateBytes = getWinExistingStateData()
             val regBytes = registerAndFetchWinWithTimeout(entitlementBytes, stateBytes, deviceId, label)
-            if (regBytes == null && !VpnController.isWinRegistered()) {
-                Logger.e(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): registration failed (bytes null and WIN not registered)")
+            if (regBytes == null && (unregisterFailed || !VpnController.isWinRegistered())) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): registration failed (bytes null)")
                 ok = false
                 return@withLock
             }
@@ -1524,7 +1526,8 @@ object RpnProxyManager : KoinComponent {
                     } catch (e: Exception) {
                         Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): payload persist failed (non-fatal): ${e.message}")
                     }
-                    entitlementBytes = getWinEntitlement() ?: extractWsObject(verdict.purchase.payload)
+                    // prefer the server-verified bytes; the file read-back may hold stale data if the store failed
+                    entitlementBytes = extractWsObject(verdict.purchase.payload) ?: getWinEntitlement()
                     if (entitlementBytes == null) {
                         Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): entitlement bytes unavailable after store")
                         return WinRefreshOutcome.StillStale
