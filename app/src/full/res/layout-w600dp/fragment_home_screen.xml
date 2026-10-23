@@ -40,7 +40,7 @@
                     android:maxLines="1"
                     tools:text="Lockdown with RPN"
                     android:textAllCaps="true"
-                    android:textColor="?attr/accentGood"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fhs_active_since_txt"
@@ -281,6 +281,7 @@
                         android:textSize="@dimen/large_font_text_view" />
 
                     <Space
+                        android:id="@+id/fhs_proxy_header_space"
                         android:layout_width="match_parent"
                         android:layout_height="18dp" />
 
@@ -535,6 +536,21 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fhs_proxy_inactive_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:alpha="0.5"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:text="@string/hsf_proxy_off_indicator"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/extra_large_font_text_view"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
