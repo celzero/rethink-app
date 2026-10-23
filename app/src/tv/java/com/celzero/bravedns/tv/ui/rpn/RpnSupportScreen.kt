@@ -172,7 +172,7 @@ fun RpnSupportScreen(navController: NavController) {
                     Intent.EXTRA_EMAIL,
                     arrayOf(supportEmail),
                 )
-                putExtra(Intent.EXTRA_SUBJECT, "Rethink Plus Support Request: [$category]")
+                putExtra(Intent.EXTRA_SUBJECT, "RPN Support Request: [$category]")
                 putExtra(Intent.EXTRA_TEXT, body)
                 zipUri?.let { uri ->
                     putExtra(Intent.EXTRA_STREAM, uri)
