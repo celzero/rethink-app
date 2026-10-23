@@ -437,6 +437,9 @@ object EnhancedBugReport : KoinComponent {
         try {
             val folder = tombstoneFolder(context.filesDir) ?: return
             // Delete empty files first.
+            folder.listFiles { f ->
+                f.isFile && f.length() == 0L && !activeSessionFileNames.contains(f.name)
+            }?.forEach { it.delete() }
             folder.listFiles { f -> f.isFile && f.length() == 0L }?.forEach { it.delete() }
             val files = folder.listFiles { f -> f.isFile && f.length() > 0 }
                 ?.sortedBy { it.lastModified() } ?: return
