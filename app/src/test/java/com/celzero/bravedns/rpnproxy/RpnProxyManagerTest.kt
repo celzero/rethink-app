@@ -25,6 +25,7 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.iab.BillingBackendClient
+import com.celzero.bravedns.iab.DidResult
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.QueryEntitlementResult
@@ -35,6 +36,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RpnEntitlement
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -42,7 +44,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
-import io.mockk.spyk
+import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.unmockkObject
 import io.mockk.verify
@@ -65,6 +67,7 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 import java.lang.reflect.Field
 
 @ExperimentalCoroutinesApi
@@ -169,21 +172,6 @@ class RpnProxyManagerTest : KoinTest {
         return field.get(obj) as T
     }
 
-    /**
-     * Swaps in a REAL PersistentState so tests that assert state-mutation writes can
-     * read back what production wrote. Stubbed PersistentState mocks always return the
-     * stubbed value on read, which can never observe a write.
-     */
-    private fun useRealPersistentState(): PersistentState {
-        // PersistentState's constructor eagerly resolves a flavor-defined string resource
-        // that is absent from Robolectric's resource table — stub getString to a constant.
-        val safeContext = spyk(context)
-        every { safeContext.getString(any()) } returns "default"
-        val real = PersistentState(safeContext)
-        setStaticFinalField(RpnProxyManager::class.java, "persistentState\$delegate", lazyOf(real))
-        return real
-    }
-
     // =========================================================================
     // 1. Activation / Deactivation
     // =========================================================================
@@ -195,14 +183,13 @@ class RpnProxyManagerTest : KoinTest {
 
         coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         every { mockStateMachine.hasValidSubscription() } returns true
-        // real state needed to observe the write
-        val realPs = useRealPersistentState()
-        realPs.rpnState = RpnProxyManager.RpnState.DISABLED.id
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
 
         RpnProxyManager.activateRpn(purchase, payload)
 
         coVerify { EncryptedFileManager.write(any(), any<ByteArray>(), any()) }
-        assertEquals(RpnProxyManager.RpnState.ENABLED.id, realPs.rpnState)
+        verify(exactly = 1) { mockPersistentState.rpnState = RpnProxyManager.RpnState.ENABLED.id }
+        verify(exactly = 0) { mockPersistentState.rpnState = RpnProxyManager.RpnState.DISABLED.id }
     }
 
     @Test
@@ -272,12 +259,11 @@ class RpnProxyManagerTest : KoinTest {
 
     @Test
     fun `deactivateRpn normal deactivation clears server meta`() {
-        val realPs = useRealPersistentState()
-        realPs.rpnState = RpnProxyManager.RpnState.ENABLED.id
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.ENABLED.id
 
         RpnProxyManager.deactivateRpn("manual deactivation")
 
-        assertEquals(RpnProxyManager.RpnState.DISABLED.id, realPs.rpnState)
+        verify(exactly = 1) { mockPersistentState.rpnState = RpnProxyManager.RpnState.DISABLED.id }
     }
 
     @Test
@@ -293,14 +279,13 @@ class RpnProxyManagerTest : KoinTest {
 
     @Test
     fun `stopProxy normal stop resets mode and deactivates`() = runTest {
-        val realPs = useRealPersistentState()
-        realPs.rpnState = RpnProxyManager.RpnState.ENABLED.id
-        realPs.rpnMode = RpnProxyManager.RpnMode.HIDE_IP.id
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.ENABLED.id
+        every { mockPersistentState.rpnMode } returns RpnProxyManager.RpnMode.HIDE_IP.id
 
         RpnProxyManager.stopProxy()
 
-        assertEquals(RpnProxyManager.RpnMode.NONE.id, realPs.rpnMode)
-        assertEquals(RpnProxyManager.RpnState.DISABLED.id, realPs.rpnState)
+        verify(exactly = 1) { mockPersistentState.rpnMode = RpnProxyManager.RpnMode.NONE.id }
+        verify(exactly = 1) { mockPersistentState.rpnState = RpnProxyManager.RpnState.DISABLED.id }
         coVerify { VpnController.unregisterWin() }
     }
 
@@ -319,14 +304,13 @@ class RpnProxyManagerTest : KoinTest {
 
     @Test
     fun `startProxy normal start sets mode and enables`() = runTest {
-        val realPs = useRealPersistentState()
-        realPs.rpnState = RpnProxyManager.RpnState.DISABLED.id
-        realPs.rpnMode = RpnProxyManager.RpnMode.NONE.id
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
+        every { mockPersistentState.rpnMode } returns RpnProxyManager.RpnMode.NONE.id
 
         RpnProxyManager.startProxy()
 
-        assertEquals(RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id, realPs.rpnMode)
-        assertEquals(RpnProxyManager.RpnState.ENABLED.id, realPs.rpnState)
+        verify(exactly = 1) { mockPersistentState.rpnMode = RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id }
+        verify(exactly = 1) { mockPersistentState.rpnState = RpnProxyManager.RpnState.ENABLED.id }
         coVerify { VpnController.handleRpnProxies() }
     }
 
@@ -1617,6 +1601,148 @@ class RpnProxyManagerTest : KoinTest {
         assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
         val reason = (result as RpnProxyManager.ResetResult.Failure).reason
         assertTrue("reason should mention empty entitlement: $reason", reason.contains("empty entitlement", ignoreCase = true))
+    }
+
+    private fun staleTunnelEntitlement(): RpnEntitlement = mockk {
+        every { expiry() } returns System.currentTimeMillis() - 3_600_000L
+        every { status() } returns "valid"
+    }
+
+    private fun freshServerPayload(): String {
+        val future = System.currentTimeMillis() + 24 * 60 * 60 * 1000L
+        return """{"ws":{"cid":"cid1","sessiontoken":"tok-fresh","expiry":"${isoUtc(future)}","status":"valid"}}"""
+    }
+
+    private fun stubLocalEntitlementFile(bytes: ByteArray) {
+        val f = File(context.cacheDir, "win_ent_${System.nanoTime()}.json")
+        f.writeBytes(bytes)
+        coEvery { mockRpnProxyDb.getProxyById(4) } returns RpnProxy(
+            id = 4, name = "WIN", configPath = "", serverResPath = f.absolutePath,
+            isActive = true, isLockdown = false, createdTs = 0, modifiedTs = 0,
+            misc = "", tunId = "", latency = 0, lastRefreshTime = 0
+        )
+        coEvery { EncryptedFileManager.readByteArray(any(), any<File>()) } returns bytes
+    }
+
+    private fun stubRpnEnabled() {
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.ENABLED.id
+        every { mockPersistentState.rpnMode } returns RpnProxyManager.RpnMode.HIDE_IP.id
+    }
+
+    @Test
+    fun `registerProxy live registration with local-only entitlement never unregisters`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
+        coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertTrue(ok)
+        coVerify(exactly = 0) { VpnController.unregisterWin() }
+        coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
+        coVerify(exactly = 0) { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `updateWinProxy stale tunnel forces server query and registers fresh entitlement without state json`() = runTest {
+        stubRpnEnabled()
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        every { mockStateMachine.getSubscriptionData() } returns SubscriptionStateMachineV2.SubscriptionData(
+            subscriptionStatus = SubscriptionStatus(),
+            purchaseDetail = makePurchaseDetail("standard.tier"),
+            lastUpdated = System.currentTimeMillis()
+        )
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = freshServerPayload()))
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { mockRpnProxyDb.update(any()) } returns 1
+        coEvery { VpnController.unregisterWin() } returns true
+        coEvery { VpnController.registerAndFetchWinConfig(any(), any(), any()) } returns "reg".toByteArray()
+        coEvery { VpnController.updateWin() } returns "upd".toByteArray()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val result = RpnProxyManager.updateWinProxy()
+
+        assertNotNull(result)
+        coVerify(exactly = 1) { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) }
+        coVerify(exactly = 1) { VpnController.unregisterWin() }
+        coVerify(exactly = 1) { VpnController.registerAndFetchWinConfig(any(), null, any()) }
+    }
+
+    @Test
+    fun `updateWinProxy stale tunnel with unverified server verdict keeps registration and updates`() = runTest {
+        stubRpnEnabled()
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        every { mockStateMachine.getSubscriptionData() } returns SubscriptionStateMachineV2.SubscriptionData(
+            subscriptionStatus = SubscriptionStatus(),
+            purchaseDetail = makePurchaseDetail("standard.tier"),
+            lastUpdated = System.currentTimeMillis()
+        )
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
+        coEvery { VpnController.updateWin() } returns "upd".toByteArray()
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val result = RpnProxyManager.updateWinProxy()
+
+        assertNotNull(result)
+        coVerify(exactly = 0) { VpnController.unregisterWin() }
+        coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
+        coVerify(exactly = 1) { VpnController.updateWin() }
+    }
+
+    @Test
+    fun `registerProxy prefers server entitlement bytes when disk read-back returns stale bytes`() = runTest {
+        stubLocalEntitlementFile(wsJson(token = "tok-old", expiryMs = System.currentTimeMillis() - 3_600_000L))
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
+            makePurchaseDetail("standard.tier", payload = freshServerPayload())
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
+        coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
+        coEvery { VpnController.isWinRegistered() } returns false
+        coEvery { VpnController.registerAndFetchWinConfig(any(), any(), any()) } returns "reg".toByteArray()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertTrue(ok)
+        val entSlot = slot<ByteArray>()
+        coVerify { VpnController.registerAndFetchWinConfig(capture(entSlot), any(), any()) }
+        assertTrue(
+            "expected server entitlement bytes, got: ${String(entSlot.captured)}",
+            String(entSlot.captured).contains("tok-fresh")
+        )
+    }
+
+    @Test
+    fun `registerProxy expired entitlement with no server refresh refuses registration`() = runTest {
+        stubLocalEntitlementFile(wsJson(token = "tok-old", expiryMs = System.currentTimeMillis() - 3_600_000L))
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
+            makePurchaseDetail("standard.tier", payload = "")
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
+        coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertFalse(ok)
+        coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
+        coVerify(exactly = 0) { VpnController.unregisterWin() }
     }
 
     // =========================================================================
