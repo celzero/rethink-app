@@ -1250,7 +1250,7 @@ object RpnProxyManager : KoinComponent {
                                         "$TAG; registerProxy: no entitlement bytes after server re-store (payloadLen=${updated.payload.length})"
                                     )
                                 }
-                                entitlementFromServer = true
+                                entitlementFromServer = wsBytes != null
                             } else {
                                 Logger.w(
                                     LOG_TAG_PROXY,
