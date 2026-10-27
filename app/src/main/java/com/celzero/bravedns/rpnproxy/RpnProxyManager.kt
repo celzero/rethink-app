@@ -474,7 +474,6 @@ object RpnProxyManager : KoinComponent {
      * @param newPayload  Optional override payload (e.g. from a fresh server entitlement query).
      */
     suspend fun activateRpn(purchase: PurchaseDetail, newPayload: String? = null) {
-
         val alreadyEnabled = persistentState.rpnState == RpnState.ENABLED.id
 
         // Priority: explicit newPayload > purchase.payload > DB developerPayload
@@ -785,9 +784,14 @@ object RpnProxyManager : KoinComponent {
             return ResetResult.Failure("Failed to register with tunnel")
         }
 
-        // manual reset: force a clean re-register even if the tunnel looks healthy
         val registered = try {
-            registerOrUpdateUnderLock(entitlementBytes, verifiedFresh = true, deviceId = deviceId, forceReRegister = true)
+            registerOrUpdateUnderLock(
+                entitlementBytes,
+                serverVerifiedFresh = true,
+                deviceId = deviceId,
+                forceReRegister = true,
+                freshEntitlement = true
+            )
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: tunnel registration failed: ${e.message}", e)
             return ResetResult.Failure("Failed to register with tunnel")
@@ -1168,6 +1172,7 @@ object RpnProxyManager : KoinComponent {
                 var entitlementBytes = getWinEntitlement() // fetch existing win entitlement
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement sz=${entitlementBytes?.size ?: "null"}")
                 var isEntitlementBytesAvailable = entitlementBytes != null && entitlementBytes.isNotEmpty()
+                var entitlementFromServer = false
                 // an expired-but-present entitlement also triggers a server query
                 val entitlementStale = isEntitlementBytesAvailable &&
                         !isWsBytesEntitlementCurrent(entitlementBytes)
@@ -1236,16 +1241,16 @@ object RpnProxyManager : KoinComponent {
                                 // capture the in-memory entitlement bytes before the
                                 // encrypted-disk round-trip so registration can proceed
                                 // even when the read-back fails after an install/update.
-                                val wsBytesFallback = extractWsObject(updated.payload)
+                                val wsBytes = extractWsObject(updated.payload)
                                 storeWinEntitlement(updated.payload)
-                                entitlementBytes = getWinEntitlement()
-                                if ((entitlementBytes == null || entitlementBytes.isEmpty()) && wsBytesFallback != null) {
+                                entitlementBytes = wsBytes ?: getWinEntitlement()
+                                if (entitlementBytes == null || entitlementBytes.isEmpty()) {
                                     Logger.w(
                                         LOG_TAG_PROXY,
-                                        "$TAG; registerProxy: encrypted read-back null after server re-store (keyset mismatch?), using in-memory entitlement bytes (len=${wsBytesFallback.size}) as fallback"
+                                        "$TAG; registerProxy: no entitlement bytes after server re-store (payloadLen=${updated.payload.length})"
                                     )
-                                    entitlementBytes = wsBytesFallback
                                 }
+                                entitlementFromServer = wsBytes != null
                             } else {
                                 Logger.w(
                                     LOG_TAG_PROXY,
@@ -1306,14 +1311,28 @@ object RpnProxyManager : KoinComponent {
                     LOG_TAG_PROXY,
                     "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${entitlementBytes?.size})"
                 )
-                // check-then-register is single-flighted inside registerOrUpdateUnderLock
                 val finalBytes = entitlementBytes
                 if (finalBytes == null || finalBytes.isEmpty()) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement bytes unavailable before registration, cannot proceed")
                     return false
                 }
-                val verifiedFresh = isWsBytesEntitlementCurrent(finalBytes)
-                ok = registerOrUpdateUnderLock(finalBytes, verifiedFresh, deviceId)
+                if (!entitlementFromServer) {
+                    val expiryMs = try {
+                        parseWsExpiryMs(JSONObject(String(finalBytes)))
+                    } catch (e: Exception) {
+                        null
+                    }
+                    if (expiryMs != null && expiryMs <= System.currentTimeMillis()) {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: stored entitlement expired (expiry=$expiryMs) and no server refresh in hand; refusing registration")
+                        return false
+                    }
+                }
+                ok = registerOrUpdateUnderLock(
+                    finalBytes,
+                    serverVerifiedFresh = entitlementFromServer,
+                    deviceId = deviceId,
+                    freshEntitlement = entitlementFromServer
+                )
                 if (!ok) return false
                 // Fetch servers from API and sync to database and cache
                 val (servers, removedSelectedIds) = fetchAndConstructWinLocations()
@@ -1373,12 +1392,12 @@ object RpnProxyManager : KoinComponent {
         return result
     }
 
-    // registers/re-registers WIN under winRegistrationMutex; never drops a live session without verified-fresh bytes
     private suspend fun registerOrUpdateUnderLock(
         entitlementBytes: ByteArray,
-        verifiedFresh: Boolean,
+        serverVerifiedFresh: Boolean,
         deviceId: String,
-        forceReRegister: Boolean = false
+        forceReRegister: Boolean = false,
+        freshEntitlement: Boolean = false
     ): Boolean {
         var ok = true
         winRegistrationMutex.withLock {
@@ -1389,9 +1408,8 @@ object RpnProxyManager : KoinComponent {
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock: WIN registered with a current entitlement, skipping")
                 return@withLock
             }
-            if (registered && stale && !verifiedFresh && !forceReRegister) {
-                // no fresh bytes: never drop a live (stale) session
-                Logger.w(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock: WIN stale but no verified-fresh entitlement in hand; leaving registration untouched")
+            if (registered && stale && !serverVerifiedFresh && !forceReRegister) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock: WIN stale but no server-verified fresh entitlement in hand; leaving registration untouched")
                 return@withLock
             }
             val label = if (registered) "refresh" else "first"
@@ -1405,7 +1423,7 @@ object RpnProxyManager : KoinComponent {
                     Logger.w(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): unregister failed (non-fatal): ${e.message}")
                 }
             }
-            val stateBytes = getWinExistingStateData()
+            val stateBytes = if (freshEntitlement) null else getWinExistingStateData()
             val regBytes = registerAndFetchWinWithTimeout(entitlementBytes, stateBytes, deviceId, label)
             if (regBytes == null && (unregisterFailed || !VpnController.isWinRegistered())) {
                 Logger.e(LOG_TAG_PROXY, "$TAG; registerOrUpdateUnderLock($label): registration failed (bytes null)")
@@ -1575,7 +1593,33 @@ object RpnProxyManager : KoinComponent {
         }
 
         val bytes = entitlementBytes
-        return if (registerOrUpdateUnderLock(bytes, verifiedFresh = true, deviceId = deviceId)) {
+        val serverVerified = freshPurchase != null
+        return if (registerOrUpdateUnderLock(
+                bytes,
+                serverVerifiedFresh = serverVerified,
+                deviceId = deviceId,
+                freshEntitlement = serverVerified
+            )
+        ) {
+            if (isTunnelEntitlementStale()) {
+                val tunnelExpiry = try {
+                    VpnController.getActiveEntitlement()?.expiry()
+                } catch (_: Exception) {
+                    null
+                }
+                val wsExpiry = try {
+                    parseWsExpiryMs(JSONObject(String(bytes)))
+                } catch (_: Exception) {
+                    null
+                }
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "$TAG; refreshWinEntitlement($label): tunnel STILL stale after fresh register " +
+                        "(tunnelExpiry=$tunnelExpiry, registeredWsExpiry=$wsExpiry, now=${System.currentTimeMillis()}); " +
+                        "not retrying this cycle"
+                )
+                return WinRefreshOutcome.StillStale
+            }
             Logger.i(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): tunnel holds a current entitlement")
             WinRefreshOutcome.Fresh
         } else {
@@ -2514,8 +2558,7 @@ object RpnProxyManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG; maybeReRegisterStaleEntitlement: rpn disabled, skipping refresh")
             return false
         }
-        // server-side deactivation is owned by the state machine, not by this watchdog
-        return when (refreshWinEntitlement("expiry-refresh", forceServerQuery = false, restoreMachine = false)) {
+        return when (refreshWinEntitlement("expiry-refresh", forceServerQuery = true, restoreMachine = false)) {
             WinRefreshOutcome.Fresh -> true
             else -> false
         }

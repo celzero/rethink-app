@@ -104,11 +104,11 @@ class RpnProxyUpdateWorker(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (UPDATE; keeps the periodic timer stable across reschedules)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE; fresh timer from registration)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */
