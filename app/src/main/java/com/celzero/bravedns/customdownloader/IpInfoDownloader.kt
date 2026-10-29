@@ -111,8 +111,13 @@ object IpInfoDownloader: KoinComponent {
         }
 
         try {
-            // check in database whether the ip info is already downloaded
-            val ipInfo = db.getIpInfo(ipToLookup)
+            // a broken/closed DB must never crash the VPN
+            val ipInfo = try {
+                db.getIpInfo(ipToLookup)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_DOWNLOAD, "$TAG; ip-info db read failed: ${e.message}")
+                return
+            }
             if (ipInfo != null) {
                 Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; already available, skip download")
                 return
@@ -210,7 +215,13 @@ object IpInfoDownloader: KoinComponent {
         val isLanIp = isLanIp(ip)
         if (isLanIp == null || isLanIp) return null
 
-        val existing = db.getIpInfo(ip)
+        // a broken/closed DB must never crash
+        val existing = try {
+            db.getIpInfo(ip)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_DOWNLOAD, "$TAG; ip-info db read failed: ${e.message}")
+            return null
+        }
         if (existing != null) return existing
 
         fetchIpInfoIfRequired(ip)
