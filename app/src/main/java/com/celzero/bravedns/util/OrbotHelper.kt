@@ -41,6 +41,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
+import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_IP
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
@@ -53,14 +54,11 @@ import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isValidPort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URI
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * One-click Orbot setup.
@@ -181,11 +179,6 @@ class OrbotHelper(
     private var httpsIp: String? = null
     private var dnsPort: Int? = null
 
-    @Volatile
-    private var isResponseReceivedFromOrbot: Boolean = false
-
-    private var retryCount = 3
-
     /** Returns the intent which will initiate the Orbot in non-vpn mode. */
     private fun getOrbotStartIntent(): Intent {
         val intent = Intent(ACTION_START)
@@ -247,12 +240,18 @@ class OrbotHelper(
     }
 
     /**
-     * Sends the intent to initiate the start in Orbot and registers for the Orbot ACTION_STATUS.
+     * Routes the selected apps to Orbot's default endpoints without waiting for a reply, as
+     * Orbot 17.9.6+ sends none (guardianproject/orbot-android@3ae39bc). If Tor is not up,
+     * their connections fail. Orbot < 17.9.6 replies to ACTION_START with its actual endpoints.
      */
     suspend fun startOrbot(type: String) {
         selectedProxyType = type
+        socks5Ip = SOCKS_DEFAULT_IP
+        socks5Port = SOCKS_DEFAULT_PORT
+        httpsIp = SOCKS_DEFAULT_IP
+        httpsPort = HTTP_PROXY_PORT
+        setOrbotMode()
         val intent = getOrbotStartIntent()
-        isResponseReceivedFromOrbot = false
         ContextCompat.registerReceiver(
             context,
             orbotStatusReceiver,
@@ -260,7 +259,6 @@ class OrbotHelper(
             ContextCompat.RECEIVER_EXPORTED
         )
         context.sendBroadcast(intent)
-        waitForOrbot()
         Logger.d(LOG_TAG_VPN, "request orbot start by broadcast")
     }
 
@@ -286,14 +284,12 @@ class OrbotHelper(
                 when (status) {
                     STATUS_ON -> {
                         Logger.i(LOG_TAG_VPN, "Orbot is ON, update the proxy data")
-                        isResponseReceivedFromOrbot = true
                         updateOrbotProxyData(intent)
                         setOrbotMode()
                     }
 
                     STATUS_OFF -> {
-                        Logger.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
-                        io { waitForOrbot() }
+                        Logger.i(LOG_TAG_VPN, "Orbot is OFF")
                         unregisterReceiver()
                     }
 
@@ -303,9 +299,7 @@ class OrbotHelper(
                     }
 
                     STATUS_STOPPING -> {
-                        Logger.i(LOG_TAG_VPN, "Orbot is STOPPING, stop the Proxy")
-                        updateOrbotProxyData(intent)
-                        stopOrbot(isInteractive = false)
+                        Logger.i(LOG_TAG_VPN, "Orbot is STOPPING")
                     }
                 }
             }
@@ -543,38 +537,6 @@ class OrbotHelper(
             LOG_TAG_VPN,
             "OrbotHelper: new val socks5:$socks5Ip($socks5Port), http: $httpsIp($httpsPort), dns: $dnsPort"
         )
-    }
-
-    /**
-     * Create a ScheduledExecutorService which will be executed after 30 sec of Orbot status
-     * initiation.
-     */
-    private suspend fun waitForOrbot() {
-        io {
-            delay(TimeUnit.SECONDS.toMillis(15L).milliseconds)
-            Logger.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
-
-            // Execute a task in the background thread after 15 sec.
-            // If there is no response for the broadcast from the Orbot,
-            // then the executor will execute and will disable the Orbot settings.
-            // Some cases where the Orbot won't be responding -eg., force stop of application,
-            // user disabled auto-start of the application.
-            if (isResponseReceivedFromOrbot) {
-                retryCount = 3 // reset the retry count
-                return@io
-            }
-
-            retryCount--
-            if (retryCount > 0) {
-                Logger.i(LOG_TAG_VPN, "retrying orbot start")
-                startOrbot(selectedProxyType)
-            } else {
-                uiCtx {
-                    stopOrbot(isInteractive = false)
-                    unregisterReceiver()
-                }
-            }
-        }
     }
 
     fun unregisterReceiver() {
