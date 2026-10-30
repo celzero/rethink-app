@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,9 +43,14 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainDAO
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 private data class DomainRuleRow(
@@ -66,59 +69,85 @@ private data class DomainRuleRow(
 }
 
 @Composable
-fun CustomDomainRulesList() {
+fun CustomDomainRulesList(uid: Int, query: String, appName: String?) {
     val dao = koinInject<CustomDomainDAO>()
     val scope = rememberCoroutineScope()
-    var reloadKey by remember { mutableStateOf(0) }
 
-    val rows by produceState(initialValue = emptyList<DomainRuleRow>(), reloadKey) {
-        value = withContext(Dispatchers.IO) {
-            dao.getDomainsByUID(Constants.UID_EVERYBODY)
-                .map { it.toRow() }
-        }
+    val rows by produceState(initialValue = emptyList<DomainRuleRow>(), uid, dao) {
+        dao.observeDomainsByUID(uid)
+            .map { list -> list.map { it.toRow() } }
+            .flowOn(Dispatchers.IO)
+            .collect { value = it }
     }
 
-    if (rows.isEmpty()) {
-        EmptyRulesState("No universal custom domain rules yet.")
+    val filtered = remember(rows, query) {
+        if (query.isBlank()) rows
+        else rows.filter { it.domain.contains(query.trim(), ignoreCase = true) }
+    }
+
+    var pendingDelete by remember { mutableStateOf<DomainRuleRow?>(null) }
+    val scopeLabel = if (uid == Constants.UID_EVERYBODY) "Universal" else (appName ?: "Unknown app")
+
+    if (filtered.isEmpty()) {
+        EmptyRulesState(
+            when {
+                rows.isEmpty() ->
+                    if (uid == Constants.UID_EVERYBODY) "No universal custom domain rules yet."
+                    else "No custom domain rules for $scopeLabel yet."
+                else -> "No domain rules match \"$query\"."
+            }
+        )
         return
     }
 
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         modifier = Modifier
             .fillMaxSize()
             .padding(bottom = 24.dp),
     ) {
-        items(rows, key = { it.key }) { row ->
+        items(filtered, key = { it.key }) { row ->
             DomainRuleCard(
                 row = row,
+                next = nextDomainStatus(row.status),
                 onSelect = {
                     scope.launch(Dispatchers.IO) {
                         applyDomainStatus(row, nextDomainStatus(row.status))
-                        withContext(Dispatchers.Main) { reloadKey++ }
                     }
                 },
+                onDelete = { pendingDelete = row },
             )
         }
+    }
+
+    pendingDelete?.let { row ->
+        RulesConfirmDialog(
+            title = "Delete rule?",
+            message = "Remove \"${row.domain}\" from $scopeLabel custom domain rules?",
+            confirmLabel = "Delete",
+            onConfirm = {
+                pendingDelete = null
+                scope.launch(Dispatchers.IO) {
+                    DomainRulesManager.deleteRules(listOf(row.toEntity()))
+                }
+            },
+            onDismiss = { pendingDelete = null },
+        )
     }
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun DomainRuleCard(row: DomainRuleRow, onSelect: () -> Unit) {
-    val next = nextDomainStatus(row.status)
-
+private fun DomainRuleCard(
+    row: DomainRuleRow,
+    next: DomainRulesManager.Status,
+    onSelect: () -> Unit,
+    onDelete: () -> Unit,
+) {
     Surface(
         onClick = onSelect,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
@@ -128,26 +157,51 @@ private fun DomainRuleCard(row: DomainRuleRow, onSelect: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.domain,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(6.dp))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     DomainStatusPill(row.status)
                     RuleTag(label = domainTypeLabel(row))
                 }
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(TvSpacing.GroupGap))
             Text(
                 text = "Next: ${statusLabel(next)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Spacer(Modifier.width(TvSpacing.GroupGap))
+            DeleteRuleButton(onDelete = onDelete)
         }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+internal fun DeleteRuleButton(onDelete: () -> Unit) {
+    Surface(
+        onClick = onDelete,
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Pill),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            focusedContainerColor = MaterialTheme.colorScheme.error,
+            focusedContentColor = MaterialTheme.colorScheme.onError,
+            pressedContainerColor = MaterialTheme.colorScheme.error,
+            pressedContentColor = MaterialTheme.colorScheme.onError,
+        ),
+    ) {
+        Text(
+            text = "Delete",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+        )
     }
 }
 
@@ -169,19 +223,33 @@ internal fun EmptyRulesState(text: String) {
 
 @Composable
 private fun DomainStatusPill(status: DomainRulesManager.Status) {
-    val (label, color) = when (status) {
-        DomainRulesManager.Status.NONE -> "None" to Color(0xFF607D8B)
-        DomainRulesManager.Status.BLOCK -> "Block" to Color(0xFFC62828)
-        DomainRulesManager.Status.TRUST -> "Trust" to Color(0xFF2E7D32)
+    // Status accent expressed through theme roles: success = good,
+    // error = bad, on-surface-variant = neutral.
+    val (label, container, content) = when (status) {
+        DomainRulesManager.Status.NONE -> Triple(
+            "None",
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            MaterialTheme.colorScheme.surface,
+        )
+        DomainRulesManager.Status.BLOCK -> Triple(
+            "Block",
+            MaterialTheme.colorScheme.error,
+            MaterialTheme.colorScheme.onError,
+        )
+        DomainRulesManager.Status.TRUST -> Triple(
+            "Trust",
+            TvColors.Success,
+            TvColors.OnSuccess,
+        )
     }
     Box(
         modifier = Modifier
-            .background(color, RoundedCornerShape(50))
+            .background(container, TvShapes.Pill)
             .padding(horizontal = 10.dp, vertical = 3.dp),
     ) {
         Text(
             text = label,
-            color = Color.White,
+            color = content,
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
         )
     }
@@ -191,7 +259,7 @@ private fun DomainStatusPill(status: DomainRulesManager.Status) {
 internal fun RuleTag(label: String) {
     Box(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.tertiary, TvShapes.Pill)
             .padding(horizontal = 8.dp, vertical = 3.dp),
     ) {
         Text(

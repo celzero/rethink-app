@@ -35,6 +35,7 @@ import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.SettingToggleRow
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -128,7 +129,7 @@ fun FirewallScreen() {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("DNS protection")
             SettingToggleRow(
                 title = "Disallow DNS bypass",
@@ -140,7 +141,7 @@ fun FirewallScreen() {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("App lifecycle")
             SettingToggleRow(
                 title = "Block when screen is off",
@@ -161,7 +162,7 @@ fun FirewallScreen() {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("Lockdown")
             SettingToggleRow(
                 title = "Universal lockdown",
@@ -173,7 +174,7 @@ fun FirewallScreen() {
                 },
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(TvSpacing.SectionGap))
         }
     }
 }

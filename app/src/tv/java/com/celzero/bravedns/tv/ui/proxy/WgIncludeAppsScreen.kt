@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +48,10 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.tv.ui.apps.AppIcon
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -212,14 +214,14 @@ fun WgIncludeAppsScreen(configId: Int, navController: NavController? = null) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Filter chips + bulk actions share one D-pad-passable row band.
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FilterChip(label = "All", selected = filter == Filter.ALL,
+                TvSelectableChip(label = "All", selected = filter == Filter.ALL,
                     onClick = { filter = Filter.ALL })
-                FilterChip(label = "Included", selected = filter == Filter.INCLUDED,
+                TvSelectableChip(label = "Included", selected = filter == Filter.INCLUDED,
                     onClick = { filter = Filter.INCLUDED })
-                FilterChip(label = "Not included", selected = filter == Filter.NOT_INCLUDED,
+                TvSelectableChip(label = "Not included", selected = filter == Filter.NOT_INCLUDED,
                     onClick = { filter = Filter.NOT_INCLUDED })
                 Spacer(Modifier.weight(1f))
                 BulkChip(
@@ -250,7 +252,7 @@ fun WgIncludeAppsScreen(configId: Int, navController: NavController? = null) {
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(TvSpacing.RowGap))
             SettingSectionHeader("Apps (${visible.size})")
 
             if (visible.isEmpty()) {
@@ -286,39 +288,11 @@ fun WgIncludeAppsScreen(configId: Int, navController: NavController? = null) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun FilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                ),
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
 private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         enabled = enabled,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Pill),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = if (armed) MaterialTheme.colorScheme.error
             else MaterialTheme.colorScheme.surfaceVariant,
@@ -339,7 +313,7 @@ private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: (
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -356,15 +330,8 @@ private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: (
 private fun AppToggleRow(row: WgAppRow, onToggle: (Boolean) -> Unit) {
     Surface(
         onClick = { onToggle(!row.included) },
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier
             .fillMaxWidth()
             .height(96.dp),
@@ -372,17 +339,15 @@ private fun AppToggleRow(row: WgAppRow, onToggle: (Boolean) -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = TvSpacing.ContentHorizontal, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppIcon(packageName = row.packageName, size = 48)
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(TvSpacing.GroupGap))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.appName.ifBlank { row.packageName },
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -395,7 +360,7 @@ private fun AppToggleRow(row: WgAppRow, onToggle: (Boolean) -> Unit) {
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(TvSpacing.IconTextGap))
             IncludedTile(included = row.included)
         }
     }
@@ -408,7 +373,7 @@ private fun IncludedTile(included: Boolean) {
     val container = if (included) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.surface
     androidx.tv.material3.Surface(
-        shape = RoundedCornerShape(50),
+        shape = TvShapes.Pill,
         colors = SurfaceDefaults.colors(containerColor = container),
     ) {
         Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) {
@@ -416,7 +381,7 @@ private fun IncludedTile(included: Boolean) {
                 text = if (included) "Included" else "Excluded",
                 color = if (included) MaterialTheme.colorScheme.onPrimary
                 else MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelMedium,
             )
         }
     }

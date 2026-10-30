@@ -22,15 +22,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -41,15 +41,20 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
+import com.celzero.bravedns.tv.ui.common.TvChipRow
+import com.celzero.bravedns.tv.ui.common.TvTabRow
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 import java.net.URLEncoder
@@ -92,16 +97,27 @@ fun StatsScreen(navController: NavController? = null) {
     var window by remember { mutableStateOf(StatsWindow.ONE_HOUR) }
     var tab by remember { mutableStateOf(StatsTab.TOP_APPS) }
     val to = System.currentTimeMillis() - window.millis
+    // Parks D-pad focus on the selected tab after screen entry; the
+    // 150 ms delay outruns the nav rail's 80 ms route-change anchor.
+    val selectedTabFocus = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        delay(150)
+        runCatching { selectedTabFocus.requestFocus() }
+    }
 
     TvScreenScaffold(
         title = "Stats",
-        subtitle = "Top apps, domains, IPs, and what got blocked.",
+        subtitle = "${tab.label} · ${window.label} — press center on a row for details.",
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             WindowSelector(current = window, onSelect = { window = it })
-            Spacer(Modifier.height(12.dp))
-            TabChipRow(active = tab, onSelect = { tab = it })
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
+            TabChipRow(
+                active = tab,
+                onSelect = { tab = it },
+                selectedFocusRequester = selectedTabFocus,
+            )
+            Spacer(Modifier.height(TvSpacing.GroupGap))
 
             val flow = remember(tab, to) {
                 pagerFlowFor(tab, to, statsDao, connDao)
@@ -132,69 +148,29 @@ private fun pagerFlowFor(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun TabChipRow(active: StatsTab, onSelect: (StatsTab) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatsTab.entries.forEach { t ->
-            val isActive = t == active
-            Surface(
-                onClick = { onSelect(t) },
-                shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = if (isActive) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (isActive) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
-            ) {
-                Text(
-                    text = t.label,
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                    ),
-                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
-                )
-            }
-        }
-    }
+private fun TabChipRow(
+    active: StatsTab,
+    onSelect: (StatsTab) -> Unit,
+    selectedFocusRequester: FocusRequester?,
+) {
+    TvTabRow(
+        tabs = StatsTab.entries.toList(),
+        selected = active,
+        label = { it.label },
+        onSelect = onSelect,
+        selectedFocusRequester = selectedFocusRequester,
+    )
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun WindowSelector(current: StatsWindow, onSelect: (StatsWindow) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatsWindow.entries.forEach { w ->
-            WindowChip(label = w.label, active = current == w, onClick = { onSelect(w) })
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun WindowChip(label: String, active: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (active) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (active) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
-        )
-    }
+    TvChipRow(
+        options = StatsWindow.entries.toList(),
+        selected = current,
+        label = { it.label },
+        onSelect = onSelect,
+    )
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -259,15 +235,8 @@ private fun keyFor(row: AppConnection): String =
 private fun StatsRow(tab: StatsTab, row: AppConnection, rank: Int, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(8.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.ExtraSmall),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier.fillMaxWidth().focusable(),
     ) {
         Row(
@@ -279,7 +248,7 @@ private fun StatsRow(tab: StatsTab, row: AppConnection, rank: Int, onClick: () -
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = primaryLabel(tab, row),
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -295,10 +264,10 @@ private fun StatsRow(tab: StatsTab, row: AppConnection, rank: Int, onClick: () -
                     )
                 }
             }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(TvSpacing.RowGap))
             Text(
                 text = trailing(tab, row),
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -310,14 +279,14 @@ private fun RankTile(rank: Int) {
     Box(
         modifier = Modifier
             .width(36.dp)
-            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(6.dp))
+            .background(MaterialTheme.colorScheme.tertiary, TvShapes.ExtraSmall)
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "#$rank",
             color = MaterialTheme.colorScheme.onTertiary,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

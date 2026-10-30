@@ -9,6 +9,7 @@
  */
 package com.celzero.bravedns.tv.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvGradients
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
 
 /**
  * Standard chrome for a top-level TV destination.
@@ -52,25 +53,26 @@ fun TvScreenScaffold(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp, vertical = 24.dp),
+            // Subtle tonal wash behind the header block — material
+            // depth, not decoration.
+            .background(brush = TvGradients.header())
+            .padding(horizontal = TvSpacing.ScreenHorizontal, vertical = TvSpacing.ScreenVertical),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Bold,
-            ),
+            style = MaterialTheme.typography.displayMedium,
         )
         if (subtitle != null) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(TvSpacing.HeaderGap))
             Text(
                 text = subtitle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium,
             )
         }
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(TvSpacing.SectionGap))
         Box(modifier = Modifier.fillMaxWidth()) {
             content()
         }

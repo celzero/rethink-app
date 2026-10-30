@@ -4,7 +4,20 @@
 
   Overrides app_name for the `tv` Gradle flavor so the Android TV launcher
   surfaces "Rethink TV" rather than the upstream phone-app label.
+
+  RPN TV screens reuse the phone (play/full) string resources wherever an
+  equivalent string exists; the tv_* entries below cover TV-only wording
+  with no phone counterpart.
 -->
 <resources>
     <string name="app_name" translatable="false">Rethink TV</string>
+
+    <string name="tv_open_action" translatable="false">Open ›</string>
+
+    <string name="tv_rpn_stats_title" translatable="false">RPN stats</string>
+    <string name="tv_rpn_stats_subtitle_fmt" translatable="false">Last %1$dh of RPN-routed traffic.</string>
+    <string name="tv_rpn_stats_top_apps_fmt" translatable="false">Top apps · last %1$dh</string>
+    <string name="tv_rpn_stats_empty_fmt" translatable="false">No connections have gone through selected servers in the last %1$dh.</string>
+    <string name="tv_rpn_stats_logs_subtitle" translatable="false">Inspect individual RPN-routed connections.</string>
+    <string name="tv_rpn_stats_window_fmt" translatable="false">%1$dh</string>
 </resources>

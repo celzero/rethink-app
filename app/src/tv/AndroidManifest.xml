@@ -19,8 +19,8 @@
   2. <activity com.celzero.bravedns.tv.ui.TvHomeActivity ...> with
      LEANBACK_LAUNCHER + LAUNCHER intent filters — the TV-specific
      launcher entry. LAUNCHER is included so the activity is also
-     reachable from the standard launcher if the .tv APK happens to
-     be installed on a phone (e.g. when QA-ing on hardware that's not
+     reachable from the standard launcher if this APK happens to be
+     installed on a phone (e.g. when QA-ing on hardware that's not
      a TV box).
 
   Drift management: when `upstream/main` modifies
@@ -32,6 +32,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-sdk tools:overrideLibrary="androidx.compose.animation,androidx.compose.animation.core,androidx.compose.foundation,androidx.compose.foundation.layout,androidx.compose.material3,androidx.compose.material3.adaptive.navigationsuite,androidx.compose.material3.ripple,androidx.compose.runtime,androidx.compose.runtime.annotation,androidx.compose.runtime.livedata,androidx.compose.runtime.retain,androidx.compose.runtime.saveable,androidx.compose.ui,androidx.compose.ui.geometry,androidx.compose.ui.graphics,androidx.compose.ui.text,androidx.compose.ui.tooling,androidx.compose.ui.tooling.data,androidx.compose.ui.tooling.preview,androidx.compose.ui.unit,androidx.compose.ui.util" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -219,6 +221,8 @@
             android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConnIdLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.EventsActivity"
             android:finishOnTaskLaunch="true" />

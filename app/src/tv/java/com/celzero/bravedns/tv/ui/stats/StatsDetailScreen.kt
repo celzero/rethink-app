@@ -9,7 +9,6 @@
  */
 package com.celzero.bravedns.tv.ui.stats
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,13 +19,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
@@ -35,10 +32,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -82,6 +84,8 @@ fun StatsDetailScreen(value: String, kind: StatsDetailKind) {
         title = value.ifBlank { kind.fallbackTitle },
         subtitle = "Recent connections — ${kind.subtitle}.",
     ) {
+        BackHintBanner()
+
         if (items.itemCount == 0) {
             Box(
                 modifier = Modifier
@@ -123,21 +127,47 @@ enum class StatsDetailKind(
 
 private val ConnTimeFmt = SimpleDateFormat("MM-dd HH:mm:ss", Locale.US)
 
+/** Tag-style reminder that Back exits the drill-down (same family as RulesScreen's scope tag). */
+@Composable
+private fun BackHintBanner() {
+    Surface(
+        shape = TvShapes.Pill,
+        colors = SurfaceDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+        modifier = Modifier.padding(bottom = TvSpacing.RowGap),
+    ) {
+        Text(
+            text = "Press back to return to Stats",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+        )
+    }
+}
+
 @Composable
 private fun ConnRow(c: ConnectionTracker) {
     val blocked = c.isBlocked
-    val bg = if (blocked) {
-        MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.18f)
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(bg, RoundedCornerShape(8.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+    Surface(
+        onClick = { /* center-click has no side effect; rows exist for focus/highlight */ },
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.ExtraSmall),
+        colors = TvSurfaceStyles.rowColors(
+            container = if (blocked) {
+                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.18f)
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+            },
+            content = MaterialTheme.colorScheme.onSurface,
+        ),
+        modifier = Modifier.fillMaxWidth(),
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = ConnTimeFmt.format(Date(c.timeStamp)),
@@ -145,7 +175,7 @@ private fun ConnRow(c: ConnectionTracker) {
                 style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                 modifier = Modifier.width(130.dp),
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(TvSpacing.RowGap))
             Text(
                 text = if (blocked) "BLOCKED" else "ALLOWED",
                 color = if (blocked) {
@@ -153,13 +183,13 @@ private fun ConnRow(c: ConnectionTracker) {
                 } else {
                     MaterialTheme.colorScheme.primary
                 },
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.width(72.dp),
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(TvSpacing.RowGap))
             Text(
                 text = c.appName.ifBlank { "uid ${c.uid}" },
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth(),
@@ -174,5 +204,6 @@ private fun ConnRow(c: ConnectionTracker) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        }
     }
 }

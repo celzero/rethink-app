@@ -28,9 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
@@ -42,7 +40,12 @@ import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogDAO
 import com.celzero.bravedns.database.ConsoleLogRepository
@@ -104,12 +107,12 @@ fun ConsoleLogScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(bottom = TvSpacing.GroupGap),
+                horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 LogLevelFilter.entries.forEach { f ->
-                    LevelChip(
+                    TvSelectableChip(
                         label = f.label,
                         selected = minLevel == f,
                         onClick = { minLevel = f },
@@ -145,44 +148,10 @@ private enum class LogLevelFilter(val label: String, val threshold: Int) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun LevelChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-            contentColor = if (selected) {
-                MaterialTheme.colorScheme.onPrimary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Box(modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                ),
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
 private fun ClearButton(onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Small),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
@@ -195,7 +164,7 @@ private fun ClearButton(onClick: () -> Unit) {
         Box(modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)) {
             Text(
                 text = "Clear log",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleSmall,
             )
         }
     }
@@ -237,11 +206,11 @@ private val LogTimeFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 @Composable
 private fun LogRow(log: ConsoleLog) {
     val (levelText, levelColor) = when (log.level.toInt()) {
-        in Int.MIN_VALUE..0 -> "VERB" to Color(0xFF8E8E93)
-        1 -> "INFO" to Color(0xFF34C759)
-        2 -> "WARN" to Color(0xFFFF9500)
-        3 -> "ERROR" to Color(0xFFFF3B30)
-        else -> "?" to Color(0xFF8E8E93)
+        in Int.MIN_VALUE..0 -> "VERB" to MaterialTheme.colorScheme.onSurfaceVariant
+        1 -> "INFO" to TvColors.Success
+        2 -> "WARN" to TvColors.Warning
+        3 -> "ERROR" to MaterialTheme.colorScheme.error
+        else -> "?" to MaterialTheme.colorScheme.onSurfaceVariant
     }
     Row(
         modifier = Modifier
@@ -262,11 +231,11 @@ private fun LogRow(log: ConsoleLog) {
                 .background(levelColor.copy(alpha = 0.18f), RoundedCornerShape(4.dp))
                 .padding(horizontal = 6.dp, vertical = 2.dp),
         ) {
-            Text(
-                text = levelText,
-                color = levelColor,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            )
+        Text(
+            text = levelText,
+            color = levelColor,
+            style = MaterialTheme.typography.labelSmall,
+        )
         }
         Text(
             text = log.message,

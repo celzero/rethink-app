@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +31,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
@@ -45,9 +42,14 @@ import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpDao
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 private data class IpRuleRow(
@@ -67,63 +69,86 @@ private data class IpRuleRow(
 }
 
 @Composable
-fun CustomIpRulesList() {
+fun CustomIpRulesList(uid: Int, query: String, appName: String?) {
     val dao = koinInject<CustomIpDao>()
     val scope = rememberCoroutineScope()
-    var reloadKey by remember { mutableStateOf(0) }
 
-    val rows by produceState(initialValue = emptyList<IpRuleRow>(), reloadKey) {
-        value = withContext(Dispatchers.IO) {
-            dao.getRulesByUid(Constants.UID_EVERYBODY)
-                .asSequence()
-                .filter { it.isActive }
-                .sortedByDescending { it.modifiedDateTime }
-                .map { it.toRow() }
-                .toList()
-        }
+    val rows by produceState(initialValue = emptyList<IpRuleRow>(), uid, dao) {
+        dao.observeRulesByUid(uid)
+            .map { list -> list.map { it.toRow() } }
+            .flowOn(Dispatchers.IO)
+            .collect { value = it }
     }
 
-    if (rows.isEmpty()) {
-        EmptyRulesState("No universal custom IP rules yet.")
+    val filtered = remember(rows, query) {
+        if (query.isBlank()) rows
+        else rows.filter { displayAddress(it).contains(query.trim(), ignoreCase = true) }
+    }
+
+    var pendingDelete by remember { mutableStateOf<IpRuleRow?>(null) }
+    val universal = uid == Constants.UID_EVERYBODY
+    val scopeLabel = if (universal) "Universal" else (appName ?: "Unknown app")
+
+    if (filtered.isEmpty()) {
+        EmptyRulesState(
+            when {
+                rows.isEmpty() ->
+                    if (universal) "No universal custom IP rules yet."
+                    else "No custom IP rules for $scopeLabel yet."
+                else -> "No IP rules match \"$query\"."
+            }
+        )
         return
     }
 
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         modifier = Modifier
             .fillMaxSize()
             .padding(bottom = 24.dp),
     ) {
-        items(rows, key = { it.key }) { row ->
+        items(filtered, key = { it.key }) { row ->
             IpRuleCard(
                 row = row,
+                next = nextIpStatus(row.status, universal),
                 onSelect = {
                     scope.launch(Dispatchers.IO) {
-                        applyIpStatus(row, nextIpStatus(row.status))
-                        withContext(Dispatchers.Main) { reloadKey++ }
+                        applyIpStatus(row, nextIpStatus(row.status, universal))
                     }
                 },
+                onDelete = { pendingDelete = row },
             )
         }
+    }
+
+    pendingDelete?.let { row ->
+        RulesConfirmDialog(
+            title = "Delete rule?",
+            message = "Remove \"${displayAddress(row)}\" from $scopeLabel custom IP rules?",
+            confirmLabel = "Delete",
+            onConfirm = {
+                pendingDelete = null
+                scope.launch(Dispatchers.IO) {
+                    IpRulesManager.deleteRules(listOf(row.toEntity()))
+                }
+            },
+            onDismiss = { pendingDelete = null },
+        )
     }
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun IpRuleCard(row: IpRuleRow, onSelect: () -> Unit) {
-    val next = nextIpStatus(row.status)
-
+private fun IpRuleCard(
+    row: IpRuleRow,
+    next: IpRulesManager.IpRuleStatus,
+    onSelect: () -> Unit,
+    onDelete: () -> Unit,
+) {
     Surface(
         onClick = onSelect,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
@@ -133,13 +158,13 @@ private fun IpRuleCard(row: IpRuleRow, onSelect: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = displayAddress(row),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(6.dp))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     IpStatusPill(row.status)
@@ -152,32 +177,52 @@ private fun IpRuleCard(row: IpRuleRow, onSelect: () -> Unit) {
                     }
                 }
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(TvSpacing.GroupGap))
             Text(
                 text = "Next: ${ipStatusLabel(next)}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Spacer(Modifier.width(TvSpacing.GroupGap))
+            DeleteRuleButton(onDelete = onDelete)
         }
     }
 }
 
 @Composable
 private fun IpStatusPill(status: IpRulesManager.IpRuleStatus) {
-    val (label, color) = when (status) {
-        IpRulesManager.IpRuleStatus.NONE -> "None" to Color(0xFF607D8B)
-        IpRulesManager.IpRuleStatus.BLOCK -> "Block" to Color(0xFFC62828)
-        IpRulesManager.IpRuleStatus.TRUST -> "Trust" to Color(0xFF2E7D32)
-        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> "Bypass" to Color(0xFF6E51BD)
+    // Status accent expressed through theme roles: success = good,
+    // error = bad, secondary = bypass, on-surface-variant = neutral.
+    val (label, container, content) = when (status) {
+        IpRulesManager.IpRuleStatus.NONE -> Triple(
+            "None",
+            MaterialTheme.colorScheme.onSurfaceVariant,
+            MaterialTheme.colorScheme.surface,
+        )
+        IpRulesManager.IpRuleStatus.BLOCK -> Triple(
+            "Block",
+            MaterialTheme.colorScheme.error,
+            MaterialTheme.colorScheme.onError,
+        )
+        IpRulesManager.IpRuleStatus.TRUST -> Triple(
+            "Trust",
+            TvColors.Success,
+            TvColors.OnSuccess,
+        )
+        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> Triple(
+            "Bypass",
+            MaterialTheme.colorScheme.secondary,
+            MaterialTheme.colorScheme.onSecondary,
+        )
     }
     Box(
         modifier = Modifier
-            .background(color, RoundedCornerShape(50))
+            .background(container, TvShapes.Pill)
             .padding(horizontal = 10.dp, vertical = 3.dp),
     ) {
         Text(
             text = label,
-            color = Color.White,
+            color = content,
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
         )
     }
@@ -221,11 +266,24 @@ private suspend fun applyIpStatus(row: IpRuleRow, next: IpRulesManager.IpRuleSta
     }
 }
 
-private fun nextIpStatus(status: IpRulesManager.IpRuleStatus): IpRulesManager.IpRuleStatus = when (status) {
-    IpRulesManager.IpRuleStatus.NONE -> IpRulesManager.IpRuleStatus.BLOCK
-    IpRulesManager.IpRuleStatus.BLOCK -> IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL
-    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL,
-    IpRulesManager.IpRuleStatus.TRUST -> IpRulesManager.IpRuleStatus.NONE
+// Bypass universal is a universal-scope-only status; per-app rules
+// cycle Block -> Trust, universal rules cycle Block -> Bypass.
+private fun nextIpStatus(
+    status: IpRulesManager.IpRuleStatus,
+    universal: Boolean,
+): IpRulesManager.IpRuleStatus = when {
+    universal -> when (status) {
+        IpRulesManager.IpRuleStatus.NONE -> IpRulesManager.IpRuleStatus.BLOCK
+        IpRulesManager.IpRuleStatus.BLOCK -> IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL
+        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL,
+        IpRulesManager.IpRuleStatus.TRUST -> IpRulesManager.IpRuleStatus.NONE
+    }
+    else -> when (status) {
+        IpRulesManager.IpRuleStatus.NONE -> IpRulesManager.IpRuleStatus.BLOCK
+        IpRulesManager.IpRuleStatus.BLOCK -> IpRulesManager.IpRuleStatus.TRUST
+        IpRulesManager.IpRuleStatus.TRUST,
+        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> IpRulesManager.IpRuleStatus.NONE
+    }
 }
 
 private fun ipStatusLabel(status: IpRulesManager.IpRuleStatus): String = when (status) {
