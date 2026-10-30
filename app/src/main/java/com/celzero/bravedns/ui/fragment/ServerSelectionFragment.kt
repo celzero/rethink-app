@@ -74,6 +74,7 @@ import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.MAX_WIN_SERVERS
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -270,12 +271,6 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     companion object {
         private const val TAG = "ServerSelectionFragment"
 
-        /**
-         * Maximum number of NON-AUTO servers the user can select simultaneously.
-         * AUTO is always kept connected on top of this limit.
-         */
-        private const val MAX_SELECTIONS = 5
-
         /** Half of the error card dolphin's bob cycle (down + up = one loop). */
         private const val ERROR_DOLPHIN_BOB_HALF_MS = 1_000L
 
@@ -423,7 +418,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupSwipeToRefresh()
         loadRpnHeatmap()
         // Center the QS pill row once its real (measured) width is known.
-        b.quickSettingsPills.post { if (isAdded) alignQuickSettingsPills() }
+        b.quickSettingsPills.post { if (view != null) alignQuickSettingsPills() }
 
         // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
@@ -438,12 +433,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         // Apply bottom padding so the last list item is not hidden behind the
         // BottomNavigationView (which floats over the fragment container).
         requireActivity().findViewById<View>(R.id.nav_view)?.let { navView ->
+            val scrollView = b.serversScrollView
             navView.post {
-                if (!isAdded) return@post
-                b.serversScrollView.setPadding(
-                    b.serversScrollView.paddingLeft,
-                    b.serversScrollView.paddingTop,
-                    b.serversScrollView.paddingRight,
+                if (view == null) return@post
+                scrollView.setPadding(
+                    scrollView.paddingLeft,
+                    scrollView.paddingTop,
+                    scrollView.paddingRight,
                     navView.height + dpPx(24)
                 )
             }
@@ -521,12 +517,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     }
 
     private fun applyScrollPadding() {
-        b.serversScrollView.post {
-            b.serversScrollView.setPadding(
-                b.serversScrollView.paddingLeft,
+        val scrollView = b.serversScrollView
+        scrollView.post {
+            scrollView.setPadding(
+                scrollView.paddingLeft,
                 0,
-                b.serversScrollView.paddingRight,
-                b.serversScrollView.paddingBottom
+                scrollView.paddingRight,
+                scrollView.paddingBottom
             )
         }
     }
@@ -995,6 +992,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             b.statusIndicator.animate().cancel()
             b.statusCard.animate().cancel()
             b.searchCard.animate().cancel()
+            b.errorStateContainer.animate().cancel()
+            b.qsRelayTile.animate().cancel()
         }
         runCatching {
             b.rvServers.suppressLayout(false)
@@ -1163,7 +1162,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 groupedByKey.forEach { (key, serversWithSameKey) ->
                     // Skip if already at the non-AUTO limit
                     val nonAutoCount = localSelected.count { it.id != AUTO_SERVER_ID }
-                    if (nonAutoCount >= MAX_SELECTIONS) return@forEach
+                    if (nonAutoCount >= MAX_WIN_SERVERS) return@forEach
                     val best = serversWithSameKey.minByOrNull { it.load } ?: serversWithSameKey.first()
 
                     if (VpnController.getWinByKey(Backend.RpnWin + key) == null) {
@@ -1217,8 +1216,10 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
                 // then start a short-lived polling job to clear them as they come up.
                 selectedAdapter.setLoadingTunnelKeys(pendingTunnelKeys)
                 if (pendingTunnelKeys.isNotEmpty()) startTunnelWatchJob(pendingTunnelKeys)
-                b.rvServers.post { b.rvServers.requestLayout() }
-                b.rvSelectedServers.post { b.rvSelectedServers.requestLayout() }
+                val rvServers = b.rvServers
+                val rvSelectedServers = b.rvSelectedServers
+                rvServers.post { rvServers.requestLayout() }
+                rvSelectedServers.post { rvSelectedServers.requestLayout() }
                 // Show frequently-selected countries as quick-pick chips
                 if (!isProxyStopped) loadAndShowFrequentChips()
             }
@@ -1428,7 +1429,7 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         val row = b.avatarRow
         row.removeAllViews()
         val density = resources.displayMetrics.density
-        countries.take(MAX_SELECTIONS).forEachIndexed { index, config ->
+        countries.take(MAX_WIN_SERVERS).forEachIndexed { index, config ->
             if (config.cc.isBlank()) return@forEachIndexed
             val avatar = FrameLayout(requireContext()).apply {
                 layoutParams = LinearLayout.LayoutParams(
@@ -1846,11 +1847,13 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         b.searchBar.isIconified = false
         // Focus alone doesn't raise the keyboard; ask the IME explicitly once
         // the scroll has settled.
-        b.searchBar.post {
-            if (!isAdded) return@post
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
-                as? InputMethodManager
-            imm?.showSoftInput(b.searchBar, InputMethodManager.SHOW_IMPLICIT)
+        val searchBar = b.searchBar
+        searchBar.post {
+            if (view == null) return@post
+            val imm =
+                searchBar.context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                    as? InputMethodManager
+            imm?.showSoftInput(searchBar, InputMethodManager.SHOW_IMPLICIT)
         }
     }
 
@@ -3274,8 +3277,8 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
             }
 
             val nonAutoCount = selectedServers.count { it.id != AUTO_SERVER_ID }
-            if (nonAutoCount >= MAX_SELECTIONS) {
-                showToast(getString(R.string.server_selection_max_reached, MAX_SELECTIONS))
+            if (nonAutoCount >= MAX_WIN_SERVERS) {
+                showToast(getString(R.string.server_selection_max_reached, MAX_WIN_SERVERS))
                 return
             }
 

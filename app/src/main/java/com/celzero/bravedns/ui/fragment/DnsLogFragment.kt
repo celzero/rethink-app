@@ -187,7 +187,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         recyclerAdapter.addLoadStateListener { loadState ->
             val isEmpty = recyclerAdapter.itemCount < 1
             if (loadState.append.endOfPaginationReached && isEmpty) {
-                viewModel.dnsLogsList.removeObservers(this)
+                viewModel.dnsLogsList.removeObservers(viewLifecycleOwner)
                 b.recyclerQuery.visibility = View.GONE
             } else {
                 if (!b.recyclerQuery.isVisible) b.recyclerQuery.visibility = View.VISIBLE
@@ -210,6 +210,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+                    if (view == null) return
 
                     val firstChild = recyclerView.getChildAt(0)
                     if (firstChild == null) {
@@ -224,12 +225,13 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                     }
 
                     b.queryListRecyclerScrollHeader.text =
-                        formatToRelativeTime(requireContext(), tag)
+                        formatToRelativeTime(recyclerView.context, tag)
                     b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
+                    if (view == null) return
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         b.queryListRecyclerScrollHeader.visibility = View.GONE
                     }

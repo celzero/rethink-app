@@ -91,7 +91,7 @@
         android:textSize="@dimen/large_font_text_view"
         android:visibility="gone" />
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_query"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -101,13 +101,9 @@
         android:focusable="true"
         android:nestedScrollingEnabled="true"
         android:orientation="vertical"
-        app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="1500"
-        app:fastScrollEnableThumbInactiveColor="true"
-        app:fastScrollThumbColor="?attr/chipColorBgNormal"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
-        app:fastScrollTrackColor="?attr/background" />
+        app:fastScrollEnabled="true"
+        app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/query_list_recycler_scroll_header"

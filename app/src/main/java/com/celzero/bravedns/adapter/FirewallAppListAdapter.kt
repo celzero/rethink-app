@@ -50,7 +50,6 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView.SectionedAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,7 +60,7 @@ class FirewallAppListAdapter(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
     private val eventLogger: EventLogger
-) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK), SectionedAdapter {
+) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
 
     private val packageManager: PackageManager = context.packageManager
     // private val systemAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.textColorAccentBad) }
@@ -497,21 +496,5 @@ class FirewallAppListAdapter(
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
-    }
-
-    override fun getSectionName(position: Int): String {
-        // Check if position is valid to prevent IndexOutOfBoundsException
-        if (position !in 0..<itemCount) {
-            return ""
-        }
-        
-        val appInfo = getItem(position) ?: return ""
-        
-        // Handle empty app names safely
-        return if (appInfo.appName.isNotEmpty()) {
-            appInfo.appName.substring(0, 1)
-        } else {
-            ""
-        }
     }
 }

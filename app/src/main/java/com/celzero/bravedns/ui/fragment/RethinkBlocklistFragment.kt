@@ -635,6 +635,7 @@ class RethinkBlocklistFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+                    if (view == null) return
 
                     if (recyclerView.getChildAt(0)?.tag == null) return
 
@@ -653,6 +654,7 @@ class RethinkBlocklistFragment :
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
+                    if (view == null) return
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         b.recyclerScrollHeaderSimple.visibility = View.GONE
                         b.recyclerScrollHeaderAdv.visibility = View.GONE
