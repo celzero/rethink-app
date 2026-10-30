@@ -226,7 +226,9 @@
         android:layout_marginBottom="2dp"
         android:clickable="true"
         android:focusable="true"
-        app:fastScrollEnabled="true"
+        app:fastScrollEnabled="false"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
         app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
         app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
 
