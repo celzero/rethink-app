@@ -3776,9 +3776,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private suspend fun uiCtx(s: String, f: suspend () -> Unit) =
         withContext(CoroutineName(s) + Dispatchers.Main) { f() }
 
-    override fun onQuery(origin: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
+    override fun onQuery(origin: String, fid: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
         return go2kt(dnsQueryDispatcher) {
-            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""), isCaptivePortal())
+            Logger.vv(LOG_TAG_VPN, "onQuery: fid: $fid, origin: $origin, uid: $uidGostr, fqdn: $fqdn, qtype: $qtype")
+            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""), isCaptivePortal(), fid)
             TunDnsManager.handleOnQuery(d)
         }
     }
@@ -3892,7 +3893,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         Logger.v(LOG_TAG_VPN, "onDNSStopped")
     }
 
-    override fun onPrequery(p0: String, p1: String, p2: String, p3: Long): DomainOpts? {
+    override fun onPrequery(origin: String, fid: String, uidGostr: String, fqdn: String, qtype: Long): DomainOpts? {
+        Logger.vv(LOG_TAG_VPN, "onPrequery: fid: $fid, origin: $origin, uid: $uidGostr, fqdn: $fqdn, qtype: $qtype")
         return null
     }
 
@@ -3902,6 +3904,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     override fun onUpstreamAnswer(
         id: String,
+        fid: String,
         smm: DNSSummary,
         rcvdDnsOpts: DNSOpts,
         ipcsv: String
@@ -3926,7 +3929,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 },
                 onDeviceLocked = { TunFlowManager.closeTrackedConnsOnDeviceLock(buildFlowContext()) },
                 onAccessibilityFailure = ::handleAccessibilityFailure,
-                isCaptivePortal = isCaptivePortal()
+                isCaptivePortal = isCaptivePortal(),
+                fid = fid
             )
             TunDnsManager.handleOnUpstreamAnswer(params)
         }
@@ -3949,13 +3953,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         TunFlowManager.handlePostflow(buildFlowContext(), s)
     }
 
-    override fun preflow(protocol: Int, uid: Int, src: String?, dst: String?): PreMark = go2kt(preflowDispatcher) {
-        TunFlowManager.handlePreflow(buildFlowContext(), protocol, uid, src, dst)
+    override fun preflow(protocol: Int, uid: Int, cid: String, src: String?, dst: String?): PreMark = go2kt(preflowDispatcher) {
+        TunFlowManager.handlePreflow(buildFlowContext(), protocol, uid, cid, src, dst)
     }
 
     override fun flow(
         protocol: Int,
         _uid: Int,
+        cid: String,
         src: String?,
         dst: String?,
         realIps: String?,
@@ -3966,13 +3971,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     ): Mark = go2kt(flowDispatcher) {
         TunFlowManager.handleFlow(
             buildFlowContext(),
-            protocol, _uid, src, dst, realIps, d, probableDomains, blocklists, isAlg
+            protocol, _uid, cid, src, dst, realIps, d, probableDomains, blocklists, isAlg
         )
     }
 
-    override fun inflow(protocol: Int, recvdUid: Int, src: String?, dst: String?): Mark =
+    override fun inflow(protocol: Int, recvdUid: Int, cid: String, src: String?, dst: String?): Mark =
         go2kt(inflowDispatcher) {
-            TunFlowManager.handleInflow(buildFlowContext(), protocol, recvdUid, src, dst)
+            TunFlowManager.handleInflow(buildFlowContext(), protocol, recvdUid, cid, src, dst)
         }
 
     // no need of go2kt here as it is called from go and performs db operations with no return value
@@ -4693,6 +4698,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun initiateRpnPing(proxyId: String) {
         vpnAdapter?.initiateRpnPing(proxyId)
+    }
+
+    suspend fun peekTrace(cid: String): String {
+        return vpnAdapter?.peekTrace(cid) ?: ""
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return vpnAdapter?.getAllTraceLogsAsBytes()
+    }
+
+    suspend fun getTraceCount(): Long {
+        return vpnAdapter?.getTraceCount() ?: 0L
     }
 
     fun screenLock() {

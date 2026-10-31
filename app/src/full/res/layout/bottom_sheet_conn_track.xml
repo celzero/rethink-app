@@ -555,5 +555,22 @@
             android:textIsSelectable="true"
             android:textSize="@dimen/mini_font_text_view"
             tools:text="message" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/connection_cid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:alpha="0.7"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/mini_font_text_view"
+            tools:text="connId" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

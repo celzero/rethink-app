@@ -43,6 +43,10 @@ class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
         consoleLogDAO.deleteAllLogs()
     }
 
+    suspend fun getLogsByCid(cid: String, limit: Int): List<ConsoleLog> {
+        return consoleLogDAO.getLogsByCid("%$cid%", limit)
+    }
+
     fun setStartTimestamp(timestamp: Long) {
         consoleLogStartTimestamp = timestamp
     }

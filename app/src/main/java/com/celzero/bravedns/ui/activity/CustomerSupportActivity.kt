@@ -48,6 +48,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.TraceLogExporter
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
@@ -81,6 +82,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         private const val SUPPORT_ZIP_FILE_NAME = "rpn_support_diagnostics.zip"
         private const val SUPPORT_CONSOLE_LOG_FILE_NAME = "console_logs.txt"
         private const val SUPPORT_RPN_LOG_FILE_NAME = "rpn_logs.txt"
+        private const val SUPPORT_TRACE_LOG_FILE_NAME = "trace_logs.txt"
         private const val WIRELOG_ATTACH_LIMIT_BYTES = 1 * 1024 * 1024L  // 1 MB
         private const val OTHER_ATTACH_THRESHOLD_BYTES = 1 * 1024 * 1024L // cap wirelog at 1 MB if other attachments exceed this
         private const val SUPPORT_ZIP_OVERHEAD_RESERVE_BYTES = 64 * 1024L
@@ -262,42 +264,34 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
      */
     private fun collectAndSend(description: String, category: String?) {
         setLoading(true)
-        val includeStatus = b.switchAttachStatus.isChecked
-        val includeStats = b.switchAttachStats.isChecked
-        val includeProcInfo = b.switchAttachProcInfo.isChecked
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
 
-                val allStatuses: List<SubscriptionStatus> = if (includeStatus) {
+                val allStatuses: List<SubscriptionStatus> =
                     runCatching { subscriptionStatusDao.getAllSubscriptions() }.getOrElse { emptyList() }
-                } else emptyList()
 
-                val recentHistory = if (includeStatus) {
-                    runCatching {
-                        subscriptionStateHistoryDao.getRecentHistory(MAX_HISTORY_ENTRIES)
-                    }.getOrElse { emptyList() }
-                } else emptyList()
+                val recentHistory = runCatching {
+                    subscriptionStateHistoryDao.getRecentHistory(MAX_HISTORY_ENTRIES)
+                }.getOrElse { emptyList() }
 
-                val entitlementJson = if (includeStats) {
-                    runCatching {
-                        val details = RpnProxyManager.getEntitlementDetails()
-                        if (details == null) {
-                            "unavailable"
-                        } else {
-                            val sb = StringBuilder()
-                            sb.append("cid: " + details.cid()?.take(12) + "\n")
-                            sb.append("did: " + details.did().take(4) + "\n")
-                            sb.append("expiry: " + Utilities.convertLongToTime(details.expiry(),
-                                Constants.TIME_FORMAT_4) + "\n")
-                            sb.append("providerId: " + details.providerID() + "\n")
-                            sb.append("token: " + details.token().take(16) + "\n")
-                            sb.append("test: " + details.test() + "\n")
-                            sb.append("allowRestore: " + details.allowRestore() + "\n\n")
-                            sb.toString()
-                        }
-                    }.getOrElse { null }
-                } else null
+                val entitlementJson = runCatching {
+                    val details = RpnProxyManager.getEntitlementDetails()
+                    if (details == null) {
+                        "unavailable"
+                    } else {
+                        val sb = StringBuilder()
+                        sb.append("cid: " + details.cid()?.take(12) + "\n")
+                        sb.append("did: " + details.did().take(4) + "\n")
+                        sb.append("expiry: " + Utilities.convertLongToTime(details.expiry(),
+                            Constants.TIME_FORMAT_4) + "\n")
+                        sb.append("providerId: " + details.providerID() + "\n")
+                        sb.append("token: " + details.token().take(16) + "\n")
+                        sb.append("test: " + details.test() + "\n")
+                        sb.append("allowRestore: " + details.allowRestore() + "\n\n")
+                        sb.toString()
+                    }
+                }.getOrElse { null }
 
                 val diagContent = buildDiagnosticText(
                     description  = description,
@@ -309,15 +303,13 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
 
                 val diagFile = writeDiagFile(diagContent)
 
-                val procInfoBytes = if (includeProcInfo) {
-                    try {
-                        ProcessInfoCollector.collect(this@CustomerSupportActivity)
-                            .toByteArray(Charsets.UTF_8)
-                    } catch (e: Exception) {
-                        Logger.w(LOG_TAG_UI, "$TAG proc info error: ${e.message}", e)
-                        null
-                    }
-                } else null
+                val procInfoBytes = try {
+                    ProcessInfoCollector.collect(this@CustomerSupportActivity)
+                        .toByteArray(Charsets.UTF_8)
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "$TAG proc info error: ${e.message}", e)
+                    null
+                }
 
                 // attach the bug report zip produced by BugReportZipper
                 // (files/rethinkdns.bugreport.zip); absent unless the user has
@@ -416,14 +408,22 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     (consoleLogs?.length() ?: 0L)
                 val wirelogBytes =
                     if (wirelogReserve > 0L) prepareWirelogAttachment(otherAttachSize) else null
+                // trace logs ride along unconditionally, exempt from the size budget
+                val traceLogs = TraceLogExporter.dumpTraceLogsFile(this@CustomerSupportActivity)
                 val supportZip = buildSupportZip(
                     diagFile,
                     wirelogBytes,
                     attachedProcInfo,
                     attachedBugZip,
                     consoleLogs,
-                    rpnLogs
+                    rpnLogs,
+                    traceLogs
                 )
+                traceLogs?.let {
+                    if (it.exists() && !it.delete()) {
+                        Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary trace log attachment")
+                    }
+                }
                 rpnLogs?.let {
                     if (it.exists() && !it.delete()) {
                         Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary RPN log attachment")
@@ -622,10 +622,11 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
         procInfoAttachment: Pair<String, ByteArray>?,
         bugZip: File?,
         consoleLogs: File?,
-        rpnLogs: File?
+        rpnLogs: File?,
+        traceLogs: File?
     ): File? {
         if (diagFile == null && wirelogBytes == null && procInfoAttachment == null &&
-            bugZip == null && consoleLogs == null && rpnLogs == null
+            bugZip == null && consoleLogs == null && rpnLogs == null && traceLogs == null
         ) {
             return null
         }
@@ -659,6 +660,11 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                 }
                 consoleLogs?.takeIf { it.exists() && it.length() > 0L }?.let {
                     zos.putNextEntry(java.util.zip.ZipEntry(SUPPORT_CONSOLE_LOG_FILE_NAME))
+                    it.inputStream().use { ins -> ins.copyTo(zos) }
+                    zos.closeEntry()
+                }
+                traceLogs?.takeIf { it.exists() && it.length() > 0L }?.let {
+                    zos.putNextEntry(java.util.zip.ZipEntry(SUPPORT_TRACE_LOG_FILE_NAME))
                     it.inputStream().use { ins -> ins.copyTo(zos) }
                     zos.closeEntry()
                 }

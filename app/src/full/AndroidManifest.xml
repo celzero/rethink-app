@@ -33,6 +33,7 @@
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
                 <data android:pathPattern=".*\\.rbk" />
+                <data android:pathPattern=".*\\.rbka" />
                 <data android:host="*" />
             </intent-filter>
         </activity>
@@ -152,6 +153,8 @@
             android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConnIdLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.EventsActivity"
             android:finishOnTaskLaunch="true" />
