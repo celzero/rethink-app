@@ -20,20 +20,33 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentFirewallSettingsBinding
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.FirewallSettingsMenuState
+import com.celzero.bravedns.ui.compose.settings.FirewallSettingsMenuContent
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.core.component.KoinComponent
 
-class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), KoinComponent {
-    private val b by viewBinding(FragmentFirewallSettingsBinding::bind)
+class FirewallSettingsFragment : Fragment(), KoinComponent {
+    private lateinit var b: FirewallSettingsMenuState
 
     companion object {
         fun newInstance() = FirewallSettingsFragment()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = FirewallSettingsMenuState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { FirewallSettingsMenuContent(b) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

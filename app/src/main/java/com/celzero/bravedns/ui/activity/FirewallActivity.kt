@@ -21,26 +21,19 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.compose.settings.setSingleSettingsContent
 import com.celzero.bravedns.ui.fragment.FirewallSettingsFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.tabs.TabLayoutMediator
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
-class FirewallActivity : BaseActivity(R.layout.activity_firewall) {
-    private val b by viewBinding(ActivityFirewallBinding::bind)
+class FirewallActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
@@ -75,31 +68,7 @@ class FirewallActivity : BaseActivity(R.layout.activity_firewall) {
     }
 
     private fun init() {
-
-        b.firewallActViewpager.adapter =
-            object : FragmentStateAdapter(this) {
-                override fun createFragment(position: Int): Fragment {
-                    return when (position) {
-                        Tabs.UNIVERSAL.screen -> FirewallSettingsFragment.newInstance()
-                        else -> FirewallSettingsFragment.newInstance()
-                    }
-                }
-
-                override fun getItemCount(): Int {
-                    return Tabs.getCount()
-                }
-            }
-
-        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position
-                -> // Styling each tab here
-                tab.text =
-                    when (position) {
-                        Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
-                        else -> getString(R.string.firewall_act_universal_tab)
-                    }
-            }
-            .attach()
-
+        setSingleSettingsContent(FirewallSettingsFragment::class.java)
         observeAppState()
     }
 
