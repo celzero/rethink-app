@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_IAB
@@ -28,14 +32,12 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetDeviceNotRegisteredBinding
 import com.celzero.bravedns.iab.DeviceNotRegisteredNotifier
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,14 +57,11 @@ import org.koin.android.ext.android.inject
  */
 class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetDeviceNotRegisteredBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var supportAction: (() -> Unit)? = null
+    private var presentation: DeviceErrorState? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private var entitlementCid: String = ""
-
-    private var resetInFlight: Boolean = false
 
     private val persistentState by inject<PersistentState>()
 
@@ -103,13 +102,12 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetDeviceNotRegisteredBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = DeviceErrorState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DeviceErrorContent(ui, unregistered = true, onSupport = { supportAction?.invoke() }, onReset = { resetIdentity() }, onDismiss = { dismissAllowingStateLoss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -129,14 +127,15 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
+        supportAction = null
     }
 
     private fun populateDetails(entitlementCid: String, deviceIdPrefix: String) {
-        binding.tvEntitlementCid.text = maskCid(entitlementCid)
+        ui.accountId = maskCid(entitlementCid)
             .ifBlank { getString(R.string.device_auth_error_id_unavailable) }
 
-        binding.tvDeviceIdPrefix.text = deviceIdPrefix.ifBlank {
+        ui.deviceId = deviceIdPrefix.ifBlank {
             getString(R.string.device_auth_error_id_unavailable)
         }
     }
@@ -152,42 +151,19 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun setupButtons(entitlementCid: String, storedCid: String, deviceIdPrefix: String) {
-        binding.btnEmailSupport.setOnClickListener {
-            openEmailClient(entitlementCid, deviceIdPrefix)
-        }
-        binding.btnDismiss.setOnClickListener {
-            dismissAllowingStateLoss()
-        }
+        supportAction = { openEmailClient(entitlementCid, deviceIdPrefix) }
         // The stored identity can never be rebound to the entitlement cid while the
         // store holds a foreign cid, so offer to discard it and let the active
         // purchase claim the empty store.
         val resettable = entitlementCid.isNotBlank() && storedCid.isNotBlank() &&
             entitlementCid != storedCid
-        if (resettable) {
-            binding.btnResetIdentity.visibility = View.VISIBLE
-            binding.btnResetIdentity.setOnClickListener {
-                confirmIdentityReset()
-            }
-        }
-    }
-
-    private fun confirmIdentityReset() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-            .setTitle(R.string.server_selection_error_retry)
-            .setMessage(R.string.device_not_registered_reset_confirm_msg)
-            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
-                resetIdentity()
-            }
-            .setNegativeButton(R.string.lbl_cancel, null)
-            .show()
+        ui.resetVisible = resettable
     }
 
     private fun resetIdentity() {
-        if (resetInFlight) return
-        resetInFlight = true
+        if (ui.resetInFlight || !ui.resetVisible) return
+        ui.resetInFlight = true
         isCancelable = false
-        binding.btnResetIdentity.isEnabled = false
-        binding.btnEmailSupport.isEnabled = false
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val cleared = try {
                 InAppBillingHandler.resetIdentityForRebind(entitlementCid)
@@ -205,10 +181,8 @@ class DeviceNotRegisteredBottomSheet : BaseBottomSheetDialogFragment() {
                         Toast.LENGTH_LONG).show()
                     dismissAllowingStateLoss()
                 } else {
-                    resetInFlight = false
+                    ui.resetInFlight = false
                     isCancelable = true
-                    binding.btnResetIdentity.isEnabled = true
-                    binding.btnEmailSupport.isEnabled = true
                     Toast.makeText(ctx, R.string.device_not_registered_reset_failed,
                         Toast.LENGTH_LONG).show()
                 }

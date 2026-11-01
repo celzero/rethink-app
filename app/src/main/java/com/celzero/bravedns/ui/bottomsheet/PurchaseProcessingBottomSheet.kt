@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.bottomsheet
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetPurchaseProcessingBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
@@ -36,10 +38,9 @@ import java.io.Serializable
  */
 class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetPurchaseProcessingBinding? = null
-    private val binding
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var primaryAction: (() -> Unit)? = null
+    private var presentation: ProcessingStateUi? = null
+    private val ui get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private var currentState: ProcessingState = ProcessingState.Processing
     private val persistentState by inject<PersistentState>()
@@ -79,13 +80,12 @@ class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetPurchaseProcessingBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = ProcessingStateUi()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ProcessingContent(ui, onPrimary = { primaryAction?.invoke() }, onSecondary = { dismiss() }) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -124,65 +124,65 @@ class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun showProcessing(message: String?) {
-        binding.progressIndicator.isVisible = true
-        binding.statusIcon.isVisible = false
-        binding.titleText.text = getString(R.string.processing_purchase)
-        binding.messageText.text = message ?: getString(R.string.please_wait_processing)
-        binding.actionButton.isVisible = false
-        binding.secondaryButton.isVisible = false
+        ui.progress = true
+        ui.iconVisible = false
+        ui.title = getString(R.string.processing_purchase)
+        ui.message = message ?: getString(R.string.please_wait_processing)
+        ui.primaryVisible = false
+        ui.secondaryVisible = false
     }
 
     private fun showPendingVerification(message: String?) {
-        binding.progressIndicator.isVisible = true
-        binding.statusIcon.isVisible = false
-        binding.titleText.text = getString(R.string.verifying_purchase)
-        binding.messageText.text = message ?: getString(R.string.verifying_with_play_store)
-        binding.actionButton.isVisible = false
-        binding.secondaryButton.isVisible = false
+        ui.progress = true
+        ui.iconVisible = false
+        ui.title = getString(R.string.verifying_purchase)
+        ui.message = message ?: getString(R.string.verifying_with_play_store)
+        ui.primaryVisible = false
+        ui.secondaryVisible = false
     }
 
     private fun showSuccess(message: String?) {
-        binding.progressIndicator.isVisible = false
-        binding.statusIcon.isVisible = true
-        binding.statusIcon.setImageResource(R.drawable.ic_check_circle)
-        binding.titleText.text = getString(R.string.purchase_successful)
-        binding.messageText.text = message ?: getString(R.string.subscription_activated)
+        ui.progress = false
+        ui.iconVisible = true
+        ui.icon = R.drawable.ic_check_circle
+        ui.title = getString(R.string.purchase_successful)
+        ui.message = message ?: getString(R.string.subscription_activated)
 
-        binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.rt_dialog_neutral)
-        binding.actionButton.setOnClickListener {
+        ui.primaryVisible = true
+        ui.primaryText = getString(R.string.rt_dialog_neutral)
+        primaryAction = {
             dismiss()
         }
-        binding.secondaryButton.isVisible = false
+        ui.secondaryVisible = false
     }
 
     private fun showError(message: String?) {
-        binding.progressIndicator.isVisible = false
-        binding.statusIcon.isVisible = true
-        binding.statusIcon.setImageResource(R.drawable.ic_error_state)
-        binding.titleText.text = getString(R.string.purchase_failed)
-        binding.messageText.text = message ?: getString(R.string.something_went_wrong)
+        ui.progress = false
+        ui.iconVisible = true
+        ui.icon = R.drawable.ic_error_state
+        ui.title = getString(R.string.purchase_failed)
+        ui.message = message ?: getString(R.string.something_went_wrong)
 
-        binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.close)
-        binding.actionButton.setOnClickListener {
+        ui.primaryVisible = true
+        ui.primaryText = getString(R.string.close)
+        primaryAction = {
             dismiss()
         }
-        binding.secondaryButton.isVisible = false
+        ui.secondaryVisible = false
     }
 
     private fun showServerAckPending(message: String?) {
-        binding.progressIndicator.isVisible = true
-        binding.statusIcon.isVisible = false
-        binding.titleText.text = getString(R.string.server_ack_pending_title)
-        binding.messageText.text = message ?: getString(R.string.server_ack_pending_message)
+        ui.progress = true
+        ui.iconVisible = false
+        ui.title = getString(R.string.server_ack_pending_title)
+        ui.message = message ?: getString(R.string.server_ack_pending_message)
 
-        binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.contact_support_title)
-        binding.actionButton.setOnClickListener {
+        ui.primaryVisible = true
+        ui.primaryText = getString(R.string.contact_support_title)
+        primaryAction = {
             dismiss()
         }
-        binding.secondaryButton.isVisible = false
+        ui.secondaryVisible = false
     }
 
     /**
@@ -190,44 +190,40 @@ class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
      * Google Play, and a "Contact Support" secondary action.
      */
     private fun showPendingTimeout(message: String?) {
-        binding.progressIndicator.isVisible = false
-        binding.statusIcon.isVisible = true
-        binding.statusIcon.setImageResource(R.drawable.ic_error_state)
-        binding.titleText.text = getString(R.string.pending_timeout_title)
-        binding.messageText.text = message ?: getString(R.string.pending_timeout_message)
+        ui.progress = false
+        ui.iconVisible = true
+        ui.icon = R.drawable.ic_error_state
+        ui.title = getString(R.string.pending_timeout_title)
+        ui.message = message ?: getString(R.string.pending_timeout_message)
 
-        binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.check_status)
-        binding.actionButton.setOnClickListener {
+        ui.primaryVisible = true
+        ui.primaryText = getString(R.string.check_status)
+        primaryAction = {
             primaryActionListener?.invoke()
         }
-        binding.secondaryButton.isVisible = true
-        binding.secondaryButton.text = getString(R.string.contact_support_title)
-        binding.secondaryButton.setOnClickListener {
-            dismiss()
-        }
+        ui.secondaryVisible = true
+        ui.secondaryText = getString(R.string.contact_support_title)
+
     }
 
     /**
      * Payment was declined / canceled after pending.
      */
     private fun showPaymentDeclined(message: String?) {
-        binding.progressIndicator.isVisible = false
-        binding.statusIcon.isVisible = true
-        binding.statusIcon.setImageResource(R.drawable.ic_error_state)
-        binding.titleText.text = getString(R.string.purchase_failed)
-        binding.messageText.text = message ?: getString(R.string.billing_err_payment_declined)
+        ui.progress = false
+        ui.iconVisible = true
+        ui.icon = R.drawable.ic_error_state
+        ui.title = getString(R.string.purchase_failed)
+        ui.message = message ?: getString(R.string.billing_err_payment_declined)
 
-        binding.actionButton.isVisible = true
-        binding.actionButton.text = getString(R.string.retry)
-        binding.actionButton.setOnClickListener {
+        ui.primaryVisible = true
+        ui.primaryText = getString(R.string.retry)
+        primaryAction = {
             primaryActionListener?.invoke()
         }
-        binding.secondaryButton.isVisible = true
-        binding.secondaryButton.text = getString(R.string.contact_support_title)
-        binding.secondaryButton.setOnClickListener {
-            dismiss()
-        }
+        ui.secondaryVisible = true
+        ui.secondaryText = getString(R.string.contact_support_title)
+
     }
 
     override fun dismiss() {
@@ -246,7 +242,8 @@ class PurchaseProcessingBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
+        primaryAction = null
     }
 
     enum class ProcessingState : Serializable {
