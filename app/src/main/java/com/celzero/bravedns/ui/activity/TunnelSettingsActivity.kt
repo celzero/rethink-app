@@ -15,22 +15,19 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.networksettings.*
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.SeekBar
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState as CompoundButton
+import com.celzero.bravedns.ui.compose.networksettings.NetworkSeekState as SeekBar
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatRadioButton
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
@@ -38,7 +35,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
@@ -58,16 +54,14 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.networksettings.NetworkAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
-    private val b by viewBinding(ActivityTunnelSettingsBinding::bind)
+class TunnelSettingsActivity : BaseActivity() {
+    private val b by lazy { TunnelSettingsState(this) }
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val eventLogger by inject<EventLogger>()
@@ -112,7 +106,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         //setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+        setContent { RethinkTheme { NetworkSettingsScreen(b.layout) } }
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -127,6 +121,16 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
     }
 
     /** Returns true when the system is in dark mode. */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        b.saveChecks(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
@@ -758,23 +762,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             NetworkPolicyOption(conservativeTxt, getString(R.string.vpn_policy_fixed_desc))
         )
         var currentSelection = persistentState.vpnBuilderPolicy
-        val adapter = object : ArrayAdapter<NetworkPolicyOption>(
-            this, R.layout.item_network_policy, R.id.policyTitle, options
-        ) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val titleView = view.findViewById<AppCompatTextView>(R.id.policyTitle)
-                val descView = view.findViewById<AppCompatTextView>(R.id.policyDesc)
-                val radio = view.findViewById<AppCompatRadioButton>(R.id.radioButton)
-
-                val item = getItem(position)
-                titleView.text = item?.title
-                descView.text = item?.description
-                radio.isChecked = position == currentSelection
-
-                return view
-            }
-        }
+        val adapter = NetworkPolicyAdapter(options.map { it.title to it.description }) { currentSelection }
 
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.vpn_policy_title))
@@ -783,7 +771,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 if (currentSelection == POLICY_FIXED) {
                     // enable experimental settings prompt
                     if (persistentState.enableStabilityDependentSettings()) {
-                        SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                        SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                     }
                 }
                 saveNetworkPolicy(which)
@@ -991,7 +979,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             // enable experimental-dependent settings for ALWAYSv46 (experimental)
             if (protocolType.id == InternetProtocol.ALWAYSv46.id) {
                 if (persistentState.enableStabilityDependentSettings()) {
-                    SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                    SnackbarHelper.showStabilityProgram(window.decorView, persistentState)
                 }
             }
 
@@ -1061,19 +1049,15 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
             uiCtx {
                 if (isFinishing || isDestroyed) return@uiCtx
 
-                val dialogView = LayoutInflater.from(this@TunnelSettingsActivity)
-                    .inflate(R.layout.dialog_lockdown_check, null)
-
-                val subtitle = dialogView.findViewById<AppCompatTextView>(R.id.lockdown_check_subtitle)
-                val itemsContainer = dialogView.findViewById<LinearLayout>(R.id.lockdown_check_items_container)
-                val allOkText = dialogView.findViewById<AppCompatTextView>(R.id.lockdown_check_all_ok)
-                val divider = dialogView.findViewById<View>(R.id.lockdown_check_divider)
-                val disableRow = dialogView.findViewById<LinearLayout>(R.id.lockdown_check_disable_row)
-                val disableLabel = dialogView.findViewById<AppCompatTextView>(R.id.lockdown_check_disable_label)
-                val disableDesc = dialogView.findViewById<AppCompatTextView>(R.id.lockdown_check_disable_desc)
-                val disableSwitch = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(
-                    R.id.lockdown_check_disable_switch
-                )
+                val dialogView = LockdownDialogState(this@TunnelSettingsActivity)
+                val items = mutableListOf<NetworkNode>()
+                val subtitle = dialogView.lockdownCheckSubtitle
+                val allOkText = dialogView.lockdownCheckAllOk
+                val divider = dialogView.lockdownCheckDivider
+                val disableRow = dialogView.lockdownCheckDisableRow
+                val disableLabel = dialogView.lockdownCheckDisableLabel
+                val disableDesc = dialogView.lockdownCheckDisableDesc
+                val disableSwitch = dialogView.lockdownCheckDisableSwitch
 
                 subtitle.text = getString(R.string.lockdown_check_dialog_subtitle)
                 disableLabel.text = getString(R.string.lockdown_check_disable_switch)
@@ -1083,32 +1067,30 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
                 val redColor = UIUtils.fetchColor(this@TunnelSettingsActivity, R.attr.accentBad)
 
                 for (check in checks) {
-                    val itemView = LayoutInflater.from(this@TunnelSettingsActivity)
-                        .inflate(R.layout.item_lockdown_check, itemsContainer, false)
-
-                    val icon = itemView.findViewById<AppCompatImageView>(R.id.lockdown_check_item_icon)
-                    val label = itemView.findViewById<AppCompatTextView>(R.id.lockdown_check_item_label)
-                    val desc = itemView.findViewById<AppCompatTextView>(R.id.lockdown_check_item_desc)
-                    val status = itemView.findViewById<AppCompatTextView>(R.id.lockdown_check_item_status)
+                    val itemView = LockdownItemState(this@TunnelSettingsActivity)
+                    val icon = itemView.lockdownCheckItemIcon
+                    val label = itemView.lockdownCheckItemLabel
+                    val desc = itemView.lockdownCheckItemDesc
+                    val status = itemView.lockdownCheckItemStatus
 
                     label.text = check.label
                     desc.text = check.description
 
                     if (check.hasConflict) {
                         icon.setImageResource(R.drawable.ic_cross_accent)
-                        icon.imageTintList = ColorStateList.valueOf(redColor)
+                        icon.textColor = redColor
                         status.text = getString(R.string.lockdown_check_conflict)
                         status.setTextColor(redColor)
-                        status.background = createChipBackground(redColor)
+                        status.backgroundColor = redColor
                     } else {
                         icon.setImageResource(R.drawable.ic_check_circle)
-                        icon.imageTintList = ColorStateList.valueOf(greenColor)
+                        icon.textColor = greenColor
                         status.text = getString(R.string.lockdown_check_ok)
                         status.setTextColor(greenColor)
-                        status.background = createChipBackground(greenColor)
+                        status.backgroundColor = greenColor
                     }
 
-                    itemsContainer.addView(itemView)
+                    items.add(itemView.layout)
                 }
 
                 if (!hasConflicts) {
@@ -1120,7 +1102,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
 
                 val dialog = MaterialAlertDialogBuilder(this@TunnelSettingsActivity, R.style.App_Dialog_NoDim)
                     .setTitle(getString(R.string.lockdown_check_dialog_title))
-                    .setView(dialogView)
+                    .setContent { NetworkContent(dialogView.layout, extraChildren = mapOf(dialogView.lockdownCheckItemsContainer to items), scrollContainer = false) }
                     .setPositiveButton(getString(R.string.lockdown_check_apply)) { d, _ ->
                         if (hasConflicts && disableSwitch.isChecked) {
                             disableConflictingOptions(checks)
@@ -1460,7 +1442,7 @@ class TunnelSettingsActivity : BaseActivity(R.layout.activity_tunnel_settings) {
         }
     }
 
-    private fun enableAfterDelay(ms: Long, vararg views: View) {
+    private fun enableAfterDelay(ms: Long, vararg views: WgControlState) {
         for (v in views) v.isEnabled = false
 
         Utilities.delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
