@@ -11,13 +11,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
-import com.celzero.bravedns.databinding.BottomSheetProxiesListBinding
-import com.celzero.bravedns.databinding.ListItemProxyCcWgBinding
+import com.celzero.bravedns.ui.compose.networksheets.ProxyCountriesSheetState
+import com.celzero.bravedns.ui.compose.networksheets.ProxyCountriesSheetContent
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -32,7 +33,7 @@ import org.koin.android.ext.android.inject
 
 class ProxyCountriesBtmSheet :
     BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetProxiesListBinding? = null
+    private var _binding: ProxyCountriesSheetState? = null
 
     private val b
         get() = checkNotNull(_binding)
@@ -97,8 +98,11 @@ class ProxyCountriesBtmSheet :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetProxiesListBinding.inflate(inflater, container, false)
-        return b.root
+        _binding = ProxyCountriesSheetState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { ProxyCountriesSheetContent(b) } }
+        }
     }
 
     override fun onDestroyView() {
@@ -142,28 +146,30 @@ class ProxyCountriesBtmSheet :
 
     private fun init() {
         b.title.text = "Select Proxy Country"
-        b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         when (type) {
             InputType.IP -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
-                b.ipDomainInfo.text = ci?.ipAddress
+                b.ipDomainInfo.text = ci?.ipAddress.orEmpty()
             }
             InputType.DOMAIN -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
-                b.ipDomainInfo.text = cd?.domain
+                b.ipDomainInfo.text = cd?.domain.orEmpty()
             }
             InputType.APP -> {
                 // TODO: Implement this
             }
         }
 
-        val lst = confs.map { it }
-        val adapter = RecyclerViewAdapter(lst) { conf ->
-            handleOnItemClicked(conf)
-        }
-
-        b.recyclerView.adapter = adapter
+        b.rows = confs.map { it }
+        b.supportsCountryDetails = type != InputType.APP
+        b.flagFor = { getFlag(it) }
+        b.selection = { when (type) {
+            InputType.DOMAIN -> cd?.proxyCC
+            InputType.IP -> ci?.proxyCC
+            InputType.APP -> null
+        } }
+        b.onClick = { conf -> handleOnItemClicked(conf) }
     }
 
     private fun handleOnItemClicked(conf: String) {
@@ -227,61 +233,6 @@ class ProxyCountriesBtmSheet :
                 "Country code updated for ${ip.ipAddress}",
                 Toast.LENGTH_SHORT
             )
-        }
-    }
-
-    inner class RecyclerViewAdapter(
-        private val data: List<String>,
-        private val onItemClicked: (String) -> Unit
-    ) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view =
-                ListItemProxyCcWgBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(data[position])
-        }
-
-        override fun getItemCount(): Int = data.size
-
-        inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
-            RecyclerView.ViewHolder(bb.root) {
-
-            fun bind(conf: String) {
-                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${conf}, ${conf}")
-                val flag = getFlag(conf)
-                val ccName = conf //conf.name.ifEmpty { getCountryNameFromFlag(flag) }
-                when (type) {
-                    InputType.DOMAIN -> {
-                        bb.proxyNameCc.text = conf
-                        bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = conf == cd?.proxyCC
-                        bb.proxyDescCc.text = ccName
-                    }
-                    InputType.IP -> {
-                        bb.proxyNameCc.text = conf
-                        bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = conf == ci?.proxyCC
-                        bb.proxyDescCc.text = ccName
-                    }
-                    InputType.APP -> {
-                        // TODO: Implement this
-                    }
-                }
-
-                bb.proxyRadioCc.setOnClickListener {
-                    notifyDataSetChanged()
-                    onItemClicked(conf)
-                }
-
-                bb.lipCcWgParent.setOnClickListener {
-                    notifyDataSetChanged()
-                    onItemClicked(conf)
-                }
-            }
         }
     }
 
