@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="compose_rule_edit">Edit rule</string>
+    <string name="compose_rule_details">Rule details</string>
+    <string name="compose_rule_select">Select %1$s</string>
+</resources>
