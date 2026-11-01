@@ -15,19 +15,21 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemWgHopBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -51,7 +53,7 @@ class GenericHopAdapter(
     private val hopItems: List<HopItem>,
     private var selectedId: Int,
     private val onHopChanged: ((Int) -> Unit)? = null
-) : RecyclerView.Adapter<GenericHopAdapter.HopViewHolder>() {
+) : WgListContent {
 
     companion object {
         private const val TAG = "GenericHopAdapter"
@@ -59,34 +61,31 @@ class GenericHopAdapter(
 
     private var isAttached = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HopViewHolder {
-        val itemBinding =
-            ListItemWgHopBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return HopViewHolder(itemBinding)
-    }
 
-    override fun getItemCount(): Int = hopItems.size
 
-    override fun onBindViewHolder(holder: HopViewHolder, position: Int) {
-        if (position < 0 || position >= itemCount) {
-            Logger.w(LOG_TAG_UI, "$TAG; Invalid position $position for itemCount $itemCount")
-            return
+    private var revision by mutableIntStateOf(0)
+    fun notifyDataSetChanged() { revision++ }
+
+
+
+
+
+
+
+    @Composable override fun Content(modifier: Modifier) {
+        DisposableEffect(this) { isAttached = true; onDispose { isAttached = false } }
+        val version = revision
+        LazyColumn(modifier, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(hopItems.size) { index ->
+                val state = remember(index) { WgHopRowState(context) }
+                val holder = remember(state) { HopViewHolder(state) }
+                LaunchedEffect(hopItems[index], version) { holder.update(hopItems[index]) }
+                WgHopRow(state)
+            }
         }
-        holder.update(hopItems[position])
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        isAttached = true
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        isAttached = false
-    }
-
-    inner class HopViewHolder(private val b: ListItemWgHopBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class HopViewHolder(private val b: WgHopRowState) {
 
         fun update(item: HopItem) {
             when (item) {
@@ -323,7 +322,7 @@ class GenericHopAdapter(
                             val txt = UIUtils.getProxyStatusStringRes(id)
                             b.wgHopListDescTv.text = context.getString(txt)
                         } else {
-                            b.wgHopListDescTv.text = statusPair.second
+                            b.wgHopListDescTv.text = statusPair.second.orEmpty()
                         }
                     }
                     return@io
