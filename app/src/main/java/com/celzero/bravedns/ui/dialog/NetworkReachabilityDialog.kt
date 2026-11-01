@@ -29,7 +29,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DialogInputIpsBinding
+import com.celzero.bravedns.ui.compose.utilities.*
+import com.celzero.bravedns.ui.compose.wireguard.setWgContent
 import com.celzero.bravedns.service.ConnectionMonitor
 import com.celzero.bravedns.service.ConnectionMonitor.Companion.SCHEME_HTTP
 import com.celzero.bravedns.service.ConnectionMonitor.Companion.SCHEME_HTTPS
@@ -46,12 +47,12 @@ import kotlinx.coroutines.withContext
 import java.net.MalformedURLException
 import java.net.URL
 
-class NetworkReachabilityDialog(activity: Activity,
+class NetworkReachabilityDialog(private val activity: Activity,
     private val persistentState: PersistentState,
     themeId: Int
 ) : androidx.appcompat.app.AppCompatDialog(activity, themeId) {
 
-    private lateinit var binding: DialogInputIpsBinding
+    private val binding by lazy { ReachabilityUiState(context) }
 
     private var useAuto: Boolean = false
 
@@ -66,11 +67,24 @@ class NetworkReachabilityDialog(activity: Activity,
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        binding = DialogInputIpsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setWgContent(activity) { ReachabilityScreen(binding) }
         setCancelable(true)
         initViews()
         setupListeners()
+    }
+
+    override fun onSaveInstanceState(): Bundle = super.onSaveInstanceState().also { saved ->
+        saveUtilityControls(saved, binding.savedControls)
+        saved.putBoolean("utility.reachability.auto", useAuto)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState.containsKey("utility.reachability.auto")) {
+            useAuto = savedInstanceState.getBoolean("utility.reachability.auto")
+            if (useAuto) updateAutoModeUi() else updateManualModeUi()
+            restoreUtilityControls(savedInstanceState, binding.savedControls)
+        }
     }
 
     private fun initViews() {
@@ -428,12 +442,12 @@ class NetworkReachabilityDialog(activity: Activity,
         }
     }
 
-    private fun selectToggleBtnUi(mb: MaterialButton) {
+    private fun selectToggleBtnUi(mb: UtilityControl) {
         mb.backgroundTintList = ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(context, R.color.accentGood))
         mb.setTextColor(UIUtils.fetchColor(context, R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(mb: MaterialButton) {
+    private fun unselectToggleBtnUi(mb: UtilityControl) {
         mb.setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
         mb.backgroundTintList = ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
     }
