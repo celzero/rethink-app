@@ -15,16 +15,20 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgNwStatsAdapter
 import com.celzero.bravedns.data.DataUsageSummary
-import com.celzero.bravedns.databinding.FragmentWgNwStatsBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.util.Logger
@@ -32,17 +36,14 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.WgNwActivityViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
-    private val b by viewBinding(FragmentWgNwStatsBinding::bind)
+class WgNwStatsFragment : Fragment() {
+    private lateinit var b: WgStatsState
     private val viewModel: WgNwActivityViewModel by viewModel()
     private lateinit var adapter: WgNwStatsAdapter
     private var wgId: String = ""
@@ -57,6 +58,14 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
             Logger.d(LOG_TAG_UI, "$TAG: newInstance called with param for $WG_ID: $param")
             fragment.arguments = args
             return fragment
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = WgStatsState(requireContext())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { WgStatsContent(b) } }
         }
     }
 
@@ -89,7 +98,20 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     }
 
     private fun setClickListeners() {
-        b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+        val buttons = listOf(b.tbRecentToggleBtn, b.tbDailyToggleBtn, b.tbWeeklyToggleBtn)
+        buttons.forEachIndexed { index, button ->
+            button.setOnClickListener {
+                if (!button.isChecked) {
+                    buttons.filter { it !== button }.forEach { it.isChecked = false; unselectToggleBtnUi(it) }
+                    button.isChecked = true
+                    selectToggleBtnUi(button)
+                    val timeCategory = WgNwActivityViewModel.TimeCategory.fromValue(index) ?: WgNwActivityViewModel.TimeCategory.ONE_HOUR
+                    Logger.d(LOG_TAG_UI, "$TAG: time category changed to $timeCategory")
+                    viewModel.timeCategoryChanged(timeCategory)
+                    handleTotalUsagesUi()
+                }
+            }
+        }
     }
 
     private fun setTabbedViewTxt() {
@@ -100,7 +122,6 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
 
     private fun setRecyclerView() {
         adapter = WgNwStatsAdapter(requireContext())
-        b.statsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.statsRecyclerView.adapter = adapter
 
         viewModel.setWgId(wgId)
@@ -124,29 +145,9 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     }
 
     private fun highlightToggleBtn() {
-        val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
-        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
-        btn.isChecked = true
-        selectToggleBtnUi(btn)
+        b.tbRecentToggleBtn.isChecked = true
+        selectToggleBtnUi(b.tbRecentToggleBtn)
     }
-
-    private val listViewToggleListener =
-        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-            val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
-            if (isChecked) {
-                selectToggleBtnUi(mb)
-                val tcValue = (mb.tag as String).toIntOrNull() ?: 0
-                val timeCategory =
-                    WgNwActivityViewModel.TimeCategory.fromValue(tcValue)
-                        ?: WgNwActivityViewModel.TimeCategory.ONE_HOUR
-                Logger.d(LOG_TAG_UI, "$TAG: time category changed to $timeCategory")
-                viewModel.timeCategoryChanged(timeCategory)
-                handleTotalUsagesUi()
-                return@OnButtonCheckedListener
-            }
-
-            unselectToggleBtnUi(mb)
-        }
 
     private fun handleTotalUsagesUi() {
         io {
@@ -177,18 +178,6 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
                 getString(R.string.lbl_overall),
                 Utilities.humanReadableByteCount(totalUsage, true)
             )
-        b.fssMeteredDataUsage.setCompoundDrawablesWithIntrinsicBounds(
-            R.drawable.dot_accent,
-            0,
-            0,
-            0
-        )
-
-        // set the alpha for the drawable
-        val alphaValue = 128 // half-transparent
-        val drawable = b.fssMeteredDataUsage.compoundDrawables[0] // drawableLeft
-        drawable?.mutate()?.alpha = alphaValue
-
         // set the progress bar
         val ump = calculatePercentage(unmeteredUsage, totalUsage) // unmetered percentage
         val mp = calculatePercentage(dataUsage.meteredDataUsage, totalUsage) // metered percentage
@@ -205,7 +194,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         return (value * 100 / maxValue).toInt()
     }
 
-    private fun selectToggleBtnUi(mb: MaterialButton) {
+    private fun selectToggleBtnUi(mb: WgControlState) {
         mb.backgroundTintList =
             ColorStateList.valueOf(
                 UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood)
@@ -213,7 +202,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(mb: MaterialButton) {
+    private fun unselectToggleBtnUi(mb: WgControlState) {
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
         mb.backgroundTintList =
             ColorStateList.valueOf(

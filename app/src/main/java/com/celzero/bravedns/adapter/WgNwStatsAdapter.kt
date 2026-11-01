@@ -15,24 +15,25 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -43,7 +44,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.log2
 
 class WgNwStatsAdapter(private val context: Context) :
-    PagingDataAdapter<AppConnection, WgNwStatsAdapter.WgNwStatsAdapterViewHolder>(DIFF_CALLBACK) {
+    WgPagingPresenter<AppConnection>(DIFF_CALLBACK) {
 
     private var maxValue: Int = 0
     companion object {
@@ -62,16 +63,9 @@ class WgNwStatsAdapter(private val context: Context) :
             }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgNwStatsAdapterViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ListItemStatisticsSummaryBinding.inflate(inflater, parent, false)
-        return WgNwStatsAdapterViewHolder(binding)
-    }
 
-    override fun onBindViewHolder(holder: WgNwStatsAdapterViewHolder, position: Int) {
-        val conn = getItem(position) ?: return
-        holder.bind(conn)
-    }
+
+
 
     private fun calculatePercentage(c: Double): Int {
         val value = (log2(c) * PERCENTAGE_MULTIPLIER).toInt()
@@ -86,8 +80,28 @@ class WgNwStatsAdapter(private val context: Context) :
         }
     }
 
-    inner class WgNwStatsAdapterViewHolder(private val b: ListItemStatisticsSummaryBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    @Composable override fun Content(modifier: Modifier) {
+        val owner = LocalLifecycleOwner.current
+
+        val version = revision
+        LazyColumn(modifier, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(itemCount) { index ->
+                val item = getItem(index)
+                if (item != null) {
+                    val state = remember(index) { WgStatsRowState(context) }
+                    val holder = remember(state) { WgNwStatsAdapterViewHolder(state) }
+                    DisposableEffect(holder, index) {
+
+                        onDispose {  }
+                    }
+                    LaunchedEffect(item, version) { ; holder.bind(item) }
+                    WgStatsRow(state)
+                }
+            }
+        }
+    }
+
+    inner class WgNwStatsAdapterViewHolder(private val b: WgStatsRowState) {
 
         fun bind(conn: AppConnection) {
             Logger.d(LOG_TAG_UI, "$TAG: Binding data for ${conn.uid}, ${conn.appOrDnsName}")
@@ -150,7 +164,7 @@ class WgNwStatsAdapter(private val context: Context) :
                 uiCtx {
                     val appName = getAppName(conn, appInfo)
                     b.ssName.visibility = View.VISIBLE
-                    b.ssName.text = appName
+                    b.ssName.text = appName.orEmpty()
                 }
             }
         }
@@ -185,10 +199,7 @@ class WgNwStatsAdapter(private val context: Context) :
 
         private fun loadAppIcon(drawable: Drawable?) {
             ui {
-                Glide.with(context)
-                    .load(drawable)
-                    .error(Utilities.getDefaultIcon(context))
-                    .into(b.ssIcon)
+                b.ssIcon.setImageDrawable(drawable ?: Utilities.getDefaultIcon(context))
             }
         }
     }
