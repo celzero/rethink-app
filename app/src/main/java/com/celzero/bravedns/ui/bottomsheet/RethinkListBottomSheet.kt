@@ -18,13 +18,17 @@ package com.celzero.bravedns.ui.bottomsheet
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.celzero.bravedns.database.RethinkDnsEndpoint
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.blocklists.RethinkListScreen
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.adapter.RethinkEndpointAdapter
-import com.celzero.bravedns.databinding.BottomSheetRethinkListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.util.Themes
@@ -35,16 +39,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RethinkListBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomSheetRethinkListBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private val pages = MutableStateFlow<PagingData<RethinkDnsEndpoint>>(PagingData.empty())
+    private val appConfig by inject<AppConfig>()
 
     private val persistentState by inject<PersistentState>()
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var recyclerAdapter: RethinkEndpointAdapter? = null
     private val viewModel: RethinkEndpointViewModel by viewModel()
 
     private val filter: Int = 1
@@ -62,8 +61,10 @@ class RethinkListBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetRethinkListBinding.inflate(inflater, container, false)
-        return b.root
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RethinkListScreen(null, pages, viewLifecycleOwner, context, appConfig, ::openRethinkBasicActivity) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,23 +73,11 @@ class RethinkListBottomSheet : BaseBottomSheetDialogFragment() {
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
         initView()
-        initClickListeners()
     }
 
     private fun initView() {
-        layoutManager = LinearLayoutManager(requireContext())
-        b.bsrRethinkListRecycler.layoutManager = layoutManager
-
-        recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(filter)
-        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
-            recyclerAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-        b.bsrRethinkListRecycler.adapter = recyclerAdapter
-    }
-
-    private fun initClickListeners() {
-        b.bsrConfigure.setOnClickListener { openRethinkBasicActivity() }
+        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) { pages.value = it }
     }
 
     private fun openRethinkBasicActivity() {
@@ -100,8 +89,4 @@ class RethinkListBottomSheet : BaseBottomSheetDialogFragment() {
         startActivity(intent)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }

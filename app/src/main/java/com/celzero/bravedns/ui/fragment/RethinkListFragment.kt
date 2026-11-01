@@ -18,26 +18,26 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.celzero.bravedns.database.RethinkDnsEndpoint
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.blocklists.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.RethinkEndpointAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.FragmentRethinkListBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -48,12 +48,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
-import com.google.android.material.chip.Chip
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,15 +58,14 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
-    private val b by viewBinding(FragmentRethinkListBinding::bind)
+class RethinkListFragment : Fragment() {
+    private var b = RethinkListState()
+    private val pages = MutableStateFlow<PagingData<RethinkDnsEndpoint>>(PagingData.empty())
 
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
-    private var recyclerAdapter: RethinkEndpointAdapter? = null
     private val viewModel: RethinkEndpointViewModel by viewModel()
 
     private var uid: Int = Constants.MISSING_UID
@@ -91,7 +87,24 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     ): View? {
         val bundle = this.arguments
         uid = bundle?.getInt(UID, Constants.MISSING_UID) ?: Constants.MISSING_UID
-        return super.onCreateView(inflater, container, savedInstanceState)
+        b = RethinkListState()
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RethinkListScreen(b, pages, viewLifecycleOwner, requireContext(), appConfig) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBooleanArray("rethink_radio_checks", booleanArrayOf(b.radioSky.isChecked, b.radioMax.isChecked))
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        savedInstanceState?.getBooleanArray("rethink_radio_checks")?.takeIf { it.size == 2 }?.let {
+            b.radioSky.isChecked = it[0]
+            b.radioMax.isChecked = it[1]
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -103,8 +116,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun showBlocklistVersionUi() {
         if (getDownloadTimeStamp() == INIT_TIME_MS) {
-            b.dohFabAddServerIcon.visibility = View.GONE
-            b.lbVersion.visibility = View.GONE
+            b.dohFabAddServerIcon.visible = false
+            b.lbVersion.visible = false
             return
         }
 
@@ -115,20 +128,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             )
     }
 
-    private fun showProgress(chip: Chip) {
-        val cpDrawable = CircularProgressDrawable(requireContext())
-        cpDrawable.setStyle(CircularProgressDrawable.DEFAULT)
-        val color = fetchColor(requireContext(), R.attr.chipTextPositive)
-        cpDrawable.colorFilter =
-            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                color,
-                BlendModeCompat.SRC_ATOP
-            )
-        cpDrawable.start()
-
-        chip.chipIcon = cpDrawable
-        chip.isChipIconVisible = true
-    }
+    private fun showProgress(chip: RethinkChipState) { chip.isChipIconVisible = true }
 
     private fun hideProgress() {
         b.bslbCheckUpdateBtn.isChipIconVisible = false
@@ -138,15 +138,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun showUpdateCheckUi() {
         if (isBlocklistUpdateAvailable()) {
-            b.bslbUpdateAvailableBtn.visibility = View.VISIBLE
-            b.bslbRedownloadBtn.visibility = View.GONE
-            b.bslbCheckUpdateBtn.visibility = View.GONE
+            b.bslbUpdateAvailableBtn.visible = true
+            b.bslbRedownloadBtn.visible = false
+            b.bslbCheckUpdateBtn.visible = false
             return
         }
 
-        b.bslbCheckUpdateBtn.visibility = View.VISIBLE
-        b.bslbRedownloadBtn.visibility = View.GONE
-        b.bslbUpdateAvailableBtn.visibility = View.GONE
+        b.bslbCheckUpdateBtn.visible = true
+        b.bslbRedownloadBtn.visible = false
+        b.bslbUpdateAvailableBtn.visible = false
         return
     }
 
@@ -172,32 +172,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         showBlocklistVersionUi()
         showUpdateCheckUi()
         updateMaxSwitchUi()
-
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerDohConnections.layoutManager = layoutManager
-        b.recyclerDohConnections.addItemDecoration(
-            RecyclerViewSpacingDecoration(spacing4dp, spacing4dp)
-        )
-
-        recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(uid)
-        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
-            recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-        b.recyclerDohConnections.adapter = recyclerAdapter
-
-        recyclerAdapter!!.addLoadStateListener { loadStates ->
-            val isEmpty = loadStates.source.refresh is LoadState.NotLoading &&
-                    recyclerAdapter!!.itemCount == 0
-            val isLoading = loadStates.source.refresh is LoadState.Loading
-
-            b.rethinkEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
-            b.rethinkLoadingIndicator.visibility = if (isLoading && recyclerAdapter!!.itemCount == 0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-        }
+        viewModel.rethinkEndpointList.observe(viewLifecycleOwner) { pages.value = it }
     }
 
     private fun updateMaxSwitchUi() {
@@ -208,8 +184,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun initClickListeners() {
-        b.dohFabAddServerIcon.bringToFront()
-        b.dohFabAddServerIcon.setOnClickListener {
+        b.dohFabAddServerIcon.onClick = {
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(
                 RETHINK_BLOCKLIST_TYPE,
@@ -218,13 +193,13 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             requireContext().startActivity(intent)
         }
 
-        b.bslbCheckUpdateBtn.setOnClickListener {
+        b.bslbCheckUpdateBtn.onClick = {
             b.bslbCheckUpdateBtn.isEnabled = false
             showProgress(b.bslbCheckUpdateBtn)
             checkBlocklistUpdate()
         }
 
-        b.bslbUpdateAvailableBtn.setOnClickListener {
+        b.bslbUpdateAvailableBtn.onClick = {
             b.bslbUpdateAvailableBtn.isEnabled = false
             val timestamp = getDownloadTimeStamp()
 
@@ -232,22 +207,22 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             download(timestamp, isRedownload = false)
         }
 
-        b.bslbRedownloadBtn.setOnClickListener {
+        b.bslbRedownloadBtn.onClick = {
             b.bslbRedownloadBtn.isEnabled = false
             showProgress(b.bslbRedownloadBtn)
             download(getDownloadTimeStamp(), isRedownload = true)
         }
 
-        b.radioMax.setOnCheckedChangeListener(null)
-        b.radioMax.setOnClickListener {
+        b.radioMax.onCheckedChange = null
+        b.radioMax.onClick = {
             if (b.radioMax.isChecked) {
                 io { appConfig.switchRethinkDnsToMax() }
                 updateRethinkRadioUi(isMax = true)
             }
         }
 
-        b.radioSky.setOnCheckedChangeListener(null)
-        b.radioSky.setOnClickListener {
+        b.radioSky.onCheckedChange = null
+        b.radioSky.onClick = {
             if (b.radioSky.isChecked) {
                 io { appConfig.switchRethinkDnsToSky() }
                 updateRethinkRadioUi(isMax = false)
@@ -368,15 +343,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun showNewUpdateUi() {
         enableChips()
-        b.bslbUpdateAvailableBtn.visibility = View.VISIBLE
-        b.bslbCheckUpdateBtn.visibility = View.GONE
+        b.bslbUpdateAvailableBtn.visible = true
+        b.bslbCheckUpdateBtn.visible = false
     }
 
     private fun showRedownloadUi() {
         enableChips()
-        b.bslbUpdateAvailableBtn.visibility = View.GONE
-        b.bslbCheckUpdateBtn.visibility = View.GONE
-        b.bslbRedownloadBtn.visibility = View.VISIBLE
+        b.bslbUpdateAvailableBtn.visible = false
+        b.bslbCheckUpdateBtn.visible = false
+        b.bslbRedownloadBtn.visible = true
     }
 
     private fun onRemoteDownloadFailure() {
