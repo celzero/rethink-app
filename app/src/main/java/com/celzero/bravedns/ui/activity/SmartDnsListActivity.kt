@@ -21,19 +21,16 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivitySmartDnsListBinding
+import com.celzero.bravedns.ui.compose.dnssettings.dnsFragmentHost
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.SmartDnsListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
-class SmartDnsListActivity : BaseActivity(R.layout.activity_smart_dns_list) {
-    private val b by viewBinding(ActivitySmartDnsListBinding::bind)
+class SmartDnsListActivity : BaseActivity() {
 
     private val persistentState by inject<PersistentState>()
 
@@ -65,7 +62,7 @@ class SmartDnsListActivity : BaseActivity(R.layout.activity_smart_dns_list) {
     }
 
     private fun init() {
-        b.smartDnsListHeading.text = getString(R.string.smart_dns)
+        setContentView(dnsFragmentHost(this, R.id.smart_dns_list_container, R.id.smart_dns_list_heading, R.id.smart_dns_list_fragment_container, getString(R.string.smart_dns), getString(R.string.smart_dns_desc)))
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.smart_dns_list_fragment_container, SmartDnsListFragment.newInstance())
