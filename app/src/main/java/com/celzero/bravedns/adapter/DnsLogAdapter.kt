@@ -16,33 +16,30 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import androidx.compose.runtime.*
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.adapter.DnsLogAdapter.DnsLogViewHolder
 import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.databinding.ListItemDnsLogBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.FirewallRuleset
@@ -59,8 +56,7 @@ import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.firestack.backend.Backend
 import com.google.gson.Gson
 
-class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) :
-    PagingDataAdapter<DnsLog, DnsLogViewHolder>(DIFF_CALLBACK) {
+class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) : LogPagingPresenter<DnsLog>(DIFF_CALLBACK) {
 
     companion object {
         private const val TAG = "DnsLogAdapter"
@@ -78,24 +74,25 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             }
     }
 
-    override fun onBindViewHolder(holder: DnsLogViewHolder, position: Int) {
-        val log: DnsLog = getItem(position) ?: return
 
-        holder.clear()
-        holder.update(log)
-        holder.setTag(log)
+
+
+
+
+
+    override fun itemKey(value: DnsLog): Any = value.id
+    @Composable override fun Row(value: DnsLog, generation: Int) {
+        val owner = LocalLifecycleOwner.current
+        val presentation = remember { Presentation(DnsRowState(context)) }
+        DisposableEffect(value) {
+            presentation.clear(); presentation.update(value)
+            onDispose { presentation.clearFavIcon() }
+        }
+        DnsLogRow(presentation.b)
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return R.layout.list_item_dns_log
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DnsLogViewHolder {
-        val binding = ListItemDnsLogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DnsLogViewHolder(binding)
-    }
-
-    inner class DnsLogViewHolder(private val b: ListItemDnsLogBinding): RecyclerView.ViewHolder(b.root) {
+    private inner class Presentation(val b: DnsRowState) {
+        private val targets = mutableListOf<CustomTarget<Drawable>>()
         fun clear() {
             b.dnsWallTime.text = ""
             b.dnsFlag.text = ""
@@ -284,7 +281,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     )
             }
 
-            if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty() && b.dnsLatency.text.isEmpty()) {
+            if (b.dnsUnicodeHint.text.isNullOrEmpty() && b.dnsQueryType.text.isNullOrEmpty() && b.dnsLatency.text.isNullOrEmpty()) {
                 b.dnsSummaryLl.visibility = View.GONE
             } else {
                 b.dnsSummaryLl.visibility = View.VISIBLE
@@ -383,10 +380,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(getDefaultIcon(context))
-                .into(b.dnsAppIcon)
+            b.dnsAppIcon.setImageDrawable(drawable ?: getDefaultIcon(context))
         }
 
         private fun displayIcon(log: DnsLog) {
@@ -445,8 +439,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             }
         }
 
-        private fun clearFavIcon() {
-            Glide.with(context.applicationContext).clear(b.dnsFavIcon)
+        fun clearFavIcon() {
+            targets.forEach { Glide.with(context.applicationContext).clear(it) }; targets.clear()
         }
 
         private fun displayNextDnsFavIcon(log: DnsLog) {
@@ -471,7 +465,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                 }
 
                 request.into(
-                        object : CustomViewTarget<ImageView, Drawable>(b.dnsFavIcon) {
+                        object : CustomTarget<Drawable>(64, 64) {
                             override fun onLoadFailed(errorDrawable: Drawable?) {
                                 showFlag()
                                 hideFavIcon()
@@ -485,16 +479,16 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                                 showFavIcon(resource)
                             }
 
-                            override fun onResourceCleared(placeholder: Drawable?) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
                                 hideFavIcon()
                                 showFlag()
                             }
-                        }
+                        }.also { targets += it }
                     )
             } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)?.into(
-                    object : CustomViewTarget<ImageView, Drawable>(b.dnsFavIcon) {
+                    object : CustomTarget<Drawable>(64, 64) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
                             showFlag()
                             hideFavIcon()
@@ -508,11 +502,11 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             showFavIcon(resource)
                         }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
+                        override fun onLoadCleared(placeholder: Drawable?) {
                             hideFavIcon()
                             showFlag()
                         }
-                    }
+                    }.also { targets += it }
                 )
             }
         }

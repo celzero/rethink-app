@@ -16,27 +16,26 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import androidx.compose.runtime.*
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.databinding.ListItemConnTrackBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -55,8 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class RethinkLogAdapter(private val context: Context) :
-    PagingDataAdapter<RethinkLog, RethinkLogAdapter.RethinkLogViewHolder>(DIFF_CALLBACK) {
+class RethinkLogAdapter(private val context: Context) : LogPagingPresenter<RethinkLog>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -80,25 +78,22 @@ class RethinkLogAdapter(private val context: Context) :
         const val DNS_IP_TEMPLATE_V6 = "fd66:f83a:c650::3"
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkLogViewHolder {
-        val itemBinding =
-            ListItemConnTrackBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        return RethinkLogViewHolder(itemBinding)
+
+
+
+
+    override fun itemKey(value: RethinkLog): Any = value.id
+    @Composable override fun Row(value: RethinkLog, generation: Int) {
+        val owner = LocalLifecycleOwner.current
+        val presentation = remember { Presentation(ConnectionRowState(context)) }
+        DisposableEffect(value) {
+            presentation.update(value)
+            onDispose { /* baseline Activity-scoped work is not cancelled on detach */ }
+        }
+        ConnectionLogRow(presentation.b)
     }
 
-    override fun onBindViewHolder(holder: RethinkLogViewHolder, position: Int) {
-        val log: RethinkLog = getItem(position) ?: return
-
-        holder.update(log)
-        holder.setTag(log)
-    }
-
-    inner class RethinkLogViewHolder(private val b: ListItemConnTrackBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    private inner class Presentation(val b: ConnectionRowState) {
 
         fun update(log: RethinkLog) {
             displayTransactionDetails(log)
@@ -369,7 +364,7 @@ class RethinkLogAdapter(private val context: Context) :
                             )
                     }
 
-                    if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                    if (b.connectionDelay.text.isNullOrEmpty() && b.connectionDataUsage.text.isNullOrEmpty()) {
                         b.connectionSummaryLl.visibility = View.GONE
                     }
                 }
@@ -407,10 +402,7 @@ class RethinkLogAdapter(private val context: Context) :
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(Utilities.getDefaultIcon(context))
-                .into(b.connectionAppIcon)
+            b.connectionAppIcon.setImageDrawable(drawable ?: Utilities.getDefaultIcon(context))
         }
     }
 

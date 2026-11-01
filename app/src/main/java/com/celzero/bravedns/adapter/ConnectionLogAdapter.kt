@@ -16,29 +16,27 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import androidx.compose.runtime.*
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.MergedConnectionLog
 import com.celzero.bravedns.database.toConnectionTracker
 import com.celzero.bravedns.database.toRethinkLog
-import com.celzero.bravedns.databinding.ListItemConnTrackBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -66,10 +64,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
-class ConnectionLogAdapter(private val context: Context) :
-    PagingDataAdapter<MergedConnectionLog, ConnectionLogAdapter.ConnectionLogViewHolder>(
-        DIFF_CALLBACK
-    ) {
+class ConnectionLogAdapter(private val context: Context) : LogPagingPresenter<MergedConnectionLog>(DIFF_CALLBACK) {
 
     // Per-uid cache of package names (immutable snapshots), living for the adapter's
     // lifetime (recreated with the fragment; uids are stable across paging pages).
@@ -108,39 +103,24 @@ class ConnectionLogAdapter(private val context: Context) :
         const val DNS_IP_TEMPLATE_V6 = "fd66:f83a:c650::3"
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionLogViewHolder {
-        val itemBinding =
-            ListItemConnTrackBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        val owner =
-            parent.findViewTreeLifecycleOwner() ?: parent.context as? LifecycleOwner
-        return ConnectionLogViewHolder(itemBinding, owner)
-    }
 
-    override fun onViewRecycled(holder: ConnectionLogViewHolder) {
-        super.onViewRecycled(holder)
-        // Stop any in progress item work (DB reads, icon loads) for a view that is
-        // leaving the screen; rebinding re-launches whatever is needed.
-        holder.cancelBinding()
-    }
 
-    override fun onBindViewHolder(holder: ConnectionLogViewHolder, position: Int) {
-        val log: MergedConnectionLog? = getItem(position)
 
-        if (log == null) {
-            holder.clear()
-            return
+
+
+
+    override fun itemKey(value: MergedConnectionLog): Any = "${value.source}:${value.id}"
+    @Composable override fun Row(value: MergedConnectionLog, generation: Int) {
+        val owner = LocalLifecycleOwner.current
+        val presentation = remember { Presentation(ConnectionRowState(context), owner) }
+        DisposableEffect(value) {
+            presentation.update(value)
+            onDispose { presentation.cancelBinding() }
         }
-        holder.update(log)
-        holder.setTag(log)
+        ConnectionLogRow(presentation.b)
     }
 
-    inner class ConnectionLogViewHolder(private val b: ListItemConnTrackBinding,
-                                        private val owner: LifecycleOwner?) :
-        RecyclerView.ViewHolder(b.root) {
+    private inner class Presentation(val b: ConnectionRowState, private val owner: androidx.lifecycle.LifecycleOwner?) {
 
         private var bindingScope: CoroutineScope? = null
 
@@ -475,7 +455,7 @@ class ConnectionLogAdapter(private val context: Context) :
                             )
                     }
 
-                    if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                    if (b.connectionDelay.text.isNullOrEmpty() && b.connectionDataUsage.text.isNullOrEmpty()) {
                         b.connectionSummaryLl.visibility = View.GONE
                     }
 

@@ -1,159 +1,90 @@
-/*
-Copyright 2023 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/* Copyright 2026 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.ui.fragment
-
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.SearchView
+import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.LoadState
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.RethinkLogAdapter
-import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
-import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.adapter.*
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.*
+import com.celzero.bravedns.service.*
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_RPN
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.viewmodel.RethinkLogViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import com.celzero.bravedns.viewmodel.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.time.Duration.Companion.milliseconds
 
-class RethinkLogFragment :
-    Fragment(R.layout.fragment_connection_tracker), SearchView.OnQueryTextListener {
-    private val b by viewBinding(FragmentConnectionTrackerBinding::bind)
-
-    private var layoutManager: RecyclerView.LayoutManager? = null
+class RethinkLogFragment : Fragment() {
     private val viewModel: RethinkLogViewModel by viewModel()
-
     private val rethinkLogRepository by inject<RethinkLogRepository>()
     private val persistentState by inject<PersistentState>()
-
+    private lateinit var state: LogScreenState
+    private var presenter: RethinkLogAdapter? = null
     companion object {
-        private const val QUERY_TEXT_DELAY: Long = 1000
+        private const val QUERY_TEXT_DELAY = 1000L
+        fun newInstance(param: String) = RethinkLogFragment().apply { arguments = Bundle().apply { putString(Constants.SEARCH_QUERY, param) } }
+    }
+    private fun resetViewPresentation() { presenter = null }
 
-        fun newInstance(param: String): RethinkLogFragment {
-            val args = Bundle()
-            args.putString(Constants.SEARCH_QUERY, param)
-            val fragment = RethinkLogFragment()
-            fragment.arguments = args
-            return fragment
-        }
+    private var viewSearchSnapshot: String? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        state = LogScreenState()
+        resetViewPresentation()
+        return ComposeView(requireContext()).apply { setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed) }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("traffic.search", if (::state.isInitialized) state.search.query else viewSearchSnapshot)
+    }
+    override fun onDestroyView() {
+        viewSearchSnapshot = state.search.query
+        super.onDestroyView()
+    }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        // TextView hierarchy restoration happens after arguments and listener installation.
+        (savedInstanceState?.getString("traffic.search") ?: viewSearchSnapshot)?.let { state.search.setQuery(it) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        if (arguments != null) {
-            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            b.connectionSearch.setQuery(query, true)
+        if (!persistentState.logsEnabled) { state.showSearch = false; state.message = getString(R.string.show_logs_disabled_network_message) }
+        else {
+            val adapter = RethinkLogAdapter(requireContext()); presenter = adapter
+            viewModel.rlogList.observe(viewLifecycleOwner) { adapter.submitData(lifecycle, it) }
+            state.search.listener = { onQueryTextChange(it) }; state.search.submitListener = { onQueryTextSubmit(it) }
+            setQueryFilter()
         }
+        arguments?.getString(Constants.SEARCH_QUERY)?.let { state.search.setQuery(it, true) }
+        (view as ComposeView).setContent { RethinkTheme { Surface(color = themeColor(R.attr.background), contentColor = themeColor(R.attr.primaryTextColor)) { Content() } } }
     }
-
-    override fun onResume() {
-        super.onResume()
-        // fix for #1939, OEM-specific bug, especially on heavily customized Android
-        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
-        // causing SearchView to stop receiving input events
-        // this is a workaround to restart the IME process
-        b.connectionSearch.setQuery("", false)
-        b.connectionSearch.clearFocus()
-
-        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.connectionSearch)
-    }
-
-    private fun initView() {
-
-        // no need to show filter options for rethink logs
-        b.connectionFilterIcon.visibility = View.GONE
-
-        if (!persistentState.logsEnabled) {
-            b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-            b.connectionCardViewTop.visibility = View.GONE
-            return
-        }
-
-        b.connectionListLogsDisabledTv.visibility = View.GONE
-        b.connectionCardViewTop.visibility = View.VISIBLE
-
-        b.recyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = RethinkLogAdapter(requireContext())
-        viewModel.rlogList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(lifecycle, it)
-        }
-        b.recyclerConnection.adapter = recyclerAdapter
-        b.recyclerConnection.layoutAnimation = null
-
-        setupRecyclerScrollListener()
-        b.connectionSearch.setOnQueryTextListener(this)
-        setQueryFilter()
-
-        b.connectionDeleteIcon.setOnClickListener { showDeleteDialog() }
-
-    }
-
-    private fun setupRecyclerScrollListener() {
-        val scrollListener =
-            object : RecyclerView.OnScrollListener() {
-
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val firstChild = recyclerView.getChildAt(0)
-                    if (firstChild == null) {
-                        Logger.w(LOG_TAG_UI, "RinRLogs; err; no child views found in recyclerView")
-                        return
-                    }
-
-                    val tag = firstChild.tag as? Long
-                    if (tag == null) {
-                        Logger.w(LOG_TAG_UI, "RinRLogs; err; tag is null for first child, rv")
-                        return
-                    }
-
-                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
-                    b.connectionListScrollHeader.visibility = View.VISIBLE
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.connectionListScrollHeader.visibility = View.GONE
-                    }
-                }
-            }
-        b.recyclerConnection.addOnScrollListener(scrollListener)
-    }
-
+    override fun onResume() { super.onResume(); state.search.setQuery(""); state.resumeGeneration++ }
     @OptIn(FlowPreview::class)
     private fun setQueryFilter() {
         lifecycleScope.launch {
@@ -165,21 +96,16 @@ class RethinkLogFragment :
                 }
         }
     }
-
-    val searchQuery = MutableStateFlow("")
-
-    override fun onQueryTextSubmit(query: String): Boolean {
+    fun onQueryTextSubmit(query: String): Boolean {
         searchQuery.value = query
         return true
     }
-
-    override fun onQueryTextChange(query: String): Boolean {
+    fun onQueryTextChange(query: String): Boolean {
         searchQuery.value = query
         return true
     }
-
     private fun showDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        val builder = WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.conn_track_clear_logs_title)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
@@ -190,8 +116,15 @@ class RethinkLogFragment :
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
     }
-
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    val searchQuery = MutableStateFlow("")
+    @Composable private fun Content() {
+        Column(Modifier.fillMaxSize().background(themeColor(R.attr.background))) {
+            LogSearchBar(state, stringResource(R.string.search_firewall_network_log), actions = { LogAction(R.drawable.ic_delete, stringResource(R.string.lbl_delete), ::showDeleteDialog) })
+            presenter?.let { LogList(state, it, Modifier.weight(1f), timestamp = { row -> row.timeStamp }) } ?: state.message?.let { Text(it) }
+        }
     }
 }
