@@ -15,7 +15,12 @@
  */
 package com.celzero.bravedns.adapter
 
+import android.app.Application
 import android.content.Context
+import com.celzero.bravedns.ui.compose.firewallapps.FirewallAppRowState
+import com.celzero.bravedns.ui.compose.firewallapps.FirewallAppsPresenter
+import io.mockk.coVerify
+import org.junit.Assert.assertTrue
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
@@ -59,14 +64,13 @@ import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
+@Config(sdk = [28], application = Application::class)
 class FirewallAppListAdapterTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
     private lateinit var context: Context
-    private lateinit var mockParent: ViewGroup
     private lateinit var lifecycleOwner: LifecycleOwner
 
     // relaxed: FirewallManager's cached `db` may bind to this mock for the rest
@@ -93,9 +97,6 @@ class FirewallAppListAdapterTest {
 
         // Use real Android context from Robolectric
         context = ApplicationProvider.getApplicationContext()
-
-        // Create real ViewGroup using Robolectric instead of mocking
-        mockParent = android.widget.LinearLayout(context)
 
         // Create mock lifecycle owner
         lifecycleOwner = mockk<LifecycleOwner>(relaxed = true)
@@ -186,30 +187,22 @@ class FirewallAppListAdapterTest {
     }
 
     @Test
-    fun `test onCreateViewHolder creates proper view holder`() {
-        // Mock the adapter's onCreateViewHolder to return our mock ViewHolder
-        val spyAdapter = spyk(adapter)
-        every { spyAdapter.onCreateViewHolder(any(), any()) } returns mockViewHolder
-
-        val viewHolder = spyAdapter.onCreateViewHolder(mockParent, 0)
-        assertNotNull("Expected: ViewHolder should be non-null", viewHolder)
+    fun `test presentation factory creates a real row controller`() {
+        val state = FirewallAppRowState()
+        val controller = adapter.AppListViewHolder(state)
+        assertNotNull("The native row controller must be real, not a mocked factory result", controller)
+        assertEquals("", state.firewallAppLabelTv.text)
+        assertTrue(state.firewallAppToggleWifi.isEnabled)
+        coVerify(exactly = 0) { FirewallManager.appStatus(any()) }
     }
 
     @Test
-    fun `test onBindViewHolder does not crash with empty data`() = testScope.runTest {
-        val spyAdapter = spyk(adapter)
-        every { spyAdapter.onCreateViewHolder(any(), any()) } returns mockViewHolder
-        every { spyAdapter.onBindViewHolder(any(), any()) } just Runs
-
-        var exceptionThrown = false
-        try {
-            spyAdapter.onBindViewHolder(mockViewHolder, 0)
-        } catch (e: Exception) {
-            exceptionThrown = true
-        }
-
-        verify { spyAdapter.onBindViewHolder(mockViewHolder, 0) }
-        assert(!exceptionThrown)
+    fun `test empty presenter exposes no row or command`() = testScope.runTest {
+        assertEquals(0, adapter.itemCount)
+        assertTrue(adapter.snapshot().items.isEmpty())
+        assertEquals("", adapter.getSectionName(0))
+        coVerify(exactly = 0) { FirewallManager.appStatus(any()) }
+        coVerify(exactly = 0) { FirewallManager.updateFirewallStatus(any(), any(), any()) }
     }
 
     // === FIREWALL MANAGER INTEGRATION TESTS ===
@@ -393,34 +386,18 @@ class FirewallAppListAdapterTest {
     // === ADAPTER BEHAVIOR TESTS ===
 
     @Test
-    fun `test adapter inherits from correct parent classes`() {
-        val adapterClass = adapter::class.java
-        val superClass = adapterClass.superclass
-        val interfaces = adapterClass.interfaces
-
-        assertNotNull("Adapter should have a superclass", superClass)
-
-        val implementsSectionedAdapter = interfaces.any {
-            it.name.contains("SectionedAdapter")
-        }
-        assert(implementsSectionedAdapter)
+    fun `test adapter inherits native paging presenter rather than recycler renderer`() {
+        assertTrue(FirewallAppsPresenter::class.java.isAssignableFrom(adapter::class.java))
+        assertTrue(!androidx.recyclerview.widget.RecyclerView.Adapter::class.java.isAssignableFrom(adapter::class.java))
     }
 
     @Test
-    fun `test adapter handles null appInfo gracefully`() = testScope.runTest {
-        val spyAdapter = spyk(adapter)
-        every { spyAdapter.onCreateViewHolder(any(), any()) } returns mockViewHolder
-        every { spyAdapter.onBindViewHolder(any(), any()) } just Runs
-
-        var exceptionThrown = false
-        try {
-            spyAdapter.onBindViewHolder(mockViewHolder, 0)
-        } catch (e: Exception) {
-            exceptionThrown = true
-        }
-
-        verify { spyAdapter.onBindViewHolder(mockViewHolder, 0) }
-        assert(!exceptionThrown)
+    fun `test section lookup handles missing positions without manager access`() = testScope.runTest {
+        assertEquals("", adapter.getSectionName(-1))
+        assertEquals("", adapter.getSectionName(0))
+        assertEquals("", adapter.getSectionName(Int.MAX_VALUE))
+        assertTrue(adapter.snapshot().items.isEmpty())
+        coVerify(exactly = 0) { FirewallManager.appStatus(any()) }
     }
 
     // === PERFORMANCE TESTS ===
