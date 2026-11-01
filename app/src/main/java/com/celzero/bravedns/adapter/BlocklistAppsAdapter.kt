@@ -1,213 +1,76 @@
-/*
- * Copyright 2026 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Copyright 2026 RethinkDNS and its authors. Licensed under Apache-2.0. */
 package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemBlocklistAppRowBinding
-import com.celzero.bravedns.databinding.ListItemBlocklistDomainRowBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.ui.compose.statistics.BlocklistStatisticsAppRow
+import com.celzero.bravedns.ui.compose.statistics.BlocklistStatisticsDomainRow
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BlocklistAppsAdapter(
-    private val context: Context,
-    private val fetchDomains: suspend (uid: Int) -> List<AppConnection>
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    companion object {
-        private const val TYPE_APP = 0
-        private const val TYPE_DOMAIN = 1
-
-        // chevron orientation for the expand/collapse indicator
-        private const val ROTATION_EXPANDED = 180f
-        private const val ROTATION_COLLAPSED = 0f
+/** Filter submissions reset expansion and cached children, as in the original adapter. */
+class BlocklistAppsAdapter internal constructor(private val context: Context,
+    private val identityResolver: (suspend (Int) -> Pair<String?, Drawable?>)?,
+    private val fetchDomains: suspend (uid: Int) -> List<AppConnection>) {
+    constructor(context: Context, fetchDomains: suspend (uid: Int) -> List<AppConnection>) : this(context, null, fetchDomains)
+    private class Group(val app: AppConnection) {
+        var expanded by mutableStateOf(false)
+        var domains by mutableStateOf<List<AppConnection>?>(null)
     }
-
-    private data class AppGroup(
-        val app: AppConnection,
-        var expanded: Boolean = false,
-        var domains: List<AppConnection>? = null
-    )
-
-    private sealed class Row {
-        abstract val groupIndex: Int
-
-        class Header(override val groupIndex: Int) : Row()
-        class Domain(override val groupIndex: Int, val domain: AppConnection) : Row()
-    }
-
-    private val groups = mutableListOf<AppGroup>()
-    private val rows = mutableListOf<Row>()
-
-    // per-uid identity caches; first bind resolves asynchronously, later binds
-    // (the common case while scrolling) are fully synchronous
-    private val appNameByUid = HashMap<Int, String?>()
-    private val appIconByUid = HashMap<Int, Drawable?>()
-
-    fun submitApps(apps: List<AppConnection>) {
-        groups.clear()
-        groups.addAll(apps.map { AppGroup(it) })
-        rebuildRows()
-        notifyDataSetChanged()
-    }
-
-    private fun rebuildRows() {
-        rows.clear()
-        groups.forEachIndexed { index, group ->
-            rows.add(Row.Header(index))
-            if (group.expanded) {
-                group.domains?.forEach { rows.add(Row.Domain(index, it)) }
+    private var groups by mutableStateOf<List<Group>>(emptyList())
+    private val identities = mutableMapOf<Int, Pair<String?, Drawable?>>()
+    val itemCount: Int get() = groups.size
+    fun submitApps(apps: List<AppConnection>) { groups = apps.map { Group(it) } }
+    @Composable
+    fun GroupAt(index: Int) {
+        val group = groups.getOrNull(index) ?: return
+        val app = group.app
+        val identity by produceState(identities[app.uid], app.uid) {
+            if (value == null) value = withContext(Dispatchers.IO) {
+                if (identityResolver != null) identityResolver.invoke(app.uid) else {
+                    val info = FirewallManager.getAppInfoByUid(app.uid)
+                    info?.appName to (Utilities.getIcon(context, info?.packageName.orEmpty(), info?.appName.orEmpty()) ?: Utilities.getDefaultIcon(context))
+                }
+            }.also { identities[app.uid] = it }
+        }
+        val description = stringResource(if (group.expanded) R.string.statistics_expanded else R.string.statistics_collapsed)
+        Column(Modifier.testTag("blocklist_group_${app.uid}").semantics { stateDescription = description }) {
+            BlocklistStatisticsAppRow(identity?.first ?: app.appOrDnsName ?: stringResource(R.string.network_log_app_name_unnamed, app.uid.toString()),
+                app.count.toString(), icon = identity?.second ?: Utilities.getDefaultIcon(context),
+                expanded = group.expanded, tag = "blocklist_app_${app.uid}") { toggle(group) }
+            if (group.expanded) group.domains.orEmpty().forEach { domain ->
+                BlocklistStatisticsDomainRow(domain.appOrDnsName.orEmpty(), domain.count.toString())
             }
         }
     }
-
-    override fun getItemCount(): Int = rows.size
-
-    override fun getItemViewType(position: Int): Int {
-        return when (rows[position]) {
-            is Row.Header -> TYPE_APP
-            is Row.Domain -> TYPE_DOMAIN
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            TYPE_APP -> {
-                val b = ListItemBlocklistAppRowBinding.inflate(inflater, parent, false)
-                AppViewHolder(b)
-            }
-            else -> {
-                val b = ListItemBlocklistDomainRowBinding.inflate(inflater, parent, false)
-                DomainViewHolder(b)
-            }
-        }
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val row = rows[position]) {
-            is Row.Header -> (holder as AppViewHolder).bind(row.groupIndex)
-            is Row.Domain -> (holder as DomainViewHolder).bind(row.domain)
-        }
-    }
-
-    private fun toggle(groupIndex: Int) {
-        val group = groups[groupIndex]
+    private fun toggle(group: Group) {
         group.expanded = !group.expanded
         if (group.expanded && group.domains == null) {
-            // first expansion: fetch the per-app domains off the main thread,
-            // then re-render the (still expanded) group
-            io {
+            val owner = context as? LifecycleOwner ?: return
+            owner.lifecycleScope.launch(Dispatchers.IO) {
                 val domains = fetchDomains(group.app.uid)
-                uiCtx {
-                    group.domains = domains
-                    rebuildRows()
-                    notifyDataSetChanged()
+                withContext(Dispatchers.Main.immediate) {
+                    if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@withContext
+                    if (group in groups) group.domains = domains
                 }
             }
-        }
-        rebuildRows()
-        notifyDataSetChanged()
-    }
-
-    inner class AppViewHolder(private val b: ListItemBlocklistAppRowBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        private var bindSeq: Long = 0L
-
-        fun bind(groupIndex: Int) {
-            val seq = ++bindSeq
-            val group = groups[groupIndex]
-            val app = group.app
-            b.blAppName.text = appNameByUid[app.uid] ?: app.appOrDnsName ?: context.getString(
-                R.string.network_log_app_name_unnamed,
-                app.uid.toString()
-            )
-            b.blAppCount.text = app.count.toString()
-            b.blAppExpand.rotation = if (group.expanded) ROTATION_EXPANDED else ROTATION_COLLAPSED
-            resolveAppIdentity(app, seq)
-            b.blAppRow.setOnClickListener { toggle(groupIndex) }
-        }
-
-        private fun applyIdentity(app: AppConnection, icon: Drawable?, name: String?) {
-            b.blAppName.text = name ?: app.appOrDnsName ?: context.getString(
-                R.string.network_log_app_name_unnamed,
-                app.uid.toString()
-            )
-            b.blAppIcon.setImageDrawable(icon ?: Utilities.getDefaultIcon(context))
-        }
-
-        private fun resolveAppIdentity(app: AppConnection, seq: Long) {
-            // paint the cached/default icon synchronously so recycled rows
-            // never show a stale app's glyph
-            b.blAppIcon.setImageDrawable(
-                appIconByUid[app.uid] ?: Utilities.getDefaultIcon(context)
-            )
-            if (appNameByUid.containsKey(app.uid) && appIconByUid.containsKey(app.uid)) {
-                return
-            }
-            io {
-                val appInfo = FirewallManager.getAppInfoByUid(app.uid)
-                if (bindSeq != seq) return@io
-                val icon = Utilities.getIcon(
-                    context,
-                    appInfo?.packageName.orEmpty(),
-                    appInfo?.appName.orEmpty()
-                ) ?: Utilities.getDefaultIcon(context)
-                uiCtx {
-                    if (bindSeq != seq) return@uiCtx
-                    appNameByUid[app.uid] = appInfo?.appName
-                    appIconByUid[app.uid] = icon
-                    applyIdentity(app, icon, appInfo?.appName)
-                }
-            }
-        }
-    }
-
-    inner class DomainViewHolder(private val b: ListItemBlocklistDomainRowBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        fun bind(domain: AppConnection) {
-            b.blDomainName.text = domain.appOrDnsName
-            b.blDomainCount.text = domain.count.toString()
-        }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        val owner = context as? LifecycleOwner ?: return
-        withContext(Dispatchers.Main.immediate) {
-            if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                return@withContext
-            }
-            f()
         }
     }
 }
