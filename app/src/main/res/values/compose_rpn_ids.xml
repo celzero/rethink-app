@@ -1,0 +1,5 @@
+<resources>
+    <item name="rpn_settings_compose" type="id"/>
+    <item name="rpn_exclusions_compose" type="id"/>
+    <item name="rpn_removal_compose" type="id"/>
+</resources>
