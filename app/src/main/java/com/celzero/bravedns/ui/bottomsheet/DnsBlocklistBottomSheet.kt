@@ -34,9 +34,7 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -250,7 +248,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun setupResponseIpsArrow() {
         val currentLog = log ?: return
-        val ips = currentLog.responseIps.split(",")
+        val ips = currentLog.responseIps.split(",").filter { it.isNotBlank() }
         if (ips.count() <= 1) return
         b.dnsBlockIpArrow.visibility = View.VISIBLE
         // the selectable ip text consumes taps, so it needs its own listener
@@ -265,37 +263,17 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             return
         }
 
-        val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
-
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        dialog.show()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        UIUtils.capDialogWidth(dialog)
-
-        if (b.dnsBlockFavIcon.isVisible) {
-            dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
-        } else {
-            dialogBinding.ipDetailsFavIcon.visibility = View.GONE
-        }
-
-        dialogBinding.ipDetailsFqdnTxt.text = currentLog.queryStr
-        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(currentLog.responseIps)
-
-        dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        b.infoDialog = LogInfoDialogState(
+            title = currentLog.queryStr,
+            description = formatIps(currentLog.responseIps),
+            iconNode = b.dnsBlockFavIcon.takeIf { it.isVisible }
+        )
     }
 
     private fun formatIps(ips: String): Spanned {
         var text = ""
-        ips.split(",").forEach {
-            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..1)), it)
+        ips.split(",").map(String::trim).filter(String::isNotEmpty).forEach {
+            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.take(2)), TextUtils.htmlEncode(it))
         }
         return htmlToSpannedText(text)
     }

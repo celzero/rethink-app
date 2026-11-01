@@ -332,6 +332,12 @@ class WgDetailState(context: Context) : WgFormState() {
         text = context.getString(R.string.adv_taster_title)
         textColor = UIUtils.fetchColor(context, R.attr.primaryTextColor)
     }
+    val msWgTaskerManagedTv = WgControlState(context).apply {
+        text = context.getString(R.string.wg_automation_tasker_managed)
+        textColor = UIUtils.fetchColor(context, R.attr.accentGood)
+        textSizeSp = wgTextDimensionSp(context, R.dimen.default_font_text_view)
+        visibility = View.GONE
+    }
     val useMobileRl = WgControlState(context).apply {
     }
     val useMobileTitleTv = WgControlState(context, textSource = "activity_wg_detail:use_mobile_title_tv").apply {

@@ -205,9 +205,17 @@ private fun RulesCard(b: HomePresentation, modifier: Modifier, wide: Boolean) {
 @Composable
 private fun ProxyCard(b: HomePresentation, modifier: Modifier, wide: Boolean) {
     HomeCard(b.fhsCardProxyLl, modifier, wide = wide) {
-        Column(Modifier.fillMaxWidth().heightIn(min = 120.dp).padding(12.dp)) {
+        if (b.fhsProxyInactiveTxt.isVisible) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 120.dp).padding(12.dp), contentAlignment = Alignment.Center) {
+                BasicText(b.fhsProxyInactiveTxt.text?.toString().orEmpty(), Modifier.alpha(b.fhsProxyInactiveTxt.alpha),
+                    style = utilityTextStyle(size = if (wide) 24f else 12f, family = if (wide) "monospace" else null, weight = if (wide) 700 else null, spacing = if (wide) 0f else .02f)
+                        .copy(color = themeColor(R.attr.primaryTextColor), textAlign = TextAlign.Center),
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    autoSize = TextAutoSize.StepBased(8.sp, if (wide) 24.sp else 12.sp, 1.sp))
+            }
+        } else Column(Modifier.fillMaxWidth().heightIn(min = 120.dp).padding(12.dp)) {
             HomeText(b.fhsCardOtherProxyCount, animated = true)
-            Spacer(Modifier.height(18.dp))
+            if (b.fhsProxyHeaderSpace.isVisible) Spacer(Modifier.height(18.dp))
             if (b.fhsProxyHealthContainer.isVisible) {
                 val counts = listOf(b.fhsProxyLiveCount, b.fhsProxyIdleCount, b.fhsProxyFailingCount, b.fhsProxyStoppedCount)
                 val bars = listOf(b.fhsProxyBarActive, b.fhsProxyBarIdle, b.fhsProxyBarFailing, b.fhsProxyBarStopped)

@@ -15,6 +15,27 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import androidx.compose.runtime.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectable
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
+
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -22,16 +43,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.RecentRoutedAppRow
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.BottomsheetRecentRoutedAppsBinding
-import com.celzero.bravedns.databinding.ListItemRecentRoutedAppBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
@@ -55,15 +70,14 @@ import java.util.Locale
  */
 class RecentRoutedAppsBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetRecentRoutedAppsBinding? = null
-    private val b
-        get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
+    private var loading by mutableStateOf(true)
+    private var apps by mutableStateOf<List<RecentRoutedAppRow>>(emptyList())
 
     private val persistentState by inject<PersistentState>()
     private val connTrackerRepository by inject<ConnectionTrackerRepository>()
 
     private var loadJob: Job? = null
-    private val excludedUids = mutableSetOf<Int>()
+    private val excludedUids = mutableStateMapOf<Int, Boolean>()
 
     companion object {
         const val TAG = "RecentRoutedAppsSheet"
@@ -93,8 +107,10 @@ class RecentRoutedAppsBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomsheetRecentRoutedAppsBinding.inflate(inflater, container, false)
-        return b.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RecentAppsContent() } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -105,61 +121,38 @@ class RecentRoutedAppsBottomSheet : BaseBottomSheetDialogFragment() {
         }
 
         val proxyId = arguments?.getString(ARG_PROXY_ID).orEmpty()
-        b.recentRoutedAppsSubtitle.isVisible =
-            !arguments?.getString(ARG_SUBTITLE).isNullOrBlank()
-        b.recentRoutedAppsSubtitle.text = arguments?.getString(ARG_SUBTITLE).orEmpty()
-
-        b.recentRoutedViewLogs.setOnClickListener { openConnectionLogs(proxyId) }
-
         loadApps(proxyId)
     }
 
     override fun onDestroyView() {
         loadJob?.cancel()
         loadJob = null
-        _binding = null
+        apps = emptyList()
+        excludedUids.clear()
         super.onDestroyView()
     }
 
     private fun loadApps(proxyId: String) {
-        showLoadingState()
-
+        loading = true
+        loadJob?.cancel()
         loadJob = viewLifecycleOwner.lifecycleScope.launch {
-            val apps = withContext(Dispatchers.IO) {
+            val (rows, excluded) = withContext(Dispatchers.IO) {
                 try {
-                    val rows = connTrackerRepository.getRecentRoutedAppsWithCount(proxyId, APPS_LIMIT)
-                    excludedUids.addAll(rows.filter { FirewallManager.isAppExcludedFromProxy(it.uid) }.map { it.uid })
-                    rows
+                    val result = connTrackerRepository.getRecentRoutedAppsWithCount(proxyId, APPS_LIMIT)
+                    result to result.filter { FirewallManager.isAppExcludedFromProxy(it.uid) }.map { it.uid }
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     Logger.w(LOG_TAG_UI, "$TAG: getRecentRoutedAppsWithCount failed: ${e.message}")
-                    emptyList()
+                    emptyList<RecentRoutedAppRow>() to emptyList<Int>()
                 }
             }
-
             if (!isAdded) return@launch
-            showContentState(apps.isNotEmpty())
-            if (apps.isEmpty()) return@launch
-
-            b.recentRoutedAppsList.layoutManager = LinearLayoutManager(requireContext())
-            b.recentRoutedAppsList.adapter = AppsAdapter(apps)
-            b.recentRoutedAppsList.itemAnimator = null
+            excludedUids.clear()
+            excluded.forEach { excludedUids[it] = true }
+            apps = rows
+            loading = false
         }
-    }
-
-    private fun showLoadingState() {
-        b.recentRoutedAppsProgress.isVisible = true
-        b.recentRoutedAppsList.isVisible = false
-        b.recentRoutedAppsEmpty.isVisible = false
-        b.recentRoutedAppsHint.isVisible = false
-        b.recentRoutedViewLogs.isVisible = false
-    }
-
-    private fun showContentState(hasApps: Boolean) {
-        b.recentRoutedAppsProgress.isVisible = false
-        b.recentRoutedAppsList.isVisible = hasApps
-        b.recentRoutedAppsEmpty.isVisible = !hasApps
-        b.recentRoutedAppsHint.isVisible = hasApps
-        b.recentRoutedViewLogs.isVisible = true
     }
 
     private fun openConnectionLogs(proxyId: String) {
@@ -170,7 +163,7 @@ class RecentRoutedAppsBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun onExcludeToggled(item: RecentRoutedAppRow, excluded: Boolean) {
-        if (excluded) excludedUids.add(item.uid) else excludedUids.remove(item.uid)
+        if (excluded) excludedUids[item.uid] = true else excludedUids.remove(item.uid)
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             FirewallManager.updateIsProxyExcluded(item.uid, excluded)
         }
@@ -186,63 +179,39 @@ class RecentRoutedAppsBottomSheet : BaseBottomSheetDialogFragment() {
         )
     }
 
-    inner class AppsAdapter(private val items: List<RecentRoutedAppRow>) :
-        RecyclerView.Adapter<AppsAdapter.ViewHolder>() {
-
-        inner class ViewHolder(val binding: ListItemRecentRoutedAppBinding) :
-            RecyclerView.ViewHolder(binding.root)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val itemBinding = ListItemRecentRoutedAppBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-            return ViewHolder(itemBinding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            with(holder.binding) {
-                recentRoutedAppName.text = item.appName
-
-                recentRoutedAppConnCount.text = root.context.getString(
-                    R.string.recent_routed_conn_count,
-                    String.format(Locale.US, "%,d", item.count)
-                )
-
-                val iconDrawable = if (item.packageName.isNotBlank()) {
-                    runCatching {
-                        Utilities.getIcon(root.context, item.packageName, item.appName)
-                    }.getOrNull()
-                } else null
-                Glide.with(root.context)
-                    .load(iconDrawable)
-                    .error(Utilities.getDefaultIcon(root.context))
-                    .into(recentRoutedAppIcon)
-
-                renderExcludeState(holder, excludedUids.contains(item.uid))
-                recentRoutedAppExclude.setOnClickListener {
-                    val newState = !excludedUids.contains(item.uid)
-                    onExcludeToggled(item, newState)
-                    renderExcludeState(holder, newState)
+    @Composable
+    private fun RecentAppsContent() {
+        val context = androidx.compose.ui.platform.LocalContext.current
+        LazyColumn(Modifier.fillMaxWidth().background(themeColor(R.attr.background)).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 20.dp)) {
+            item { Text(stringResource(R.string.recent_routed_apps_title), style = MaterialTheme.typography.titleLarge) }
+            val subtitle = arguments?.getString(ARG_SUBTITLE).orEmpty()
+            if (subtitle.isNotBlank()) item { Text(subtitle) }
+            if (loading) item { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
+            else {
+                if (apps.isEmpty()) item { Text(stringResource(R.string.recent_routed_apps_empty)) }
+                items(apps, key = { it.uid }) { item ->
+                    val excluded = excludedUids[item.uid] == true
+                    val icon by produceState<android.graphics.drawable.Drawable?>(null, item.packageName, item.appName) {
+                        value = withContext(Dispatchers.IO) {
+                            runCatching { if (item.packageName.isNotBlank()) Utilities.getIcon(context, item.packageName, item.appName) else null }.getOrNull()
+                                ?: Utilities.getDefaultIcon(context)
+                        }
+                    }
+                    val bitmap = remember(icon) { icon?.toBitmap(96, 96)?.asImageBitmap() }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        bitmap?.let { Image(it, null, Modifier.size(40.dp).alpha(if (excluded) .5f else 1f)) }
+                        Column(Modifier.weight(1f)) {
+                            Text(item.appName, Modifier.alpha(if (excluded) .5f else 1f), style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(R.string.recent_routed_conn_count, String.format(Locale.US, "%,d", item.count)), style = MaterialTheme.typography.bodySmall)
+                        }
+                        TextButton(onClick = { onExcludeToggled(item, !excluded) }) {
+                            Text(stringResource(if (excluded) R.string.fapps_firewall_filter_excluded else R.string.exclude))
+                        }
+                    }
                 }
+                if (apps.isNotEmpty()) item { Text(stringResource(R.string.recent_routed_apps_hint), style = MaterialTheme.typography.bodySmall) }
+                item { TextButton(onClick = { openConnectionLogs(arguments?.getString(ARG_PROXY_ID).orEmpty()) }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.recent_routed_view_logs)) } }
             }
         }
-
-        private fun renderExcludeState(holder: ViewHolder, excluded: Boolean) {
-            val ctx = holder.binding.root.context
-            with(holder.binding) {
-                val btn = recentRoutedAppExclude
-                btn.text = ctx.getString(
-                    if (excluded) R.string.fapps_firewall_filter_excluded
-                    else R.string.exclude
-                )
-                btn.contentDescription = btn.text
-                val contentAlpha = if (excluded) 0.5f else 1f
-                recentRoutedAppName.alpha = contentAlpha
-                recentRoutedAppIcon.alpha = contentAlpha
-            }
-        }
-
-        override fun getItemCount(): Int = items.size
     }
 }

@@ -6,6 +6,7 @@ import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
 import androidx.biometric.BiometricManager
+import androidx.test.core.app.ActivityScenario
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.lifecycle.Lifecycle
@@ -19,6 +20,7 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.bottomsheet.PcapFilesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.TaskerAutomationBottomSheet
 import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.compose.networksettings.MiscSettingsState
@@ -60,7 +62,8 @@ import org.robolectric.shadows.ShadowDialog
  * Firebase and launcher-alias mutations are replaced before create(); BiometricManager.from
  * returns a strict capability fake. At API 28 permission/bubble branches cannot run. The two
  * API 33 persistent-notification cases keep bubbles false and never request permissions.
- * No PCAP destination, import/export sheet, real scheduler, service or account is opened.
+ * PCAP opens only its native sheet against Robolectric sandbox files, never a capture
+ * destination. No import/export sheet, real scheduler, service or account is opened.
  * See docs/compose-migration/app-settings-host-tests.md for the boundary and case mapping.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -76,6 +79,8 @@ class MiscSettingsActivityRobolectricTest {
     private lateinit var scheduler: WorkScheduler
     private lateinit var biometric: BiometricManager
     private var controller: ActivityController<MiscSettingsActivity>? = null
+    private var scenario: ActivityScenario<MiscSettingsActivity>? = null
+    private var scenarioHost: MiscSettingsActivity? = null
     private var logs = false
     private var boot = false
     private var ipInfo = false
@@ -83,6 +88,7 @@ class MiscSettingsActivityRobolectricTest {
     private var notification = false
     private var theme = 0
     private var pcap = PcapMode.NONE.id
+    private var expectLogcatCallback = false
     private var notificationAction = 0
     private var biometricType = 0
     private var biometricTime = 0L
@@ -156,7 +162,14 @@ class MiscSettingsActivityRobolectricTest {
         controller?.let { if (!it.get().isDestroyed) it.pause().stop().destroy() }
         controller?.let { host -> runBlocking { withTimeout(5000) { requireNotNull(host.get().lifecycleScope.coroutineContext[Job]).join() } } }
         controller = null
-        verify { config wasNot Called }
+        scenario?.close()
+        scenario = null
+        scenarioHost?.let { activity -> runBlocking { withTimeout(5000) { requireNotNull(activity.lifecycleScope.coroutineContext[Job]).join() } } }
+        scenarioHost = null
+        if (expectLogcatCallback) {
+            verify(exactly = 1) { config.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT) }
+            confirmVerified(config)
+        } else verify { config wasNot Called }
         verify { scheduler wasNot Called }
         unmockkStatic(BiometricManager::class)
         unmockkObject(Logger, FirebaseErrorReporting, LauncherSwitcher)
@@ -172,7 +185,7 @@ class MiscSettingsActivityRobolectricTest {
         compose.waitForIdle()
         return host.get()
     }
-    private fun host() = requireNotNull(controller).get()
+    private fun host() = scenarioHost ?: requireNotNull(controller).get()
     private fun node(id: String) = compose.onNodeWithTag("network.$id", useUnmergedTree = true)
     private fun click(id: String) { node(id).performScrollTo().assertIsDisplayed().performClick() }
     private fun text(id: String, expected: String) { node(id).performScrollTo().assertTextEquals(expected) }
@@ -199,6 +212,14 @@ class MiscSettingsActivityRobolectricTest {
         click(id)
         dialogText(host().getString(title)).assertIsDisplayed()
         return dialog()
+    }
+    private fun pcapSheet(): PcapFilesBottomSheet =
+        requireNotNull(host().supportFragmentManager.findFragmentByTag(PcapFilesBottomSheet::class.java.simpleName) as? PcapFilesBottomSheet)
+    private fun openPcapSheet(): PcapFilesBottomSheet {
+        click("settings_activity_pcap_rl")
+        compose.runOnUiThread { host().supportFragmentManager.executePendingTransactions() }
+        compose.onNodeWithText(host().getString(R.string.settings_pcap_dialog_title)).assertIsDisplayed()
+        return pcapSheet().also { assertTrue(it.requireDialog().isShowing) }
     }
     private fun verifyLog(details: String) = verify(exactly = 1) {
         events.log(EventType.UI_TOGGLE, Severity.LOW, "Misc settings", EventSource.UI, false, details)
@@ -307,10 +328,17 @@ class MiscSettingsActivityRobolectricTest {
         launch(); click("settings_activity_app_notification_persistent_switch")
         verify(exactly = 1) { persistent.persistentNotification = true }; verifyLog("Persistent notification set to true")
     }
-    @Test fun pcapRl_click_createsAlertDialog() { launch(); openDialog("settings_activity_pcap_rl", R.string.settings_pcap_dialog_title) }
+    @Test fun pcapRl_click_createsAlertDialog() { launch(); openPcapSheet() }
     @Test fun pcapDialog_dismiss_closesWithoutCrash() {
-        launch(); val window = openDialog("settings_activity_pcap_rl", R.string.settings_pcap_dialog_title)
-        window.dismiss(); assertFalse(window.isShowing); verify { events wasNot Called }
+        launch(); val sheet = openPcapSheet(); val window = sheet.requireDialog()
+        compose.runOnUiThread { sheet.dismissNow() }
+        assertFalse(window.isShowing)
+        assertNull(host().supportFragmentManager.findFragmentByTag(PcapFilesBottomSheet::class.java.simpleName))
+        compose.onNodeWithTag("pcap_mode_NONE").assertDoesNotExist()
+        // Dismissal must leave the row usable once its intentional debounce has elapsed.
+        compose.runOnUiThread { shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1)) }
+        openPcapSheet()
+        verify { events wasNot Called }
     }
     @Test fun themeRl_click_createsAlertDialog() { launch(); openDialog("settings_activity_theme_rl", R.string.settings_theme_dialog_title) }
     @Test fun notificationRl_click_createsAlertDialog() { launch(); openDialog("settings_activity_notification_rl", R.string.settings_notification_dialog_title) }
@@ -361,11 +389,26 @@ class MiscSettingsActivityRobolectricTest {
     @Test fun displayAppThemeUi_systemDefault_showsTheme1Text() { launch(); node("gen_settings_theme_desc").assertTextContains(host().getString(R.string.settings_theme_dialog_themes_1), substring = true) }
     @Test fun displayAppThemeUi_light_showsTheme2Text() { theme = 1; launch(); node("gen_settings_theme_desc").assertTextContains(host().getString(R.string.settings_theme_dialog_themes_2), substring = true) }
     @Test fun displayAppThemeUi_dark_showsTheme3Text() { theme = 2; launch(); node("gen_settings_theme_desc").assertTextContains(host().getString(R.string.settings_theme_dialog_themes_3), substring = true) }
-    @Test fun pcapRl_afterClick_isDisabledImmediately() { assertDisabledAfterClick("settings_activity_pcap_rl", R.string.settings_pcap_dialog_title) }
+    @Test fun pcapRl_afterClick_isDisabledImmediately() {
+        launch(); node("settings_activity_pcap_rl").performScrollTo().assertIsEnabled()
+        compose.runOnUiThread {
+            state().settingsActivityPcapRl.performClick()
+            assertFalse(state().settingsActivityPcapRl.isEnabled)
+        }
+        assertTrue(pcapSheet().requireDialog().isShowing)
+    }
     @Test fun themeRl_afterClick_isDisabledImmediately() { assertDisabledAfterClick("settings_activity_theme_rl", R.string.settings_theme_dialog_title) }
     @Test fun notificationRl_afterClick_isDisabledImmediately() { assertDisabledAfterClick("settings_activity_notification_rl", R.string.settings_notification_dialog_title) }
     @Test fun goLogRl_afterClick_isDisabledImmediately() { assertDisabledAfterClick("settings_go_log_rl", R.string.settings_go_log_heading) }
-    @Test fun pcapDialog_activityDestroyedWhileShowing_doesNotCrash() { destroyWithDialog("settings_activity_pcap_rl", R.string.settings_pcap_dialog_title) }
+    @Test fun pcapDialog_activityDestroyedWhileShowing_doesNotCrash() {
+        launch(); val sheet = openPcapSheet(); val window = sheet.requireDialog()
+        compose.runOnUiThread { requireNotNull(controller).pause().stop().destroy() }
+        assertTrue(host().isDestroyed)
+        assertEquals(Lifecycle.State.DESTROYED, host().lifecycle.currentState)
+        assertFalse(window.isShowing)
+        assertNull(sheet.view)
+        verify { events wasNot Called }
+    }
     @Test fun themeDialog_activityDestroyedWhileShowing_doesNotCrash() { destroyWithDialog("settings_activity_theme_rl", R.string.settings_theme_dialog_title) }
     @Test fun notificationDialog_activityDestroyedWhileShowing_doesNotCrash() { destroyWithDialog("settings_activity_notification_rl", R.string.settings_notification_dialog_title) }
     @Test fun setFirebaseUserId_withValidToken_doesNotThrow() { launch(); host().setFirebaseUserId("synthetic-token"); verify(exactly = 1) { FirebaseErrorReporting.setUserId("synthetic-token") } }
@@ -376,11 +419,79 @@ class MiscSettingsActivityRobolectricTest {
         assertTrue(themeChanged()); node("settings_activity_enable_logs_rl").assertExists()
     }
     @Test fun pcapRl_rapidDoubleClick_onlyOneDialogCreated() {
-        launch(); click("settings_activity_pcap_rl"); val first = dialog()
-        node("settings_activity_pcap_rl").assertIsNotEnabled().performClick()
-        assertSame(first, ShadowDialog.getLatestDialog())
-        assertEquals(1, ShadowDialog.getShownDialogs().count { it.isShowing })
+        launch()
+        compose.runOnUiThread {
+            state().settingsActivityPcapRl.performClick()
+            assertFalse(state().settingsActivityPcapRl.isEnabled)
+            state().settingsActivityPcapRl.performClick()
+        }
+        val first = pcapSheet()
+        assertTrue(first.requireDialog().isShowing)
+        assertEquals(1, host().supportFragmentManager.fragments.filterIsInstance<PcapFilesBottomSheet>().size)
+        // A retained callback after debounce must also not stack a second sheet.
+        compose.runOnUiThread {
+            shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1))
+            assertTrue(state().settingsActivityPcapRl.isEnabled)
+            assertTrue(state().settingsActivityPcapRl.performClick())
+        }
+        assertSame(first, pcapSheet())
+        assertEquals(1, host().supportFragmentManager.fragments.filterIsInstance<PcapFilesBottomSheet>().size)
     }
+    @Test fun pcapSheet_rotationRestoresOneSheetAndRebindsModeListenerToNewHost() {
+        // ActivityScenario supplies the real instrumentation window/lifecycle ordering
+        // for a host Compose root plus a separate DialogFragment Compose root.
+        val activeScenario = ActivityScenario.launch(MiscSettingsActivity::class.java)
+        scenario = activeScenario
+        activeScenario.onActivity { scenarioHost = it }
+        compose.waitForIdle()
+        val original = openPcapSheet(); val oldActivity = host()
+        activeScenario.recreate()
+        activeScenario.onActivity { scenarioHost = it }
+        compose.waitForIdle()
+        val restored = pcapSheet()
+        assertNotSame(oldActivity, host())
+        assertNotSame(original, restored)
+        assertEquals(1, host().supportFragmentManager.fragments.filterIsInstance<PcapFilesBottomSheet>().size)
+        assertTrue(restored.requireDialog().isShowing)
+        assertSame(host(), restored.modeSelectListener)
+        compose.onNodeWithTag("pcap_mode_NONE").assertIsSelected()
+        // Only this exact constructor-free fake command is permitted. It updates the
+        // fixture preference without touching a capture backend or destination.
+        expectLogcatCallback = true
+        every { config.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT) } answers { pcap = PcapMode.LOGCAT.id }
+        compose.onNodeWithTag("pcap_mode_LOGCAT").performClick().assertIsSelected()
+        verify(exactly = 1) { config.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT) }
+        verifyLog("PCAP mode set to LOGCAT")
+        assertEquals(PcapMode.LOGCAT.id, pcap)
+        // The restored tag must disappear on dismissal, allowing a fresh request.
+        // Exercise the dialog's actual Back/outside-touch cancellation route rather
+        // than forcing a synchronous FragmentManager removal during composition work.
+        compose.runOnUiThread { restored.requireDialog().cancel() }
+        compose.waitForIdle()
+        assertNull(host().supportFragmentManager.findFragmentByTag(PcapFilesBottomSheet::class.java.simpleName))
+        val reopened = openPcapSheet()
+        assertNotSame(restored, reopened)
+        assertSame(host(), reopened.modeSelectListener)
+        compose.onNodeWithTag("pcap_mode_LOGCAT").assertIsSelected()
+    }
+
+    @Test fun pcapSheet_savedStateTapIsIgnoredAndResumedHostCanOpenIt() {
+        launch()
+        compose.runOnUiThread {
+            save()
+            assertTrue(host().supportFragmentManager.isStateSaved)
+            state().settingsActivityPcapRl.performClick()
+        }
+        assertTrue(host().supportFragmentManager.fragments.filterIsInstance<PcapFilesBottomSheet>().isEmpty())
+        compose.runOnUiThread {
+            requireNotNull(controller).pause().stop().start().resume()
+            shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1))
+            assertFalse(host().supportFragmentManager.isStateSaved)
+        }
+        openPcapSheet()
+        verify { config wasNot Called }
+    }
+
     @Test fun enableLogsSwitch_initialState_trueWhenLogsEnabled() { logs = true; launch(); node("settings_activity_enable_logs_switch").assertIsOn(); verify(exactly = 0) { persistent.logsEnabled = any() } }
     @Test fun autoStartSwitch_initialState_trueWhenPrefAutoStartBootUpTrue() { boot = true; launch(); node("settings_activity_auto_start_switch").assertIsOn(); verify(exactly = 0) { persistent.prefAutoStartBootUp = any() } }
     @Test fun dvIpInfoSwitch_initialState_trueWhenDownloadIpInfoTrue() { ipInfo = true; launch(); node("dv_ip_info_switch").assertIsOn(); verify(exactly = 0) { persistent.downloadIpInfo = any() } }

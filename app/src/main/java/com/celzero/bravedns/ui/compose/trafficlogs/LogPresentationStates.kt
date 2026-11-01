@@ -107,6 +107,8 @@ class DnsDetailsState(context: Context) {
     val dnsBlockHeaderFlag = LogControlState()
     val dnsBlockInfoDetails = LogControlState()
     val dnsBlockInfoHeader = LogControlState()
+    val dnsBlockIpArrow = LogControlState().apply { visibility = View.GONE }
+    val dnsBlockIpHeader = LogControlState()
     val dnsBlockIpAddress = LogControlState()
     val dnsBlockIpLatency = LogControlState()
     val dnsBlockUrl = LogControlState()

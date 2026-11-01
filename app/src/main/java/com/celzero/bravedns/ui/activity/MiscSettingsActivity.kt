@@ -465,9 +465,14 @@ class MiscSettingsActivity : BaseActivity(), PcapFilesBottomSheet.PcapModeSelect
     }
 
     private fun showPcapOptionsDialog() {
+        if (isFinishing || isDestroyed || supportFragmentManager.isStateSaved) return
+        val tag = PcapFilesBottomSheet::class.java.simpleName
+        if (supportFragmentManager.findFragmentByTag(tag) != null) return
         val sheet = PcapFilesBottomSheet()
         sheet.modeSelectListener = this
-        sheet.show(supportFragmentManager, PcapFilesBottomSheet::class.java.simpleName)
+        // Add synchronously so another callback cannot enqueue a second sheet before
+        // FragmentManager processes the first, or after the row's debounce expires.
+        sheet.showNow(supportFragmentManager, tag)
     }
 
     override fun onPcapModeSelected(mode: PcapMode) {

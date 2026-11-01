@@ -44,7 +44,6 @@ import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.iab.PurchaseConflictNotifier
 import com.celzero.bravedns.iab.ServerApiError
 import com.celzero.bravedns.ui.activity.CustomerSupportActivity
-import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet
@@ -197,10 +196,6 @@ class RethinkPlusFragment : Fragment(),
 
     private fun setupTermsAndPolicy() {
         b.termsText.text = getString(R.string.rethink_terms)
-    }
-
-    private fun adjustCtaBottomMargin() {
-        b.hosted = activity is FragmentHostActivity
     }
 
     private fun syncScrollBottomPaddingWithCta() { /* Scaffold measures the CTA. */ }

@@ -35,12 +35,11 @@ import kotlin.random.Random
  * The pod is arranged as a small swim-along group of three dolphins moving
  * together (staggered horizontally and vertically so they read as natural
  * pod mates, not a conga line) followed by two solo swimmers trailing with
- * plenty of water between them. Exactly one member breaches: the smallest
- * dolphin of the pod — the playful calf — rises to the surface in an
+ * plenty of water between them. Exactly one member breaches, randomly selected each cycle, and rises to the surface in an
  * elegant arc (splash), hangs briefly at the apex, dives back in (second
  * splash), and continues off-screen toward the far end of the view. Every
  * other member just swims, rising to cruise just below the surface while
- * the calf leaps and settling back down afterwards. The whole pod crosses
+ * the jumper leaps and settling back down afterwards. The whole pod crosses
  * slowly (an 18-second cycle) with a slow, sweeping tail stroke, so the
  * movement reads as a relaxed glide rather than a scurry.
  *
@@ -126,7 +125,7 @@ internal class DolphinOceanRenderer(private val density: Float) {
         val sizeFraction: Float,
         val lagMs: Long,
         val alphaFraction: Float,
-        val dives: Boolean,
+        var dives: Boolean,
         val depthOffsetFraction: Float
     ) {
         val pose = DolphinPose()
@@ -211,6 +210,7 @@ internal class DolphinOceanRenderer(private val density: Float) {
     private var lastFrameNanos = 0L
     private var wavePhase1 = 0f
     private var wavePhase2 = 0f
+    private var pendingDiver: PodMember? = null
 
     // ---------------------------------------------------------------------
     // Paints (reused; alpha set per frame)
@@ -347,6 +347,7 @@ internal class DolphinOceanRenderer(private val density: Float) {
             it.cycleCount = 0
             it.previousCenterY = 0f
         }
+        chooseDiver(null)
         clearParticles()
         ensureRunning()
     }
@@ -357,6 +358,22 @@ internal class DolphinOceanRenderer(private val density: Float) {
         running = false
         clearParticles()
     }
+
+    /** Defer switching until the new jumper is in the enter/swim phase, avoiding pose jumps. */
+    private fun chooseDiver(exclude: PodMember?) {
+        pendingDiver = pod.filter { it !== exclude }.randomOrNull(random)
+        maybePromotePendingDiver()
+    }
+
+    private fun maybePromotePendingDiver() {
+        val next = pendingDiver ?: return
+        if (next.elapsedMs >= safeSwitchWindowMs(next.cycleCount)) return
+        pendingDiver = null
+        pod.forEach { it.dives = it === next }
+    }
+
+    private fun safeSwitchWindowMs(cycle: Int): Float =
+        (DolphinPhase.ENTER.durationMs + swimDurationMs(cycle)).toFloat()
 
     private fun clearParticles() {
         droplets.forEach { it.active = false }
@@ -469,8 +486,13 @@ internal class DolphinOceanRenderer(private val density: Float) {
             if (member.elapsedMs >= cycleLen) {
                 member.elapsedMs -= cycleLen
                 member.cycleCount++
+                if (member.dives) {
+                    member.dives = false
+                    chooseDiver(member)
+                }
             }
         }
+        maybePromotePendingDiver()
         wavePhase1 += WAVE_SPEED_1 * dtMs / 1000f
         wavePhase2 -= WAVE_SPEED_2 * dtMs / 1000f
     }
@@ -711,11 +733,9 @@ internal class DolphinOceanRenderer(private val density: Float) {
         }
 
         // small per-member depth bias so pod mates don't ride the exact
-        // same line. The diver's offset is 0, so breach/splash geometry
-        // (surface-crossing detection keys off this same centerY) is
-        // unaffected; swim-only members keep SWIMMER_SURFACE_GAP_FRACTION
-        // of clearance, which absorbs the largest bias here.
-        pose.centerY += dolphinSize * member.depthOffsetFraction
+        // same line; divers keep zero so breach/splash geometry keys off
+        // exact surfaceY
+        if (!member.dives) pose.centerY += dolphinSize * member.depthOffsetFraction
 
         // a barely-there continuous pitch swell layered over every phase:
         // ±1.5° of slow rocking keeps the long underwater stretches from
@@ -985,16 +1005,9 @@ internal class DolphinOceanRenderer(private val density: Float) {
 
     companion object {
         // --- the pod ---
-        // Five members arranged as: one tight swim-along group of three
-        // (indices 0-2) plus two solo swimmers trailing with plenty of
-        // water between them. Lags are scaled for the 18s cycle so the
-        // on-screen gaps stay generous at the slower crossing speed.
-        // Exactly one member breaches: the smallest dolphin of the whole
-        // pod (index 2, the playful calf). Its jump position is cycle
-        // arithmetic: x is linear in cycle time, and preBreach=9000 +
-        // lag=3750 puts its surface exit at f = 12750/18000 ≈ 0.71 — so
-        // the whole arc (apex ≈ 0.94w, re-entry at the edge) plays out at
-        // the far END of the view. All arrays must be the same length.
+        // Five members: a tight group of three (indices 0-2) plus two
+        // solo swimmers trailing. Exactly one breaches, re-rolled by
+        // [chooseDiver] after each jump. All arrays must be the same length.
         private val POD_SIZE_FRACTIONS =
             floatArrayOf(0.50f, 0.40f, 0.30f, 0.56f, 0.44f)
         private val POD_LAG_MS =
@@ -1002,16 +1015,12 @@ internal class DolphinOceanRenderer(private val density: Float) {
         private val POD_ALPHA_FRACTIONS =
             floatArrayOf(0.95f, 0.88f, 0.86f, 1.00f, 0.84f)
 
-        /** true = this member breaches and dives; false = swims only. */
+        /** Initial diver flags; reassigned randomly by [chooseDiver]. */
         private val POD_DIVER_FLAGS =
             booleanArrayOf(false, false, true, false, false)
 
-        // per-member vertical bias (fraction of the leader's nose-to-tail
-        // length); small ±values break up the "train on a single line"
-        // look. Every diver's entry MUST stay 0 so their breach arcs and
-        // the surface-crossing splash detection key off exact surfaceY;
-        // swim-only members keep SWIMMER_SURFACE_GAP_FRACTION of clearance,
-        // which absorbs the largest bias here.
+        // per-member vertical bias (fraction of the leader's length);
+        // applied only to swim-only members so divers ride exact surfaceY
         private val POD_DEPTH_OFFSET_FRACTIONS =
             floatArrayOf(0.06f, -0.05f, 0f, 0.08f, -0.06f)
 

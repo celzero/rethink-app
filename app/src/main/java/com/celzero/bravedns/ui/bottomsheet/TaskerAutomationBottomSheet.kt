@@ -21,12 +21,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomSheetTaskerAutomationBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
+import com.celzero.bravedns.ui.compose.utilities.utilityTextStyle
 
 /**
  * Settings for external automation apps:
@@ -36,12 +59,6 @@ import org.koin.android.ext.android.inject
  *  3. a reference of every supported intent action and extra
  */
 class TaskerAutomationBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetTaskerAutomationBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
-
     private val persistentState by inject<PersistentState>()
 
     override fun getTheme(): Int =
@@ -57,13 +74,11 @@ class TaskerAutomationBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomSheetTaskerAutomationBinding.inflate(inflater, container, false)
-        return b.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return ComposeView(requireContext()).apply {
+            id = R.id.tasker_sheet_root
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { TaskerContent() } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,25 +86,63 @@ class TaskerAutomationBottomSheet : BaseBottomSheetDialogFragment() {
         dialog?.window?.let { window ->
             Themes.applyBottomSheetSystemBarAppearance(window, isDarkThemeOn(), persistentState.theme)
         }
-        init()
     }
 
-    private fun init() {
-        b.taskerPackagesEt.setText(persistentState.appTriggerPackages)
-        b.taskerPackagesSaveBtn.setOnClickListener { savePackages() }
-
-        b.taskerWgSwitch.setOnCheckedChangeListener(null)
-        b.taskerWgSwitch.isChecked = persistentState.wgTaskerAutomationEnabled
-        b.taskerWgSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.wgTaskerAutomationEnabled = isChecked
-            Logger.i(LOG_TAG_UI, "wg tasker automation set to $isChecked")
+    @Composable
+    private fun TaskerContent() {
+        var packages by rememberSaveable { mutableStateOf(persistentState.appTriggerPackages) }
+        var wgEnabled by rememberSaveable { mutableStateOf(persistentState.wgTaskerAutomationEnabled) }
+        val setWgEnabled: (Boolean) -> Unit = { checked ->
+            wgEnabled = checked
+            persistentState.wgTaskerAutomationEnabled = checked
+            Logger.i(LOG_TAG_UI, "wg tasker automation set to $checked")
         }
-        b.taskerWgRl.setOnClickListener { b.taskerWgSwitch.performClick() }
+        Column(Modifier.fillMaxWidth().background(themeColor(R.attr.background))) {
+            Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 10.dp, bottom = 6.dp)
+                .size(60.dp, 3.dp).background(themeColor(R.attr.border)))
+            SelectionContainer(Modifier.align(Alignment.CenterHorizontally)) {
+                Text(stringResource(R.string.adv_taster_title), Modifier.padding(bottom = 8.dp),
+                    style = utilityTextStyle(size = 18f, weight = 700), color = themeColor(R.attr.primaryLightColorText))
+            }
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
+                Text(stringResource(R.string.tasker_allowed_apps_title), Modifier.padding(top = 8.dp),
+                    style = utilityTextStyle(size = 14f), fontWeight = FontWeight.Bold, color = themeColor(R.attr.primaryTextColor))
+                Text(stringResource(R.string.adv_tasker_dialog_msg), Modifier.padding(top = 2.dp),
+                    style = utilityTextStyle(size = 12f), color = themeColor(R.attr.primaryLightColorText))
+                Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(value = packages, onValueChange = { packages = it },
+                        modifier = Modifier.weight(1f).testTag("tasker_packages_et"),
+                        label = { Text(stringResource(R.string.adv_tasker_dialog_edit_hint)) },
+                        singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done))
+                    Button(onClick = { savePackages(packages) }, modifier = Modifier.padding(start = 8.dp).testTag("tasker_packages_save_btn")) {
+                        Text(stringResource(R.string.lbl_save))
+                    }
+                }
+                HorizontalDivider(Modifier.padding(top = 20.dp, bottom = 4.dp), color = themeColor(R.attr.border))
+                Row(Modifier.fillMaxWidth().toggleable(value = wgEnabled, role = Role.Switch, onValueChange = setWgEnabled)
+                    .testTag("tasker_wg_rl").padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.tasker_wg_automation_title), style = utilityTextStyle(size = 14f),
+                            color = themeColor(R.attr.primaryTextColor))
+                        Text(stringResource(R.string.tasker_wg_automation_desc), Modifier.padding(top = 4.dp),
+                            style = utilityTextStyle(size = 12f), color = themeColor(R.attr.primaryLightColorText))
+                    }
+                    Switch(checked = wgEnabled, onCheckedChange = null, modifier = Modifier.padding(start = 12.dp).testTag("tasker_wg_switch"))
+                }
+                HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 4.dp), color = themeColor(R.attr.border))
+                Text(stringResource(R.string.tasker_intent_reference_title), Modifier.padding(top = 8.dp),
+                    style = utilityTextStyle(size = 14f), fontWeight = FontWeight.Bold, color = themeColor(R.attr.primaryTextColor))
+                SelectionContainer {
+                    Text(stringResource(R.string.adv_tasker_dialog_instructions), Modifier.padding(top = 6.dp),
+                        fontFamily = FontFamily.Monospace, style = utilityTextStyle(size = 12f), color = themeColor(R.attr.primaryLightColorText))
+                }
+            }
+        }
     }
 
-    private fun savePackages() {
+    private fun savePackages(raw: CharSequence?) {
         // blank input intentionally clears the allowlist (blocks all senders)
-        val pkgName = normalizePackages(b.taskerPackagesEt.text) ?: ""
+        val pkgName = normalizePackages(raw) ?: ""
         persistentState.appTriggerPackages = pkgName
         Logger.i(LOG_TAG_UI, "app trigger packages set to $pkgName")
         dismiss()

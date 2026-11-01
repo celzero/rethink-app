@@ -80,6 +80,13 @@ class MiscSettingsState(context: Context) {
     val genSettingsConsoleLogDesc = WgControlState(context, checkable = false) .apply { text = context.getText(R.string.settings_go_log_desc); textColor = UIUtils.fetchColor(context, R.attr.colorOnSurfaceVariant) }
     val settingsActivityConsoleLogImg = WgControlState(context, checkable = false) .apply { imageResource = R.drawable.ic_right_arrow_white }
     val node69 = WgControlState(context, checkable = false)
+    val settingsConnectionCheckRl = WgControlState(context).apply { visibility = View.GONE }
+    val dividerConnectionCheck = WgControlState(context).apply { visibility = View.GONE }
+    private val connectionCheckIcon = WgControlState(context).apply { imageResource = R.drawable.ic_shield_check }
+    private val connectionCheckTitle = WgControlState(context).apply { text = context.getText(R.string.connection_check_title) }
+    private val connectionCheckDescription = WgControlState(context).apply { text = context.getText(R.string.connection_check_subtitle); textColor = UIUtils.fetchColor(context, R.attr.colorOnSurfaceVariant) }
+    private val connectionCheckArrow = WgControlState(context).apply { imageResource = R.drawable.ic_right_arrow_white }
+    private val connectionCheckColumn = WgControlState(context)
     val settingsLogLifespanRl = WgControlState(context, checkable = false)
     val settingsLogLifespanIcon = WgControlState(context, checkable = false) .apply { imageResource = R.drawable.ic_log_lifespan }
     val node72 = WgControlState(context, checkable = false)
@@ -243,6 +250,15 @@ class MiscSettingsState(context: Context) {
                         NetworkNode(NetworkKind.ICON, control = settingsActivityConsoleLogImg, key = "network.settings_activity_console_log_img", margin = NetworkInsets(0f, 0f, 10f, 0f), padding = NetworkInsets(10f, 10f, 10f, 10f), trailing = true)
                     )),
                     NetworkNode(NetworkKind.DIVIDER, control = node69, margin = NetworkInsets(56f, 5f, 16f, 5f), fillWidth = true),
+                    NetworkNode(NetworkKind.ROW, control = settingsConnectionCheckRl, key = "network.settings_connection_check_rl", padding = NetworkInsets(0f, 15f, 0f, 15f), children = listOf(
+                        NetworkNode(NetworkKind.ICON, control = connectionCheckIcon, hideSemantics = true, margin = NetworkInsets(5f, 5f, 5f, 5f), padding = NetworkInsets(10f, 10f, 10f, 10f)),
+                        NetworkNode(NetworkKind.COLUMN, control = connectionCheckColumn, flexible = true, children = listOf(
+                            NetworkNode(NetworkKind.TEXT, control = connectionCheckTitle, appearance = R.style.TextAppearance_Material3_BodyLarge_Emphasized),
+                            NetworkNode(NetworkKind.TEXT, control = connectionCheckDescription, appearance = R.style.TextAppearance_Material3_BodyMedium, padding = NetworkInsets(0f, 3f, 0f, 0f))
+                        )),
+                        NetworkNode(NetworkKind.ICON, control = connectionCheckArrow, hideSemantics = true, margin = NetworkInsets(0f, 0f, 10f, 0f), padding = NetworkInsets(10f, 10f, 10f, 10f), trailing = true)
+                    )),
+                    NetworkNode(NetworkKind.DIVIDER, control = dividerConnectionCheck, margin = NetworkInsets(56f, 5f, 16f, 5f), fillWidth = true),
                     NetworkNode(NetworkKind.ROW, control = settingsLogLifespanRl, key = "network.settings_log_lifespan_rl", padding = NetworkInsets(0f, 15f, 0f, 15f), children = listOf(
                         NetworkNode(NetworkKind.ICON, control = settingsLogLifespanIcon, key = "network.settings_log_lifespan_icon", hideSemantics = true, margin = NetworkInsets(5f, 5f, 5f, 5f), padding = NetworkInsets(10f, 10f, 10f, 10f)),
                         NetworkNode(NetworkKind.COLUMN, control = node72, flexible = true, children = listOf(

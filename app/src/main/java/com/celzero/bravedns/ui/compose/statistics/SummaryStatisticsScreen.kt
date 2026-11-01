@@ -20,7 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -28,8 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.core.os.ConfigurationCompat
-import java.util.Locale
 import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.compose.chrome.homeNavigationClearance
 import com.celzero.bravedns.data.AppConnection
@@ -57,7 +55,7 @@ internal fun SummaryStatisticsScreen(state: SummaryStatisticsState) {
                 Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).alpha(.5f)) {
                         val appName = stringResource(if (state.alpha) R.string.app_name_alpha else R.string.app_name_small_case)
-                        val locale = ConfigurationCompat.getLocales(LocalConfiguration.current)[0] ?: Locale.getDefault()
+                        val locale = LocalLocale.current.platformLocale
                         Text(if (state.alpha) appName else appName.uppercase(locale),
                             Modifier.testTag("stats_header_title"), color = themeColor(R.attr.colorOnSurface),
                             style = utilityTextStyle(R.style.TextAppearance_Heading_HomeScreen))

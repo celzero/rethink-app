@@ -42,7 +42,6 @@ import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.settings.Settings
 import org.koin.android.ext.android.inject
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 
 class AntiCensorshipActivity : BaseActivity() {
     val b = AntiCensorshipState()
@@ -89,7 +88,7 @@ class AntiCensorshipActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

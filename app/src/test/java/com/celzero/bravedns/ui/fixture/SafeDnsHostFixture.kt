@@ -47,6 +47,7 @@ abstract class SafeDnsHostTest {
         every { preferences.useCustomDownloadManager } returns false
         every { preferences.enableDnsCache } returns false
         every { preferences.useSystemDnsForUndelegatedDomains } returns false
+        every { preferences.useSystemDnsOnCaptivePortal } returns false
         every { preferences.blockDnsForUnknownApp } returns false
         every { preferences.preventDnsLeaks } returns false
         every { preferences.splitDns } returns false

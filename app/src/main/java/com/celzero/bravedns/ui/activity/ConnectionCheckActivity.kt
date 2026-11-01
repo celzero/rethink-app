@@ -18,170 +18,175 @@ package com.celzero.bravedns.ui.activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.adapter.DecisionStepAdapter
+import com.celzero.bravedns.adapter.DecisionStepRow
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ActivityConnectionCheckBinding
 import com.celzero.bravedns.service.ConnectionSimulator
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.themeColor
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import dev.androidbroadcast.vbpd.viewBinding
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class ConnectionCheckActivity : BaseActivity(R.layout.activity_connection_check) {
-    private val b by viewBinding(ActivityConnectionCheckBinding::bind)
+class ConnectionCheckActivity : BaseActivity() {
     private val persistentState by inject<PersistentState>()
-    private val stepsAdapter by lazy { DecisionStepAdapter(this) }
-
-    // uid of the selected app; null = unknown / no-uid
-    private var selectedUid: Int? = null
-    private val uidByLabel = linkedMapOf<String, Int?>()
+    private var apps by mutableStateOf<List<AppInfo>>(emptyList())
+    private var loading by mutableStateOf(false)
+    private var result by mutableStateOf<ConnectionSimulator.SimulationResult?>(null)
+    private var simulationError by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-
         if (isAtleastQ()) {
-            val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
+            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars =
+                Themes.isActivityLightTheme(isDarkThemeOn(), persistentState.theme)
             window.isNavigationBarContrastEnforced = false
         }
-        // debug-only diagnostic: bail out if somehow launched in a production build
+        // Keep the upstream production guard even for explicit activity launches.
         if (!DEBUG) {
             finish()
             return
         }
-        setupAppPicker()
-        setupStepsRecycler()
-        setupClickListeners()
-    }
-
-    private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                Configuration.UI_MODE_NIGHT_YES
-    }
-
-    private fun setupAppPicker() {
-        uidByLabel[UNKNOWN_APP_LABEL] = null
-        FirewallManager.getApplistObserver().observe(this) { apps ->
-            refreshAppDropdown(apps)
+        FirewallManager.getApplistObserver().observe(this) { values ->
+            apps = values.distinctBy { it.uid }.sortedBy { it.appName.lowercase() }
         }
+        setContent { RethinkTheme { ConnectionCheckContent() } }
     }
 
-    private fun refreshAppDropdown(apps: Collection<AppInfo>) {
-        val byUid = linkedMapOf<Int, AppInfo>()
-        apps.forEach { app ->
-            // multiple packages can share a uid; keep the first entry per uid
-            if (!byUid.containsKey(app.uid)) byUid[app.uid] = app
-        }
-        byUid.values.sortedBy { it.appName.lowercase() }.forEach { app ->
-            val label = "${app.appName} (${app.packageName})"
-            if (!uidByLabel.containsKey(label)) uidByLabel[label] = app.uid
-        }
-        val labels = uidByLabel.keys.toList()
-        b.ccAppInput.setAdapter(ArrayAdapter(this, android.R.layout.simple_list_item_1, labels))
-        if (b.ccAppInput.text.isNullOrBlank()) {
-            b.ccAppInput.setText(UNKNOWN_APP_LABEL, false)
-            selectedUid = null
-        }
-        b.ccAppInput.setOnItemClickListener { _, _, position, _ ->
-            selectedUid = uidByLabel[labels[position]]
-        }
-    }
+    private fun Context.isDarkThemeOn(): Boolean =
+        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
-    private fun setupStepsRecycler() {
-        b.ccStepsRv.layoutManager = LinearLayoutManager(this)
-        b.ccStepsRv.adapter = stepsAdapter
-    }
-
-    private fun setupClickListeners() {
-        b.ccSimulateBtn.setOnClickListener { runSimulation() }
-    }
-
-    private fun runSimulation() {
-        val domain = b.ccDomainInput.text?.toString()?.trim().orEmpty()
-        if (domain.isBlank()) {
-            b.ccDomainInputLayout.error = getString(R.string.connection_check_err_domain)
-            return
-        }
-        b.ccDomainInputLayout.error = null
-        val ip = b.ccIpInput.text?.toString()?.trim().orEmpty().ifEmpty { null }
-        if (ip != null && runCatching { IPAddressString(ip).address }.isFailure) {
-            b.ccIpInputLayout.error = getString(R.string.connection_check_err_ip)
-            return
-        }
-        b.ccIpInputLayout.error = null
-        hideKeyboard()
-        setResultLoading()
-
-        io {
-            val result = ConnectionSimulator.simulate(
-                ConnectionSimulator.SimulationInput(domain = domain, ip = ip, uid = selectedUid)
-            )
-            uiCtx { renderResult(result) }
-        }
-    }
-
-    private fun setResultLoading() {
-        b.ccResultCard.visibility = View.VISIBLE
-        b.ccVerdictIcon.setImageResource(R.drawable.ic_shield_check)
-        b.ccVerdictIcon.setColorFilter(UIUtils.fetchColor(this, R.attr.primaryTextColor))
-        b.ccVerdictTitle.text = getString(R.string.connection_check_running)
-        b.ccDetailsTv.text = ""
-        b.ccConfigTv.text = ""
-        stepsAdapter.submitList(emptyList())
-        b.ccSimulateBtn.isEnabled = false
-    }
-
-    private fun renderResult(result: ConnectionSimulator.SimulationResult) {
-        b.ccSimulateBtn.isEnabled = true
-        if (result.blocked) {
-            b.ccVerdictIcon.setImageResource(R.drawable.ic_cross_accent)
-            b.ccVerdictIcon.setColorFilter(UIUtils.fetchColor(this, R.attr.accentBad))
-        } else {
-            b.ccVerdictIcon.setImageResource(R.drawable.ic_tick)
-            b.ccVerdictIcon.setColorFilter(UIUtils.fetchColor(this, R.attr.accentGood))
-        }
-        b.ccVerdictTitle.text = getString(
-            if (result.blocked) R.string.connection_check_verdict_blocked
-            else R.string.connection_check_verdict_allowed
-        )
-        b.ccDetailsTv.text = result.detailLines.joinToString("\n") { "• $it" }
-        b.ccConfigTv.text = result.configLines.joinToString("\n") { "• $it" }
-        stepsAdapter.submitList(result.steps)
-        b.ccResultCard.visibility = View.VISIBLE
-    }
-
-    private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        currentFocus?.let { imm.hideSoftInputFromWindow(it.windowToken, 0) }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            if (!isFinishing && !isDestroyed) {
-                f()
+    @Composable
+    private fun ConnectionCheckContent() {
+        var domain by rememberSaveable { mutableStateOf("") }
+        var ip by rememberSaveable { mutableStateOf("") }
+        var selectedUid by rememberSaveable { mutableStateOf<Int?>(null) }
+        var showApps by rememberSaveable { mutableStateOf(false) }
+        var appSearch by rememberSaveable { mutableStateOf("") }
+        var domainError by rememberSaveable { mutableStateOf(false) }
+        var ipError by rememberSaveable { mutableStateOf(false) }
+        val focus = LocalFocusManager.current
+        val selectedLabel = apps.firstOrNull { it.uid == selectedUid }?.let {
+            "${it.appName} (${it.packageName})"
+        } ?: selectedUid?.let { "Unknown app (uid: $it)" } ?: UNKNOWN_APP_LABEL
+        Surface(Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().safeDrawingPadding().imePadding(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item { Text(stringResource(R.string.connection_check_title), style = MaterialTheme.typography.headlineSmall) }
+                item { Text(stringResource(R.string.connection_check_subtitle), style = MaterialTheme.typography.bodySmall) }
+                item {
+                    OutlinedTextField(domain, { domain = it; domainError = false }, Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.connection_check_domain_hint)) }, singleLine = true,
+                        isError = domainError, supportingText = { if (domainError) Text(stringResource(R.string.connection_check_err_domain)) })
+                }
+                item {
+                    OutlinedTextField(ip, { ip = it; ipError = false }, Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.connection_check_ip_hint)) }, singleLine = true,
+                        isError = ipError, supportingText = { if (ipError) Text(stringResource(R.string.connection_check_err_ip)) })
+                }
+                item {
+                    OutlinedButton(onClick = { showApps = true }, modifier = Modifier.fillMaxWidth()) {
+                        Text("${stringResource(R.string.connection_check_app_hint)}: $selectedLabel")
+                    }
+                }
+                item {
+                    Button(onClick = {
+                        domainError = domain.isBlank()
+                        val address = ip.trim().ifEmpty { null }
+                        ipError = address != null && runCatching { IPAddressString(address).address }.getOrNull() == null
+                        if (!domainError && !ipError) {
+                            focus.clearFocus()
+                            runSimulation(ConnectionSimulator.SimulationInput(domain.trim(), address, selectedUid))
+                        }
+                    }, enabled = !loading, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(if (loading) R.string.connection_check_running else R.string.connection_check_simulate))
+                    }
+                }
+                if (loading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
+                simulationError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
+                result?.let { current ->
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Icon(painterResource(if (current.blocked) R.drawable.ic_cross_accent else R.drawable.ic_tick), null,
+                                tint = themeColor(if (current.blocked) R.attr.accentBad else R.attr.accentGood))
+                            Text(stringResource(if (current.blocked) R.string.connection_check_verdict_blocked else R.string.connection_check_verdict_allowed),
+                                style = MaterialTheme.typography.titleLarge)
+                        }
+                    }
+                    item { Text(current.detailLines.joinToString("\n") { "• $it" }) }
+                    item { Text(stringResource(R.string.connection_check_config_heading), style = MaterialTheme.typography.titleMedium) }
+                    item { Text(current.configLines.joinToString("\n") { "• $it" }) }
+                    item { Text(stringResource(R.string.connection_check_steps_heading), style = MaterialTheme.typography.titleMedium) }
+                    items(current.steps) { DecisionStepRow(it) }
+                }
             }
         }
+        if (showApps) AlertDialog(
+            onDismissRequest = { showApps = false },
+            title = { Text(stringResource(R.string.connection_check_app_hint)) },
+            text = {
+                Column {
+                    OutlinedTextField(appSearch, { appSearch = it }, Modifier.fillMaxWidth(), singleLine = true,
+                        label = { Text(stringResource(R.string.connection_check_app_hint)) })
+                    LazyColumn(Modifier.heightIn(max = 360.dp)) {
+                        item { Text(UNKNOWN_APP_LABEL, Modifier.fillMaxWidth().clickable { selectedUid = null; showApps = false }.padding(12.dp)) }
+                        items(apps.filter { it.appName.contains(appSearch, true) || it.packageName.contains(appSearch, true) }, key = { it.uid }) { app ->
+                            Text("${app.appName} (${app.packageName})", Modifier.fillMaxWidth().clickable {
+                                selectedUid = app.uid; showApps = false
+                            }.padding(12.dp))
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showApps = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
     }
 
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) { f() }
+    private fun runSimulation(input: ConnectionSimulator.SimulationInput) {
+        if (loading) return
+        loading = true
+        result = null
+        simulationError = null
+        lifecycleScope.launch {
+            try {
+                val computed = withContext(Dispatchers.IO) { ConnectionSimulator.simulate(input) }
+                if (!isFinishing && !isDestroyed) result = computed
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                if (!isFinishing && !isDestroyed) simulationError = error.localizedMessage ?: error.javaClass.simpleName
+            } finally {
+                loading = false
+            }
+        }
     }
 
     companion object {

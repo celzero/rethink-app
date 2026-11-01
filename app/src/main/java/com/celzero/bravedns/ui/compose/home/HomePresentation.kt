@@ -132,7 +132,7 @@ class HomePresentation(val context: Context) {
     }
     val fhsProtectionLevelTxt = HomeNode(context, R.id.fhs_protection_level_txt).apply {
         textSize = context.resources.getDimension(R.dimen.default_font_text_view)
-        setTextColor(UIUtils.fetchColor(context, R.attr.accentGood))
+        setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
         allCaps = true
     }
     val fhsActiveSinceTxt = HomeNode(context, R.id.fhs_active_since_txt).apply {
@@ -190,6 +190,13 @@ class HomePresentation(val context: Context) {
     }
     val fhsCardOtherProxyCount = HomeNode(context, R.id.fhs_card_other_proxy_count).apply {
         textSize = context.resources.getDimension(R.dimen.large_font_text_view)
+        setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
+    }
+    val fhsProxyHeaderSpace = HomeNode(context)
+    val fhsProxyInactiveTxt = HomeNode(context).apply {
+        text = context.getText(R.string.hsf_proxy_off_indicator)
+        visibility = View.GONE
+        alpha = 0.5f
         setTextColor(UIUtils.fetchColor(context, R.attr.primaryTextColor))
     }
     val fhsProxyHealthContainer = HomeNode(context, R.id.fhs_proxy_health_container).apply {

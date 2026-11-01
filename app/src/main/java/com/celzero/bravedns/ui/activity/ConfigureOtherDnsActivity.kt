@@ -77,7 +77,7 @@ class ConfigureOtherDnsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applyTopInsetOnly()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

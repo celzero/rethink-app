@@ -275,7 +275,6 @@ class VpnServerAdapter(
      */
     private fun hasAddTile(): Boolean = serverGroups.size < MAX_LOCATION_TILES
 
-import android.util.LruCache
     // holders currently bound with live polling; main-thread confined. Three shared
     // tickers (stats / routed-apps / server-info) poll all of them per tick instead of
     // three while-loops per visible row.

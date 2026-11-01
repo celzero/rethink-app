@@ -86,6 +86,7 @@ class AppInfoActivityTest {
     private lateinit var connectionDao: ConnectionTrackerDAO
     private lateinit var rethinkDao: RethinkLogDao
     private lateinit var statsDao: StatsSummaryDao
+    private lateinit var logActivityAggregator: LogActivityAggregator
     private val apps = mutableMapOf<Int, AppInfo>()
     private val controllers = mutableListOf<ActivityController<AppInfoActivity>>()
     private lateinit var controller: ActivityController<AppInfoActivity>
@@ -114,6 +115,8 @@ class AppInfoActivityTest {
         check(GlobalContext.getOrNull() == null) { "This fixture requires its own empty Koin graph" }
         persistent = mockk(); config = mockk(); events = mockk(); startupRepository = mockk()
         appDao = mockk(); ipDao = mockk(); domainDao = mockk(); connectionDao = mockk(); rethinkDao = mockk(); statsDao = mockk()
+        logActivityAggregator = mockk()
+        coEvery { logActivityAggregator.forceRestoreFromDatabase() } just Runs
         every { persistent.theme } returns 0
         every { persistent.statsViewMode } answers { statsMode }
         every { persistent.statsViewMode = any() } answers { statsMode = firstArg() }
@@ -139,7 +142,7 @@ class AppInfoActivityTest {
             viewModel { AppInfoViewModel(appDao) }
             viewModel { CustomIpViewModel(ipDao) }
             viewModel { CustomDomainViewModel(domainDao) }
-            viewModel { AppConnectionsViewModel(connectionDao, rethinkDao, statsDao) }
+            viewModel { AppConnectionsViewModel(connectionDao, rethinkDao, statsDao, logActivityAggregator) }
         }) }
         // Install log sinks BEFORE FirewallManager's first reference: its empty startup logs cannot
         // fall through to VpnController/console storage. Logger has only lazy injected properties.

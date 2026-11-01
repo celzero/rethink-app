@@ -40,7 +40,7 @@ import com.celzero.bravedns.ui.compose.themeColor
                         Text(stringResource(R.string.sponsor_contribution_subtitle), style = utilityTextStyle(com.google.android.material.R.style.TextAppearance_Material3_BodySmall), color = themeColor(R.attr.colorOnSurfaceVariant))
                         UtilityText(ui.contributionPrice, Modifier.padding(top = 16.dp))
                         var sliding by remember { mutableStateOf(false) }
-                        BoxWithConstraints(Modifier.fillMaxWidth()) {
+                        Box(Modifier.fillMaxWidth()) {
                             OriginalSlider("fragment_sponsor:contribution_seekbar", ui.contributionSeekbar.value, { sliding = true; ui.contributionSeekbar.userValue(it) }, onValueChangeFinished = { sliding = false }, valueRange = 0f..6f, steps = 5,
                                 modifier = Modifier.fillMaxWidth().testTag(ui.contributionSeekbar.tag).semantics { stateDescription = ui.contributionSeekbar.label(ui.contributionSeekbar.value) })
                             if (sliding) OriginalSliderValueLabel("fragment_sponsor:contribution_seekbar",

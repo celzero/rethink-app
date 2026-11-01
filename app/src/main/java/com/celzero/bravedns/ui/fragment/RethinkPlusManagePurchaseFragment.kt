@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.ui.compose.purchase.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.celzero.bravedns.ui.compose.rpn.RpnControlState
 
 import android.content.Intent
@@ -378,10 +379,10 @@ class RethinkPlusManagePurchaseFragment : Fragment() {
     }
 
     private fun showPurchaseAlreadyEndedDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        WgAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.rpn_purchase_already_ended_title))
             .setMessage(getString(R.string.rpn_purchase_already_ended_message))
-            .setPositiveButton(android.R.string.ok, null)
+            .setPositiveButton(android.R.string.ok) { _, _ -> }
             .setCancelable(true)
             .show()
     }

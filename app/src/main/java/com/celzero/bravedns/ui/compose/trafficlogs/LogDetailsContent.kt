@@ -34,7 +34,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.ui.compose.NoDimDialogWindow
 import com.celzero.bravedns.ui.compose.themeColor
 
-data class LogInfoDialogState(val title: String?, val description: CharSequence, val icon: Int? = null, val fullWidth: Boolean = true)
+data class LogInfoDialogState(val title: String?, val description: CharSequence, val icon: Int? = null, val fullWidth: Boolean = true, val iconNode: LogControlState? = null)
 internal fun logAnnotated(text: CharSequence): AnnotatedString {
     val builder = AnnotatedString.Builder(text.toString())
     if (text is Spanned) text.getSpans(0, text.length, Any::class.java).forEach { span ->
@@ -57,6 +57,7 @@ internal fun logAnnotated(text: CharSequence): AnnotatedString {
             Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { IconButton(onDismiss, Modifier.size(30.dp)) { com.celzero.bravedns.ui.compose.utilities.utilityImage(android.R.drawable.ic_menu_close_clear_cancel, Modifier.size(30.dp), stringResource(R.string.lbl_cancel)) } }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    state.iconNode?.let { LogDrawable(it, Modifier.padding(5.dp).size(24.dp), stringResource(R.string.fav_icon)) }
                     state.icon?.let { Icon(painterResource(it), null, Modifier.padding(5.dp).size(24.dp)) }
                     state.title?.let { Text(it, fontSize = logTextSize(R.dimen.heading_font_text_view), color = themeColor(R.attr.primaryTextColor)) }
                 }
@@ -86,8 +87,8 @@ internal fun logAnnotated(text: CharSequence): AnnotatedString {
 @Composable private fun DetailCard(modifier: Modifier = Modifier, hero: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
     Card(modifier.fillMaxWidth(), shape = RoundedCornerShape(if (hero) 20.dp else 16.dp), border = BorderStroke(1.dp, themeColor(R.attr.border)), colors = CardDefaults.cardColors(containerColor = themeColor(androidx.cardview.R.attr.cardBackgroundColor)), content = content)
 }
-@Composable private fun DetailLabel(label: Int, content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+@Composable private fun DetailLabel(label: Int, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(stringResource(label).uppercase(), Modifier.alpha(.55f), fontSize = logTextSize(R.dimen.mini_font_text_view), color = themeColor(R.attr.primaryLightColorText)); content()
     }
 }
@@ -154,8 +155,22 @@ internal fun logAnnotated(text: CharSequence): AnnotatedString {
             }
             HorizontalDivider(Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp).alpha(.5f), color = themeColor(R.attr.border))
             DetailLabel(R.string.bsdl_meta_app) { if (b.dnsAppNameHeader.isVisible) Row(verticalAlignment = Alignment.CenterVertically) { LogDrawable(b.dnsAppIcon, Modifier.padding(end = 10.dp).size(20.dp), stringResource(R.string.apps_icon_content_desc)); LogText(b.dnsAppName, lines = 1, overflow = TextOverflow.Ellipsis) } }
-            DetailLabel(R.string.bsdl_meta_response) {
-                Row(verticalAlignment = Alignment.CenterVertically) { Text(b.dnsBlockConnectionFlag.text?.toString().orEmpty(), Modifier.padding(end = 10.dp).widthIn(min = 22.dp), fontSize = 18.sp); SelectionContainer(Modifier.weight(1f)) { LogText(b.dnsBlockIpAddress, font = FontFamily.Monospace, lines = 2, overflow = TextOverflow.Ellipsis) }; LogText(b.dnsBlockIpLatency, Modifier.padding(start = 8.dp).background(themeColor(R.attr.background)).padding(horizontal = 6.dp), size = R.dimen.mini_font_text_view, lines = 1, colorAttr = R.attr.primaryLightColorText) }
+            DetailLabel(R.string.bsdl_meta_response, Modifier.then(
+                if (b.dnsBlockIpHeader.hasClickListener) Modifier.clickable { b.dnsBlockIpHeader.performClick() } else Modifier
+            )) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(b.dnsBlockConnectionFlag.text?.toString().orEmpty(), Modifier.padding(end = 10.dp).widthIn(min = 22.dp), fontSize = 18.sp)
+                    SelectionContainer(Modifier.weight(1f)) {
+                        LogText(b.dnsBlockIpAddress, Modifier.then(
+                            if (b.dnsBlockIpAddress.hasClickListener) Modifier.clickable { b.dnsBlockIpAddress.performClick() } else Modifier
+                        ), font = FontFamily.Monospace, lines = 2, overflow = TextOverflow.Ellipsis)
+                    }
+                    if (b.dnsBlockIpArrow.isVisible) Icon(
+                        painterResource(R.drawable.ic_right_arrow_small), null,
+                        Modifier.padding(start = 8.dp).size(16.dp).alpha(.5f)
+                    )
+                    LogText(b.dnsBlockIpLatency, Modifier.padding(start = 8.dp).background(themeColor(R.attr.background)).padding(horizontal = 6.dp), size = R.dimen.mini_font_text_view, lines = 1, colorAttr = R.attr.primaryLightColorText)
+                }
             }
             DetailLabel(R.string.bsdl_meta_query_type) { LogText(b.dnsRecordTypeChip, size = R.dimen.small_font_text_view, lines = 1, overflow = TextOverflow.Ellipsis, colorAttr = R.attr.primaryLightColorText) }
             if (b.dnsBlockInfoHeader.isVisible) DetailLabel(R.string.bsdl_meta_resolver) { SelectionContainer { LogText(b.dnsBlockInfoDetails, size = R.dimen.small_font_text_view, lines = 1, overflow = TextOverflow.Ellipsis, colorAttr = R.attr.primaryLightColorText) } }

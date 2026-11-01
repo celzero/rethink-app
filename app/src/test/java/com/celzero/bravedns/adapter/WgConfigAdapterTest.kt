@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import com.celzero.bravedns.BuildConfig
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
@@ -585,15 +586,10 @@ class WgConfigAdapterTest : KoinTest {
     @Test
     fun `test context initialization`() {
         assertNotNull("Context should not be null", context)
-        // Fix the context assertion to be more lenient
-        val packageName = context.packageName
-        assertTrue(
-            "Expected valid package name, got: $packageName",
-            packageName.isNotEmpty() &&
-                (packageName.contains("test") ||
-                    packageName.contains("android") ||
-                    packageName == "org.robolectric.default")
-        )
+        // Robolectric loads the tested variant's manifest, not a synthetic test package.
+        assertEquals(BuildConfig.APPLICATION_ID, context.packageName)
+        val appInfo = context.packageManager.getApplicationInfo(context.packageName, 0)
+        assertEquals(context.packageName, appInfo.packageName)
     }
 
     // Remove the problematic RouterStats tests that are causing native library issues

@@ -5,4 +5,5 @@
     <item name="root_container" type="id" />
     <!-- Compose geometry/tour anchor; no placeholder View is rendered for this ID. -->
     <item name="nav_view" type="id" />
+    <item name="tasker_sheet_root" type="id" />
 </resources>

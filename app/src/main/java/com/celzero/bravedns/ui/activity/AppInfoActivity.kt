@@ -50,7 +50,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -95,7 +97,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
@@ -138,8 +139,7 @@ class AppInfoActivity : BaseActivity() {
     private var notesDialog: android.app.Dialog? = null
     private var notesEditText: AppNotesDraft? = null
 
-    // ticks the temp-allow countdown label until expiry
-    private var tempAllowTickerJob: Job? = null
+    // The RESUMED lifecycle ticker reads the current expiry on the main thread.
     private var tempAllowExpiryMs: Long = 0L
     private var suppressTempAllowListener: Boolean = false
 
@@ -196,6 +196,23 @@ class AppInfoActivity : BaseActivity() {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
         setContent { RethinkTheme { AppDetailsContent(b) } }
+        // Register once for this Activity. repeatOnLifecycle cancels only its active
+        // child on pause and restarts it on resume; new grants/revocations simply
+        // change tempAllowExpiryMs, without stacking observers or timer jobs.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (isActive) {
+                    if (tempAllowExpiryMs > 0L) {
+                        if (System.currentTimeMillis() >= tempAllowExpiryMs) {
+                            onTempAllowExpiredOrDisabled()
+                        } else {
+                            renderTempAllowLabel()
+                        }
+                    }
+                    delay(TEMP_ALLOW_TICK_INTERVAL_MS)
+                }
+            }
+        }
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -342,7 +359,11 @@ class AppInfoActivity : BaseActivity() {
                 val isTempAllowed = tempAllowExpiry > 0L
                 if (b.tempAllowSwitch.isChecked != isTempAllowed) {
                     suppressTempAllowListener = true
-                    b.tempAllowSwitch.isChecked = isTempAllowed
+                    try {
+                        b.tempAllowSwitch.isChecked = isTempAllowed
+                    } finally {
+                        suppressTempAllowListener = false
+                    }
                 }
                 updateTempAllowDescription(isTempAllowed, tempAllowExpiry)
                 
@@ -596,20 +617,14 @@ class AppInfoActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // ticker is cancelled in onPause; re-render (or lapse) and restart it here
+        // Refresh immediately; the single lifecycle-owned ticker resumes after ON_RESUME.
         if (tempAllowExpiryMs > 0L) {
             if (System.currentTimeMillis() >= tempAllowExpiryMs) {
                 onTempAllowExpiredOrDisabled()
             } else {
                 renderTempAllowLabel()
-                startTempAllowTicker()
             }
         }
-    }
-
-    override fun onPause() {
-        stopTempAllowTicker()
-        super.onPause()
     }
 
     override fun onDestroy() {
@@ -952,7 +967,6 @@ class AppInfoActivity : BaseActivity() {
         if (isAllowed && expiryTime > System.currentTimeMillis()) {
             tempAllowExpiryMs = expiryTime
             renderTempAllowLabel()
-            startTempAllowTicker()
         } else {
             onTempAllowExpiredOrDisabled()
         }
@@ -969,35 +983,16 @@ class AppInfoActivity : BaseActivity() {
     }
 
     private fun onTempAllowExpiredOrDisabled() {
-        stopTempAllowTicker()
         tempAllowExpiryMs = 0L
         if (b.tempAllowSwitch.isChecked) {
             suppressTempAllowListener = true
-            b.tempAllowSwitch.isChecked = false
-        }
-        b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
-    }
-
-    // ticks only while resumed (cancelled in onPause); refreshes the countdown label
-    // and resets the toggle ui when the window lapses
-    private fun startTempAllowTicker() {
-        if (tempAllowTickerJob?.isActive == true) return
-        tempAllowTickerJob = lifecycleScope.launch(Dispatchers.Main) {
-            while (isActive) {
-                delay(TEMP_ALLOW_TICK_INTERVAL_MS)
-                if (tempAllowExpiryMs <= 0L) break
-                if (System.currentTimeMillis() >= tempAllowExpiryMs) {
-                    onTempAllowExpiredOrDisabled()
-                    break
-                }
-                renderTempAllowLabel()
+            try {
+                b.tempAllowSwitch.isChecked = false
+            } finally {
+                suppressTempAllowListener = false
             }
         }
-    }
-
-    private fun stopTempAllowTicker() {
-        tempAllowTickerJob?.cancel()
-        tempAllowTickerJob = null
+        b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
     }
 
     private fun openAppWiseDomainLogsActivity(

@@ -109,6 +109,7 @@ fun RpnSelectionScreen(ui: RpnSelectionState, anchors: HomeTourAnchors) {
                         Row(Modifier.horizontalScroll(rememberScrollState()).widthIn(min = maxWidth), horizontalArrangement = Arrangement.Center) {
                             QuickPill(ui.qsRelayTile, R.drawable.ic_hop, stringResource(R.string.cd_dns_crypt_relay_heading), ui.qsRelayState, ui.qsRelayIcon, ui.qsRelayLabel, Modifier.homeTourAnchor(R.id.qs_relay_tile, anchors))
                             QuickPill(ui.qsBypassAppsTile, R.drawable.ic_bypass, stringResource(R.string.fapps_bypass_block_dialog_title), ui.qsBypassAppsState, modifier = Modifier.homeTourAnchor(R.id.qs_bypass_apps_tile, anchors))
+                            if (ui.qsRemoteServiceTile.isVisible) QuickPill(ui.qsRemoteServiceTile, R.drawable.ic_laptop, stringResource(R.string.qs_remote_service_label), ui.qsRemoteServiceState)
                             QuickPill(ui.qsStatsTile, R.drawable.ic_statistics, stringResource(R.string.title_statistics), ui.qsStatsState)
                         }
                     }
@@ -128,11 +129,6 @@ fun RpnSelectionScreen(ui: RpnSelectionState, anchors: HomeTourAnchors) {
                     Text(stringResource(R.string.server_selection_tap_to_select), Modifier.padding(top = 12.dp), fontSize = 16.sp)
                     Text(stringResource(R.string.server_selection_max_info), Modifier.padding(top = 6.dp).alpha(.7f), fontSize = 11.sp)
                 } }
-                if (ui.locationCapacityIndicator.isVisible) Row(Modifier.fillMaxWidth().rpnMotion(ui.locationCapacityIndicator).padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally)) {
-                    listOf(ui.capacityDotOne, ui.capacityDotTwo, ui.capacityDotThree, ui.capacityDotFour, ui.capacityDotFive).forEach { dot ->
-                        Box(Modifier.size(16.dp, 6.dp).rpnMotion(dot).background(dot.backgroundTintList?.defaultColor?.let(::Color) ?: themeColor(R.attr.accentGood), RoundedCornerShape(3.dp)))
-                    }
-                }
                 if (ui.searchCard.isVisible) OriginalCardSurface(
                     Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 10.dp)
                         .onGloballyPositioned { searchY = it.positionInParent().y.toInt() }.rpnMotion(ui.searchCard),
