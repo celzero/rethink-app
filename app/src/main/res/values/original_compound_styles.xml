@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Baseline compound-control attributes only. These are values, not layouts. -->
+<resources>
+    <style name="OriginalCompound_activity_advanced_setting_dv_experimental_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_advanced_setting_dv_auto_dial_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_advanced_setting_go_max_memory_seekbar" parent="">
+    </style>
+    <style name="OriginalCompound_activity_app_details_exclude_proxy_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_app_details_temp_allow_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_activity_check_update_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_tombstone_app_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_firewall_bubble_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_dv_ip_info_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_activity_enable_logs_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_activity_app_notification_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_activity_app_notification_persistent_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_activity_auto_start_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_misc_settings_settings_firebase_error_reporting_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tcp_proxy_tcp_proxy_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tcp_proxy_enable_udp_relay" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_activity_tcp_proxy_warp_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_stall_no_nw_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_allow_bypass_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_lan_traffic_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_all_network_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_tunnel_metered_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_mobile_metered_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_r_in_r_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_exclude_proxy_apps_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_wg_listen_port_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_wg_allow_incoming_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_wg_lockdown_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_flood_wg_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_wg_smart_persistent_keepalive_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_tcp_keep_alive_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_eimf_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_timeout_seekbar" parent="">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_use_max_mtu_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_dv_socket_buffer_size_seekbar" parent="">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_tunnel_settings_settings_activity_ptrans_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_conn_track_bs_conn_unknown_app_check" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_home_screen_bs_home_screen_radio_dns" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_home_screen_bs_home_screen_radio_firewall" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_home_screen_bs_home_screen_radio_dns_firewall" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_orbot_bs_orbot_radio_http" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_orbot_bs_orbot_radio_socks5" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_orbot_bs_orbot_radio_both" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_orbot_bs_orbot_radio_none" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_dialog_import_confirm_dic_block_radio" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_import_confirm_dic_allow_radio" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_lockdown_check_lockdown_check_disable_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_dialog_set_custom_doh_dialog_secure_checkbox" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_dialog_set_dns_crypt_dialog_dns_crypt_radio_server" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_set_dns_crypt_dialog_dns_crypt_radio_relay" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_set_dns_proxy_dialog_dns_proxy_exclude_apps_check" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_fragment_proxy_configure_settings_activity_socks5_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_proxy_configure_settings_activity_http_proxy_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_rethink_list_radio_sky" parent="">
+        <item name="android:button">@null</item>
+        <item name="android:drawableBottom">?android:attr/listChoiceIndicatorSingle</item>
+    </style>
+    <style name="OriginalCompound_fragment_rethink_list_radio_max" parent="">
+        <item name="android:button">@null</item>
+        <item name="android:drawableBottom">?android:attr/listChoiceIndicatorSingle</item>
+    </style>
+    <style name="OriginalCompound_fragment_sponsor_contribution_seekbar" parent="Widget.Sponsor.Slider">
+    </style>
+    <style name="OriginalCompound_list_item_custom_all_domain_custom_domain_checkbox" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_custom_all_ip_custom_ip_checkbox" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_custom_domain_custom_domain_checkbox" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_custom_ip_custom_ip_checkbox" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_rethink_blocklist_simple_crp_check_box" parent="">
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_never_split" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_split_auto" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_split_tcp" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_split_tls" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_desync" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_tcp_proxy" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_never_retry" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_retry_with_split" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_anti_censorship_ac_radio_retry_after_split" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_activity_checkout_proxy_plan1MonthButton" parent="">
+        <item name="android:padding">16dp</item>
+    </style>
+    <style name="OriginalCompound_activity_checkout_proxy_plan3MonthsButton" parent="">
+        <item name="android:padding">16dp</item>
+    </style>
+    <style name="OriginalCompound_activity_checkout_proxy_plan6MonthsButton" parent="">
+        <item name="android:padding">16dp</item>
+    </style>
+    <style name="OriginalCompound_activity_customer_support_switch_attach_status" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_customer_support_switch_attach_stats" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_customer_support_switch_attach_proc_info" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_rpn_bypass_apps_rpn_bypass_bulk_check" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="buttonIconTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_activity_rpn_bypass_apps_rpn_bypass_deselect_all_check" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="buttonIconTint">?attr/accentBad</item>
+    </style>
+    <style name="OriginalCompound_activity_rpn_config_detail_hop_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_rpn_config_detail_lockdown_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_rpn_config_detail_catch_all_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_rpn_config_detail_use_mobile_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_rpn_config_detail_ssid_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_all_apps_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_background_mode_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_unknown_connection_mode_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_udp_connection_mode_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_disallow_dns_bypass_mode_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_block_new_app_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_check_ipv4_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_block_metered_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_block_http_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_universal_firewall_settings_firewall_univ_lockdown_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_activity_wg_detail_lockdown_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_wg_detail_catch_all_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_wg_detail_use_mobile_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_activity_wg_detail_ssid_check" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_block_free_dns_mode_bfdm_option_fallback_rb" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_block_free_dns_mode_bfdm_option_global_rb" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_block_free_dns_mode_bfdm_option_none_rb" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_bug_report_files_brbs_proc_info_checkbox" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_bug_report_files_brbs_select_all_checkbox" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_domains_custom_domain_rb_no_rule" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_domains_custom_domain_rb_block" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_domains_custom_domain_rb_whitelist" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_ips_custom_ip_rb_no_rule" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_ips_custom_ip_rb_block" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_ips_custom_ip_rb_bypass_app" parent="">
+    </style>
+    <style name="OriginalCompound_bottom_sheet_custom_ips_custom_ip_rb_bypass_univ" parent="">
+    </style>
+    <style name="OriginalCompound_bottomsheet_server_settings_cb_dns_privacy" parent="">
+    </style>
+    <style name="OriginalCompound_bottomsheet_server_settings_cb_dns_family" parent="">
+    </style>
+    <style name="OriginalCompound_bottomsheet_server_settings_cb_dns_security" parent="">
+    </style>
+    <style name="OriginalCompound_bottomsheet_server_settings_identity_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_bottomsheet_server_settings_permanent_config_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_dialog_rpn_ssid_radio_equal" parent="">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+    <style name="OriginalCompound_dialog_rpn_ssid_radio_not_equal" parent="">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+    <style name="OriginalCompound_dialog_rpn_ssid_radio_exact" parent="">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+    <style name="OriginalCompound_dialog_rpn_ssid_radio_wildcard" parent="">
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+    </style>
+    <style name="OriginalCompound_dialog_set_proxy_dialog_proxy_udp_check" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_dialog_set_proxy_dialog_proxy_exclude_apps_check" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_dialog_wg_apps_wg_include_app_bulk_check" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="buttonIconTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_dialog_wg_apps_wg_include_app_deselect_all_check" parent="">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="buttonIconTint">?attr/accentBad</item>
+    </style>
+    <style name="OriginalCompound_dialog_wg_ssid_radioEqual" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_wg_ssid_radioNotEqual" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_wg_ssid_radioExact" parent="">
+    </style>
+    <style name="OriginalCompound_dialog_wg_ssid_radioWildcard" parent="">
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_network_dns_rb" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_custom_dns_rb" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_rethink_plus_dns_rb" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_smart_dns_rb" parent="">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_downloader_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_check_update_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_alg_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_split_dns_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_favicon_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_enable_cache_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_proxy_dns_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_prevent_dns_leaks_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_block_unknown_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_fragment_dns_configure_dc_undelegated_domains_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="OriginalCompound_item_bug_report_file_item_file_checkbox" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_item_dns_record_type_item_dns_record_type_checkbox" parent="">
+        <item name="android:buttonTint">?attr/primaryTextColor</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_item_network_policy_radioButton" parent="">
+    </style>
+    <style name="OriginalCompound_item_server_checkbox_server" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_item_server_group_checkbox_server" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_list_item_exclude_country_cb_exclude" parent="">
+    </style>
+    <style name="OriginalCompound_list_item_play_subs_selection_indicator" parent="">
+    </style>
+    <style name="OriginalCompound_list_item_proxy_cc_wg_proxy_radio_cc" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_rethink_blocklist_adv_crp_check_box" parent="">
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_rpn_bypass_app_rpn_bypass_app_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+    </style>
+    <style name="OriginalCompound_list_item_wg_general_interface_interface_switch" parent="CustomWidget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:padding">15dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_wg_hop_wg_hop_list_checkbox" parent="">
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+    </style>
+    <style name="OriginalCompound_list_item_wg_include_apps_wg_include_app_list_checkbox" parent="">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:buttonTint">?attr/accentGood</item>
+        <item name="android:foregroundTint">?attr/accentGood</item>
+        <item name="android:minWidth">44dp</item>
+        <item name="android:minHeight">44dp</item>
+    </style>
+    <style name="OriginalCompound_list_item_wg_one_interface_one_wg_check" parent="">
+        <item name="android:padding">20dp</item>
+    </style>
+</resources>

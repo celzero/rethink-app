@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stable FragmentManager IDs retained after retiring the XML Activity shells. -->
+    <item name="fragment_container" type="id" />
+    <item name="root_container" type="id" />
+    <!-- Compose geometry/tour anchor; no placeholder View is rendered for this ID. -->
+    <item name="nav_view" type="id" />
+</resources>
