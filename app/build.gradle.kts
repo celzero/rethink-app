@@ -358,7 +358,6 @@ android {
         }
         create("tv") {
             dimension = "releaseType"
-            applicationIdSuffix = ".tv"
             versionCode = appVersionCode
             versionName = gitVersion
             buildConfigField("int", "BASE_VERSION_CODE", appVersionCode.toString())
@@ -399,7 +398,12 @@ kotlin {
         languageVersion.set(
             KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast("."))
         )
-        freeCompilerArgs.addAll("-Xwarning-level=SENSELESS_COMPARISON:disabled")
+        freeCompilerArgs.addAll(
+            "-Xwarning-level=SENSELESS_COMPARISON:disabled",
+            // centralized M3 Expressive opt-ins for the TV Compose UI
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+        )
     }
 }
 
@@ -413,6 +417,11 @@ tasks.withType<Test>().configureEach {
 
 androidComponents {
     onVariants(selector().all()) { variant ->
+        // Billing-capable TV RPN screens shared by play/website TV (fdroidTv stays unbilled).
+        if (variant.flavorName == "playTv" || variant.flavorName == "websiteTv") {
+            variant.sources.java?.addStaticSourceDirectory("src/tvBilling/java")
+            variant.sources.kotlin?.addStaticSourceDirectory("src/tvBilling/java")
+        }
         variant.outputs.forEach { output ->
             val abi =
                 output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
@@ -578,7 +587,6 @@ dependencies {
 
     // barcode scanner for wireguard
     "fullImplementation"(libs.journeyappsZxingAndroidEmbedded)
-    "fullImplementation"(libs.simplecityappsRecyclerviewFastscroll)
 
     // for confetti animation
     "fullImplementation"(libs.nlDionsegijnKonfettiXml)
@@ -608,7 +616,6 @@ dependencies {
     "tvImplementation"(libs.androidxNavigationNavigationUiKtx)
     "tvImplementation"(libs.androidxBiometricBiometric)
     "tvImplementation"(libs.journeyappsZxingAndroidEmbedded)
-    "tvImplementation"(libs.simplecityappsRecyclerviewFastscroll)
     "tvImplementation"(libs.nlDionsegijnKonfettiXml)
 
     implementation(platform(libs.androidxComposeComposeBom))
@@ -618,7 +625,7 @@ dependencies {
     "tvImplementation"(libs.androidxComposeUiUiToolingPreview)
     "tvImplementation"(libs.androidxComposeFoundationFoundation)
     "tvImplementation"(libs.androidxComposeRuntimeRuntimeLivedata)
-    "tvImplementation"(libs.androidxComposeMaterial3Material3)
+    "tvImplementation"(libs.androidxComposeMaterial3Material3Expressive)
     "tvImplementation"(libs.androidxTvTvMaterial)
     "tvImplementation"(libs.androidxActivityActivityCompose)
     "tvImplementation"(libs.androidxLifecycleLifecycleRuntimeCompose)
