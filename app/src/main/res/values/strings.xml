@@ -1724,6 +1724,12 @@
     <string name="brbs_backup_complete_toast" translatable="true">Backup completed</string>
     <string name="brbs_restore_invalid_file" translatable="false">Invalid backup file. Please select a %1$s backup file for this build.</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Restore failed; try again</string>
+    <string name="brbs_no_file_picker_backup" translatable="true">No file picker available on this device. Backup will be saved to the app folder.</string>
+    <string name="brbs_backup_saved_to" translatable="false">Saving backup to %1$s</string>
+    <string name="brbs_no_file_picker_restore" translatable="true">No file picker available on this device.</string>
+    <string name="brbs_restore_folder_empty" translatable="true">No %1$s backup found in %2$s. Copy your backup file there and try again.</string>
+    <string name="brbs_restore_pick_file_title" translatable="true">Select backup file</string>
+    <string name="brbs_backup_restore_in_progress" translatable="true">Backup or restore already in progress</string>
 
     <!-- Rethink simple view -->
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklists</string>
@@ -1890,6 +1896,9 @@
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Logs</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
+
+    <string name="conn_id_logs_title" translatable="true">Connection Logs</string>
+    <string name="conn_id_logs_empty" translatable="true">No logs found for this connection</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
