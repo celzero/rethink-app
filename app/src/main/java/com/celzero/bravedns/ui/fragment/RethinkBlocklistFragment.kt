@@ -91,6 +91,10 @@ class RethinkBlocklistFragment :
 
     private var advanceRemoteViewAdapter: RemoteAdvancedViewAdapter? = null
     private var advanceLocalViewAdapter: LocalAdvancedViewAdapter? = null
+
+    // set on deliberate list replacement (search/filter change), consumed by the
+    // load-state listeners; Room invalidations from item selection must not scroll
+    private var scrollToTopOnLoad = false
     private var localSimpleViewAdapter: LocalSimpleViewAdapter? = null
     private var remoteSimpleViewAdapter: RemoteSimpleViewAdapter? = null
 
@@ -190,6 +194,7 @@ class RethinkBlocklistFragment :
         viewModel.filters.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
+            scrollToTopOnLoad = true
             if (viewModel.isRemote()) {
                 remoteFileTagViewModel.setFilter(it)
             } else {
@@ -784,8 +789,12 @@ class RethinkBlocklistFragment :
         var prevLoadState: LoadState? = null
         advanceRemoteViewAdapter?.addLoadStateListener { loadState ->
             val currentState = loadState.refresh
-            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
+            if (prevLoadState is LoadState.Loading &&
+                currentState is LoadState.NotLoading &&
+                scrollToTopOnLoad
+            ) {
                 b.lbAdvancedRecycler.scrollToPosition(0)
+                scrollToTopOnLoad = false
             }
             prevLoadState = currentState
         }
@@ -813,8 +822,12 @@ class RethinkBlocklistFragment :
         var prevLoadState: LoadState? = null
         advanceLocalViewAdapter?.addLoadStateListener { loadState ->
             val currentState = loadState.refresh
-            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
+            if (prevLoadState is LoadState.Loading &&
+                currentState is LoadState.NotLoading &&
+                scrollToTopOnLoad
+            ) {
                 b.lbAdvancedRecycler.scrollToPosition(0)
+                scrollToTopOnLoad = false
             }
             prevLoadState = currentState
         }
