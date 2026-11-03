@@ -106,7 +106,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -2348,6 +2347,36 @@ class GoVpnAdapter : KoinComponent {
         )
     }
 
+    suspend fun peekTrace(cid: String): String {
+        return try {
+            val logs = String(Intra.peekTrace(cid), Charsets.UTF_8)
+            // unlike extractLogs (destructive), peekTrace keeps logs in firestack
+            Logger.i(LOG_TAG_VPN, "$TAG logs for $cid: $logs")
+            logs
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err fetching logs: ${e.message}", e)
+            ""
+        }
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return try {
+            Intra.traces()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err fetching trace bytes: ${e.message}", e)
+            null
+        }
+    }
+
+    suspend fun getTraceCount(): Long {
+        return try {
+            Intra.traceCount()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err fetching trace count: ${e.message}", e)
+            0L
+        }
+    }
+
     suspend fun setRDNSStamp() {
         try {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)
@@ -3186,7 +3215,7 @@ class GoVpnAdapter : KoinComponent {
             val socks5Url = constructSocks5ProxyUrl(null, null, "", port = 0) // use constructSocks5ProxyUrl?
             val httpUrl = "http://" // use constructHttpProxyUrl?
             // username, pwd, port (empty port lets go pick one)
-            val server = tunnel.services?.addServer(type, win, socks5Url)
+            val server = tunnel.services?.addServer(type, Backend.Exit, socks5Url)
             val sid = server?.id().orEmpty()
             if (sid.isEmpty()) {
                 Logger.e(LOG_TAG_VPN, "$TAG addServer returned no id, skip start remote service")
@@ -3442,8 +3471,8 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun addRpnHop(hopId: String): Pair<Boolean, String> {
         // assumption: by this time the add call should have happened
-        val origin = getWinProxyId()
-        if (origin.isNullOrEmpty()) {
+        val hop = getWinProxyId() // hop is going to be auto
+        if (hop.isNullOrEmpty()) {
             Logger.w(LOG_TAG_VPN, "$TAG addRpnHop; no origin win proxy id found, skip add hop for $hopId")
             return Pair(false, "No origin win proxy id found, cannot add hop")
         }
@@ -3451,20 +3480,20 @@ class GoVpnAdapter : KoinComponent {
         Logger.vv(LOG_TAG_VPN, "$TAG addRpnHop; hopId: $hopId")
         // see if the id which is passed is already in the list, if not no need to proceed
         if (!win.has(hopId)) {
-            Logger.i(LOG_TAG_VPN, "$TAG addRpnHop; no hop found for $origin")
-            return Pair(false, "No hop found for $origin")
+            Logger.i(LOG_TAG_VPN, "$TAG addRpnHop; no hop found for $hop")
+            return Pair(false, "No hop found for $hop")
         }
         // TODO: see if the hop is already added, if so no need to redo this
         try {
-            val rpnWinId = Backend.RpnWin + hopId
-            tunnel.proxies.hop(rpnWinId, origin)
-            logEvent(Severity.LOW, "set hop", "set hop for $origin -> $rpnWinId")
-            Logger.i(LOG_TAG_VPN, "$TAG addRpnHop; new hop for $origin -> $rpnWinId")
-            return Pair(true, "Set hop for $origin -> $hopId")
+            val exit = Backend.RpnWin + hopId
+            tunnel.proxies.hop(hop, exit)
+            logEvent(Severity.LOW, "set hop", "set hop for $hop -> $exit")
+            Logger.i(LOG_TAG_VPN, "$TAG addRpnHop; new hop for $hop -> $exit")
+            return Pair(true, "Set hop for $hop -> $hopId")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG addRpnHop; err setting hop for $origin -> $hopId; ${e.message}")
-            showHopFailureNotification(origin, hopId, err = e.message)
-            logEvent(Severity.HIGH, "set hop error", "error setting hop for $origin -> $hopId, reason: ${e.message}")
+            Logger.e(LOG_TAG_VPN, "$TAG addRpnHop; err setting hop for $hop -> $hopId; ${e.message}")
+            showHopFailureNotification(hop, hopId, err = e.message)
+            logEvent(Severity.HIGH, "set hop error", "error setting hop for $hop -> $hopId, reason: ${e.message}")
             return Pair(false, "Error setting hop: ${e.message}")
         }
     }
@@ -3703,13 +3732,13 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun createHop(origin: String, hop: String): Pair<Boolean, String> {
+    suspend fun createHop(exit: String, hop: String): Pair<Boolean, String> {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG createHop; no tunnel, skip create hop")
             logEvent(
                 Severity.CRITICAL,
                 "Hop creation failed",
-                "Failed to create hop from $origin to $hop: no tunnel"
+                "Failed to create hop from $exit to $hop: no tunnel"
             )
             return Pair(false, "no tunnel")
         }
@@ -3719,17 +3748,17 @@ class GoVpnAdapter : KoinComponent {
             logEvent(
                 Severity.MEDIUM,
                 "Hop creation failed",
-                "Failed to create hop from $origin to $hop: hop is empty"
+                "Failed to create hop from $exit to $hop: hop is empty"
             )
             return Pair(false, "hop is empty")
         }
         return try {
-            Logger.i(LOG_TAG_VPN, "$TAG create hop: $origin, hop: $hop")
-            tunnel.proxies.hop(hop, origin)
+            Logger.i(LOG_TAG_VPN, "$TAG create hop: $exit, hop: $hop")
+            tunnel.proxies.hop(hop, exit)
             logEvent(
                 Severity.LOW,
                 "Hop created",
-                "Created hop from $origin to $hop"
+                "Created hop from $exit to $hop"
             )
             Pair(true, context.getString(R.string.config_add_success_toast))
         } catch (e: Exception) {
@@ -3737,7 +3766,7 @@ class GoVpnAdapter : KoinComponent {
             logEvent(
                 Severity.HIGH,
                 "Hop creation failed",
-                "Failed to create hop from $origin to $hop: ${e.message}"
+                "Failed to create hop from $exit to $hop: ${e.message}"
             )
             Pair(false, e.message ?: "Hop creation failed")
         }
