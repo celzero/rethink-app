@@ -48,6 +48,7 @@ import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
+import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN_ALPHA
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
@@ -240,6 +241,23 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             return
         }
 
+        // alpha builds accept only .rbka backups, other builds only .rbk
+        val expectedExtension =
+            if (Utilities.isAlphaBuild()) BACKUP_FILE_EXTN_ALPHA else BACKUP_FILE_EXTN
+        val fileName = BackupHelper.getBackupFileNameFromUri(this, uri)
+        if (!fileName.endsWith(expectedExtension)) {
+            Logger.w(
+                LOG_TAG_UI,
+                "invalid backup file selected: $fileName, expected extension: $expectedExtension"
+            )
+            showToastUiCentered(
+                this,
+                getString(R.string.brbs_restore_invalid_file, expectedExtension),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+
         showRestoreDialog(uri)
     }
 
@@ -282,6 +300,15 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     }
 
     private fun startRestore(fileUri: Uri): java.util.UUID? {
+        if (BackupHelper.isBackupRestoreActive(this)) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup/restore already active, dropping restore")
+            showToastUiCentered(
+                this,
+                getString(R.string.brbs_backup_restore_in_progress),
+                Toast.LENGTH_SHORT
+            )
+            return null
+        }
         Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
         data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
@@ -296,10 +323,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                 )
                 .addTag(RestoreAgent.TAG)
                 .build()
-        // unique work: a concurrent restore (double-tap or the other entry point)
-        // would close/copy the same database files simultaneously and corrupt them
+        // unique work shared with backup: a concurrent backup or restore would
+        // close/copy the same database files and corrupt them
         WorkManager.getInstance(this).enqueueUniqueWork(
-            RestoreAgent.TAG,
+            BackupHelper.BACKUP_RESTORE_WORK_NAME,
             ExistingWorkPolicy.KEEP,
             importWorker
         )
