@@ -95,6 +95,7 @@
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
                 <data android:pathPattern=".*\\.rbk" />
+                <data android:pathPattern=".*\\.rbka" />
                 <data android:host="*" />
             </intent-filter>
         </activity>
