@@ -26,6 +26,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CustomDomainDAO {
@@ -56,6 +57,9 @@ interface CustomDomainDAO {
 
     @Query("select * from CustomDomain where uid = :uid order by modifiedTs desc")
     fun getDomainsByUID(uid: Int): List<CustomDomain>
+
+    @Query("select * from CustomDomain where uid = :uid order by modifiedTs desc")
+    fun observeDomainsByUID(uid: Int): Flow<List<CustomDomain>>
 
     @Transaction
     fun updateUid(uid: Int, newUid: Int) {

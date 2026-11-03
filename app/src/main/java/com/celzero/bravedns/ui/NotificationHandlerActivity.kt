@@ -52,6 +52,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVI
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_NOT_REGISTERED_VALUE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -67,6 +68,13 @@ class NotificationHandlerActivity: BaseActivity() {
         // Biometric authentication timeout durations (in milliseconds)
         private const val BIOMETRIC_TIMEOUT_FIVE_MIN_MS = 5L * 60L * 1000L
         private const val BIOMETRIC_TIMEOUT_FIFTEEN_MIN_MS = 15L * 60L * 1000L
+
+        // tv compose route (e.g. "rpn/dashboard"), read by TvHomeActivity
+        const val EXTRA_RPN_ROUTE = "com.celzero.bravedns.extra.RPN_ROUTE"
+
+        // class name, not a class literal: tv source set is absent in phone variants
+        private const val TV_HOME_ACTIVITY_CLASS = "com.celzero.bravedns.tv.ui.TvHomeActivity"
+        private const val TV_RPN_PLUS_ROUTE = "rpn/dashboard"
     }
 
     enum class TrampolineType {
@@ -182,14 +190,7 @@ class NotificationHandlerActivity: BaseActivity() {
         }
     }
 
-    /**
-     * Rebuilds the [ServerApiError.Conflict409] from the notification intent extras,
-     * re-posts it to [InAppBillingHandler.serverApiErrorLiveData], cancels the notification,
-     * then opens [RethinkPlusDashboardFragment]
-     *
-     * [RethinkPlusDashboardFragment.setupServerErrorObserver] observes the LiveData and will
-     * immediately show [com.celzero.bravedns.ui.bottomsheet.PurchaseConflictBottomSheet]
-     */
+    // rebuilds Conflict409 from extras, re-posts it, then opens the RPN dashboard
     private fun launchPurchaseConflictAndFinish(intent: Intent) {
         try {
             val operationName = intent.getStringExtra(PurchaseConflictNotifier.EXTRA_OPERATION)
@@ -216,29 +217,14 @@ class NotificationHandlerActivity: BaseActivity() {
 
             Logger.i(LOG_TAG_UI, "launchPurchaseConflictAndFinish: re-posted conflict409, op=$operation")
 
-            val hostIntent = FragmentHostActivity.createIntent(
-                context = this,
-                fragmentClass = RethinkPlusDashboardFragment::class.java,
-                args = Bundle()
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            startActivity(hostIntent)
-            finish()
+            launchRpnDashboardAndFinish()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "launchPurchaseConflictAndFinish: error: ${e.message}", e)
             launchHomeScreenAndFinish()
         }
     }
 
-    /**
-     * Rebuilds [ServerApiError.DeviceNotRegistered] from the notification intent extras,
-     * re-posts it to [InAppBillingHandler.serverApiErrorLiveData], cancels the notification,
-     * then opens [RethinkPlusDashboardFragment]
-     *
-     * [RethinkPlusDashboardFragment.setupServerErrorObserver] will immediately show
-     * [com.celzero.bravedns.ui.bottomsheet.DeviceNotRegisteredBottomSheet]
-     */
+    // rebuilds DeviceNotRegistered from extras, re-posts it, then opens the dashboard
     private fun launchDeviceNotRegisteredAndFinish(intent: Intent) {
         try {
             val error = ServerApiError.DeviceNotRegistered(
@@ -247,37 +233,21 @@ class NotificationHandlerActivity: BaseActivity() {
                 deviceIdPrefix = intent.getStringExtra(DeviceNotRegisteredNotifier.EXTRA_DEVICE_ID_PREFIX) ?: ""
             )
 
-            // Re-post to LiveData on main thread so RethinkPlusDashboardFragment's observer
-            // picks it up and shows DeviceNotRegisteredBottomSheet automatically.
+            // observer in the dashboard picks this up and shows the error UI
             InAppBillingHandler.serverApiErrorLiveData.value = error
 
             DeviceNotRegisteredNotifier.cancel(this)
 
             Logger.i(LOG_TAG_UI, "launchDeviceNotRegisteredAndFinish: re-posted DeviceNotRegistered error")
 
-            val hostIntent = FragmentHostActivity.createIntent(
-                context = this,
-                fragmentClass = RethinkPlusDashboardFragment::class.java,
-                args = Bundle()
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            startActivity(hostIntent)
-            finish()
+            launchRpnDashboardAndFinish()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "launchDeviceNotRegisteredAndFinish: error: ${e.message}", e)
             launchHomeScreenAndFinish()
         }
     }
 
-    /**
-     * Rebuilds [ServerApiError.Unauthorized401] from the notification intent extras,
-     * re-posts it to [InAppBillingHandler.serverApiErrorLiveData], cancels the notification,
-     * then opens [RethinkPlusDashboardFragment].
-     *
-     * [RethinkPlusDashboardFragment.setupServerErrorObserver] will immediately show
-     * [com.celzero.bravedns.ui.bottomsheet.DeviceAuthErrorBottomSheet].
-     */
+    // rebuilds Unauthorized401 from extras, re-posts it, then opens the dashboard
     private fun launchDeviceAuthErrorAndFinish(intent: Intent) {
         try {
             val operationName = intent.getStringExtra(DeviceAuthErrorNotifier.EXTRA_OPERATION)
@@ -294,27 +264,37 @@ class NotificationHandlerActivity: BaseActivity() {
                 deviceIdPrefix = intent.getStringExtra(DeviceAuthErrorNotifier.EXTRA_DEVICE_ID_PREFIX) ?: ""
             )
 
-            // Re-post to LiveData on the main thread so RethinkPlusDashboardFragment's observer
-            // picks it up and shows DeviceAuthErrorBottomSheet automatically.
+            // observer in the dashboard picks this up and shows the error UI
             InAppBillingHandler.serverApiErrorLiveData.value = error
 
             DeviceAuthErrorNotifier.cancel(this)
 
             Logger.i(LOG_TAG_UI, "launchDeviceAuthErrorAndFinish: re-posted Unauthorized401, op=$operation")
 
-            val hostIntent = FragmentHostActivity.createIntent(
-                context = this,
-                fragmentClass = RethinkPlusDashboardFragment::class.java,
-                args = Bundle()
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            startActivity(hostIntent)
-            finish()
+            launchRpnDashboardAndFinish()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "launchDeviceAuthErrorAndFinish: error: ${e.message}", e)
             launchHomeScreenAndFinish()
         }
+    }
+
+    // opens the RPN dashboard (tv routes via EXTRA_RPN_ROUTE) and finishes
+    private fun launchRpnDashboardAndFinish() {
+        val intent = if (Utilities.isTvFlavour()) {
+            Intent().apply {
+                setClassName(packageName, TV_HOME_ACTIVITY_CLASS)
+                putExtra(EXTRA_RPN_ROUTE, TV_RPN_PLUS_ROUTE)
+            }
+        } else {
+            FragmentHostActivity.createIntent(
+                context = this,
+                fragmentClass = RethinkPlusDashboardFragment::class.java,
+                args = Bundle()
+            )
+        }
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        finish()
     }
 
     private fun isAppLocked(): Boolean {
