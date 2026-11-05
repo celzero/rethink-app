@@ -114,6 +114,7 @@ class WgIncludeAppsAdapter(
             val itemProxyId = proxyId
 
             io {
+                ProxyManager.ensureLoaded()
                 // all proxies assigned to this uid and package
                 val proxyIdsForApp =
                     ProxyManager.getProxyIdsForApp(mapping.uid, mapping.packageName)

@@ -220,6 +220,7 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
 
     private fun refreshAppCount() {
         io {
+            ProxyManager.ensureLoaded()
             val count = ProxyManager.getAppCountForProxy(ID_S5_BASE)
             uiCtx {
                 b.appsLabel.text = getString(R.string.settings_socks5_apps_btn, count.toString())
@@ -457,6 +458,7 @@ class Socks5ConfigActivity : BaseActivity(R.layout.activity_socks5_config) {
                 appConfig.saveCustomSocks5Endpoint(updated)
             }
             val fwdrName = forwarderAppName(updated)
+            ProxyManager.ensureLoaded()
             val noApps = ProxyManager.getAppCountForProxy(ID_S5_BASE) == 0
             uiCtx {
                 endpoint = updated

@@ -99,8 +99,23 @@ object ProxyManager : KoinComponent {
     // concurrent updates
     private val pamMutex = Mutex()
 
+    // pamSet is only a cache of the ProxyApplicationMapping table. It used to be filled only by
+    // RefreshDatabase (vpn start, periodic job), so with the vpn off it could be empty: screens
+    // showed no apps, the exclusive-owner check passed, and removals never reached the db.
+    @Volatile private var loaded = false
+
     suspend fun load(): Int {
         pamMutex.withLock { return loadLocked() }
+    }
+
+    // loads the cache once per process; call before reading it from ui
+    suspend fun ensureLoaded() {
+        if (loaded) return
+        pamMutex.withLock { ensureLoadedLocked() }
+    }
+
+    private suspend fun ensureLoadedLocked() {
+        if (!loaded) loadLocked()
     }
 
     private suspend fun loadLocked(): Int {
@@ -108,6 +123,7 @@ object ProxyManager : KoinComponent {
         val entries = a.map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
         pamSet.clear()
         pamSet.addAll(entries)
+        loaded = true
         return a.size
     }
 
@@ -178,6 +194,7 @@ object ProxyManager : KoinComponent {
             return
         }
         pamMutex.withLock {
+            ensureLoadedLocked()
             // FirewallManager is the source of truth for "all apps"; iterate it instead of the
             // proxy cache (trackedApps) so that apps missing from the proxy mapping are also
             // backfilled.
@@ -219,6 +236,7 @@ object ProxyManager : KoinComponent {
             return
         }
         pamMutex.withLock {
+            ensureLoadedLocked()
             // "remaining apps" = apps not routed by ANY proxy yet. Apps already assigned to
             // another proxy must be skipped, otherwise this call inserts new rows into
             // ProxyApplicationMapping for apps that never opted into this proxy.
@@ -243,6 +261,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun setNoProxyForAllAppsForProxy(proxyId: String) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             // remove only this proxyId from every app
             val toRemove = pamSet.filter { it.proxyId == proxyId }.toSet()
             if (toRemove.isEmpty()) return@withLock
@@ -274,18 +293,21 @@ object ProxyManager : KoinComponent {
 
     suspend fun deleteApps(m: Collection<FirewallManager.AppInfoTuple>) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             m.forEach { deleteAppLocked(it.uid, it.packageName) }
         }
     }
 
     suspend fun addApps(m: Collection<AppInfo?>) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             m.forEach { addNewAppLocked(it) }
         }
     }
 
     suspend fun updateApps(m: Collection<FirewallManager.AppInfoTuple>) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             m.forEach {
                 val newInfo = FirewallManager.getAppInfoByPackage(it.packageName) ?: return@forEach
                 if (newInfo.uid == it.uid) return@forEach // no change in uid
@@ -296,7 +318,10 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun updateApp(uid: Int, packageName: String) {
-        pamMutex.withLock { updateAppLocked(uid, packageName) }
+        pamMutex.withLock {
+            ensureLoadedLocked()
+            updateAppLocked(uid, packageName)
+        }
     }
 
     private suspend fun updateAppLocked(uid: Int, packageName: String) {
@@ -336,7 +361,10 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun addNewApp(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {
-        pamMutex.withLock { addNewAppLocked(appInfo, proxyId, proxyName) }
+        pamMutex.withLock {
+            ensureLoadedLocked()
+            addNewAppLocked(appInfo, proxyId, proxyName)
+        }
     }
 
     private suspend fun addNewAppLocked(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {
@@ -371,7 +399,10 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteApp(uid: Int, packageName: String) {
-        pamMutex.withLock { deleteAppLocked(uid, packageName) }
+        pamMutex.withLock {
+            ensureLoadedLocked()
+            deleteAppLocked(uid, packageName)
+        }
     }
 
     // Caller must hold pamMutex.
@@ -383,6 +414,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun deleteAppIfNeeded(uid: Int, packageName: String) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             val fm = FirewallManager.getAppInfoByPackage(packageName)
             // if there is no app info for the package, then delete the app from the mapping
             if (fm == null) {
@@ -397,6 +429,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun deleteAppByPkgName(packageName: String) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             val toRemove = pamSet.filter { it.packageName == packageName }
             if (toRemove.isEmpty()) {
                 Logger.i(LOG_TAG_PROXY, "deleteAppByPkgName: app not found in proxy mapping: $packageName")
@@ -411,6 +444,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun clear() {
         pamMutex.withLock {
+            ensureLoadedLocked()
             pamSet.clear()
             db.deleteAll()
             Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
@@ -419,6 +453,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun tombstoneApp(oldUid: Int) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             val newUid = if (oldUid > 0) -1 * oldUid else oldUid
             if (newUid == oldUid) {
                 Logger.w(LOG_TAG_PROXY, "no change in uid, not tombstoning: $oldUid")
@@ -549,6 +584,7 @@ object ProxyManager : KoinComponent {
             return false
         }
         pamMutex.withLock {
+            ensureLoadedLocked()
             val tuple = ProxyAppMapTuple(uid, packageName, proxyId)
             if (pamSet.contains(tuple)) return true
             if (isExclusiveProxyId(proxyId)) {
@@ -568,6 +604,7 @@ object ProxyManager : KoinComponent {
 
     suspend fun removeProxyFromApp(uid: Int, packageName: String, proxyId: String) {
         pamMutex.withLock {
+            ensureLoadedLocked()
             val toRemove =
                 pamSet.filter { it.uid == uid && it.packageName == packageName && it.proxyId == proxyId }
             if (toRemove.isEmpty()) return@withLock
