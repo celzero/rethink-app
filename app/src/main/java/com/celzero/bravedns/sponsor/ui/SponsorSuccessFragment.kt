@@ -17,14 +17,27 @@ package com.celzero.bravedns.sponsor.ui
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.utilities.*
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentSponsorSuccessBinding
-import dev.androidbroadcast.vbpd.viewBinding
 
-class SponsorSuccessFragment : Fragment(R.layout.fragment_sponsor_success) {
+class SponsorSuccessFragment : Fragment() {
 
-    private val b by viewBinding(FragmentSponsorSuccessBinding::bind)
+    private lateinit var b: SponsorSuccessUiState
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        b = SponsorSuccessUiState(requireContext())
+        return ComposeView(requireContext()).apply {
+            id = R.id.continue_button
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { SponsorSuccessScreen(b) } }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

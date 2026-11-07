@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
@@ -29,7 +32,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppIpDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
@@ -38,7 +40,7 @@ import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 import kotlin.math.log2
 
 class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int, val isAsn: Boolean = false) :
-    PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
+    AppConnectionsPresenter(DIFF_CALLBACK),
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private var maxValue: Int = 0
@@ -60,16 +62,14 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         private const val PERCENTAGE_MULTIPLIER = 100
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionDetailsViewHolder {
-        val itemBinding =
-            ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ConnectionDetailsViewHolder(itemBinding)
-    }
 
-    override fun onBindViewHolder(holder: ConnectionDetailsViewHolder, position: Int) {
-        val appConnection: AppConnection = getItem(position) ?: return
-        // updates the app-wise connections from network log to AppInfo screen
-        holder.update(appConnection)
+
+    @Composable
+    override fun Row(index: Int, connection: AppConnection, revision: Int) {
+        val state = remember(connection, revision) { AppIpsRowState() }
+        val holder = remember(connection, revision) { ConnectionDetailsViewHolder(state, index) }
+        LaunchedEffect(holder) { holder.update(connection) }
+        AppIpsRowContent(state)
     }
 
     private fun calculatePercentage(c: Double): Int {
@@ -90,8 +90,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         }
     }
 
-    inner class ConnectionDetailsViewHolder(private val b: ListItemAppIpDetailsBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class ConnectionDetailsViewHolder(private val b: AppIpsRowState, private val absoluteAdapterPosition: Int) {
         fun update(conn: AppConnection) {
             displayTransactionDetails(conn)
             setupClickListeners(conn)
@@ -143,7 +142,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         private fun displayTransactionDetails(conn: AppConnection) {
             b.acdCount.text = conn.count.toString()
             if (isAsn) {
-                b.acdIpAddress.text = conn.appOrDnsName
+                b.acdIpAddress.text = conn.appOrDnsName.orEmpty()
                 b.acdDomainName.text = conn.ipAddress
                 // in case of ASN, flag consists of country code, extract flag from it
                 val cc = Utilities.getFlag(conn.flag)

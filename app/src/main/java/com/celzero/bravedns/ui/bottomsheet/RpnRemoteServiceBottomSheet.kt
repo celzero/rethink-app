@@ -24,10 +24,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.rpn.RemoteServiceContent
+import com.celzero.bravedns.ui.compose.rpn.RemoteServiceState
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetRpnRemoteServiceBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -52,14 +57,16 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetRpnRemoteServiceBinding? = null
+    private var presentation: RemoteServiceState? = null
     private val b
-        get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
+        get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private val persistentState by inject<PersistentState>()
 
     private var statusPollJob: Job? = null
     private var isRunning = false
+    private var serviceGeneration = 0L
+    private var runningInfo: GoVpnAdapter.RemoteServiceInfo? = null
 
     /** Address shown in the sheet; "ip:port" when start succeeds. */
     private var addrText: String = ""
@@ -87,8 +94,13 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomsheetRpnRemoteServiceBinding.inflate(inflater, container, false)
-        return b.root
+        val state = RemoteServiceState()
+        presentation = state
+        runningInfo?.let(::showRunningState)
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RemoteServiceContent(state) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,65 +119,64 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
 
         b.rmtCopy.setOnClickListener { copyAddress() }
         b.rmtStartStop.setOnClickListener { onStartStopClicked() }
-
-        refreshTunnelUi()
-    }
-
-    override fun onStop() {
-        stopPolling()
-        super.onStop()
+        observeStatus()
     }
 
     override fun onDestroyView() {
         stopPolling()
-        _binding = null
+        presentation = null
         super.onDestroyView()
     }
 
     private fun onStartStopClicked() {
+        val state = presentation ?: return
+        if (state.busy) return
+        state.busy = true
+        serviceGeneration++
         viewLifecycleOwner.lifecycleScope.launch {
-            if (isRunning) {
-                withContext(Dispatchers.IO) { VpnController.stopRemoteService() }
-                if (!isAdded) return@launch
-                stopPolling()
-                showStoppedState()
-            } else {
-                val info = withContext(Dispatchers.IO) { VpnController.startRemoteService() }
-                if (!isAdded) return@launch
-                if (info == null) {
-                    Logger.w(LOG_TAG_UI, "$TAG: startRemoteService failed")
-                    Utilities.showToastUiCentered(
-                        requireContext(),
-                        getString(R.string.rpn_remote_service_start_failure),
-                        Toast.LENGTH_SHORT
-                    )
-                    return@launch
+            try {
+                if (isRunning) {
+                    withContext(Dispatchers.IO) { VpnController.stopRemoteService() }
+                    if (!isAdded || presentation == null) return@launch
+                    showStoppedState()
+                } else {
+                    val info = withContext(Dispatchers.IO) { VpnController.startRemoteService() }
+                    if (!isAdded || presentation == null) return@launch
+                    if (info == null) {
+                        Logger.w(LOG_TAG_UI, "$TAG: startRemoteService failed")
+                        Utilities.showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.rpn_remote_service_start_failure),
+                            Toast.LENGTH_SHORT
+                        )
+                        return@launch
+                    }
+                    showRunningState(info)
                 }
-                showRunningState(info)
-                pollStatus()
+            } finally {
+                state.busy = false
             }
         }
     }
 
     /** No-tunnel hint vs interactive Start state, re-evaluated on entry. */
-    private fun refreshTunnelUi() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val hasTunnel = withContext(Dispatchers.IO) { VpnController.hasTunnel() }
-            if (!isAdded) return@launch
-            if (!hasTunnel) {
-                b.rmtAddrCard.isVisible = false
-                b.rmtStatusRow.isVisible = false
-                b.rmtNoTunnel.isVisible = true
-                b.rmtStartStop.isVisible = false
-            } else {
-                b.rmtNoTunnel.isVisible = false
-                showStoppedState()
-            }
+    private suspend fun refreshTunnelUi() {
+        val hasTunnel = withContext(Dispatchers.IO) { VpnController.hasTunnel() }
+        if (!isAdded || presentation == null || isRunning || b.busy) return
+        if (!hasTunnel) {
+            b.rmtAddrCard.isVisible = false
+            b.rmtStatusRow.isVisible = false
+            b.rmtNoTunnel.isVisible = true
+            b.rmtStartStop.isVisible = false
+        } else {
+            b.rmtNoTunnel.isVisible = false
+            showStoppedState()
         }
     }
 
     private fun showStoppedState() {
         isRunning = false
+        runningInfo = null
         addrText = ""
         b.rmtAddrCard.isVisible = false
         b.rmtStatusRow.isVisible = false
@@ -175,6 +186,7 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun showRunningState(info: GoVpnAdapter.RemoteServiceInfo) {
         isRunning = true
+        runningInfo = info
         addrText = info.addr
         b.rmtNoTunnel.isVisible = false
         b.rmtStartStop.isVisible = true
@@ -184,19 +196,25 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
         applyStatusUi(null)
     }
 
-    private fun pollStatus() {
-        stopPolling()
+    /** Register once per view; repeatOnLifecycle cancels/restarts only the active loop. */
+    private fun observeStatus() {
         statusPollJob = viewLifecycleOwner.lifecycleScope.launch {
-            while (isActive && isAdded && isRunning) {
-                val status = withContext(Dispatchers.IO) { VpnController.remoteServiceStatus() }
-                if (!isAdded) return@launch
-                // null status => service or tunnel gone; revert to stopped state
-                if (status == null) {
-                    showStoppedState()
-                    return@launch
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                if (!isRunning) refreshTunnelUi()
+                while (isActive) {
+                    if (isRunning && presentation?.busy == false) {
+                        val generation = serviceGeneration
+                        val status = withContext(Dispatchers.IO) { VpnController.remoteServiceStatus() }
+                        if (!isAdded || presentation == null) return@repeatOnLifecycle
+                        // A start/stop request may have completed while the status read was in flight.
+                        if (isRunning && !b.busy && generation == serviceGeneration) {
+                            if (status == null) showStoppedState() else applyStatusUi(status)
+                        }
+                    }
+                    // Stay registered while stopped so a later Start resumes polling without
+                    // creating another lifecycle observer or restarting the fragment.
+                    delay(STATUS_POLL_INTERVAL_MS.milliseconds)
                 }
-                applyStatusUi(status)
-                delay(STATUS_POLL_INTERVAL_MS.milliseconds)
             }
         }
     }

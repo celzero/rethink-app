@@ -15,25 +15,20 @@
  */
 package com.celzero.bravedns.ui.dialog
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.SsidAdapter
 import com.celzero.bravedns.data.SsidItem
-import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 
 class WgSsidDialog(
     private val activity: Activity,
@@ -42,21 +37,39 @@ class WgSsidDialog(
     private val onSave: (String) -> Unit
 ) : Dialog(activity, themeId) {
 
-    private lateinit var b: DialogWgSsidBinding
-    private lateinit var ssidAdapter: SsidAdapter
+    private lateinit var b: WgSsidState
+    private lateinit var ssidAdapter: WgSsidPresenter
     private val ssidItems = mutableListOf<SsidItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
 
-        b = DialogWgSsidBinding.inflate(layoutInflater)
-        setContentView(b.root)
+        b = WgSsidState(context)
+        setWgContent(activity) { WgSsidContent(b, if (::ssidAdapter.isInitialized) ssidAdapter else null) }
         setCancelable(false)
         setupDialog()
         setupRecyclerView()
         loadCurrentSsids()
         setupClickListeners()
+        restoreInputs(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(): Bundle = super.onSaveInstanceState().also {
+        b.saveForm(it, "wg.ssid.")
+        it.putBoolean("wg.ssid.equal", b.radioEqual.isChecked)
+        it.putBoolean("wg.ssid.exact", b.radioExact.isChecked)
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        restoreInputs(savedInstanceState)
+    }
+    private fun restoreInputs(state: Bundle?) {
+        b.restoreForm(state, "wg.ssid.")
+        if (state?.containsKey("wg.ssid.equal") == true) {
+            if (state.getBoolean("wg.ssid.equal")) b.radioEqual.isChecked = true else b.radioNotEqual.isChecked = true
+            if (state.getBoolean("wg.ssid.exact")) b.radioExact.isChecked = true else b.radioWildcard.isChecked = true
+        }
     }
 
     private fun setupDialog() {
@@ -69,11 +82,7 @@ class WgSsidDialog(
 
         window?.setGravity(Gravity.CENTER)
         window?.setBackgroundDrawableResource(android.R.color.transparent)
-        ViewCompat.setOnApplyWindowInsetsListener(b.root) { view, insets ->
-            val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(0, sysInsets.top, 0, sysInsets.bottom)
-            insets
-        }
+
 
         b.descriptionTextView.text = getDescTxt()
         b.ssidTextInputLayout.hint = context.getString(R.string.wg_ssid_input_hint, context.getString(R.string.lbl_ssids))
@@ -86,11 +95,11 @@ class WgSsidDialog(
         disableOrEnableRadioButtons(false)
 
         // listeners to update description text when radio buttons change
-        b.ssidConditionRadioGroup.setOnCheckedChangeListener { _, _ ->
+        b.ssidConditionRadioGroup.setOnClickListener {
             updateDescriptionText()
         }
 
-        b.ssidMatchTypeRadioGroup.setOnCheckedChangeListener { _, _ ->
+        b.ssidMatchTypeRadioGroup.setOnClickListener {
             updateDescriptionText()
         }
     }
@@ -115,14 +124,7 @@ class WgSsidDialog(
     }
 
     private fun setupRecyclerView() {
-        ssidAdapter = SsidAdapter(ssidItems) { ssidItem ->
-            showDeleteConfirmation(ssidItem)
-        }
-
-        b.ssidRecyclerView.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = ssidAdapter
-        }
+        ssidAdapter = WgSsidPresenter(ssidItems) { showDeleteConfirmation(it) }
     }
 
     private fun loadCurrentSsids() {
@@ -138,25 +140,7 @@ class WgSsidDialog(
             addSsid()
         }
 
-        b.ssidEditText.setOnEditorActionListener { view, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                // Hide keyboard first
-                val imm = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-                imm.hideSoftInputFromWindow(view.windowToken, 0)
-
-                // Post the addSsid call to ensure it happens after keyboard is hidden
-                // This prevents focus search issues
-                view.post {
-                    view.clearFocus()
-                    addSsid()
-                }
-
-                // Return true to indicate we handled the action
-                true
-            } else {
-                false
-            }
-        }
+        b.ssidEditText.onEditorDone = { addSsid() }
 
         b.ssidEditText.addTextChangedListener { text ->
             val isNotEmpty = !text.isNullOrBlank()
@@ -170,7 +154,7 @@ class WgSsidDialog(
             disableOrEnableRadioButtons(isNotEmpty)
 
             // Change button background color based on state
-            val context = b.addSsidBtn.context
+            val context = this.context
             val enabledColor = UIUtils.fetchColor(context, R.attr.accentGood)
             val disabledColor = UIUtils.fetchColor(context, R.attr.primaryLightColorText)
 
@@ -231,7 +215,7 @@ class WgSsidDialog(
         if (ssidAdapter.getSsidItems().any {
             it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType
         }) {
-            b.ssidEditText.text?.clear()
+            b.ssidEditText.setText("")
             resetToDefaultSelection()
             return
         }
@@ -245,7 +229,7 @@ class WgSsidDialog(
         }
 
         ssidAdapter.addSsidItem(SsidItem(ssidName, selectedType))
-        b.ssidEditText.text?.clear()
+        b.ssidEditText.setText("")
         resetToDefaultSelection()
         updateEmptyState()
     }

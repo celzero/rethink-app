@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import android.content.Context
 import android.content.res.Configuration
@@ -24,18 +28,14 @@ import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.EventsAdapter
 import com.celzero.bravedns.database.EventDao
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityEventsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Logger
@@ -46,12 +46,8 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.util.restoreFrost
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.EventsViewModel
 import com.celzero.bravedns.viewmodel.EventsViewModel.TopLevelFilter
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,13 +58,13 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.milliseconds
 
-class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityEventsBinding::bind)
+class EventsActivity : BaseActivity() {
+    private val state = EventsState()
+    private lateinit var presenter: EventsAdapter
     private val persistentState by inject<PersistentState>()
     private val viewModel: EventsViewModel by viewModel()
     private val eventDao by inject<EventDao>()
 
-    private var layoutManager: RecyclerView.LayoutManager? = null
     private var filterQuery: String = ""
     private val filterSources: MutableSet<EventSource> = mutableSetOf()
     private var filterSeverity: Severity? = null
@@ -101,7 +97,7 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -112,22 +108,12 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         }
 
         initView()
-        initAnimation()
+        setContent { RethinkTheme { EventsScreen(state, presenter,
+            { showSeverityChipsUi(); showSourceChipsIfNeeded(); state.logs.search.expand() },
+            ::toggleSeverityChipsUi, ::applySeverityFilter, ::applySourceFilter, ::refreshEvents, ::showDeleteDialog) } }
     }
 
-    private fun initAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
-    }
+
 
     override fun onResume() {
         super.onResume()
@@ -135,112 +121,31 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         restoreFrost(themeId)
 
         // Fix for keyboard issues
-        b.eventsSearch.clearFocus()
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.eventsSearch)
-        b.eventsListRl.requestFocus()
+        state.logs.resumeGeneration++
     }
 
+    override fun onSaveInstanceState(outState: Bundle) { super.onSaveInstanceState(outState); outState.putString("traffic.search", state.logs.search.query) }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) { super.onRestoreInstanceState(savedInstanceState); savedInstanceState.getString("traffic.search")?.let { state.logs.search.setQuery(it) } }
+
     private fun initView() {
-        setupSearchView()
-        setupRecyclerView()
-        setupClickListeners()
-        remakeSeverityFilterChipsUi()
-        remakeSourceFilterChipsUi()
+        state.logs.search.listener = { onQueryTextChange(it) }
+        state.logs.search.submitListener = { onQueryTextSubmit(it) }
+        presenter = EventsAdapter(this)
+        viewModel.eventsList.observe(this) { presenter.submitData(lifecycle, it) }
+        presenter.addLoadStateListener { state.logs.showList = !(it.append.endOfPaginationReached && presenter.itemCount < 1) }
         setQueryFilter()
     }
 
-    private fun setupSearchView() {
-        b.eventsSearch.setOnQueryTextListener(this)
 
-        b.eventsSearch.setOnClickListener {
-            showSeverityChipsUi()
-            showSourceChipsIfNeeded()
-            b.eventsSearch.requestFocus()
-            b.eventsSearch.onActionViewExpanded()
-        }
-    }
 
-    private fun setupClickListeners() {
-        b.eventsFilterIcon.setOnClickListener { toggleSeverityChipsUi() }
-        b.eventsRefreshIcon.setOnClickListener { refreshEvents() }
-        b.eventsDeleteIcon.setOnClickListener { showDeleteDialog() }
-    }
 
-    private fun setupRecyclerView() {
-        b.eventsRecyclerView.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this)
-        b.eventsRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter = EventsAdapter(this)
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-        b.eventsRecyclerView.adapter = recyclerAdapter
 
-        viewModel.eventsList.observe(this) { pagingData ->
-            recyclerAdapter.submitData(lifecycle, pagingData)
-        }
 
-        recyclerAdapter.addLoadStateListener { loadState ->
-            val isEmpty = recyclerAdapter.itemCount < 1
-            if (loadState.append.endOfPaginationReached && isEmpty) {
-                b.emptyStateContainer.visibility = View.VISIBLE
-                b.eventsRecyclerView.visibility = View.GONE
-            } else {
-                b.emptyStateContainer.visibility = View.GONE
-                if (!b.eventsRecyclerView.isVisible) b.eventsRecyclerView.visibility = View.VISIBLE
-            }
-        }
-
-        b.eventsRecyclerView.post {
-            try {
-                if (recyclerAdapter.itemCount > 0) {
-                    recyclerAdapter.stateRestorationPolicy =
-                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                }
-            } catch (_: Exception) {
-                Logger.e(Logger.LOG_TAG_UI, "$TAG; err in setting recycler restoration policy")
-            }
-        }
-
-        setupRecyclerScrollListener()
-    }
-
-    private fun setupRecyclerScrollListener() {
-        val scrollListener =
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val firstChild = recyclerView.getChildAt(0)
-                    if (firstChild == null) {
-                        Logger.v(Logger.LOG_TAG_UI, "$TAG; err; no child views found")
-                        return
-                    }
-
-                    val tag = firstChild.tag as? Long
-                    if (tag == null) {
-                        Logger.v(Logger.LOG_TAG_UI, "$TAG; err; tag is null for first child")
-                        return
-                    }
-
-                    b.eventsListScrollHeader.text = formatToRelativeTime(this@EventsActivity, tag)
-                    b.eventsListScrollHeader.visibility = View.VISIBLE
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.eventsListScrollHeader.visibility = View.GONE
-                    }
-                }
-            }
-        b.eventsRecyclerView.addOnScrollListener(scrollListener)
-    }
 
     private fun toggleSeverityChipsUi() {
-        if (b.filterChipSeverityGroup.isVisible) {
+        if (state.logs.showParentFilters) {
             hideSeverityChipsUi()
             hideSourceChipsUi()
         } else {
@@ -250,19 +155,19 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
     }
 
     private fun showSeverityChipsUi() {
-        b.filterChipSeverityGroup.visibility = View.VISIBLE
+        state.logs.showParentFilters = true
     }
 
     private fun hideSeverityChipsUi() {
-        b.filterChipSeverityGroup.visibility = View.GONE
+        state.logs.showParentFilters = false
     }
 
     private fun showSourceChipsUi() {
-        b.filterChipSourceGroup.visibility = View.VISIBLE
+        state.logs.showChildFilters = true
     }
 
     private fun hideSourceChipsUi() {
-        b.filterChipSourceGroup.visibility = View.GONE
+        state.logs.showChildFilters = false
     }
 
     private fun showSourceChipsIfNeeded() {
@@ -279,71 +184,11 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         }
     }
 
-    private fun remakeSeverityFilterChipsUi() {
-        b.filterChipSeverityGroup.removeAllViews()
 
-        val all = makeSeverityChip(CHIP_TAG_ALL, getString(R.string.lbl_all), true)
-        val low = makeSeverityChip(CHIP_TAG_LOW, CHIP_TAG_LOW, false)
-        val medium = makeSeverityChip(CHIP_TAG_MEDIUM, CHIP_TAG_MEDIUM, false)
-        val high = makeSeverityChip(CHIP_TAG_HIGH, CHIP_TAG_HIGH, false)
-        val critical = makeSeverityChip(CHIP_TAG_CRITICAL, CHIP_TAG_CRITICAL, false)
-        val source = makeSeverityChip(CHIP_TAG_SOURCE, "Source", false)
 
-        b.filterChipSeverityGroup.addView(all)
-        b.filterChipSeverityGroup.addView(low)
-        b.filterChipSeverityGroup.addView(medium)
-        b.filterChipSeverityGroup.addView(high)
-        b.filterChipSeverityGroup.addView(critical)
-        b.filterChipSeverityGroup.addView(source)
-    }
 
-    private fun makeSeverityChip(tag: String, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = tag
-        chip.text = label.lowercase().replaceFirstChar(Char::titlecase)
-        chip.isChecked = checked
 
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applySeverityFilter(button.tag)
-            } else {
-                // Only auto-select "ALL" if this chip was unchecked without another chip being selected
-                // This prevents the issue where switching from one severity to another triggers both
-                // the uncheck of the old chip and the check of the new chip
-                val hasAnyChecked = (0 until b.filterChipSeverityGroup.childCount).any { i ->
-                    (b.filterChipSeverityGroup.getChildAt(i) as? Chip)?.isChecked == true
-                }
-                if (!hasAnyChecked) {
-                    unselectSeverityChipsUi(button.tag)
-                }
-            }
-        }
 
-        return chip
-    }
-
-    private fun makeSourceChip(source: EventSource): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        // Format source name for better readability
-        chip.text = when (source) {
-            EventSource.UI -> "UI"
-            EventSource.VPN -> "VPN"
-            EventSource.DNS -> "DNS"
-            EventSource.FIREWALL -> "Firewall"
-            EventSource.SYSTEM -> "System"
-            EventSource.SERVICE -> "Service"
-            EventSource.WORKER -> "Worker"
-            EventSource.MANAGER -> "Manager"
-            EventSource.PROXY -> "Proxy"
-        }
-        chip.isCheckedIconVisible = true
-        chip.tag = source
-
-        chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
-            applySourceFilter(compoundButton.tag as EventSource, isSelected)
-        }
-        return chip
-    }
 
     private fun applySeverityFilter(tag: Any) {
         val tagString = tag as String
@@ -378,29 +223,9 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
         }
     }
 
-    private fun unselectSeverityChipsUi(tag: Any) {
-        val chipCount = b.filterChipSeverityGroup.childCount
-        val tagString = tag as String
-        for (i in 0 until chipCount) {
-            val chip = b.filterChipSeverityGroup.getChildAt(i) as Chip
-            if (chip.tag != tagString && chip.tag == CHIP_TAG_ALL) {
-                chip.isChecked = true
-                return
-            }
-        }
-    }
 
-    private fun remakeSourceFilterChipsUi() {
-        b.filterChipSourceGroup.removeAllViews()
 
-        EventSource.entries.forEach { source ->
-            val chip = makeSourceChip(source)
-            if (filterSources.contains(source)) {
-                chip.isChecked = true
-            }
-            b.filterChipSourceGroup.addView(chip)
-        }
-    }
+
 
     private fun applySourceFilter(source: EventSource, isSelected: Boolean) {
         if (isSelected) {
@@ -435,34 +260,30 @@ class EventsActivity : BaseActivity(R.layout.activity_events), SearchView.OnQuer
 
     val searchQuery = MutableStateFlow("")
 
-    override fun onQueryTextSubmit(query: String): Boolean {
+    fun onQueryTextSubmit(query: String): Boolean {
         searchQuery.value = query
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
+    fun onQueryTextChange(query: String): Boolean {
         searchQuery.value = query
         return true
     }
-    private lateinit var animation: Animation
     private fun refreshEvents() {
         ui {
-            b.eventsRefreshIcon.isEnabled = false
-            b.eventsRefreshIcon.animation = animation
-            b.eventsRefreshIcon.startAnimation(animation)
+            state.refreshing = true
             viewModel.setFilter(filterQuery, filterSources, filterSeverity)
             delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isFinishing) return@delay
 
-                b.eventsRefreshIcon.isEnabled = true
-                b.eventsRefreshIcon.clearAnimation()
+                state.refreshing = false
                 showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
             }
         }
     }
 
     private fun showDeleteDialog() {
-        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+        WgAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(R.string.delete_all_events)
             .setMessage(R.string.delete_all_events_confirmation)
             .setCancelable(true)

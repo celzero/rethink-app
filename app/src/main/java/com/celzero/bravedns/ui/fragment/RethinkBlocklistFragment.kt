@@ -16,31 +16,28 @@
 package com.celzero.bravedns.ui.fragment
 
 import android.annotation.SuppressLint
-import android.content.res.ColorStateList
 import android.os.Bundle
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.paging.PagingData
+import androidx.paging.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.blocklists.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.filter
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.LocalAdvancedViewAdapter
-import com.celzero.bravedns.adapter.LocalSimpleViewAdapter
-import com.celzero.bravedns.adapter.RemoteAdvancedViewAdapter
-import com.celzero.bravedns.adapter.RemoteSimpleViewAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.FileTag
-import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
@@ -67,11 +64,6 @@ import com.celzero.bravedns.viewmodel.RemoteBlocklistPacksMapViewModel
 import com.celzero.bravedns.viewmodel.RethinkBlocklistViewModel
 import com.celzero.bravedns.viewmodel.RethinkLocalFileTagViewModel
 import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,8 +72,13 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RethinkBlocklistFragment :
-    Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
-    private val b by viewBinding(FragmentRethinkBlocklistBinding::bind)
+    Fragment() {
+    private var b = BlocklistConfigurationState()
+    private val packs = MutableStateFlow<PagingData<BlocklistRow>>(PagingData.empty())
+    private val advanced = MutableStateFlow<PagingData<BlocklistRow>>(PagingData.empty())
+    private lateinit var presenter: BlocklistSelectionPresenter
+    private var advanceRemoteInitialized = false
+    private var advanceLocalInitialized = false
 
     private val persistentState by inject<PersistentState>()
     private val appDownloadManager by inject<AppDownloadManager>()
@@ -89,10 +86,6 @@ class RethinkBlocklistFragment :
 
     private val viewModel: RethinkBlocklistViewModel by viewModel()
 
-    private var advanceRemoteViewAdapter: RemoteAdvancedViewAdapter? = null
-    private var advanceLocalViewAdapter: LocalAdvancedViewAdapter? = null
-    private var localSimpleViewAdapter: LocalSimpleViewAdapter? = null
-    private var remoteSimpleViewAdapter: RemoteSimpleViewAdapter? = null
 
     // Guards the one-time configure() call into the (surviving) ViewModel so that
     // repeated onCreateView() invocations don't reset the user's in-progress selection.
@@ -155,15 +148,36 @@ class RethinkBlocklistFragment :
             blocklistConfigured = true
             viewModel.configure(type, remoteName, remoteUrl)
         }
-        return super.onCreateView(inflater, container, savedInstanceState)
+        b = BlocklistConfigurationState()
+        presenter = BlocklistSelectionPresenter(inflater.context, this)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { BlocklistConfigurationScreen(b, packs, advanced, viewLifecycleOwner,
+                onTab = ::selectTab, onQueryChange = ::onQueryTextChange, onQuerySubmit = ::onQueryTextSubmit,
+                onFilter = ::applyFilter) } }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("blocklist_tab_advanced", b.selectedAdvanced)
+        outState.putString("blocklist_query", b.query)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        savedInstanceState?.let {
+            selectTab(it.getBoolean("blocklist_tab_advanced", false))
+            val query = it.getString("blocklist_query", "") ?: ""
+            if (b.query != query) { b.query = query; onQueryTextChange(query) }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         // a download-error dialog shown against this activity must not outlive the view,
         // else the activity's window is torn down with the dialog attached (WindowLeaked)
-        downloadErrorDialog?.dismiss()
-        downloadErrorDialog = null
+        b.prompt = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -183,8 +197,7 @@ class RethinkBlocklistFragment :
         }
 
         viewModel.selectedFileTags.observe(viewLifecycleOwner) {
-            localSimpleViewAdapter?.notifyDataSetChanged()
-            remoteSimpleViewAdapter?.notifyDataSetChanged()
+            b.selectedTags = it ?: emptySet()
         }
 
         viewModel.filters.observe(viewLifecycleOwner) {
@@ -247,28 +260,16 @@ class RethinkBlocklistFragment :
         maybeResetStaleTerminalDownloadState()
 
         // be default, select the simple blocklist view
-        selectToggleBtnUi(b.lbSimpleToggleBtn)
-        unselectToggleBtnUi(b.lbAdvToggleBtn)
+        b.selectedAdvanced = false
 
         remakeFilterChipsUi()
     }
 
     private fun updateFilteredTxtUi(filter: RethinkBlocklistViewModel.Filters) {
-        if (filter.subGroups.isEmpty()) {
-            b.lbAdvancedFilterLabelTv.text =
-                htmlToSpannedText(
-                    getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
-                )
+        b.lbAdvancedFilterLabelTv.text = if (filter.subGroups.isEmpty()) {
+            getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
         } else {
-            b.lbAdvancedFilterLabelTv.text =
-                htmlToSpannedText(
-                    getString(
-                        R.string.rt_filter_desc_subgroups,
-                        filter.filterSelected.name.lowercase(),
-                        "",
-                        filter.subGroups
-                    )
-                )
+            getString(R.string.rt_filter_desc_subgroups, filter.filterSelected.name.lowercase(), "", filter.subGroups)
         }
     }
 
@@ -313,9 +314,9 @@ class RethinkBlocklistFragment :
 
     private fun showDownloadUi() {
         if (viewModel.isLocal()) {
-            b.lbDownloadLayout.visibility = View.VISIBLE
+            b.lbDownloadLayout.visible = true
         } else {
-            b.lbDownloadProgressRemote.visibility = View.VISIBLE
+            b.lbDownloadProgressRemote.visible = true
             // Only auto-start the remote download the first time (or if no download is already
             // active). This prevents re-triggering the download on every recreation / Idle
             // state transition / failure, which would otherwise start duplicate downloads.
@@ -326,27 +327,27 @@ class RethinkBlocklistFragment :
     }
 
     private fun showConfigureUi() {
-        b.lbConfigureLayout.visibility = View.VISIBLE
+        b.lbConfigureLayout.visible = true
     }
 
     private fun hideDownloadUi() {
-        b.lbDownloadLayout.visibility = View.GONE
-        b.lbDownloadProgressRemote.visibility = View.GONE
+        b.lbDownloadLayout.visible = false
+        b.lbDownloadProgressRemote.visible = false
     }
 
     private fun hideConfigureUi() {
-        b.lbConfigureLayout.visibility = View.GONE
+        b.lbConfigureLayout.visible = false
     }
 
     private fun initClickListeners() {
-        b.lbDownloadBtn.setOnClickListener {
+        b.lbDownloadBtn.onClick = {
             b.lbDownloadBtn.isEnabled = false
             b.lbDownloadBtn.isClickable = false
 
             downloadBlocklist(viewModel.getType())
         }
 
-        b.lbCancelDownloadBtn.setOnClickListener {
+        b.lbCancelDownloadBtn.onClick = {
             cancelDownload()
             // the screen is going away; clear the sticky terminal state the cancellation
             // produces so no later screen re-delivers it as an error dialog
@@ -354,7 +355,7 @@ class RethinkBlocklistFragment :
             activity?.finish()
         }
 
-        b.lbBlocklistApplyBtn.setOnClickListener {
+        b.lbBlocklistApplyBtn.onClick = {
             val a = activity
             appScope.launch {
                 viewModel.applyStamp()
@@ -362,7 +363,7 @@ class RethinkBlocklistFragment :
             }
         }
 
-        b.lbBlocklistCancelBtn.setOnClickListener {
+        b.lbBlocklistCancelBtn.onClick = {
             // close the activity associated with the fragment after reverting to old stamp
             val a = activity
             appScope.launch {
@@ -371,11 +372,9 @@ class RethinkBlocklistFragment :
             }
         }
 
-        b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
-        b.lbAdvSearchFilterIcon.setOnClickListener { openFilterBottomSheet() }
+        b.lbAdvSearchFilterIcon.onClick = { openFilterBottomSheet() }
 
-        b.lbAdvSearchSv.setOnQueryTextListener(this)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             // fixme: show dialog if the user selects/unselects from the list and try to close
@@ -464,21 +463,11 @@ class RethinkBlocklistFragment :
     }
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-        builder.setTitle(R.string.lockdown_download_enable_inapp)
-        builder.setMessage(R.string.lockdown_download_message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->
-            // Enable in-app downloader and proceed with download
-            persistentState.useCustomDownloadManager = true
-            downloadBlocklist(type)
-        }
-        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
-            dialog.dismiss()
-            // Proceed with Android download manager (useCustomDownloadManager stays false)
-            proceedWithBlocklistDownload()
-        }
-        builder.create().show()
+        b.prompt = BlocklistPrompt(getString(R.string.lockdown_download_enable_inapp), getString(R.string.lockdown_download_message),
+            getString(R.string.lockdown_download_enable_inapp), {
+                persistentState.useCustomDownloadManager = true
+                downloadBlocklist(type)
+            }, getString(R.string.lbl_cancel), { proceedWithBlocklistDownload() })
     }
 
     private fun proceedWithBlocklistDownload(forceInApp: Boolean = false) {
@@ -558,65 +547,26 @@ class RethinkBlocklistFragment :
     }
 
     private fun showApplyChangesDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
-        builder.setTitle(getString(R.string.rt_dialog_title))
-        builder.setMessage(getString(R.string.rt_dialog_message))
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
+        b.prompt = BlocklistPrompt(getString(R.string.rt_dialog_title), getString(R.string.rt_dialog_message), getString(R.string.lbl_apply), {
             val a = activity
             appScope.launch {
                 viewModel.applyStamp()
                 uiCtx { a?.finish() }
             }
-        }
-        builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
-            // no-op
-        }
-        builder.setNegativeButton(getString(R.string.notif_dialog_pause_dialog_negative)) { _, _ ->
-            activity?.finish()
-        }
-        builder.create().show()
+        }, getString(R.string.notif_dialog_pause_dialog_negative), { activity?.finish() }, getString(R.string.rt_dialog_neutral), {})
     }
 
-    private val listViewToggleListener =
-        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-            val mb: MaterialButton = b.lbListToggleGroup.findViewById(checkedId)
-            if (isChecked) {
-                selectToggleBtnUi(mb)
-                showList(mb.tag.toString())
-                return@OnButtonCheckedListener
-            }
-
-            unselectToggleBtnUi(mb)
-        }
-
-    private fun showList(id: String) {
-        // change the check based on the tag
-        when (BlocklistView.getTag(id)) {
-            BlocklistView.PACKS -> {
-                b.lbSimpleRecyclerPacks.visibility = View.VISIBLE
-                b.lbAdvContainer.visibility = View.INVISIBLE
-            }
-            BlocklistView.ADVANCED -> {
-                b.lbSimpleRecyclerPacks.visibility = View.GONE
-                b.lbAdvContainer.visibility = View.VISIBLE
-            }
-        }
+    private fun selectTab(advanced: Boolean) {
+        if (b.selectedAdvanced == advanced) return
+        b.selectedAdvanced = advanced
+        showList(if (advanced) BlocklistView.ADVANCED.tag else BlocklistView.PACKS.tag)
     }
 
-    private fun selectToggleBtnUi(mb: MaterialButton) {
-        mb.backgroundTintList =
-            ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.accentGood))
-        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
-    }
+    private fun showList(id: String) { b.showAdvanced = !BlocklistView.getTag(id).isSimple() }
 
-    private fun unselectToggleBtnUi(mb: MaterialButton) {
-        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
-        mb.backgroundTintList =
-            ColorStateList.valueOf(
-                fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
-            )
-    }
+
+
+
 
     private fun setListAdapter() {
         ui {
@@ -625,42 +575,11 @@ class RethinkBlocklistFragment :
             } else {
                 setRemoteAdapter()
             }
-            showList(b.lbSimpleToggleBtn.tag.toString())
+            showList(BlocklistView.PACKS.tag)
         }
     }
 
-    private fun setupRecyclerScrollListener(recycler: RecyclerView, viewType: BlocklistView) {
-        val scrollListener =
-            object : RecyclerView.OnScrollListener() {
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    if (recyclerView.getChildAt(0)?.tag == null) return
-
-                    val tag: String = recyclerView.getChildAt(0).tag as String
-
-                    if (viewType.isSimple()) {
-                        b.recyclerScrollHeaderSimple.visibility = View.VISIBLE
-                        b.recyclerScrollHeaderSimple.text = tag
-                        b.recyclerScrollHeaderAdv.visibility = View.GONE
-                    } else {
-                        b.recyclerScrollHeaderAdv.visibility = View.VISIBLE
-                        b.recyclerScrollHeaderAdv.text = tag
-                        b.recyclerScrollHeaderSimple.visibility = View.GONE
-                    }
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.recyclerScrollHeaderSimple.visibility = View.GONE
-                        b.recyclerScrollHeaderAdv.visibility = View.GONE
-                    }
-                }
-            }
-        recycler.addOnScrollListener(scrollListener)
-    }
 
     private fun setSimpleAdapter() {
         if (viewModel.isLocal()) {
@@ -670,7 +589,7 @@ class RethinkBlocklistFragment :
         }
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
+    fun onQueryTextSubmit(query: String): Boolean {
         if (viewModel.isRethinkStampSearch(query)) {
             viewModel.restoreStamp(query)
             showToastUiCentered(requireContext(), "Blocklists restored", Toast.LENGTH_SHORT)
@@ -680,7 +599,7 @@ class RethinkBlocklistFragment :
         return false
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
+    fun onQueryTextChange(query: String): Boolean {
         if (viewModel.isRethinkStampSearch(query)) {
             return false
         }
@@ -693,60 +612,22 @@ class RethinkBlocklistFragment :
     }
 
     private fun setLocalSimpleViewAdapter() {
-        localSimpleViewAdapter = LocalSimpleViewAdapter(requireContext(), this)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.lbSimpleRecyclerPacks.layoutManager = layoutManager
-
         localBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            val l = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) && it1.pack.isNotEmpty() }
-            localSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, l)
+            val filtered = it.filter { item -> !item.pack.contains(DEAD_PACK) && item.pack.isNotEmpty() }
+            packs.value = filtered.map { item -> presenter.localPack(item) }
         }
-        b.lbSimpleRecyclerPacks.adapter = localSimpleViewAdapter
-        setupRecyclerScrollListener(b.lbSimpleRecyclerPacks, BlocklistView.PACKS)
     }
 
     private fun setRemoteSimpleViewAdapter() {
-        remoteSimpleViewAdapter = RemoteSimpleViewAdapter(requireContext(), this)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.lbSimpleRecyclerPacks.layoutManager = layoutManager
-
         remoteBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            val r = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) && it1.pack.isNotEmpty() }
-            remoteSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, r)
+            val filtered = it.filter { item -> !item.pack.contains(DEAD_PACK) && item.pack.isNotEmpty() }
+            packs.value = filtered.map { item -> presenter.remotePack(item) }
         }
-        b.lbSimpleRecyclerPacks.adapter = remoteSimpleViewAdapter
-        setupRecyclerScrollListener(b.lbSimpleRecyclerPacks, BlocklistView.PACKS)
     }
 
-    private fun remakeFilterChipsUi() {
-        b.filterChipGroup.removeAllViews()
+    private fun remakeFilterChipsUi() { b.selectionFilter = RethinkBlocklistViewModel.BlocklistSelectionFilter.ALL.id }
 
-        val all = makeChip(RethinkBlocklistViewModel.BlocklistSelectionFilter.ALL.id, getString(R.string.lbl_all), true)
-        val selected =
-            makeChip(
-                RethinkBlocklistViewModel.BlocklistSelectionFilter.SELECTED.id,
-                getString(R.string.rt_filter_parent_selected),
-                false
-            )
 
-        b.filterChipGroup.addView(all)
-        b.filterChipGroup.addView(selected)
-    }
-
-    private fun makeChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) { // apply filter only when the CompoundButton is selected
-                applyFilter(button.tag)
-            }
-        }
-
-        return chip
-    }
 
     private fun applyFilter(tag: Any) {
         if (tag is Int) {
@@ -770,70 +651,35 @@ class RethinkBlocklistFragment :
     }
 
     private fun setRemoteAdapter() {
-        if (advanceRemoteViewAdapter != null) return
-
-        advanceRemoteViewAdapter = RemoteAdvancedViewAdapter(requireContext(), this)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.lbAdvancedRecycler.layoutManager = layoutManager
-
+        if (advanceRemoteInitialized) return
+        advanceRemoteInitialized = true
         remoteFileTagViewModel.remoteFileTags.observe(viewLifecycleOwner) {
-            advanceRemoteViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            advanced.value = it.map { item -> presenter.remoteTag(item) }
         }
-        var prevLoadState: LoadState? = null
-        advanceRemoteViewAdapter?.addLoadStateListener { loadState ->
-            val currentState = loadState.refresh
-            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
-                b.lbAdvancedRecycler.scrollToPosition(0)
-            }
-            prevLoadState = currentState
-        }
-        b.lbAdvancedRecycler.adapter = advanceRemoteViewAdapter
-        setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
-
-        // implement sticky headers
-        // ref:
-        // https://stackoverflow.com/questions/32949971/how-can-i-make-sticky-headers-in-recyclerview-without-external-lib
-        /*b.lbAdvancedRecycler.addItemDecoration(HeaderItemDecoration(b.lbAdvancedRecycler) { itemPosition ->
-            itemPosition >= 0 && itemPosition < advanceRemoteListAdapter?.itemCount
-        })*/
     }
 
     private fun setLocalAdapter() {
-        if (advanceLocalViewAdapter != null) return
-
-        advanceLocalViewAdapter = LocalAdvancedViewAdapter(requireContext(), this)
-        val layoutManager = LinearLayoutManager(requireContext())
-        b.lbAdvancedRecycler.layoutManager = layoutManager
-
+        if (advanceLocalInitialized) return
+        advanceLocalInitialized = true
         localFileTagViewModel.localFiletags.observe(viewLifecycleOwner) {
-            advanceLocalViewAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+            advanced.value = it.map { item -> presenter.localTag(item) }
         }
-        var prevLoadState: LoadState? = null
-        advanceLocalViewAdapter?.addLoadStateListener { loadState ->
-            val currentState = loadState.refresh
-            if (prevLoadState is LoadState.Loading && currentState is LoadState.NotLoading) {
-                b.lbAdvancedRecycler.scrollToPosition(0)
-            }
-            prevLoadState = currentState
-        }
-        b.lbAdvancedRecycler.adapter = advanceLocalViewAdapter
-        setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
     }
 
 
     private fun onDownloadStart() {
         // update ui for download start
         showDownloadUi()
-        b.lbDownloadProgress.visibility = View.VISIBLE
+        b.lbDownloadProgress.visible = true
         b.lbDownloadBtn.text = getString(R.string.rt_download_start)
         hideConfigureUi()
     }
 
     private fun onDownloadFail(reason: String? = null) {
         // update ui for download fail
-        b.lbDownloadProgress.visibility = View.GONE
-        b.lbDownloadProgressRemote.visibility = View.GONE
-        b.lbDownloadBtn.visibility = View.VISIBLE
+        b.lbDownloadProgress.visible = false
+        b.lbDownloadProgressRemote.visible = false
+        b.lbDownloadBtn.visible = true
         b.lbDownloadBtn.isEnabled = true
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         showDownloadUi()
@@ -847,57 +693,33 @@ class RethinkBlocklistFragment :
     // tracked so the dialog can be dismissed when this view tears down; otherwise an
     // Error delivered while the activity is finishing leaks the dialog's window
     // (android.view.WindowLeaked)
-    private var downloadErrorDialog: androidx.appcompat.app.AlertDialog? = null
 
     private fun showDownloadErrorDialog(reason: String) {
-        // the Error may have been posted while this screen was going away; showing a
-        // dialog against a finishing activity leaks its window. The sticky Error state
-        // is reset on the next entry to this screen (see maybeResetStaleTerminalDownloadState).
         val a = activity
         if (a == null || !isAdded || a.isFinishing || a.isDestroyed) return
-
-        val builder = MaterialAlertDialogBuilder(a, R.style.App_Dialog_NoDim)
-        builder.setTitle(R.string.download_update_dialog_failure_title)
-        builder.setMessage(getString(R.string.download_update_dialog_failure_message) + "\n\n" + reason)
-        builder.setPositiveButton(R.string.retry) { _, _ ->
-            appDownloadManager.resetDownloadState()
-            downloadBlocklist(viewModel.getType())
-        }
-        if (persistentState.useCustomDownloadManager) {
-            builder.setNeutralButton(R.string.download_switch_to_system) { _, _ ->
-                 // stop the in-app downloader chain before flipping mechanisms so the two
-                 // pipelines cannot run in parallel and race into the same target folder
-                 appDownloadManager.cancelDownload(type = downloadType())
-                 persistentState.useCustomDownloadManager = false
-                 appDownloadManager.resetDownloadState()
-                 downloadBlocklist(viewModel.getType())
-            }
-        } else {
-             builder.setNeutralButton(R.string.settings_custom_downloader_heading) { _, _ ->
-                 // stop any Android download-manager downloads before flipping mechanisms
-                 appDownloadManager.cancelDownload(type = downloadType())
-                 persistentState.useCustomDownloadManager = true
-                 appDownloadManager.resetDownloadState()
-                 downloadBlocklist(viewModel.getType())
-             }
-        }
-        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
-            appDownloadManager.resetDownloadState()
-            dialog.dismiss()
-        }
-        downloadErrorDialog = builder.create()
-        downloadErrorDialog?.show()
+        val custom = persistentState.useCustomDownloadManager
+        b.prompt = BlocklistPrompt(getString(R.string.download_update_dialog_failure_title), getString(R.string.download_update_dialog_failure_message) + "\n\n" + reason,
+            getString(R.string.retry), {
+                appDownloadManager.resetDownloadState()
+                downloadBlocklist(viewModel.getType())
+            }, getString(R.string.lbl_cancel), { appDownloadManager.resetDownloadState() },
+            getString(if (custom) R.string.download_switch_to_system else R.string.settings_custom_downloader_heading), {
+                appDownloadManager.cancelDownload(type = downloadType())
+                persistentState.useCustomDownloadManager = !custom
+                appDownloadManager.resetDownloadState()
+                downloadBlocklist(viewModel.getType())
+            })
     }
 
     private fun onDownloadSuccess() {
         // update ui for download success
-        b.lbDownloadProgress.visibility = View.GONE
-        b.lbDownloadProgressRemote.visibility = View.GONE
+        b.lbDownloadProgress.visible = false
+        b.lbDownloadProgressRemote.visible = false
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         hideDownloadUi()
         appDownloadManager.resetDownloadState()
         // hasBlocklist() is triggered by resetDownloadState -> Idle
-        b.lbListToggleGroup.check(R.id.lb_simple_toggle_btn)
+        selectTab(false)
         showToastUiCentered(
             requireContext(),
             getString(R.string.download_update_dialog_message_success),

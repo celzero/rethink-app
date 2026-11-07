@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.purchase.HistoryRowState
+import com.celzero.bravedns.ui.compose.purchase.HistoryRowContent
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemServerOrderBinding
 import com.celzero.bravedns.iab.ServerOrderEntry
 import com.celzero.bravedns.util.UIUtils
 import java.text.SimpleDateFormat
@@ -33,13 +31,21 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * [ListAdapter] for [ServerOrderEntry] items fetched from the billing server.
+ * Native observable UI collection for [ServerOrderEntry] items fetched from the billing server.
  *
  * Displays subscription and one-time purchase records with a card UI,
  * including product type badge, status chip, dates and order ID.
  */
-class ServerOrderHistoryAdapter(private val context: Context) :
-    ListAdapter<ServerOrderEntry, ServerOrderHistoryAdapter.OrderViewHolder>(DIFF_CB) {
+class ServerOrderHistoryAdapter(private val context: Context) {
+    var entries by mutableStateOf<List<ServerOrderEntry>>(emptyList())
+        private set
+    fun submitList(value: List<ServerOrderEntry>) { entries = value }
+    val itemCount: Int get() = entries.size
+    @Composable fun Row(index: Int) {
+        val entry = entries[index]
+        val presenter = remember(entry, index, itemCount) { OrderPresenter(HistoryRowState()).apply { bind(entry, index == itemCount - 1) } }
+        HistoryRowContent(presenter.b, server = true)
+    }
 
     companion object {
         private val DIFF_CB = object : DiffUtil.ItemCallback<ServerOrderEntry>() {
@@ -53,20 +59,7 @@ class ServerOrderHistoryAdapter(private val context: Context) :
         private val DATE_ONLY = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
-        val binding = ListItemServerOrderBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-        return OrderViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
-        holder.bind(getItem(position), position == itemCount - 1)
-    }
-
-    inner class OrderViewHolder(private val b: ListItemServerOrderBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
+    inner class OrderPresenter(val b: HistoryRowState) {
         fun bind(entry: ServerOrderEntry, isLast: Boolean) {
             bindTypeBadge(entry)
             bindStatusChip(entry)

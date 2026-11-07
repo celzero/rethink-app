@@ -22,17 +22,21 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.statistics.RpnStatisticsPresentation
+import com.celzero.bravedns.ui.compose.statistics.RpnStatisticsContent
+import com.celzero.bravedns.ui.compose.statistics.RpnStatisticsAppRow
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.RpnConnStatsSummary
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.databinding.BottomsheetRpnStatsBinding
-import com.celzero.bravedns.databinding.ListItemRpnStatAppBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
@@ -63,7 +67,7 @@ import com.celzero.bravedns.ui.custom.EmbeddedDolphinContent
  */
 class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetRpnStatsBinding? = null
+    private var _binding: RpnStatisticsPresentation? = null
     private val b
         get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
 
@@ -107,8 +111,13 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomsheetRpnStatsBinding.inflate(inflater, container, false)
-        return b.root
+        val presentation = RpnStatisticsPresentation(inflater.context)
+        _binding = presentation
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_statistics_compose
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnStatisticsContent(presentation) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -201,9 +210,7 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         b.rpnStatsTopApps.isVisible = hasApps
         b.rpnStatsTopAppsEmpty.isVisible = !hasApps
         if (hasApps) {
-            b.rpnStatsTopApps.layoutManager = LinearLayoutManager(requireContext())
             b.rpnStatsTopApps.adapter = TopAppsAdapter(topApps)
-            b.rpnStatsTopApps.itemAnimator = null
         }
     }
 
@@ -257,47 +264,22 @@ class RpnStatsBottomSheet : BaseBottomSheetDialogFragment() {
         b.rpnStatsViewLogs.isVisible = false
     }
 
-    inner class TopAppsAdapter(private val items: List<AppConnection>) :
-        RecyclerView.Adapter<TopAppsAdapter.ViewHolder>() {
-
-        inner class ViewHolder(val binding: ListItemRpnStatAppBinding) :
-            RecyclerView.ViewHolder(binding.root)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val itemBinding = ListItemRpnStatAppBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-            return ViewHolder(itemBinding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    inner class TopAppsAdapter(private val items: List<AppConnection>) {
+        val itemCount: Int get() = items.size
+        @Composable
+        fun Row(position: Int) {
             val item = items[position]
-            with(holder.binding) {
-                rpnStatAppName.text = item.appOrDnsName ?: root.context.getString(R.string.lbl_unknown)
-
-                rpnStatAppMeta.text = getString(
-                    R.string.rpn_stats_conn_count,
-                    formatCount(item.count)
-                ) + " · " +
-                    humanReadableByteCount(item.downloadBytes ?: 0L, true) + " 🔻 · " +
-                    humanReadableByteCount(item.uploadBytes ?: 0L, true) + " 🔺"
-
-                rpnStatAppTotal.text = humanReadableByteCount(item.totalBytes ?: 0L, true)
-
-                val icon = loadIconForUid(root.context, item.uid)
-                Glide.with(root.context)
-                    .load(icon)
-                    .error(Utilities.getDefaultIcon(root.context))
-                    .into(rpnStatAppIcon)
-            }
+            val context = LocalContext.current
+            val icon = remember(context, item.uid) { loadIconForUid(context, item.uid) }
+            val meta = getString(R.string.rpn_stats_conn_count, formatCount(item.count)) + " · " +
+                humanReadableByteCount(item.downloadBytes ?: 0L, true) + " 🔻 · " +
+                humanReadableByteCount(item.uploadBytes ?: 0L, true) + " 🔺"
+            RpnStatisticsAppRow(item.appOrDnsName ?: stringResource(R.string.lbl_unknown), meta,
+                humanReadableByteCount(item.totalBytes ?: 0L, true), icon = icon)
         }
-
-        /** Resolves an app icon from a bare uid (AppConnection carries no package name). */
         private fun loadIconForUid(context: android.content.Context, uid: Int) =
             context.packageManager.getPackagesForUid(uid)?.firstOrNull()?.let {
                 Utilities.getIcon(context, it)
             } ?: Utilities.getDefaultIcon(context)
-
-        override fun getItemCount(): Int = items.size
     }
 }

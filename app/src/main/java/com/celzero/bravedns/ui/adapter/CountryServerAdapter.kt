@@ -1,50 +1,43 @@
-/*
- * Copyright 2026 RethinkDNS and its authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.celzero.bravedns.ui.adapter
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
-import android.content.res.ColorStateList
-import android.graphics.drawable.GradientDrawable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.ui.compose.controls.*
+
+import androidx.compose.ui.platform.LocalLocale
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CountryConfig
-import com.celzero.bravedns.databinding.ItemSectionHeaderBinding
-import com.celzero.bravedns.databinding.ItemServerGroupBinding
-import com.celzero.bravedns.databinding.ListItemCountryCardBinding
+import com.celzero.bravedns.ui.compose.themeColor
+import com.celzero.bravedns.ui.compose.rpn.*
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
-import com.celzero.bravedns.util.UIUtils.fetchColor
 import java.util.Locale
+import android.view.animation.AccelerateDecelerateInterpolator
+import com.celzero.bravedns.ui.compose.utilities.utilityTextStyle
+import android.graphics.Typeface
 
-/**
- * Adapter showing servers grouped by country using list_item_country_card.
- * Each country row can be expanded to reveal its city servers.
- */
-class CountryServerAdapter(
-    countries: List<CountryItem>,
-    private val listener: CitySelectionListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
+/** Native presenter; the original grouping and callback contract is retained. */
+class CountryServerAdapter(countries: List<CountryItem>, private val listener: CitySelectionListener) {
     interface CitySelectionListener {
         fun onCitySelected(server: CountryConfig, isEnabled: Boolean)
         /**
@@ -84,437 +77,176 @@ class CountryServerAdapter(
         var isFavourite: Boolean = false
     )
 
-    private sealed class Row {
-        data class Header(val letter: String) : Row()
-        data class Country(val item: CountryItem) : Row()
-    }
 
-    /** Alphabetically sorted source countries */
-    private var countries: List<CountryItem> = sortCountries(countries)
-
-    private var rows: List<Row> = buildRows(countries)
-
-    // track which countries are expanded by country code
-    private val expandedCountries = mutableSetOf<String>()
-
-    /**
-     * True when the RPN proxy has been deliberately stopped.
-     * Propagated to every [ServerGroupAdapter] instance so server items
-     * block selection and redirect taps to the settings sheet.
-     *
-     * Using a plain private backing field (not `var isXxx: Boolean`) to avoid the
-     * JVM declaration clash between the auto-generated `setProxyStopped` property
-     * setter and the explicit [setProxyStopped] method.
-     */
-    private var proxyStopped = false
-
-    /**
-     * Switches all country rows (and their expanded server groups) to/from stopped mode.
-     * Skips rebind if the flag did not change.
-     */
-    fun setProxyStopped(stopped: Boolean) {
-        if (proxyStopped == stopped) return
-        proxyStopped = stopped
-        notifyItemRangeChanged(0, itemCount)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return if (viewType == TYPE_HEADER) {
-            HeaderViewHolder(ItemSectionHeaderBinding.inflate(inflater, parent, false))
-        } else {
-            CountryViewHolder(ListItemCountryCardBinding.inflate(inflater, parent, false))
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int =
-        if (rows[position] is Row.Header) TYPE_HEADER else TYPE_COUNTRY
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val row = rows[position]) {
-            is Row.Header -> (holder as HeaderViewHolder).bind(row.letter)
-            is Row.Country -> {
-                Logger.v(LOG_TAG_UI, "CountryServerAdapter.bind: ${row.item.countryName} with ${row.item.serverGroups.size} server groups")
-                (holder as CountryViewHolder).bind(
-                    row.item,
-                    expandedCountries.contains(row.item.countryCode)
-                )
-            }
-        }
-    }
-
-    override fun getItemCount(): Int = rows.size
-
+    private var countries by mutableStateOf(sortCountries(countries), neverEqualPolicy())
+    private val expandedCountries = mutableStateMapOf<String, Boolean>()
+    private var proxyStoppedValue by mutableStateOf(false)
+    fun setProxyStopped(stopped: Boolean) { if (proxyStoppedValue != stopped) proxyStoppedValue = stopped }
     fun updateCountries(newCountries: List<CountryItem>) {
-        val sorted = sortCountries(newCountries)
-        val newRows = buildRows(sorted)
-        val old = rows
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize() = old.size
-            override fun getNewListSize() = newRows.size
-            override fun areItemsTheSame(o: Int, n: Int): Boolean {
-                val a = old[o]
-                val b = newRows[n]
-                return when {
-                    a is Row.Header && b is Row.Header -> a.letter == b.letter
-                    a is Row.Country && b is Row.Country ->
-                        a.item.countryCode == b.item.countryCode
-                    else -> false
-                }
-            }
-
-            override fun areContentsTheSame(o: Int, n: Int): Boolean {
-                val a = old[o]
-                val b = newRows[n]
-                return when {
-                    a is Row.Header && b is Row.Header -> a.letter == b.letter
-                    a is Row.Country && b is Row.Country -> a.item == b.item
-                    else -> false
-                }
-            }
-        })
-        countries = sorted
-        rows = newRows
-        val newCodes = sorted.map { it.countryCode }.toSet()
-        expandedCountries.retainAll(newCodes)
-        diff.dispatchUpdatesTo(this)
+        countries = sortCountries(newCountries)
+        val newCodes = countries.map { it.countryCode }.toSet()
+        expandedCountries.keys.retainAll(newCodes)
     }
-
-    /** Sorts countries A→Z by name so alphabet sections stay monotonic. */
-    private fun sortCountries(list: List<CountryItem>): List<CountryItem> {
-        return list.sortedBy { it.countryName.lowercase(Locale.getDefault()) }
-    }
-
-    /**
-     * Builds the flat row list: a [Row.Header] is inserted whenever the section
-     * letter of the current country differs from the previous one.
-     */
-    private fun buildRows(sorted: List<CountryItem>): List<Row> {
-        val out = mutableListOf<Row>()
-        var lastLetter: String? = null
-        for (country in sorted) {
-            val letter = sectionLetter(country.countryName)
-            if (letter != lastLetter) {
-                out.add(Row.Header(letter))
-                lastLetter = letter
-            }
-            out.add(Row.Country(country))
-        }
-        return out
-    }
-
-    /** Section letter for a country name; non-letter initials collapse to "#". */
+    private fun sortCountries(list: List<CountryItem>): List<CountryItem> = list.sortedBy { it.countryName.lowercase(Locale.getDefault()) }
     private fun sectionLetter(name: String): String {
         val c = name.trim().uppercase(Locale.getDefault()).firstOrNull() ?: return "#"
         return if (c.isLetter()) c.toString() else "#"
     }
-
-    class HeaderViewHolder(
-        private val binding: ItemSectionHeaderBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(letter: String) {
-            binding.tvSectionLetter.text = letter
+    @Composable
+    fun Content(modifier: Modifier = Modifier) {
+        Column(modifier) {
+            var previous: String? = null
+            countries.forEach { item ->
+                val letter = sectionLetter(item.countryName)
+                if (letter != previous) Text(letter,
+                    Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, top = 14.dp, bottom = 4.dp),
+                    color = themeColor(R.attr.primaryLightColorText),
+                    style = countryTextStyle(11.sp, family = "sans-serif-medium", bold = true, spacing = .1f))
+                previous = letter
+                key(item.countryCode) { Country(item) }
+            }
+        }
+    }
+    @Composable
+    private fun Country(item: CountryItem) {
+        val expanded = expandedCountries[item.countryCode] == true
+        val arrow by animateFloatAsState(if (expanded) 180f else 0f, label = "country expansion")
+        val star = remember { RpnControlState() }
+        // list_item_country_card is a plain section, with a circular avatar and an inset divider.
+        Column(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().clickable { expandedCountries[item.countryCode] = !expanded }
+                .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.size(36.dp).background(themeColor(R.attr.colorSurfaceVariant), CircleShape).padding(horizontal = 2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Text(item.flagEmoji, maxLines = 1, style = countryTextStyle(12.sp, includeFontPadding = false))
+                    Text(item.countryCode.uppercase(LocalLocale.current.platformLocale), Modifier.fillMaxWidth(),
+                        color = themeColor(R.attr.primaryLightColorText), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        style = countryTextStyle(rpnDimensionSp(R.dimen.mini_font_text_view), includeFontPadding = false, bold = true, spacing = .02f)
+                            .copy(textAlign = TextAlign.Center))
+                }
+                Column(Modifier.weight(1f).padding(start = 13.dp, end = 10.dp)) {
+                    Text(item.countryName, Modifier.fillMaxWidth(), color = themeColor(R.attr.primaryTextColor),
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, style = countryTextStyle(rpnDimensionSp(R.dimen.extra_large_font_text_view)))
+                    val total = item.serverGroups.sumOf { it.serverCount }
+                    Text(pluralStringResource(R.plurals.server_count, total, total), Modifier.padding(top = 2.dp),
+                        color = themeColor(R.attr.primaryLightColorText), style = countryTextStyle(11.sp))
+                }
+                IconButton({
+                    val next = !item.isFavourite
+                    star.animate().scaleX(1.35f).scaleY(1.35f).setDuration(120).setInterpolator(AccelerateDecelerateInterpolator()).withEndAction {
+                        star.animate().scaleX(1f).scaleY(1f).setDuration(100).setInterpolator(AccelerateDecelerateInterpolator()).start()
+                    }.start()
+                    item.isFavourite = next
+                    countries = countries.toList()
+                    listener.onFavouriteToggled(item.countryCode, item.countryName, next)
+                }, Modifier.padding(horizontal = 8.dp).size(48.dp)) { Image(painterResource(if (item.isFavourite) R.drawable.ic_star_filled else R.drawable.ic_star_outline), stringResource(R.string.server_selection_filter_favourites_only), Modifier.size(32.dp).rpnMotion(star)) }
+                Icon(painterResource(R.drawable.ic_expand_more_24), stringResource(R.string.server_selection_filter_locations),
+                    Modifier.padding(horizontal = 8.dp).size(24.dp).padding(2.dp).rotate(arrow), tint = themeColor(R.attr.primaryLightColorText))
+            }
+            HorizontalDivider(Modifier.padding(start = 53.dp), thickness = 1.dp, color = themeColor(R.attr.border))
+            if (expanded) Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, bottom = 6.dp)) {
+                item.serverGroups.forEach { group -> key(group.key) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable {
+                        if (proxyStoppedValue) listener.onProxyStoppedItemTapped() else listener.onCitySelected(group.servers.first(), !group.isEnabled)
+                    }.padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(group.city.capitalizeWords(), color = themeColor(R.attr.primaryTextColor),
+                                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                style = countryTextStyle(15.sp, family = "sans-serif-medium"))
+                            if (group.serverCount > 1) Text(pluralStringResource(R.plurals.server_count, group.serverCount, group.serverCount),
+                                Modifier.padding(top = 2.dp), color = themeColor(R.attr.primaryLightColorText), style = countryTextStyle(12.sp))
+                        }
+                        Row(Modifier.padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            if (group.avgLoad > 0) {
+                                val (label, attr) = loadInfo(group.avgLoad)
+                                Box(Modifier.padding(end = 5.dp).size(7.dp).background(themeColor(attr), CircleShape))
+                                Text(label, Modifier.padding(end = 8.dp), color = themeColor(attr),
+                                    style = countryTextStyle(12.sp, family = "sans-serif-medium"))
+                            }
+                            if (group.avgLink > 0) {
+                                val (label, attr) = speedInfo(group.avgLink)
+                                com.celzero.bravedns.ui.compose.controls.OriginalLabel("item_server_group:chip_link_speed",
+                                    Modifier.padding(end = 12.dp), containerColor = themeColor(if (group.avgLink >= 10_000) attr else R.attr.chipColorBgNormal)) { Text(label) }
+                            }
+                            OriginalCheckbox("item_server_group:checkbox_server", group.isEnabled, null,
+                                Modifier.size(28.dp).alpha(if (proxyStoppedValue) .4f else 1f), enabled = !proxyStoppedValue)
+                        }
+                    }
+                } }
+            }
         }
     }
 
-    inner class CountryViewHolder(
-        private val binding: ListItemCountryCardBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    @Composable private fun countryTextStyle(size: androidx.compose.ui.unit.TextUnit, includeFontPadding: Boolean = true,
+        family: String? = null, bold: Boolean = false, spacing: Float? = null) = utilityTextStyle(
+        size = size.value, family = family, weight = if (bold) Typeface.BOLD else null, spacing = spacing)
+        .copy(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))
 
-        private var serverGroupAdapter: ServerGroupAdapter? = null
+    private fun speedInfo(linkMbps: Int): Pair<String, Int> {
+        val formatted: String
+        val attr: Int
 
-        fun bind(item: CountryItem, isExpanded: Boolean) {
-            binding.apply {
-                // Circular avatar: country flag emoji above its code initials (e.g. "AL")
-                tvCountryFlag.text = item.flagEmoji
-                tvCountryCode.text = item.countryCode.uppercase(Locale.getDefault())
-                tvCountryName.text = item.countryName
-
-                // Count total servers across all groups
-                val totalServers = item.serverGroups.sumOf { it.serverCount }
-                tvServerCount.text =
-                    itemView.context.resources.getQuantityString(
-                        R.plurals.server_count,
-                        totalServers,
-                        totalServers
-                    )
-
-                if (serverGroupAdapter == null) {
-                    serverGroupAdapter = ServerGroupAdapter(listener)
-                    rvServers.layoutManager = LinearLayoutManager(itemView.context)
-                    rvServers.adapter = serverGroupAdapter
-                    rvServers.isNestedScrollingEnabled = false
-                }
-                // Always keep the inner adapter in sync with the outer stopped state
-                // before submitting new data so all bound items reflect the correct mode.
-                serverGroupAdapter?.setProxyStopped(this@CountryServerAdapter.proxyStopped)
-                serverGroupAdapter?.submitList(item.serverGroups)
-
-                // expand / collapse state
-                rvServers.visibility = if (isExpanded) View.VISIBLE else View.GONE
-                ivExpandArrow.rotation = if (isExpanded) 180f else 0f
-
-                bindFavouriteStar(item)
-
-                ivFavourite.setOnClickListener {
-                    val newFavourite = !item.isFavourite
-                    // Animate the star: quick scale bounce for tactile feedback
-                    ivFavourite.animate()
-                        .scaleX(1.35f).scaleY(1.35f)
-                        .setDuration(120)
-                        .setInterpolator(AccelerateDecelerateInterpolator())
-                        .withEndAction {
-                            ivFavourite.animate()
-                                .scaleX(1f).scaleY(1f)
-                                .setDuration(100)
-                                .setInterpolator(AccelerateDecelerateInterpolator())
-                                .start()
-                        }
-                        .start()
-                    bindFavouriteStar(item.copy(isFavourite = newFavourite))
-                    item.isFavourite = newFavourite
-                    val position = bindingAdapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        notifyItemChanged(position)
-                    }
-                    listener.onFavouriteToggled(item.countryCode, item.countryName,newFavourite)
-                }
-
-                layoutCountryHeader.setOnClickListener {
-                    val code = item.countryCode
-                    val nowExpanded: Boolean
-                    if (expandedCountries.contains(code)) {
-                        expandedCountries.remove(code)
-                        nowExpanded = false
-                    } else {
-                        expandedCountries.add(code)
-                        nowExpanded = true
-                    }
-                    rvServers.visibility = if (nowExpanded) View.VISIBLE else View.GONE
-                    ivExpandArrow.animate().rotation(if (nowExpanded) 180f else 0f).start()
-                }
+        when {
+            linkMbps >= 10_000 -> {
+                val gbps = linkMbps / 1_000.0
+                formatted = String.format(Locale.US, "%.0f Gbps", gbps)
+                attr = R.attr.chipTextPositive
+            }
+            linkMbps >= 1_000 -> {
+                val gbps = linkMbps / 1_000.0
+                formatted = if (gbps == gbps.toLong().toDouble())
+                    String.format(Locale.US, "%.0f Gbps", gbps)
+                else
+                    String.format(Locale.US, "%.1f Gbps", gbps)
+                attr = R.attr.accentGood
+            }
+            linkMbps >= 100 -> {
+                formatted = "$linkMbps Mbps"
+                attr = R.attr.chipTextNeutral
+            }
+            linkMbps >= 10 -> {
+                formatted = "$linkMbps Mbps"
+                attr = R.attr.chipTextNeutral
+            }
+            else -> {
+                formatted = "$linkMbps Mbps"
+                attr = R.attr.chipTextNegative
             }
         }
-
-        private fun bindFavouriteStar(item: CountryItem) {
-            binding.apply {
-                if (item.isFavourite) {
-                    ivFavourite.setImageResource(R.drawable.ic_star_filled)
-                    // The filled star vector uses ?attr/colorGolden as its fillColor,
-                    // so no explicit tint override is needed — clear any residual tint.
-                    ivFavourite.imageTintList = null
-                } else {
-                    ivFavourite.setImageResource(R.drawable.ic_star_outline)
-                    // Outline star is tinted in the vector via ?attr/primaryLightColorText,
-                    // but set tint explicitly here for robustness at runtime.
-                    ivFavourite.imageTintList = ContextCompat.getColorStateList(
-                        itemView.context, android.R.color.transparent
-                    )
-                    ivFavourite.imageTintList = null
-                }
-            }
-        }
+        return Pair(formatted, attr)
     }
 
     /**
-     * Adapter for server groups (merged by key) under each country card.
+     * Returns (displayText, textColorAttr) for [loadPercent].
+     *
+     * Tier thresholds:
+     *   ≤ 20 → Light
+     *   ≤ 40 → Normal
+     *   ≤ 60 → Busy
+     *   ≤ 80 → Very Busy
+     *   > 80 → Overloaded
      */
-    private class ServerGroupAdapter(
-        private val listener: CitySelectionListener
-    ) : RecyclerView.Adapter<ServerGroupAdapter.ServerGroupViewHolder>() {
+    private fun loadInfo(loadPercent: Int): Pair<String, Int> {
+        val attr: Int
 
-        private val items = mutableListOf<ServerGroup>()
-
-        /**
-         * True when the RPN proxy is stopped, taps are redirected to
-         * [CitySelectionListener.onProxyStoppedItemTapped] instead of selecting.
-         *
-         * Plain private field (no `is` prefix) to avoid the JVM setter name clash.
-         */
-        private var proxyStopped: Boolean = false
-
-        fun setProxyStopped(stopped: Boolean) {
-            if (proxyStopped == stopped) return
-            proxyStopped = stopped
-            notifyItemRangeChanged(0, items.size)
-        }
-
-        fun submitList(newItems: List<ServerGroup>) {
-            val old = items.toList()
-            val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun getOldListSize() = old.size
-                override fun getNewListSize() = newItems.size
-                override fun areItemsTheSame(o: Int, n: Int) = old[o].key == newItems[n].key
-                override fun areContentsTheSame(o: Int, n: Int) = old[o] == newItems[n]
-            })
-            items.clear()
-            items.addAll(newItems)
-            diff.dispatchUpdatesTo(this)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServerGroupViewHolder {
-            val binding = ItemServerGroupBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-            return ServerGroupViewHolder(binding)
-        }
-
-        override fun onBindViewHolder(holder: ServerGroupViewHolder, position: Int) {
-            holder.bind(items[position])
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        inner class ServerGroupViewHolder(
-            private val binding: ItemServerGroupBinding
-        ) : RecyclerView.ViewHolder(binding.root) {
-
-            fun bind(group: ServerGroup) {
-                binding.apply {
-                    tvCityName.text = group.city.capitalizeWords()
-
-                    if (group.serverCount > 1) {
-                        tvServerCount.visibility = View.VISIBLE
-                        tvServerCount.text = itemView.context.resources.getQuantityString(
-                            R.plurals.server_count,
-                            group.serverCount,
-                            group.serverCount
-                        )
-                    } else {
-                        tvServerCount.visibility = View.GONE
-                    }
-
-                    if (group.avgLink > 0) {
-                        chipLinkSpeed.visibility = View.VISIBLE
-                        val (speedStr, speedAttr) = speedInfo(group.avgLink)
-                        chipLinkSpeed.text = speedStr
-                        val bgAttr =
-                            if (group.avgLink >= 10_000) speedAttr else R.attr.chipColorBgNormal
-                        chipLinkSpeed.chipBackgroundColor =
-                            ColorStateList.valueOf(fetchColor(itemView.context, bgAttr))
-                    } else {
-                        chipLinkSpeed.visibility = View.GONE
-                    }
-
-                    if (group.avgLoad > 0) {
-                        viewLoadDot.visibility = View.VISIBLE
-                        tvLoad.visibility = View.VISIBLE
-                        val (loadStr, loadAttr) = loadInfo(group.avgLoad)
-                        tvLoad.text = loadStr
-                        val color = fetchColor(itemView.context, loadAttr)
-                        viewLoadDot.background = GradientDrawable().apply {
-                            shape = GradientDrawable.OVAL
-                            setColor(color)
-                        }
-                        tvLoad.setTextColor(color)
-                    } else {
-                        viewLoadDot.visibility = View.GONE
-                        tvLoad.visibility = View.GONE
-                    }
-
-                    checkboxServer.isChecked = group.isEnabled
-
-                    if (proxyStopped) {
-                        // Visually indicate the server cannot be selected right now.
-                        checkboxServer.isEnabled = false
-                        checkboxServer.alpha = 0.4f
-                        // Any tap opens the settings sheet so the user can restart the proxy.
-                        root.setOnClickListener { listener.onProxyStoppedItemTapped() }
-                    } else {
-                        checkboxServer.isEnabled = true
-                        checkboxServer.alpha = 1f
-                        root.setOnClickListener {
-                            listener.onCitySelected(group.servers.first(), !group.isEnabled)
-                        }
-                    }
-                }
+        when {
+            loadPercent <= 20 -> {
+                attr  = R.attr.chipTextPositive
             }
-
-            /**
-             * Returns (formattedSpeed, tierLabel, chipBackgroundAttr) for [linkMbps].
-             *
-             * Tier thresholds (matching common datacenter NIC grades):
-             *   ≥ 10 000 Mbps (10 Gbps)
-             *   ≥ 1 000 Mbps (1 Gbps)
-             *   ≥ 100 Mbps
-             *   ≥ 10 Mbps
-             *   > 0 Mbps
-             */
-            private fun speedInfo(linkMbps: Int): Pair<String, Int> {
-                val formatted: String
-                val attr: Int
-
-                when {
-                    linkMbps >= 10_000 -> {
-                        val gbps = linkMbps / 1_000.0
-                        formatted = String.format(Locale.US, "%.0f Gbps", gbps)
-                        attr = R.attr.chipTextPositive
-                    }
-                    linkMbps >= 1_000 -> {
-                        val gbps = linkMbps / 1_000.0
-                        formatted = if (gbps == gbps.toLong().toDouble())
-                            String.format(Locale.US, "%.0f Gbps", gbps)
-                        else
-                            String.format(Locale.US, "%.1f Gbps", gbps)
-                        attr = R.attr.accentGood
-                    }
-                    linkMbps >= 100 -> {
-                        formatted = "$linkMbps Mbps"
-                        attr = R.attr.chipTextNeutral
-                    }
-                    linkMbps >= 10 -> {
-                        formatted = "$linkMbps Mbps"
-                        attr = R.attr.chipTextNeutral
-                    }
-                    else -> {
-                        formatted = "$linkMbps Mbps"
-                        attr = R.attr.chipTextNegative
-                    }
-                }
-                return Pair(formatted, attr)
+            loadPercent <= 40 -> {
+                attr  = R.attr.accentGood
             }
-
-            /**
-             * Returns (displayText, textColorAttr) for [loadPercent].
-             *
-             * Tier thresholds:
-             *   ≤ 20 → Light
-             *   ≤ 40 → Normal
-             *   ≤ 60 → Busy
-             *   ≤ 80 → Very Busy
-             *   > 80 → Overloaded
-             */
-            private fun loadInfo(loadPercent: Int): Pair<String, Int> {
-                val attr: Int
-
-                when {
-                    loadPercent <= 20 -> {
-                        attr  = R.attr.chipTextPositive
-                    }
-                    loadPercent <= 40 -> {
-                        attr  = R.attr.accentGood
-                    }
-                    loadPercent <= 60 -> {
-                        attr  = R.attr.chipTextNeutral
-                    }
-                    loadPercent <= 80 -> {
-                        attr  = R.attr.chipTextNegative
-                    }
-                    else -> {
-                        attr  = R.attr.chipTextNegative
-                    }
-                }
-                val label = "$loadPercent%"
-                return Pair(label, attr)
+            loadPercent <= 60 -> {
+                attr  = R.attr.chipTextNeutral
+            }
+            loadPercent <= 80 -> {
+                attr  = R.attr.chipTextNegative
+            }
+            else -> {
+                attr  = R.attr.chipTextNegative
             }
         }
-    }
-
-    private companion object {
-        const val TYPE_HEADER = 0
-        const val TYPE_COUNTRY = 1
+        val label = "$loadPercent%"
+        return Pair(label, attr)
     }
 }

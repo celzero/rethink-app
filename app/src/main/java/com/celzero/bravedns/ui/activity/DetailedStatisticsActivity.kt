@@ -19,35 +19,34 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
-import android.view.View
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.statistics.PagedStatisticsScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ActivityDetailedStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.DetailedStatisticsViewModel
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_statistics) {
-    private val b by viewBinding(ActivityDetailedStatisticsBinding::bind)
+class DetailedStatisticsActivity : BaseActivity() {
+    private var screenTitle by mutableStateOf("")
+    private var subtitle by mutableStateOf<String?>(null)
+    private var presenter: SummaryStatisticsAdapter? = null
+    private var empty by mutableStateOf(false)
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -71,7 +70,7 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -106,15 +105,16 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
         }
         setSubTitle(statType, timeCategory)
         setRecyclerView(statType, timeCategory, uid, startTime)
+        setContent { RethinkTheme { PagedStatisticsScreen(screenTitle, subtitle, empty, presenter) } }
     }
 
     private fun setSubTitle(type: SummaryStatisticsFragment.SummaryStatisticsType, timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         if (type == SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS) {
-            b.dsaSubtitle.visibility = View.GONE
+            subtitle = null
             return
         }
 
-        b.dsaSubtitle.text =
+        subtitle =
             when (timeCategory) {
                 SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
                     getString(
@@ -150,50 +150,13 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
         startTime: Long?
     ) {
 
-        b.dsaRecycler.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(this)
-        b.dsaRecycler.layoutManager = layoutManager
-        b.dsaRecycler.itemAnimator = null
-
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)
-        // propagate the per-app scope to the adapter: row-click drill-downs
-        // (e.g. blocklists) read it from here, not from the ViewModel
         recyclerAdapter.setUid(uid)
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         recyclerAdapter.setTimeCategory(timeCategory)
-
+        presenter = recyclerAdapter
         viewModel.timeCategoryChanged(timeCategory, startTime)
-        handleStatType(type).observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
-            b.dsaRecycler.post {
-                try {
-                    if (recyclerAdapter.itemCount > 0) {
-                        recyclerAdapter.stateRestorationPolicy =
-                            RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-                    }
-                } catch (_: Exception) {
-                    Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
-                }
-            }
-        }
-
-        // remove the view if there is no data
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.dsaRecycler.visibility = View.GONE
-                    b.dsaNoDataRl.visibility = View.VISIBLE
-                } else {
-                    b.dsaRecycler.visibility = View.VISIBLE
-                    b.dsaNoDataRl.visibility = View.GONE
-                }
-            } else {
-                b.dsaRecycler.visibility = View.VISIBLE
-                b.dsaNoDataRl.visibility = View.GONE
-            }
-        }
-        b.dsaRecycler.adapter = recyclerAdapter
+        handleStatType(type).observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
+        recyclerAdapter.addLoadStateListener { empty = it.append.endOfPaginationReached && recyclerAdapter.itemCount < 1 }
     }
 
     private fun handleStatType(
@@ -202,47 +165,47 @@ class DetailedStatisticsActivity : BaseActivity(R.layout.activity_detailed_stati
         viewModel.setData(type)
         return when (type) {
             SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
-                b.dsaTitle.text = getString(R.string.top_active_conns)
+                screenTitle = getString(R.string.top_active_conns)
                 viewModel.getAllActiveConns
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                b.dsaTitle.text = getString(R.string.ssv_app_network_activity_heading)
+                screenTitle = getString(R.string.ssv_app_network_activity_heading)
                 viewModel.getAllAllowedAppNetworkActivity
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                b.dsaTitle.text = getString(R.string.ssv_app_blocked_heading)
+                screenTitle = getString(R.string.ssv_app_blocked_heading)
                 viewModel.getAllBlockedAppNetworkActivity
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_ASN -> {
-                b.dsaTitle.text = getString(R.string.most_contacted_asn)
+                screenTitle = getString(R.string.most_contacted_asn)
                 viewModel.getAllAllowedAsn
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_ASN -> {
-                b.dsaTitle.text = getString(R.string.most_blocked_asn)
+                screenTitle = getString(R.string.most_blocked_asn)
                 viewModel.getAllBlockedAsn
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                b.dsaTitle.text = getString(R.string.ssv_most_contacted_domain_heading)
+                screenTitle = getString(R.string.ssv_most_contacted_domain_heading)
                 viewModel.getAllContactedDomains
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                b.dsaTitle.text = getString(R.string.ssv_most_blocked_domain_heading)
+                screenTitle = getString(R.string.ssv_most_blocked_domain_heading)
                 viewModel.getAllBlockedDomains
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                b.dsaTitle.text = getString(R.string.ssv_most_contacted_ips_heading)
+                screenTitle = getString(R.string.ssv_most_contacted_ips_heading)
                 viewModel.getAllContactedIps
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                b.dsaTitle.text = getString(R.string.ssv_most_blocked_ips_heading)
+                screenTitle = getString(R.string.ssv_most_blocked_ips_heading)
                 viewModel.getAllBlockedIps
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                b.dsaTitle.text = getString(R.string.ssv_most_contacted_countries_heading)
+                screenTitle = getString(R.string.ssv_most_contacted_countries_heading)
                 viewModel.getAllContactedCountries
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_BLOCKLISTS -> {
-                b.dsaTitle.text = getString(R.string.ssv_blocklists_heading)
+                screenTitle = getString(R.string.ssv_blocklists_heading)
                 viewModel.getAllBlockedBlocklists
             }
         }

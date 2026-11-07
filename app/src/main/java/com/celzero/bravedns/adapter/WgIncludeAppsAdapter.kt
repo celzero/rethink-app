@@ -15,27 +15,27 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ProxyApplicationMapping
-import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.addProxyToApp
@@ -44,7 +44,7 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,9 +55,7 @@ class WgIncludeAppsAdapter(
     private val proxyName: String,
     private val onAppModified: (() -> Unit)? = null
 ) :
-    PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
-        DIFF_CALLBACK
-    ) {
+    WgPagingPresenter<ProxyApplicationMapping>(DIFF_CALLBACK) {
     private val packageManager: PackageManager = context.packageManager
 
     companion object {
@@ -84,24 +82,33 @@ class WgIncludeAppsAdapter(
             }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncludedAppInfoViewHolder {
-        val itemBinding =
-            ListItemWgIncludeAppsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return IncludedAppInfoViewHolder(itemBinding)
-    }
 
-    override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
-        // Guard against stale positions during layout pass after data change
-        if (position !in 0..<itemCount) {
-            Logger.w(LOG_TAG_PROXY, "Invalid position $position for itemCount $itemCount")
-            return
+
+
+
+    @Composable override fun Content(modifier: Modifier) {
+        val owner = LocalLifecycleOwner.current
+
+        val version = revision
+        LazyColumn(modifier, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(itemCount) { index ->
+                val item = getItem(index)
+                if (item != null) {
+                    val state = remember(index) { WgAppRowState(context) }
+                    val holder = remember(state) { IncludedAppInfoViewHolder(state) }
+                    DisposableEffect(holder, index) {
+                        holder.bindingAdapterPosition = index
+                        onDispose { holder.bindingAdapterPosition = RecyclerView.NO_POSITION }
+                    }
+                    LaunchedEffect(item, version) { ; holder.update(item) }
+                    WgAppRow(state)
+                }
+            }
         }
-        val apps: ProxyApplicationMapping = getItem(position) ?: return
-        holder.update(apps)
     }
 
-    inner class IncludedAppInfoViewHolder(private val b: ListItemWgIncludeAppsBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class IncludedAppInfoViewHolder(private val b: WgAppRowState) {
+        var bindingAdapterPosition = RecyclerView.NO_POSITION
 
         fun update(mapping: ProxyApplicationMapping) {
             // capture item identity before async operations to prevent incorrect UI updates
@@ -194,10 +201,7 @@ class WgIncludeAppsAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(getDefaultIcon(context))
-                .into(b.wgIncludeAppListApkIconIv)
+            b.wgIncludeAppListApkIconIv.setImageDrawable(drawable ?: getDefaultIcon(context))
         }
 
         private fun setCardBackground(isSelected: Boolean) {
@@ -280,9 +284,7 @@ class WgIncludeAppsAdapter(
                 }
 
             builderSingle.setTitle(title)
-            val arrayAdapter =
-                ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
-            arrayAdapter.addAll(packageList)
+
             builderSingle.setCancelable(false)
 
             // show list just for information, we operate on all uids for this package
@@ -318,8 +320,7 @@ class WgIncludeAppsAdapter(
                 .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
                 }
 
-            val alertDialog: AlertDialog = builderSingle.show()
-            alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+            val alertDialog = builderSingle.show()
             alertDialog.setCancelable(false)
         }
     }

@@ -18,26 +18,13 @@ package com.celzero.bravedns.ui.activity
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.res.Configuration
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
-import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.databinding.ActivityRpnBypassAppsBinding
-import com.celzero.bravedns.databinding.ListItemRpnBypassAppBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -49,10 +36,17 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnBypassState
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnBypassContent
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnBypassAppRow
+import androidx.compose.runtime.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -67,10 +61,10 @@ import org.koin.android.ext.android.inject
  * UI mirrors [WgIncludeAppsActivity]: search bar, All / Bypassed / Not bypassed chips
  * and bulk select / deselect actions.
  */
-class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
+class RpnBypassAppsActivity : BaseActivity(),
     SearchView.OnQueryTextListener {
 
-    private val b by viewBinding(ActivityRpnBypassAppsBinding::bind)
+    private val b by lazy { RpnBypassState(this) }
     private val persistentState by inject<PersistentState>()
     private val appInfoRepository by inject<AppInfoRepository>()
 
@@ -82,8 +76,8 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
     /** Subset of [allApps] matching the current chip filter + search query. */
     private val filteredApps = mutableListOf<AppInfo>()
 
-    private var filterType = Filter.ALL_APPS
-    private var searchText = ""
+    private var filterType by mutableStateOf(Filter.ALL_APPS)
+    private var searchText by mutableStateOf("")
 
     /** true while a bulk bypass/clear is being persisted; guards against re-entry. */
     @Volatile
@@ -91,7 +85,6 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
 
     private var loadJob: Job? = null
 
-    private lateinit var animation: Animation
 
     private enum class Filter(val id: Int) {
         ALL_APPS(0), BYPASSED(1), NOT_BYPASSED(2)
@@ -115,7 +108,7 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -126,29 +119,38 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
             window.isNavigationBarContrastEnforced = false
         }
 
-        addAnimation()
-
         adapter = BypassAppsAdapter()
-        b.rpnBypassRecyclerView.layoutManager = LinearLayoutManager(this)
-        b.rpnBypassRecyclerView.adapter = adapter
-
-        remakeChipsUi()
+        setContentView(ComposeView(this).apply {
+            id = android.R.id.primary
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                RethinkTheme {
+                    RpnBypassContent(b, searchText, filterType.id,
+                        search = { onQueryTextChange(it) }, submit = { onQueryTextSubmit(searchText) },
+                        filter = { id -> filterType = Filter.entries.first { it.id == id }; applyFilter() },
+                        apps = { modifier -> adapter.Content(modifier) })
+                }
+            }
+        })
         setupClickListeners()
         loadApps()
     }
 
-    private fun addAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("rpn.bypass.query", searchText)
+        // Generated-ID chips and controller filter were not persisted by the baseline.
+        outState.putBoolean("rpn.bypass.bulk", b.rpnBypassBulkCheck.isChecked)
+        outState.putBoolean("rpn.bypass.none", b.rpnBypassDeselectAllCheck.isChecked)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val restoredQuery = savedInstanceState.getString("rpn.bypass.query", "").orEmpty()
+        // SearchAutoComplete restored before bulk controls; suppress unchanged query events.
+        if (restoredQuery != searchText) onQueryTextChange(restoredQuery)
+        b.rpnBypassBulkCheck.isChecked = savedInstanceState.getBoolean("rpn.bypass.bulk")
+        b.rpnBypassDeselectAllCheck.isChecked = savedInstanceState.getBoolean("rpn.bypass.none")
     }
 
     override fun onDestroy() {
@@ -157,46 +159,7 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
         super.onDestroy()
     }
 
-    private fun remakeChipsUi() {
-        b.rpnBypassChipGroup.removeAllViews()
-
-        b.rpnBypassChipGroup.addView(makeFilterChip(Filter.ALL_APPS.id, getString(R.string.lbl_all), true))
-        b.rpnBypassChipGroup.addView(makeFilterChip(Filter.BYPASSED.id, getString(R.string.fapps_firewall_filter_bypass_universal), false))
-        b.rpnBypassChipGroup.addView(makeFilterChip(Filter.NOT_BYPASSED.id, getString(R.string.lbl_unselected), false))
-    }
-
-    private fun makeFilterChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                filterType = Filter.entries.firstOrNull { it.id == button.tag } ?: Filter.ALL_APPS
-                applyFilter()
-                colorUpChipIcon(chip)
-            }
-        }
-        return chip
-    }
-
-    private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(this, R.color.primaryText),
-            PorterDuff.Mode.SRC_IN
-        )
-        chip.checkedIcon?.colorFilter = colorFilter
-        chip.chipIcon?.colorFilter = colorFilter
-    }
-
     private fun setupClickListeners() {
-        b.rpnBypassSearchView.setOnQueryTextListener(this)
-        b.rpnBypassSearchView.setOnCloseListener {
-            searchText = ""
-            applyFilter()
-            false
-        }
-
         b.rpnBypassBulkCheck.setOnClickListener {
             if (bulkOpInProgress) return@setOnClickListener
             confirmBulkAction(include = true)
@@ -208,13 +171,12 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
 
         b.rpnBypassRefreshList.setOnClickListener {
             b.rpnBypassRefreshList.isEnabled = false
-            b.rpnBypassRefreshList.animation = animation
-            b.rpnBypassRefreshList.startAnimation(animation)
+            b.startRefresh()
             loadApps()
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (!this.isFinishing && !this.isDestroyed) {
                     b.rpnBypassRefreshList.isEnabled = true
-                    b.rpnBypassRefreshList.clearAnimation()
+                    b.refreshSpinning = false
                 }
             }
         }
@@ -403,42 +365,24 @@ class RpnBypassAppsActivity : BaseActivity(R.layout.activity_rpn_bypass_apps),
         return true
     }
 
-    inner class BypassAppsAdapter : RecyclerView.Adapter<BypassAppsAdapter.ViewHolder>() {
-
-        inner class ViewHolder(val binding: ListItemRpnBypassAppBinding) :
-            RecyclerView.ViewHolder(binding.root)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val itemBinding = ListItemRpnBypassAppBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-            return ViewHolder(itemBinding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val app = filteredApps[position]
-            with(holder.binding) {
-                val iconDrawable = Utilities.getIcon(root.context, app.packageName, app.appName)
-                Glide.with(root.context)
-                    .load(iconDrawable)
-                    .error(Utilities.getDefaultIcon(root.context))
-                    .into(rpnBypassAppIcon)
-
-                rpnBypassAppName.text = app.appName
-                rpnBypassAppPackage.text = app.packageName
-
-                rpnBypassAppSwitch.isEnabled = true
-                rpnBypassAppSwitch.setOnCheckedChangeListener(null)
-                rpnBypassAppSwitch.isChecked = app.isProxyExcluded
-                rpnBypassAppSwitch.setOnCheckedChangeListener { _, isChecked ->
-                    onAppToggled(app, isChecked)
+    /** Observable presenter only; all loading/filtering/mutation remains above. */
+    inner class BypassAppsAdapter {
+        private var rows by mutableStateOf<List<BypassRow>>(emptyList())
+        fun notifyDataSetChanged() { rows = filteredApps.map { BypassRow(it, it.isProxyExcluded) } }
+        @Composable fun Content(modifier: Modifier) {
+            LazyColumn(modifier) {
+                items(rows) { row ->
+                    val icon = remember(row.app.packageName, row.app.appName) {
+                        Utilities.getIcon(this@RpnBypassAppsActivity, row.app.packageName, row.app.appName)
+                            ?: Utilities.getDefaultIcon(this@RpnBypassAppsActivity)
+                    }
+                    RpnBypassAppRow(row.app.appName, row.app.packageName, row.excluded, icon) { excluded -> onAppToggled(row.app, excluded) }
                 }
-                root.setOnClickListener { rpnBypassAppSwitch.isChecked = !rpnBypassAppSwitch.isChecked }
             }
         }
-
-        override fun getItemCount(): Int = filteredApps.size
     }
+
+    private data class BypassRow(val app: AppInfo, val excluded: Boolean)
 
     private fun io(f: suspend () -> Unit): Job {
         return lifecycleScope.launch(Dispatchers.IO) { f() }

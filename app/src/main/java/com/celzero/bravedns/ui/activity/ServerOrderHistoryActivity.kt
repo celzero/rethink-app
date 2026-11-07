@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
 
 import android.content.Context
 import android.content.Intent
@@ -21,14 +24,11 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ServerOrderHistoryAdapter
-import com.celzero.bravedns.databinding.ActivityServerOrderHistoryBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
@@ -44,8 +44,6 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ServerOrderHistoryViewModel
-import com.facebook.shimmer.Shimmer
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,9 +58,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * transitions stored in Room), this activity always fetches fresh data from
  * the server, giving the user an accurate view of what the server holds.
  */
-class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_history) {
+class ServerOrderHistoryActivity : BaseActivity() {
 
-    private val b by viewBinding(ActivityServerOrderHistoryBinding::bind)
+    private val b = HistoryScreenState()
     private val viewModel: ServerOrderHistoryViewModel by viewModel()
     private lateinit var adapter: ServerOrderHistoryAdapter
     private val persistentState by inject<PersistentState>()
@@ -96,6 +94,13 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
         loadHeroSubtitle()
         applyScrollPadding()
         setDolphinSignature()
+        setContent { RethinkTheme {
+            HistoryScreen(b, server = true, count = adapter.itemCount,
+                key = { index -> index },
+                onBack = { onBackPressedDispatcher.onBackPressed() },
+                onFetchHidden = { if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) b.fetchProgress.isVisible = false },
+                row = { index -> adapter.Row(index) })
+        } }
     }
 
     /** Dolphin signature (at the bottom of the content.); random pairing, fresh on every visit. */
@@ -103,33 +108,14 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
-    private fun applyScrollPadding() {
-        b.contentContainer.post {
-            b.contentContainer.setPadding(
-                b.contentContainer.paddingLeft,
-                0,
-                b.contentContainer.paddingRight,
-                b.contentContainer.paddingBottom
-            )
-        }
-    }
+    private fun applyScrollPadding() { /* LazyColumn follows the native app bar. */ }
 
     private fun setupToolbar() {
-        b.collapsingToolbar.title = getString(R.string.server_order_title)
-        setSupportActionBar(b.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         b.tvHeroSubtitle.text = ""
     }
 
     private fun setupRecyclerView() {
         adapter = ServerOrderHistoryAdapter(this)
-        b.rvOrders.apply {
-            layoutManager = LinearLayoutManager(this@ServerOrderHistoryActivity)
-                .also { it.isItemPrefetchEnabled = true }
-            adapter = this@ServerOrderHistoryActivity.adapter
-            setHasFixedSize(true)
-        }
     }
 
     private fun setupClickListeners() {
@@ -171,8 +157,7 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
 
                             adapter.submitList(state.orders)
 
-                            b.rvOrders.alpha = 0f
-                            b.rvOrders.animate().alpha(1f).setDuration(280).start()
+                            b.listEpoch++
                         }
                         is ServerOrderHistoryViewModel.UiState.Empty -> {
                             showFetchProgress(false)
@@ -211,18 +196,8 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
      * Uses a smooth alpha animation to avoid jarring transitions.
      */
     private fun showFetchProgress(visible: Boolean) {
-        if (visible) {
-            b.fetchProgress.isVisible = true
-            b.fetchProgress.animate().alpha(1f).setDuration(200).start()
-        } else {
-            b.fetchProgress.animate().alpha(0f).setDuration(400)
-                .withEndAction {
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                        b.fetchProgress.isVisible = false
-                    }
-                }
-                .start()
-        }
+        if (visible) b.fetchProgress.isVisible = true
+        b.fetchTarget = if (visible) 1f else 0f
     }
 
     private fun showShimmer() {
@@ -262,19 +237,11 @@ class ServerOrderHistoryActivity : BaseActivity(R.layout.activity_server_order_h
     }
 
     private fun startShimmer() {
-        if (b.shimmer.isShimmerStarted) return
-        val shimmer = Shimmer.AlphaHighlightBuilder()
-            .setDuration(1500)
-            .setBaseAlpha(0.85f)
-            .setDropoff(1f)
-            .setHighlightAlpha(0.35f)
-            .build()
-        b.shimmer.setShimmer(shimmer)
-        b.shimmer.startShimmer()
+        b.shimmerRunning = true
     }
 
     private fun stopShimmer() {
-        if (b.shimmer.isShimmerStarted) b.shimmer.stopShimmer()
+        b.shimmerRunning = false
     }
 
     override fun onPause() {

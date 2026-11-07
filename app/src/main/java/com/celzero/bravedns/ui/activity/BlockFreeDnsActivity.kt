@@ -19,13 +19,14 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.dns.*
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.BlockFreeDnsAdapter
 import com.celzero.bravedns.data.BlockFreeDnsItem
 import com.celzero.bravedns.data.BlockFreeDnsType
-import com.celzero.bravedns.databinding.ActivityBlockFreeDnsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Logger
@@ -33,19 +34,17 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.BlockFreeDnsViewModel
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class BlockFreeDnsActivity : BaseActivity(R.layout.activity_block_free_dns) {
-    private val b by viewBinding(ActivityBlockFreeDnsBinding::bind)
+class BlockFreeDnsActivity : BaseActivity() {
+    private lateinit var b: BlockFreeDnsPresentation
 
     private val persistentState by inject<PersistentState>()
     private val viewModel: BlockFreeDnsViewModel by viewModel()
 
-    private lateinit var adapter: BlockFreeDnsAdapter
+    private lateinit var adapter: BlockFreeDnsListState
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -55,7 +54,7 @@ class BlockFreeDnsActivity : BaseActivity(R.layout.activity_block_free_dns) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -65,21 +64,23 @@ class BlockFreeDnsActivity : BaseActivity(R.layout.activity_block_free_dns) {
             window.isNavigationBarContrastEnforced = false
         }
 
+        b = BlockFreeDnsPresentation(this)
         setupRecycler()
         setupFilterChips()
         observeViewModel()
         updateSelectedCard()
+        setContentView(ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { BlockFreeDnsContent(b, adapter) } }
+        })
     }
 
 
     private fun setupRecycler() {
-        adapter = BlockFreeDnsAdapter(
-            context = this,
+        adapter = BlockFreeDnsListState(
             selectedKey = persistentState.blockFreeDns,
             onItemSelected = { item -> onDnsSelected(item) }
         )
-        b.bfdRecycler.layoutManager = LinearLayoutManager(this)
-        b.bfdRecycler.adapter = adapter
     }
 
     private fun setupFilterChips() {
@@ -123,6 +124,19 @@ class BlockFreeDnsActivity : BaseActivity(R.layout.activity_block_free_dns) {
         val displayName = found?.name ?: BlockFreeDnsType.urlFromKey(key)
         b.bfdSelectedName.text = displayName
         b.bfdSelectedCard.visibility = View.VISIBLE
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("block_free_filter_id", b.bfdFilterChipGroup.checkedId)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        // Framework ChipGroup restoration used to dispatch this same installed callback.
+        if (savedInstanceState.containsKey("block_free_filter_id")) {
+            b.bfdFilterChipGroup.restore(savedInstanceState.getInt("block_free_filter_id"))
+        }
     }
 
     override fun onResume() {

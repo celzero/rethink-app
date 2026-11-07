@@ -6,7 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.BottomsheetRinrWarningBinding
+import com.celzero.bravedns.ui.compose.networksheets.RethinkWarningSheetState
+import com.celzero.bravedns.ui.compose.networksheets.RethinkWarningSheetContent
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
@@ -14,7 +18,7 @@ import org.koin.android.ext.android.inject
 
 class RethinkInRethinkWarningBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetRinrWarningBinding? = null
+    private var _binding: RethinkWarningSheetState? = null
     private val binding
         get() = checkNotNull(_binding)
         { "Binding accessed outside of view lifecycle" }
@@ -45,8 +49,11 @@ class RethinkInRethinkWarningBottomSheet : BaseBottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = BottomsheetRinrWarningBinding.inflate(inflater, container, false)
-        return binding.root
+        _binding = RethinkWarningSheetState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RethinkWarningSheetContent(binding) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

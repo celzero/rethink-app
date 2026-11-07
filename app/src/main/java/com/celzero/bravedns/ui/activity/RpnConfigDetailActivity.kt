@@ -21,10 +21,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.DrawableWrapper
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -35,19 +31,15 @@ import android.text.style.TypefaceSpan
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.graphics.withRotation
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.CountryConfig
-import com.celzero.bravedns.databinding.ActivityRpnConfigDetailBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.PersistentState
@@ -74,9 +66,13 @@ import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.androidbroadcast.vbpd.viewBinding
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnConfigState
+import com.celzero.bravedns.ui.compose.rpnconfig.RpnConfigContent
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -96,8 +92,9 @@ import kotlin.time.Duration.Companion.milliseconds
  * Stats card: The poll runs every [STATS_POLL_MS] milliseconds while the activity
  * is resumed, and is canceled on pause so it does not drain battery in the background.
  */
-class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail) {
-    private val b by viewBinding(ActivityRpnConfigDetailBinding::bind)
+class RpnConfigDetailActivity : BaseActivity() {
+    private val b by lazy { RpnConfigState(this) }
+    private lateinit var composeRoot: ComposeView
     private val persistentState by inject<PersistentState>()
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
@@ -137,25 +134,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     private var statsJob: Job? = null
     /** Looping spin animator for the refresh chip icon. */
     private var chipAnimator: ValueAnimator? = null
-
-    /**
-     * Fades the hero banner as the app bar collapses. Held as a property so it
-     * can be removed in [onDestroy]; AppBarLayout keeps delivering offset
-     * callbacks from an in-flight collapse animation even after the activity
-     * is destroyed, and touching the view binding then crashes.
-     */
-    private val appBarOffsetListener =
-        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange
-            if (totalScrollRange == 0) return@OnOffsetChangedListener
-            val fraction = 1f - (abs(verticalOffset).toFloat() / totalScrollRange.toFloat())
-            val alpha = (fraction / 0.6f).coerceIn(0f, 1f)
-            b.heroContent.alpha = alpha
-            b.heroContent.visibility = if (alpha == 0f) View.INVISIBLE else View.VISIBLE
-            // Flag watermark fades with the hero; visibility is owned by the
-            // view itself (GONE when no flag is set), so only alpha moves here.
-            b.flagWatermark.alpha = alpha
-        }
 
     // SSID permission callback
     private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
@@ -211,8 +189,13 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
             window.isNavigationBarContrastEnforced = false
         }
 
+        composeRoot = ComposeView(this).apply {
+            id = android.R.id.primary
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnConfigContent(b) } }
+        }
+        setContentView(composeRoot)
         configKey = intent.getStringExtra(INTENT_EXTRA_CONFIG_KEY) ?: ""
-        applyScrollPadding()
         setDolphinSignature()
     }
 
@@ -221,15 +204,14 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.dolphinSignature.setContent(EmbeddedDolphinContent.random())
     }
 
-    private fun applyScrollPadding() {
-        b.nestedScroll.post {
-            b.nestedScroll.setPadding(
-                b.nestedScroll.paddingLeft,
-                0,
-                b.nestedScroll.paddingRight,
-                b.nestedScroll.paddingBottom
-            )
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        b.save(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restore(savedInstanceState)
     }
 
     override fun onResume() {
@@ -252,18 +234,6 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         cancelStatsJob()
         chipAnimator?.cancel()
         chipAnimator = null
-    }
-
-    override fun onDestroy() {
-        // Remove before the lifecycle clears the view binding; otherwise a
-        // still-running app-bar collapse animation keeps delivering
-        // onOffsetChanged callbacks that touch the (now cleared) binding.
-        try {
-            b.appBar.removeOnOffsetChangedListener(appBarOffsetListener)
-        } catch (e: IllegalStateException) {
-            Logger.w(LOG_TAG_UI, "onDestroy: offset listener not removed: ${e.message}")
-        }
-        super.onDestroy()
     }
 
     private fun init() {
@@ -394,17 +364,17 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                         if (configKey.equals(AUTO_SERVER_ID, true)) city.capitalizeWords()
                         else city.ifBlank { config.cc }
                     // Show the flag + city name in the collapsing toolbar title when collapsed.
-                    b.collapsingToolbar.title =
+                    b.headerTitle =
                         collapsedHeaderTitle(config.flagEmoji, city.ifBlank { config.cc })
                 } else {
                     b.flagWatermark.clear()
                     b.configNameText.text = configKey.ifBlank { getString(R.string.lbl_server_config) }
                     b.tvHeroCity.text = ""
-                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
+                    b.headerTitle = b.configNameText.text.toString().capitalizeWords()
                 }
                 // Fallback: if no city-based title was set above, use the config name.
-                if (b.collapsingToolbar.title.isNullOrBlank()) {
-                    b.collapsingToolbar.title = b.configNameText.text.toString().capitalizeWords()
+                if (b.headerTitle.isNullOrBlank()) {
+                    b.headerTitle = b.configNameText.text.toString().capitalizeWords()
                 }
 
                 startStatsPolling(configKey)
@@ -466,7 +436,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
                     if (key.isEmpty() || key.equals(AUTO_SERVER_ID, true)) {
                         b.tvHeroCity.text = addlInfo.city.capitalizeWords()
                         // Keep the collapsing toolbar title in sync with the hero city.
-                        b.collapsingToolbar.title = addlInfo.city.capitalizeWords()
+                        b.headerTitle = addlInfo.city.capitalizeWords()
                     }
                 }
             }
@@ -483,8 +453,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     /** Show inline shimmer placeholders for client IPv4/IPv6 value cells. */
     private fun showClientIpShimmer() {
-        b.shimmerIpv4.visibility = View.VISIBLE
-        b.shimmerIpv4.startShimmer()
+        b.clientIpShimmer = true
         b.valueIpv4.visibility = View.GONE
     }
 
@@ -496,8 +465,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         val na = getString(R.string.lbl_not_available_short)
 
         // IPv4
-        b.shimmerIpv4.stopShimmer()
-        b.shimmerIpv4.visibility = View.GONE
+        b.clientIpShimmer = false
         b.valueIpv4.visibility = View.VISIBLE
 
         val exitIp = ip4?.takeIf { it.ip?.isNotBlank() == true }?.ip
@@ -1206,58 +1174,36 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         val targetAlpha = if (enabled) 1f else 0.40f
         b.refreshChip.isEnabled = enabled
         b.refreshChip.isClickable = enabled
-        b.refreshChip.animate().alpha(targetAlpha).setDuration(160).start()
+        ValueAnimator.ofFloat(b.refreshChip.alpha, targetAlpha).apply {
+            duration = 160L
+            addUpdateListener { b.refreshChip.alpha = it.animatedValue as Float }
+            start()
+        }
         if (enabled) stopChipIconAnimation() else startChipIconAnimation()
     }
 
-    /** Starts a continuous clockwise spin on the chip's icon only. */
+    /** Same icon-only timing; native rendering observes rotation instead of a DrawableWrapper. */
     private fun startChipIconAnimation() {
         chipAnimator?.cancel()
-        val raw = b.refreshChip.chipIcon
-        val spinning: RotatingDrawable = raw as? RotatingDrawable ?: RotatingDrawable(raw ?: return).also { b.refreshChip.chipIcon = it }
-        spinning.rotation = 0f
+        b.refreshRotation = 0f
         chipAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
             duration = 700L
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             interpolator = LinearInterpolator()
-            addUpdateListener { spinning.rotation = it.animatedValue as Float }
+            addUpdateListener { b.refreshRotation = it.animatedValue as Float }
             start()
         }
     }
 
-    /**
-     * Stops the spin and eases the chip icon back to 0° so it doesn't
-     * snap abruptly when the reconnect operation completes.
-     */
     private fun stopChipIconAnimation() {
         chipAnimator?.cancel()
         chipAnimator = null
-        val icon = b.refreshChip.chipIcon as? RotatingDrawable ?: return
-        ValueAnimator.ofFloat(icon.rotation, 0f).apply {
+        ValueAnimator.ofFloat(b.refreshRotation, 0f).apply {
             duration = 200L
             interpolator = AccelerateDecelerateInterpolator()
-            addUpdateListener { icon.rotation = it.animatedValue as Float }
+            addUpdateListener { b.refreshRotation = it.animatedValue as Float }
             start()
-        }
-    }
-
-    /**
-     * A [DrawableWrapper] that applies a canvas rotation around its own centre
-     * during [draw], leaving the host view's background and tint untouched.
-     */
-    private class RotatingDrawable(drawable: Drawable) : DrawableWrapper(drawable.mutate()) {
-        var rotation: Float = 0f
-            set(value) {
-                field = value
-                invalidateSelf()
-            }
-
-        override fun draw(canvas: Canvas) {
-            val b = bounds
-            canvas.withRotation(rotation, b.exactCenterX(), b.exactCenterY()) {
-                super@RotatingDrawable.draw(this)
-            }
         }
     }
 
@@ -1360,21 +1306,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     private fun setupHeaderUI() {
-        // Title (city) is set asynchronously in populateHeroBanner(). Keep this identical to
-        // ServerOrderHistoryActivity / CustomerSupportActivity: no custom collapse mode and no
-        // programmatic collapsed title colors — theme defaults drive the pinned collapsed title.
-        b.collapsingToolbar.title = ""
-        // The hero already displays the city name while expanded, so keep the expanded CTL
-        // title transparent to avoid showing the city twice. Safe with the default FADE
-        // collapse mode: the collapsed title is drawn with the theme collapsed color (only
-        // TITLE_COLLAPSE_MODE_SCALE blends the expanded color into the collapsed title).
-        b.collapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT)
-        setSupportActionBar(b.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
-        // Fade out the entire hero banner content as the toolbar collapses so that
-        // other views do not peek through when fully collapsed.
-        b.appBar.addOnOffsetChangedListener(appBarOffsetListener)
+        // Native collapsing header replaces the AppBar listener; retain the asynchronous reset.
+        b.headerTitle = ""
     }
 
     private fun setupSsidSection(cc: String) {
@@ -1386,12 +1319,12 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
     private fun setupSsidSectionUI(config: CountryConfig?) {
         val sw = b.ssidCheck
-        val displayGroup: LinearLayout = b.ssidDisplayGroup
-        val editBtn: AppCompatImageView = b.ssidEditBtn
+        val displayGroup: WgControlState = b.ssidDisplayGroup
+        val editBtn: WgControlState = b.ssidEditBtn
         val valueTv = b.ssidValueTv
         val layout = b.ssidFilterRl
-        val permissionErrorLayout: LinearLayout = b.ssidPermissionErrorLayout
-        val locationErrorLayout: LinearLayout = b.ssidLocationErrorLayout
+        val permissionErrorLayout: WgControlState = b.ssidPermissionErrorLayout
+        val locationErrorLayout: WgControlState = b.ssidLocationErrorLayout
 
         if (config == null) {
             displayGroup.visibility = View.GONE
@@ -1472,7 +1405,7 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
 
                 if (checked) {
                     if (persistentState.enableStabilityDependentSettings()) {
-                        SnackbarHelper.showStabilityProgram(b.root, persistentState)
+                        SnackbarHelper.showStabilityProgram(composeRoot, persistentState)
                     }
                     // Load and display the latest SSID list
                     io {
@@ -1559,8 +1492,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         hasPermissions: Boolean,
         isLocationEnabled: Boolean,
         hasConfiguredSsids: Boolean,
-        permissionErrorLayout: LinearLayout,
-        locationErrorLayout: LinearLayout
+        permissionErrorLayout: WgControlState,
+        locationErrorLayout: WgControlState
     ) {
         val sw = b.ssidCheck
         // Location access is only needed when a configured SSID list must be evaluated.
@@ -1579,8 +1512,8 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
     }
 
     private fun hideErrorLayouts(
-        permissionErrorLayout: LinearLayout,
-        locationErrorLayout: LinearLayout
+        permissionErrorLayout: WgControlState,
+        locationErrorLayout: WgControlState
     ) {
         Logger.vv(LOG_TAG_UI, "Hiding all SSID error layouts")
         permissionErrorLayout.visibility = View.GONE

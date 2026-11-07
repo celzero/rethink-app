@@ -15,25 +15,22 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import com.celzero.bravedns.ui.compose.rpn.*
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.databinding.BottomsheetAutoExcludeCountriesBinding
-import com.celzero.bravedns.databinding.ListItemExcludeCountryBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.service.PersistentState
@@ -60,9 +57,7 @@ import org.koin.android.ext.android.inject
  */
 class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
 
-    private var _binding: BottomsheetAutoExcludeCountriesBinding? = null
-    private val b
-        get() = checkNotNull(_binding) { "Binding accessed outside of view lifecycle" }
+    private lateinit var ui: RpnExcludeState
 
     private val persistentState by inject<PersistentState>()
 
@@ -72,7 +67,6 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
     /** Subset of [allItems] currently visible (filtered by search query). */
     private val filteredItems = mutableListOf<CountryItem>()
 
-    private lateinit var adapter: ExcludeCountryAdapter
 
     private var loadJob: Job? = null
 
@@ -145,13 +139,13 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
         isCancelable = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomsheetAutoExcludeCountriesBinding.inflate(inflater, container, false)
-        return b.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        ui = RpnExcludeState(inflater.context)
+        return ComposeView(inflater.context).apply {
+            id = R.id.rpn_exclusions_compose
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { RpnExcludeContent(ui, filteredItems, allItems, MIN_AVAILABLE, ::onItemToggled) } }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -176,7 +170,6 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
         // detect a real change (mirrors the snapshot pattern in ServerSettingsBottomSheet).
         snapshotExcludedCcs = persistentState.rpnAutoExcludedCcs
 
-        setupRecyclerView()
         setupSearch()
         setupButtons()
         loadCountries()
@@ -186,7 +179,7 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
         loadJob?.cancel()
         loadJob = null
         listener = null
-        _binding = null
+
         super.onDestroyView()
     }
 
@@ -209,42 +202,29 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
         super.onDismiss(dialog)
     }
 
-    private fun setupRecyclerView() {
-        adapter = ExcludeCountryAdapter()
-        b.rvCountries.layoutManager = LinearLayoutManager(requireContext())
-        b.rvCountries.adapter = adapter
-        b.rvCountries.itemAnimator = null  // disable default item animations for snappy toggling
-    }
 
     private fun setupSearch() {
-        b.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                applyFilter(s?.toString() ?: "")
-                updateSearchClearVisibility(s?.isNotEmpty() == true)
-            }
-        })
-
-        b.btnClearSearch.setOnClickListener {
-            b.etSearch.text?.clear()
+        ui.onQueryChanged = { query ->
+            applyFilter(query)
+            updateSearchClearVisibility(query.isNotEmpty())
         }
+        ui.btnClearSearch.setOnClickListener { ui.setQuery("") }
     }
 
     private fun updateSearchClearVisibility(show: Boolean) {
         if (!isAdded) return
-        if (show && !b.btnClearSearch.isVisible) {
-            b.btnClearSearch.visibility = View.VISIBLE
-            b.btnClearSearch.animate().alpha(1f).setDuration(150).start()
-        } else if (!show && b.btnClearSearch.isVisible) {
-            b.btnClearSearch.animate().alpha(0f).setDuration(150)
-                .withEndAction { if (isAdded) b.btnClearSearch.visibility = View.INVISIBLE }
+        if (show && !ui.btnClearSearch.isVisible) {
+            ui.btnClearSearch.visibility = View.VISIBLE
+            ui.btnClearSearch.animate().alpha(1f).setDuration(150).start()
+        } else if (!show && ui.btnClearSearch.isVisible) {
+            ui.btnClearSearch.animate().alpha(0f).setDuration(150)
+                .withEndAction { if (isAdded) ui.btnClearSearch.visibility = View.INVISIBLE }
                 .start()
         }
     }
 
     private fun setupButtons() {
-        b.btnDone.setOnClickListener { onDoneTapped() }
+        ui.btnDone.setOnClickListener { onDoneTapped() }
     }
 
     private fun loadCountries() {
@@ -307,51 +287,51 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
                       }
         filteredItems.clear()
         filteredItems.addAll(newList)
-        adapter.notifyDataSetChanged() // safe: full list replacement after filter
+        ui.revision++ // safe: full list replacement after filter
     }
 
     private fun showLoadingState() {
-        b.loadingState.isVisible = true
-        b.tvEmpty.isVisible = false
-        b.rvCountries.isVisible = false
-        b.actionRow.isVisible = false
+        ui.loadingState.isVisible = true
+        ui.tvEmpty.isVisible = false
+        ui.rvCountries.isVisible = false
+        ui.actionRow.isVisible = false
     }
 
     private fun showEmptyState() {
-        b.loadingState.isVisible = false
-        b.tvEmpty.isVisible = true
-        b.rvCountries.isVisible = false
-        b.actionRow.isVisible = false
+        ui.loadingState.isVisible = false
+        ui.tvEmpty.isVisible = true
+        ui.rvCountries.isVisible = false
+        ui.actionRow.isVisible = false
     }
 
     private fun showListState() {
-        b.loadingState.isVisible = false
-        b.tvEmpty.isVisible = false
-        b.rvCountries.isVisible = true
+        ui.loadingState.isVisible = false
+        ui.tvEmpty.isVisible = false
+        ui.rvCountries.isVisible = true
 
         // Animate list in from slightly below
-        b.rvCountries.alpha = 0f
-        b.rvCountries.translationY = 16f
-        b.rvCountries.animate()
+        ui.rvCountries.alpha = 0f
+        ui.rvCountries.translationY = 16f
+        ui.rvCountries.animate()
             .alpha(1f)
             .translationY(0f)
             .setDuration(280)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
 
-        b.actionRow.isVisible = true
+        ui.actionRow.isVisible = true
     }
 
     private fun updateMinInfoBanner() {
         if (!isAdded) return
-        b.tvMinInfo.text = getString(R.string.auto_exclude_cc_min_info, MIN_AVAILABLE)
+        ui.tvMinInfo.text = getString(R.string.auto_exclude_cc_min_info, MIN_AVAILABLE)
     }
 
     private fun updateActionRow() {
         if (!isAdded) return
         val excludedCount = allItems.count { it.isExcluded }
 
-        b.tvSelectedCount.text = if (excludedCount == 0) {
+        ui.tvSelectedCount.text = if (excludedCount == 0) {
             getString(R.string.auto_exclude_cc_none)
         } else {
             getString(R.string.auto_exclude_cc_count, excludedCount)
@@ -373,7 +353,7 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
             item.isExcluded = false
         }
         // refresh all visible rows so alpha is correct for all items
-        adapter.notifyDataSetChanged()
+        ui.revision++
         updateActionRow()
     }
 
@@ -397,48 +377,4 @@ class AutoExcludeCountriesBottomSheet : BaseBottomSheetDialogFragment() {
         if (isAdded) Utilities.showToastUiCentered(requireContext(), msg, Toast.LENGTH_SHORT)
     }
 
-    // note: this adapter is not optimized for large lists since it calls notifyDataSetChanged()
-    // on every toggle, but the country list is small enough that this is not a problem, and
-    // it keeps the code simpler.
-    inner class ExcludeCountryAdapter :
-        RecyclerView.Adapter<ExcludeCountryAdapter.ViewHolder>() {
-
-        inner class ViewHolder(val binding: ListItemExcludeCountryBinding) :
-            RecyclerView.ViewHolder(binding.root)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val itemBinding =
-                ListItemExcludeCountryBinding.inflate(inflater, parent, false)
-            return ViewHolder(itemBinding)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = filteredItems[position]
-            with(holder.binding) {
-                tvFlag.text = item.flagEmoji
-                tvCountryName.text = item.countryName
-                tvCountryCode.text = item.cc
-
-                // set checkbox state without triggering any listener
-                cbExclude.setOnCheckedChangeListener(null)
-                cbExclude.isChecked = item.isExcluded
-
-                val excludedCount = allItems.count { it.isExcluded }
-                val maxAllowed = allItems.size - MIN_AVAILABLE
-                val limitReached = maxAllowed in 1..excludedCount
-                val canToggle = item.isExcluded || !limitReached
-                root.alpha = if (canToggle) 1f else 0.45f
-
-                root.setOnClickListener { onItemToggled(item) }
-            }
-        }
-
-        override fun getItemCount(): Int = filteredItems.size
-    }
 }
-
-
-
-
-

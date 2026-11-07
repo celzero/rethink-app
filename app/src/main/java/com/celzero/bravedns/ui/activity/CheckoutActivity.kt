@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.purchase.*
+import com.celzero.bravedns.ui.compose.rpn.RpnControlState
 
 import android.content.Context
 import android.content.Intent
@@ -23,13 +27,11 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.widget.RadioButton
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.EncryptionException
 import com.celzero.bravedns.service.PersistentState
@@ -40,9 +42,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.firestack.backend.Backend
-import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,8 +52,8 @@ import java.math.BigInteger
 import java.security.SecureRandom
 import java.util.UUID
 
-class CheckoutActivity : BaseActivity(R.layout.activity_checkout_proxy) {
-    private val b by viewBinding(ActivityCheckoutProxyBinding::bind)
+class CheckoutActivity : BaseActivity() {
+    private val b = CheckoutScreenState()
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -68,7 +68,7 @@ class CheckoutActivity : BaseActivity(R.layout.activity_checkout_proxy) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -79,6 +79,7 @@ class CheckoutActivity : BaseActivity(R.layout.activity_checkout_proxy) {
         }
         init()
         setupClickListeners()
+        setContent { RethinkTheme { CheckoutContent(b) } }
 
         /*paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
         "Your backend endpoint/payment-sheet".httpPost().responseJson { _, _, result ->
@@ -276,7 +277,7 @@ class CheckoutActivity : BaseActivity(R.layout.activity_checkout_proxy) {
         }
     }*/
 
-    private fun setSpannablePricing(btn: RadioButton, planType: String, planPrice: String) {
+    private fun setSpannablePricing(btn: RpnControlState, planType: String, planPrice: String) {
 
         val spannableStringBuilder = SpannableStringBuilder()
 

@@ -15,56 +15,32 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemDecisionStepBinding
 import com.celzero.bravedns.service.ConnectionSimulator
 import com.celzero.bravedns.service.FirewallRuleset
-import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.ui.compose.themeColor
 
-class DecisionStepAdapter(private val context: Context) :
-    ListAdapter<ConnectionSimulator.DecisionStep, DecisionStepAdapter.DecisionStepViewHolder>(DiffCallback) {
-
-    companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<ConnectionSimulator.DecisionStep>() {
-            override fun areItemsTheSame(oldItem: ConnectionSimulator.DecisionStep, newItem: ConnectionSimulator.DecisionStep): Boolean {
-                return oldItem.text == newItem.text
-            }
-
-            override fun areContentsTheSame(oldItem: ConnectionSimulator.DecisionStep, newItem: ConnectionSimulator.DecisionStep): Boolean {
-                return oldItem == newItem
-            }
-        }
+/** Native Compose presentation of the unchanged simulator decision chain. */
+@Composable
+fun DecisionStepRow(step: ConnectionSimulator.DecisionStep) {
+    val rule = step.rule
+    val icon = rule?.let { FirewallRuleset.getRulesIcon(it.id) } ?: R.drawable.ic_whats_new
+    val color = when {
+        rule == null -> R.attr.secondaryTextColor
+        FirewallRuleset.ground(rule) -> R.attr.accentBad
+        else -> R.attr.accentGood
     }
-
-    inner class DecisionStepViewHolder(private val b: ListItemDecisionStepBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        fun bind(step: ConnectionSimulator.DecisionStep) {
-            b.stepText.text = step.text
-            val rule = step.rule
-            val iconRes = rule?.let { FirewallRuleset.getRulesIcon(it.id) } ?: R.drawable.ic_whats_new
-            b.stepIcon.setImageResource(iconRes)
-            val tint = when {
-                rule == null -> UIUtils.fetchColor(context, R.attr.secondaryTextColor)
-                FirewallRuleset.ground(rule) -> UIUtils.fetchColor(context, R.attr.accentBad)
-                else -> UIUtils.fetchColor(context, R.attr.accentGood)
-            }
-            b.stepIcon.setColorFilter(tint)
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DecisionStepViewHolder {
-        val b = ListItemDecisionStepBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DecisionStepViewHolder(b)
-    }
-
-    override fun onBindViewHolder(holder: DecisionStepViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Icon(painterResource(icon), null, Modifier.size(24.dp), tint = themeColor(color))
+        Text(step.text, Modifier.weight(1f))
     }
 }

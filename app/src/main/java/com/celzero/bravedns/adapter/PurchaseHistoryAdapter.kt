@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.purchase.HistoryRowState
+import com.celzero.bravedns.ui.compose.purchase.HistoryRowContent
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStateHistory
 import com.celzero.bravedns.database.SubscriptionStatus
-import com.celzero.bravedns.databinding.ListItemPurchaseHistoryBinding
 import com.celzero.bravedns.util.UIUtils
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,8 +33,28 @@ import java.util.Locale
 /**
  * Paging adapter for [SubscriptionStateHistory] rows.
  */
-class PurchaseHistoryAdapter(private val context: Context) :
-    PagingDataAdapter<SubscriptionStateHistory, PurchaseHistoryAdapter.HistoryViewHolder>(DIFF_CALLBACK) {
+class PurchaseHistoryAdapter(private val context: Context) {
+    private var revision by mutableIntStateOf(0)
+    private val differ = androidx.paging.AsyncPagingDataDiffer(
+        diffCallback = DIFF_CALLBACK,
+        updateCallback = object : androidx.recyclerview.widget.ListUpdateCallback {
+            override fun onInserted(position: Int, count: Int) { revision++ }
+            override fun onRemoved(position: Int, count: Int) { revision++ }
+            override fun onMoved(fromPosition: Int, toPosition: Int) { revision++ }
+            override fun onChanged(position: Int, count: Int, payload: Any?) { revision++ }
+        }
+    )
+    val itemCount: Int get() { revision; return differ.itemCount }
+    fun key(index: Int): Any = differ.peek(index)?.id ?: "placeholder_$index"
+    fun submitData(lifecycle: androidx.lifecycle.Lifecycle, value: androidx.paging.PagingData<SubscriptionStateHistory>) = differ.submitData(lifecycle, value)
+    fun retry() = differ.retry()
+    fun addLoadStateListener(listener: (androidx.paging.CombinedLoadStates) -> Unit) = differ.addLoadStateListener(listener)
+    @Composable fun Row(index: Int) {
+        revision
+        val entry = differ.getItem(index) ?: return
+        val presenter = remember(entry, index, itemCount) { HistoryPresenter(HistoryRowState()).apply { bind(entry, index == itemCount - 1) } }
+        HistoryRowContent(presenter.b, server = false)
+    }
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<SubscriptionStateHistory>() {
@@ -54,23 +72,8 @@ class PurchaseHistoryAdapter(private val context: Context) :
         private val DATE_FORMAT = SimpleDateFormat("MMM dd, yyyy  hh:mm a", Locale.getDefault())
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val binding = ListItemPurchaseHistoryBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-        return HistoryViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
-        // getItem() may return null while a placeholder page is loading
-        val entry = getItem(position) ?: return
-        holder.bind(entry)
-    }
-
-    inner class HistoryViewHolder(private val b: ListItemPurchaseHistoryBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
-        fun bind(entry: SubscriptionStateHistory) {
+    inner class HistoryPresenter(val b: HistoryRowState) {
+        fun bind(entry: SubscriptionStateHistory, isLast: Boolean) {
             b.tvTimestamp.text = DATE_FORMAT.format(Date(entry.timestamp))
 
             val stateLabel = context.getString(stateStringRes(entry.toState))
@@ -102,7 +105,7 @@ class PurchaseHistoryAdapter(private val context: Context) :
             b.tvPurchaseToken.visibility = View.GONE
 
             b.divider.visibility =
-                if (bindingAdapterPosition == itemCount - 1) View.GONE else View.VISIBLE
+                if (isLast) View.GONE else View.VISIBLE
         }
 
         private fun isSuccess(entry: SubscriptionStateHistory) =

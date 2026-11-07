@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import com.celzero.bravedns.ui.compose.appdetails.*
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -24,7 +27,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppCountryDetailsBinding
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastN
@@ -33,7 +35,7 @@ import kotlin.math.log2
 class AppWiseCountriesAdapter(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner
-) : PagingDataAdapter<AppConnection, AppWiseCountriesAdapter.CountryViewHolder>(DIFF_CALLBACK) {
+) : AppConnectionsPresenter(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppConnection>() {
@@ -50,22 +52,17 @@ class AppWiseCountriesAdapter(
         private const val MIN_VISIBLE_PERCENTAGE = 5
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
-        val binding = ListItemAppCountryDetailsBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return CountryViewHolder(binding)
+
+
+    @Composable
+    override fun Row(index: Int, connection: AppConnection, revision: Int) {
+        val state = remember(connection, revision) { AppCountriesRowState() }
+        val holder = remember(connection, revision) { CountryViewHolder(state, index) }
+        LaunchedEffect(holder) { holder.bind(connection) }
+        AppCountriesRowContent(state)
     }
 
-    override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
-        val conn = getItem(position) ?: return
-        holder.bind(conn)
-    }
-
-    inner class CountryViewHolder(private val b: ListItemAppCountryDetailsBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class CountryViewHolder(private val b: AppCountriesRowState, private val absoluteAdapterPosition: Int) {
 
         fun bind(conn: AppConnection) {
             setFlag(conn.flag)

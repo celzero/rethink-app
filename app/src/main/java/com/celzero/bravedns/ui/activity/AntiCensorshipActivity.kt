@@ -19,15 +19,17 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.widget.CompoundButton
+import com.celzero.bravedns.ui.compose.wireguard.WgControlState
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.ActivityAntiCensorshipBinding
+import androidx.activity.compose.setContent
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.settings.AntiCensorshipState
+import com.celzero.bravedns.ui.compose.settings.AntiCensorshipContent
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
@@ -39,12 +41,10 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.firestack.settings.Settings
-import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
-import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 
-class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
-    val b by viewBinding(ActivityAntiCensorshipBinding::bind)
+class AntiCensorshipActivity : BaseActivity() {
+    val b = AntiCensorshipState()
 
     private val persistentState by inject<PersistentState>()
     private val eventLogger by inject<EventLogger>()
@@ -88,7 +88,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
-        b.root.applySystemBarEdgeInsets()
+
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -99,6 +99,17 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
         }
         initView()
         setupClickListeners()
+        setContent { RethinkTheme { AntiCensorshipContent(b) } }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        b.saveChecks(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        b.restoreChecks(savedInstanceState)
     }
 
     override fun onResume() {
@@ -192,7 +203,7 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
 
     private fun setupClickListeners() {
 
-        b.acRadioNeverSplit.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioNeverSplit.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleAcMode(isSelected, DialStrategies.NEVER_SPLIT)
         }
 
@@ -203,23 +214,23 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
             }
         }
 
-        b.acRadioSplitAuto.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioSplitAuto.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleAcMode(isSelected, DialStrategies.SPLIT_AUTO)
         }
 
-        b.acRadioSplitTcp.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioSplitTcp.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleAcMode(isSelected, DialStrategies.SPLIT_TCP)
         }
 
-        b.acRadioSplitTls.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioSplitTls.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleAcMode(isSelected, DialStrategies.SPLIT_TCP_TLS)
         }
 
-        b.acRadioDesync.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioDesync.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleAcMode(isSelected, DialStrategies.DESYNC)
         }
 
-        b.acRadioTcpProxy.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+        b.acRadioTcpProxy.setOnCheckedChangeListener { _: WgControlState, isChecked: Boolean ->
             handleAcMode(isChecked, DialStrategies.TCP_PROXY)
         }
 
@@ -274,15 +285,15 @@ class AntiCensorshipActivity : BaseActivity(R.layout.activity_anti_censorship) {
             }
         }
 
-        b.acRadioRetryWithSplit.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioRetryWithSplit.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleRetryMode(isSelected, RetryStrategies.RETRY_WITH_SPLIT.mode)
         }
 
-        b.acRadioNeverRetry.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioNeverRetry.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleRetryMode(isSelected, RetryStrategies.RETRY_NEVER.mode)
         }
 
-        b.acRadioRetryAfterSplit.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.acRadioRetryAfterSplit.setOnCheckedChangeListener { _: WgControlState, isSelected: Boolean ->
             handleRetryMode(isSelected, RetryStrategies.RETRY_AFTER_SPLIT.mode)
         }
 

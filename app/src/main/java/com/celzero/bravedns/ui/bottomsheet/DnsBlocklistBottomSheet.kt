@@ -15,6 +15,11 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
 
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.celzero.bravedns.ui.compose.RethinkTheme
+import com.celzero.bravedns.ui.compose.trafficlogs.*
+
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Intent
@@ -29,16 +34,13 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.target.CustomViewTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
@@ -46,9 +48,6 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
-import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
@@ -56,7 +55,6 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -65,7 +63,7 @@ import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
@@ -78,11 +76,8 @@ import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
-    private var _binding: BottomSheetDnsLogBinding? = null
-
-    private val b
-        get() = checkNotNull(_binding)
-        { "Binding accessed outside of view lifecycle" }
+    private var presentation: DnsDetailsState? = null
+    private val b get() = checkNotNull(presentation) { "Presentation accessed outside of view lifecycle" }
 
     private var log: DnsLog? = null
 
@@ -100,13 +95,12 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         const val INSTANCE_STATE_DNSLOGS = "DNSLOGS"
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomSheetDnsLogBinding.inflate(inflater, container, false)
-        return b.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        presentation = DnsDetailsState(requireContext())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { RethinkTheme { DnsDetailsContent(b) } }
+        }
     }
 
     // enum to represent the status of the domain in the chip (ui)
@@ -124,7 +118,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        presentation = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -184,7 +178,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         view.post {
             // The sheet may be dismissed before this runnable is dispatched;
             // b throws once the view lifecycle has ended.
-            if (!isAdded || _binding == null) return@post
+            if (!isAdded || presentation == null) return@post
             displayRecordTypeChip()
             displayDnsTransactionDetails()
             updateRulesUi(log?.queryStr.orEmpty())
@@ -193,7 +187,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         // Defer favicon loading even more (lowest priority, can be slow)
         lifecycleScope.launch {
             kotlinx.coroutines.delay(150.milliseconds) // Let basic UI settle first
-            if (!isAdded || _binding == null) return@launch
+            if (!isAdded || presentation == null) return@launch
             displayFavIcon()
         }
     }
@@ -254,7 +248,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun setupResponseIpsArrow() {
         val currentLog = log ?: return
-        val ips = currentLog.responseIps.split(",")
+        val ips = currentLog.responseIps.split(",").filter { it.isNotBlank() }
         if (ips.count() <= 1) return
         b.dnsBlockIpArrow.visibility = View.VISIBLE
         // the selectable ip text consumes taps, so it needs its own listener
@@ -269,37 +263,17 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             return
         }
 
-        val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
-
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        dialog.show()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        UIUtils.capDialogWidth(dialog)
-
-        if (b.dnsBlockFavIcon.isVisible) {
-            dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
-        } else {
-            dialogBinding.ipDetailsFavIcon.visibility = View.GONE
-        }
-
-        dialogBinding.ipDetailsFqdnTxt.text = currentLog.queryStr
-        dialogBinding.ipDetailsIpDetailsTxt.text = formatIps(currentLog.responseIps)
-
-        dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        b.infoDialog = LogInfoDialogState(
+            title = currentLog.queryStr,
+            description = formatIps(currentLog.responseIps),
+            iconNode = b.dnsBlockFavIcon.takeIf { it.isVisible }
+        )
     }
 
     private fun formatIps(ips: String): Spanned {
         var text = ""
-        ips.split(",").forEach {
-            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..1)), it)
+        ips.split(",").map(String::trim).filter(String::isNotEmpty).forEach {
+            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.take(2)), TextUtils.htmlEncode(it))
         }
         return htmlToSpannedText(text)
     }
@@ -490,11 +464,11 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
     // pill glyph beside the trailing state text; blocked points left with a
     // cross, trusted points right with a tick, no rule stays dim
-    private fun domainRuleSwitchState(status: DomainRulesManager.Status): RuleStateSwitch.SwitchState {
+    private fun domainRuleSwitchState(status: DomainRulesManager.Status): LogRuleGlyph {
         return when (status) {
-            DomainRulesManager.Status.BLOCK -> RuleStateSwitch.SwitchState.OFF
-            DomainRulesManager.Status.TRUST -> RuleStateSwitch.SwitchState.ON
-            DomainRulesManager.Status.NONE -> RuleStateSwitch.SwitchState.NEUTRAL
+            DomainRulesManager.Status.BLOCK -> LogRuleGlyph.OFF
+            DomainRulesManager.Status.TRUST -> LogRuleGlyph.ON
+            DomainRulesManager.Status.NONE -> LogRuleGlyph.NEUTRAL
         }
     }
 
@@ -539,7 +513,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
                 }
 
             uiCtx {
-                if (_binding == null) return@uiCtx
+                if (presentation == null) return@uiCtx
 
                 appRuleScopeName = displayName
                 // the row's title names the app the rule is scoped to; the
@@ -600,29 +574,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     // explanation dialog for the filter-reason chip, mirrors the conn-track sheet's
     // firewall-rules dialog (title, description, icon)
     private fun showFilterReasonDialog(rule: FirewallRuleset) {
-        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val lp = WindowManager.LayoutParams()
-        val dialog = builder.create()
-        dialog.show()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
-        // keep the dialog within the app's max width on expanded windows (foldables/tablets)
-        UIUtils.capDialogWidth(dialog)
-
-        dialogBinding.infoRulesDialogRulesTitle.text = getString(rule.title)
-        dialogBinding.infoRulesDialogRulesDesc.text = htmlToSpannedText(getString(rule.desc))
-        dialogBinding.infoRulesDialogRulesIcon.visibility = View.VISIBLE
-        dialogBinding.infoRulesDialogRulesIcon.setImageDrawable(
-            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(rule.id))
-        )
-
-        dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        b.infoDialog = LogInfoDialogState(getString(rule.title), htmlToSpannedText(getString(rule.desc)), FirewallRuleset.getRulesIcon(rule.id))
     }
 
     private fun handleBlocklistChip() {
@@ -716,15 +668,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
-        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
-        val dialog = builder.create()
-        dialog.setCancelable(true)
-        dialogBinding.infoRulesDialogRulesDesc.text = formatText(groupNames)
-        dialogBinding.infoRulesDialogRulesTitle.visibility = View.GONE
-
-        dialogBinding.infoRulesDialogCancelImg.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        b.infoDialog = LogInfoDialogState(null, formatText(groupNames), fullWidth = false)
     }
 
     private fun formatText(groupNames: Multimap<String, String>): Spanned {
@@ -830,7 +774,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     // resolver's flag emoji takes its place so the slot is never empty
     private fun showHeaderFlag() {
         val currentLog = log
-        if (_binding == null || currentLog == null) return
+        if (presentation == null || currentLog == null) return
 
         if (currentLog.flag.isEmpty()) {
             b.dnsBlockHeaderFlag.visibility = View.GONE
@@ -841,7 +785,7 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun hideHeaderFlag() {
-        if (_binding == null) return
+        if (presentation == null) return
 
         b.dnsBlockHeaderFlag.visibility = View.GONE
     }
@@ -899,12 +843,12 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             }
 
             request.into(
-                    object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
+                    object : CustomTarget<Drawable>(64, 64) {
                         override fun onLoadFailed(errorDrawable: Drawable?) {
                             // the application-scoped Glide request can deliver
                             // after onDestroyView() cleared the binding while
                             // the fragment is still added; `b` would throw
-                            if (_binding == null) return
+                            if (presentation == null) return
 
                             b.dnsBlockFavIcon.visibility = View.GONE
                             showHeaderFlag()
@@ -918,15 +862,15 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
                                 LOG_TAG_DNS,
                                 "Glide - CustomViewTarget onResourceReady() nextdns: $url"
                             )
-                            if (_binding == null) return
+                            if (presentation == null) return
 
                             b.dnsBlockFavIcon.visibility = View.VISIBLE
                             b.dnsBlockFavIcon.setImageDrawable(resource)
                             hideHeaderFlag()
                         }
 
-                        override fun onResourceCleared(placeholder: Drawable?) {
-                            if (_binding == null) return
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            if (presentation == null) return
 
                             b.dnsBlockFavIcon.visibility = View.GONE
                             showHeaderFlag()
@@ -936,9 +880,9 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         } catch (e: Exception) {
             Logger.d(LOG_TAG_DNS, "Glide - TransactionViewHolder Exception() -${e.message}")
             lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL)?.into(
-                object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
+                object : CustomTarget<Drawable>(64, 64) {
                     override fun onLoadFailed(errorDrawable: Drawable?) {
-                        if (_binding == null) return
+                        if (presentation == null) return
 
                         b.dnsBlockFavIcon.visibility = View.GONE
                         showHeaderFlag()
@@ -952,15 +896,15 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
                             LOG_TAG_DNS,
                             "Glide - CustomViewTarget onResourceReady() duckduckgo: $url"
                         )
-                        if (_binding == null) return
+                        if (presentation == null) return
 
                         b.dnsBlockFavIcon.visibility = View.VISIBLE
                         b.dnsBlockFavIcon.setImageDrawable(resource)
                         hideHeaderFlag()
                     }
 
-                    override fun onResourceCleared(placeholder: Drawable?) {
-                        if (_binding == null) return
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        if (presentation == null) return
 
                         b.dnsBlockFavIcon.visibility = View.GONE
                         showHeaderFlag()

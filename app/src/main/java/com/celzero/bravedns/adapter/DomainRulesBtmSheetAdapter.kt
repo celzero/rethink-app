@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Modifier
+import com.celzero.bravedns.ui.compose.wireguard.WgListContent
+import com.celzero.bravedns.ui.compose.appdetails.*
 
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
@@ -25,7 +30,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DomainItemBottomSheetBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,25 +38,26 @@ class DomainRulesBtmSheetAdapter(
     val context: Context,
     private val uid: Int,
     private val domains: Array<String>
-) : RecyclerView.Adapter<DomainRulesBtmSheetAdapter.ViewHolder>() {
+) : WgListContent {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemBinding =
-            DomainItemBottomSheetBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(itemBinding)
+
+
+
+
+    @Composable override fun Content(modifier: Modifier) {
+        Column(modifier) {
+            domains.forEachIndexed { index, domain ->
+                key(index, domain) {
+                    val state = remember { DomainRuleRowState() }
+                    val holder = remember { ViewHolder(state) }
+                    LaunchedEffect(holder) { holder.update(domain) }
+                    DomainRuleRowContent(state)
+                }
+            }
+        }
     }
 
-    override fun getItemCount(): Int {
-        return domains.size
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val domain: String = domains[position]
-        holder.update(domain)
-    }
-
-    inner class ViewHolder(private val b: DomainItemBottomSheetBinding) :
-        RecyclerView.ViewHolder(b.root) {
+    inner class ViewHolder(private val b: DomainRuleRowState) {
 
         fun update(item: String) {
             val domain = item.trim()

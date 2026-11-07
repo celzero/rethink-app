@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui.activity
 
-import androidx.test.espresso.Espresso.onView
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.accessibility.AccessibilityChecks
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -15,6 +16,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/** Device-only controller obligation: requires a separately reviewed disposable Application and
+ * strict VPN/permission/manager fixture. The default production runner is NOT approved to run. */
 @RunWith(AndroidJUnit4::class)
 class HomeScreenActivityTest {
 
@@ -26,21 +29,23 @@ class HomeScreenActivityTest {
         }
     }
 
-    @get:Rule
+    @get:Rule(order = 0)
     var activityRule: ActivityScenarioRule<HomeScreenActivity> =
         ActivityScenarioRule(HomeScreenActivity::class.java)
 
+    @get:Rule(order = 1) val compose = createEmptyComposeRule()
+
     @Test
     fun testHomeScreenDisplay() {
-        onView(withId(R.id.fhs_dns_on_off_btn)).check(matches(isDisplayed()))
-        onView(withId(R.id.fhs_card_dns_ll)).check(matches(isDisplayed()))
-        onView(withId(R.id.fhs_card_firewall_ll)).check(matches(isDisplayed()))
+        compose.onNodeWithTag("fhs_dns_on_off_btn").assertIsDisplayed()
+        compose.onNodeWithTag("fhs_card_dns_ll").assertIsDisplayed()
+        compose.onNodeWithTag("fhs_card_firewall_ll").assertIsDisplayed()
     }
 
     @Test
     fun testVpnToggleClick() {
         // Clicking the start button might trigger a system VPN dialog, which Espresso can't handle directly.
         // But we can check if the button is clickable.
-        onView(withId(R.id.fhs_dns_on_off_btn)).perform(click())
+        compose.onNodeWithTag("fhs_dns_on_off_btn").performClick()
     }
 }

@@ -15,23 +15,25 @@
  */
 package com.celzero.bravedns.adapter
 
+import com.celzero.bravedns.ui.compose.wireguard.*
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
@@ -40,7 +42,6 @@ import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.ProxyManager
@@ -65,12 +66,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
-import androidx.core.view.isVisible
 import com.celzero.bravedns.service.IpRulesManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.celzero.bravedns.ui.compose.wireguard.WgAlertDialogBuilder as MaterialAlertDialogBuilder
 
 class WgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val splitDns: Boolean, private val eventLogger: EventLogger) :
-    PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
+    WgPagingPresenter<WgConfigFiles>(DIFF_CALLBACK) {
 
     private var lifecycleOwner: LifecycleOwner? = null
 
@@ -96,33 +96,31 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
     }
 
-    override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
-        if (lifecycleOwner == null) {
-            lifecycleOwner = holder.itemView.findViewTreeLifecycleOwner()
-        }
-        val item = getItem(position)
-        val wgConfigFiles: WgConfigFiles = item ?: return
-        holder.update(wgConfigFiles)
-    }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        statusTicker.cancel()
-        statusHolders.clear()
-        lifecycleOwner = null
-    }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgInterfaceViewHolder {
-        val itemBinding =
-            ListItemWgGeneralInterfaceBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        if (lifecycleOwner == null) {
-            lifecycleOwner = parent.findViewTreeLifecycleOwner()
+
+
+
+
+    @Composable override fun Content(modifier: Modifier) {
+        val owner = LocalLifecycleOwner.current
+        DisposableEffect(owner) { lifecycleOwner = owner; onDispose { statusTicker.cancel(); statusHolders.clear(); lifecycleOwner = null } }
+        val version = revision
+        LazyColumn(modifier, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(itemCount) { index ->
+                val item = getItem(index)
+                if (item != null) {
+                    val state = remember(index) { WgConfigRowState(context) }
+                    val holder = remember(state) { WgInterfaceViewHolder(state) }
+                    DisposableEffect(holder, index) {
+
+                        onDispose { holder.cancelJobIfAny() }
+                    }
+                    LaunchedEffect(item, version) { holder.cancelJobIfAny(); holder.update(item) }
+                    WgConfigRow(state)
+                }
+            }
         }
-        return WgInterfaceViewHolder(itemBinding)
     }
 
     private val statusHolders = mutableListOf<WgInterfaceViewHolder>()
@@ -147,18 +145,10 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
     }
 
     private fun refreshStatuses(): Boolean {
-        val iterator = statusHolders.iterator()
-        val active = ArrayList<WgInterfaceViewHolder>()
-        while (iterator.hasNext()) {
-            val holder = iterator.next()
-            val lifecycleActive =
-                lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
-            if (!lifecycleActive || holder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
-                iterator.remove()
-                continue
-            }
-            active.add(holder)
+        if (lifecycleOwner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) != true) {
+            return statusHolders.isNotEmpty()
         }
+        val active = statusHolders.toList()
         if (active.isEmpty()) {
             statusTicker.cancel()
             return false
@@ -169,14 +159,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         return true
     }
 
-    override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        holder.cancelJobIfAny()
-    }
-
-    inner class WgInterfaceViewHolder(private val b: ListItemWgGeneralInterfaceBinding) :
-        RecyclerView.ViewHolder(b.root) {
-
+    inner class WgInterfaceViewHolder(private val b: WgConfigRowState) {
         private var boundConfig: WgConfigFiles? = null
 
         fun update(config: WgConfigFiles) {
