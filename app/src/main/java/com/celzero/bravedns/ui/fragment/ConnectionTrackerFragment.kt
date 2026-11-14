@@ -271,7 +271,6 @@ class ConnectionTrackerFragment :
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE
                 }
-                viewModel.connectionTrackerListMerged.removeObservers(viewLifecycleOwner)
                 b.recyclerConnection.visibility = View.GONE
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE

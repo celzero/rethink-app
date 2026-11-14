@@ -175,9 +175,8 @@ object SupportDiagnostics {
         sb.append("Device      : ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}\n")
         sb.append("Android     : ${android.os.Build.VERSION.RELEASE} (SDK ${android.os.Build.VERSION.SDK_INT})\n")
         sb.append("\n")
-        sb.append("Subscription status, state history, proxy statistics,\n")
-        sb.append("and available recent console logs are included in the\n")
-        sb.append("attached diagnostic ZIP.\n\n")
+        sb.append("Subscription status, state history, and proxy statistics\n")
+        sb.append("are included in the attached diagnostic ZIP.\n\n")
         sb.append("--\nSent via Rethink Plus Support")
 
         return sb.toString()

@@ -56,6 +56,10 @@ class ConnIdLogsActivity : BaseActivity(R.layout.activity_conn_id_logs) {
     companion object {
         const val EXTRA_CONN_ID = "conn_id"
         private const val MAX_LOG_ROWS = 10_000
+
+        // row id of the live-trace divider; negative so it can never
+        // collide with auto-generated console-log row ids
+        private const val LIVE_TRACE_DIVIDER_ID = Int.MIN_VALUE
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -113,16 +117,29 @@ class ConnIdLogsActivity : BaseActivity(R.layout.activity_conn_id_logs) {
                 Logger.e(LOG_TAG_UI, "err extracting go logs for $cid: ${e.message}")
                 ""
             }
-            val now = System.currentTimeMillis()
-            // negative ids keep go lines unique vs auto-generated console-log row ids
+            // go trace lines carry no per-line event times, so they render as
+            // their own undated section above the timestamped db rows instead
+            // of being sorted in with a faked timestamp
             val goLines = goLogs.lines()
                 .filter { it.isNotBlank() }
-                .mapIndexed { i, line -> ConsoleLog(-(i + 1), line, 0L, now) }
-            val merged = (goLines + dbLogs)
-                .sortedWith(
-                    compareByDescending<ConsoleLog> { it.timestamp }
-                        .thenByDescending { it.id }
-                )
+                .mapIndexed { i, line -> ConsoleLog(-(i + 1), line, 0L, 0L) }
+            val liveTraceSection = if (goLines.isEmpty()) {
+                emptyList()
+            } else {
+                listOf(
+                    ConsoleLog(
+                        LIVE_TRACE_DIVIDER_ID,
+                        getString(R.string.conn_id_logs_live_trace),
+                        0L,
+                        0L,
+                    )
+                ) + goLines
+            }
+            val sortedDbLogs = dbLogs.sortedWith(
+                compareByDescending<ConsoleLog> { it.timestamp }
+                    .thenByDescending { it.id }
+            )
+            val merged = liveTraceSection + sortedDbLogs
             withContext(Dispatchers.Main) {
                 if (isFinishing || isDestroyed) return@withContext
                 recyclerAdapter?.submitData(lifecycle, PagingData.from(merged))

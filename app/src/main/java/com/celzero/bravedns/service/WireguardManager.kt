@@ -25,6 +25,7 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
+import com.celzero.bravedns.service.ProxyManager.ID_RPN_WIN
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.util.UIUtils.getRelativeTimeSpan
@@ -681,6 +682,7 @@ object WireguardManager : KoinComponent {
     }
 
     fun isWgProxyId(pid: String): Boolean {
+        if (pid.startsWith(ID_RPN_WIN, ignoreCase = true)) return false
         if (!pid.startsWith(ID_WG_BASE, ignoreCase = true)) return false
         val suffix = pid.removePrefix(ID_WG_BASE)
         return suffix.isNotEmpty() && suffix.toIntOrNull() != null

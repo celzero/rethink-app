@@ -286,7 +286,6 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                         sb.append("expiry: " + Utilities.convertLongToTime(details.expiry(),
                             Constants.TIME_FORMAT_4) + "\n")
                         sb.append("providerId: " + details.providerID() + "\n")
-                        sb.append("token: " + details.token().take(16) + "\n")
                         sb.append("test: " + details.test() + "\n")
                         sb.append("allowRestore: " + details.allowRestore() + "\n\n")
                         sb.toString()
@@ -410,7 +409,7 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     if (wirelogReserve > 0L) prepareWirelogAttachment(otherAttachSize) else null
                 // trace logs ride along unconditionally, exempt from the size budget
                 val traceLogs = TraceLogExporter.dumpTraceLogsFile(this@CustomerSupportActivity)
-                val supportZip = buildSupportZip(
+                var supportZip = buildSupportZip(
                     diagFile,
                     wirelogBytes,
                     attachedProcInfo,
@@ -419,6 +418,23 @@ class CustomerSupportActivity : BaseActivity(R.layout.activity_customer_support)
                     rpnLogs,
                     traceLogs
                 )
+                // trace logs are exempt from the drop-order budget but not from
+                // the hard cap: rebuild the zip without them before giving up
+                if (supportZip != null && traceLogs != null &&
+                    supportZip.length() > BugReportZipper.MAX_ZIP_SIZE_BYTES
+                ) {
+                    Logger.w(LOG_TAG_UI, "$TAG support zip over size limit, rebuilding without trace logs")
+                    supportZip.delete()
+                    supportZip = buildSupportZip(
+                        diagFile,
+                        wirelogBytes,
+                        attachedProcInfo,
+                        attachedBugZip,
+                        consoleLogs,
+                        rpnLogs,
+                        null
+                    )
+                }
                 traceLogs?.let {
                     if (it.exists() && !it.delete()) {
                         Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary trace log attachment")

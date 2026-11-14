@@ -187,7 +187,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         recyclerAdapter.addLoadStateListener { loadState ->
             val isEmpty = recyclerAdapter.itemCount < 1
             if (loadState.append.endOfPaginationReached && isEmpty) {
-                viewModel.dnsLogsList.removeObservers(viewLifecycleOwner)
                 b.recyclerQuery.visibility = View.GONE
             } else {
                 if (!b.recyclerQuery.isVisible) b.recyclerQuery.visibility = View.VISIBLE

@@ -200,7 +200,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         if (accepted) {
             Utilities.showToastUiCentered(
                 requireContext(),
-                getString(R.string.brbs_backup_saved_to, exportDir.absolutePath),
+                getString(R.string.brbs_backup_saved_app_folder_warning, exportDir.absolutePath),
                 Toast.LENGTH_LONG
             )
         }

@@ -90,7 +90,7 @@ object TunFlowManager : KoinComponent {
         val keyguardManager: KeyguardManager?,
         val vpnAdapter: GoVpnAdapter?,
         val connTracer: ConnectionTracer,
-        val prevDns: MutableSet<InetAddress>,
+        val prevDns: Set<InetAddress>,
         val isPrimaryUser: Boolean,
         val context: Context,
         val notificationManager: NotificationManager,

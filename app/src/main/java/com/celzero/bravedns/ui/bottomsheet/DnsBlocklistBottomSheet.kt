@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -55,6 +56,7 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
@@ -64,6 +66,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
@@ -335,6 +338,25 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
 
         b.dnsBlockUrl.setOnClickListener {
             log?.queryStr?.let { query -> startDomainConnectionsActivity(query) }
+        }
+
+        b.dnsAppNameHeader.setOnClickListener {
+            val uid = log?.uid ?: return@setOnClickListener
+            io {
+                val ai = FirewallManager.getAppInfoByUid(uid)
+                uiCtx {
+                    // case: app is uninstalled but still available in RethinkDNS database
+                    if (ai == null || uid == Constants.INVALID_UID) {
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.ct_bs_app_info_error),
+                            Toast.LENGTH_SHORT
+                        )
+                        return@uiCtx
+                    }
+                    openAppInfoActivity(uid)
+                }
+            }
         }
 
         // one rules card, one row per scope; tapping a row cycles its domain
@@ -711,6 +733,13 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, domain)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, log?.isBlocked ?: false)
+        requireContext().startActivity(intent)
+        this.dismiss()
+    }
+
+    private fun openAppInfoActivity(uid: Int) {
+        val intent = Intent(requireContext(), AppInfoActivity::class.java)
+        intent.putExtra(AppInfoActivity.INTENT_UID, uid)
         requireContext().startActivity(intent)
         this.dismiss()
     }

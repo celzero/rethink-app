@@ -357,13 +357,13 @@
                                 style="@style/RethinkPlus.RowTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/support_attach_proc_info" />
+                                android:text="@string/support_attach_trace_log" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/RethinkPlus.RowSubtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/support_attach_proc_info_desc" />
+                                android:text="@string/support_attach_trace_log_desc" />
 
                         </LinearLayout>
 

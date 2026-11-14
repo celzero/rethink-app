@@ -8,7 +8,7 @@ import java.io.File
 object TraceLogExporter {
 
     private const val TAG = "TraceLogExporter;"
-    private const val TRACE_LOG_FILE_NAME = "trace_logs.txt"
+    private const val TRACE_LOG_FILE_PREFIX = "trace_logs_"
 
     suspend fun dumpTraceLogsFile(context: Context): File? {
         return try {
@@ -17,8 +17,11 @@ object TraceLogExporter {
                 Logger.i(LOG_TAG_VPN, "$TAG no trace logs to dump")
                 return null
             }
-            val file = File(context.cacheDir, TRACE_LOG_FILE_NAME)
-            if (file.exists()) file.delete()
+            // unique per export so consumers delete only the file they created
+            val file = File(
+                context.cacheDir,
+                "$TRACE_LOG_FILE_PREFIX${System.currentTimeMillis()}.txt",
+            )
             file.writeBytes(bytes)
             file
         } catch (e: Exception) {
