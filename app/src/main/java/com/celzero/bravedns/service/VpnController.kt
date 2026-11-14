@@ -160,6 +160,19 @@ object VpnController : KoinComponent {
         b.signalStopService(reason, userInitiated)
     }
 
+    // stop that suspends until the vpn adapter teardown completes
+    suspend fun stopAwait(reason: String, context: Context, userInitiated: Boolean = true) {
+        Logger.i(LOG_TAG_VPN, "VPN Controller stop-await with context: $context")
+        vpnState = null
+        onConnectionStateChanged(null)
+        val b = rvpn
+        if (b == null) {
+            persistentState.setVpnEnabled(false)
+            return
+        }
+        b.signalStopServiceAwait(reason, userInitiated)
+    }
+
     @Suppress("DEPRECATION")
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()

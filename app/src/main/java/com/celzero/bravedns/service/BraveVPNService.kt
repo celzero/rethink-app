@@ -2019,6 +2019,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         Logger.i(LOG_TAG_VPN, "stopped vpn adapter & service: $reason, $userInitiated")
     }
 
+    // suspending variant for callers that must not race the teardown (restore)
+    suspend fun signalStopServiceAwait(reason: String, userInitiated: Boolean = true) {
+        if (!userInitiated) notifyUserOnVpnFailure()
+        stopVpnAdapter()
+        eventLogger.logHigh(
+            EventType.VPN_STOP, "vpn service destroyed",
+            EventSource.SERVICE, userAction = userInitiated, details = "vpn destroyed"
+        )
+        stopSelf()
+        Logger.i(LOG_TAG_VPN, "stopped vpn adapter & service: $reason, $userInitiated")
+    }
+
     private suspend fun stopVpnAdapter() =
         withContext(CoroutineName("stopVpn") + serializer) {
             if (vpnAdapter == null) {
@@ -2882,15 +2894,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     // publish snapshot only after a successful apply
                     val dns = dnsServers.map { it.hostAddress }
                     val isSysDnsSet = vpnAdapter?.setSystemDns(dns)
+                    val needDefault = isDefaultDnsNone()
                     var defSet: Boolean? = false
                     // set default dns server for the tunnel if none is set
-                    if (isDefaultDnsNone()) {
+                    if (needDefault) {
                         val dnsCsv = dns.joinToString(",")
                         defSet = vpnAdapter?.addDefaultTransport(dnsCsv)
                     }
-                    Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? ${isDefaultDnsNone()}")
+                    Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? $needDefault")
 
-                    if (isSysDnsSet == true) {
+                    // a failed required default-transport must not be snapshotted,
+                    // else a later non-forced update would skip the retry
+                    if (isSysDnsSet == true && (!needDefault || defSet == true)) {
                         prevDns = dnsServers.toSet()
                     }
                     val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
