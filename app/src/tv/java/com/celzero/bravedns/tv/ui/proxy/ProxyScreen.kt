@@ -9,9 +9,7 @@
  */
 package com.celzero.bravedns.tv.ui.proxy
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,61 +19,58 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.Text
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.nav.TvPaidRoutes
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
+import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 /**
- * Proxy destination — WireGuard tunnels + SOCKS5/HTTP/Orbot status.
+ * Proxy destination — RPN status, WireGuard tunnel summary, and
+ * SOCKS5/HTTP/Orbot status.
  *
  * Layout:
  *
- *  1. **WireGuard tunnels** — list of [WgConfigFilesImmutable]
- *     returned by `WireguardManager.getAllMappings()`. Each card
- *     shows the tunnel name, status pills (Active / Catch-all /
- *     Lockdown / One-WG), and acts as an enable/disable toggle.
- *  2. **Other proxies** — read-only summary card for the legacy
+ *  1. **RPN** — status card mirroring the phone's
+ *     `ProxySettingsActivity.displayRpnUi()`: "Active · cities" when
+ *     enabled + active, "RPN" when enabled or subscribed, "Subscribe"
+ *     otherwise. Navigates to the RPN hub (`rpn`), which
+ *     dispatches to dashboard or checkout. Hidden on channels without
+ *     billing (fdroid).
+ *  2. **WireGuard** — live summary of active tunnel names; drills
+ *     into the tunnel list (`wg/list`) which owns per-tunnel cards,
+ *     enable/disable, and "+ Add tunnel".
+ *  3. **Other proxies** — read-only summary card for the legacy
  *     SOCKS5 / HTTP / Orbot proxy state (the phone surfaces a full
  *     form for these; on TV the editor will land alongside the
  *     custom-DNS editor in the polish phase).
  *
- * Writes go through the same `WireguardManager.enableConfig` /
- * `disableConfig` paths upstream's per-card toggles use; these are
- * the only public mutators that also re-bind `VpnController` and
- * the `AppConfig.ProxyProvider` flag.
- *
  * Out of scope for v1 (noted in code):
  *
  *  * WG add/import (file picker + clipboard paste — needs TV-friendly
- *    text-entry dialog).
+ *    text-entry dialog); lives behind `wg/list`.
  *  * WG detail (peers, allowed IPs, DNS, per-app mapping).
  *  * TCP / anti-censorship sub-screens.
  *  * SOCKS5 / HTTP credentials editor (form needs paste-friendly
@@ -86,78 +81,55 @@ import org.koin.compose.koinInject
 @Composable
 fun ProxyScreen(navController: NavController) {
     val appConfig = koinInject<AppConfig>()
-    val scope = rememberCoroutineScope()
+    val rpnVisible = remember { TvPaidRoutes.isInstalled && !Utilities.isFdroidFlavour() }
 
-    // Reload key bumped after each enable/disable write so we re-read
-    // the immutable list from the manager.
-    var reloadKey by remember { mutableStateOf(0) }
-
-    // Make sure mappings are loaded — first visit to the screen may
-    // hit before WireguardManager.load() ran via the boot flow.
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            WireguardManager.load(false)
-        }
-        reloadKey++
-    }
-
-    val tunnels by produceState(
-        initialValue = emptyList<WgConfigFilesImmutable>(),
-        reloadKey,
-    ) {
+    val proxyDetails by produceState(initialValue = ProxyDetails()) {
         value = withContext(Dispatchers.IO) {
-            WireguardManager.getAllMappings()
-                .sortedWith(compareByDescending<WgConfigFilesImmutable> { it.isActive }
-                    .thenBy { it.name.lowercase() })
-        }
-    }
-
-    val proxyDetails by produceState(initialValue = ProxyDetails(), reloadKey) {
-        value = withContext(Dispatchers.IO) {
+            val tunnels = loadTunnels()
             ProxyDetails(
                 socks5 = appConfig.getSocks5ProxyDetails()?.let { "${it.proxyIP}:${it.proxyPort}" },
                 http = appConfig.getHttpProxyDetails()?.let { "${it.proxyIP}:${it.proxyPort}" },
                 orbot = appConfig.isOrbotProxyEnabled(),
+                wgSummary = summarizeActiveWgs(
+                    tunnels.filter { it.isActive }
+                        .map { it.name.ifBlank { "tunnel #${it.id}" } },
+                    tunnels.size,
+                ),
             )
         }
     }
 
+    val rpnStatus by produceState(initialValue = "Subscribe") {
+        if (!rpnVisible) return@produceState
+        value = withContext(Dispatchers.IO) { rpnStatusValue() }
+    }
+
     TvScreenScaffold(
         title = "Proxy",
-        subtitle = "WireGuard tunnels, plus SOCKS5 / HTTP / Orbot status.",
+        subtitle = "RPN, WireGuard, plus SOCKS5 / HTTP / Orbot status.",
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SettingSectionHeader(
-                    text = "WireGuard tunnels (${tunnels.size})",
-                    modifier = Modifier.weight(1f),
+            if (rpnVisible) {
+                SettingSectionHeader("Rethink Private Network")
+                ProxyStatusCard(
+                    label = "RPN",
+                    value = rpnStatus,
+                    onClick = { navController.navigate("rpn") },
                 )
-                AddTunnelButton(onClick = { navController.navigate("wg/import") })
-            }
-            if (tunnels.isEmpty()) {
-                Text(
-                    text = "No WireGuard tunnels yet. Use \"+ Add tunnel\" above to paste a .conf you copied from your phone, or sideload from the phone build.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, top = 4.dp),
-                )
-            } else {
-                tunnels.forEach { wg ->
-                    TunnelCard(
-                        wg = wg,
-                        onClick = { navController.navigate("wg/${wg.id}") },
-                    )
-                }
             }
 
-            Spacer(Modifier.height(16.dp))
+            SettingSectionHeader("WireGuard")
+            ProxyStatusCard(
+                label = "WireGuard",
+                value = proxyDetails.wgSummary,
+                onClick = { navController.navigate("wg/list") },
+            )
+
             SettingSectionHeader("Other proxies")
             ProxyStatusCard(
                 label = "SOCKS5",
@@ -174,19 +146,10 @@ fun ProxyScreen(navController: NavController) {
                 value = if (proxyDetails.orbot) "Active" else null,
                 onClick = null,
             )
-            // TV counterpart of the phone's `RpnBypassAppsActivity`
-            // (reached there via ServerSelectionFragment). RPN purchase
-            // flows stay off-TV (F-Droid, no billing) but the per-app
-            // bypass list is manageable once any proxy exists.
-            ProxyStatusCard(
-                label = "RPN bypass",
-                value = "Manage excluded apps",
-                onClick = { navController.navigate("proxy/rpn-bypass") },
-            )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(TvSpacing.SectionGap))
             Text(
-                text = "Tap a tunnel to manage its peers and per-tunnel behaviour. Tap SOCKS5 or HTTP to edit the proxy credentials.",
+                text = "Tap RPN to manage your subscription and servers. Tap WireGuard to add or manage tunnels. Tap SOCKS5 or HTTP to edit the proxy credentials.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp),
@@ -199,104 +162,45 @@ private data class ProxyDetails(
     val socks5: String? = null,
     val http: String? = null,
     val orbot: Boolean = false,
+    val wgSummary: String? = null,
 )
 
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun AddTunnelButton(onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Box(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp)) {
-            Text(
-                text = "+ Add tunnel",
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-            )
-        }
+// "2 active · Home, Work" / "+3 more" once names exceed the cap;
+// "Inactive" when tunnels exist but none are active; null (renders
+// "Not configured") when no tunnels are set up.
+private const val WG_SUMMARY_NAME_CAP = 3
+
+private fun summarizeActiveWgs(active: List<String>, tunnelCount: Int): String? {
+    if (tunnelCount == 0) return null
+    if (active.isEmpty()) return "Inactive"
+    val shown = active.take(WG_SUMMARY_NAME_CAP).joinToString(", ")
+    val more = if (active.size > WG_SUMMARY_NAME_CAP) {
+        " +${active.size - WG_SUMMARY_NAME_CAP} more"
+    } else {
+        ""
     }
+    return "${active.size} active · $shown$more"
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun TunnelCard(wg: WgConfigFilesImmutable, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            ActiveTile(active = wg.isActive)
-            Spacer(Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = wg.name.ifBlank { "tunnel #${wg.id}" },
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    if (wg.isCatchAll) TagPill("catch-all")
-                    if (wg.isLockdown) TagPill("lockdown")
-                    if (wg.oneWireGuard) TagPill("one-WG")
-                    if (wg.useOnlyOnMetered) TagPill("metered-only")
-                }
+// Same three-state resolution as the phone's displayRpnUi(), without
+// the string resources (TV convention is hardcoded English).
+private suspend fun rpnStatusValue(): String {
+    val isEnabled = RpnProxyManager.isRpnEnabled()
+    val hasValidSub = RpnProxyManager.hasValidSubscription()
+    val isActive = RpnProxyManager.isRpnActive()
+    return when {
+        isEnabled && isActive -> {
+            val ccs = RpnProxyManager.getSelectedCCs()
+                .map { it.city.capitalizeWords() }
+                .filter { it.isNotBlank() }
+            if (ccs.isNotEmpty()) {
+                "Active · ${ccs.take(6).joinToString(", ")}"
+            } else {
+                "Active · RPN"
             }
         }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ActiveTile(active: Boolean) {
-    val container = if (active) Color(0xFF2E7D32) else MaterialTheme.colorScheme.surface
-    val text = if (active) "ON" else "OFF"
-    Box(
-        modifier = Modifier
-            .background(container, RoundedCornerShape(50))
-            .padding(horizontal = 14.dp, vertical = 6.dp),
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-        )
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun TagPill(label: String) {
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(50))
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-    ) {
-        Text(
-            label,
-            color = MaterialTheme.colorScheme.onTertiary,
-            style = MaterialTheme.typography.labelSmall,
-        )
+        isEnabled || hasValidSub -> "RPN"
+        else -> "Subscribe"
     }
 }
 
@@ -305,12 +209,12 @@ private fun TagPill(label: String) {
 private fun ProxyStatusCard(label: String, value: String?, onClick: (() -> Unit)?) {
     val content: @Composable () -> Unit = {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+            modifier = Modifier.padding(horizontal = TvSpacing.ContentHorizontal, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.width(96.dp),
             )
             Text(
@@ -329,20 +233,13 @@ private fun ProxyStatusCard(label: String, value: String?, onClick: (() -> Unit)
     if (onClick != null) {
         Surface(
             onClick = onClick,
-            shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-            colors = ClickableSurfaceDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
+            shape = TvSurfaceStyles.interactiveShape(),
+            colors = TvSurfaceStyles.rowColors(),
             modifier = Modifier.fillMaxWidth(),
         ) { content() }
     } else {
         Surface(
-            shape = RoundedCornerShape(10.dp),
+            shape = TvShapes.Small,
             colors = androidx.tv.material3.SurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
             ),

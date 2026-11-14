@@ -26,8 +26,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         doHEndpointDAO.update(doHEndpoint)
     }
 
-    suspend fun insertAsync(doHEndpoint: DoHEndpoint) {
-        doHEndpointDAO.insert(doHEndpoint)
+    suspend fun insertAsync(doHEndpoint: DoHEndpoint): Long {
+        return doHEndpointDAO.insert(doHEndpoint)
     }
 
     suspend fun deleteOlderData(date: Long) {

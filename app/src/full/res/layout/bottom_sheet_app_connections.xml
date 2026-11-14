@@ -65,6 +65,20 @@
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/extra_large_font_text_view" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bsac_universal_rule_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="20dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="2dp"
+        android:text="@string/bsac_universal_rule_hint"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

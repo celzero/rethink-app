@@ -25,6 +25,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
+import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_PATH
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -37,6 +38,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
@@ -99,13 +101,17 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         Logger.i(LOG_TAG_BACKUP_RESTORE, "restore worker started, workId? $id, isStopped? $isStopped")
         val restoreUri = inputData.getString(DATA_BUILDER_RESTORE_URI)?.toUri()
-        if (restoreUri == null) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "restore uri is null, return failure")
+        val restorePath = inputData.getString(DATA_BUILDER_RESTORE_PATH)
+        if (restoreUri == null && restorePath == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "restore uri and path are null, return failure")
             return Result.failure()
         }
 
-        Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
-        val result = startRestore(restoreUri)
+        Logger.d(
+            LOG_TAG_BACKUP_RESTORE,
+            "begin restore process with file uri: $restoreUri, path: $restorePath"
+        )
+        val result = startRestore(restoreUri, restorePath)
 
         Logger.i(LOG_TAG_BACKUP_RESTORE, "completed restore process, is successful? $result")
         return if (result) {
@@ -115,55 +121,76 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private suspend fun startRestore(importUri: Uri): Boolean {
+    private suspend fun startRestore(importUri: Uri?, importPath: String? = null): Boolean {
+        // a failed restore must not leave a previously-running tunnel down
+        val vpnWasRunning = VpnController.hasTunnel()
         stopVpn(context)
-        try {
-            val tempDir = getTempDir(context)
-            Logger.d(LOG_TAG_BACKUP_RESTORE, "restore process, temp file dir: ${tempDir.path}")
-
-            var unzipped = false
-            context.contentResolver.openInputStream(importUri)?.use { input ->
-                unzipped = unzip(input, tempDir.path)
-            }
-            if (!unzipped) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to unzip the backup into ${tempDir.path}")
-                return false
-            }
-
-            if (!validateMetadata(tempDir)) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "backup metadata missing or unsupported version")
-                return false
-            }
-
-            if (!restoreSharedPreferencesFromFile(tempDir)) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore shared preferences")
-                return false
-            }
-
-            if (!restoreDatabaseFile(tempDir)) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore databases")
-                return false
-            }
-
-            if (!restoreWireGuardFiles(tempDir)) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore wireguard files; clearing wireguard entries")
-                wireGuardCleanup()
-            }
-
-            // HomeScreenActivity's INTENT_RESTART_APP branch ->
-            // RefreshDatabase.ACTION_REFRESH_RESTORE.
-            updateLatestVersion()
-
-            deleteRecursive(tempDir)
-            return true
+        val restored = try {
+            doRestore(importUri, importPath)
         } catch (e: Exception) {
             Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception during restore process, reason? ${e.message}",
                 e
             )
+            false
+        }
+        if (!restored && vpnWasRunning) BackupHelper.startVpn(context)
+        return restored
+    }
+
+    private suspend fun doRestore(importUri: Uri?, importPath: String?): Boolean {
+        val tempDir = getTempDir(context)
+        // clear leftovers of a previously failed restore so a partial unzip of
+        // one backup cannot contaminate the next
+        deleteRecursive(tempDir)
+        if (!tempDir.exists() && !tempDir.mkdirs()) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to create temp dir ${tempDir.path}")
             return false
         }
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "restore process, temp file dir: ${tempDir.path}")
+
+        var unzipped = false
+        if (importPath != null) {
+            FileInputStream(File(importPath)).use { input ->
+                unzipped = unzip(input, tempDir.path)
+            }
+        } else {
+            context.contentResolver.openInputStream(importUri ?: return false)?.use { input ->
+                unzipped = unzip(input, tempDir.path)
+            }
+        }
+        if (!unzipped) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to unzip the backup into ${tempDir.path}")
+            return false
+        }
+
+        if (!validateMetadata(tempDir)) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup metadata missing or unsupported version")
+            return false
+        }
+
+        if (!restoreSharedPreferencesFromFile(tempDir)) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore shared preferences")
+            return false
+        }
+
+        if (!restoreDatabaseFile(tempDir)) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore databases")
+            return false
+        }
+
+        if (!restoreWireGuardFiles(tempDir)) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore wireguard files; clearing wireguard entries")
+            wireGuardCleanup()
+        }
+
+        // HomeScreenActivity's INTENT_RESTART_APP branch ->
+        // RefreshDatabase.ACTION_REFRESH_RESTORE.
+        updateLatestVersion()
+
+        deleteRecursive(tempDir)
+        return true
     }
 
     private fun validateMetadata(tempDir: File): Boolean {

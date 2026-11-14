@@ -602,6 +602,18 @@ object VpnController : KoinComponent {
         rvpn?.crashTun(type)
     }
 
+    suspend fun peekTrace(cid: String): String {
+        return rvpn?.peekTrace(cid) ?: ""
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return rvpn?.getAllTraceLogsAsBytes()
+    }
+
+    suspend fun getTraceCount(): Long {
+        return rvpn?.getTraceCount() ?: 0L
+    }
+
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {
         return rvpn?.getEntitlementDetails(prevBytes, deviceId)
     }

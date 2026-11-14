@@ -29,6 +29,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.CREATED_TIME
+import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_PATH
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.PACKAGE_NAME
@@ -78,13 +79,17 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     override fun doWork(): Result {
         val backupFileUri = inputData.getString(DATA_BUILDER_BACKUP_URI)?.toUri()
-        if (backupFileUri == null) {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup file uri is null, return failure")
+        val backupFilePath = inputData.getString(DATA_BUILDER_BACKUP_PATH)
+        if (backupFileUri == null && backupFilePath == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup file uri and path are null, return failure")
             return Result.failure()
         }
 
-        Logger.d(LOG_TAG_BACKUP_RESTORE, "begin backup process with file uri: $backupFileUri")
-        val isBackupSucceed = startBackupProcess(backupFileUri)
+        Logger.d(
+            LOG_TAG_BACKUP_RESTORE,
+            "begin backup process with file uri: $backupFileUri, path: $backupFilePath"
+        )
+        val isBackupSucceed = startBackupProcess(backupFileUri, backupFilePath)
 
         Logger.i(
             LOG_TAG_BACKUP_RESTORE,
@@ -100,7 +105,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private fun startBackupProcess(backupFileUri: Uri): Boolean {
+    private fun startBackupProcess(backupFileUri: Uri?, backupFilePath: String? = null): Boolean {
         var processCompleted: Boolean
         try {
             // note: the vpn is NOT stopped and the Room instances are NOT closed for a
@@ -150,7 +155,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 return false
             }
 
-            return zipAndCopyToDestination(tempDir, backupFileUri)
+            return zipAndCopyToDestination(tempDir, backupFileUri, backupFilePath)
         } catch (e: Exception) {
             Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
@@ -241,31 +246,52 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         return "$VERSION:${persistentState.appVersion}|$PACKAGE_NAME:${context.packageName}|$CREATED_TIME:${SystemClock.elapsedRealtime()}"
     }
 
-    private fun zipAndCopyToDestination(tempDir: File, destUri: Uri): Boolean {
+    private fun zipAndCopyToDestination(tempDir: File, destUri: Uri?, destPath: String?): Boolean {
         val bZipSucceeded: Boolean = zip(filesPathToZip, tempDir.path)
 
         Logger.i(
             LOG_TAG_BACKUP_RESTORE,
-            "backup zip completed, is success? $bZipSucceeded, proceed to copy $destUri"
+            "backup zip completed, is success? $bZipSucceeded, proceed to copy to $destUri / $destPath"
         )
 
-        if (bZipSucceeded) {
-            val tempZipFile = File(tempDir, TEMP_ZIP_FILE_NAME)
+        if (!bZipSucceeded) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup zip failed, do not proceed")
+            return false
+        }
+
+        val tempZipFile = File(tempDir, TEMP_ZIP_FILE_NAME)
+        try {
+            // file-path fallback: destination is an app-accessible plain file, no SAF
+            if (destPath != null) {
+                val copySucceeded = FileInputStream(tempZipFile).use { input ->
+                    FileOutputStream(File(destPath)).use { output -> copyWithStream(input, output) }
+                }
+                return if (copySucceeded) {
+                    Logger.i(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "Copy completed, delete the temp dir ${tempZipFile.path}"
+                    )
+                    true
+                } else {
+                    Logger.w(LOG_TAG_BACKUP_RESTORE, "copy failed to destination file, path: $destPath")
+                    false
+                }
+            }
+
+            val dest = destUri ?: return false
             val zipFileUri: Uri = Uri.fromFile(tempZipFile)
             val inputStream: InputStream =
                 context.contentResolver.openInputStream(zipFileUri) ?: return false
             val outputStream: OutputStream =
-                context.contentResolver.openOutputStream(destUri) ?: return false
+                context.contentResolver.openOutputStream(dest) ?: return false
 
-            // we are passing the streams instead of actual files because we do not have
-            // write access to the destination dir.
+            // streams, not files: no write access to the destination dir
             val copySucceeded: Boolean = copyWithStream(inputStream, outputStream)
             return if (copySucceeded) {
                 Logger.i(
                     LOG_TAG_BACKUP_RESTORE,
                     "Copy completed, delete the temp dir ${tempZipFile.path}"
                 )
-                deleteResidue(tempZipFile)
                 true
             } else {
                 Logger.w(
@@ -274,9 +300,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 )
                 false
             }
-        } else {
-            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup zip failed, do not proceed")
-            return false
+        } finally {
+            deleteResidue(tempZipFile)
         }
     }
 

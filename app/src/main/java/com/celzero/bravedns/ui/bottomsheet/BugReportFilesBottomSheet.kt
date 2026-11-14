@@ -36,6 +36,7 @@ import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.ProcessInfoCollector
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.TraceLogExporter
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -214,9 +215,21 @@ class BugReportFilesBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun collectAllBugReportFiles(): List<BugReportFile> {
+    private suspend fun collectAllBugReportFiles(): List<BugReportFile> {
         val files = mutableListOf<BugReportFile>()
         val dir = requireContext().filesDir
+
+        // firestack trace logs, freshly written to cacheDir (absent when VPN is off)
+        TraceLogExporter.dumpTraceLogsFile(requireContext())?.let { traceFile ->
+            files.add(
+                BugReportFile(
+                    file = traceFile,
+                    name = traceFile.name,
+                    type = FileType.TEXT,
+                    isSelected = true
+                )
+            )
+        }
 
         // bug report zip
         val bugReportZip = File(BugReportZipper.getZipFileName(dir))

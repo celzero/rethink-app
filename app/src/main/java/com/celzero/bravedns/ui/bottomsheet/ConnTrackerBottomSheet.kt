@@ -34,6 +34,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
@@ -50,6 +51,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.ConnIdLogsActivity
 import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Protocol
@@ -309,6 +311,14 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
             b.connectionMessage.text = info?.message
         }
 
+        val cid = info?.connId.orEmpty()
+        if (cid.isEmpty() || DEBUG) {
+            b.connectionCid.visibility = View.GONE
+        } else {
+            b.connectionCid.text = cid
+            b.connectionCid.visibility = View.VISIBLE
+        }
+
         io {
             val currentInfo = info
             val hasCid = currentInfo != null && VpnController.hasCid(currentInfo.connId, currentInfo.uid)
@@ -452,6 +462,12 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
         b.bsConnRuleRowApp.setOnClickListener { showAppRuleOptionsDialog() }
         b.bsConnRuleRowIp.setOnClickListener { cycleIpRule() }
         b.bsConnRuleRowDomain.setOnClickListener { cycleDomainRule() }
+
+        b.connectionCid.setOnClickListener {
+            val cid = info?.connId ?: return@setOnClickListener
+            if (cid.isEmpty()) return@setOnClickListener
+            openConnIdLogs(cid)
+        }
     }
 
     /**
@@ -648,6 +664,13 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
         this.dismiss()
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
         intent.putExtra(AppInfoActivity.INTENT_UID, uid)
+        requireContext().startActivity(intent)
+    }
+
+    private fun openConnIdLogs(cid: String) {
+        this.dismiss()
+        val intent = Intent(requireContext(), ConnIdLogsActivity::class.java)
+        intent.putExtra(ConnIdLogsActivity.EXTRA_CONN_ID, cid)
         requireContext().startActivity(intent)
     }
 

@@ -4,6 +4,9 @@
 
   Overrides app_name for the `tv` Gradle flavor so the Android TV launcher
   surfaces "Rethink TV" rather than the upstream phone-app label.
+
+  TV screens reuse the main string resources; localized tv_* entries live
+  in app/src/main/res alongside the phone-app strings.
 -->
 <resources>
     <string name="app_name" translatable="false">Rethink TV</string>

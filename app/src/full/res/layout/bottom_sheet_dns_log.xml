@@ -179,6 +179,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:background="?attr/selectableItemBackground"
                     android:baselineAligned="false"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -201,6 +202,15 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view"
                         tools:text="Firefox (10100)" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="8dp"
+                        android:alpha="0.5"
+                        android:contentDescription="@string/bsdl_open_app_info"
+                        android:src="@drawable/ic_right_arrow_small"
+                        app:tint="?attr/primaryLightColorText" />
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatTextView

@@ -90,7 +90,7 @@ object TunFlowManager : KoinComponent {
         val keyguardManager: KeyguardManager?,
         val vpnAdapter: GoVpnAdapter?,
         val connTracer: ConnectionTracer,
-        val prevDns: MutableSet<InetAddress>,
+        val prevDns: Set<InetAddress>,
         val isPrimaryUser: Boolean,
         val context: Context,
         val notificationManager: NotificationManager,
@@ -191,25 +191,8 @@ object TunFlowManager : KoinComponent {
         }
 
         if (s.id.isEmpty()) { // this should not happen, but just in case
-            // in case of empty connId, insert a new entry
-            val cid = "debug-" + Utilities.getRandomString(8)
-            val uid = FirewallManager.appId(s.uid.toInt(), ctx.isPrimaryUser)
-            val cm = createConnTrackerMetaData(
-                uid,
-                uid,
-                s.target,
-                0,
-                s.target,
-                0,
-                0,
-                proxyDetails = s.pid,
-                "",
-                s.target,
-                cid,
-                ConnectionTracker.ConnType.UNMETERED,
-            )
-            aggregateConnActivity(cm)
-            netLogTracker.writeIpLog(cm)
+            // conn-id comes from go; a kotlin-generated one can't be correlated, so drop
+            Logger.e(LOG_TAG_VPN, "onSocketClosed: empty connId in summary: $s")
             return
         }
 
@@ -303,12 +286,13 @@ object TunFlowManager : KoinComponent {
         ctx: FlowContext,
         protocol: Int,
         uid: Int,
+        cid: String,
         src: String?,
         dst: String?
     ): PreMark {
         val srcIpPort = parseIpAndPort(src)
         val dstIpPort = parseIpAndPort(dst)
-        Logger.d(LOG_TAG_VPN, "preflow: init, uid: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
+        Logger.d(LOG_TAG_VPN, "preflow: init, cid: $cid, uid: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
         var newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
             getUid(
                 ctx,
@@ -317,19 +301,20 @@ object TunFlowManager : KoinComponent {
                 srcIpPort.first,
                 srcIpPort.second,
                 dstIpPort.first,
-                dstIpPort.second
+                dstIpPort.second,
+                cid
             )
         } else {
             uid
         }
         // fixme: see flow()
         newUid = FirewallManager.appId(newUid, ctx.isPrimaryUser)
-        Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIpPort, $dstIpPort")
+        Logger.d(LOG_TAG_VPN, "preflow: cid: $cid, uid: $newUid, $srcIpPort, $dstIpPort")
 
         val p = PreMark()
         p.uid = newUid.toString()
         p.isUidSelf = newUid == rethinkUid
-        Logger.i(LOG_TAG_VPN, "preflow: returning uid: ${p.uid} for src: $srcIpPort, dst: $dstIpPort, isRethink? ${p.isUidSelf}")
+        Logger.i(LOG_TAG_VPN, "preflow: returning cid: $cid, uid: ${p.uid} for src: $srcIpPort, dst: $dstIpPort, isRethink? ${p.isUidSelf}")
         return p
     }
 
@@ -337,6 +322,7 @@ object TunFlowManager : KoinComponent {
         ctx: FlowContext,
         protocol: Int,
         _uid: Int,
+        cid: String,
         src: String?,
         dst: String?,
         realIps: String?,
@@ -345,7 +331,10 @@ object TunFlowManager : KoinComponent {
         blocklists: String?,
         isAlg: Boolean
     ): Mark {
-        logd("flow: $_uid, $src, $dst, $realIps, $d, $probableDomains, $blocklists, $isAlg")
+        logd("flow: cid: $cid, $_uid, $src, $dst, $realIps, $d, $probableDomains, $blocklists, $isAlg")
+        if (cid.isEmpty()) {
+            Logger.e(LOG_TAG_VPN, "flow: empty cid received from go, src: $src, dst: $dst")
+        }
         ctx.onVpnLockdownStateChanged()
 
         val srcIpPort = parseIpAndPort(src)
@@ -375,7 +364,8 @@ object TunFlowManager : KoinComponent {
             srcIp,
             srcPort,
             dstIp,
-            dstPort
+            dstPort,
+            cid
         )
         // fixme: decide a behaviour on what uid to use when the firewall rules are
         // handled, either to let user to apply same firewall rules for same app in main user and
@@ -384,10 +374,7 @@ object TunFlowManager : KoinComponent {
         // which can trigger in bypass-dns rule
         uid = FirewallManager.appId(uid, ctx.isPrimaryUser)
         val userId = FirewallManager.userId(uid)
-
-        // generates a random 6-byte value, converts it to hexadecimal, and then
-        // provides the hexadecimal value as a string for connId
-        val connId = Utilities.getRandomString(8)
+        val connId = cid
 
         // TODO: handle multiple domains, for now, use the first domain
         var domains = d?.split(",") ?: emptyList()
@@ -431,7 +418,7 @@ object TunFlowManager : KoinComponent {
 
         // always block, since the vpn tunnel doesn't serve dns-over-tls
         if (trapVpnPrivateDns) {
-            logd("flow: trap vpn private dns ($dstIp), returning Ipn.Block, $uid, $domains")
+            logd("flow: trap vpn private dns ($dstIp), returning Ipn.Block, $connId, $uid, $domains")
             cm.isBlocked = true
             cm.blockedByRule = FirewallRuleset.RULE14.id
             return persistAndConstructFlowResponse(ctx, cm, Backend.Block, connId, uid)
@@ -479,7 +466,7 @@ object TunFlowManager : KoinComponent {
                         Backend.Exit
                     }
                 }
-            logd("flow: return $proxy for $uid, $srcIp, $srcPort, $realDestIp, $dstPort, $domains, $probableDomains")
+            logd("flow: return $proxy for $connId, $uid, $srcIp, $srcPort, $realDestIp, $dstPort, $domains, $probableDomains")
             return persistAndConstructFlowResponse(ctx, cm, proxy, connId, uid)
         }
 
@@ -520,6 +507,7 @@ object TunFlowManager : KoinComponent {
         ctx: FlowContext,
         protocol: Int,
         recvdUid: Int,
+        cid: String,
         src: String?,
         dst: String?
     ): Mark {
@@ -539,15 +527,19 @@ object TunFlowManager : KoinComponent {
             srcIp,
             srcPort,
             dstIp,
-            dstPort
+            dstPort,
+            cid
         )
         // fixme: see flow()
         uid = FirewallManager.appId(uid, ctx.isPrimaryUser)
         val userId = FirewallManager.userId(uid)
 
-        logd("inflow: $uid($recvdUid), $srcIp, $srcPort, $dstIp, $dstPort")
+        logd("inflow: cid: $cid, $uid($recvdUid), $srcIp, $srcPort, $dstIp, $dstPort")
+        if (cid.isEmpty()) {
+            Logger.e(LOG_TAG_VPN, "inflow: empty cid received from go, src: $src, dst: $dst")
+        }
 
-        val connId = Utilities.getRandomString(8)
+        val connId = cid
 
         val connType =
             if (isConnectionMetered(ctx, dstIp)) {
@@ -622,7 +614,7 @@ object TunFlowManager : KoinComponent {
             netLogTracker.writeIpLog(cm)
         }
 
-        logd("flow/postFlow, write conn in db: $mark")
+        logd("flow/postFlow, cid: ${mark.cid}, write conn in db: $mark")
     }
 
     suspend fun hasCid(ctx: FlowContext, connId: String, uid: Int): Boolean {
@@ -802,7 +794,8 @@ object TunFlowManager : KoinComponent {
         srcIp: String,
         srcPort: Int,
         dstIp: String,
-        dstPort: Int
+        dstPort: Int,
+        cid: String
     ): Int {
         val res = if (recdUid != INVALID_UID) {
             recdUid
@@ -813,7 +806,7 @@ object TunFlowManager : KoinComponent {
                 recdUid // uid must have been retrieved from procfs by the caller
             }
         }
-        Logger.vv(LOG_TAG_VPN, "getUid: recdUid: $recdUid, protocol: $protocol, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, result: $res")
+        Logger.vv(LOG_TAG_VPN, "getUid: cid: $cid, recdUid: $recdUid, protocol: $protocol, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, result: $res")
         return res
     }
 

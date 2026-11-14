@@ -26,8 +26,8 @@ class DoTEndpointRepository(private val endpointDao: DoTEndpointDAO) {
         endpointDao.update(endpoint)
     }
 
-    suspend fun insertAsync(endpoint: DoTEndpoint) {
-        endpointDao.insert(endpoint)
+    suspend fun insertAsync(endpoint: DoTEndpoint): Long {
+        return endpointDao.insert(endpoint)
     }
 
     suspend fun deleteOlderData(date: Long) {

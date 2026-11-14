@@ -70,10 +70,18 @@ interface DnsLogDAO {
     @Query("select * from DNSLogs where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where isBlocked = 1 and uid = :uid order by id desc LIMIT $MAX_LOGS")
+    fun getBlockedDnsLogs(uid: Int): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString or flag = :searchString or appName like :searchString) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString or flag = :searchString or appName like :searchString) and isBlocked = 1 and uid = :uid order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getBlockedDnsLogsByName(searchString: String, uid: Int): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS"

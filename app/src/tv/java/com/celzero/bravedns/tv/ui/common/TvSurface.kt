@@ -30,6 +30,7 @@ import androidx.tv.material3.Glow
 import androidx.tv.material3.SurfaceColors
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Surface as TvMaterialSurface
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 
 /**
  * Drop-in replacement for [androidx.tv.material3.Surface] that also responds to
@@ -50,9 +51,9 @@ fun Surface(
     tonalElevation: Dp = 0.dp,
     shape: ClickableSurfaceShape = ClickableSurfaceDefaults.shape(),
     colors: ClickableSurfaceColors = ClickableSurfaceDefaults.colors(),
-    scale: ClickableSurfaceScale = ClickableSurfaceDefaults.scale(),
+    scale: ClickableSurfaceScale = TvSurfaceStyles.expressiveScale(),
     border: ClickableSurfaceBorder = ClickableSurfaceDefaults.border(),
-    glow: ClickableSurfaceGlow = ClickableSurfaceDefaults.glow(),
+    glow: ClickableSurfaceGlow = TvSurfaceStyles.expressiveGlow(),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {

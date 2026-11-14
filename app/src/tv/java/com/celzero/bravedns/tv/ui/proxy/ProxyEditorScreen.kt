@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +42,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -129,7 +129,7 @@ fun ProxyEditorScreen(kind: ProxyEditorKind) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap),
         ) {
             OutlinedTextField(
                 value = host,
@@ -174,8 +174,8 @@ fun ProxyEditorScreen(kind: ProxyEditorKind) {
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(Modifier.height(TvSpacing.GroupGap))
+            Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap)) {
                 Button(onClick = {
                     val p = port.toIntOrNull() ?: 0
                     if (host.isBlank() || p <= 0 || p > 65535) {
@@ -240,7 +240,7 @@ fun ProxyEditorScreen(kind: ProxyEditorKind) {
                     }
                 }
             }
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(TvSpacing.SectionGap))
         }
     }
 }

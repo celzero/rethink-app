@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/conn_id_logs_info_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"
+        android:fontFamily="serif-monospace"
+        android:textSize="@dimen/small_font_text_view"
+        android:textColor="?attr/primaryLightColorText"
+        tools:text="Connection Logs abc123def456" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/conn_id_logs_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/conn_id_logs_info_text"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:fastScrollEnabled="false"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/conn_id_logs_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/conn_id_logs_empty"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</RelativeLayout>

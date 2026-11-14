@@ -10,30 +10,54 @@
 package com.celzero.bravedns.tv.ui.rules
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.ClickableSurfaceDefaults
+import androidx.navigation.NavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
-import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.SurfaceDefaults
-import androidx.tv.material3.Text
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.tv.ui.apps.AppRow
+import com.celzero.bravedns.tv.ui.apps.toRow
+import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
+import com.celzero.bravedns.tv.ui.common.TvButton
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
+import com.celzero.bravedns.tv.ui.common.TvTabRow
+import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.tv.material3.Text
+
+/** savedStateHandle key the app picker uses to return the picked uid. */
+internal const val PICKED_UID_KEY = "rulesPickedUid"
 
 private enum class RulesTab(val label: String) {
     DOMAINS("Domains"),
@@ -42,19 +66,91 @@ private enum class RulesTab(val label: String) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun RulesScreen() {
-    var activeTab by remember { mutableStateOf(RulesTab.DOMAINS) }
+fun RulesScreen(navController: NavController) {
+    val scope = rememberCoroutineScope()
+    var activeTab by rememberSaveable { mutableStateOf(RulesTab.DOMAINS) }
+    var selectedUid by rememberSaveable { mutableStateOf(Constants.UID_EVERYBODY) }
+    var domainQuery by rememberSaveable { mutableStateOf("") }
+    var ipQuery by rememberSaveable { mutableStateOf("") }
+    var confirmDeleteAll by remember { mutableStateOf(false) }
+    var pendingDelete by remember { mutableStateOf<PendingRuleDelete?>(null) }
+
+    // App picker hands back the picked uid on the caller's savedStateHandle.
+    LaunchedEffect(navController.currentBackStackEntry) {
+        val handle = navController.currentBackStackEntry?.savedStateHandle ?: return@LaunchedEffect
+        handle.getStateFlow(PICKED_UID_KEY, Constants.UID_EVERYBODY).collect { uid ->
+            if (uid != Constants.UID_EVERYBODY) {
+                selectedUid = uid
+                handle[PICKED_UID_KEY] = Constants.UID_EVERYBODY
+            }
+        }
+    }
+
+    val appRows by rememberAsImmutableState(
+        liveData = FirewallManager.getApplistObserver(),
+        initial = emptyList<AppRow>(),
+    ) { apps -> apps.orEmpty().map { it.toRow() } }
+    val appName = if (selectedUid == Constants.UID_EVERYBODY) {
+        null
+    } else {
+        appRows.firstOrNull { it.uid == selectedUid }?.appName ?: "Unknown app"
+    }
+
+    val addRoute = when (activeTab) {
+        RulesTab.DOMAINS -> "rules/add/domain?uid=$selectedUid"
+        RulesTab.IPS -> "rules/add/ip?uid=$selectedUid"
+    }
 
     TvScreenScaffold(
         title = "Rules",
-        subtitle = "Cycle the universal custom domain and IP rules already stored on device.",
+        subtitle = "Add, search, and manage universal or per-app custom domain and IP rules.",
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                // trap D-pad focus away from the background while a
+                // delete confirmation is up (dialog buttons stay focusable)
+                .then(
+                    if (confirmDeleteAll || pendingDelete != null) {
+                        Modifier.focusProperties { canFocus = false }
+                    } else {
+                        Modifier
+                    }
+                ),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         ) {
             RulesTabs(active = activeTab, onSelect = { activeTab = it })
-            ScopeBanner()
+            ScopeRow(
+                uid = selectedUid,
+                appName = appName,
+                onPickApp = { navController.navigate("rules/app-picker") },
+                onChangeApp = { navController.navigate("rules/app-picker") },
+                onClearApp = { selectedUid = Constants.UID_EVERYBODY },
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap),
+            ) {
+                val query = if (activeTab == RulesTab.DOMAINS) domainQuery else ipQuery
+                RulesSearchField(
+                    query = query,
+                    onQueryChange = { value ->
+                        if (activeTab == RulesTab.DOMAINS) domainQuery = value else ipQuery = value
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+                TvButton(
+                    text = "Add rule",
+                    onClick = { navController.navigate(addRoute) },
+                )
+                TvButton(
+                    text = "Delete all",
+                    destructive = true,
+                    onClick = { confirmDeleteAll = true },
+                )
+            }
+
             SettingSectionHeader(
                 when (activeTab) {
                     RulesTab.DOMAINS -> "Domain rules"
@@ -62,10 +158,77 @@ fun RulesScreen() {
                 },
             )
             Spacer(Modifier.height(4.dp))
-            when (activeTab) {
-                RulesTab.DOMAINS -> CustomDomainRulesList()
-                RulesTab.IPS -> CustomIpRulesList()
+            // key per scope: rows (and their captured callbacks) reset
+            // when the uid changes, so stale-uid select/delete can't fire
+            key(selectedUid) {
+                when (activeTab) {
+                    RulesTab.DOMAINS ->
+                        CustomDomainRulesList(
+                            uid = selectedUid,
+                            query = domainQuery,
+                            appName = appName,
+                            onDeleteRequest = { pendingDelete = PendingRuleDelete.DomainRule(it) },
+                        )
+                    RulesTab.IPS ->
+                        CustomIpRulesList(
+                            uid = selectedUid,
+                            query = ipQuery,
+                            appName = appName,
+                            onDeleteRequest = { pendingDelete = PendingRuleDelete.IpRule(it) },
+                        )
+                }
             }
+        }
+
+        // delete confirmations render in the scaffold's content Box so
+        // they overlay the full content area instead of a list's bounds
+        if (confirmDeleteAll) {
+            val tabLabel = if (activeTab == RulesTab.DOMAINS) "domain" else "IP"
+            val scopeLabel = appName ?: "Universal"
+            RulesConfirmDialog(
+                title = "Delete all $tabLabel rules?",
+                message =
+                    "This removes every custom $tabLabel rule for $scopeLabel. This cannot be undone.",
+                confirmLabel = "Delete all",
+                onConfirm = {
+                    confirmDeleteAll = false
+                    val uid = selectedUid
+                    val tab = activeTab
+                    scope.launch(Dispatchers.IO) {
+                        when (tab) {
+                            RulesTab.DOMAINS -> RulesScopeOps.deleteAllDomainRules(uid)
+                            RulesTab.IPS -> RulesScopeOps.deleteAllIpRules(uid)
+                        }
+                    }
+                },
+                onDismiss = { confirmDeleteAll = false },
+            )
+        }
+
+        pendingDelete?.let { pending ->
+            val scopeLabel = appName ?: "Universal"
+            RulesConfirmDialog(
+                title = "Delete rule?",
+                message = when (pending) {
+                    is PendingRuleDelete.DomainRule ->
+                        "Remove \"${pending.row.domain}\" from $scopeLabel custom domain rules?"
+                    is PendingRuleDelete.IpRule ->
+                        "Remove \"${pending.row.ipAddress}\" from $scopeLabel custom IP rules?"
+                },
+                confirmLabel = "Delete",
+                onConfirm = {
+                    pendingDelete = null
+                    scope.launch(Dispatchers.IO) {
+                        when (pending) {
+                            is PendingRuleDelete.DomainRule ->
+                                DomainRulesManager.deleteRules(listOf(pending.row.toEntity()))
+                            is PendingRuleDelete.IpRule ->
+                                IpRulesManager.deleteRules(listOf(pending.row.toEntity()))
+                        }
+                    }
+                },
+                onDismiss = { pendingDelete = null },
+            )
         }
     }
 }
@@ -73,47 +236,25 @@ fun RulesScreen() {
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun RulesTabs(active: RulesTab, onSelect: (RulesTab) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        RulesTab.entries.forEach { tab ->
-            val isActive = tab == active
-            Surface(
-                onClick = { onSelect(tab) },
-                shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = if (isActive) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    },
-                    contentColor = if (isActive) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
-            ) {
-                Box(modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp)) {
-                    Text(
-                        text = tab.label,
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                        ),
-                    )
-                }
-            }
-        }
-    }
+    TvTabRow(
+        tabs = RulesTab.entries.toList(),
+        selected = active,
+        label = { it.label },
+        onSelect = onSelect,
+    )
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun ScopeBanner() {
+private fun ScopeRow(
+    uid: Int,
+    appName: String?,
+    onPickApp: () -> Unit,
+    onChangeApp: () -> Unit,
+    onClearApp: () -> Unit,
+) {
     Surface(
-        shape = RoundedCornerShape(12.dp),
+        shape = TvShapes.Small,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -122,17 +263,20 @@ private fun ScopeBanner() {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "Scope",
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelLarge,
             )
-            ScopeTag(text = "Universal only")
-            Text(
-                text = "Per-app rule groups can land in a follow-up.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (uid == Constants.UID_EVERYBODY) {
+                ScopeTag(text = "Universal")
+                TvSelectableChip(label = "Pick app…", selected = false, onClick = onPickApp)
+            } else {
+                ScopeTag(text = appName ?: "Unknown app")
+                TvSelectableChip(label = "Change app", selected = false, onClick = onChangeApp)
+                TvSelectableChip(label = "Clear", selected = false, onClick = onClearApp)
+            }
         }
     }
 }
@@ -141,7 +285,7 @@ private fun ScopeBanner() {
 @Composable
 private fun ScopeTag(text: String) {
     Surface(
-        shape = RoundedCornerShape(50),
+        shape = TvShapes.Pill,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
             contentColor = MaterialTheme.colorScheme.primary,
@@ -149,8 +293,30 @@ private fun ScopeTag(text: String) {
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
         )
     }
+}
+
+@Composable
+private fun RulesSearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        singleLine = true,
+        placeholder = {
+            Text(
+                text = "Search rules…",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        modifier = modifier,
+    )
 }

@@ -193,7 +193,7 @@ class ConnectionTrackerFragment :
         b.recyclerConnection.adapter = recyclerAdapter
 
         viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
-            recyclerAdapter.submitData(lifecycle, pagingData)
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, pagingData)
         }
 
         recyclerAdapter.addLoadStateListener { loadState ->
@@ -215,7 +215,7 @@ class ConnectionTrackerFragment :
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE
                 }
-                viewModel.connectionTrackerList.removeObservers(this)
+                viewModel.connectionTrackerList.removeObservers(viewLifecycleOwner)
                 b.recyclerConnection.visibility = View.GONE
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
@@ -248,7 +248,7 @@ class ConnectionTrackerFragment :
         b.recyclerConnection.adapter = recyclerAdapter
 
         viewModel.connectionTrackerListMerged.observe(viewLifecycleOwner) { pagingData ->
-            recyclerAdapter.submitData(lifecycle, pagingData)
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, pagingData)
         }
 
         recyclerAdapter.addLoadStateListener { loadState ->
@@ -271,7 +271,6 @@ class ConnectionTrackerFragment :
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE
                 }
-                viewModel.connectionTrackerListMerged.removeObservers(this)
                 b.recyclerConnection.visibility = View.GONE
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
@@ -321,6 +320,7 @@ class ConnectionTrackerFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+                    if (view == null) return
 
                     val now = System.currentTimeMillis()
                     if (now - lastScrollHeaderUpdateMs < 100L) return
@@ -338,12 +338,13 @@ class ConnectionTrackerFragment :
                         return
                     }
 
-                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
+                    b.connectionListScrollHeader.text = formatToRelativeTime(recyclerView.context, tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
+                    if (view == null) return
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         b.connectionListScrollHeader.visibility = View.GONE
                     }

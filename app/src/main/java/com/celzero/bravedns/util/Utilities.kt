@@ -65,6 +65,7 @@ import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.util.Constants.Companion.BUILD_TYPE_ALPHA
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_TV
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -741,6 +742,10 @@ object Utilities {
 
     fun isFdroidFlavour(): Boolean {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_FDROID
+    }
+
+    fun isTvFlavour(): Boolean {
+        return BuildConfig.FLAVOR_releaseType == FLAVOR_TV
     }
 
     fun isWebsiteFlavour(): Boolean {

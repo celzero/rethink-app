@@ -25,7 +25,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,11 +47,16 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN_ALPHA
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME_DATETIME
+import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_PATH
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
+import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_PATH
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_OCTET
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
+import com.celzero.bravedns.backup.BackupHelper.Companion.getBackupExportDir
+import com.celzero.bravedns.backup.BackupHelper.Companion.getBackupFileNameFromUri
+import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.databinding.ActivityBackupRestoreBinding
 import com.celzero.bravedns.service.PersistentState
@@ -61,6 +65,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -140,49 +145,62 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         return getString(R.string.build__flavor_website)
     }
 
+    // filename format (Rethink_version_DATE_FORMAT.rbk)
+    private fun getBackupZipFileName(): String {
+        val sdf = SimpleDateFormat(BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
+        val version = getVersionName().replace(' ', '_')
+        val bkExtension = if (Utilities.isAlphaBuild()) {
+            BACKUP_FILE_EXTN_ALPHA
+        } else {
+            BACKUP_FILE_EXTN
+        }
+        return BACKUP_FILE_NAME + version + sdf.format(Date()) + bkExtension
+    }
+
     private fun backup() {
         try {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
             // have complete access to the physical location returned as part of result
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = INTENT_TYPE_OCTET
-            val sdf = SimpleDateFormat(BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-            // filename format (Rethink_version_DATA_FORMAT.bk)
-            val version = getVersionName().replace(' ', '_')
-            val bkExtension = if (Utilities.isAlphaBuild()) {
-                BACKUP_FILE_EXTN_ALPHA
-            } else {
-                BACKUP_FILE_EXTN
-            }
-            val zipFileName: String = BACKUP_FILE_NAME + version + sdf.format(Date()) + bkExtension
+            intent.putExtra(Intent.EXTRA_TITLE, getBackupZipFileName())
 
-            intent.putExtra(Intent.EXTRA_TITLE, zipFileName)
-
-            // Check if there's an activity that can handle this intent
+            // launch is not subject to package-visibility filtering, unlike resolveActivity
             try {
-                if (intent.resolveActivity(requireContext().packageManager) != null) {
-                    backupActivityResult.launch(intent)
-                } else {
-                    Logger.e(LOG_TAG_BACKUP_RESTORE, "No activity found to handle CREATE_DOCUMENT intent")
-                    Utilities.showToastUiCentered(
-                        requireContext(),
-                        getString(R.string.brbs_backup_dialog_failure_message),
-                        Toast.LENGTH_LONG
-                    )
-                }
+                backupActivityResult.launch(intent)
             } catch (e: android.content.ActivityNotFoundException) {
-                Logger.e(LOG_TAG_BACKUP_RESTORE, "Activity not found for CREATE_DOCUMENT: ${e.message}")
-                Utilities.showToastUiCentered(
-                    requireContext(),
-                    getString(R.string.brbs_backup_dialog_failure_message),
-                    Toast.LENGTH_LONG
-                )
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "no activity for CREATE_DOCUMENT: ${e.message}")
+                backupToAppFolder()
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BACKUP_RESTORE, "err opening file picker for backup: ${e.message}")
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.brbs_backup_dialog_failure_message),
+                Toast.LENGTH_LONG
+            )
+        }
+    }
+
+    private fun backupToAppFolder() {
+        val exportDir = getBackupExportDir(requireContext())
+        if (exportDir == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup export dir unavailable, cannot fallback")
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_no_file_picker_backup),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+        val destFile = File(exportDir, getBackupZipFileName())
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "no file picker, backup to app folder: ${destFile.path}")
+        val accepted =
+            startBackupProcess(backupUri = null, backupPath = destFile.absolutePath)
+        if (accepted) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_backup_saved_app_folder_warning, exportDir.absolutePath),
                 Toast.LENGTH_LONG
             )
         }
@@ -251,15 +269,62 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             val mimeTypes = arrayOf(INTENT_TYPE_OCTET, INTENT_TYPE_XZIP)
             intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
 
-            restoreActivityResult.launch(intent)
+            // launch is not subject to package-visibility filtering, unlike resolveActivity
+            try {
+                restoreActivityResult.launch(intent)
+            } catch (e: android.content.ActivityNotFoundException) {
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "no activity for OPEN_DOCUMENT: ${e.message}")
+                restoreFromAppFolder()
+            }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BACKUP_RESTORE, "err opening file picker: ${e.message}")
             Utilities.showToastUiCentered(
                 requireContext(),
-                getString(R.string.blocklist_update_check_failure),
+                getString(R.string.brbs_no_file_picker_restore),
                 Toast.LENGTH_SHORT
             )
         }
+    }
+
+    private fun restoreFromAppFolder() {
+        val exportDir = getBackupExportDir(requireContext())
+        val expectedExtension =
+            if (Utilities.isAlphaBuild()) BACKUP_FILE_EXTN_ALPHA else BACKUP_FILE_EXTN
+        val backupFiles = exportDir?.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(expectedExtension) }
+            ?.sortedByDescending { it.lastModified() }
+            .orEmpty()
+
+        if (backupFiles.isEmpty()) {
+            Logger.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "no backup files in app folder: ${exportDir?.absolutePath}"
+            )
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(
+                    R.string.brbs_restore_folder_empty,
+                    expectedExtension,
+                    exportDir?.absolutePath ?: ""
+                ),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+
+        val fileNames = backupFiles.map { it.name }.toTypedArray()
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.brbs_restore_pick_file_title)
+            .setSingleChoiceItems(fileNames, -1) { dialog, which ->
+                dialog.dismiss()
+                startRestoreProcess(fileUri = null, filePath = backupFiles[which].absolutePath)
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+                // no-op
+            }
+            .setCancelable(true)
+            .create()
+            .show()
     }
 
     private fun result() {
@@ -321,19 +386,8 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         }
     }
 
-    private fun getFileNameFromUri(uri: Uri): String {
-        var name = ""
-        requireContext().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (idx >= 0) name = cursor.getString(idx) ?: ""
-            }
-        }
-        return name
-    }
-
-    private fun startRestoreProcess(fileUri: Uri?) {
-        if (fileUri == null) {
+    private fun startRestoreProcess(fileUri: Uri?, filePath: String? = null) {
+        if (fileUri == null && filePath == null) {
             Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
                 "uri received from activity result is null, cancel restore process"
@@ -342,11 +396,26 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             return
         }
 
+        if (BackupHelper.isBackupRestoreActive(requireContext())) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup/restore already active, dropping restore")
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_backup_restore_in_progress),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         // Validate that the selected file matches the expected extension for this build type.
         // Alpha builds require .rbka files; regular builds require .rbk files.
         val expectedExtension =
             if (Utilities.isAlphaBuild()) BACKUP_FILE_EXTN_ALPHA else BACKUP_FILE_EXTN
-        val fileName = getFileNameFromUri(fileUri)
+        val fileName =
+            if (fileUri != null) {
+                getBackupFileNameFromUri(requireContext(), fileUri)
+            } else {
+                getFileNameFromPath(filePath ?: "")
+            }
         if (!fileName.endsWith(expectedExtension)) {
             Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
@@ -362,7 +431,11 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
 
         Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
-        data.putString(DATA_BUILDER_RESTORE_URI, fileUri.toString())
+        if (fileUri != null) {
+            data.putString(DATA_BUILDER_RESTORE_URI, fileUri.toString())
+        } else {
+            data.putString(DATA_BUILDER_RESTORE_PATH, filePath)
+        }
 
         val importWorker =
             OneTimeWorkRequestBuilder<RestoreAgent>()
@@ -374,24 +447,36 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
                 )
                 .addTag(RestoreAgent.TAG)
                 .build()
-        // unique work: a concurrent restore (double-tap or the other entry point)
-        // would close/copy the same database files simultaneously and corrupt them
+        // unique work shared with backup: a concurrent backup or restore (double-tap or
+        // the other entry point) would close/copy the same database files and corrupt them
         WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            RestoreAgent.TAG,
+            BackupHelper.BACKUP_RESTORE_WORK_NAME,
             ExistingWorkPolicy.KEEP,
             importWorker
         )
         observeRestoreWorker(importWorker.id)
     }
 
-    private fun startBackupProcess(backupUri: Uri?) {
-        if (backupUri == null) {
+    // returns true only when the work request was actually enqueued; callers use this
+    // to decide whether to show the submission toast
+    private fun startBackupProcess(backupUri: Uri?, backupPath: String? = null): Boolean {
+        if (backupUri == null && backupPath == null) {
             Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
                 "uri received from activity result is null, cancel backup process"
             )
             showBackupFailureDialog()
-            return
+            return false
+        }
+
+        if (BackupHelper.isBackupRestoreActive(requireContext())) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup/restore already active, dropping backup")
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_backup_restore_in_progress),
+                Toast.LENGTH_SHORT
+            )
+            return false
         }
 
         // stop vpn before beginning the backup process
@@ -400,7 +485,11 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the backup process")
         val data = Data.Builder()
 
-        data.putString(DATA_BUILDER_BACKUP_URI, backupUri.toString())
+        if (backupUri != null) {
+            data.putString(DATA_BUILDER_BACKUP_URI, backupUri.toString())
+        } else {
+            data.putString(DATA_BUILDER_BACKUP_PATH, backupPath)
+        }
         val downloadWatcher =
             OneTimeWorkRequestBuilder<BackupAgent>()
                 .setInputData(data.build())
@@ -411,8 +500,14 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
                 )
                 .addTag(BackupAgent.TAG)
                 .build()
-        WorkManager.getInstance(requireContext()).beginWith(downloadWatcher).enqueue()
+        // unique work shared with restore (see startRestoreProcess)
+        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+            BackupHelper.BACKUP_RESTORE_WORK_NAME,
+            ExistingWorkPolicy.KEEP,
+            downloadWatcher
+        )
         observeBackupWorker(downloadWatcher.id)
+        return true
     }
 
     private fun showBackupFailureDialog() {

@@ -1600,10 +1600,12 @@
 
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
+    <string name="bsac_universal_rule_hint" translatable="true">A universal rule exists for this domain or IP.</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_blocked_desc" translatable="true">blocked %1$s by %2$s</string>
     <string name="bsdl_open_domain_connections" translatable="true">Open domain connections</string>
+    <string name="bsdl_open_app_info" translatable="true">Open app info</string>
     <string name="bsdl_meta_app" translatable="true">App</string>
     <string name="bsdl_meta_response" translatable="true">Response</string>
     <string name="bsdl_meta_alias" translatable="true">Alias</string>
@@ -1724,6 +1726,13 @@
     <string name="brbs_backup_complete_toast" translatable="true">Backup completed</string>
     <string name="brbs_restore_invalid_file" translatable="false">Invalid backup file. Please select a %1$s backup file for this build.</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Restore failed; try again</string>
+    <string name="brbs_no_file_picker_backup" translatable="true">No file picker available and the app folder is unusable. Backup was not saved.</string>
+    <string name="brbs_backup_saved_app_folder_warning" translatable="true">Backup will be saved to %1$s. Files here are deleted if the app is uninstalled.</string>
+    <string name="brbs_backup_saved_to" translatable="false">Saving backup to %1$s</string>
+    <string name="brbs_no_file_picker_restore" translatable="true">No file picker available on this device.</string>
+    <string name="brbs_restore_folder_empty" translatable="true">No %1$s backup found in %2$s. Copy your backup file there and try again.</string>
+    <string name="brbs_restore_pick_file_title" translatable="true">Select backup file</string>
+    <string name="brbs_backup_restore_in_progress" translatable="true">Backup or restore already in progress</string>
 
     <!-- Rethink simple view -->
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklists</string>
@@ -1890,6 +1899,10 @@
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Logs</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
+
+    <string name="conn_id_logs_title" translatable="true">Connection Logs</string>
+    <string name="conn_id_logs_empty" translatable="true">No logs found for this connection</string>
+    <string name="conn_id_logs_live_trace" translatable="true">── Live trace ──</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
@@ -2561,6 +2574,8 @@
     <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy statistics</string>
     <string name="support_attach_proc_info" translatable="false">System State</string>
     <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state</string>
+    <string name="support_attach_trace_log" translatable="false">Trace Logs</string>
+    <string name="support_attach_trace_log_desc" translatable="false">Go-engine connection trace for this session</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
     <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
@@ -3086,4 +3101,12 @@
     <string name="connection_check_steps_heading" translatable="false">Reason chain</string>
     <string name="connection_check_err_domain" translatable="false">Enter a domain to check</string>
     <string name="connection_check_err_ip" translatable="false">Enter a valid IP address</string>
+
+    <string name="tv_open_action" translatable="true">Open ›</string>
+    <string name="tv_rpn_stats_title" translatable="true">RPN stats</string>
+    <string name="tv_rpn_stats_subtitle_fmt" translatable="true">Last %1$dh of RPN-routed traffic.</string>
+    <string name="tv_rpn_stats_top_apps_fmt" translatable="true">Top apps · last %1$dh</string>
+    <string name="tv_rpn_stats_empty_fmt" translatable="true">No connections have gone through selected servers in the last %1$dh.</string>
+    <string name="tv_rpn_stats_logs_subtitle" translatable="true">Inspect individual RPN-routed connections.</string>
+    <string name="tv_rpn_stats_window_fmt" translatable="true">%1$dh</string>
 </resources>

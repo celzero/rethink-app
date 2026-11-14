@@ -79,22 +79,19 @@
             android:paddingBottom="112dp">
 
             <androidx.appcompat.widget.AppCompatTextView
+                style="@style/RethinkPlus.SectionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/support_section_describe"
-                android:textStyle="bold"
-                style="@style/TextAppearance.Material3.TitleSmall"
-                android:textColor="?attr/colorPrimary"
-                android:letterSpacing="0.08"
                 android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:text="@string/support_section_describe" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/RethinkPlus.ContentCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:cardCornerRadius="16dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -200,22 +197,19 @@
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.appcompat.widget.AppCompatTextView
+                style="@style/RethinkPlus.SectionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/support_section_attachments"
-                android:textStyle="bold"
-                style="@style/TextAppearance.Material3.TitleSmall"
-                android:textColor="?attr/colorPrimary"
-                android:letterSpacing="0.08"
                 android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:text="@string/support_section_attachments" />
 
             <com.google.android.material.card.MaterialCardView
+                style="@style/RethinkPlus.ContentCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:cardCornerRadius="16dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -224,58 +218,13 @@
                     android:padding="16dp">
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/RethinkPlus.RowSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/support_attachments_desc"
-                        android:textSize="13sp"
-                        android:textColor="?attr/primaryLightColorText"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="12dp"
                         android:lineSpacingExtra="3dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/support_attach_sub_status"
-                                android:textStyle="bold"
-                                android:textColor="?attr/primaryTextColor" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/support_attach_sub_status_desc"
-                                android:textSize="12sp"
-                                android:textColor="?attr/primaryLightColorText" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/switch_attach_status"
-                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/divider"
-                        android:layout_marginBottom="10dp" />
+                        android:text="@string/support_attachments_desc" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -283,84 +232,140 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
 
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            app:srcCompat="@drawable/ic_check_circle"
+                            app:tint="?attr/accentGood" />
+
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/support_attach_vpn_stats"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium"
-                                android:textColor="?attr/primaryTextColor" />
+                                android:text="@string/support_attach_sub_status" />
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowSubtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/support_attach_vpn_stats_desc"
-                                android:textSize="12sp"
-                                android:textColor="?attr/primaryLightColorText" />
+                                android:text="@string/support_attach_sub_status_desc" />
 
                         </LinearLayout>
 
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/switch_attach_stats"
-                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true" />
-
                     </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/divider"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="10dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            app:srcCompat="@drawable/ic_check_circle"
+                            app:tint="?attr/accentGood" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/support_attach_proc_info"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium"
-                                android:textColor="?attr/primaryTextColor" />
+                                android:text="@string/support_attach_vpn_stats" />
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowSubtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/support_attach_proc_info_desc"
-                                android:textSize="12sp"
-                                android:textColor="?attr/primaryLightColorText" />
+                                android:text="@string/support_attach_vpn_stats_desc" />
 
                         </LinearLayout>
 
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/switch_attach_proc_info"
-                            style="@style/CustomWidget.Material3.CompoundButton.MaterialSwitch"
-                            android:layout_width="wrap_content"
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            app:srcCompat="@drawable/ic_check_circle"
+                            app:tint="?attr/accentGood" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:checked="true" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/support_attach_proc_info" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowSubtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/support_attach_proc_info_desc" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            app:srcCompat="@drawable/ic_check_circle"
+                            app:tint="?attr/accentGood" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/support_attach_trace_log" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/RethinkPlus.RowSubtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/support_attach_trace_log_desc" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -397,12 +402,12 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/support_privacy_note"
-            android:textSize="10sp"
+            android:textSize="@dimen/small_font_text_view"
             android:alpha="0.8"
             android:layout_marginTop="6dp"
             android:paddingStart="20dp"

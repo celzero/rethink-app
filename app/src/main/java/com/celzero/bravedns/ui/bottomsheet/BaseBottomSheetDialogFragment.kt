@@ -19,6 +19,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.NestedScrollView
 import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -65,6 +66,9 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         bottomSheet.layoutParams.height = bottomSheetHeight
         bottomSheet.requestLayout()
 
+        // stale focused child would crash NestedScrollView's focus-scroll on resize
+        guardScrollViewFocus(bottomSheet)
+
         // Dialog windows do not consult the activity's onWindowStartingActionMode, so
         // selectable text inside sheets is disabled directly on affected installs.
         TextSelectionGuard.apply(bottomSheet)
@@ -73,6 +77,25 @@ abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
             state = BottomSheetBehavior.STATE_EXPANDED
             skipCollapsed = true
         }
+    }
+
+    // focus-scroll during sheet resize crashes when the NSV is not itself the focus target
+    private fun guardScrollViewFocus(root: View) {
+        if (root is NestedScrollView) {
+            root.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+            root.isFocusableInTouchMode = true
+        }
+        if (root is ViewGroup) {
+            for (i in 0 until root.childCount) {
+                guardScrollViewFocus(root.getChildAt(i))
+            }
+        }
+    }
+
+    override fun onStop() {
+        // Clear focus before dialog teardown so the sheet never keeps a stale focus chain.
+        view?.clearFocus()
+        super.onStop()
     }
 
     /**

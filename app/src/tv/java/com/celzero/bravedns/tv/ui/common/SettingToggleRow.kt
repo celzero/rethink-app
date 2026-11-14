@@ -10,7 +10,6 @@
 package com.celzero.bravedns.tv.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,16 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import com.celzero.bravedns.tv.ui.common.Surface
-import androidx.tv.material3.SurfaceDefaults
+import androidx.tv.material3.Switch
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSizes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 
 /**
  * A focusable, click-to-toggle setting row used by Firewall and
@@ -82,6 +78,7 @@ fun SettingToggleRow(
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
+    leadingIconRes: Int? = null,
     modifier: Modifier = Modifier,
 ) {
     // Mirror prop into local state so taps feel instant; resync if
@@ -95,41 +92,41 @@ fun SettingToggleRow(
             onCheckedChange(next)
         },
         enabled = enabled,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
+        scale = TvSurfaceStyles.expressiveScale(),
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = TvSpacing.RowGap),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(
+                    horizontal = TvSpacing.ContentHorizontal,
+                    vertical = TvSpacing.ContentVertical,
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (leadingIcon != null) {
                 Icon(
                     imageVector = leadingIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(TvSizes.LeadingIcon),
                 )
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(TvSpacing.IconTextGap))
+            } else if (leadingIconRes != null) {
+                Icon(
+                    painter = painterResource(leadingIconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(TvSizes.LeadingIcon),
+                )
+                Spacer(Modifier.width(TvSpacing.IconTextGap))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 if (!description.isNullOrBlank()) {
                     Spacer(Modifier.height(4.dp))
@@ -140,45 +137,15 @@ fun SettingToggleRow(
                     )
                 }
             }
-            Spacer(Modifier.width(20.dp))
-            ToggleStateTile(checked = localChecked)
-        }
-    }
-}
-
-/**
- * Visual indicator that replaces the small material Switch widget.
- * At 10 ft a 44 dp filled circle with a check is far easier to parse
- * than an animated thumb.
- */
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ToggleStateTile(checked: Boolean) {
-    val container = if (checked) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-    Surface(
-        shape = CircleShape,
-        colors = SurfaceDefaults.colors(containerColor = container),
-        modifier = Modifier.size(44.dp),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            if (checked) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = "On",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(28.dp),
-                )
-            } else {
-                Text(
-                    text = "Off",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            }
+            Spacer(Modifier.width(TvSpacing.ContentHorizontal))
+            // Display-only Material switch: the whole row is the
+            // D-pad target, so the switch itself is non-interactive
+            // and mirrors the row state.
+            Switch(
+                checked = localChecked,
+                onCheckedChange = null,
+                enabled = enabled,
+            )
         }
     }
 }
@@ -193,12 +160,9 @@ fun SettingSectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text.uppercase(),
         color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelLarge.copy(
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.5.sp,
-        ),
+        style = MaterialTheme.typography.labelLarge,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 16.dp, bottom = 8.dp, start = 4.dp),
+            .padding(top = TvSpacing.GroupGap, bottom = TvSpacing.HeaderGap, start = 4.dp),
     )
 }

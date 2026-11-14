@@ -17,6 +17,9 @@ package com.celzero.bravedns.backup
 
 import com.celzero.bravedns.util.Logger
 import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.work.WorkManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.VpnController
@@ -59,6 +62,15 @@ class BackupHelper {
         // data builder uri string for backup worker
         const val DATA_BUILDER_BACKUP_URI = "backupFileUri"
 
+        // data builder file-path string for backup worker (no file picker on device)
+        const val DATA_BUILDER_BACKUP_PATH = "backupFilePath"
+
+        // data builder file-path string for restore worker (no file picker on device)
+        const val DATA_BUILDER_RESTORE_PATH = "restoreFilePath"
+
+        // app-specific folder for backups when no SAF file picker is available
+        const val BACKUP_EXPORT_DIR_NAME = "backup"
+
         // temp zip  file name
         const val TEMP_ZIP_FILE_NAME = "temp.rbk"
 
@@ -67,6 +79,9 @@ class BackupHelper {
 
         // restart app after database restore
         const val INTENT_RESTART_APP = "restartApp"
+
+        // unique work name shared by backup and restore so they never run concurrently
+        const val BACKUP_RESTORE_WORK_NAME = "backupRestoreWork"
 
         // wireguard dir to backup the wireguard configs
         const val BACKUP_WG_DIR = "wireguard"
@@ -81,6 +96,12 @@ class BackupHelper {
         const val PACKAGE_NAME = "package"
         // time when the backup  is taken
         const val CREATED_TIME = "createdTs"
+
+        fun getBackupExportDir(context: Context): File? {
+            val dir = File(context.getExternalFilesDir(null) ?: return null, BACKUP_EXPORT_DIR_NAME)
+            if (!dir.exists() && !dir.mkdirs()) return null
+            return dir
+        }
 
         fun getTempDir(context: Context): File {
             // temp dir (files/Rethink/)
@@ -111,6 +132,19 @@ class BackupHelper {
         fun startVpn(context: Context) {
             Logger.i(Logger.LOG_TAG_BACKUP_RESTORE, "calling vpn start from backup helper")
             VpnController.start(context)
+        }
+
+        // fail-open false: a failed lookup must not block a new backup/restore
+        fun isBackupRestoreActive(context: Context): Boolean {
+            return try {
+                WorkManager.getInstance(context)
+                    .getWorkInfosForUniqueWork(BACKUP_RESTORE_WORK_NAME)
+                    .get()
+                    .any { !it.state.isFinished }
+            } catch (e: Exception) {
+                Logger.w(Logger.LOG_TAG_BACKUP_RESTORE, "err querying unique work: ${e.message}")
+                false
+            }
         }
 
         fun deleteResidue(backupFile: File) {
@@ -152,6 +186,24 @@ class BackupHelper {
 
         fun getFileNameFromPath(file: String): String {
             return file.substring(file.lastIndexOf("/") + 1)
+        }
+
+        // display name for a document uri; falls back to the path segment when the
+        // provider does not expose DISPLAY_NAME (file:// uris, some cloud providers)
+        fun getBackupFileNameFromUri(context: Context, uri: Uri): String {
+            try {
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        if (idx >= 0) {
+                            cursor.getString(idx)?.takeIf { it.isNotBlank() }?.let { return it }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Logger.w(Logger.LOG_TAG_BACKUP_RESTORE, "err querying uri name: ${e.message}")
+            }
+            return uri.lastPathSegment?.substringAfterLast('/') ?: ""
         }
     }
 }

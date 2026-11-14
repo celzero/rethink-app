@@ -215,7 +215,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     @Volatile
     private var tunUnderlyingNetworks: String? = null
     @Volatile
-    private var prevDns: MutableSet<InetAddress> = mutableSetOf()
+    private var prevDns: Set<InetAddress> = emptySet()
     private val testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -2861,41 +2861,50 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     // no-op
                 }
             }
-            io("setSystemAndDefaultDns") {
+            vpnScope.launch(CoroutineName("setSystemAndDefaultDns") + serializer) {
                 // ref: kotlinlang.org/docs/equality.html#structural-equality
-                val same = dnsServers == prevDns
+                val existing = prevDns
+                val same = dnsServers == existing
 
                 Logger.i(
                     LOG_TAG_VPN,
-                    "dns: $dnsServers, existing: $prevDns, force: $forceUpdate, same? $same"
+                    "dns: $dnsServers, existing: $existing, force: $forceUpdate, same? $same"
                 )
                 if (same && !forceUpdate) {
-                    return@io
+                    return@launch
                 }
-                // set system dns whenever there is a change in network
-                prevDns.clear()
                 if (vpnAdapter == null) {
+                    prevDns = emptySet()
                     Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: vpnAdapter is null, not setting system/default dns")
-                    return@io
+                    return@launch
                 }
-                prevDns.addAll(dnsServers)
-                val dns = dnsServers.map { it.hostAddress }
-                val isSysDnsSet = vpnAdapter?.setSystemDns(dns)
-                var defSet: Boolean? = false
-                // set default dns server for the tunnel if none is set
-                if (isDefaultDnsNone()) {
-                    val dnsCsv = dns.joinToString(",")
-                    defSet = vpnAdapter?.addDefaultTransport(dnsCsv)
-                }
-                Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? ${isDefaultDnsNone()}")
+                try {
+                    // publish snapshot only after a successful apply
+                    val dns = dnsServers.map { it.hostAddress }
+                    val isSysDnsSet = vpnAdapter?.setSystemDns(dns)
+                    var defSet: Boolean? = false
+                    // set default dns server for the tunnel if none is set
+                    if (isDefaultDnsNone()) {
+                        val dnsCsv = dns.joinToString(",")
+                        defSet = vpnAdapter?.addDefaultTransport(dnsCsv)
+                    }
+                    Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? ${isDefaultDnsNone()}")
 
-                val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
-                val mainDnsStatus = vpnAdapter?.getDnsStatus(id)
-                val mainDnsOK = mainDnsStatus != null && mainDnsStatus != Backend.DEnd
-                Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
+                    if (isSysDnsSet == true) {
+                        prevDns = dnsServers.toSet()
+                    }
+                    val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
+                    val mainDnsStatus = vpnAdapter?.getDnsStatus(id)
+                    val mainDnsOK = mainDnsStatus != null && mainDnsStatus != Backend.DEnd
+                    Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
 
-                if (!mainDnsOK) {
-                    vpnAdapter?.addTransport()
+                    if (!mainDnsOK) {
+                        vpnAdapter?.addTransport()
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "setSystemAndDefaultDns failed: ${e.message}", e)
+                    eventLogger.logHigh(EventType.VPN_ERROR, "set system/default dns failed",
+                        EventSource.VPN, userAction = false, details = "err: ${e.message}")
                 }
             }
         }
@@ -3776,9 +3785,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private suspend fun uiCtx(s: String, f: suspend () -> Unit) =
         withContext(CoroutineName(s) + Dispatchers.Main) { f() }
 
-    override fun onQuery(origin: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
+    override fun onQuery(origin: String, fid: String, uidGostr: String, fqdn: String, qtype: Long): DNSOpts {
         return go2kt(dnsQueryDispatcher) {
-            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""), isCaptivePortal())
+            Logger.vv(LOG_TAG_VPN, "onQuery: fid: $fid, origin: $origin, uid: $uidGostr, fqdn: $fqdn, qtype: $qtype")
+            val d = TunDnsManager.DnsParams(origin, uidGostr, fqdn, qtype, isLockdown(), getUnderlyingSsid(), isIfaceCellular(""), isCaptivePortal(), fid)
             TunDnsManager.handleOnQuery(d)
         }
     }
@@ -3892,7 +3902,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         Logger.v(LOG_TAG_VPN, "onDNSStopped")
     }
 
-    override fun onPrequery(p0: String, p1: String, p2: String, p3: Long): DomainOpts? {
+    override fun onPrequery(origin: String, fid: String, uidGostr: String, fqdn: String, qtype: Long): DomainOpts? {
+        Logger.vv(LOG_TAG_VPN, "onPrequery: fid: $fid, origin: $origin, uid: $uidGostr, fqdn: $fqdn, qtype: $qtype")
         return null
     }
 
@@ -3902,6 +3913,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     override fun onUpstreamAnswer(
         id: String,
+        fid: String,
         smm: DNSSummary,
         rcvdDnsOpts: DNSOpts,
         ipcsv: String
@@ -3926,7 +3938,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 },
                 onDeviceLocked = { TunFlowManager.closeTrackedConnsOnDeviceLock(buildFlowContext()) },
                 onAccessibilityFailure = ::handleAccessibilityFailure,
-                isCaptivePortal = isCaptivePortal()
+                isCaptivePortal = isCaptivePortal(),
+                fid = fid
             )
             TunDnsManager.handleOnUpstreamAnswer(params)
         }
@@ -3949,13 +3962,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         TunFlowManager.handlePostflow(buildFlowContext(), s)
     }
 
-    override fun preflow(protocol: Int, uid: Int, src: String?, dst: String?): PreMark = go2kt(preflowDispatcher) {
-        TunFlowManager.handlePreflow(buildFlowContext(), protocol, uid, src, dst)
+    override fun preflow(protocol: Int, uid: Int, cid: String, src: String?, dst: String?): PreMark = go2kt(preflowDispatcher) {
+        TunFlowManager.handlePreflow(buildFlowContext(), protocol, uid, cid, src, dst)
     }
 
     override fun flow(
         protocol: Int,
         _uid: Int,
+        cid: String,
         src: String?,
         dst: String?,
         realIps: String?,
@@ -3966,13 +3980,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     ): Mark = go2kt(flowDispatcher) {
         TunFlowManager.handleFlow(
             buildFlowContext(),
-            protocol, _uid, src, dst, realIps, d, probableDomains, blocklists, isAlg
+            protocol, _uid, cid, src, dst, realIps, d, probableDomains, blocklists, isAlg
         )
     }
 
-    override fun inflow(protocol: Int, recvdUid: Int, src: String?, dst: String?): Mark =
+    override fun inflow(protocol: Int, recvdUid: Int, cid: String, src: String?, dst: String?): Mark =
         go2kt(inflowDispatcher) {
-            TunFlowManager.handleInflow(buildFlowContext(), protocol, recvdUid, src, dst)
+            TunFlowManager.handleInflow(buildFlowContext(), protocol, recvdUid, cid, src, dst)
         }
 
     // no need of go2kt here as it is called from go and performs db operations with no return value
@@ -4693,6 +4707,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun initiateRpnPing(proxyId: String) {
         vpnAdapter?.initiateRpnPing(proxyId)
+    }
+
+    suspend fun peekTrace(cid: String): String {
+        return vpnAdapter?.peekTrace(cid) ?: ""
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return vpnAdapter?.getAllTraceLogsAsBytes()
+    }
+
+    suspend fun getTraceCount(): Long {
+        return vpnAdapter?.getTraceCount() ?: 0L
     }
 
     fun screenLock() {

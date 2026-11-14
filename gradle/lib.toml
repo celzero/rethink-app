@@ -47,9 +47,10 @@ playUpdate = "2.1.0"
 securityCrypto = "1.1.0"
 securityAppAuthenticator = "1.0.0"
 zxingAndroidEmbedded = "4.3.0"
-recyclerviewFastscroll = "2.0.1"
 konfettiXml = "2.0.5"
 composeBom = "2026.08.00"
+# BOM's material3 (1.4.0) predates the Expressive APIs used by the TV UI
+material3 = "1.5.0-alpha28"
 tvMaterial = "1.1.0"
 activityCompose = "1.13.0"
 annotationExperimental = "1.6.0"
@@ -127,7 +128,6 @@ googleAndroidPlayAppUpdateKtx = { module = "com.google.android.play:app-update-k
 androidxSecuritySecurityCrypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 androidxSecuritySecurityAppAuthenticator = { module = "androidx.security:security-app-authenticator", version.ref = "securityAppAuthenticator" }
 journeyappsZxingAndroidEmbedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
-simplecityappsRecyclerviewFastscroll = { module = "com.simplecityapps:recyclerview-fastscroll", version.ref = "recyclerviewFastscroll" }
 nlDionsegijnKonfettiXml = { module = "nl.dionsegijn:konfetti-xml", version.ref = "konfettiXml" }
 githubBumptechGlideCompilerTv = { module = "com.github.bumptech.glide:compiler", version.ref = "glideCompiler" }
 androidxComposeComposeBom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -138,6 +138,7 @@ androidxComposeUiUiToolingPreview = { module = "androidx.compose.ui:ui-tooling-p
 androidxComposeFoundationFoundation = { module = "androidx.compose.foundation:foundation" }
 androidxComposeRuntimeRuntimeLivedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidxComposeMaterial3Material3 = { module = "androidx.compose.material3:material3" }
+androidxComposeMaterial3Material3Expressive = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidxTvTvMaterial = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }
 androidxActivityActivityCompose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidxLifecycleLifecycleRuntimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }

@@ -983,16 +983,16 @@ internal constructor(
         dnsCryptRelayEndpointRepository.insertAsync(endpoint)
     }
 
-    suspend fun insertDnscryptEndpoint(endpoint: DnsCryptEndpoint) {
-        dnsCryptEndpointRepository.insertAsync(endpoint)
+    suspend fun insertDnscryptEndpoint(endpoint: DnsCryptEndpoint): Long {
+        return dnsCryptEndpointRepository.insertAsync(endpoint)
     }
 
-    suspend fun insertDohEndpoint(endpoint: DoHEndpoint) {
-        doHEndpointRepository.insertAsync(endpoint)
+    suspend fun insertDohEndpoint(endpoint: DoHEndpoint): Long {
+        return doHEndpointRepository.insertAsync(endpoint)
     }
 
-    suspend fun insertDoTEndpoint(endpoint: DoTEndpoint) {
-        doTEndpointRepository.insertAsync(endpoint)
+    suspend fun insertDoTEndpoint(endpoint: DoTEndpoint): Long {
+        return doTEndpointRepository.insertAsync(endpoint)
     }
 
     suspend fun insertODoHEndpoint(endpoint: ODoHEndpoint) {
@@ -1007,8 +1007,8 @@ internal constructor(
         rethinkDnsEndpointRepository.updateEndpoint(name, url, count)
     }
 
-    suspend fun insertDnsproxyEndpoint(endpoint: DnsProxyEndpoint) {
-        dnsProxyEndpointRepository.insertAsync(endpoint)
+    suspend fun insertDnsproxyEndpoint(endpoint: DnsProxyEndpoint): Long {
+        return dnsProxyEndpointRepository.insertAsync(endpoint)
     }
 
     suspend fun deleteDohEndpoint(id: Int) {

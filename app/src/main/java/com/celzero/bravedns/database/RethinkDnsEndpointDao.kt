@@ -56,6 +56,9 @@ interface RethinkDnsEndpointDao {
     @Query("select * from RethinkDnsEndpoint where uid =  $MISSING_UID order by isActive desc")
     fun getRethinkEndpoints(): PagingSource<Int, RethinkDnsEndpoint>
 
+    @Query("select * from RethinkDnsEndpoint where uid = :uid order by isActive desc")
+    suspend fun getRethinkEndpointsList(uid: Int): List<RethinkDnsEndpoint>
+
     @Transaction
     @Query("select * from RethinkDnsEndpoint order by isActive desc")
     fun getAllRethinkEndpoints(): PagingSource<Int, RethinkDnsEndpoint>
