@@ -215,7 +215,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     @Volatile
     private var tunUnderlyingNetworks: String? = null
     @Volatile
-    private var prevDns: MutableSet<InetAddress> = mutableSetOf()
+    private var prevDns: Set<InetAddress> = emptySet()
     private val testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -2861,41 +2861,50 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     // no-op
                 }
             }
-            io("setSystemAndDefaultDns") {
+            vpnScope.launch(CoroutineName("setSystemAndDefaultDns") + serializer) {
                 // ref: kotlinlang.org/docs/equality.html#structural-equality
-                val same = dnsServers == prevDns
+                val existing = prevDns
+                val same = dnsServers == existing
 
                 Logger.i(
                     LOG_TAG_VPN,
-                    "dns: $dnsServers, existing: $prevDns, force: $forceUpdate, same? $same"
+                    "dns: $dnsServers, existing: $existing, force: $forceUpdate, same? $same"
                 )
                 if (same && !forceUpdate) {
-                    return@io
+                    return@launch
                 }
-                // set system dns whenever there is a change in network
-                prevDns.clear()
                 if (vpnAdapter == null) {
+                    prevDns = emptySet()
                     Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: vpnAdapter is null, not setting system/default dns")
-                    return@io
+                    return@launch
                 }
-                prevDns.addAll(dnsServers)
-                val dns = dnsServers.map { it.hostAddress }
-                val isSysDnsSet = vpnAdapter?.setSystemDns(dns)
-                var defSet: Boolean? = false
-                // set default dns server for the tunnel if none is set
-                if (isDefaultDnsNone()) {
-                    val dnsCsv = dns.joinToString(",")
-                    defSet = vpnAdapter?.addDefaultTransport(dnsCsv)
-                }
-                Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? ${isDefaultDnsNone()}")
+                try {
+                    // publish snapshot only after a successful apply
+                    val dns = dnsServers.map { it.hostAddress }
+                    val isSysDnsSet = vpnAdapter?.setSystemDns(dns)
+                    var defSet: Boolean? = false
+                    // set default dns server for the tunnel if none is set
+                    if (isDefaultDnsNone()) {
+                        val dnsCsv = dns.joinToString(",")
+                        defSet = vpnAdapter?.addDefaultTransport(dnsCsv)
+                    }
+                    Logger.i(LOG_TAG_VPN, "setSystemAndDefaultDns: sys-dns set? $isSysDnsSet, def-set? $defSet/none? ${isDefaultDnsNone()}")
 
-                val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
-                val mainDnsStatus = vpnAdapter?.getDnsStatus(id)
-                val mainDnsOK = mainDnsStatus != null && mainDnsStatus != Backend.DEnd
-                Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
+                    if (isSysDnsSet == true) {
+                        prevDns = dnsServers.toSet()
+                    }
+                    val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
+                    val mainDnsStatus = vpnAdapter?.getDnsStatus(id)
+                    val mainDnsOK = mainDnsStatus != null && mainDnsStatus != Backend.DEnd
+                    Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
 
-                if (!mainDnsOK) {
-                    vpnAdapter?.addTransport()
+                    if (!mainDnsOK) {
+                        vpnAdapter?.addTransport()
+                    }
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_VPN, "setSystemAndDefaultDns failed: ${e.message}", e)
+                    eventLogger.logHigh(EventType.VPN_ERROR, "set system/default dns failed",
+                        EventSource.VPN, userAction = false, details = "err: ${e.message}")
                 }
             }
         }
