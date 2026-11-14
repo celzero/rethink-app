@@ -32,7 +32,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FI
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
-import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
 import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
@@ -124,7 +123,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private suspend fun startRestore(importUri: Uri?, importPath: String? = null): Boolean {
         // a failed restore must not leave a previously-running tunnel down
         val vpnWasRunning = VpnController.hasTunnel()
-        stopVpn(context)
+        VpnController.stopAwait("bkup", context)
         val restored = try {
             doRestore(importUri, importPath)
         } catch (e: Exception) {
