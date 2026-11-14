@@ -157,7 +157,8 @@ fun RpnServersScreen(navController: NavController) {
                 }
                 if (!res.first) tvToast(context, "Failed to remove ${row.countryName}: ${res.second}")
             } else {
-                if (ui.selectedCount >= MAX_SELECTIONS) {
+                // in-flight additions count toward the cap too
+                if (ui.selectedCount + busyKeys.size >= MAX_SELECTIONS) {
                     tvToast(
                         context,
                         context.getString(R.string.server_selection_max_reached, MAX_SELECTIONS),
@@ -377,7 +378,8 @@ private suspend fun loadServersUi(): ServersUi = withContext(Dispatchers.IO) {
             countryName = best.countryName.ifBlank { cc },
             flagEmoji = best.flagEmoji,
             citySummary = cities.joinToString(" · "),
-            key = best.key,
+            // toggle ops target the enabled endpoint, not just the best-loaded one
+            key = group.firstOrNull { it.isEnabled }?.key ?: best.key,
             load = best.load,
             link = best.link,
             isSelected = isSelected,
@@ -387,7 +389,8 @@ private suspend fun loadServersUi(): ServersUi = withContext(Dispatchers.IO) {
     ServersUi(
         autoRow = autoRow,
         rows = rows,
-        selectedCount = rows.count { it.isSelected },
+        // distinct enabled endpoint keys (excl. AUTO) — the backend's cap unit
+        selectedCount = selected.count { !it.id.equals(AUTO_SERVER_ID, true) },
         expiryMs = expiry,
     )
 }

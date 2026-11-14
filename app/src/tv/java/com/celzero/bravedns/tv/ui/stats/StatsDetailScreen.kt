@@ -84,33 +84,38 @@ fun StatsDetailScreen(value: String, kind: StatsDetailKind) {
         title = value.ifBlank { kind.fallbackTitle },
         subtitle = "Recent connections — ${kind.subtitle}.",
     ) {
-        BackHintBanner()
+        // Column keeps the banner from stacking over the content Box
+        Column(modifier = Modifier.fillMaxSize()) {
+            BackHintBanner()
 
-        if (items.itemCount == 0) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 32.dp),
-                contentAlignment = Alignment.TopCenter,
-            ) {
-                Text(
-                    text = "No connections logged for this ${kind.noun} yet.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            return@TvScreenScaffold
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            items(
-                count = items.itemCount,
-                key = items.itemKey { "${it.id}" },
-            ) { i ->
-                items[i]?.let { ConnRow(it) }
+            if (items.itemCount == 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(top = 32.dp),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
+                    Text(
+                        text = "No connections logged for this ${kind.noun} yet.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = items.itemCount,
+                        key = items.itemKey { "${it.id}" },
+                    ) { i ->
+                        items[i]?.let { ConnRow(it) }
+                    }
+                }
             }
         }
     }

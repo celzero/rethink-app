@@ -168,10 +168,8 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
                 if (currentRoute == null || prev == null || currentRoute == prev) {
                     return@LaunchedEffect
                 }
-                val parent = TvDestination.entries.firstOrNull {
-                    currentRoute == it.route ||
-                        currentRoute.startsWith(it.route + "/")
-                } ?: return@LaunchedEffect
+                val parent = parentDestinationForRoute(currentRoute)
+                    ?: return@LaunchedEffect
                 // Wait for the rail's recomposition (selected-state
                 // change) to settle so the FocusRequester has actually
                 // attached to the new measure pass before we request.
@@ -359,8 +357,7 @@ private fun NavRailContent(
                     else -> Modifier
                 }
                 NavRailItem(
-                    selected = currentRoute == dest.route ||
-                        (currentRoute != null && currentRoute.startsWith(dest.route + "/")),
+                    selected = parentDestinationForRoute(currentRoute) == dest,
                     iconRes = dest.iconRes,
                     labelRes = dest.labelRes,
                     onClick = { onSelect(dest) },

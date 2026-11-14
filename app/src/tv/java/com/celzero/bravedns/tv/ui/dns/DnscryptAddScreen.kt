@@ -33,6 +33,7 @@ import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import androidx.compose.material3.Text as M3Text
 
@@ -121,14 +122,17 @@ fun DnscryptAddScreen(navController: NavController? = null) {
                         val epStamp = stamp
                         val epDesc = desc
                         scope.launch(Dispatchers.IO) {
+                            var saved = false
                             try {
                                 persistDnsCrypt(appConfig, dnscryptDao, asRelay, epName, epStamp, epDesc)
-                                navController?.popBackStack()
+                                saved = true
                             } catch (e: Exception) {
                                 saveError = e.message ?: "Save failed"
-                            } finally {
-                                saving = false
                             }
+                            if (saved) {
+                                withContext(Dispatchers.Main) { navController?.popBackStack() }
+                            }
+                            saving = false
                         }
                     },
                 )
@@ -184,10 +188,7 @@ private suspend fun persistDnsCrypt(
         modifiedDataTime = 0,
         latency = 0,
     )
-    appConfig.insertDnscryptEndpoint(server)
-    val inserted = dnscryptDao.getAll().firstOrNull {
-        it.dnsCryptURL == stamp && it.dnsCryptName == finalName
-    }
+    val inserted = dnscryptDao.getEndpointById(appConfig.insertDnscryptEndpoint(server).toInt())
     if (inserted != null) {
         inserted.isSelected = true
         appConfig.handleDnscryptChanges(inserted)

@@ -85,12 +85,16 @@ fun ProxyScreen(navController: NavController) {
 
     val proxyDetails by produceState(initialValue = ProxyDetails()) {
         value = withContext(Dispatchers.IO) {
-            val activeWgNames = loadActiveWgNames()
+            val tunnels = loadTunnels()
             ProxyDetails(
                 socks5 = appConfig.getSocks5ProxyDetails()?.let { "${it.proxyIP}:${it.proxyPort}" },
                 http = appConfig.getHttpProxyDetails()?.let { "${it.proxyIP}:${it.proxyPort}" },
                 orbot = appConfig.isOrbotProxyEnabled(),
-                wgSummary = summarizeActiveWgs(activeWgNames),
+                wgSummary = summarizeActiveWgs(
+                    tunnels.filter { it.isActive }
+                        .map { it.name.ifBlank { "tunnel #${it.id}" } },
+                    tunnels.size,
+                ),
             )
         }
     }
@@ -162,18 +166,20 @@ private data class ProxyDetails(
 )
 
 // "2 active · Home, Work" / "+3 more" once names exceed the cap;
-// null (renders "Not configured") when nothing is active.
+// "Inactive" when tunnels exist but none are active; null (renders
+// "Not configured") when no tunnels are set up.
 private const val WG_SUMMARY_NAME_CAP = 3
 
-private fun summarizeActiveWgs(names: List<String>): String? {
-    if (names.isEmpty()) return null
-    val shown = names.take(WG_SUMMARY_NAME_CAP).joinToString(", ")
-    val more = if (names.size > WG_SUMMARY_NAME_CAP) {
-        " +${names.size - WG_SUMMARY_NAME_CAP} more"
+private fun summarizeActiveWgs(active: List<String>, tunnelCount: Int): String? {
+    if (tunnelCount == 0) return null
+    if (active.isEmpty()) return "Inactive"
+    val shown = active.take(WG_SUMMARY_NAME_CAP).joinToString(", ")
+    val more = if (active.size > WG_SUMMARY_NAME_CAP) {
+        " +${active.size - WG_SUMMARY_NAME_CAP} more"
     } else {
         ""
     }
-    return "${names.size} active · $shown$more"
+    return "${active.size} active · $shown$more"
 }
 
 // Same three-state resolution as the phone's displayRpnUi(), without

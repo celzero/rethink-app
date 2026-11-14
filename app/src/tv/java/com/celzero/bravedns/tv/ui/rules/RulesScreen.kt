@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -71,6 +73,7 @@ fun RulesScreen(navController: NavController) {
     var domainQuery by rememberSaveable { mutableStateOf("") }
     var ipQuery by rememberSaveable { mutableStateOf("") }
     var confirmDeleteAll by remember { mutableStateOf(false) }
+    var pendingDelete by remember { mutableStateOf<PendingRuleDelete?>(null) }
 
     // App picker hands back the picked uid on the caller's savedStateHandle.
     LaunchedEffect(navController.currentBackStackEntry) {
@@ -103,7 +106,17 @@ fun RulesScreen(navController: NavController) {
         subtitle = "Add, search, and manage universal or per-app custom domain and IP rules.",
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                // trap D-pad focus away from the background while a
+                // delete confirmation is up (dialog buttons stay focusable)
+                .then(
+                    if (confirmDeleteAll || pendingDelete != null) {
+                        Modifier.focusProperties { canFocus = false }
+                    } else {
+                        Modifier
+                    }
+                ),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         ) {
             RulesTabs(active = activeTab, onSelect = { activeTab = it })
@@ -145,36 +158,78 @@ fun RulesScreen(navController: NavController) {
                 },
             )
             Spacer(Modifier.height(4.dp))
-            when (activeTab) {
-                RulesTab.DOMAINS ->
-                    CustomDomainRulesList(uid = selectedUid, query = domainQuery, appName = appName)
-                RulesTab.IPS ->
-                    CustomIpRulesList(uid = selectedUid, query = ipQuery, appName = appName)
+            // key per scope: rows (and their captured callbacks) reset
+            // when the uid changes, so stale-uid select/delete can't fire
+            key(selectedUid) {
+                when (activeTab) {
+                    RulesTab.DOMAINS ->
+                        CustomDomainRulesList(
+                            uid = selectedUid,
+                            query = domainQuery,
+                            appName = appName,
+                            onDeleteRequest = { pendingDelete = PendingRuleDelete.DomainRule(it) },
+                        )
+                    RulesTab.IPS ->
+                        CustomIpRulesList(
+                            uid = selectedUid,
+                            query = ipQuery,
+                            appName = appName,
+                            onDeleteRequest = { pendingDelete = PendingRuleDelete.IpRule(it) },
+                        )
+                }
             }
         }
-    }
 
-    if (confirmDeleteAll) {
-        val tabLabel = if (activeTab == RulesTab.DOMAINS) "domain" else "IP"
-        val scopeLabel = appName ?: "Universal"
-        RulesConfirmDialog(
-            title = "Delete all $tabLabel rules?",
-            message =
-                "This removes every custom $tabLabel rule for $scopeLabel. This cannot be undone.",
-            confirmLabel = "Delete all",
-            onConfirm = {
-                confirmDeleteAll = false
-                val uid = selectedUid
-                val tab = activeTab
-                scope.launch(Dispatchers.IO) {
-                    when (tab) {
-                        RulesTab.DOMAINS -> DomainRulesManager.deleteRulesByUid(uid)
-                        RulesTab.IPS -> IpRulesManager.deleteRulesByUid(uid)
+        // delete confirmations render in the scaffold's content Box so
+        // they overlay the full content area instead of a list's bounds
+        if (confirmDeleteAll) {
+            val tabLabel = if (activeTab == RulesTab.DOMAINS) "domain" else "IP"
+            val scopeLabel = appName ?: "Universal"
+            RulesConfirmDialog(
+                title = "Delete all $tabLabel rules?",
+                message =
+                    "This removes every custom $tabLabel rule for $scopeLabel. This cannot be undone.",
+                confirmLabel = "Delete all",
+                onConfirm = {
+                    confirmDeleteAll = false
+                    val uid = selectedUid
+                    val tab = activeTab
+                    scope.launch(Dispatchers.IO) {
+                        when (tab) {
+                            RulesTab.DOMAINS -> RulesScopeOps.deleteAllDomainRules(uid)
+                            RulesTab.IPS -> RulesScopeOps.deleteAllIpRules(uid)
+                        }
                     }
-                }
-            },
-            onDismiss = { confirmDeleteAll = false },
-        )
+                },
+                onDismiss = { confirmDeleteAll = false },
+            )
+        }
+
+        pendingDelete?.let { pending ->
+            val scopeLabel = appName ?: "Universal"
+            RulesConfirmDialog(
+                title = "Delete rule?",
+                message = when (pending) {
+                    is PendingRuleDelete.DomainRule ->
+                        "Remove \"${pending.row.domain}\" from $scopeLabel custom domain rules?"
+                    is PendingRuleDelete.IpRule ->
+                        "Remove \"${pending.row.ipAddress}\" from $scopeLabel custom IP rules?"
+                },
+                confirmLabel = "Delete",
+                onConfirm = {
+                    pendingDelete = null
+                    scope.launch(Dispatchers.IO) {
+                        when (pending) {
+                            is PendingRuleDelete.DomainRule ->
+                                DomainRulesManager.deleteRules(listOf(pending.row.toEntity()))
+                            is PendingRuleDelete.IpRule ->
+                                IpRulesManager.deleteRules(listOf(pending.row.toEntity()))
+                        }
+                    }
+                },
+                onDismiss = { pendingDelete = null },
+            )
+        }
     }
 }
 

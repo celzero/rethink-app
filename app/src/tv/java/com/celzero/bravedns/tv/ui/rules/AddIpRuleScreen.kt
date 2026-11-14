@@ -91,6 +91,13 @@ fun AddIpRuleScreen(navController: NavController, uid: Int = Constants.UID_EVERY
                 )
                 return@launch
             }
+            // getIpNetPort maps a non-numeric port suffix to 0 (wildcard);
+            // reject such input instead of saving an unintended rule
+            val portPart = IpRulesManager.splitHostPort(ipString).second
+            if (portPart.isNotEmpty() && (portPart.toIntOrNull() ?: 0) !in 1..65535) {
+                fail("Invalid port.")
+                return@launch
+            }
             IpRulesManager.addIpRule(uid, ip, port, status, proxyId = "", proxyCC = "")
             withContext(Dispatchers.Main) {
                 saving = false

@@ -133,6 +133,11 @@ fun RpnCheckoutScreen(navController: NavController, extendMode: Boolean) {
         TvBillingListener(
             onConnection = { ok, msg -> vm.onBillingConnected(ok, msg) },
             onProducts = { ok, list -> vm.onProductsFetched(ok, list, InAppBillingHandler.lastProductQueryResponseCode) },
+            onPurchaseRejected = {
+                // state machine refused the purchase start; re-enable Subscribe
+                purchaseInFlight = false
+                dialog = null
+            },
         )
     }
 
@@ -275,6 +280,9 @@ fun RpnCheckoutScreen(navController: NavController, extendMode: Boolean) {
         val id = (dialog as? CheckoutDialog.Processing)?.sessionId ?: return@LaunchedEffect
         delay(PROCESSING_TIMEOUT_MS)
         if ((dialog as? CheckoutDialog.Processing)?.sessionId == id) {
+            // a purchase is pending with Play; keep waiting rather than
+            // dropping the overlay and re-initializing billing mid-verify
+            if (uiState is SubscriptionUiState.PendingPurchase) return@LaunchedEffect
             Logger.w(LOG_IAB, "$TAG: processing timeout, dismissing overlay")
             purchaseInFlight = false
             dialog = null
@@ -425,6 +433,7 @@ private fun onSubscribeClicked(
 private class TvBillingListener(
     private val onConnection: (Boolean, String) -> Unit,
     private val onProducts: (Boolean, List<ProductDetail>) -> Unit,
+    private val onPurchaseRejected: () -> Unit,
 ) : BillingListener {
     override fun onConnectionResult(isSuccess: Boolean, message: String) = onConnection(isSuccess, message)
     override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<com.celzero.bravedns.iab.PurchaseDetail>) {
@@ -432,6 +441,7 @@ private class TvBillingListener(
     }
     override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) =
         onProducts(isSuccess, productList)
+    override fun purchaseRejected() = onPurchaseRejected()
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -719,13 +729,21 @@ private fun PlanCard(
 
     var currentPrice = ""
     var discountedPrice = ""
+    var currentPriceMicros = 0L
+    var discountedPriceMicros = 0L
     var freeTrialDays = 0
     pricing?.let { p0 ->
         product.pricingDetails.forEach { phase ->
             when {
                 phase.freeTrialPeriod > 0 -> freeTrialDays = phase.freeTrialPeriod
-                phase.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED -> discountedPrice = phase.price
-                phase.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL -> currentPrice = phase.price
+                phase.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED -> {
+                    discountedPrice = phase.price
+                    discountedPriceMicros = phase.priceAmountMicros
+                }
+                phase.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL -> {
+                    currentPrice = phase.price
+                    currentPriceMicros = phase.priceAmountMicros
+                }
             }
         }
     }
@@ -747,7 +765,7 @@ private fun PlanCard(
     val savingsPct = if (isInApp) {
         pricing?.discountPercent ?: 0
     } else if (discountedPrice.isNotEmpty()) {
-        savingsPercent(currentPrice, discountedPrice)
+        savingsPercent(currentPriceMicros, discountedPriceMicros)
     } else {
         0
     }
@@ -956,14 +974,9 @@ private fun durationLabel(ctx: Context, months: Int): String {
     }
 }
 
-private fun savingsPercent(originalPrice: String, discountedPrice: String): Int {
-    return try {
-        val original = originalPrice.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0
-        val discounted = discountedPrice.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0
-        if (original > 0 && discounted > 0) ((original - discounted) / original * 100).toInt() else 0
-    } catch (e: Exception) {
-        0
-    }
+private fun savingsPercent(originalMicros: Long, discountedMicros: Long): Int {
+    if (originalMicros <= 0L || discountedMicros <= 0L) return 0
+    return (((originalMicros - discountedMicros).toDouble() / originalMicros) * 100).toInt()
 }
 
 private fun revokeDaysFor(productId: String?, planId: String?): Int = when (productId) {
@@ -971,11 +984,13 @@ private fun revokeDaysFor(productId: String?, planId: String?): Int = when (prod
     InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
     InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
     InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
+    InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
     else -> when (planId) {
         InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_MONTHLY_DAYS
         InAppBillingHandler.SUBS_PRODUCT_YEARLY -> InAppBillingHandler.REVOKE_WINDOW_SUBS_YEARLY_DAYS
         InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS
+        InAppBillingHandler.ONE_TIME_PRODUCT_ID -> InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_2YRS_DAYS
         else -> 7
     }
 }

@@ -24,11 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +51,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private data class DomainRuleRow(
+internal data class DomainRuleRow(
     val domain: String,
     val uid: Int,
     val ips: String,
@@ -69,7 +67,12 @@ private data class DomainRuleRow(
 }
 
 @Composable
-fun CustomDomainRulesList(uid: Int, query: String, appName: String?) {
+internal fun CustomDomainRulesList(
+    uid: Int,
+    query: String,
+    appName: String?,
+    onDeleteRequest: (DomainRuleRow) -> Unit,
+) {
     val dao = koinInject<CustomDomainDAO>()
     val scope = rememberCoroutineScope()
 
@@ -85,7 +88,6 @@ fun CustomDomainRulesList(uid: Int, query: String, appName: String?) {
         else rows.filter { it.domain.contains(query.trim(), ignoreCase = true) }
     }
 
-    var pendingDelete by remember { mutableStateOf<DomainRuleRow?>(null) }
     val scopeLabel = if (uid == Constants.UID_EVERYBODY) "Universal" else (appName ?: "Unknown app")
 
     if (filtered.isEmpty()) {
@@ -115,24 +117,9 @@ fun CustomDomainRulesList(uid: Int, query: String, appName: String?) {
                         applyDomainStatus(row, nextDomainStatus(row.status))
                     }
                 },
-                onDelete = { pendingDelete = row },
+                onDelete = { onDeleteRequest(row) },
             )
         }
-    }
-
-    pendingDelete?.let { row ->
-        RulesConfirmDialog(
-            title = "Delete rule?",
-            message = "Remove \"${row.domain}\" from $scopeLabel custom domain rules?",
-            confirmLabel = "Delete",
-            onConfirm = {
-                pendingDelete = null
-                scope.launch(Dispatchers.IO) {
-                    DomainRulesManager.deleteRules(listOf(row.toEntity()))
-                }
-            },
-            onDismiss = { pendingDelete = null },
-        )
     }
 }
 
@@ -283,7 +270,7 @@ private fun CustomDomain.toRow() = DomainRuleRow(
     version = version,
 )
 
-private fun DomainRuleRow.toEntity(): CustomDomain = CustomDomain(
+internal fun DomainRuleRow.toEntity(): CustomDomain = CustomDomain(
     domain,
     uid,
     ips,

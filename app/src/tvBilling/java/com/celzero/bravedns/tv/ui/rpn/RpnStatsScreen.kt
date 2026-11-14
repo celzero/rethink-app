@@ -38,10 +38,14 @@ import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.common.TvSectionHeader
 import com.celzero.bravedns.tv.ui.common.TvStatTile
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
+
+private const val TAG = "RpnTvStats"
 
 /**
  * RPN stats — window rx/tx, connection / blocked / app counts, and top
@@ -57,6 +61,8 @@ fun RpnStatsScreen(navController: NavController) {
     var timeWindowMs by remember { mutableStateOf(DEFAULT_WINDOW_MS) }
 
     data class Stats(
+        val queriedWindowMs: Long = 0L,
+        val error: Boolean = false,
         val connections: Int = 0,
         val download: Long = 0L,
         val upload: Long = 0L,
@@ -68,13 +74,23 @@ fun RpnStatsScreen(navController: NavController) {
     val stats by produceState(Stats(), timeWindowMs) {
         value = withContext(Dispatchers.IO) {
             val since = System.currentTimeMillis() - timeWindowMs
-            val summary = runCatching {
+            val summaryResult = runCatching {
                 connDao.getRpnConnStats(Backend.RpnWin, since)
-            }.getOrNull()
-            val topApps = runCatching {
+            }
+            val topAppsResult = runCatching {
                 connDao.getRpnTopAppsForProxy(Backend.RpnWin, since, 10)
-            }.getOrDefault(emptyList())
+            }
+            if (summaryResult.isFailure) {
+                Logger.w(LOG_TAG_UI, "$TAG: getRpnConnStats failed: ${summaryResult.exceptionOrNull()?.message}")
+            }
+            if (topAppsResult.isFailure) {
+                Logger.w(LOG_TAG_UI, "$TAG: getRpnTopAppsForProxy failed: ${topAppsResult.exceptionOrNull()?.message}")
+            }
+            val summary = summaryResult.getOrNull()
+            val topApps = topAppsResult.getOrDefault(emptyList())
             Stats(
+                queriedWindowMs = timeWindowMs,
+                error = summaryResult.isFailure || topAppsResult.isFailure,
                 connections = summary?.connectionsCount ?: 0,
                 download = summary?.totalDownload ?: 0L,
                 upload = summary?.totalUpload ?: 0L,
@@ -88,6 +104,8 @@ fun RpnStatsScreen(navController: NavController) {
     }
 
     val windowHours = timeWindowMs / HOUR_MS
+    // results not yet loaded for the selected window → placeholders
+    val stale = stats.queriedWindowMs != timeWindowMs
 
     TvScreenScaffold(
         title = stringResource(R.string.tv_rpn_stats_title),
@@ -111,38 +129,47 @@ fun RpnStatsScreen(navController: NavController) {
                     )
                 }
             }
+            if (stats.error && !stale) {
+                Text(
+                    text = stringResource(R.string.subscription_action_failed),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap)) {
                 TvStatTile(
                     label = stringResource(R.string.rpn_stats_connections),
-                    value = stats.connections.toString(),
+                    value = if (stale) "—" else stats.connections.toString(),
                     modifier = Modifier.weight(1f),
                 )
                 TvStatTile(
                     label = stringResource(R.string.lbl_blocked),
-                    value = stats.blocked.toString(),
+                    value = if (stale) "—" else stats.blocked.toString(),
                     modifier = Modifier.weight(1f),
                 )
                 TvStatTile(
                     label = stringResource(R.string.apps_info_title),
-                    value = stats.apps.toString(),
+                    value = if (stale) "—" else stats.apps.toString(),
                     modifier = Modifier.weight(1f),
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap)) {
                 TvStatTile(
                     label = stringResource(R.string.rpn_stats_downloaded),
-                    value = formatBytes(stats.download),
+                    value = if (stale) "—" else formatBytes(stats.download),
                     modifier = Modifier.weight(1f),
                 )
                 TvStatTile(
                     label = stringResource(R.string.rpn_stats_uploaded),
-                    value = formatBytes(stats.upload),
+                    value = if (stale) "—" else formatBytes(stats.upload),
                     modifier = Modifier.weight(1f),
                 )
             }
 
             TvSectionHeader(stringResource(R.string.tv_rpn_stats_top_apps_fmt, windowHours))
-            if (stats.topApps.isEmpty()) {
+            if (stale) {
+                // wait for the fresh window before showing any rows
+            } else if (stats.topApps.isEmpty()) {
                 Text(
                     text = stringResource(R.string.tv_rpn_stats_empty_fmt, windowHours),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

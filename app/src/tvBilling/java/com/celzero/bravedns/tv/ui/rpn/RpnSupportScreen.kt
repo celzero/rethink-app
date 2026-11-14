@@ -49,6 +49,7 @@ import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.SettingToggleRow
@@ -59,6 +60,8 @@ import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import androidx.tv.material3.Text
 import com.celzero.bravedns.util.ProcessInfoCollector
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SupportDiagnostics
 import com.celzero.bravedns.util.TraceLogExporter
 import com.celzero.bravedns.util.Utilities
@@ -154,7 +157,6 @@ fun RpnSupportScreen() {
                                     Utilities.convertLongToTime(details.expiry(), com.celzero.bravedns.util.Constants.TIME_FORMAT_4)
                                 ).append('\n')
                                 append("providerId: ").append(details.providerID()).append('\n')
-                                append("token: ").append(details.token().take(16)).append('\n')
                                 append("test: ").append(details.test()).append('\n')
                                 append("allowRestore: ").append(details.allowRestore()).append("\n\n")
                             }
@@ -180,6 +182,7 @@ fun RpnSupportScreen() {
                 } else {
                     null
                 }
+                val traceLogs = TraceLogExporter.dumpTraceLogsFile(context)
                 val supportZip = SupportDiagnostics.buildSupportZip(
                     context,
                     diagFile,
@@ -189,8 +192,23 @@ fun RpnSupportScreen() {
                     ),
                     procInfoBytes,
                     null,
-                    traceLogs = TraceLogExporter.dumpTraceLogsFile(context),
+                    traceLogs = traceLogs,
                 )
+                traceLogs?.let {
+                    if (it.exists() && !it.delete()) {
+                        Logger.w(LOG_TAG_UI, "$TAG failed to delete temporary trace log file")
+                    }
+                }
+                // the email pipeline cannot carry an oversized attachment
+                if (supportZip != null && supportZip.length() > BugReportZipper.MAX_ZIP_SIZE_BYTES) {
+                    Logger.w(LOG_TAG_UI, "$TAG support zip exceeds email size limit, rejecting send")
+                    supportZip.delete()
+                    withContext(Dispatchers.Main) {
+                        sending = false
+                        tvToast(context, context.getString(R.string.support_error_collect))
+                    }
+                    return@launch
+                }
                 val emailBody = SupportDiagnostics.buildEmailBody(context, description.trim(), category)
 
                 withContext(Dispatchers.Main) {

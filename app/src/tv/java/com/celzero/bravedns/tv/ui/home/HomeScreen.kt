@@ -225,7 +225,7 @@ fun HomeScreen(navController: NavController? = null) {
 
     // Live dashboard data; null means "first load still running".
     var usage by remember { mutableStateOf<DataUsageSummary?>(null) }
-    var blockedCount by remember { mutableStateOf(0L) }
+    var blockedCount by remember { mutableStateOf<Long?>(null) }
     var slots by remember { mutableStateOf<List<ActivitySlot>?>(null) }
     var events by remember { mutableStateOf<List<HomeEvent>?>(null) }
     // Selected look-back window for the activity panel; deliberately
@@ -265,9 +265,6 @@ fun HomeScreen(navController: NavController? = null) {
                     ConnectionTracker.ConnType.METERED.value,
                 )
             }.getOrNull()
-            blockedCount = runCatching {
-                connTrackRepo.getWindowCounts(now - timeRange.windowMs, now).blocked
-            }.getOrDefault(0L)
             slots = runCatching {
                 loadActivitySlots(
                     connTrackRepo,
@@ -277,6 +274,8 @@ fun HomeScreen(navController: NavController? = null) {
                     timeRange.segments,
                 )
             }.getOrNull()
+            // same data as the waves: merged DNS + connection blocked totals
+            blockedCount = slots?.sumOf { it.blocked }
             events = runCatching {
                 loadRecentEvents(connTrackDao, dnsLogDao, now)
             }.getOrNull()
@@ -515,7 +514,7 @@ private fun ProtectionHero(
 @Composable
 private fun NetworkActivitySection(
     usage: DataUsageSummary?,
-    blockedCount: Long,
+    blockedCount: Long?,
     slots: List<ActivitySlot>?,
     timeRange: TimeRange,
     onCycleRange: () -> Unit,
@@ -596,11 +595,12 @@ private fun NetworkActivitySection(
 /**
  * The panel's compact headline numbers for the selected window:
  * colored received/sent/blocked values in a single line. Bytes come
- * from the connection-log since-timestamp sums, blocked count from
- * the same table's window aggregate — waves carry the shape, this
- * line carries the exact figures (also the semantics for the wave).
+ * from the connection-log since-timestamp sums; the blocked count is
+ * the merged DNS + connection slot totals (the wave's own data), so
+ * headline and waves can never disagree. Null blocked (still loading)
+ * renders as "—".
  */
-private fun activityStatLine(usage: DataUsageSummary?, blocked: Long) = buildAnnotatedString {
+private fun activityStatLine(usage: DataUsageSummary?, blocked: Long?) = buildAnnotatedString {
     withStyle(SpanStyle(color = TvColors.TrafficReceived)) {
         append(formatBytes(usage?.totalDownload))
     }
@@ -610,7 +610,7 @@ private fun activityStatLine(usage: DataUsageSummary?, blocked: Long) = buildAnn
     }
     append(" sent · ")
     withStyle(SpanStyle(color = TvColors.TrafficBlocked)) {
-        append(formatCount(blocked))
+        append(blocked?.let(::formatCount) ?: "—")
     }
     append(" blocked")
 }
@@ -853,6 +853,10 @@ private fun headline(state: ProtectionState) = buildAnnotatedString {
         ProtectionState.PROTECTED -> {
             append("Your device is ")
             withStyle(SpanStyle(color = TvColors.Success)) { append("protected") }
+        }
+        ProtectionState.PARTIAL -> {
+            append("Your device is ")
+            withStyle(SpanStyle(color = TvColors.OnSurfaceVariant)) { append("partially protected") }
         }
         else -> {
             append("Your device is ")

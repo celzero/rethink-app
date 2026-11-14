@@ -159,6 +159,7 @@ private fun parseProxyForm(ip: String, port: String): ProxyForm {
         invalidIps.isNotEmpty() ->
             ProxyForm.Error("Invalid IP: ${invalidIps.joinToString(", ")}")
         portInt == null -> ProxyForm.Error("Port must be a number.")
+        portInt !in 1..65535 -> ProxyForm.Error("Port must be between 1 and 65535.")
         lanPortInvalid ->
             ProxyForm.Error("Port $portInt is not valid for a LAN address.")
         else -> ProxyForm.Input(ips, portInt)
@@ -184,8 +185,10 @@ private suspend fun persistDnsProxy(
         modifiedDataTime = 0L,
         latency = 0,
     )
-    appConfig.insertDnsproxyEndpoint(endpoint)
-    val inserted = dnsProxyDao.getAll().firstOrNull {
+    val inserted = appConfig.insertDnsproxyEndpoint(endpoint).let { id ->
+        // IGNORE conflict (-1) or unknown id: fall back to IP+port+name lookup
+        if (id > 0) dnsProxyDao.getById(id.toInt()) else null
+    } ?: dnsProxyDao.getAll().firstOrNull {
         it.proxyIP == endpoint.proxyIP &&
             it.proxyPort == endpoint.proxyPort &&
             it.proxyName == endpoint.proxyName

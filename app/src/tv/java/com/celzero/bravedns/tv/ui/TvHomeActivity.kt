@@ -69,7 +69,11 @@ class TvHomeActivity : ComponentActivity() {
         setContent {
             TvNavScaffold(
                 pendingRoute = pendingRoute,
-                onRouteConsumed = { pendingRoute = null },
+                onRouteConsumed = {
+                    pendingRoute = null
+                    // drop the extra so recreation does not re-load the consumed route
+                    intent.removeExtra(NotificationHandlerActivity.EXTRA_RPN_ROUTE)
+                },
             )
         }
     }
@@ -91,8 +95,10 @@ class TvHomeActivity : ComponentActivity() {
      */
     private fun initAppVersion() {
         val prevVersion = persistentState.appVersion
-        persistentState.appVersion = BuildConfig.BASE_VERSION_CODE
-        Logger.i(Logger.LOG_TAG_VPN, "tv launcher: app version set to ${BuildConfig.BASE_VERSION_CODE} (prev: $prevVersion)")
+
+        // Persisted unconditionally so version-gated server endpoints never
+        // observe the 0 default on fresh installs.
+        persistAppVersion(prevVersion)
 
         // Same one-time firewall exemption HomeScreenActivity applies to
         // installs at or below v53 (fresh installs included).
@@ -100,6 +106,9 @@ class TvHomeActivity : ComponentActivity() {
             val rethinkUid = android.os.Process.myUid()
             lifecycleScope.launch(Dispatchers.IO) {
                 runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }
+                    .onFailure {
+                        Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed: ${it.message}")
+                    }
             }
         }
 
@@ -108,5 +117,10 @@ class TvHomeActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching { WireguardManager.deleteResidueWgs() }
         }
+    }
+
+    private fun persistAppVersion(prevVersion: Int) {
+        persistentState.appVersion = BuildConfig.BASE_VERSION_CODE
+        Logger.i(Logger.LOG_TAG_VPN, "tv launcher: app version set to ${BuildConfig.BASE_VERSION_CODE} (prev: $prevVersion)")
     }
 }

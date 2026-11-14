@@ -33,6 +33,7 @@ import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.database.DoHEndpointDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import java.net.MalformedURLException
 import java.net.URL
@@ -118,37 +119,44 @@ fun DohAddScreen(navController: NavController? = null) {
                             val epName = name.trim()
                             val epIp = ip.trim()
                             val secure = !skipTlsValidation
-                            scope.launch(Dispatchers.IO) {
+                            scope.launch {
+                                var saved = false
                                 try {
-                                    val finalName = epName.ifBlank {
-                                        "DoH ${appConfig.getDohCount() + 1}"
+                                    saved = withContext(Dispatchers.IO) {
+                                        val finalName = epName.ifBlank {
+                                            "DoH ${appConfig.getDohCount() + 1}"
+                                        }
+                                        val endpoint = DoHEndpoint(
+                                            id = 0,
+                                            dohName = finalName,
+                                            dohURL = trimmedUrl,
+                                            dohIp = epIp.takeIf { it.isNotBlank() },
+                                            dohExplanation = "",
+                                            isSelected = true,
+                                            isCustom = true,
+                                            isSecure = secure,
+                                            modifiedDataTime = 0,
+                                            latency = 0,
+                                        )
+                                        val inserted = appConfig.insertDohEndpoint(endpoint).let { id ->
+                                            // IGNORE conflict (-1) or unknown id: fall back to URL+name lookup
+                                            if (id > 0) dohDao.getById(id.toInt()) else null
+                                        } ?: dohDao.getAll().firstOrNull {
+                                            it.dohURL == trimmedUrl && it.dohName == finalName
+                                        }
+                                        if (inserted != null) {
+                                            inserted.isSelected = true
+                                            appConfig.handleDoHChanges(inserted)
+                                        }
+                                        true
                                     }
-                                    val endpoint = DoHEndpoint(
-                                        id = 0,
-                                        dohName = finalName,
-                                        dohURL = trimmedUrl,
-                                        dohIp = epIp.takeIf { it.isNotBlank() },
-                                        dohExplanation = "",
-                                        isSelected = true,
-                                        isCustom = true,
-                                        isSecure = secure,
-                                        modifiedDataTime = 0,
-                                        latency = 0,
-                                    )
-                                    appConfig.insertDohEndpoint(endpoint)
-                                    val inserted = dohDao.getAll().firstOrNull {
-                                        it.dohURL == trimmedUrl && it.dohName == finalName
-                                    }
-                                    if (inserted != null) {
-                                        inserted.isSelected = true
-                                        appConfig.handleDoHChanges(inserted)
-                                    }
-                                    navController?.popBackStack()
                                 } catch (e: Exception) {
                                     saveError = e.message ?: "Save failed"
-                                } finally {
-                                    saving = false
                                 }
+                                if (saved) {
+                                    navController?.popBackStack()
+                                }
+                                saving = false
                             }
                         }
                     },

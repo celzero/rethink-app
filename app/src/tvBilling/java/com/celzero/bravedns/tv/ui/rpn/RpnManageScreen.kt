@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,6 +42,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -107,6 +111,7 @@ fun RpnManageScreen(navController: NavController) {
     var confirmCancel by remember { mutableStateOf(false) }
     var confirmRevoke by remember { mutableStateOf(false) }
     var opMessage by remember { mutableStateOf<String?>(null) }
+    var opIsCancel by remember { mutableStateOf(false) }
     var alreadyEnded by remember { mutableStateOf(false) }
 
     val ui by produceState<ManageUi?>(initialValue = null, reloadKey) {
@@ -117,20 +122,40 @@ fun RpnManageScreen(navController: NavController) {
 
     val ackInfo by InAppBillingHandler.ackFailureFlow.collectAsStateWithLifecycle()
 
+    // Re-sync purchases when returning from the Play subscriptions page.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                InAppBillingHandler.fetchPurchases(
+                    listOf(
+                        InAppBillingHandler.PRODUCT_TYPE_SUBS,
+                        InAppBillingHandler.PRODUCT_TYPE_INAPP,
+                    ),
+                )
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     // Cancel / revoke operation lifecycle → progress dialog / toasts.
     LaunchedEffect(Unit) {
         vm.operationState.collect { state ->
             when (state) {
                 is ManagePurchaseViewModel.OperationState.Idle -> opMessage = null
-                is ManagePurchaseViewModel.OperationState.InProgress -> opMessage = buildString {
-                    append(
-                        if (state.isCancel) context.getString(R.string.manage_sub_cancelling)
-                        else context.getString(R.string.manage_sub_revoking),
-                    )
-                    append("\n")
-                    append(stepLabel(context, state.step))
-                    append("\n")
-                    append(context.getString(R.string.progress_do_not_close))
+                is ManagePurchaseViewModel.OperationState.InProgress -> {
+                    opIsCancel = state.isCancel
+                    opMessage = buildString {
+                        append(
+                            if (state.isCancel) context.getString(R.string.manage_sub_cancelling)
+                            else context.getString(R.string.manage_sub_revoking),
+                        )
+                        append("\n")
+                        append(stepLabel(context, state.step))
+                        append("\n")
+                        append(context.getString(R.string.progress_do_not_close))
+                    }
                 }
                 is ManagePurchaseViewModel.OperationState.Success -> {
                     opMessage = null
@@ -260,7 +285,9 @@ fun RpnManageScreen(navController: NavController) {
 
     opMessage?.let { msg ->
         TvMessageDialog(
-            title = stringResource(R.string.rpn_restore_confirm_title),
+            title = stringResource(
+                if (opIsCancel) R.string.manage_sub_cancelling else R.string.manage_sub_revoking,
+            ),
             message = msg,
             onDismiss = {},
             confirmLabel = "",
@@ -396,7 +423,7 @@ private suspend fun buildManageUi(
             }
         }
 
-        val activeAndNotEnding = state.isActive && !dbRowCancelled
+        val activeAndNotEnding = state.isActive && !effectivelyCancelled
         val canRevoke = canRevokePurchase(data)
 
         ManageUi(
@@ -417,7 +444,7 @@ private suspend fun buildManageUi(
     }
 }
 
-/** Opens the Play subscriptions page for the current product, then re-syncs purchases. */
+/** Opens the Play subscriptions page; purchases re-sync on ON_RESUME. */
 private fun manageOnPlay(context: Context) {
     try {
         val productId = RpnProxyManager.getRpnProductId()
@@ -429,11 +456,6 @@ private fun manageOnPlay(context: Context) {
             .replace("$1", productId)
             .replace("$2", context.packageName)
         UIUtils.openUrl(context, link)
-        // fetchPurchases is non-suspending and internally dispatches; the
-        // phone fragment fires the same re-sync after opening the link.
-        InAppBillingHandler.fetchPurchases(
-            listOf(InAppBillingHandler.PRODUCT_TYPE_SUBS, InAppBillingHandler.PRODUCT_TYPE_INAPP),
-        )
     } catch (e: Exception) {
         Logger.e(LOG_TAG_UI, "$TAG err managing play store subs: ${e.message}", e)
         tvToast(context, context.getString(R.string.error_loading_manage_subscription))

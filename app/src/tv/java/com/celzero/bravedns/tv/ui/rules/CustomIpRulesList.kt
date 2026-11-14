@@ -24,11 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +50,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private data class IpRuleRow(
+internal data class IpRuleRow(
     val uid: Int,
     val ipAddress: String,
     val port: Int,
@@ -69,7 +67,12 @@ private data class IpRuleRow(
 }
 
 @Composable
-fun CustomIpRulesList(uid: Int, query: String, appName: String?) {
+internal fun CustomIpRulesList(
+    uid: Int,
+    query: String,
+    appName: String?,
+    onDeleteRequest: (IpRuleRow) -> Unit,
+) {
     val dao = koinInject<CustomIpDao>()
     val scope = rememberCoroutineScope()
 
@@ -85,7 +88,6 @@ fun CustomIpRulesList(uid: Int, query: String, appName: String?) {
         else rows.filter { displayAddress(it).contains(query.trim(), ignoreCase = true) }
     }
 
-    var pendingDelete by remember { mutableStateOf<IpRuleRow?>(null) }
     val universal = uid == Constants.UID_EVERYBODY
     val scopeLabel = if (universal) "Universal" else (appName ?: "Unknown app")
 
@@ -116,24 +118,9 @@ fun CustomIpRulesList(uid: Int, query: String, appName: String?) {
                         applyIpStatus(row, nextIpStatus(row.status, universal))
                     }
                 },
-                onDelete = { pendingDelete = row },
+                onDelete = { onDeleteRequest(row) },
             )
         }
-    }
-
-    pendingDelete?.let { row ->
-        RulesConfirmDialog(
-            title = "Delete rule?",
-            message = "Remove \"${displayAddress(row)}\" from $scopeLabel custom IP rules?",
-            confirmLabel = "Delete",
-            onConfirm = {
-                pendingDelete = null
-                scope.launch(Dispatchers.IO) {
-                    IpRulesManager.deleteRules(listOf(row.toEntity()))
-                }
-            },
-            onDismiss = { pendingDelete = null },
-        )
     }
 }
 
@@ -242,7 +229,7 @@ private fun CustomIp.toRow() = IpRuleRow(
     modifiedDateTime = modifiedDateTime,
 )
 
-private fun IpRuleRow.toEntity(): CustomIp = CustomIp().apply {
+internal fun IpRuleRow.toEntity(): CustomIp = CustomIp().apply {
     uid = this@toEntity.uid
     ipAddress = this@toEntity.ipAddress
     port = this@toEntity.port

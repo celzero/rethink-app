@@ -28,8 +28,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -123,6 +125,7 @@ private data class RuleSheetEntry(
     val uid: Int,
     val domain: String?,
     val ip: String?,
+    val port: Int,
 )
 
 private fun buildRuleSheetEntry(c: ConnectionTracker): RuleSheetEntry {
@@ -134,6 +137,7 @@ private fun buildRuleSheetEntry(c: ConnectionTracker): RuleSheetEntry {
         uid = c.uid,
         domain = domain,
         ip = ip,
+        port = c.port,
     )
 }
 
@@ -146,6 +150,7 @@ private fun buildRuleSheetEntry(d: DnsLog): RuleSheetEntry {
         uid = d.uid,
         domain = domain,
         ip = ip,
+        port = 0,
     )
 }
 
@@ -406,7 +411,11 @@ private fun OverlayBackdrop(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .then(if (cardHeightFraction != null) Modifier.fillMaxSize() else Modifier)
+                    // unconstrained card scrolls; the fixed-height one fills
+                    .then(
+                        if (cardHeightFraction != null) Modifier.fillMaxSize()
+                        else Modifier.verticalScroll(rememberScrollState())
+                    )
                     .padding(20.dp),
                 content = content,
             )
@@ -857,6 +866,7 @@ private fun LogRuleSheet(
             IpRuleRow(
                 ip = entry.ip,
                 uid = entry.uid,
+                port = entry.port,
                 scopeLabel = "This app",
                 eventLogger = eventLogger,
             )
@@ -938,6 +948,7 @@ private fun DomainRuleRow(
 private fun IpRuleRow(
     ip: String,
     uid: Int,
+    port: Int,
     scopeLabel: String,
     eventLogger: EventLogger,
 ) {
@@ -946,9 +957,9 @@ private fun IpRuleRow(
     var status by remember { mutableStateOf<IpRulesManager.IpRuleStatus?>(null) }
     var pending by remember { mutableStateOf(false) }
 
-    LaunchedEffect(ip, uid) {
+    LaunchedEffect(ip, uid, port) {
         status = withContext(Dispatchers.IO) {
-            IpRulesManager.getMostSpecificRuleMatch(uid, ip)
+            IpRulesManager.hasRule(uid, ip, port)
         }
     }
 
@@ -972,7 +983,7 @@ private fun IpRuleRow(
                 IpRulesManager.addIpRule(
                     uid,
                     net,
-                    /* wildcard-port */ 0,
+                    port,
                     next,
                     proxyId = "",
                     proxyCC = "",
@@ -983,9 +994,9 @@ private fun IpRuleRow(
                     "IP rule changed",
                     EventSource.UI,
                     false,
-                    "UID: $uid, IP: $net, IpRuleStatus: ${next.name}",
+                    "UID: $uid, IP: $net, Port: $port, IpRuleStatus: ${next.name}",
                 )
-                val current = IpRulesManager.getMostSpecificRuleMatch(uid, ip)
+                val current = IpRulesManager.hasRule(uid, ip, port)
                 withContext(Dispatchers.Main) { status = current }
             } finally {
                 withContext(Dispatchers.Main) { pending = false }

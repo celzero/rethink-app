@@ -30,6 +30,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,18 +46,6 @@ import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.tv.ui.common.TvTabRow
 import androidx.tv.material3.Text
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DoHEndpoint
-import com.celzero.bravedns.database.DoHEndpointDAO
-import com.celzero.bravedns.database.DoTEndpoint
-import com.celzero.bravedns.database.DoTEndpointDAO
-import com.celzero.bravedns.database.DnsCryptEndpoint
-import com.celzero.bravedns.database.DnsCryptEndpointDAO
-import com.celzero.bravedns.database.DnsProxyEndpoint
-import com.celzero.bravedns.database.DnsProxyEndpointDAO
-import com.celzero.bravedns.database.ODoHEndpoint
-import com.celzero.bravedns.database.ODoHEndpointDAO
-import com.celzero.bravedns.database.RethinkDnsEndpoint
-import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
@@ -69,37 +59,6 @@ import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 
 /**
- * Generic, type-erased row we render in the DNS picker. Each
- * concrete endpoint type (RDNS / DoH / DoT / DNSCrypt / DNS Proxy /
- * ODoH) is converted to one of these so the row composable is
- * type-blind.
- */
-private data class DnsRow(
-    val key: String,
-    val name: String,
-    val url: String,
-    val isSelected: Boolean,
-    val isCustom: Boolean,
-)
-
-/**
- * DNS protocol tabs — RDNS first, then the encrypted protocols, in
- * the same order as the phone's six-option list. [addRoute] is null
- * for RDNS: its presets are seeded, no custom endpoints.
- */
-private enum class DnsTab(
-    val label: String,
-    val addRoute: String?,
-) {
-    RDNS("RDNS", null),
-    DOH("DoH", "dns/doh/add"),
-    DOT("DoT", "dns/dot/add"),
-    DNSCRYPT("DNSCrypt", "dns/dnscrypt/add"),
-    DNS_PROXY("DNS Proxy", "dns/proxy/add"),
-    ODOH("ODoH", "dns/odoh/add"),
-}
-
-/**
  * DNS destination — encrypted-DNS resolver picker.
  *
  * Layout:
@@ -111,10 +70,10 @@ private enum class DnsTab(
  *  2. **Protocol tabs**: RDNS / DoH / DoT / DNSCrypt / DNS Proxy /
  *     ODoH segmented row.
  *  3. **Endpoint list**: lazy column of the chosen tab's endpoints,
- *     fetched on a background dispatcher from the DAOs. Each row is
- *     a TV-material clickable surface; pressing center calls the
- *     matching `AppConfig.handle…Changes` setter, which is the same
- *     code path the phone screen invokes.
+ *     fetched on a background dispatcher via [DnsEndpointStore]. Each
+ *     row is a TV-material clickable surface; pressing center calls
+ *     the matching `AppConfig.handle…Changes` setter, which is the
+ *     same code path the phone screen invokes.
  *  4. **Add custom**: every tab but RDNS shows a pill button that
  *     routes to its save-and-activate add form.
  */
@@ -122,40 +81,22 @@ private enum class DnsTab(
 @Composable
 fun DnsScreen(navController: NavController? = null) {
     val appConfig = koinInject<AppConfig>()
-    val rethinkRepository = koinInject<RethinkDnsEndpointRepository>()
-    val dohDao = koinInject<DoHEndpointDAO>()
-    val dotDao = koinInject<DoTEndpointDAO>()
-    val dnscryptDao = koinInject<DnsCryptEndpointDAO>()
-    val dnsProxyDao = koinInject<DnsProxyEndpointDAO>()
-    val odohDao = koinInject<ODoHEndpointDAO>()
     val scope = rememberCoroutineScope()
 
     // Tracks the user's currently-focused tab. Independent of the
     // *active* DNS type — the user can browse DoT while DoH is the
     // live resolver, for example.
-    var activeTab by remember { mutableStateOf(DnsTab.RDNS) }
+    // Persisted across navigation so returning from an add screen
+    // keeps the selected tab.
+    val tabSaver = Saver<DnsTab, Int>(save = { it.ordinal }, restore = { DnsTab.entries[it] })
+    var activeTab by rememberSaveable(stateSaver = tabSaver) { mutableStateOf(DnsTab.RDNS) }
 
     // Reload trigger — bumped after each successful "set active"
     // write so the list refreshes its is-selected pill state.
     var reloadKey by remember { mutableStateOf(0) }
 
     val rows by produceState(initialValue = emptyList<DnsRow>(), activeTab, reloadKey) {
-        value = withContext(Dispatchers.IO) {
-            val fetched = when (activeTab) {
-                DnsTab.RDNS -> rethinkRepository.getGlobalRethinkEndpoints()
-                    .filterNot { it.name == RethinkDnsEndpoint.RETHINK_PLUS }
-                    .map { it.toRow() }
-                DnsTab.DOH -> dohDao.getAll().map { it.toRow() }
-                DnsTab.DOT -> dotDao.getAll().map { it.toRow() }
-                DnsTab.DNSCRYPT -> dnscryptDao.getAll().map { it.toRow() }
-                DnsTab.DNS_PROXY -> dnsProxyDao.getAll().map { it.toRow() }
-                DnsTab.ODOH -> odohDao.getAllAsList().map { it.toRow() }
-            }
-            // Active row first, seeded before custom, then by name.
-            fetched.sortedWith(
-                compareBy({ !it.isSelected }, { it.isCustom }, { it.name.lowercase() }),
-            )
-        }
+        value = withContext(Dispatchers.IO) { DnsEndpointStore.rows(activeTab) }
     }
 
     // Subscribe to the connected DNS name (string) so the banner is
@@ -218,17 +159,7 @@ fun DnsScreen(navController: NavController? = null) {
                             row = row,
                             onSelect = {
                                 scope.launch(Dispatchers.IO) {
-                                    activateRow(
-                                        appConfig,
-                                        activeTab,
-                                        row.key,
-                                        rethinkRepository,
-                                        dohDao,
-                                        dotDao,
-                                        dnscryptDao,
-                                        dnsProxyDao,
-                                        odohDao,
-                                    )
+                                    DnsEndpointStore.activate(activeTab, row.key)
                                     // Bounce reload back to main thread so
                                     // produceState observes the change.
                                     withContext(Dispatchers.Main) { reloadKey++ }
@@ -394,108 +325,6 @@ private fun TagPill(label: String) {
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             style = MaterialTheme.typography.labelSmall,
         )
-    }
-}
-
-// -- Conversions and writes ----------------------------------------
-
-private fun RethinkDnsEndpoint.toRow() = DnsRow(
-    key = "rdns/$name",
-    name = name,
-    url = url,
-    isSelected = isActive,
-    isCustom = isCustom,
-)
-
-private fun DoHEndpoint.toRow() = DnsRow(
-    key = "doh/$id",
-    name = dohName,
-    url = dohURL,
-    isSelected = isSelected,
-    isCustom = isCustom,
-)
-
-private fun DoTEndpoint.toRow() = DnsRow(
-    key = "dot/$id",
-    name = name,
-    url = url,
-    isSelected = isSelected,
-    isCustom = isCustom,
-)
-
-private fun DnsCryptEndpoint.toRow() = DnsRow(
-    key = "dnscrypt/$id",
-    name = dnsCryptName,
-    url = dnsCryptURL,
-    isSelected = isSelected,
-    isCustom = isCustom,
-)
-
-private fun DnsProxyEndpoint.toRow() = DnsRow(
-    key = "dnsproxy/$id",
-    name = proxyName,
-    url = "$proxyIP:$proxyPort",
-    isSelected = isSelected,
-    isCustom = isCustom,
-)
-
-private fun ODoHEndpoint.toRow() = DnsRow(
-    key = "odoh/$id",
-    name = name,
-    url = "",
-    isSelected = isSelected,
-    isCustom = isCustom,
-)
-
-private suspend fun activateRow(
-    appConfig: AppConfig,
-    tab: DnsTab,
-    key: String,
-    rethinkRepository: RethinkDnsEndpointRepository,
-    dohDao: DoHEndpointDAO,
-    dotDao: DoTEndpointDAO,
-    dnscryptDao: DnsCryptEndpointDAO,
-    dnsProxyDao: DnsProxyEndpointDAO,
-    odohDao: ODoHEndpointDAO,
-) {
-    when (tab) {
-        DnsTab.RDNS -> {
-            val name = key.substringAfter('/')
-            val ep = rethinkRepository.getGlobalRethinkEndpoints()
-                .firstOrNull { it.name == name } ?: return
-            ep.isActive = true
-            appConfig.handleRethinkChanges(ep)
-        }
-        DnsTab.DOH -> {
-            val id = key.substringAfter('/').toIntOrNull()
-            val ep = dohDao.getAll().firstOrNull { it.id == id } ?: return
-            ep.isSelected = true
-            appConfig.handleDoHChanges(ep)
-        }
-        DnsTab.DOT -> {
-            val id = key.substringAfter('/').toIntOrNull()
-            val ep = dotDao.getAll().firstOrNull { it.id == id } ?: return
-            ep.isSelected = true
-            appConfig.handleDoTChanges(ep)
-        }
-        DnsTab.DNSCRYPT -> {
-            val id = key.substringAfter('/').toIntOrNull()
-            val ep = dnscryptDao.getAll().firstOrNull { it.id == id } ?: return
-            ep.isSelected = true
-            appConfig.handleDnscryptChanges(ep)
-        }
-        DnsTab.DNS_PROXY -> {
-            val id = key.substringAfter('/').toIntOrNull()
-            val ep = dnsProxyDao.getAll().firstOrNull { it.id == id } ?: return
-            ep.isSelected = true
-            appConfig.handleDnsProxyChanges(ep)
-        }
-        DnsTab.ODOH -> {
-            val id = key.substringAfter('/').toIntOrNull()
-            val ep = odohDao.getAllAsList().firstOrNull { it.id == id } ?: return
-            ep.isSelected = true
-            appConfig.handleODoHChanges(ep)
-        }
     }
 }
 

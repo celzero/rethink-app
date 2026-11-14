@@ -60,6 +60,7 @@ import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import androidx.tv.material3.Text
 import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -114,6 +115,8 @@ fun RpnPingScreen() {
                 }
                 latencyMs = latency
                 outcome = if (result) PingTestOutcome.SUCCESS else PingTestOutcome.FAILURE
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 RpnProxyManager.recordPingTest(
                     targets = "",
@@ -152,6 +155,7 @@ fun RpnPingScreen() {
                 description = statusDesc,
                 latencyMs = if (!testing && outcome != null) latencyMs else 0L,
                 testing = testing,
+                outcome = if (!testing) outcome else null,
             )
 
             Surface(
@@ -221,11 +225,13 @@ private fun StatusCard(
     description: String,
     latencyMs: Long,
     testing: Boolean,
+    outcome: PingTestOutcome?,
 ) {
     val (icon, tint) = when {
         testing -> Icons.Filled.Speed to MaterialTheme.colorScheme.primary
-        latencyMs > 0 -> Icons.Filled.CheckCircle to MaterialTheme.colorScheme.primary
-        else -> Icons.Filled.ErrorOutline to MaterialTheme.colorScheme.error
+        outcome == PingTestOutcome.SUCCESS -> Icons.Filled.CheckCircle to MaterialTheme.colorScheme.primary
+        outcome == PingTestOutcome.FAILURE -> Icons.Filled.ErrorOutline to MaterialTheme.colorScheme.error
+        else -> Icons.Filled.Speed to MaterialTheme.colorScheme.onSurfaceVariant
     }
     androidx.tv.material3.Surface(
         shape = TvShapes.Medium,

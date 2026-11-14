@@ -33,6 +33,7 @@ import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import androidx.compose.material3.Text as M3Text
 
@@ -120,15 +121,19 @@ fun DotAddScreen(navController: NavController? = null) {
                                     modifiedDataTime = 0,
                                     latency = 0,
                                 )
-                                appConfig.insertDoTEndpoint(endpoint)
-                                val inserted = dotDao.getAll().firstOrNull {
+                                val inserted = appConfig.insertDoTEndpoint(endpoint).let { id ->
+                                    // IGNORE conflict (-1) or unknown id: fall back to URL+name lookup
+                                    if (id > 0) dotDao.getById(id.toInt()) else null
+                                } ?: dotDao.getAll().firstOrNull {
                                     it.url == trimmedUrl && it.name == finalName
                                 }
                                 if (inserted != null) {
                                     inserted.isSelected = true
                                     appConfig.handleDoTChanges(inserted)
                                 }
-                                navController?.popBackStack()
+                                withContext(Dispatchers.Main) {
+                                    navController?.popBackStack()
+                                }
                             } catch (e: Exception) {
                                 saveError = e.message ?: "Save failed"
                             } finally {

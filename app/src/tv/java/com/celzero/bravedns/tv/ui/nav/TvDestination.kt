@@ -65,3 +65,17 @@ fun visibleTvDestinations(): List<TvDestination> {
     if (paidVisible) return TvDestination.entries.toList()
     return TvDestination.entries.filter { it != TvDestination.Rpn }
 }
+
+/**
+ * Resolves a NavHost route to its parent rail destination: either an
+ * exact top-level route or a prefixed sub-screen route. WireGuard
+ * sub-screens (wg/…) hang off the Proxy rail entry even though their
+ * routes are not "proxy/"-prefixed.
+ */
+fun parentDestinationForRoute(route: String?): TvDestination? {
+    if (route == null) return null
+    TvDestination.entries.firstOrNull {
+        route == it.route || route.startsWith(it.route + "/")
+    }?.let { return it }
+    return if (route.startsWith("wg/")) TvDestination.Proxy else null
+}

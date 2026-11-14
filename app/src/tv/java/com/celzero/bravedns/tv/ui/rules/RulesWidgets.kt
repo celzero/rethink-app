@@ -41,6 +41,15 @@ import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import androidx.tv.material3.Text
 import androidx.compose.material3.Text as M3Text
 
+/**
+ * Row captured for the delete-confirmation dialog the rules screen
+ * hosts; keeps the row models (and their delete calls) untouched.
+ */
+internal sealed interface PendingRuleDelete {
+    data class DomainRule(val row: DomainRuleRow) : PendingRuleDelete
+    data class IpRule(val row: IpRuleRow) : PendingRuleDelete
+}
+
 @Composable
 internal fun RuleFormField(
     label: String,

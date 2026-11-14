@@ -144,16 +144,6 @@ internal suspend fun loadTunnels(): List<WgConfigFilesImmutable> {
     }
 }
 
-// Names of active (non-residue) tunnels, sorted for a stable summary.
-internal suspend fun loadActiveWgNames(): List<String> {
-    return withContext(Dispatchers.IO) {
-        WireguardManager.getAllMappings()
-            .filter { it.isActive && !it.isWarpResidue() }
-            .sortedBy { it.name.lowercase() }
-            .map { it.name.ifBlank { "tunnel #${it.id}" } }
-    }
-}
-
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun AddTunnelButton(onClick: () -> Unit) {

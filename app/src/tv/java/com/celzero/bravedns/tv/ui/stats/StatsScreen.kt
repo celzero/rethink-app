@@ -107,7 +107,7 @@ fun StatsScreen(navController: NavController? = null) {
 
     TvScreenScaffold(
         title = "Stats",
-        subtitle = "${tab.label} · ${window.label} — press center on a row for details.",
+        subtitle = "${tab.label} · ${window.label} — select a row with more detail to drill down.",
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             WindowSelector(current = window, onSelect = { window = it })

@@ -424,8 +424,11 @@ internal fun canRevokePurchase(
     if (subscriptionData.subscriptionStatus.status != SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id) {
         return false
     }
-    val planId = subscriptionData.purchaseDetail?.planId.orEmpty()
-    val productId = subscriptionData.purchaseDetail?.productId.orEmpty()
+    val detail = subscriptionData.purchaseDetail
+    val status = subscriptionData.subscriptionStatus
+    // purchaseDetail first, persisted row as fallback when blank/absent
+    val planId = detail?.planId?.takeIf { it.isNotBlank() } ?: status.planId
+    val productId = detail?.productId?.takeIf { it.isNotBlank() } ?: status.productId
     val dayMs = 24L * 60 * 60 * 1000
     val revokeWindowMs = when {
         productId == InAppBillingHandler.ONE_TIME_PRODUCT_2YRS ||

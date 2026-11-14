@@ -403,7 +403,7 @@ private fun DnsSection(
     var preventDnsLeaks by remember { mutableStateOf(persistentState.preventDnsLeaks) }
 
     fun logEvent(msg: String, details: String) {
-        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, false, details)
+        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, true, details)
     }
 
     fun blockFreeDnsLabel(mode: BlockFreeDnsModeBottomSheet.BlockFreeDnsMode): String = when (mode) {

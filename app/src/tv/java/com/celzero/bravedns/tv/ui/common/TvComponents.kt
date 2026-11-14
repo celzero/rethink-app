@@ -658,6 +658,8 @@ fun TvActivityWave(
     val totals = slots.map { it.allowed + it.blocked }
     val allowed = slots.map { it.allowed }
     val blocked = slots.map { it.blocked }
+    // One shared maximum so the three bands stay proportionally comparable.
+    val sharedMax = totals.maxOrNull()?.coerceAtLeast(1L) ?: 1L
     val summary = slots.fold(0L to 0L) { acc, slot ->
         acc.first + slot.allowed to acc.second + slot.blocked
     }
@@ -676,17 +678,20 @@ fun TvActivityWave(
     ) {
         TvWaveRow(
             values = totals,
+            max = sharedMax,
             color = TvColors.Primary,
             bandHeight = TvSizes.ActivityWaveTotalHeight,
         )
         TvWaveRow(
             values = allowed,
+            max = sharedMax,
             color = TvColors.Secondary,
             bandHeight = TvSizes.ActivityWaveAllowedHeight,
             modifier = Modifier.offset(y = (-6).dp),
         )
         TvWaveRow(
             values = blocked,
+            max = sharedMax,
             color = TvColors.Warning,
             bandHeight = TvSizes.ActivityWaveBlockedHeight,
             modifier = Modifier.offset(y = (-6).dp),
@@ -698,20 +703,20 @@ fun TvActivityWave(
  * One wave band: a Row of static full-progress wavy segments, one per
  * bucket. `waveSpeed = 0.dp` keeps the wave fully static (no lateral
  * drift); the per-segment amplitude is the bucket's value normalized
- * against the series max, floored so quiet buckets render a calm
- * baseline wave instead of a dead line. Rounded stroke caps blend
- * adjacent segments into one continuous wave.
+ * against the shared series max, floored so quiet buckets render a
+ * calm baseline wave instead of a dead line. Rounded stroke caps
+ * blend adjacent segments into one continuous wave.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TvWaveRow(
     values: List<Long>,
+    max: Long,
     color: Color,
     bandHeight: Dp,
     modifier: Modifier = Modifier,
     stroke: Dp = TvSizes.ActivityWaveStroke,
 ) {
-    val max = values.maxOrNull()?.coerceAtLeast(1L) ?: 1L
     val strokePx = with(LocalDensity.current) { stroke.toPx() }
     Row(
         verticalAlignment = Alignment.CenterVertically,
