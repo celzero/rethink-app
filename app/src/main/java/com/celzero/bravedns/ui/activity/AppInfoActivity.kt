@@ -962,6 +962,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
 
     override fun onResume() {
         super.onResume()
+        // re-render so rule-colors changed on other screens are re-resolved
+        if (statsViewMode == StatsViewMode.INSIGHTS && !isFinishing && !isDestroyed) {
+            renderInsights()
+        }
         // ticker is cancelled in onPause; re-render (or lapse) and restart it here
         if (tempAllowExpiryMs > 0L) {
             if (System.currentTimeMillis() >= tempAllowExpiryMs) {

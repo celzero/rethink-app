@@ -228,23 +228,23 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
     private fun initializeClickListeners() {
 
         b.blockIcon.setOnClickListener {
-            if (domainRule == DomainRulesManager.Status.BLOCK) {
-                applyDomainRule(DomainRulesManager.Status.NONE)
-                noRuleUi()
-            } else {
-                applyDomainRule(DomainRulesManager.Status.BLOCK)
-                enableBlockUi()
-            }
+            applyDomainRule(
+                if (domainRule == DomainRulesManager.Status.BLOCK) {
+                    DomainRulesManager.Status.NONE
+                } else {
+                    DomainRulesManager.Status.BLOCK
+                }
+            )
         }
 
         b.trustIcon.setOnClickListener {
-            if (domainRule == DomainRulesManager.Status.TRUST) {
-                applyDomainRule(DomainRulesManager.Status.NONE)
-                noRuleUi()
-            } else {
-                applyDomainRule(DomainRulesManager.Status.TRUST)
-                enableTrustUi()
-            }
+            applyDomainRule(
+                if (domainRule == DomainRulesManager.Status.TRUST) {
+                    DomainRulesManager.Status.NONE
+                } else {
+                    DomainRulesManager.Status.TRUST
+                }
+            )
         }
 
         b.chooseProxyRl.setOnClickListener {
@@ -296,6 +296,8 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
                 DomainRulesManager.DomainType.DOMAIN,
                 status
             )
+            // refresh after the write lands so inherited universal rules and the hint reflect
+            setRulesUi()
         }
         logEvent("Domain rule applied: $domain, $uid, ${status.name}")
     }
