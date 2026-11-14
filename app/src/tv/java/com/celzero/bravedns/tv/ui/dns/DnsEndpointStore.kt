@@ -96,9 +96,11 @@ internal object DnsEndpointStore : KoinComponent {
     suspend fun activate(tab: DnsTab, key: String) {
         when (tab) {
             DnsTab.RDNS -> {
-                val name = key.substringAfter('/')
+                val rest = key.substringAfter('/')
+                val name = rest.substringBefore('/')
+                val url = rest.substringAfter('/', missingDelimiterValue = "")
                 val ep = rethinkRepository.getGlobalRethinkEndpoints()
-                    .firstOrNull { it.name == name } ?: return
+                    .firstOrNull { it.name == name && it.url == url } ?: return
                 ep.isActive = true
                 appConfig.handleRethinkChanges(ep)
             }
@@ -137,7 +139,7 @@ internal object DnsEndpointStore : KoinComponent {
 }
 
 private fun RethinkDnsEndpoint.toRow() = DnsRow(
-    key = "rdns/$name",
+    key = "rdns/$name/$url",
     name = name,
     url = url,
     isSelected = isActive,

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -95,10 +96,6 @@ fun DnsScreen(navController: NavController? = null) {
     // write so the list refreshes its is-selected pill state.
     var reloadKey by remember { mutableStateOf(0) }
 
-    val rows by produceState(initialValue = emptyList<DnsRow>(), activeTab, reloadKey) {
-        value = withContext(Dispatchers.IO) { DnsEndpointStore.rows(activeTab) }
-    }
-
     // Subscribe to the connected DNS name (string) so the banner is
     // live without us needing to poll.
     val connectedDnsName by rememberAsImmutableState(
@@ -137,35 +134,47 @@ fun DnsScreen(navController: NavController? = null) {
                 }
             }
 
-            if (rows.isEmpty()) {
-                Text(
-                    text = if (activeTab == DnsTab.RDNS) {
-                        "No RDNS endpoints found."
-                    } else {
-                        "No ${activeTab.label} endpoints. Use + Add custom to add one."
-                    },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, top = 8.dp),
-                )
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                ) {
-                    items(rows, key = { it.key }) { row ->
-                        DnsRow(
-                            row = row,
-                            onSelect = {
-                                scope.launch(Dispatchers.IO) {
-                                    DnsEndpointStore.activate(activeTab, row.key)
-                                    // Bounce reload back to main thread so
-                                    // produceState observes the change.
-                                    withContext(Dispatchers.Main) { reloadKey++ }
-                                }
-                            },
-                        )
+            // key the row-state by tab: produceState does not reset its value
+            // on key change, so prior-tab rows would linger (and stay clickable)
+            // while the new read is pending
+            key(activeTab) {
+                val rows by produceState(initialValue = emptyList<DnsRow>(), reloadKey) {
+                    value = withContext(Dispatchers.IO) { DnsEndpointStore.rows(activeTab) }
+                }
+
+                if (rows.isEmpty()) {
+                    Text(
+                        text = if (activeTab == DnsTab.RDNS) {
+                            "No RDNS endpoints found."
+                        } else {
+                            "No ${activeTab.label} endpoints. Use + Add custom to add one."
+                        },
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, top = 8.dp),
+                    )
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                    ) {
+                        items(rows, key = { it.key }) { row ->
+                            DnsRow(
+                                row = row,
+                                onSelect = {
+                                    // capture the protocol at tap time; the tab can
+                                    // change before the launched coroutine runs
+                                    val selectedTab = activeTab
+                                    scope.launch(Dispatchers.IO) {
+                                        DnsEndpointStore.activate(selectedTab, row.key)
+                                        // Bounce reload back to main thread so
+                                        // produceState observes the change.
+                                        withContext(Dispatchers.Main) { reloadKey++ }
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
             }

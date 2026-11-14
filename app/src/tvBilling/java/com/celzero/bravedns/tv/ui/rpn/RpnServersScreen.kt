@@ -157,8 +157,9 @@ fun RpnServersScreen(navController: NavController) {
                 }
                 if (!res.first) tvToast(context, "Failed to remove ${row.countryName}: ${res.second}")
             } else {
-                // in-flight additions count toward the cap too
-                if (ui.selectedCount + busyKeys.size >= MAX_SELECTIONS) {
+                // in-flight additions count toward the cap too; the current row is
+                // already in busyKeys, so a projected total == cap must be allowed
+                if (ui.selectedCount + busyKeys.size > MAX_SELECTIONS) {
                     tvToast(
                         context,
                         context.getString(R.string.server_selection_max_reached, MAX_SELECTIONS),
