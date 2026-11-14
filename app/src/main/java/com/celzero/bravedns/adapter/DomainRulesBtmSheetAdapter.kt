@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DomainItemBottomSheetBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -51,13 +52,19 @@ class DomainRulesBtmSheetAdapter(
         holder.update(domain)
     }
 
+    private fun resolveDomainStatus(domain: String): DomainRulesManager.Status {
+        val status = DomainRulesManager.status(domain, uid)
+        if (status != DomainRulesManager.Status.NONE) return status
+        return DomainRulesManager.status(domain, UID_EVERYBODY)
+    }
+
     inner class ViewHolder(private val b: DomainItemBottomSheetBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(item: String) {
             val domain = item.trim()
             b.domainText.text = domain.trim()
-            when (DomainRulesManager.getDomainRule(domain, uid)) {
+            when (resolveDomainStatus(domain)) {
                 DomainRulesManager.Status.TRUST -> {
                     enableTrustUi()
                 }

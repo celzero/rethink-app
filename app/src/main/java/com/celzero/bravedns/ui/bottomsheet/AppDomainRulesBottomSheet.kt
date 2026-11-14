@@ -40,6 +40,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -185,8 +186,15 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
     private fun setRulesUi() {
         io {
             // no need to send port number for the app info screen
+            val universalRule = DomainRulesManager.status(domain, UID_EVERYBODY)
             domainRule = DomainRulesManager.status(domain, uid)
-            Logger.d(LOG_TAG_FIREWALL, "$TAG set selection of ip: $domain, ${domainRule.id}")
+            val isUniversalOnly =
+                domainRule == DomainRulesManager.Status.NONE &&
+                    universalRule != DomainRulesManager.Status.NONE
+            Logger.d(
+                LOG_TAG_FIREWALL,
+                "$TAG set selection of domain: $domain, ${domainRule.id}, universal: $universalRule"
+            )
             uiCtx {
                 when (domainRule) {
                     DomainRulesManager.Status.TRUST -> {
@@ -196,9 +204,15 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
                         enableBlockUi()
                     }
                     DomainRulesManager.Status.NONE -> {
-                        noRuleUi()
+                        when (universalRule) {
+                            DomainRulesManager.Status.BLOCK -> enableBlockUi()
+                            DomainRulesManager.Status.TRUST -> enableTrustUi()
+                            DomainRulesManager.Status.NONE -> noRuleUi()
+                        }
                     }
                 }
+                b.bsacUniversalRuleHint.visibility =
+                    if (isUniversalOnly) View.VISIBLE else View.GONE
             }
         }
     }
