@@ -25,8 +25,8 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
-    suspend fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint) {
-        dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
+    suspend fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint): Long {
+        return dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
     }
 
     suspend fun deleteOlderData(date: Long) {
