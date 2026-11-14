@@ -45,9 +45,9 @@ import androidx.compose.material3.Text as M3Text
  * Mirrors the phone's `DohListFragment` dialog: name + URL + optional
  * IP + a "skip TLS validation" toggle. The URL must be a plausible
  * DoH server (https, host, path, no query/fragment). Saving inserts
- * with `isCustom = true`, re-reads the row (auto-generated id is not
- * written back onto the inserted entity) and activates it via
- * [AppConfig.handleDoHChanges].
+ * with `isCustom = true`, re-reads the row by its insertion id
+ * (IGNORE conflict = duplicate: surfaced as an error, not activated)
+ * and activates it via [AppConfig.handleDoHChanges].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -138,17 +138,20 @@ fun DohAddScreen(navController: NavController? = null) {
                                             modifiedDataTime = 0,
                                             latency = 0,
                                         )
+                                        // select by insertion id; IGNORE conflict (-1) = duplicate
                                         val inserted = appConfig.insertDohEndpoint(endpoint).let { id ->
-                                            // IGNORE conflict (-1) or unknown id: fall back to URL+name lookup
                                             if (id > 0) dohDao.getById(id.toInt()) else null
-                                        } ?: dohDao.getAll().firstOrNull {
-                                            it.dohURL == trimmedUrl && it.dohName == finalName
                                         }
-                                        if (inserted != null) {
+                                        if (inserted == null) {
+                                            withContext(Dispatchers.Main) {
+                                                saveError = "Endpoint already exists"
+                                            }
+                                            false
+                                        } else {
                                             inserted.isSelected = true
                                             appConfig.handleDoHChanges(inserted)
+                                            true
                                         }
-                                        true
                                     }
                                 } catch (e: Exception) {
                                     saveError = e.message ?: "Save failed"

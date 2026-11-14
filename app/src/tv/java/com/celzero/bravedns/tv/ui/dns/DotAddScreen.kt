@@ -28,6 +28,7 @@ import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.database.DoTEndpointDAO
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.tv.ui.common.SettingToggleRow
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
@@ -41,10 +42,11 @@ import androidx.compose.material3.Text as M3Text
  * Custom DoT endpoint add screen (`dns/dot/add`).
  *
  * Mirrors the phone's `DoTListFragment` dialog: name + URL + a
- * "skip TLS validation" toggle, no URL validation (phone parity).
- * Saving inserts with `isCustom = true`, re-reads the row
- * (auto-generated id is not written back onto the inserted entity)
- * and activates it via [AppConfig.handleDoTChanges].
+ * "skip TLS validation" toggle. Unlike the phone (insert only, no
+ * validation), activation is gated on a hostname-shape check.
+ * Saving inserts with `isCustom = true`, re-reads the row by its
+ * insertion id (IGNORE conflict = duplicate: surfaced as an error,
+ * not activated) and activates it via [AppConfig.handleDoTChanges].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -107,6 +109,9 @@ fun DotAddScreen(navController: NavController? = null) {
                         val secure = !skipTlsValidation
                         scope.launch(Dispatchers.IO) {
                             try {
+                                // endpoint is always stored; activation is gated on a valid hostname
+                                val hostOk = DomainRulesManager.extractHost(trimmedUrl)
+                                    ?.let { DomainRulesManager.isValidDomain(it) } == true
                                 val finalName = epName.ifBlank {
                                     "DoT ${appConfig.getDoTCount() + 1}"
                                 }
@@ -115,24 +120,30 @@ fun DotAddScreen(navController: NavController? = null) {
                                     name = finalName,
                                     url = trimmedUrl,
                                     desc = "",
-                                    isSelected = true,
+                                    isSelected = hostOk,
                                     isCustom = true,
                                     isSecure = secure,
                                     modifiedDataTime = 0,
                                     latency = 0,
                                 )
+                                // select by insertion id; IGNORE conflict (-1) = duplicate
                                 val inserted = appConfig.insertDoTEndpoint(endpoint).let { id ->
-                                    // IGNORE conflict (-1) or unknown id: fall back to URL+name lookup
                                     if (id > 0) dotDao.getById(id.toInt()) else null
-                                } ?: dotDao.getAll().firstOrNull {
-                                    it.url == trimmedUrl && it.name == finalName
                                 }
-                                if (inserted != null) {
-                                    inserted.isSelected = true
-                                    appConfig.handleDoTChanges(inserted)
-                                }
-                                withContext(Dispatchers.Main) {
-                                    navController?.popBackStack()
+                                when {
+                                    !hostOk -> withContext(Dispatchers.Main) {
+                                        saveError = "Invalid DoT host, expected a hostname."
+                                    }
+                                    inserted == null -> withContext(Dispatchers.Main) {
+                                        saveError = "Endpoint already exists"
+                                    }
+                                    else -> {
+                                        inserted.isSelected = true
+                                        appConfig.handleDoTChanges(inserted)
+                                        withContext(Dispatchers.Main) {
+                                            navController?.popBackStack()
+                                        }
+                                    }
                                 }
                             } catch (e: Exception) {
                                 saveError = e.message ?: "Save failed"
