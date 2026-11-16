@@ -262,6 +262,43 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
     }
 
     private fun restore() {
+        // app-folder backups are only reachable via the chooser; keep the
+        // picker-first flow when the folder has nothing restorable
+        if (appFolderBackupFiles().isNotEmpty()) {
+            showRestoreSourceDialog()
+            return
+        }
+        launchRestorePicker()
+    }
+
+    private fun appFolderBackupFiles(): List<File> {
+        val exportDir = getBackupExportDir(requireContext())
+        val expectedExtension =
+            if (Utilities.isAlphaBuild()) BACKUP_FILE_EXTN_ALPHA else BACKUP_FILE_EXTN
+        return exportDir?.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(expectedExtension) }
+            ?.sortedByDescending { it.lastModified() }
+            .orEmpty()
+    }
+
+    private fun showRestoreSourceDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+            .setTitle(R.string.brbs_restore_pick_source_title)
+            .setPositiveButton(getString(R.string.brbs_restore_pick_source_browse)) { _, _ ->
+                launchRestorePicker()
+            }
+            .setNeutralButton(getString(R.string.brbs_restore_pick_source_app_folder)) { _, _ ->
+                restoreFromAppFolder()
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+                // no-op
+            }
+            .setCancelable(true)
+            .create()
+            .show()
+    }
+
+    private fun launchRestorePicker() {
         try {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -270,12 +307,10 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
 
             // launch is not subject to package-visibility filtering, unlike resolveActivity
-            try {
-                restoreActivityResult.launch(intent)
-            } catch (e: android.content.ActivityNotFoundException) {
-                Logger.w(LOG_TAG_BACKUP_RESTORE, "no activity for OPEN_DOCUMENT: ${e.message}")
-                restoreFromAppFolder()
-            }
+            restoreActivityResult.launch(intent)
+        } catch (e: android.content.ActivityNotFoundException) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "no activity for OPEN_DOCUMENT: ${e.message}")
+            restoreFromAppFolder()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BACKUP_RESTORE, "err opening file picker: ${e.message}")
             Utilities.showToastUiCentered(
@@ -290,10 +325,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         val exportDir = getBackupExportDir(requireContext())
         val expectedExtension =
             if (Utilities.isAlphaBuild()) BACKUP_FILE_EXTN_ALPHA else BACKUP_FILE_EXTN
-        val backupFiles = exportDir?.listFiles()
-            ?.filter { it.isFile && it.name.endsWith(expectedExtension) }
-            ?.sortedByDescending { it.lastModified() }
-            .orEmpty()
+        val backupFiles = appFolderBackupFiles()
 
         if (backupFiles.isEmpty()) {
             Logger.w(
@@ -506,6 +538,30 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             ExistingWorkPolicy.KEEP,
             downloadWatcher
         )
+        // KEEP silently drops the request when unfinished unique work exists;
+        // confirm this request was enqueued before reporting success
+        val accepted = try {
+            WorkManager.getInstance(requireContext().applicationContext)
+                .getWorkInfosForUniqueWork(BackupHelper.BACKUP_RESTORE_WORK_NAME)
+                .get()
+                .any { it.id == downloadWatcher.id }
+        } catch (e: Exception) {
+            // fail-open like BackupHelper.isBackupRestoreActive
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "err verifying backup enqueue: ${e.message}")
+            true
+        }
+        if (!accepted) {
+            Logger.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "backup request kept out by existing work, reporting in-progress"
+            )
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.brbs_backup_restore_in_progress),
+                Toast.LENGTH_SHORT
+            )
+            return false
+        }
         observeBackupWorker(downloadWatcher.id)
         return true
     }
