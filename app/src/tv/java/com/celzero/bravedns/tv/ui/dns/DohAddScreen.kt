@@ -44,10 +44,10 @@ import androidx.compose.material3.Text as M3Text
  *
  * Mirrors the phone's `DohListFragment` dialog: name + URL + optional
  * IP + a "skip TLS validation" toggle. The URL must be a plausible
- * DoH server (https, host, path, no query/fragment). Saving inserts
- * with `isCustom = true`, re-reads the row by its insertion id
- * (IGNORE conflict = duplicate: surfaced as an error, not activated)
- * and activates it via [AppConfig.handleDoHChanges].
+ * DoH server (https, host, path, no query/fragment). Saving checks
+ * for an existing endpoint by identity (name, URL, IP, TLS) before
+ * inserting with `isCustom = true`, re-reads the row by its insertion
+ * id and activates it via [AppConfig.handleDoHChanges].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -126,11 +126,12 @@ fun DohAddScreen(navController: NavController? = null) {
                                         val finalName = epName.ifBlank {
                                             "DoH ${appConfig.getDohCount() + 1}"
                                         }
+                                        val endpointIp = epIp.takeIf { it.isNotBlank() }
                                         val endpoint = DoHEndpoint(
                                             id = 0,
                                             dohName = finalName,
                                             dohURL = trimmedUrl,
-                                            dohIp = epIp.takeIf { it.isNotBlank() },
+                                            dohIp = endpointIp,
                                             dohExplanation = "",
                                             isSelected = true,
                                             isCustom = true,
@@ -138,19 +139,32 @@ fun DohAddScreen(navController: NavController? = null) {
                                             modifiedDataTime = 0,
                                             latency = 0,
                                         )
-                                        // select by insertion id; IGNORE conflict (-1) = duplicate
-                                        val inserted = appConfig.insertDohEndpoint(endpoint).let { id ->
-                                            if (id > 0) dohDao.getById(id.toInt()) else null
+                                        // identity check; IGNORE-on-insert never
+                                        // conflicts (no unique index beyond the pk)
+                                        val exists = dohDao.getAll().any {
+                                            it.dohName == finalName && it.dohURL == trimmedUrl &&
+                                                it.dohIp == endpointIp && it.isSecure == secure
                                         }
-                                        if (inserted == null) {
+                                        if (exists) {
                                             withContext(Dispatchers.Main) {
                                                 saveError = "Endpoint already exists"
                                             }
                                             false
                                         } else {
-                                            inserted.isSelected = true
-                                            appConfig.handleDoHChanges(inserted)
-                                            true
+                                            val inserted = appConfig.insertDohEndpoint(endpoint)
+                                                .let { id ->
+                                                    if (id > 0) dohDao.getById(id.toInt()) else null
+                                                }
+                                            if (inserted == null) {
+                                                withContext(Dispatchers.Main) {
+                                                    saveError = "Endpoint already exists"
+                                                }
+                                                false
+                                            } else {
+                                                inserted.isSelected = true
+                                                appConfig.handleDoHChanges(inserted)
+                                                true
+                                            }
                                         }
                                     }
                                 } catch (e: Exception) {

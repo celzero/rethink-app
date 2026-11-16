@@ -93,7 +93,7 @@ fun AddDomainRuleScreen(navController: NavController, uid: Int = Constants.UID_E
                 return@launch
             }
             if (selectedType == DomainRulesManager.DomainType.WILDCARD &&
-                !DomainRulesManager.isWildCardEntry(host)
+                (!host.startsWith("*.") || !DomainRulesManager.isWildCardEntry(host))
             ) {
                 fail("Invalid wildcard URL or domain")
                 return@launch

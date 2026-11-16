@@ -44,9 +44,9 @@ import androidx.compose.material3.Text as M3Text
  * Mirrors the phone's `DoTListFragment` dialog: name + URL + a
  * "skip TLS validation" toggle. Unlike the phone (insert only, no
  * validation), activation is gated on a hostname-shape check.
- * Saving inserts with `isCustom = true`, re-reads the row by its
- * insertion id (IGNORE conflict = duplicate: surfaced as an error,
- * not activated) and activates it via [AppConfig.handleDoTChanges].
+ * Saving checks for an existing endpoint by identity (name, URL,
+ * TLS) before inserting with `isCustom = true`, re-reads the row by
+ * its insertion id and activates it via [AppConfig.handleDoTChanges].
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -109,7 +109,7 @@ fun DotAddScreen(navController: NavController? = null) {
                         val secure = !skipTlsValidation
                         scope.launch(Dispatchers.IO) {
                             try {
-                                // endpoint is always stored; activation is gated on a valid hostname
+                                // duplicates are not stored; activation is gated on a valid hostname
                                 val hostOk = DomainRulesManager.extractHost(trimmedUrl)
                                     ?.let { DomainRulesManager.isValidDomain(it) } == true
                                 val finalName = epName.ifBlank {
@@ -126,9 +126,18 @@ fun DotAddScreen(navController: NavController? = null) {
                                     modifiedDataTime = 0,
                                     latency = 0,
                                 )
-                                // select by insertion id; IGNORE conflict (-1) = duplicate
-                                val inserted = appConfig.insertDoTEndpoint(endpoint).let { id ->
-                                    if (id > 0) dotDao.getById(id.toInt()) else null
+                                // identity check; IGNORE-on-insert never
+                                // conflicts (no unique index beyond the pk)
+                                val exists = dotDao.getAll().any {
+                                    it.name == finalName && it.url == trimmedUrl &&
+                                        it.isSecure == secure
+                                }
+                                val inserted = if (exists) {
+                                    null
+                                } else {
+                                    appConfig.insertDoTEndpoint(endpoint).let { id ->
+                                        if (id > 0) dotDao.getById(id.toInt()) else null
+                                    }
                                 }
                                 when {
                                     !hostOk -> withContext(Dispatchers.Main) {
