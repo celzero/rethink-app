@@ -52,7 +52,8 @@ class StoreAppUpdater(
     override fun checkForAppUpdate(
         isInteractive: AppUpdater.UserPresent,
         activity: Activity,
-        listener: AppUpdater.InstallStateListener
+        listener: AppUpdater.InstallStateListener,
+        startUpdateFlow: (IntentSender) -> Unit
     ) {
         Logger.i(LOG_TAG_APP_UPDATE, "StoreAppUpdater: beginning update check")
         // drop any stale play listener for this app listener before re-registering
@@ -94,7 +95,7 @@ class StoreAppUpdater(
                     }
                 }
             withContext(Dispatchers.Main) {
-                handleUpdateInfo(info, isInteractive, activity, listener)
+                handleUpdateInfo(info, isInteractive, activity, listener, startUpdateFlow)
             }
         }
     }
@@ -103,7 +104,8 @@ class StoreAppUpdater(
         info: AppUpdateInfo?,
         isInteractive: AppUpdater.UserPresent,
         activity: Activity,
-        listener: AppUpdater.InstallStateListener
+        listener: AppUpdater.InstallStateListener,
+        startUpdateFlow: (IntentSender) -> Unit
     ) {
         // throttle auto-checks for the play path too; the web updater sets this itself
         persistentState.lastAppUpdateCheck = System.currentTimeMillis()
@@ -138,12 +140,19 @@ class StoreAppUpdater(
                     unregisterListener(listener)
                     listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
                 } else {
-                    startUpdateFlow(activity, info, type, listener, isInteractive)
+                    launchUpdateFlow(activity, info, type, listener, isInteractive, startUpdateFlow)
                 }
             }
             UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
                 if (info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                    startUpdateFlow(activity, info, AppUpdateType.IMMEDIATE, listener, isInteractive)
+                    launchUpdateFlow(
+                        activity,
+                        info,
+                        AppUpdateType.IMMEDIATE,
+                        listener,
+                        isInteractive,
+                        startUpdateFlow
+                    )
                 } else {
                     Logger.w(LOG_TAG_APP_UPDATE, "StoreAppUpdater: update in progress but immediate not allowed")
                     unregisterListener(listener)
@@ -176,12 +185,13 @@ class StoreAppUpdater(
         }
     }
 
-    private fun startUpdateFlow(
+    private fun launchUpdateFlow(
         activity: Activity,
         info: AppUpdateInfo,
         @AppUpdateType type: Int,
         listener: AppUpdater.InstallStateListener,
-        isInteractive: AppUpdater.UserPresent
+        isInteractive: AppUpdater.UserPresent,
+        startUpdateFlow: (IntentSender) -> Unit
     ) {
         if (activity.isFinishing || activity.isDestroyed) {
             Logger.w(LOG_TAG_APP_UPDATE, "StoreAppUpdater: activity finishing, skipping update flow")
@@ -193,9 +203,9 @@ class StoreAppUpdater(
             val options = AppUpdateOptions.newBuilder(type).build()
             appUpdateManager.startUpdateFlowForResult(
                 info,
-                activity,
+                { sender, _, _, _, _, _, _ -> startUpdateFlow(sender) },
                 options,
-                AppUpdater.PLAY_UPDATE_REQUEST_CODE
+                0
             )
         } catch (e: IntentSender.SendIntentException) {
             Logger.e(LOG_TAG_APP_UPDATE, "StoreAppUpdater: send intent err: ${e.message}", e)

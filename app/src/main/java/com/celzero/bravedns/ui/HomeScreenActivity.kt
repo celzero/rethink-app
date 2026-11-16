@@ -20,6 +20,7 @@ import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -28,6 +29,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -116,14 +119,26 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val appConfig by inject<AppConfig>()
     private val smartDnsEndpointRepository by inject<SmartDnsEndpointRepository>()
 
-    // set before each update check; onActivityResult() uses it to decide whether
-    // a canceled play flow should fall back to the play listing
-    @Volatile
-    private var isUpdateCheckInteractive = false
+    // two launchers encode check interactivity at registration; the framework
+    // redelivers flow results across recreation/process death
+    private val interactiveUpdateFlowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Logger.i(LOG_TAG_APP_UPDATE, "update flow accepted")
+            } else {
+                Logger.w(LOG_TAG_APP_UPDATE, "update flow not completed, opening store page")
+                Utilities.openPlayStorePage(this)
+            }
+        }
 
-    companion object {
-        private const val KEY_UPDATE_CHECK_INTERACTIVE = "isUpdateCheckInteractive"
-    }
+    private val silentUpdateFlowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Logger.i(LOG_TAG_APP_UPDATE, "auto update flow accepted")
+            } else {
+                Logger.i(LOG_TAG_APP_UPDATE, "auto update flow not completed, code: ${result.resultCode}")
+            }
+        }
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -175,11 +190,6 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
         // handle intent receiver for backup/restore
         handleIntent()
-
-        // restore before initUpdateCheck: a new check must set its own interaction state
-        if (savedInstanceState != null) {
-            isUpdateCheckInteractive = savedInstanceState.getBoolean(KEY_UPDATE_CHECK_INTERACTIVE)
-        }
 
         initUpdateCheck()
 
@@ -621,14 +631,20 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             return
         }
 
+        val launcher =
+            if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) interactiveUpdateFlowLauncher
+            else silentUpdateFlowLauncher
+        val startFlow: (IntentSender) -> Unit = { sender ->
+            launcher.launch(IntentSenderRequest.Builder(sender).build())
+        }
+
         if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
             try {
-                isUpdateCheckInteractive =
-                    isInteractive == AppUpdater.UserPresent.INTERACTIVE
                 appUpdateManager.checkForAppUpdate(
                     isInteractive,
                     this,
-                    installStateUpdatedListener
+                    installStateUpdatedListener,
+                    startFlow
                 )
             } catch (e: Exception) {
                 Logger.crash(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
@@ -642,7 +658,8 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
                     .checkForAppUpdate(
                         isInteractive,
                         this,
-                        installStateUpdatedListener
+                        installStateUpdatedListener,
+                        startFlow
                     ) // Always web updater
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
@@ -842,27 +859,6 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
             Logger.w(Logger.LOG_TAG_VPN, "err opening rethink download link: ${e.message}", e)
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_UPDATE_CHECK_INTERACTIVE, isUpdateCheckInteractive)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != AppUpdater.PLAY_UPDATE_REQUEST_CODE) return
-        if (resultCode == Activity.RESULT_OK) {
-            Logger.i(LOG_TAG_APP_UPDATE, "update flow accepted")
-            return
-        }
-        // play's flow was canceled or failed to launch; interactive checks fall
-        // back to the play listing, auto-checks stay silent
-        Logger.w(LOG_TAG_APP_UPDATE, "update flow not completed, interactive: $isUpdateCheckInteractive")
-        if (isUpdateCheckInteractive) {
-            Utilities.openPlayStorePage(this)
         }
     }
 

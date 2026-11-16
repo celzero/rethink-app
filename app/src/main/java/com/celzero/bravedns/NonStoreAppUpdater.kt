@@ -18,6 +18,7 @@ package com.celzero.bravedns
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
 import android.app.Activity
+import android.content.IntentSender
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
@@ -41,7 +42,8 @@ class NonStoreAppUpdater(
     override fun checkForAppUpdate(
         isInteractive: AppUpdater.UserPresent,
         activity: Activity,
-        listener: AppUpdater.InstallStateListener
+        listener: AppUpdater.InstallStateListener,
+        @Suppress("UNUSED_PARAMETER") startUpdateFlow: (IntentSender) -> Unit
     ) {
         Logger.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + persistentState.appVersion.toString()

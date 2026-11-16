@@ -16,18 +16,15 @@
 package com.celzero.bravedns.service
 
 import android.app.Activity
+import android.content.IntentSender
 
 interface AppUpdater {
-
-    companion object {
-        // shared so the host activity can match it in onActivityResult()
-        const val PLAY_UPDATE_REQUEST_CODE = 20023
-    }
 
     fun checkForAppUpdate(
         isInteractive: UserPresent,
         activity: Activity,
-        listener: InstallStateListener
+        listener: InstallStateListener,
+        startUpdateFlow: (IntentSender) -> Unit
     )
 
     fun completeUpdate()
