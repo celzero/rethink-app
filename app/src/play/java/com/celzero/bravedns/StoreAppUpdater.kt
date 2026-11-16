@@ -95,7 +95,7 @@ class StoreAppUpdater(
                     }
                 }
             withContext(Dispatchers.Main) {
-                handleUpdateInfo(info, isInteractive, activity, listener, startUpdateFlow)
+                handleUpdateInfo(info, isInteractive, activity, listener, playListener, startUpdateFlow)
             }
         }
     }
@@ -105,6 +105,7 @@ class StoreAppUpdater(
         isInteractive: AppUpdater.UserPresent,
         activity: Activity,
         listener: AppUpdater.InstallStateListener,
+        playListener: InstallStateUpdatedListener,
         startUpdateFlow: (IntentSender) -> Unit
     ) {
         // throttle auto-checks for the play path too; the web updater sets this itself
@@ -112,7 +113,7 @@ class StoreAppUpdater(
 
         if (info == null) {
             Logger.e(LOG_TAG_APP_UPDATE, "StoreAppUpdater: update info unavailable (timeout/failure)")
-            unregisterListener(listener)
+            unregisterIfCurrent(listener, playListener)
             if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
                 Utilities.openPlayStorePage(activity)
             }
@@ -137,10 +138,10 @@ class StoreAppUpdater(
                 val type = resolveUpdateType(info)
                 if (type == null) {
                     Logger.w(LOG_TAG_APP_UPDATE, "StoreAppUpdater: update available but no allowed update types")
-                    unregisterListener(listener)
+                    unregisterIfCurrent(listener, playListener)
                     listener.onUpdateQuotaExceeded(AppUpdater.InstallSource.STORE)
                 } else {
-                    launchUpdateFlow(activity, info, type, listener, isInteractive, startUpdateFlow)
+                    launchUpdateFlow(activity, info, type, listener, playListener, isInteractive, startUpdateFlow)
                 }
             }
             UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
@@ -150,24 +151,25 @@ class StoreAppUpdater(
                         info,
                         AppUpdateType.IMMEDIATE,
                         listener,
+                        playListener,
                         isInteractive,
                         startUpdateFlow
                     )
                 } else {
                     Logger.w(LOG_TAG_APP_UPDATE, "StoreAppUpdater: update in progress but immediate not allowed")
-                    unregisterListener(listener)
+                    unregisterIfCurrent(listener, playListener)
                     if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
                         Utilities.openPlayStorePage(activity)
                     }
                 }
             }
             UpdateAvailability.UPDATE_NOT_AVAILABLE -> {
-                unregisterListener(listener)
+                unregisterIfCurrent(listener, playListener)
                 listener.onUpToDate(AppUpdater.InstallSource.STORE, isInteractive)
             }
             else -> {
                 Logger.i(LOG_TAG_APP_UPDATE, "StoreAppUpdater: unhandled update availability: $availability")
-                unregisterListener(listener)
+                unregisterIfCurrent(listener, playListener)
             }
         }
     }
@@ -190,12 +192,13 @@ class StoreAppUpdater(
         info: AppUpdateInfo,
         @AppUpdateType type: Int,
         listener: AppUpdater.InstallStateListener,
+        playListener: InstallStateUpdatedListener,
         isInteractive: AppUpdater.UserPresent,
         startUpdateFlow: (IntentSender) -> Unit
     ) {
         if (activity.isFinishing || activity.isDestroyed) {
             Logger.w(LOG_TAG_APP_UPDATE, "StoreAppUpdater: activity finishing, skipping update flow")
-            unregisterListener(listener)
+            unregisterIfCurrent(listener, playListener)
             return
         }
 
@@ -209,13 +212,13 @@ class StoreAppUpdater(
             )
         } catch (e: IntentSender.SendIntentException) {
             Logger.e(LOG_TAG_APP_UPDATE, "StoreAppUpdater: send intent err: ${e.message}", e)
-            unregisterListener(listener)
+            unregisterIfCurrent(listener, playListener)
             if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
                 Utilities.openPlayStorePage(activity)
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_APP_UPDATE, "StoreAppUpdater: update flow err: ${e.message}", e)
-            unregisterListener(listener)
+            unregisterIfCurrent(listener, playListener)
             if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
                 Utilities.openPlayStorePage(activity)
             }
@@ -230,6 +233,14 @@ class StoreAppUpdater(
         } catch (e: Exception) {
             Logger.e(LOG_TAG_APP_UPDATE, "StoreAppUpdater: complete update err: ${e.message}", e)
         }
+    }
+
+    // drop this check's play registration only if a newer check has not replaced it
+    private fun unregisterIfCurrent(
+        listener: AppUpdater.InstallStateListener,
+        playListener: InstallStateUpdatedListener
+    ) {
+        if (listenerMapping[listener] === playListener) unregisterListener(listener)
     }
 
     override fun unregisterListener(listener: AppUpdater.InstallStateListener) {
