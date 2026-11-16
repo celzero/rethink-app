@@ -544,8 +544,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             downloadWatcher
         )
         // KEEP silently drops the request when unfinished unique work exists;
-        // confirm this request was enqueued before reporting success. The query
-        // runs off the main thread; the result is consumed back on main.
+        // confirm this request was enqueued before reporting success
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
         val accepted = try {
             withContext(Dispatchers.IO) {
