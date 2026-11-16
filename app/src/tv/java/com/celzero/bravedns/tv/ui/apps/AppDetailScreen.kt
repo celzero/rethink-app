@@ -9,9 +9,7 @@
  */
 package com.celzero.bravedns.tv.ui.apps
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,27 +17,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
-import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.Text
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
+import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Detail screen for a single app — the equivalent of upstream's
@@ -53,25 +47,19 @@ import kotlinx.coroutines.withContext
  *    Block Wi-Fi. Disabled when Firewall status is anything other
  *    than NONE (the connection-class concept only applies to the
  *    NONE / NONE-with-class baseline upstream uses).
- *
- * Per-app domain & IP rules and per-app proxy mapping will be added
- * as sub-destinations during the polish phase. The decision to ship
- * the segmented status selectors first is deliberate: the headline
- * "block this app from the internet" use-case is the marquee feature
- * for a TV firewall, and it works without the rest.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AppDetailScreen(uid: Int, navController: NavController? = null) {
     val scope = rememberCoroutineScope()
 
-    // Re-fetch on `uid` so navigating to a sibling redraws the screen.
-    val initialRow by produceState<AppRow?>(initialValue = null, uid) {
-        value = withContext(Dispatchers.IO) {
-            FirewallManager.getAppInfoByUid(uid)?.toRow()
-        }
-    }
-    val row = initialRow
+    // Backed by the app-list LiveData so rule writes (which post a fresh
+    // snapshot via informObservers) re-project this row and refresh the UI.
+    val rowState = rememberAsImmutableState(
+        liveData = FirewallManager.getApplistObserver(),
+        initial = null as AppRow?,
+    ) { apps -> apps.orEmpty().firstOrNull { it.uid == uid }?.toRow() }
+    val row = rowState.value
 
     if (row == null) {
         TvScreenScaffold(title = "App", subtitle = "Loading…") {
@@ -93,15 +81,15 @@ fun AppDetailScreen(uid: Int, navController: NavController? = null) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap),
         ) {
             // Identity header: large icon + current status pill.
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AppIcon(packageName = row.packageName, size = 96)
-                Spacer(Modifier.width(20.dp))
+                Spacer(Modifier.width(TvSpacing.ContentHorizontal))
                 Column {
                     StatusPill(row.firewallStatus, row.connectionStatus)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(TvSpacing.RowGap))
                     Text(
                         text = "uid · ${row.uid}",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -115,6 +103,7 @@ fun AppDetailScreen(uid: Int, navController: NavController? = null) {
             SectionLabel("Firewall rule")
             FirewallStatusRow(
                 current = row.firewallStatus,
+                excludeEnabled = !row.isUnknownPackage,
                 onSelect = { selected ->
                     scope.launch(Dispatchers.IO) {
                         FirewallManager.updateFirewallStatus(
@@ -143,20 +132,13 @@ fun AppDetailScreen(uid: Int, navController: NavController? = null) {
                 },
             )
             if (classDisabled) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(TvSpacing.RowGap))
                 Text(
                     "Connection class is only meaningful when the firewall rule is the default (\"Allow / Block\").",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-
-            Spacer(Modifier.height(24.dp))
-            Text(
-                "Per-app domain and IP rules, plus per-app proxy mapping, will live here in a follow-up.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-            )
         }
     }
 }
@@ -166,7 +148,7 @@ private fun SectionLabel(text: String) {
     Text(
         text = text.uppercase(),
         color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+        style = MaterialTheme.typography.labelLarge,
         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp, start = 2.dp),
     )
 }
@@ -175,6 +157,7 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun FirewallStatusRow(
     current: FirewallManager.FirewallStatus,
+    excludeEnabled: Boolean,
     onSelect: (FirewallManager.FirewallStatus) -> Unit,
 ) {
     val options = remember {
@@ -190,6 +173,9 @@ private fun FirewallStatusRow(
         options = options,
         current = current,
         enabled = true,
+        // updateFirewallStatus silently ignores EXCLUDE for unknown/synthetic
+        // packages, so grey the option out instead of showing a dead button.
+        enabledFor = { it != FirewallManager.FirewallStatus.EXCLUDE || excludeEnabled },
         onSelect = onSelect,
     )
 }
@@ -223,49 +209,20 @@ private fun <T> SegmentedButtons(
     options: List<Pair<T, String>>,
     current: T,
     enabled: Boolean,
+    enabledFor: (T) -> Boolean = { true },
     onSelect: (T) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
     ) {
         options.forEach { (value, label) ->
-            val selected = value == current
-            Surface(
+            TvSelectableChip(
+                label = label,
+                selected = value == current,
                 onClick = { onSelect(value) },
-                enabled = enabled,
-                shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = if (selected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    },
-                    contentColor = if (selected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                ),
-            ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = if (selected) "✓  $label" else label,
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        ),
-                    )
-                }
-            }
+                enabled = enabled && enabledFor(value),
+            )
         }
     }
 }

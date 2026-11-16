@@ -9,18 +9,10 @@
  */
 package com.celzero.bravedns.tv.ui.nav
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.automirrored.filled.Rule
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Hub
-import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Utilities
 
 /**
  * Top-level destinations surfaced in the TV navigation drawer.
@@ -36,30 +28,54 @@ import androidx.compose.ui.graphics.vector.ImageVector
  *
  * Order is the rendered order in the drawer, which is also the
  * order users will D-pad through. We follow the convention "most-used
- * first": Home, then the five control surfaces (DNS / Firewall / Apps
- * / Rules / Proxy), then the two visibility surfaces (Logs / Stats), then
- * Settings last (matching every Android TV launcher's convention of
- * parking Settings at the bottom).
+ * first": Home, Apps, then the paid RPN destination, then the four
+ * control surfaces (Proxy / DNS / Firewall / Rules), then Stats,
+ * Settings, and Logs.
  *
- * RPN is a full destination on play/website builds (server selection,
- * per-location detail, purchase + manage). The fdroid channel cannot
- * ship billing, so [Rpn] must be filtered out of the rail by the
- * scaffold (see TvNavScaffold's flavor gate) — the enum entry stays so
- * sub-routes keep a stable parent.
+ * The paid [Rpn] destination renders only on billing-capable
+ * channels (see [visibleTvDestinations]); its sub-graph is contributed
+ * by the billing-capable TV variants via [TvPaidRoutes].
  */
 enum class TvDestination(
     val route: String,
-    val label: String,
-    val icon: ImageVector,
+    @StringRes val labelRes: Int,
+    @DrawableRes val iconRes: Int,
 ) {
-    Home("home", "Home", Icons.Filled.Home),
-    Dns("dns", "DNS", Icons.Filled.Dns),
-    Firewall("firewall", "Firewall", Icons.Filled.Shield),
-    Apps("apps", "Apps", Icons.Filled.Apps),
-    Rules("rules", "Rules", Icons.AutoMirrored.Filled.Rule),
-    Proxy("proxy", "Proxy", Icons.Filled.Hub),
-    Rpn("rpn", "RPN", Icons.Filled.Public),
-    Logs("logs", "Logs", Icons.AutoMirrored.Filled.Article),
-    Stats("stats", "Stats", Icons.Filled.Insights),
-    Settings("settings", "Settings", Icons.Filled.Settings),
+    Home("home", R.string.txt_home, R.drawable.tv_rail_home),
+    Apps("apps", R.string.apps_info_title, R.drawable.tv_rail_apps),
+    Rpn("rpn", R.string.rpn_title, R.drawable.tv_rail_rpn),
+    Proxy("proxy", R.string.settings_proxy_header, R.drawable.tv_rail_proxy),
+    Dns("dns", R.string.dns_mode_info_title, R.drawable.tv_rail_dns),
+    Firewall("firewall", R.string.firewall_mode_info_title, R.drawable.tv_rail_firewall),
+    Rules("rules", R.string.dc_block_heading, R.drawable.tv_rail_rules),
+    Stats("stats", R.string.title_statistics, R.drawable.tv_rail_stats),
+    Settings("settings", R.string.title_settings, R.drawable.tv_rail_settings),
+    Logs("logs", R.string.lbl_logs, R.drawable.tv_rail_logs),
+}
+
+/**
+ * Drawer entries to render for this process: every destination except
+ * the paid [TvDestination.Rpn] entry, which requires (a) the
+ * billing-capable graph installed via [TvPaidRoutes] and (b) a channel
+ * that ships billing — the fdroid channel keeps its no-billing guarantee
+ * by never showing it.
+ */
+fun visibleTvDestinations(): List<TvDestination> {
+    val paidVisible = TvPaidRoutes.isInstalled && !Utilities.isFdroidFlavour()
+    if (paidVisible) return TvDestination.entries.toList()
+    return TvDestination.entries.filter { it != TvDestination.Rpn }
+}
+
+/**
+ * Resolves a NavHost route to its parent rail destination: either an
+ * exact top-level route or a prefixed sub-screen route. WireGuard
+ * sub-screens (wg/…) hang off the Proxy rail entry even though their
+ * routes are not "proxy/"-prefixed.
+ */
+fun parentDestinationForRoute(route: String?): TvDestination? {
+    if (route == null) return null
+    TvDestination.entries.firstOrNull {
+        route == it.route || route.startsWith(it.route + "/")
+    }?.let { return it }
+    return if (route.startsWith("wg/")) TvDestination.Proxy else null
 }

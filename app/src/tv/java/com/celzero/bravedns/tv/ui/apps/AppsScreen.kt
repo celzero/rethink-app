@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.runtime.Composable
@@ -45,12 +44,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -60,6 +57,10 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
 import com.celzero.bravedns.tv.ui.common.rememberAsImmutableState
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -77,6 +78,7 @@ internal data class AppRow(
     val firewallStatus: FirewallManager.FirewallStatus,
     val connectionStatus: FirewallManager.ConnectionStatus,
     val appCategory: String,
+    val isUnknownPackage: Boolean,
 )
 
 internal fun AppInfo.toRow() = AppRow(
@@ -87,6 +89,7 @@ internal fun AppInfo.toRow() = AppRow(
     firewallStatus = FirewallManager.FirewallStatus.getStatus(firewallStatus),
     connectionStatus = FirewallManager.ConnectionStatus.getStatus(connectionStatus),
     appCategory = appCategory,
+    isUnknownPackage = FirewallManager.isUnknownPackage(uid),
 )
 
 /**
@@ -142,8 +145,8 @@ fun AppsScreen(navController: NavController? = null) {
 
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 260.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
+            horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
             modifier = Modifier.fillMaxSize(),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 32.dp, end = 24.dp),
         ) {
@@ -167,15 +170,8 @@ fun AppsScreen(navController: NavController? = null) {
 private fun AppCard(row: AppRow, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier
             .fillMaxWidth()
             .height(112.dp),
@@ -187,13 +183,11 @@ private fun AppCard(row: AppRow, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppIcon(packageName = row.packageName, size = 56)
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(TvSpacing.GroupGap))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.appName.ifBlank { row.packageName },
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -217,46 +211,54 @@ private fun AppCard(row: AppRow, onClick: () -> Unit) {
  * pair into the same shorthand upstream uses in its rule-summary
  * tooltips.
  */
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 internal fun StatusPill(
     firewallStatus: FirewallManager.FirewallStatus,
     connectionStatus: FirewallManager.ConnectionStatus,
 ) {
-    val (label, color) = pillFor(firewallStatus, connectionStatus)
+    val (label, container, content) = pillFor(firewallStatus, connectionStatus)
     Box(
         modifier = Modifier
             .padding(horizontal = 0.dp)
-            .background(color, RoundedCornerShape(50))
+            .background(container, TvShapes.Pill)
             .padding(horizontal = 10.dp, vertical = 2.dp),
     ) {
         Text(
             text = label,
-            color = Color.White,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = content,
+            style = MaterialTheme.typography.labelSmall,
         )
     }
 }
 
+/** Container/content color pair for one status pill, from the TV palette. */
+internal data class StatusPillStyle(
+    val label: String,
+    val container: Color,
+    val content: Color,
+)
+
 internal fun pillFor(
     firewallStatus: FirewallManager.FirewallStatus,
     connectionStatus: FirewallManager.ConnectionStatus,
-): Pair<String, Color> = when (firewallStatus) {
+): StatusPillStyle = when (firewallStatus) {
     FirewallManager.FirewallStatus.BYPASS_UNIVERSAL ->
-        "Bypass" to Color(0xFF6E51BD)
+        StatusPillStyle("Bypass", TvColors.SecondaryContainer, TvColors.OnSecondaryContainer)
     FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL ->
-        "Bypass+" to Color(0xFF6E51BD)
+        StatusPillStyle("Bypass+", TvColors.SecondaryContainer, TvColors.OnSecondaryContainer)
     FirewallManager.FirewallStatus.EXCLUDE ->
-        "Exclude" to Color(0xFF607D8B)
+        StatusPillStyle("Exclude", TvColors.SurfaceVariant, TvColors.OnSurfaceVariant)
     FirewallManager.FirewallStatus.ISOLATE ->
-        "Isolate" to Color(0xFFEF6C00)
+        StatusPillStyle("Isolate", TvColors.Tertiary, TvColors.OnTertiary)
     FirewallManager.FirewallStatus.NONE -> when (connectionStatus) {
-        FirewallManager.ConnectionStatus.ALLOW -> "Allow" to Color(0xFF2E7D32)
-        FirewallManager.ConnectionStatus.BOTH -> "Block" to Color(0xFFC62828)
+        FirewallManager.ConnectionStatus.ALLOW ->
+            StatusPillStyle("Allow", TvColors.TertiaryContainer, TvColors.OnTertiaryContainer)
+        FirewallManager.ConnectionStatus.BOTH ->
+            StatusPillStyle("Block", TvColors.ErrorContainer, TvColors.OnErrorContainer)
         FirewallManager.ConnectionStatus.METERED ->
-            "Block metered" to Color(0xFFAD1457)
+            StatusPillStyle("Block metered", TvColors.ErrorContainer, TvColors.OnErrorContainer)
         FirewallManager.ConnectionStatus.UNMETERED ->
-            "Block Wi-Fi" to Color(0xFFAD1457)
+            StatusPillStyle("Block Wi-Fi", TvColors.ErrorContainer, TvColors.OnErrorContainer)
     }
 }
 
@@ -280,7 +282,7 @@ internal fun AppIcon(packageName: String, size: Int) {
     Box(
         modifier = Modifier
             .size(sizeDp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)),
+            .background(MaterialTheme.colorScheme.surface, TvShapes.ExtraSmall),
         contentAlignment = Alignment.Center,
     ) {
         val d = drawable

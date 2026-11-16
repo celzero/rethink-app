@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -37,7 +36,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.tv.material3.ClickableSurfaceDefaults
@@ -48,6 +46,8 @@ import androidx.tv.material3.Text
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -114,10 +114,10 @@ fun WgImportScreen(navController: NavController? = null) {
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap),
         ) {
             // Source row — paste-from-clipboard + open-file shortcuts.
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap)) {
                 SecondaryButton(
                     label = "Paste from clipboard",
                     onClick = {
@@ -151,9 +151,7 @@ fun WgImportScreen(navController: NavController? = null) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 M3Text(
                     text = "Tunnel name (optional)",
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleSmall,
                 )
                 OutlinedTextField(
                     value = tunnelName,
@@ -167,9 +165,7 @@ fun WgImportScreen(navController: NavController? = null) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 M3Text(
                     text = "Tunnel configuration",
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleSmall,
                 )
                 OutlinedTextField(
                     value = configText,
@@ -193,8 +189,8 @@ fun WgImportScreen(navController: NavController? = null) {
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(Modifier.height(TvSpacing.RowGap))
+            Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap)) {
                 PrimaryButton(
                     label = if (saving) "Saving…" else "Import tunnel",
                     enabled = !saving && configText.isNotBlank(),
@@ -242,7 +238,7 @@ private fun PrimaryButton(label: String, enabled: Boolean, onClick: () -> Unit) 
     Surface(
         onClick = onClick,
         enabled = enabled,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        shape = TvSurfaceStyles.interactiveShape(),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -255,7 +251,7 @@ private fun PrimaryButton(label: String, enabled: Boolean, onClick: () -> Unit) 
         ),
     ) {
         Box(modifier = Modifier.padding(horizontal = 28.dp, vertical = 14.dp)) {
-            Text(label, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+            Text(label, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -265,7 +261,7 @@ private fun PrimaryButton(label: String, enabled: Boolean, onClick: () -> Unit) 
 private fun SecondaryButton(label: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+        shape = TvSurfaceStyles.interactiveShape(),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,

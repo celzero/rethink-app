@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -55,6 +56,8 @@ import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.ConnIdLogsActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
@@ -64,6 +67,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
@@ -154,13 +158,15 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             b.dnsBlockedTarget.text = log?.blockedTarget
             b.dnsBlockedTargetHeader.visibility = View.VISIBLE
         }
-        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
-                ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
-        ) {
+        val isLogLvlDebugOrBelow = Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+            ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
+        if (isLogLvlDebugOrBelow) {
             b.dnsMessage.text = "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
         } else {
             b.dnsMessage.text = log?.msg.orEmpty()
         }
+
+        displayConnId(isLogLvlDebugOrBelow)
 
         val region = log?.region.orEmpty()
         if (region.isNotEmpty()) {
@@ -337,10 +343,34 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             log?.queryStr?.let { query -> startDomainConnectionsActivity(query) }
         }
 
+        b.dnsAppNameHeader.setOnClickListener {
+            val uid = log?.uid ?: return@setOnClickListener
+            io {
+                val ai = FirewallManager.getAppInfoByUid(uid)
+                uiCtx {
+                    // case: app is uninstalled but still available in RethinkDNS database
+                    if (ai == null || uid == Constants.INVALID_UID) {
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.ct_bs_app_info_error),
+                            Toast.LENGTH_SHORT
+                        )
+                        return@uiCtx
+                    }
+                    openAppInfoActivity(uid)
+                }
+            }
+        }
+
         // one rules card, one row per scope; tapping a row cycles its domain
         // rule no rule → block → trust → no rule, no dialog in between
         b.bsdlRuleRowApp.setOnClickListener { cycleAppRule() }
         b.bsdlRuleRowGlobal.setOnClickListener { cycleGlobalRule() }
+
+        b.dnsCid.setOnClickListener {
+            val cid = connId() ?: return@setOnClickListener
+            openConnIdLogs(cid)
+        }
     }
 
     /**
@@ -713,6 +743,37 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, log?.isBlocked ?: false)
         requireContext().startActivity(intent)
         this.dismiss()
+    }
+
+    private fun openAppInfoActivity(uid: Int) {
+        val intent = Intent(requireContext(), AppInfoActivity::class.java)
+        intent.putExtra(AppInfoActivity.INTENT_UID, uid)
+        requireContext().startActivity(intent)
+        this.dismiss()
+    }
+
+    // DnsLog.msg is "fid; origin; msg; extra" (see DnsLogTracker#processOnResponse)
+    private fun connId(): String? {
+        val msg = log?.msg.orEmpty()
+        if (!msg.contains("; ")) return null
+        return msg.substringBefore("; ").ifBlank { null }
+    }
+
+    private fun displayConnId(isLogLvlDebugOrBelow: Boolean) {
+        val cid = connId()
+        if (cid.isNullOrEmpty() || !isLogLvlDebugOrBelow) {
+            b.dnsCid.visibility = View.GONE
+            return
+        }
+        b.dnsCid.text = cid
+        b.dnsCid.visibility = View.VISIBLE
+    }
+
+    private fun openConnIdLogs(cid: String) {
+        this.dismiss()
+        val intent = Intent(requireContext(), ConnIdLogsActivity::class.java)
+        intent.putExtra(ConnIdLogsActivity.EXTRA_CONN_ID, cid)
+        requireContext().startActivity(intent)
     }
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {

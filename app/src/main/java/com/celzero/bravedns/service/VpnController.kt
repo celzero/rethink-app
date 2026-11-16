@@ -160,6 +160,19 @@ object VpnController : KoinComponent {
         b.signalStopService(reason, userInitiated)
     }
 
+    // stop that suspends until the vpn adapter teardown completes
+    suspend fun stopAwait(reason: String, context: Context, userInitiated: Boolean = true) {
+        Logger.i(LOG_TAG_VPN, "VPN Controller stop-await with context: $context")
+        vpnState = null
+        onConnectionStateChanged(null)
+        val b = rvpn
+        if (b == null) {
+            persistentState.setVpnEnabled(false)
+            return
+        }
+        b.signalStopServiceAwait(reason, userInitiated)
+    }
+
     @Suppress("DEPRECATION")
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
@@ -600,6 +613,18 @@ object VpnController : KoinComponent {
 
     suspend fun crashTun(type: Long) {
         rvpn?.crashTun(type)
+    }
+
+    suspend fun peekTrace(cid: String): String {
+        return rvpn?.peekTrace(cid) ?: ""
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return rvpn?.getAllTraceLogsAsBytes()
+    }
+
+    suspend fun getTraceCount(): Long {
+        return rvpn?.getTraceCount() ?: 0L
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {

@@ -29,7 +29,7 @@ interface DnsCryptEndpointDAO {
 
     @Update fun update(dnsCryptEndpoint: DnsCryptEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(dnsCryptEndpoint: DnsCryptEndpoint)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(dnsCryptEndpoint: DnsCryptEndpoint): Long
 
     @Delete fun delete(dnsCryptEndpoint: DnsCryptEndpoint)
 
@@ -68,6 +68,8 @@ interface DnsCryptEndpointDAO {
     fun updateConnectionStatus(liveServerID: Int)
 
     @Transaction @Query("update DNSCryptEndpoint set isSelected=0") fun updateFailingConnections()
+
+    @Transaction @Query("select * from DNSCryptEndpoint where id = :id") fun getEndpointById(id: Int): DnsCryptEndpoint?
 
     @Query("select * from DNSCryptEndpoint order by dnsCryptName asc")
     fun getAll(): List<DnsCryptEndpoint>

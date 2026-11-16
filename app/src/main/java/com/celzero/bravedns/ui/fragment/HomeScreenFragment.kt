@@ -500,7 +500,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.v(LOG_TAG_UI, "$TAG: click event on bottom sheet icon")
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
                 b.homeFragmentBottomSheetIcon.isEnabled = true
             }
             logEvent(
@@ -523,7 +523,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsDnsOnOffBtn.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on main button")
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
                 if (isAdded) {
                     b.homeFragmentBottomSheetIcon.isEnabled = true
                 }
@@ -2690,7 +2690,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun handleMainScreenBtnClickEvent() {
         b.fhsDnsOnOffBtn.isEnabled = false
-        delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+        delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
             if (isAdded) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }

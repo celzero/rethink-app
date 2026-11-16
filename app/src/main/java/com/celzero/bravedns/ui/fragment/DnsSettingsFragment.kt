@@ -605,7 +605,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.dcRefresh.animation = animation
             b.dcRefresh.startAnimation(animation)
             io { VpnController.refreshResolvers() }
-            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
+            Utilities.delay(REFRESH_TIMEOUT, viewLifecycleOwner.lifecycleScope) {
                 if (isAdded) {
                     b.dcRefresh.isEnabled = true
                     b.dcRefresh.clearAnimation()

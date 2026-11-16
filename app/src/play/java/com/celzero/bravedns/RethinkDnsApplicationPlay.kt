@@ -63,7 +63,7 @@ class RethinkDnsApplicationPlay : Application(), Configuration.Provider {
                     module {
                         // New Koin override strategy allow to override any definition by default.
                         // don't need to specify override = true anymore in module.
-                        single<AppUpdater> { StoreAppUpdater(androidContext()) }
+                        single<AppUpdater> { StoreAppUpdater(androidContext(), get()) }
                         // Play Billing in-app messaging
                         single<InAppMessageProvider> { PlayInAppMessageProvider() }
                     }

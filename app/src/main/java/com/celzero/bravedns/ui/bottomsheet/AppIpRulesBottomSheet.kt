@@ -43,6 +43,7 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -210,8 +211,15 @@ class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmS
     private fun setRulesUi() {
         io {
             // no need to send port number for the app info screen
+            val universalRule = IpRulesManager.getMostSpecificRuleMatch(UID_EVERYBODY, ipAddress)
             ipRule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
-            Logger.d(LOG_TAG_FIREWALL, "$TAG set selection of ip: $ipAddress, ${ipRule.id}")
+            val isUniversalOnly =
+                ipRule == IpRulesManager.IpRuleStatus.NONE &&
+                    universalRule != IpRulesManager.IpRuleStatus.NONE
+            Logger.d(
+                LOG_TAG_FIREWALL,
+                "$TAG set selection of ip: $ipAddress, ${ipRule.id}, universal: $universalRule"
+            )
             uiCtx {
                 when (ipRule) {
                     IpRulesManager.IpRuleStatus.TRUST -> {
@@ -221,12 +229,19 @@ class AppIpRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardListBtmS
                         enableBlockUi()
                     }
                     IpRulesManager.IpRuleStatus.NONE -> {
-                        noRuleUi()
+                        when (universalRule) {
+                            IpRulesManager.IpRuleStatus.BLOCK -> enableBlockUi()
+                            IpRulesManager.IpRuleStatus.TRUST,
+                            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> enableTrustUi()
+                            IpRulesManager.IpRuleStatus.NONE -> noRuleUi()
+                        }
                     }
                     IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                        noRuleUi()
+                        enableTrustUi()
                     }
                 }
+                b.bsacUniversalRuleHint.visibility =
+                    if (isUniversalOnly) View.VISIBLE else View.GONE
             }
         }
     }

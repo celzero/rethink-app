@@ -29,7 +29,7 @@ interface DnsProxyEndpointDAO {
 
     @Update fun update(dnsProxyEndpoint: DnsProxyEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsProxyEndpoint: DnsProxyEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsProxyEndpoint: DnsProxyEndpoint): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertWithReplace(dnsProxyEndpoint: DnsProxyEndpoint)
@@ -63,4 +63,6 @@ interface DnsProxyEndpointDAO {
 
     @Query("select * from DNSProxyEndpoint order by proxyName asc")
     fun getAll(): List<DnsProxyEndpoint>
+
+    @Query("select * from DNSProxyEndpoint where id = :id") fun getById(id: Int): DnsProxyEndpoint?
 }

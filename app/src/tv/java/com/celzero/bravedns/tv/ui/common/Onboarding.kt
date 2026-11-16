@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,14 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Button
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
 
 private const val PREFS = "rethink_tv_ux"
 private const val KEY_ONBOARDING_SEEN = "onboarding_seen"
@@ -85,7 +84,7 @@ data class OnboardingState(
 fun WelcomeBanner(state: OnboardingState) {
     if (!state.shouldShow) return
     Surface(
-        shape = RoundedCornerShape(12.dp),
+        shape = TvShapes.Medium,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -94,14 +93,17 @@ fun WelcomeBanner(state: OnboardingState) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
+            modifier = Modifier.padding(
+                horizontal = TvSpacing.SectionGap,
+                vertical = TvSpacing.ContentVertical + 2.dp,
+            ),
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Welcome to Rethink TV",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleMedium,
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(TvSpacing.HeaderGap / 2))
                 Text(
                     text = "Start protection from the toggle below, then explore DNS, " +
                         "Firewall, Apps, and Proxy from the left rail. Logs and Stats " +
@@ -109,10 +111,8 @@ fun WelcomeBanner(state: OnboardingState) {
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            Spacer(Modifier.padding(start = 16.dp))
-            Button(onClick = state.markSeen) {
-                Text("Got it")
-            }
+            Spacer(Modifier.padding(start = TvSpacing.IconTextGap))
+            TvButton(text = "Got it", onClick = state.markSeen)
         }
     }
 }

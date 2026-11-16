@@ -9,6 +9,7 @@
  */
 package com.celzero.bravedns.tv.ui.nav
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,16 +33,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvGradients
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSizes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import androidx.tv.material3.Text
 import kotlinx.coroutines.delay
 import com.celzero.bravedns.tv.ui.apps.AppDetailScreen
@@ -50,7 +58,11 @@ import com.celzero.bravedns.tv.ui.apps.AppsScreen
 import com.celzero.bravedns.tv.ui.apps.RpnBypassAppsScreen
 import com.celzero.bravedns.tv.ui.console.ConsoleLogScreen
 import com.celzero.bravedns.tv.ui.dns.DnsScreen
+import com.celzero.bravedns.tv.ui.dns.DnscryptAddScreen
+import com.celzero.bravedns.tv.ui.dns.DohAddScreen
+import com.celzero.bravedns.tv.ui.dns.DotAddScreen
 import com.celzero.bravedns.tv.ui.dns.OdohAddScreen
+import com.celzero.bravedns.tv.ui.dns.ProxyAddScreen
 import com.celzero.bravedns.tv.ui.firewall.FirewallScreen
 import com.celzero.bravedns.tv.ui.home.HomeScreen
 import com.celzero.bravedns.tv.ui.logs.LogsScreen
@@ -60,27 +72,20 @@ import com.celzero.bravedns.tv.ui.proxy.ProxyScreen
 import com.celzero.bravedns.tv.ui.proxy.WgDetailScreen
 import com.celzero.bravedns.tv.ui.proxy.WgImportScreen
 import com.celzero.bravedns.tv.ui.proxy.WgIncludeAppsScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnAddLocationScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnAppsScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnExcludeCountriesScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnHomeScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnIntervalScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnLocationDetailScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnManagePurchaseScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnPlusDashboardScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnPurchaseRoute
-import com.celzero.bravedns.tv.ui.rpn.RpnSettingsScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnStatsScreen
-import com.celzero.bravedns.tv.ui.rpn.RpnSupportScreen
+import com.celzero.bravedns.tv.ui.proxy.WgListScreen
+import com.celzero.bravedns.tv.ui.rules.AddDomainRuleScreen
+import com.celzero.bravedns.tv.ui.rules.AddIpRuleScreen
+import com.celzero.bravedns.tv.ui.rules.AppPickerScreen
 import com.celzero.bravedns.tv.ui.rules.RulesScreen
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.tv.ui.settings.AntiCensorshipScreen
+import com.celzero.bravedns.tv.ui.settings.DnsBypassScreen
 import com.celzero.bravedns.tv.ui.settings.PauseVpnScreen
 import com.celzero.bravedns.tv.ui.settings.SettingsScreen
 import com.celzero.bravedns.tv.ui.stats.StatsDetailKind
 import com.celzero.bravedns.tv.ui.stats.StatsDetailScreen
 import com.celzero.bravedns.tv.ui.stats.StatsScreen
 import com.celzero.bravedns.tv.ui.theme.RethinkTvTheme
-import com.celzero.bravedns.util.Utilities
 
 /**
  * Root Compose entry-point for the TV launcher.
@@ -100,24 +105,33 @@ import com.celzero.bravedns.util.Utilities
  *    launchMode combinations.
  *  * Lets every screen share the same Koin scope and the same
  *    underlying upstream singletons without a re-bind dance.
+ *
+ * @param pendingRoute optional Compose route to navigate to once the
+ *   nav host is ready (set from the hosting Activity's intent extras,
+ *   e.g. the billing-error trampoline's `EXTRA_RPN_ROUTE`).
+ * @param onRouteConsumed invoked after [pendingRoute] has been
+ *   navigated so the host can clear it.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun TvNavScaffold() {
+fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}) {
     RethinkTvTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             val navController = rememberNavController()
             val backStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = backStackEntry?.destination?.route
-            // fdroid cannot ship billing, so the RPN destination (and
-            // its purchase flows) are removed from the rail entirely.
-            val destinations = remember {
-                if (Utilities.isFdroidFlavour()) {
-                    TvDestination.entries.filter { it != TvDestination.Rpn }
-                } else {
-                    TvDestination.entries.toList()
-                }
+
+            LaunchedEffect(pendingRoute) {
+                val route = pendingRoute ?: return@LaunchedEffect
+                runCatching { navController.navigate(route) { launchSingleTop = true } }
+                onRouteConsumed()
             }
+
+            // The paid RPN rail entry materializes only when the
+            // billing-capable init provider installed the rpn sub-graph (see
+            // TvPaidRoutes); evaluated once — the provider runs before
+            // the first composition frame.
+            val destinations = remember { visibleTvDestinations() }
 
             // Park initial focus on the drawer's first item so the
             // user's first D-pad press is always interpreted as
@@ -141,7 +155,7 @@ fun TvNavScaffold() {
             // top-level destination UX — so this preserves the
             // ten-foot rail navigation pattern.
             val railFocusRequesters = remember {
-                destinations.associateWith { FocusRequester() }
+                TvDestination.entries.associateWith { FocusRequester() }
             }
             LaunchedEffect(Unit) {
                 runCatching { firstItemFocus.requestFocus() }
@@ -154,10 +168,8 @@ fun TvNavScaffold() {
                 if (currentRoute == null || prev == null || currentRoute == prev) {
                     return@LaunchedEffect
                 }
-                val parent = TvDestination.entries.firstOrNull {
-                    currentRoute == it.route ||
-                        currentRoute.startsWith(it.route + "/")
-                } ?: return@LaunchedEffect
+                val parent = parentDestinationForRoute(currentRoute)
+                    ?: return@LaunchedEffect
                 // Wait for the rail's recomposition (selected-state
                 // change) to settle so the FocusRequester has actually
                 // attached to the new measure pass before we request.
@@ -183,12 +195,12 @@ fun TvNavScaffold() {
                     }
                 },
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 8.dp),
-                    contentAlignment = Alignment.TopStart,
-                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = TvSpacing.RowGap),
+                        contentAlignment = Alignment.TopStart,
+                    ) {
                     NavHost(
                         navController = navController,
                         startDestination = TvDestination.Home.route,
@@ -197,9 +209,40 @@ fun TvNavScaffold() {
                         composable(TvDestination.Home.route) { HomeScreen(navController) }
                         composable(TvDestination.Dns.route) { DnsScreen(navController) }
                         composable("dns/odoh/add") { OdohAddScreen(navController) }
+                        composable("dns/doh/add") { DohAddScreen(navController) }
+                        composable("dns/dot/add") { DotAddScreen(navController) }
+                        composable("dns/dnscrypt/add") { DnscryptAddScreen(navController) }
+                        composable("dns/proxy/add") { ProxyAddScreen(navController) }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
                         composable(TvDestination.Apps.route) { AppsScreen(navController) }
-                        composable(TvDestination.Rules.route) { RulesScreen() }
+                        composable(TvDestination.Rules.route) { RulesScreen(navController) }
+                        composable(
+                            route = "rules/add/domain?uid={uid}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("uid") {
+                                    type = androidx.navigation.NavType.IntType
+                                    defaultValue = Constants.UID_EVERYBODY
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val uid = backStackEntry.arguments?.getInt("uid")
+                                ?: Constants.UID_EVERYBODY
+                            AddDomainRuleScreen(navController = navController, uid = uid)
+                        }
+                        composable(
+                            route = "rules/add/ip?uid={uid}",
+                            arguments = listOf(
+                                androidx.navigation.navArgument("uid") {
+                                    type = androidx.navigation.NavType.IntType
+                                    defaultValue = Constants.UID_EVERYBODY
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val uid = backStackEntry.arguments?.getInt("uid")
+                                ?: Constants.UID_EVERYBODY
+                            AddIpRuleScreen(navController = navController, uid = uid)
+                        }
+                        composable("rules/app-picker") { AppPickerScreen(navController) }
                         composable(
                             route = "apps/{uid}",
                             arguments = listOf(
@@ -238,52 +281,7 @@ fun TvNavScaffold() {
                         composable("proxy/http") { ProxyEditorScreen(kind = ProxyEditorKind.HTTP) }
                         composable("proxy/rpn-bypass") { RpnBypassAppsScreen() }
                         composable("wg/import") { WgImportScreen(navController) }
-                        composable(TvDestination.Rpn.route) { RpnHomeScreen(navController) }
-                        composable("rpn/add") { RpnAddLocationScreen(navController) }
-                        composable(
-                            route = "rpn/location/{key}",
-                            arguments = listOf(
-                                androidx.navigation.navArgument("key") {
-                                    type = androidx.navigation.NavType.StringType
-                                },
-                            ),
-                        ) { backStackEntry ->
-                            val key = backStackEntry.arguments?.getString("key").orEmpty()
-                            RpnLocationDetailScreen(key = key, navController = navController)
-                        }
-                        composable(
-                            route = "rpn/apps/{key}",
-                            arguments = listOf(
-                                androidx.navigation.navArgument("key") {
-                                    type = androidx.navigation.NavType.StringType
-                                },
-                            ),
-                        ) { backStackEntry ->
-                            val key = backStackEntry.arguments?.getString("key").orEmpty()
-                            RpnAppsScreen(key = key)
-                        }
-                        composable("rpn/settings") { RpnSettingsScreen(navController) }
-                        composable("rpn/settings/exclude") { RpnExcludeCountriesScreen() }
-                        composable("rpn/stats") { RpnStatsScreen(navController) }
-                        composable(
-                            route = "rpn/heatmap/{start}/{end}",
-                            arguments = listOf(
-                                androidx.navigation.navArgument("start") {
-                                    type = androidx.navigation.NavType.LongType
-                                },
-                                androidx.navigation.navArgument("end") {
-                                    type = androidx.navigation.NavType.LongType
-                                },
-                            ),
-                        ) { backStackEntry ->
-                            val start = backStackEntry.arguments?.getLong("start") ?: 0L
-                            val end = backStackEntry.arguments?.getLong("end") ?: 0L
-                            RpnIntervalScreen(start = start, end = end)
-                        }
-                        composable("rpn/plus") { RpnPlusDashboardScreen(navController) }
-                        composable("rpn/plus/purchase") { RpnPurchaseRoute(navController) }
-                        composable("rpn/plus/manage") { RpnManagePurchaseScreen(navController) }
-                        composable("rpn/plus/support") { RpnSupportScreen(navController) }
+                        composable("wg/list") { WgListScreen(navController) }
                         composable(TvDestination.Logs.route) { LogsScreen() }
                         composable(TvDestination.Stats.route) { StatsScreen(navController) }
                         composable(
@@ -305,7 +303,14 @@ fun TvNavScaffold() {
                         composable(TvDestination.Settings.route) { SettingsScreen(navController) }
                         composable("settings/anti-censorship") { AntiCensorshipScreen() }
                         composable("settings/pause") { PauseVpnScreen() }
+                        composable("settings/dns-bypass") { DnsBypassScreen() }
                         composable("settings/console-log") { ConsoleLogScreen() }
+
+                        // Paid RPN sub-graph (rpn/hub → checkout / servers /
+                        // dashboard / manage). Registered only when the
+                        // billing-capable init provider installed a builder; the
+                        // matching rail entry is filtered out otherwise.
+                        TvPaidRoutes.rpnGraphBuilder?.invoke(this, navController)
                     }
                 }
             }
@@ -336,10 +341,10 @@ private fun NavRailContent(
     Row(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .width(80.dp)
+                .width(TvSizes.RailWidth)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 12.dp, horizontal = 8.dp),
+                .padding(vertical = TvSpacing.ScreenVertical / 2, horizontal = TvSpacing.RowGap),
         ) {
             destinations.forEachIndexed { index, dest ->
                 val perItemFocus = railFocusRequesters[dest]
@@ -352,17 +357,32 @@ private fun NavRailContent(
                     else -> Modifier
                 }
                 NavRailItem(
-                    selected = currentRoute == dest.route ||
-                        (currentRoute != null && currentRoute.startsWith(dest.route + "/")),
-                    icon = dest.icon,
-                    label = dest.label,
+                    selected = parentDestinationForRoute(currentRoute) == dest,
+                    iconRes = dest.iconRes,
+                    labelRes = dest.labelRes,
                     onClick = { onSelect(dest) },
                     modifier = itemModifier,
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(TvSpacing.RowGap / 2))
             }
         }
-        Box(modifier = Modifier.fillMaxSize()) {
+        // Layered-surface cue: a quiet border separates the rail from
+        // the content pane so the elevation step is visible at 10 ft.
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .padding(vertical = TvSpacing.ScreenVertical / 2)
+                .background(TvColors.BorderVariant),
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                // Subtle tonal wash behind the content pane so the
+                // screen reads as depth (Background → Surface), not
+                // one flat color.
+                .background(brush = TvGradients.header()),
+        ) {
             content()
         }
     }
@@ -372,34 +392,36 @@ private fun NavRailContent(
 @Composable
 private fun NavRailItem(
     selected: Boolean,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
+    @androidx.annotation.DrawableRes iconRes: Int,
+    @androidx.annotation.StringRes labelRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.surface,
-            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-        modifier = modifier.size(56.dp),
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Pill),
+        colors = TvSurfaceStyles.railItemColors(selected),
+        scale = TvSurfaceStyles.expressiveScale(),
+        modifier = modifier
+            .width(TvSizes.RailWidth)
+            .height(TvSizes.RailItem),
     ) {
-        Box(
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
         ) {
+            Spacer(Modifier.width(TvSpacing.ContentHorizontal))
             Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier = Modifier.size(22.dp),
+                painter = painterResource(iconRes),
+                contentDescription = stringResource(labelRes),
+                modifier = Modifier.size(TvSizes.RailIcon),
+            )
+            Spacer(Modifier.width(TvSpacing.HeaderGap + 4.dp))
+            Text(
+                text = stringResource(labelRes),
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

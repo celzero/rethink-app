@@ -108,7 +108,7 @@ class RethinkLogFragment :
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = RethinkLogAdapter(requireContext())
         viewModel.rlogList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(lifecycle, it)
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerConnection.adapter = recyclerAdapter
         b.recyclerConnection.layoutAnimation = null
@@ -127,6 +127,7 @@ class RethinkLogFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+                    if (view == null) return
 
                     val firstChild = recyclerView.getChildAt(0)
                     if (firstChild == null) {
@@ -140,12 +141,13 @@ class RethinkLogFragment :
                         return
                     }
 
-                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
+                    b.connectionListScrollHeader.text = formatToRelativeTime(recyclerView.context, tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
+                    if (view == null) return
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         b.connectionListScrollHeader.visibility = View.GONE
                     }
