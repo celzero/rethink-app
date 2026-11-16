@@ -121,6 +121,10 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     @Volatile
     private var isUpdateCheckInteractive = false
 
+    companion object {
+        private const val KEY_UPDATE_CHECK_INTERACTIVE = "isUpdateCheckInteractive"
+    }
+
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
     private var appInBackground = false
@@ -834,6 +838,16 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
             Logger.w(Logger.LOG_TAG_VPN, "err opening rethink download link: ${e.message}", e)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_UPDATE_CHECK_INTERACTIVE, isUpdateCheckInteractive)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        isUpdateCheckInteractive = savedInstanceState.getBoolean(KEY_UPDATE_CHECK_INTERACTIVE)
     }
 
     @Deprecated("Deprecated in Java")
