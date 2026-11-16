@@ -57,6 +57,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.ConnIdLogsActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.custom.RuleStateSwitch
 import com.celzero.bravedns.util.Constants
@@ -164,6 +165,8 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         } else {
             b.dnsMessage.text = log?.msg.orEmpty()
         }
+
+        displayConnId()
 
         val region = log?.region.orEmpty()
         if (region.isNotEmpty()) {
@@ -363,6 +366,11 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         // rule no rule → block → trust → no rule, no dialog in between
         b.bsdlRuleRowApp.setOnClickListener { cycleAppRule() }
         b.bsdlRuleRowGlobal.setOnClickListener { cycleGlobalRule() }
+
+        b.dnsCid.setOnClickListener {
+            val cid = connId() ?: return@setOnClickListener
+            openConnIdLogs(cid)
+        }
     }
 
     /**
@@ -742,6 +750,30 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         intent.putExtra(AppInfoActivity.INTENT_UID, uid)
         requireContext().startActivity(intent)
         this.dismiss()
+    }
+
+    // DnsLog.msg is "fid; origin; msg; extra" (see DnsLogTracker#processOnResponse)
+    private fun connId(): String? {
+        val msg = log?.msg.orEmpty()
+        if (!msg.contains("; ")) return null
+        return msg.substringBefore("; ").ifBlank { null }
+    }
+
+    private fun displayConnId() {
+        val cid = connId()
+        if (cid.isNullOrEmpty()) {
+            b.dnsCid.visibility = View.GONE
+            return
+        }
+        b.dnsCid.text = cid
+        b.dnsCid.visibility = View.VISIBLE
+    }
+
+    private fun openConnIdLogs(cid: String) {
+        this.dismiss()
+        val intent = Intent(requireContext(), ConnIdLogsActivity::class.java)
+        intent.putExtra(ConnIdLogsActivity.EXTRA_CONN_ID, cid)
+        requireContext().startActivity(intent)
     }
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
