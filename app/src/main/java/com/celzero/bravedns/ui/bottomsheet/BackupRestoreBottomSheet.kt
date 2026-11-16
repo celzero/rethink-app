@@ -70,6 +70,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -198,7 +199,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         }
         val destFile = File(exportDir, getBackupZipFileName())
         Logger.i(LOG_TAG_BACKUP_RESTORE, "no file picker, backup to app folder: ${destFile.path}")
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val accepted =
                 startBackupProcess(backupUri = null, backupPath = destFile.absolutePath)
             if (accepted) {
@@ -402,7 +403,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
                             "activity result for backup process with uri: $backupFileUri"
                         )
                         persistUriPermission(backupFileUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                        lifecycleScope.launch { startBackupProcess(backupFileUri) }
+                        viewLifecycleOwner.lifecycleScope.launch { startBackupProcess(backupFileUri) }
                     }
                     Activity.RESULT_CANCELED -> {
                         showBackupFailureDialog()
@@ -552,6 +553,8 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
                     .get()
                     .any { it.id == downloadWatcher.id }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             // fail-open like BackupHelper.isBackupRestoreActive
             Logger.w(LOG_TAG_BACKUP_RESTORE, "err verifying backup enqueue: ${e.message}")
