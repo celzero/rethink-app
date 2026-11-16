@@ -16,6 +16,7 @@
 package com.celzero.bravedns.util
 
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
@@ -23,6 +24,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -37,6 +39,7 @@ import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
+import android.net.Uri
 import android.os.Build
 import android.os.Process
 import androidx.annotation.ChecksSdkIntAtLeast
@@ -780,6 +783,30 @@ object Utilities {
     /** Returns true when the app is built with the "alpha" build type. */
     fun isAlphaBuild(): Boolean {
         return BuildConfig.BUILD_TYPE == BUILD_TYPE_ALPHA
+    }
+
+    /**
+     * Takes the user to this app's Play Store listing; last-resort path when the
+     * in-app update API fails. Falls back to the web listing, then a toast.
+     */
+    fun openPlayStorePage(activity: android.app.Activity) {
+        if (activity.isFinishing || activity.isDestroyed) return
+        val listing = "market://details?id=${activity.packageName}"
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(listing)))
+        } catch (e: ActivityNotFoundException) {
+            Logger.w(LOG_TAG_APP_UPDATE, "no handler for $listing, trying web listing")
+            try {
+                activity.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=${activity.packageName}")
+                    )
+                )
+            } catch (e: ActivityNotFoundException) {
+                showToastUiCentered(activity, activity.getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
+            }
+        }
     }
 
     /**

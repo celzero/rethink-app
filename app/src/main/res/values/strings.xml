@@ -488,6 +488,7 @@
 
     <string name="download_update_dialog_title" translatable="true">New Update!</string>
     <string name="download_update_dialog_message" translatable="true">A new version of the app is available for download from the website. Do you want to proceed?</string>
+    <string name="download_update_dialog_message_play" translatable="true">A new version of the app is available on Google Play. Do you want to update?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Up-to-date!</string>
     <string name="download_update_dialog_message_ok" translatable="true">You are already on the latest version.</string>
     <string name="download_update_dialog_message_success" translatable="true">Blocklist download successful.</string>
@@ -1200,7 +1201,7 @@
 
     <!-- Home Screen activity -->
     <string name="hs_download_positive_default" translatable="true">ok</string>
-    <string name="hs_download_positive_play_store" translatable="true">Complete Update</string>
+    <string name="hs_download_positive_play_store" translatable="true">Open Play Store</string>
     <string name="hs_download_positive_website" translatable="true">Visit website</string>
 
     <string name="hs_download_negative_default" translatable="true">Remind me later</string>
@@ -1732,6 +1733,9 @@
     <string name="brbs_no_file_picker_restore" translatable="true">No file picker available on this device.</string>
     <string name="brbs_restore_folder_empty" translatable="true">No %1$s backup found in %2$s. Copy your backup file there and try again.</string>
     <string name="brbs_restore_pick_file_title" translatable="true">Select backup file</string>
+    <string name="brbs_restore_pick_source_title" translatable="true">Restore backup</string>
+    <string name="brbs_restore_pick_source_browse" translatable="true">Browse files</string>
+    <string name="brbs_restore_pick_source_app_folder" translatable="true">From app folder</string>
     <string name="brbs_backup_restore_in_progress" translatable="true">Backup or restore already in progress</string>
 
     <!-- Rethink simple view -->

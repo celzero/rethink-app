@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.app.Activity
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -114,6 +115,11 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     private val rdb by inject<RefreshDatabase>()
     private val appConfig by inject<AppConfig>()
     private val smartDnsEndpointRepository by inject<SmartDnsEndpointRepository>()
+
+    // set before each update check; onActivityResult() uses it to decide whether
+    // a canceled play flow should fall back to the play listing
+    @Volatile
+    private var isUpdateCheckInteractive = false
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -608,19 +614,17 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
 
         if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
             try {
+                isUpdateCheckInteractive =
+                    isInteractive == AppUpdater.UserPresent.INTERACTIVE
                 appUpdateManager.checkForAppUpdate(
                     isInteractive,
                     this,
                     installStateUpdatedListener
-                ) // Might be play updater or web updater
+                )
             } catch (e: Exception) {
                 Logger.crash(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
                 runOnUiThread {
-                    showDownloadDialog(
-                        AppUpdater.InstallSource.STORE,
-                        getString(R.string.download_update_dialog_failure_title),
-                        getString(R.string.download_update_dialog_failure_message)
-                    )
+                    showDownloadDialog(UpdateDialogType.CHECK_FAILED)
                 }
             }
         } else {
@@ -634,11 +638,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
                 runOnUiThread {
-                    showDownloadDialog(
-                        AppUpdater.InstallSource.OTHER,
-                        getString(R.string.download_update_dialog_failure_title),
-                        getString(R.string.download_update_dialog_failure_message)
-                    )
+                    showDownloadDialog(UpdateDialogType.CHECK_FAILED)
                 }
             }
         }
@@ -694,11 +694,7 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             ) {
                 runOnUiThread {
                     if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
-                        showDownloadDialog(
-                            installSource,
-                            getString(R.string.download_update_dialog_failure_title),
-                            getString(R.string.download_update_dialog_failure_message)
-                        )
+                        showDownloadDialog(UpdateDialogType.CHECK_FAILED)
                     }
                 }
             }
@@ -709,32 +705,24 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
             ) {
                 runOnUiThread {
                     if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
-                        showDownloadDialog(
-                            installSource,
-                            getString(R.string.download_update_dialog_message_ok_title),
-                            getString(R.string.download_update_dialog_message_ok)
-                        )
+                        showDownloadDialog(UpdateDialogType.UP_TO_DATE)
                     }
                 }
             }
 
             override fun onUpdateAvailable(installSource: AppUpdater.InstallSource) {
                 runOnUiThread {
-                    showDownloadDialog(
-                        installSource,
-                        getString(R.string.download_update_dialog_title),
-                        getString(R.string.download_update_dialog_message)
-                    )
+                    if (installSource == AppUpdater.InstallSource.STORE) {
+                        showDownloadDialog(UpdateDialogType.UPDATE_AVAILABLE_STORE)
+                    } else {
+                        showDownloadDialog(UpdateDialogType.UPDATE_AVAILABLE_OTHER)
+                    }
                 }
             }
 
             override fun onUpdateQuotaExceeded(installSource: AppUpdater.InstallSource) {
                 runOnUiThread {
-                    showDownloadDialog(
-                        installSource,
-                        getString(R.string.download_update_dialog_trylater_title),
-                        getString(R.string.download_update_dialog_trylater_message)
-                    )
+                    showDownloadDialog(UpdateDialogType.QUOTA_EXCEEDED)
                 }
             }
         }
@@ -758,71 +746,66 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         }
     }
 
-    private fun showDownloadDialog(
-        source: AppUpdater.InstallSource,
-        title: String,
-        message: String
-    ) {
+    private enum class UpdateDialogType {
+        UPDATE_AVAILABLE_STORE,
+        UPDATE_AVAILABLE_OTHER,
+        UP_TO_DATE,
+        CHECK_FAILED,
+        QUOTA_EXCEEDED
+    }
+
+    private fun showDownloadDialog(type: UpdateDialogType) {
         if (!isInForeground()) return
 
         val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-        builder.setTitle(title)
 
-        // Determine dialog type based on title to decide if it should be modal
-        val isUpdateAvailable = title == getString(R.string.download_update_dialog_title)
-        val isUpToDate = message == getString(R.string.download_update_dialog_message_ok)
-        val isError = message == getString(R.string.download_update_dialog_failure_message)
-        val isQuotaExceeded = message == getString(R.string.download_update_dialog_trylater_message)
-
-        // Adjust message for Play Store if needed
-        if (isUpdateAvailable && source == AppUpdater.InstallSource.STORE) {
-            // Play Store updates should use native UI, but if we reach here, show appropriate message
-            builder.setMessage("A new version is available. Please update from Play Store.")
-        } else {
-            builder.setMessage(message)
-        }
-
-        // Make dialog non-dismissible (modal) only when an actual update is available
-        // User cannot dismiss by tapping outside or pressing back button
-        // However, user can still choose "Remind me later" button
-        builder.setCancelable(!isUpdateAvailable)
-
-        when {
-            isUpdateAvailable -> {
-                // Update is available - modal dialog with explicit user choice
-                if (source == AppUpdater.InstallSource.STORE) {
-                    // For Play Store updates, this dialog rarely appears as Google's native UI handles it
-                    // But if it does appear, just show OK to dismiss (native UI should have been shown)
-                    builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
-                        appUpdateManager.completeUpdate()
-                        dialogInterface.dismiss()
-                    }
-                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
-                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                        dialogInterface.dismiss()
-                    }
-                } else {
-                    // For website version, open browser to download - this is the main use case
-                    builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
-                        initiateDownload()
-                        dialogInterface.dismiss()
-                    }
-                    // Negative button allows user to postpone the update
-                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
-                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                        dialogInterface.dismiss()
-                    }
+        when (type) {
+            UpdateDialogType.UPDATE_AVAILABLE_STORE -> {
+                builder.setTitle(R.string.download_update_dialog_title)
+                builder.setMessage(R.string.download_update_dialog_message_play)
+                // modal: user must pick update-now or remind-later
+                builder.setCancelable(false)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { dialogInterface, _ ->
+                    Utilities.openPlayStorePage(this)
+                    dialogInterface.dismiss()
+                }
+                builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                    dialogInterface.dismiss()
                 }
             }
-            isUpToDate || isError || isQuotaExceeded -> {
-                // Informational dialogs - dismissible with OK button
+            UpdateDialogType.UPDATE_AVAILABLE_OTHER -> {
+                builder.setTitle(R.string.download_update_dialog_title)
+                builder.setMessage(R.string.download_update_dialog_message)
+                builder.setCancelable(false)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
+                    initiateDownload()
+                    dialogInterface.dismiss()
+                }
+                builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                    dialogInterface.dismiss()
+                }
+            }
+            UpdateDialogType.UP_TO_DATE -> {
+                builder.setTitle(R.string.download_update_dialog_message_ok_title)
+                builder.setMessage(R.string.download_update_dialog_message_ok)
                 builder.setCancelable(true)
                 builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
             }
-            else -> {
-                // Fallback for any other case - make it dismissible
+            UpdateDialogType.CHECK_FAILED -> {
+                builder.setTitle(R.string.download_update_dialog_failure_title)
+                builder.setMessage(R.string.download_update_dialog_failure_message)
+                builder.setCancelable(true)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                }
+            }
+            UpdateDialogType.QUOTA_EXCEEDED -> {
+                builder.setTitle(R.string.download_update_dialog_trylater_title)
+                builder.setMessage(R.string.download_update_dialog_trylater_message)
                 builder.setCancelable(true)
                 builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                     dialogInterface.dismiss()
@@ -850,6 +833,22 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
             Logger.w(Logger.LOG_TAG_VPN, "err opening rethink download link: ${e.message}", e)
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != AppUpdater.PLAY_UPDATE_REQUEST_CODE) return
+        if (resultCode == Activity.RESULT_OK) {
+            Logger.i(LOG_TAG_APP_UPDATE, "update flow accepted")
+            return
+        }
+        // play's flow was canceled or failed to launch; interactive checks fall
+        // back to the play listing, auto-checks stay silent
+        Logger.w(LOG_TAG_APP_UPDATE, "update flow not completed, interactive: $isUpdateCheckInteractive")
+        if (isUpdateCheckInteractive) {
+            Utilities.openPlayStorePage(this)
         }
     }
 
