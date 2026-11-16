@@ -70,6 +70,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
     private var _binding: ActivityBackupRestoreBinding? = null
@@ -195,14 +198,16 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
         }
         val destFile = File(exportDir, getBackupZipFileName())
         Logger.i(LOG_TAG_BACKUP_RESTORE, "no file picker, backup to app folder: ${destFile.path}")
-        val accepted =
-            startBackupProcess(backupUri = null, backupPath = destFile.absolutePath)
-        if (accepted) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.brbs_backup_saved_app_folder_warning, exportDir.absolutePath),
-                Toast.LENGTH_LONG
-            )
+        lifecycleScope.launch {
+            val accepted =
+                startBackupProcess(backupUri = null, backupPath = destFile.absolutePath)
+            if (accepted) {
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.brbs_backup_saved_app_folder_warning, exportDir.absolutePath),
+                    Toast.LENGTH_LONG
+                )
+            }
         }
     }
 
@@ -397,7 +402,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
                             "activity result for backup process with uri: $backupFileUri"
                         )
                         persistUriPermission(backupFileUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                        startBackupProcess(backupFileUri)
+                        lifecycleScope.launch { startBackupProcess(backupFileUri) }
                     }
                     Activity.RESULT_CANCELED -> {
                         showBackupFailureDialog()
@@ -491,7 +496,7 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
 
     // returns true only when the work request was actually enqueued; callers use this
     // to decide whether to show the submission toast
-    private fun startBackupProcess(backupUri: Uri?, backupPath: String? = null): Boolean {
+    private suspend fun startBackupProcess(backupUri: Uri?, backupPath: String? = null): Boolean {
         if (backupUri == null && backupPath == null) {
             Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
@@ -539,12 +544,15 @@ class BackupRestoreBottomSheet : BaseBottomSheetDialogFragment() {
             downloadWatcher
         )
         // KEEP silently drops the request when unfinished unique work exists;
-        // confirm this request was enqueued before reporting success
+        // confirm this request was enqueued before reporting success. The query
+        // runs off the main thread; the result is consumed back on main.
+        val workManager = WorkManager.getInstance(requireContext().applicationContext)
         val accepted = try {
-            WorkManager.getInstance(requireContext().applicationContext)
-                .getWorkInfosForUniqueWork(BackupHelper.BACKUP_RESTORE_WORK_NAME)
-                .get()
-                .any { it.id == downloadWatcher.id }
+            withContext(Dispatchers.IO) {
+                workManager.getWorkInfosForUniqueWork(BackupHelper.BACKUP_RESTORE_WORK_NAME)
+                    .get()
+                    .any { it.id == downloadWatcher.id }
+            }
         } catch (e: Exception) {
             // fail-open like BackupHelper.isBackupRestoreActive
             Logger.w(LOG_TAG_BACKUP_RESTORE, "err verifying backup enqueue: ${e.message}")
