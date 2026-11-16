@@ -176,6 +176,11 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
         // handle intent receiver for backup/restore
         handleIntent()
 
+        // restore before initUpdateCheck: a new check must set its own interaction state
+        if (savedInstanceState != null) {
+            isUpdateCheckInteractive = savedInstanceState.getBoolean(KEY_UPDATE_CHECK_INTERACTIVE)
+        }
+
         initUpdateCheck()
 
         observeAppState()
@@ -843,11 +848,6 @@ class HomeScreenActivity : BaseActivity(R.layout.activity_home_screen) {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_UPDATE_CHECK_INTERACTIVE, isUpdateCheckInteractive)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        isUpdateCheckInteractive = savedInstanceState.getBoolean(KEY_UPDATE_CHECK_INTERACTIVE)
     }
 
     @Deprecated("Deprecated in Java")
