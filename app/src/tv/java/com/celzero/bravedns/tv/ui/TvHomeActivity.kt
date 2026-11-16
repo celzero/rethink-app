@@ -96,20 +96,27 @@ class TvHomeActivity : ComponentActivity() {
     private fun initAppVersion() {
         val prevVersion = persistentState.appVersion
 
-        // Persisted unconditionally so version-gated server endpoints never
-        // observe the 0 default on fresh installs.
-        persistAppVersion(prevVersion)
-
         // Same one-time firewall exemption HomeScreenActivity applies to
         // installs at or below v53 (fresh installs included).
         if (prevVersion <= 53) {
             val rethinkUid = android.os.Process.myUid()
             lifecycleScope.launch(Dispatchers.IO) {
-                runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }
+                val exempted = runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }
                     .onFailure {
                         Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed: ${it.message}")
                     }
+                    .getOrDefault(false)
+                if (exempted) {
+                    persistAppVersion(prevVersion)
+                } else {
+                    Logger.w(
+                        Logger.LOG_TAG_VPN,
+                        "tv launcher: exemption incomplete, deferring version persistence"
+                    )
+                }
             }
+        } else {
+            persistAppVersion(prevVersion)
         }
 
         // Parity with HomeScreenActivity: purge pre-v055o WARP/SEC_WARP
