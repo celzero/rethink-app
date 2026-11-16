@@ -158,15 +158,15 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
             b.dnsBlockedTarget.text = log?.blockedTarget
             b.dnsBlockedTargetHeader.visibility = View.VISIBLE
         }
-        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
-                ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
-        ) {
+        val isLogLvlDebugOrBelow = Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+            ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
+        if (isLogLvlDebugOrBelow) {
             b.dnsMessage.text = "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
         } else {
             b.dnsMessage.text = log?.msg.orEmpty()
         }
 
-        displayConnId()
+        displayConnId(isLogLvlDebugOrBelow)
 
         val region = log?.region.orEmpty()
         if (region.isNotEmpty()) {
@@ -759,9 +759,9 @@ class DnsBlocklistBottomSheet : BaseBottomSheetDialogFragment() {
         return msg.substringBefore("; ").ifBlank { null }
     }
 
-    private fun displayConnId() {
+    private fun displayConnId(isLogLvlDebugOrBelow: Boolean) {
         val cid = connId()
-        if (cid.isNullOrEmpty()) {
+        if (cid.isNullOrEmpty() || !isLogLvlDebugOrBelow) {
             b.dnsCid.visibility = View.GONE
             return
         }

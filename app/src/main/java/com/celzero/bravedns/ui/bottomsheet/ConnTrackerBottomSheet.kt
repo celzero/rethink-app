@@ -302,17 +302,18 @@ class ConnTrackerBottomSheet : BaseBottomSheetDialogFragment(), KoinComponent {
 
     private fun displaySummaryDetails() {
         b.bsConnConnTypeSecondary.visibility = View.GONE
+        val isLogLvlDebugOrBelow = Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+            ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
         // show connId and message if the log level is less than DEBUG
-        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
-                ?.isLessThanOrEqualTo(Logger.LoggerLevel.DEBUG) == true
-        ) {
+        if (isLogLvlDebugOrBelow) {
             b.connectionMessage.text = "${info?.proxyDetails}; ${info?.rpid}; ${info?.connId}; ${info?.message}; ${info?.synack}"
         } else {
             b.connectionMessage.text = info?.message
         }
 
         val cid = info?.connId.orEmpty()
-        if (cid.isEmpty() || DEBUG) {
+        Logger.d(LOG_TAG_FIREWALL, "connId: $cid, isLogLvlDebugOrBelow: $isLogLvlDebugOrBelow")
+        if (cid.isEmpty() || !isLogLvlDebugOrBelow) {
             b.connectionCid.visibility = View.GONE
         } else {
             b.connectionCid.text = cid

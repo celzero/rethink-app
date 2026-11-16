@@ -1904,9 +1904,7 @@
     <string name="console_log_title" translatable="true">App Logs</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
 
-    <string name="conn_id_logs_title" translatable="true">Connection Logs</string>
     <string name="conn_id_logs_empty" translatable="true">No logs found for this connection</string>
-    <string name="conn_id_logs_live_trace" translatable="true">── Live trace ──</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>

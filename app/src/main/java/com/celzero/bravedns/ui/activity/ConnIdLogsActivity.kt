@@ -88,8 +88,7 @@ class ConnIdLogsActivity : BaseActivity(R.layout.activity_conn_id_logs) {
             return
         }
 
-        b.connIdLogsInfoText.text =
-            getString(R.string.two_argument_space, getString(R.string.conn_id_logs_title), cid)
+        b.connIdLogsInfoText.text = cid
         setAdapter()
         loadLogs(cid)
     }
@@ -129,7 +128,7 @@ class ConnIdLogsActivity : BaseActivity(R.layout.activity_conn_id_logs) {
                 listOf(
                     ConsoleLog(
                         LIVE_TRACE_DIVIDER_ID,
-                        getString(R.string.conn_id_logs_live_trace),
+                        "",
                         0L,
                         0L,
                     )
