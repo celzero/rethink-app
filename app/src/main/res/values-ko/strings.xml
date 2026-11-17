@@ -781,7 +781,7 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">가장 많이 접속한 IP</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">가장 많이 차단된 IP</string>
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">가장 많이 차단된 지역</string>
-    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Rethink를 시작해 계속 진행</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Rethink 시작</string>
     <string name="ssv_see_more" translatable="true">모두 표시</string>
     <string name="bad_config_reason_invalid_key" translatable="true">잘못된 키</string>
     <string name="bad_config_reason_invalid_number" translatable="true">잘못된 숫자</string>
@@ -927,7 +927,7 @@
     <string name="close_all" translatable="true">모두 닫기</string>
     <string name="smart_dns" translatable="true">스마트 DNS</string>
     <string name="processing_dialog_desc" translatable="true">요청을 처리할 동안 잠시 기다려주세요.</string>
-    <string name="smart_dns_desc" translatable="true"><i>스마트 DNS</i>는 다음 DNS 리졸버 중 무작위로 이용합니다:</string>
+    <string name="smart_dns_desc" translatable="true">선택한 필터를 기반으로 올바른 DNS를 자동 선택</string>
     <string name="vpn_policy_sensitive" translatable="true">민감</string>
     <string name="vpn_policy_sensitive_desc" translatable="true">모든 네트워크 및 연결 상태 변화에 반응합니다.</string>
     <string name="vpn_policy_relaxed" translatable="true">느슨</string>
