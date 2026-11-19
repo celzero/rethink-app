@@ -272,44 +272,40 @@ object TunDnsManager: KoinComponent {
         }
 
         if (uid != INVALID_UID) {
-            when (DomainRulesManager.getDomainRule(fqdn, uid)) {
+            val appDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, uid).first
+            logd("onQuery: fid: $fid, getDomainRule($fqdn, uid=$uid) for $fqdn")
+            when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, uid=$uid) is trusted")
-                    val r = makeDecision(uid, getTransportIdToBypass(tid, isLockdown, fid), fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED)
-                    logd("onQuery: fid: $fid, makeDecision(app-trusted) for $fqdn, return $r")
-                    return r
+                    val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED_DF)
+                    logd("onQuery: fid: $fid, makeDecision(app-trusted-df) for $fqdn")
+                    return opts
                 }
-
                 DomainRulesManager.Status.BLOCK -> {
-                    logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, uid=$uid) is blocked")
-                    val r = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_APP_BLOCKED)
-                    logd("onQuery: fid: $fid, makeDecision(app-blocked) for $fqdn, return $r")
-                    return r
+                    val opts = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_APP_BLOCKED_DF)
+                    logd("onQuery: fid: $fid, makeDecision(app-blocked-df) for $fqdn")
+                    return opts
                 }
-
-                else -> {
-                    logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, uid=$uid) is none")
-                }
+                DomainRulesManager.Status.NONE -> {}
             }
         }
 
         // check for global domain rules
-        when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
+        val globalDomainRule = DomainRulesManager.getAggregatedDomainRule(fqdn, UID_EVERYBODY).first
+        logd("onQuery: fid: $fid, getDomainRule($fqdn, UID_EVERYBODY) for $fqdn: ${globalDomainRule.name}")
+        when (globalDomainRule) {
             DomainRulesManager.Status.TRUST -> {
-                logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is trusted")
-                val r = makeDecision(uid, getTransportIdToBypass(tid, isLockdown, fid), fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED)
-                logd("onQuery: fid: $fid, makeDecision(global-trusted) for $fqdn, return $r")
-                return r
+                val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED_DF)
+                logd("onQuery: fid: $fid, makeDecision(global-trusted-df) for $fqdn")
+                return opts
             }
+
             DomainRulesManager.Status.BLOCK -> {
-                logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is blocked")
                 val r = makeDecision(uid, Pair(Backend.BlockAll, ""), fqdn, false, isIfaceCellular, ssid, BRANCH_GLOBAL_BLOCKED)
                 logd("onQuery: fid: $fid, makeDecision(global-blocked) for $fqdn, return $r")
                 return r
             }
-            else -> {
-                logd("onQuery: fid: $fid, DomainRulesManager.getDomainRule($fqdn, UID_EVERYBODY) is unknown")
-            }
+
+            DomainRulesManager.Status.NONE -> {}
         }
 
         val r = makeDecision(uid, tid, fqdn, false, isIfaceCellular, ssid, BRANCH_DEFAULT)
