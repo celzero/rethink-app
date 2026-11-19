@@ -16,10 +16,6 @@
  */
 package com.celzero.bravedns.service
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
-import com.celzero.bravedns.util.Logger.LOG_TAG_CONNECTION
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
@@ -70,11 +66,11 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.net.go.GoVpnAdapter
@@ -83,12 +79,12 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.receiver.UserPresentReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.RpnType
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker
 import com.celzero.bravedns.scheduler.WgProxyPingController
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.tunnel.TunDnsManager
-
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -108,6 +104,10 @@ import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger.LOG_TAG_CONNECTION
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.UIUtils.getAccentColor
@@ -3600,12 +3600,53 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             // Broadcast
             ipsToExclude.add(IPUtil.CIDR("224.0.0.0", 3))
 
+            // https://en.wikipedia.org/wiki/Mobile_country_code
+            val config = resources.configuration
+            // for WiFi calling, Verizon, T-Mobile, Germany Telefónica, SFR France
+            if (config.mcc == 310 && (config.mnc == 160 || config.mnc == 200 || config.mnc == 210 ||
+                        config.mnc == 220 || config.mnc == 230 || config.mnc == 240 ||
+                        config.mnc == 250 || config.mnc == 260 || config.mnc == 270 ||
+                        config.mnc == 310 || config.mnc == 490 || config.mnc == 660 ||
+                        config.mnc == 800)) {
+                ipsToExclude.add(IPUtil.CIDR("66.94.2.0", 24))
+                ipsToExclude.add(IPUtil.CIDR("66.94.6.0", 23))
+                ipsToExclude.add(IPUtil.CIDR("66.94.8.0", 22))
+                ipsToExclude.add(IPUtil.CIDR("208.54.0.0", 16))
+            }
+
+            if ((config.mcc == 310 && (config.mnc == 4 || config.mnc == 5 || config.mnc == 6 ||
+                        config.mnc == 10 || config.mnc == 12 || config.mnc == 13 ||
+                        config.mnc == 350 || config.mnc == 590 || config.mnc == 820 ||
+                        config.mnc == 890 || config.mnc == 910)) ||
+                        (config.mcc == 311 && (config.mnc == 12 || config.mnc == 110 ||
+                        (config.mnc in 270..289) || config.mnc == 390 ||
+                        (config.mnc in 480..489) || config.mnc == 590)) ||
+                        (config.mcc == 312 && (config.mnc == 770))) {
+                ipsToExclude.add(IPUtil.CIDR("66.174.0.0", 16)) // 66.174.0.0 - 66.174.255.255
+                ipsToExclude.add(IPUtil.CIDR("66.82.0.0", 15)) // 69.82.0.0 - 69.83.255.255
+                ipsToExclude.add(IPUtil.CIDR("69.96.0.0", 13)) // 69.96.0.0 - 69.103.255.255
+                ipsToExclude.add(IPUtil.CIDR("70.192.0.0", 11)) // 70.192.0.0 - 70.223.255.255
+                ipsToExclude.add(IPUtil.CIDR("97.128.0.0", 9)) // 97.128.0.0 - 97.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("174.192.0.0", 9)) // 174.192.0.0 - 174.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("72.96.0.0", 9)) // 72.96.0.0 - 72.127.255.255
+                ipsToExclude.add(IPUtil.CIDR("75.192.0.0", 9)) // 75.192.0.0 - 75.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("97.0.0.0", 10)) // 97.0.0.0 - 97.63.255.255
+            }
+
+            if (config.mnc == 10 && config.mcc == 208)
+                ipsToExclude.add(IPUtil.CIDR("10.151.0.0", 24))
+
+            if (config.mnc == 3 && config.mcc == 262) {
+                ipsToExclude.add(IPUtil.CIDR("213.20.0.0", 16))
+                ipsToExclude.add(IPUtil.CIDR("62.52.0.0", 14))
+            }
+
             ipsToExclude.sort()
 
             try {
                 var start: InetAddress? = InetAddress.getByName(Constants.UNSPECIFIED_IP_IPV4)
                 ipsToExclude.forEach { exclude ->
-                    val include = IPUtil.toCIDR(start, IPUtil.minus1(exclude.start)!!)
+                    val include = IPUtil.toCIDR(start, IPUtil.minus1(exclude.start))
                     include?.forEach {
                         try {
                             it.address?.let { it1 -> b.addRoute(it1, it.prefix) }
@@ -3614,6 +3655,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                         }
                     }
                     start = IPUtil.plus1(exclude.end)
+                }
+                val end = InetAddress.getByName("255.255.255.254")
+                IPUtil.toCIDR(InetAddress.getByName("224.0.0.0"), end)?.forEach {
+                    try {
+                        it.address?.let { addr -> b.addRoute(addr, it.prefix) }
+                    } catch (ex: Exception) {
+                        Logger.e(LOG_TAG_VPN, "exception while adding route: ${ex.message}", ex)
+                    }
                 }
             } catch (ex: SocketException) {
                 Logger.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
@@ -4490,8 +4539,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.unregisterWin() == true
     }
 
-    suspend fun updateWin(): ByteArray? {
-        return vpnAdapter?.updateWin()
+    suspend fun updateWin(): WinUpdateResult {
+        return vpnAdapter?.updateWin() ?: WinUpdateResult.Failed("no vpn adapter")
     }
 
     suspend fun onRpnOptsChange() {
@@ -4738,10 +4787,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun getAllTraceLogsAsBytes(): ByteArray? {
         return vpnAdapter?.getAllTraceLogsAsBytes()
-    }
-
-    suspend fun getTraceCount(): Long {
-        return vpnAdapter?.getTraceCount() ?: 0L
     }
 
     fun screenLock() {
