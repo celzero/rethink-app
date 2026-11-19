@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.tv.material3.Button
@@ -58,6 +59,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
@@ -68,6 +70,7 @@ import com.celzero.bravedns.tv.ui.theme.TvSizes
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -271,6 +274,12 @@ fun SettingsScreen(navController: NavController? = null) {
                 description = "Rolling app diagnostics. Helpful when something looks broken — useful for bug reports.",
                 leadingIcon = Icons.Filled.BugReport,
                 onClick = { navController?.navigate("settings/console-log") },
+            )
+
+            LogLevelSection(
+                persistentState = persistentState,
+                eventLogger = eventLogger,
+                ioScope = ioScope,
             )
 
             Spacer(Modifier.height(32.dp))
@@ -491,4 +500,77 @@ private fun DnsSection(
         leadingIconRes = R.drawable.ic_use_fallback_bypass,
         onClick = { navController?.navigate("settings/dns-bypass") },
     )
+}
+
+/**
+ * App log level picker, mirroring the full variant's `showGoLoggerDialog`:
+ * persists [PersistentState.goLoggerLevel], updates the in-process Logger
+ * gates, and pushes the level to the Go tunnel. Levels 0-7 map directly to
+ * [Logger.LoggerLevel] ids; id 7 ("None") is translated to Go's `none`
+ * inside [GoVpnAdapter.setLogLevel].
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun LogLevelSection(
+    persistentState: PersistentState,
+    eventLogger: EventLogger,
+    ioScope: CoroutineScope,
+) {
+    var logLevel by remember { mutableStateOf(persistentState.goLoggerLevel.toInt()) }
+
+    val levelLabels = listOf(
+        R.string.settings_gologger_dialog_option_0,
+        R.string.settings_gologger_dialog_option_1,
+        R.string.settings_gologger_dialog_option_2,
+        R.string.settings_gologger_dialog_option_3,
+        R.string.settings_gologger_dialog_option_4,
+        R.string.settings_gologger_dialog_option_5,
+        R.string.settings_gologger_dialog_option_6,
+        R.string.settings_gologger_dialog_option_7,
+    )
+
+    SettingSectionHeader("Log level")
+    Text(
+        text = "How verbose app and tunnel diagnostics are. Debug or lower is useful for bug reports.",
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(bottom = 12.dp, start = 4.dp),
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        levelLabels.indices.chunked(4).forEach { rowLevels ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                rowLevels.forEach { level ->
+                    TvSelectableChip(
+                        label = stringResource(levelLabels[level]),
+                        selected = level == logLevel,
+                        onClick = {
+                            if (level == logLevel) return@TvSelectableChip
+                            logLevel = level
+                            ioScope.launch {
+                                persistentState.goLoggerLevel = level.toLong()
+                                Logger.uiLogLevel = level.toLong()
+                                Logger.updateConfigLevel(level.toLong())
+                                GoVpnAdapter.setLogLevel(
+                                    level,
+                                    Logger.uiLogLevel.toInt(),
+                                    persistentState.includeFileTrace
+                                )
+                                eventLogger.log(
+                                    EventType.UI_SETTING_CHANGED,
+                                    Severity.LOW,
+                                    "app log level set to $level",
+                                    EventSource.UI,
+                                    true,
+                                    "User changed app log level to $level"
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+        }
+    }
 }

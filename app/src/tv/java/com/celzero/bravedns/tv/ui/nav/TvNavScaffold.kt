@@ -63,6 +63,7 @@ import com.celzero.bravedns.tv.ui.dns.DohAddScreen
 import com.celzero.bravedns.tv.ui.dns.DotAddScreen
 import com.celzero.bravedns.tv.ui.dns.OdohAddScreen
 import com.celzero.bravedns.tv.ui.dns.ProxyAddScreen
+import com.celzero.bravedns.tv.ui.dns.RdnsPlusBlocklistScreen
 import com.celzero.bravedns.tv.ui.firewall.FirewallScreen
 import com.celzero.bravedns.tv.ui.home.HomeScreen
 import com.celzero.bravedns.tv.ui.logs.LogsScreen
@@ -133,13 +134,6 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
             // the first composition frame.
             val destinations = remember { visibleTvDestinations() }
 
-            // Park initial focus on the drawer's first item so the
-            // user's first D-pad press is always interpreted as
-            // navigation. Without this the focus engine picks an
-            // arbitrary focusable on the active screen, which on Home
-            // means the big "Start protection" button — confusing
-            // because D-pad LEFT then has nowhere obvious to go.
-            val firstItemFocus = remember { FocusRequester() }
             // A FocusRequester per top-level rail destination. When
             // the user descends into a sub-screen (e.g. proxy → wg/0)
             // the OS focus engine snaps focus to the topologically
@@ -153,12 +147,10 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
             // visible route. The user can still press D-pad RIGHT to
             // enter the screen content — same as the existing
             // top-level destination UX — so this preserves the
-            // ten-foot rail navigation pattern.
+            // ten-foot rail navigation pattern. Home is exempt: it
+            // parks focus on its own start/stop CTA on every entry.
             val railFocusRequesters = remember {
                 TvDestination.entries.associateWith { FocusRequester() }
-            }
-            LaunchedEffect(Unit) {
-                runCatching { firstItemFocus.requestFocus() }
             }
 
             var previousRoute by remember { mutableStateOf<String?>(null) }
@@ -170,6 +162,7 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
                 }
                 val parent = parentDestinationForRoute(currentRoute)
                     ?: return@LaunchedEffect
+                if (parent == TvDestination.Home) return@LaunchedEffect
                 // Wait for the rail's recomposition (selected-state
                 // change) to settle so the FocusRequester has actually
                 // attached to the new measure pass before we request.
@@ -180,7 +173,6 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
             NavRailContent(
                 destinations = destinations,
                 currentRoute = currentRoute,
-                firstItemFocus = firstItemFocus,
                 railFocusRequesters = railFocusRequesters,
                 onSelect = { dest ->
                     if (currentRoute != dest.route) {
@@ -213,6 +205,7 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
                         composable("dns/dot/add") { DotAddScreen(navController) }
                         composable("dns/dnscrypt/add") { DnscryptAddScreen(navController) }
                         composable("dns/proxy/add") { ProxyAddScreen(navController) }
+                        composable("dns/rdns-plus") { RdnsPlusBlocklistScreen(navController) }
                         composable(TvDestination.Firewall.route) { FirewallScreen() }
                         composable(TvDestination.Apps.route) { AppsScreen(navController) }
                         composable(TvDestination.Rules.route) { RulesScreen(navController) }
@@ -333,7 +326,6 @@ fun TvNavScaffold(pendingRoute: String? = null, onRouteConsumed: () -> Unit = {}
 private fun NavRailContent(
     destinations: List<TvDestination>,
     currentRoute: String?,
-    firstItemFocus: FocusRequester,
     railFocusRequesters: Map<TvDestination, FocusRequester>,
     onSelect: (TvDestination) -> Unit,
     content: @Composable () -> Unit,
@@ -346,13 +338,9 @@ private fun NavRailContent(
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = TvSpacing.ScreenVertical / 2, horizontal = TvSpacing.RowGap),
         ) {
-            destinations.forEachIndexed { index, dest ->
+            destinations.forEach { dest ->
                 val perItemFocus = railFocusRequesters[dest]
                 val itemModifier = when {
-                    // The first-item requester must win over the
-                    // per-destination one for the Home item so the
-                    // initial-launch focus park is preserved.
-                    index == 0 -> Modifier.focusRequester(firstItemFocus)
                     perItemFocus != null -> Modifier.focusRequester(perItemFocus)
                     else -> Modifier
                 }

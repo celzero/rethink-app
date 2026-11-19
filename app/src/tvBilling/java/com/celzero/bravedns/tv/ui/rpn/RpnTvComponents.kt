@@ -40,15 +40,19 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.iab.AckFailureInfo
 import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver
 import com.celzero.bravedns.rpnproxy.SubscriptionUiStateResolver.PurchaseUiModel
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.tv.ui.theme.TvColors
 import com.celzero.bravedns.tv.ui.theme.TvShapes
 import com.celzero.bravedns.tv.ui.theme.TvSizes
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
 import androidx.tv.material3.Text
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,6 +60,25 @@ import java.util.Locale
 
 /** Status-chip tint kinds shared by the dashboard / manage heroes. */
 internal enum class RpnStatusKind { GOOD, BAD, DIM }
+
+private const val TAG = "RpnTv;"
+
+/**
+ * Registers the WIN proxy in the tunnel when RPN is active but missing.
+ * TV screens have no phone-style refresh self-heal, so the catalog fetch
+ * would otherwise fail with "rpn not found" until the next VPN restart.
+ */
+internal suspend fun ensureWinRegisteredForUi() {
+    try {
+        val rpnActive = RpnProxyManager.isRpnActive()
+        val hasTunnel = VpnController.hasTunnel()
+        if (!rpnActive || !hasTunnel || VpnController.isWinRegistered()) return
+        Logger.i(LOG_TAG_PROXY, "$TAG win(rpn) not registered, attempting registration")
+        RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+    } catch (e: Exception) {
+        Logger.w(LOG_TAG_PROXY, "$TAG err win(rpn) registration: ${e.message}")
+    }
+}
 
 /**
  * One D-pad-focusable action row (the TV equivalent of the phone

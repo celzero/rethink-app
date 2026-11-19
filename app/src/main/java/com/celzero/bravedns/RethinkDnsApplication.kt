@@ -23,8 +23,10 @@ import android.os.StrictMode
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
+import com.celzero.bravedns.util.Utilities
 import androidx.work.Configuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,12 @@ import org.koin.core.context.startKoin
 class RethinkDnsApplication : Application(), Configuration.Provider {
     companion object {
         var DEBUG: Boolean = false
+
+        // tv debug builds always run against test billing/rpn endpoints;
+        // called from every Application subclass (play overrides this class)
+        fun maybeForceTvDebugTestMode(app: Application) {
+            if (Utilities.isTvFlavour() && DEBUG) app.get<PersistentState>().appTestMode = true
+        }
     }
 
     // on-demand init: WorkManager self-initializes even if the
@@ -56,6 +64,8 @@ class RethinkDnsApplication : Application(), Configuration.Provider {
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+
+        maybeForceTvDebugTestMode(this)
 
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

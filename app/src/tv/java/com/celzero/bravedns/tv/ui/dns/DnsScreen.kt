@@ -129,7 +129,14 @@ fun DnsScreen(navController: NavController? = null) {
                     modifier = Modifier.weight(1f),
                 )
                 val addRoute = activeTab.addRoute
-                if (addRoute != null) {
+                val configRoute = activeTab.configRoute
+                if (configRoute != null) {
+                    AddCustomButton(
+                        label = "Configure blocklists",
+                        showIcon = false,
+                        onClick = { navController?.navigate(configRoute) },
+                    )
+                } else if (addRoute != null) {
                     AddCustomButton(onClick = { navController?.navigate(addRoute) })
                 }
             }
@@ -339,7 +346,11 @@ private fun TagPill(label: String) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun AddCustomButton(onClick: () -> Unit) {
+private fun AddCustomButton(
+    label: String = "Add custom",
+    showIcon: Boolean = true,
+    onClick: () -> Unit,
+) {
     Surface(
         onClick = onClick,
         shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Pill),
@@ -356,14 +367,16 @@ private fun AddCustomButton(onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = null,
-                modifier = Modifier.width(18.dp),
-            )
-            Spacer(Modifier.width(6.dp))
+            if (showIcon) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null,
+                    modifier = Modifier.width(18.dp),
+                )
+                Spacer(Modifier.width(6.dp))
+            }
             Text(
-                "Add custom",
+                label,
                 style = MaterialTheme.typography.labelLarge,
             )
         }

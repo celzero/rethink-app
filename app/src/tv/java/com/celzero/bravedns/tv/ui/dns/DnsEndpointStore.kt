@@ -47,13 +47,15 @@ internal data class DnsRow(
 /**
  * DNS protocol tabs — RDNS first, then the encrypted protocols, in
  * the same order as the phone's six-option list. [addRoute] is null
- * for RDNS: its presets are seeded, no custom endpoints.
+ * for RDNS: its presets are seeded, no custom endpoints. [configRoute]
+ * is set only on RDNS: it opens the RDNS Plus blocklist config screen.
  */
 internal enum class DnsTab(
     val label: String,
     val addRoute: String?,
+    val configRoute: String? = null,
 ) {
-    RDNS("RDNS", null),
+    RDNS("RDNS", null, "dns/rdns-plus"),
     DOH("DoH", "dns/doh/add"),
     DOT("DoT", "dns/dot/add"),
     DNSCRYPT("DNSCrypt", "dns/dnscrypt/add"),
@@ -79,7 +81,6 @@ internal object DnsEndpointStore : KoinComponent {
     suspend fun rows(tab: DnsTab): List<DnsRow> {
         val fetched = when (tab) {
             DnsTab.RDNS -> rethinkRepository.getGlobalRethinkEndpoints()
-                .filterNot { it.name == RethinkDnsEndpoint.RETHINK_PLUS }
                 .map { it.toRow() }
             DnsTab.DOH -> dohDao.getAll().map { it.toRow() }
             DnsTab.DOT -> dotDao.getAll().map { it.toRow() }
