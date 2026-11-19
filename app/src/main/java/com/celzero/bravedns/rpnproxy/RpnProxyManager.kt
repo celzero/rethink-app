@@ -2087,7 +2087,9 @@ object RpnProxyManager : KoinComponent {
                 // Fall through to activateRpn with whatever we have (may also check DB below)
             } else if (deviceId == null) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: did unavailable for cid=${accountId.take(8)}, cannot query server, using best available payload")
-                // Fall through to activateRpn with whatever we have (may also check DB below)
+                if (dbPayloadValid && !existingPayloadValid) {
+                    effectivePurchase = purchase.copy(payload = existingSubs.developerPayload)
+                }
             } else {
                 try {
                     val updatedPurchase = InAppBillingHandler.queryEntitlementFromServer(accountId, deviceId, purchase)
