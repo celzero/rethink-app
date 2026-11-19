@@ -148,9 +148,26 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
 
     // Selection state, decoded from the endpoint URL stamp on first Ready.
     val selectedTags = remember { mutableStateOf(setOf<Int>()) }
+    var selectionInitialized by remember { mutableStateOf(false) }
+    // Serializes selection init and toggles: FIFO order keeps each DB
+    // read-back after all earlier DB writes, so no stale selection is
+    // published and a late decode cannot clobber user toggles.
+    val blocklistSerial = remember { Dispatchers.IO.limitedParallelism(1) }
     LaunchedEffect(uiState) {
-        if (uiState is RdnsPlusUiState.Ready && selectedTags.value.isEmpty()) {
-            selectedTags.value = withContext(Dispatchers.IO) { RdnsPlusBlocklistStore.initialTags() }
+        if (uiState is RdnsPlusUiState.Ready) {
+            withContext(blocklistSerial) {
+                if (!selectionInitialized) {
+                    val tags = RdnsPlusBlocklistStore.initialTags()
+                    withContext(Dispatchers.Main) {
+                        // null = resolver unavailable; stay uninitialized
+                        // so a later attempt can decode the stamp
+                        if (tags != null) {
+                            selectedTags.value = tags
+                            selectionInitialized = true
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -223,23 +240,39 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
     // coalesce into one endpoint update (which the VPN service turns
     // into an in-place addTransport, no restart). appScope (not a
     // composition scope) so an in-flight apply survives navigation.
+    // dirty clears only on a successful apply; on failure it stays set
+    // so the back-press flush and VPN-recovery retry re-attempt it.
     var applyJob by remember { mutableStateOf<Job?>(null) }
     var dirty by remember { mutableStateOf(false) }
 
+    fun scheduleApply() {
+        applyJob?.cancel()
+        applyJob = appScope.launch {
+            delay(APPLY_DEBOUNCE_MS)
+            val tags = withContext(Dispatchers.Main) { selectedTags.value }
+            val ok = RdnsPlusBlocklistStore.apply(tags)
+            withContext(Dispatchers.Main) { if (ok) dirty = false }
+        }
+    }
+
     fun togglePack(row: RdnsPackRow, selected: Boolean) {
-        scope.launch(Dispatchers.IO) {
+        // guard init synchronously so a late decode cannot overwrite
+        // this toggle's DB-backed selection
+        selectionInitialized = true
+        appScope.launch(blocklistSerial) {
             val tags = RdnsPlusBlocklistStore.toggle(row.pack.blocklistIds, selected)
             withContext(Dispatchers.Main) {
                 selectedTags.value = tags
                 dirty = true
             }
-            applyJob?.cancel()
-            applyJob = appScope.launch {
-                delay(APPLY_DEBOUNCE_MS)
-                RdnsPlusBlocklistStore.apply(selectedTags.value)
-                withContext(Dispatchers.Main) { dirty = false }
-            }
+            scheduleApply()
         }
+    }
+
+    // Retry a failed apply once the resolver is back (VPN reconnected).
+    val vpnStatus by VpnController.connectionStatus.observeAsState()
+    LaunchedEffect(vpnStatus, dirty) {
+        if (dirty && VpnController.hasTunnel()) scheduleApply()
     }
 
     // Back press flushes the pending apply immediately instead of

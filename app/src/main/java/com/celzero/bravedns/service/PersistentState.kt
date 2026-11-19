@@ -507,6 +507,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN encrypted-file storage migration (external -> internal).
     var rpnInternalStorageMigrationVersion by intPref("rpn_internal_storage_migration_version").withDefault<Int>(0)
 
+    // true once the TV launcher self-exemption has been persisted (consumer is TV-only)
+    var tvSelfExemptionDone by booleanPref("tv_self_exemption_done").withDefault<Boolean>(false)
+
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
     // -1 = no override; any other value is a ProtoTranslationMode.id to force in DEBUG mode

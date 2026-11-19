@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
@@ -59,12 +60,14 @@ fun Surface(
 ) {
     TvMaterialSurface(
         onClick = onClick,
-        modifier = modifier.pointerInput(onClick, onLongClick, enabled) {
-            detectTapGestures(
-                onTap = { if (enabled) onClick() },
-                onLongPress = { if (enabled) onLongClick?.invoke() },
-            )
-        },
+        modifier = modifier
+            .focusProperties { canFocus = enabled }
+            .pointerInput(onClick, onLongClick, enabled) {
+                detectTapGestures(
+                    onTap = { if (enabled) onClick() },
+                    onLongPress = { if (enabled) onLongClick?.invoke() },
+                )
+            },
         onLongClick = onLongClick,
         enabled = enabled,
         tonalElevation = tonalElevation,

@@ -65,12 +65,23 @@ internal object RdnsPlusBlocklistStore : KoinComponent {
         return remoteBlocklistPacksMapDao.getTagsList()
     }
 
-    // Entry-point selection: decoded from the RDNS Plus endpoint URL stamp,
-    // not the DB flags (which only sync once the user toggles).
-    suspend fun initialTags(): Set<Int> {
-        val endpoint = appConfig.getRethinkPlusEndpoint() ?: return emptySet()
+    // Entry-point selection: DB flags once they exist (authoritative after
+    // the first toggle or a pending apply), else decoded from the RDNS Plus
+    // endpoint URL stamp. Returns null when the selection cannot be
+    // determined (no endpoint, or the Go resolver is down and a nonempty
+    // stamp decodes as empty); empty set means a genuinely empty stamp.
+    suspend fun initialTags(): Set<Int>? {
+        val dbTags = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
+        if (dbTags.isNotEmpty()) return dbTags
+        val endpoint = appConfig.getRethinkPlusEndpoint() ?: return null
         val stamp = Utilities.getRemoteBlocklistStamp(endpoint.url)
-        return RethinkBlocklistManager.getTagsFromStamp(stamp, RethinkBlocklistType.REMOTE)
+        if (stamp.isEmpty()) return emptySet()
+        val tags = RethinkBlocklistManager.getTagsFromStamp(stamp, RethinkBlocklistType.REMOTE)
+        if (tags.isEmpty()) return null
+        // DB is empty here, so sync the endpoint selection into it before
+        // any toggle read-back; keeps toggles from dropping stamp-only tags.
+        RethinkBlocklistManager.updateFiletagsRemote(tags, 1)
+        return tags
     }
 
     // Persists the pack's tags, then returns the re-read selection set

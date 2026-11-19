@@ -517,6 +517,8 @@ private fun LogLevelSection(
     ioScope: CoroutineScope,
 ) {
     var logLevel by remember { mutableStateOf(persistentState.goLoggerLevel.toInt()) }
+    // serializes level changes so rapid clicks apply in click order
+    val logSerial = remember { Dispatchers.IO.limitedParallelism(1) }
 
     val levelLabels = listOf(
         R.string.settings_gologger_dialog_option_0,
@@ -549,7 +551,7 @@ private fun LogLevelSection(
                         onClick = {
                             if (level == logLevel) return@TvSelectableChip
                             logLevel = level
-                            ioScope.launch {
+                            ioScope.launch(logSerial) {
                                 persistentState.goLoggerLevel = level.toLong()
                                 Logger.uiLogLevel = level.toLong()
                                 Logger.updateConfigLevel(level.toLong())

@@ -107,16 +107,19 @@ class TvHomeActivity : ComponentActivity() {
             )
         }
 
-        // Same one-time firewall exemption HomeScreenActivity applies to
-        // installs at or below v53 (fresh installs included); best-effort
-        // and never gates version persistence.
-        if (prevVersion <= 53) {
+        // Same firewall exemption HomeScreenActivity applies to installs at
+        // or below v53 (fresh installs included); retried on every launch
+        // until it succeeds, since exemptRethinkApp returns false on DB
+        // failure or when the app has not been scanned yet.
+        if (!persistentState.tvSelfExemptionDone) {
             val rethinkUid = android.os.Process.myUid()
             lifecycleScope.launch(Dispatchers.IO) {
-                runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }
-                    .onFailure {
-                        Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed: ${it.message}")
-                    }
+                val ok = runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }.getOrDefault(false)
+                if (ok) {
+                    persistentState.tvSelfExemptionDone = true
+                } else {
+                    Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed, will retry next launch")
+                }
             }
         }
 
