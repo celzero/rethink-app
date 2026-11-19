@@ -2143,6 +2143,18 @@ object RpnProxyManager : KoinComponent {
             effectivePurchase = purchase.copy(payload = existingSubs.developerPayload)
         }
 
+        // Keep the machine's retained purchase in sync with the effective payload so
+        // later Active-state activations don't re-store a stale payload (machine-only;
+        // DB developerPayload is untouched). No-op when the machine serves another token.
+        if (effectivePurchase !== purchase) {
+            try {
+                subscriptionStateMachine.updatePayloadForToken(
+                    purchase.purchaseToken, effectivePurchase.payload, effectivePurchase)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: machine payload sync failed (non-fatal): ${e.message}")
+            }
+        }
+
         // This is the single point that writes the entitlement file and sets rpnState.
         // Calling it even when already-enabled ensures the file is present after app restart.
         activateRpn(effectivePurchase)
