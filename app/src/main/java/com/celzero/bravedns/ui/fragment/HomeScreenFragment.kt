@@ -158,6 +158,7 @@ import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
@@ -1885,7 +1886,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (entry == null) return
 
         topAppsHeaderRevertJob = lifecycleScope.launch {
-            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS)
+            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS.milliseconds)
             if (isAdded && view != null) renderTopAppsHeader(null)
         }
     }
@@ -2059,12 +2060,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
             else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
         val gap = (2f * resources.displayMetrics.density).toInt()
-        // the grid stretches to the page bottom; size cells from the measured
-        // height, falling back to the design height before the first layout
-        val gridHeightPx =
-            if (grid.height > 0) grid.height.toFloat()
-            else HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
-        val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val designPitch =
+            (HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density -
+                HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val gridWidthPx =
+            if (grid.width > 0) grid.width.toFloat()
+            else resources.displayMetrics.widthPixels - 48f * resources.displayMetrics.density
+        val cellPitch = min(designPitch, gridWidthPx / LogActivityAggregator.HOURS_IN_WINDOW)
 
         // iterate hour-major so each visual column holds one hour: cells are
         // added bucket-by-bucket across the columns (GridLayout auto-places
@@ -2101,8 +2103,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 val lp =
                     GridLayout.LayoutParams().apply {
-                        width = (cellBaseHeight * frac).toInt()
-                        height = (cellBaseHeight * frac).toInt()
+                        width = (cellPitch * frac).toInt()
+                        height = (cellPitch * frac).toInt()
                         columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         setMargins(gap, gap, gap, gap)
@@ -2153,8 +2155,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 lastGridTouchX
             }
+        // same pitch the grid uses to size cells: grid width per hour column
         val col =
-            ((x / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+            (x / (grid.width / LogActivityAggregator.HOURS_IN_WINDOW.toFloat())).toInt()
                 .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
         val row =
             ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
