@@ -811,6 +811,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN use permanent configuration: only effective when rpnConfigHandlingManual=true
     var rpnUsePermanentConfig by booleanPref("rpn_use_permanent_config").withDefault<Boolean>(false)
 
+    // true when a TV RDNS Plus blocklist selection change is pending an endpoint apply
+    var rdnsPlusApplyPending by booleanPref("rdns_plus_apply_pending").withDefault<Boolean>(false)
+
     /** Comma-separated country codes (e.g. "US,DE,FR") excluded from AUTO server selection.
      *  Empty string = no exclusions (default). */
     var rpnAutoExcludedCcs by stringPref("rpn_auto_excluded_ccs").withDefault<String>("")
