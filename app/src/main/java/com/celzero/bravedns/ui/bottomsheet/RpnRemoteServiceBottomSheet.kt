@@ -295,6 +295,9 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
                 if (!isAdded) return@launch
                 statuses.forEach { (type, status) ->
                     if (status == GoVpnAdapter.SVC_STOPPED) {
+                        // clear the adapter entry so a later start is not
+                        // skipped as "already running"
+                        withContext(Dispatchers.IO) { VpnController.stopRemoteService(type) }
                         running.remove(type)
                         addresses.remove(type)
                     } else {
