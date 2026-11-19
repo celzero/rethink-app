@@ -288,11 +288,19 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
         stopPolling()
         statusPollJob = viewLifecycleOwner.lifecycleScope.launch {
             while (isActive && isAdded && running.isNotEmpty() && !isTransitioning) {
+                val keys = running.keys.toList()
                 val statuses = withContext(Dispatchers.IO) {
-                    running.keys.associateWith { VpnController.remoteServiceStatus(it) }
+                    keys.associateWith { VpnController.remoteServiceStatus(it) }
                 }
                 if (!isAdded) return@launch
-                statuses.forEach { (type, status) -> running[type] = status }
+                statuses.forEach { (type, status) ->
+                    if (status == GoVpnAdapter.SVC_STOPPED) {
+                        running.remove(type)
+                        addresses.remove(type)
+                    } else {
+                        running[type] = status
+                    }
+                }
                 val allSilent = statuses.values.all {
                     it == null || it == GoVpnAdapter.SVC_STOPPED
                 }
