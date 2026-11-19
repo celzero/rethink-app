@@ -158,6 +158,11 @@ class IPUtil {
         fun plus1(address: InetAddress?): InetAddress? {
             return long2inet(inet2long(address) + 1)
         }
+
+        // unsigned IPv4 value, for address ordering comparisons
+        fun toLong(address: InetAddress?): Long {
+            return inet2long(address)
+        }
     }
 
     class CIDR : Comparable<CIDR?> {

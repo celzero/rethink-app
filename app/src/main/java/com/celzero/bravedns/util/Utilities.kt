@@ -1235,21 +1235,28 @@ object Utilities {
 
     /**
      * Best-effort LAN IPv4 address of this device (site-local, non-loopback),
-     * preferring wlan interfaces. Empty string when none is available (e.g. no
-     * Wi-Fi/Ethernet).
+     * preferring Wi-Fi/Ethernet interfaces. VPN (tun) interfaces are excluded
+     * so the VPN address is never reported. Empty string when none is
+     * available.
      */
     fun getLanIpv4(): String {
         return try {
             val candidates = NetworkInterface.getNetworkInterfaces().asSequence()
-                .filter { it.isUp && !it.isLoopback }
+                .filter { it.isUp && !it.isLoopback && !it.name.startsWith("tun") }
                 .flatMap { nic ->
                     nic.inetAddresses.asSequence()
                         .filter { addr -> addr is Inet4Address && !addr.isLoopbackAddress }
-                        .map { it as Inet4Address }
+                        .map { it as Inet4Address to nic.name }
                 }
                 .toList()
-            candidates.firstOrNull { it.isSiteLocalAddress }?.hostAddress
-                ?: candidates.firstOrNull()?.hostAddress.orEmpty()
+            val isWifiOrEth = { name: String ->
+                name.startsWith("wlan") || name.startsWith("eth")
+            }
+            candidates.firstOrNull { (addr, name) ->
+                addr.isSiteLocalAddress && isWifiOrEth(name)
+            }?.first?.hostAddress
+                ?: candidates.firstOrNull { (addr, _) -> addr.isSiteLocalAddress }?.first?.hostAddress
+                ?: candidates.firstOrNull()?.first?.hostAddress.orEmpty()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "err get lan ipv4: ${e.message}")
             ""

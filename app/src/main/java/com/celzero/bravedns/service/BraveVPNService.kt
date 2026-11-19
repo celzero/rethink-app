@@ -3654,15 +3654,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                             Logger.e(LOG_TAG_VPN, "exception while adding route: ${ex.message}", ex)
                         }
                     }
-                    start = IPUtil.plus1(exclude.end)
-                }
-                val end = InetAddress.getByName("255.255.255.254")
-                IPUtil.toCIDR(InetAddress.getByName("224.0.0.0"), end)?.forEach {
-                    try {
-                        it.address?.let { addr -> b.addRoute(addr, it.prefix) }
-                    } catch (ex: Exception) {
-                        Logger.e(LOG_TAG_VPN, "exception while adding route: ${ex.message}", ex)
-                    }
+                    val next = IPUtil.plus1(exclude.end)
+                    if (IPUtil.toLong(next) > IPUtil.toLong(start)) start = next
                 }
             } catch (ex: SocketException) {
                 Logger.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
