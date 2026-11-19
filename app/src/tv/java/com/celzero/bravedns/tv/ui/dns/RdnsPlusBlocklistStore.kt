@@ -72,7 +72,8 @@ internal object RdnsPlusBlocklistStore : KoinComponent {
     // stamp decodes as empty); empty set means a genuinely empty stamp.
     suspend fun initialTags(): Set<Int>? {
         val dbTags = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-        if (dbTags.isNotEmpty()) return dbTags
+        // rows exist: the persisted selection is authoritative even when empty
+        if (RethinkBlocklistManager.hasRemoteFileTags()) return dbTags
         val endpoint = appConfig.getRethinkPlusEndpoint() ?: return null
         val stamp = Utilities.getRemoteBlocklistStamp(endpoint.url)
         if (stamp.isEmpty()) return emptySet()

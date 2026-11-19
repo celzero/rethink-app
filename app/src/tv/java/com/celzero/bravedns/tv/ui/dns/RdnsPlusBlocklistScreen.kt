@@ -245,13 +245,15 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
     var applyJob by remember { mutableStateOf<Job?>(null) }
     var dirty by remember { mutableStateOf(false) }
 
-    fun scheduleApply() {
+    fun scheduleApply(immediate: Boolean = false) {
         applyJob?.cancel()
         applyJob = appScope.launch {
-            delay(APPLY_DEBOUNCE_MS)
-            val tags = withContext(Dispatchers.Main) { selectedTags.value }
-            val ok = RdnsPlusBlocklistStore.apply(tags)
-            withContext(Dispatchers.Main) { if (ok) dirty = false }
+            if (!immediate) delay(APPLY_DEBOUNCE_MS)
+            withContext(blocklistSerial) {
+                val tags = withContext(Dispatchers.Main) { selectedTags.value }
+                val ok = RdnsPlusBlocklistStore.apply(tags)
+                withContext(Dispatchers.Main) { if (ok) dirty = false }
+            }
         }
     }
 
@@ -279,8 +281,7 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
     // waiting out the debounce window.
     BackHandler(enabled = dirty) {
         applyJob?.cancel()
-        val tags = selectedTags.value
-        appScope.launch { RdnsPlusBlocklistStore.apply(tags) }
+        scheduleApply(immediate = true)
         dirty = false
         navController?.popBackStack()
     }
