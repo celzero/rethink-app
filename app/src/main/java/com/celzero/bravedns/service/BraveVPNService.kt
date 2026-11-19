@@ -495,17 +495,25 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getPlusTransportById(transportId)
     }
 
-    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
+    suspend fun startRemoteService(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
         if (!DEBUG) return null
-        return vpnAdapter?.startRemoteService()
+        return vpnAdapter?.startRemoteService(type)
     }
 
-    suspend fun stopRemoteService() {
-        vpnAdapter?.stopRemoteService()
+    suspend fun stopRemoteService(type: GoVpnAdapter.RemoteServiceType) {
+        vpnAdapter?.stopRemoteService(type)
     }
 
-    suspend fun remoteServiceStatus(): Int? {
-        return vpnAdapter?.remoteServiceStatus()
+    suspend fun stopAllRemoteServices() {
+        vpnAdapter?.stopAllRemoteServices()
+    }
+
+    suspend fun remoteServiceStatus(type: GoVpnAdapter.RemoteServiceType): Int? {
+        return vpnAdapter?.remoteServiceStatus(type)
+    }
+
+    fun remoteServiceInfo(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return vpnAdapter?.remoteServiceInfo(type)
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long, addrPort: String): Boolean {

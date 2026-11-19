@@ -853,7 +853,7 @@
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
 
-    <string name="logs_card_heatmap_window" translatable="true">last 24 hours</string>
+    <string name="logs_card_heatmap_window" translatable="true">Last 24 hours</string>
 
     <!-- top-apps histogram page of the home-screen logs card -->
     <string name="logs_card_apps_hint_allowed" translatable="true">Data used by your most active apps · last 24 hours</string>
@@ -3000,18 +3000,36 @@
 
     <!-- DEBUG-only: connect a laptop to the on-device proxy (Server Selection) -->
     <string name="qs_remote_service_label" translatable="false">Laptop</string>
-    <string name="rpn_remote_service_title" translatable="false">Connect your laptop (debug)</string>
-    <string name="rpn_remote_service_desc" translatable="false">Runs a proxy on this phone through the Rethink tunnel. Connect from a laptop on the same Wi-Fi network.</string>
-    <string name="rpn_remote_service_addr_hint" translatable="false">Address</string>
-    <string name="rpn_remote_service_start" translatable="false">Start service</string>
+    <string name="rpn_remote_service_title" translatable="false">Connect any device</string>
+    <string name="rpn_remote_service_subtitle" translatable="false">Proxy through the Rethink tunnel on this phone</string>
+    <string name="rpn_remote_service_section_proxy_type" translatable="false">Proxy type</string>
+    <string name="rpn_remote_service_section_endpoints" translatable="false">Endpoints</string>
+    <string name="rpn_remote_service_mode_socks5" translatable="false">SOCKS5</string>
+    <string name="rpn_remote_service_mode_http" translatable="false">HTTP</string>
+    <string name="rpn_remote_service_mode_both" translatable="false">Both</string>
+    <string name="rpn_remote_service_caption_socks5" translatable="false">Works with most apps, browsers and curl</string>
+    <string name="rpn_remote_service_caption_http" translatable="false">Plain HTTP proxy for browsers and curl</string>
+    <string name="rpn_remote_service_caption_both" translatable="false">Run the SOCKS5 and HTTP proxies together</string>
+    <string name="rpn_remote_service_hero_stopped" translatable="false">Service stopped</string>
+    <string name="rpn_remote_service_hero_stopped_hint" translatable="false">Pick a proxy type, then start</string>
+    <string name="rpn_remote_service_hero_starting" translatable="false">Starting…</string>
+    <string name="rpn_remote_service_hero_stopping" translatable="false">Stopping…</string>
+    <string name="rpn_remote_service_hero_listening" translatable="false">Listening</string>
+    <string name="rpn_remote_service_hero_listening_hint" translatable="false">Connect from a device on the same Wi-Fi</string>
+    <string name="rpn_remote_service_start" translatable="false">StarIn t service</string>
     <string name="rpn_remote_service_stop" translatable="false">Stop</string>
     <string name="rpn_remote_service_waiting" translatable="false">Waiting for connection…</string>
     <string name="rpn_remote_service_connected" translatable="false">Connected</string>
     <string name="rpn_remote_service_not_ok" translatable="false">Not reachable</string>
+    <string name="rpn_remote_service_failed" translatable="false">Failed to start</string>
     <string name="rpn_remote_service_no_tunnel" translatable="false">Start Rethink first</string>
     <string name="rpn_remote_service_start_failure" translatable="false">Failed to start service</string>
-    <string name="rpn_remote_service_copied" translatable="false">Address copied</string>
+    <string name="rpn_remote_service_copied_socks5" translatable="false">SOCKS5 proxy copied</string>
+    <string name="rpn_remote_service_copied_http" translatable="false">HTTP proxy copied</string>
+    <string name="rpn_remote_service_copy_desc" translatable="false">Copy proxy address</string>
     <string name="rpn_remote_service_no_addr" translatable="false">Could not determine address</string>
+    <string name="rpn_remote_service_hint_socks5" translatable="false">curl --proxy %1$s https://example.com</string>
+    <string name="rpn_remote_service_hint_http" translatable="false">curl -x %1$s https://example.com</string>
 
 
     <!-- RPN bypass apps -->

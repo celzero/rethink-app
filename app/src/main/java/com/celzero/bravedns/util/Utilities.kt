@@ -91,7 +91,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.net.URI
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
@@ -1228,6 +1230,29 @@ object Utilities {
                 buttonContainer.orientation = LinearLayout.HORIZONTAL
                 buttonContainer.gravity = Gravity.END
             }
+        }
+    }
+
+    /**
+     * Best-effort LAN IPv4 address of this device (site-local, non-loopback),
+     * preferring wlan interfaces. Empty string when none is available (e.g. no
+     * Wi-Fi/Ethernet).
+     */
+    fun getLanIpv4(): String {
+        return try {
+            val candidates = NetworkInterface.getNetworkInterfaces().asSequence()
+                .filter { it.isUp && !it.isLoopback }
+                .flatMap { nic ->
+                    nic.inetAddresses.asSequence()
+                        .filter { addr -> addr is Inet4Address && !addr.isLoopbackAddress }
+                        .map { it as Inet4Address }
+                }
+                .toList()
+            candidates.firstOrNull { it.isSiteLocalAddress }?.hostAddress
+                ?: candidates.firstOrNull()?.hostAddress.orEmpty()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "err get lan ipv4: ${e.message}")
+            ""
         }
     }
 

@@ -245,16 +245,24 @@ object VpnController : KoinComponent {
         return rvpn?.getProxyAddrById(id)
     }
 
-    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
-        return rvpn?.startRemoteService()
+    suspend fun startRemoteService(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.startRemoteService(type)
     }
 
-    suspend fun stopRemoteService() {
-        rvpn?.stopRemoteService()
+    suspend fun stopRemoteService(type: GoVpnAdapter.RemoteServiceType) {
+        rvpn?.stopRemoteService(type)
     }
 
-    suspend fun remoteServiceStatus(): Int? {
-        return rvpn?.remoteServiceStatus()
+    suspend fun stopAllRemoteServices() {
+        rvpn?.stopAllRemoteServices()
+    }
+
+    suspend fun remoteServiceStatus(type: GoVpnAdapter.RemoteServiceType): Int? {
+        return rvpn?.remoteServiceStatus(type)
+    }
+
+    fun remoteServiceInfo(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.remoteServiceInfo(type)
     }
 
     suspend fun getProxyStats(id: String): RouterStats? {

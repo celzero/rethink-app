@@ -1958,7 +1958,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun closeTun() {
-        remoteSvc = null
+        remoteServices.clear()
         try {
             if (tunnel.isConnected) {
                 // this is not the only place where tunnel is disconnected
@@ -2461,6 +2461,11 @@ class GoVpnAdapter : KoinComponent {
     companion object {
 
         private const val TAG = "TunAdapter;"
+
+        // go-side remote service status values; null handle means gone/unknown (stopped)
+        const val SVC_OK = 1
+        const val SVC_NOT_OK = -1
+        const val SVC_STOPPED = -2
 
         // max time to wait for one proxy check.
         private const val PROBE_TIMEOUT_MS = 5_000L
@@ -3192,12 +3197,27 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    data class RemoteServiceInfo(val id: String, val addr: String, val port: String)
+    /** Proxy types the debug remote service can expose to a laptop. */
+    enum class RemoteServiceType(val label: String) {
+        SOCKS5("svcsocks5"),
+        HTTP("svchttp")
+    }
 
-    private var remoteSvc: Server? = null
+    data class RemoteServiceInfo(
+        val type: RemoteServiceType,
+        val id: String,
+        val addr: String,
+        val port: String
+    )
 
-    suspend fun startRemoteService(): RemoteServiceInfo? {
+    private val remoteServices = mutableMapOf<RemoteServiceType, Server>()
+
+    suspend fun startRemoteService(type: RemoteServiceType): RemoteServiceInfo? {
         if (!DEBUG) return null
+        if (remoteServices.containsKey(type)) {
+            Logger.i(LOG_TAG_VPN, "$TAG remote service(${type.name}) already running, skip start")
+            return remoteServiceInfo(type)
+        }
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start remote service")
             return null
@@ -3210,50 +3230,75 @@ class GoVpnAdapter : KoinComponent {
                 Logger.e(LOG_TAG_VPN, "$TAG no win(rpn) id, skip start remote service")
                 return null
             }
-            val type = "svcsocks5" // "svchttp"
-            val id = "rpnRmtSvc"
-            val socks5Url = constructSocks5ProxyUrl(null, null, "", port = 0) // use constructSocks5ProxyUrl?
-            val httpUrl = "http://" // use constructHttpProxyUrl?
-            // username, pwd, port (empty port lets go pick one)
-            val server = tunnel.services?.addServer(type, Backend.Exit, socks5Url)
+            // empty host + port 0 lets go pick a free port
+            val url = when (type) {
+                RemoteServiceType.SOCKS5 -> constructSocks5ProxyUrl(null, null, "", port = 0)
+                RemoteServiceType.HTTP -> constructHttpProxyUrl()
+            }
+            if (url.isEmpty()) {
+                Logger.e(LOG_TAG_VPN, "$TAG empty remote service url(${type.name}), skip start")
+                return null
+            }
+            val server = tunnel.services?.addServer(type.label, Backend.Exit, url)
             val sid = server?.id().orEmpty()
-            if (sid.isEmpty()) {
+            if (server == null || sid.isEmpty()) {
                 Logger.e(LOG_TAG_VPN, "$TAG addServer returned no id, skip start remote service")
                 return null
             }
             tunnel.services?.bridge(sid, win)
-            remoteSvc = server
+            remoteServices[type] = server
             val addr = server?.addr.orEmpty()
-            Logger.i(LOG_TAG_VPN, "$TAG remote service started: $sid, addr: $addr, win: $win")
-            RemoteServiceInfo(sid, addr, addr.substringAfterLast(':', missingDelimiterValue = ""))
+            Logger.i(LOG_TAG_VPN, "$TAG remote service(${type.name}) started: $sid, addr: $addr, win: $win")
+            RemoteServiceInfo(type, sid, addr, addr.substringAfterLast(':', missingDelimiterValue = ""))
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err start remote service: ${e.message}", e)
-            logEvent(Severity.HIGH, "remote service start error", "error starting remote service, reason: ${e.message}")
+            Logger.e(LOG_TAG_VPN, "$TAG err start remote service(${type.name}): ${e.message}", e)
+            logEvent(Severity.HIGH, "remote service start error", "error starting remote service(${type.name}), reason: ${e.message}")
             null
         }
     }
 
-    suspend fun stopRemoteService() {
-        val sid = remoteSvc?.id().orEmpty()
-        if (sid.isEmpty()) return
+    suspend fun stopRemoteService(type: RemoteServiceType) {
+        val server = remoteServices.remove(type) ?: return
+        val sid = server.id().orEmpty()
         try {
-            if (tunnel.isConnected) {
+            if (tunnel.isConnected && sid.isNotEmpty()) {
                 tunnel.services?.bridge(sid, "")
                 tunnel.services?.removeServer(sid)
             }
-            Logger.i(LOG_TAG_VPN, "$TAG remote service stopped: $sid")
+            Logger.i(LOG_TAG_VPN, "$TAG remote service(${type.name}) stopped: $sid")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err stop remote service: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "$TAG err stop remote service(${type.name}): ${e.message}", e)
         }
-        remoteSvc = null
     }
 
-    suspend fun remoteServiceStatus(): Int? {
+    suspend fun stopAllRemoteServices() {
+        remoteServices.keys.toList().forEach { stopRemoteService(it) }
+    }
+
+    suspend fun remoteServiceStatus(type: RemoteServiceType): Int? {
         return try {
-            remoteSvc?.status()
+            remoteServices[type]?.status()
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err get remote service status: ${e.message}")
+            Logger.w(LOG_TAG_VPN, "$TAG err get remote service(${type.name}) status: ${e.message}")
             null
+        }
+    }
+
+    fun remoteServiceInfo(type: RemoteServiceType): RemoteServiceInfo? {
+        val server = remoteServices[type] ?: return null
+        val sid = server.id().orEmpty()
+        val addr = server.addr.orEmpty()
+        if (sid.isEmpty()) return null
+        return RemoteServiceInfo(type, sid, addr, addr.substringAfterLast(':', missingDelimiterValue = ""))
+    }
+
+    // empty host + port 0 lets go pick a free port
+    private fun constructHttpProxyUrl(): String {
+        return try {
+            URI.create("http://:0").toASCIIString()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err construct http url: ${e.message}")
+            ""
         }
     }
 

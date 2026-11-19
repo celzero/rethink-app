@@ -2121,9 +2121,25 @@ object RpnProxyManager : KoinComponent {
         // Calling it even when already-enabled ensures the file is present after app restart.
         activateRpn(effectivePurchase)
 
+        // Activation alone doesn't touch the tunnel; register WIN now so UI variants
+        // without a registration self-heal (e.g. TV) don't depend on a VPN restart.
+        ensureWinRegisteredInTunnel()
+
         val storedOk = effectivePurchase.payload.isNotEmpty()
         Logger.i(LOG_TAG_PROXY, "$TAG; processRpnPurchase: complete, payloadStored=$storedOk, product=${purchase.productId}")
         return storedOk
+    }
+
+    // best-effort tunnel registration; non-fatal when the VPN service isn't running
+    private suspend fun ensureWinRegisteredInTunnel() {
+        try {
+            if (rpnMode().isNone()) {
+                setRpnMode(RpnMode.ANTI_CENSORSHIP)
+            }
+            VpnController.handleRpnProxies()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; ensureWinRegisteredInTunnel: deferred to VPN restart/GlobalProxyHandler: ${e.message}")
+        }
     }
 
     /**
