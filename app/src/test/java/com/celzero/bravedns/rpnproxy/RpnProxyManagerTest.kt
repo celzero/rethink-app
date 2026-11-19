@@ -34,6 +34,7 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.shadows.ShadowBackend
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RpnEntitlement
@@ -1665,7 +1666,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { mockRpnProxyDb.update(any()) } returns 1
         coEvery { VpnController.unregisterWin() } returns true
         coEvery { VpnController.registerAndFetchWinConfig(any(), any(), any()) } returns "reg".toByteArray()
-        coEvery { VpnController.updateWin() } returns "upd".toByteArray()
+        coEvery { VpnController.updateWin() } returns WinUpdateResult.Updated("upd".toByteArray())
         coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
 
         val result = RpnProxyManager.updateWinProxy()
@@ -1689,7 +1690,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
-        coEvery { VpnController.updateWin() } returns "upd".toByteArray()
+        coEvery { VpnController.updateWin() } returns WinUpdateResult.Updated("upd".toByteArray())
         coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
 
@@ -1699,6 +1700,54 @@ class RpnProxyManagerTest : KoinTest {
         coVerify(exactly = 0) { VpnController.unregisterWin() }
         coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
         coVerify(exactly = 1) { VpnController.updateWin() }
+    }
+
+    @Test
+    fun `updateWinProxy skips persistence and continues when tunnel reports no change`() = runTest {
+        stubRpnEnabled()
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        every { mockStateMachine.getSubscriptionData() } returns SubscriptionStateMachineV2.SubscriptionData(
+            subscriptionStatus = SubscriptionStatus(),
+            purchaseDetail = makePurchaseDetail("standard.tier"),
+            lastUpdated = System.currentTimeMillis()
+        )
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
+        coEvery { VpnController.updateWin() } returns WinUpdateResult.NoChange
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val result = RpnProxyManager.updateWinProxy()
+
+        assertNotNull(result)
+        coVerify(exactly = 1) { VpnController.updateWin() }
+        coVerify(exactly = 0) { EncryptedFileManager.write(any(), any<ByteArray>(), any()) }
+    }
+
+    @Test
+    fun `updateWinProxy returns null when tunnel update fails`() = runTest {
+        stubRpnEnabled()
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        every { mockStateMachine.getSubscriptionData() } returns SubscriptionStateMachineV2.SubscriptionData(
+            subscriptionStatus = SubscriptionStatus(),
+            purchaseDetail = makePurchaseDetail("standard.tier"),
+            lastUpdated = System.currentTimeMillis()
+        )
+        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
+        coEvery { VpnController.updateWin() } returns WinUpdateResult.Failed("boom")
+        coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
+
+        val result = RpnProxyManager.updateWinProxy()
+
+        assertNull(result)
+        coVerify(exactly = 1) { VpnController.updateWin() }
+        coVerify(exactly = 0) { EncryptedFileManager.write(any(), any<ByteArray>(), any()) }
+        coVerify(exactly = 0) { VpnController.getRpnLocations(any()) }
     }
 
     @Test

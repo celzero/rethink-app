@@ -48,6 +48,7 @@ import com.celzero.bravedns.database.SmartDnsMode
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.EventLogger
@@ -2368,15 +2369,6 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun getTraceCount(): Long {
-        return try {
-            Intra.traceCount()
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err fetching trace count: ${e.message}", e)
-            0L
-        }
-    }
-
     suspend fun setRDNSStamp() {
         try {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)
@@ -3383,26 +3375,36 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun updateWin(): ByteArray? {
+    suspend fun updateWin(): WinUpdateResult {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update win(rpn)")
-            return null
+            return WinUpdateResult.Failed("no tunnel")
         }
         val rpn: RpnProxy? = try {
             tunnel.proxies.rpn().win()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG err get win(rpn) for update: ${e.message}")
-            null
+            return WinUpdateResult.Failed(e.message)
+        }
+        if (rpn == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG win(rpn) is null, cannot update")
+            return WinUpdateResult.Failed("win(rpn) not registered")
         }
         return try {
-            val bytes = rpn?.update(constructRpnOps())
-            Logger.i(LOG_TAG_PROXY, "$TAG updated win(rpn), ${bytes?.size} bytes")
-            logEvent(Severity.MEDIUM, "update win(rpn)", "win(rpn) updated, ${bytes?.size} bytes")
-            bytes
+            val bytes = rpn.update(constructRpnOps())
+            if (bytes == null) {
+                Logger.i(LOG_TAG_PROXY, "$TAG updated win(rpn), no new bytes, keeping previous state")
+                logEvent(Severity.LOW, "update win(rpn)", "no new bytes, keeping previous state")
+                WinUpdateResult.NoChange
+            } else {
+                Logger.i(LOG_TAG_PROXY, "$TAG updated win(rpn), ${bytes.size} bytes")
+                logEvent(Severity.MEDIUM, "update win(rpn)", "win(rpn) updated, ${bytes.size} bytes")
+                WinUpdateResult.Updated(bytes)
+            }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG err update win(rpn): ${e.message}", e)
             logEvent(Severity.CRITICAL, "update win(rpn)", "error updating win(rpn): ${e.message}")
-            null
+            WinUpdateResult.Failed(e.message)
         }
     }
 

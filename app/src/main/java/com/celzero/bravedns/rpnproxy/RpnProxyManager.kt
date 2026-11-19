@@ -1047,6 +1047,13 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
+    // win update() outcome: null is success (previous state stands), only errors retry
+    sealed class WinUpdateResult {
+        data class Updated(val bytes: ByteArray) : WinUpdateResult()
+        object NoChange : WinUpdateResult()
+        data class Failed(val reason: String?) : WinUpdateResult()
+    }
+
     private fun getTime(time: Long): String {
         return  Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
     }
@@ -2397,33 +2404,13 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     * Returns the set of WIN server keys currently held in the in-memory cache (excluding the
-     * AUTO sentinel), without triggering any DB read or network fetch.
-     *
-     * Used by the ghost-cleanup in [com.celzero.bravedns.database.RefreshDatabase] (via
-     * [com.celzero.bravedns.service.ProxyManager.purgeGhostMappings]) to determine which RPN
-     * proxyIds are still backed by a live server.
-     *
-     * A disabled-but-present server is NOT a ghost — the user may have temporarily toggled it
-     * off while keeping per-app assignments — so this returns every cached server regardless of
-     * its [CountryConfig.isEnabled] state.
-     */
-    suspend fun getCachedWinServerKeys(): Set<String> {
-        return winCacheMutex.withLock {
-            winServersCache
-                .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
-                .map { it.key }
-                .toSet()
-        }
-    }
-
-    /**
      * Full update pipeline:
-     *  1. Ask the tunnel to refresh and return updated WIN state bytes
-     *     ([VpnController.updateWin]).
-     *  2a. If the tunnel returns bytes → persist them with [updateWinConfigState].
-     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register).
-     *     If that also fails return null so callers can show an error.
+     *  1. Ask the tunnel to refresh WIN state and report the outcome
+     *     ([VpnController.updateWin], [WinUpdateResult]).
+     *  2a. [WinUpdateResult.Updated]: persist the bytes with [updateWinConfigState].
+     *  2b. [WinUpdateResult.NoChange]: No new bytes; previous state stands,
+     *      skip persistence and continue.
+     *  2c. [WinUpdateResult.Failed]: return null so callers can show an error / retry.
      *  3. Fetch server locations from the tunnel ([fetchAndConstructWinLocations]).
      *     If empty, retry up to 3 times with 1 s back-off.
      *  4. Sync fetched locations to DB + in-memory cache ([syncWinServers]).
@@ -2456,21 +2443,25 @@ object RpnProxyManager : KoinComponent {
         } else {
             // rotate the entitlement first; plain updateWin() never does
             if (!maybeReRegisterStaleEntitlement()) {
-                val bytes: ByteArray? = VpnController.updateWin()
-
-                if (bytes == null) {
-                    Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null")
-                    return null
-                }
-
-                val persisted = updateWinConfigState(bytes)
-                if (!persisted) {
-                    // Log the failure but do NOT return null; the in-memory state is already
-                    // updated by updateWinConfigState before it touches the DB.
-                    Logger.w(
-                        LOG_TAG_PROXY,
-                        "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
-                    )
+                when (val result = VpnController.updateWin()) {
+                    is WinUpdateResult.Updated -> {
+                        val persisted = updateWinConfigState(result.bytes)
+                        if (!persisted) {
+                            // only log the failure
+                            Logger.w(
+                                LOG_TAG_PROXY,
+                                "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
+                            )
+                        }
+                    }
+                    // null without error: previous state stands, nothing to persist
+                    is WinUpdateResult.NoChange -> {
+                        Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() reports no change, keeping previous state")
+                    }
+                    is WinUpdateResult.Failed -> {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() failed: ${result.reason}")
+                        return null
+                    }
                 }
             }
         }
@@ -2492,7 +2483,7 @@ object RpnProxyManager : KoinComponent {
 
             if (attempt < maxFetchRetries) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: no locations on attempt $attempt, retrying in 1s…")
-                delay(2_000L)
+                delay(2_000L.milliseconds) // TODO: magic number
             }
         }
 
