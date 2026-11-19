@@ -276,8 +276,10 @@ object TunDnsManager: KoinComponent {
             logd("onQuery: fid: $fid, getDomainRule($fqdn, uid=$uid) for $fqdn")
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED_DF)
-                    logd("onQuery: fid: $fid, makeDecision(app-trusted-df) for $fqdn")
+                    // bypass transports let trusted domains recover when the preferred
+                    // transport blocks upstream; dns mode has no onUpstreamAnswer recovery
+                    val opts = makeDecision(uid, getTransportIdToBypass(tid, isLockdown, fid), fqdn, true, isIfaceCellular, ssid, BRANCH_APP_TRUSTED)
+                    logd("onQuery: fid: $fid, makeDecision(app-trusted) for $fqdn")
                     return opts
                 }
                 DomainRulesManager.Status.BLOCK -> {
@@ -294,8 +296,8 @@ object TunDnsManager: KoinComponent {
         logd("onQuery: fid: $fid, getDomainRule($fqdn, UID_EVERYBODY) for $fqdn: ${globalDomainRule.name}")
         when (globalDomainRule) {
             DomainRulesManager.Status.TRUST -> {
-                val opts = makeDecision(uid, tid, fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED_DF)
-                logd("onQuery: fid: $fid, makeDecision(global-trusted-df) for $fqdn")
+                val opts = makeDecision(uid, getTransportIdToBypass(tid, isLockdown, fid), fqdn, true, isIfaceCellular, ssid, BRANCH_GLOBAL_TRUSTED)
+                logd("onQuery: fid: $fid, makeDecision(global-trusted) for $fqdn")
                 return opts
             }
 
