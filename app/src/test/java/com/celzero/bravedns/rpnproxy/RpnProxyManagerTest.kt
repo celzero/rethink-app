@@ -110,6 +110,9 @@ class RpnProxyManagerTest : KoinTest {
         mockkObject(InAppBillingHandler)
         // The real handler posts UI on the main dispatcher, which never runs under runTest.
         coEvery { InAppBillingHandler.handleUnauthorized401(any(), any(), any()) } just Runs
+        every { InAppBillingHandler.postDeviceNotRegisteredError(any(), any()) } just Runs
+        // DID reconciliation succeeds by default; failure tests override this stub
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), any()) } returns "did-default"
         mockkObject(EncryptedFileManager)
         mockkObject(ProxyManager)
         mockkObject(IpRulesManager)
@@ -448,6 +451,54 @@ class RpnProxyManagerTest : KoinTest {
 
         assertTrue(result)
         coVerify { mockSubscriptionStatusDb.updateDeveloperPayload(any(), eq(serverPayload), any()) }
+    }
+
+    @Test
+    fun `processRpnPurchase restore reconciles missing DID before server query`() = runTest {
+        val purchase = makePurchaseDetail("standard.tier").copy(accountId = "acc-restore-1")
+        val existingSub = SubscriptionStatus().apply {
+            accountExpiry = 0L
+            billingExpiry = System.currentTimeMillis() + 86400000L
+            developerPayload = ""
+        }
+
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
+        every { mockStateMachine.hasValidSubscription() } returns true
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-restore-1", any(), false) } returns "did-minted-1"
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-minted-1"
+        coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
+            makePurchaseDetail("standard.tier", payload = "")
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns null
+
+        val result = RpnProxyManager.processRpnPurchase(purchase, existingSub)
+
+        assertFalse(result)
+        coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("acc-restore-1", any(), false) }
+        coVerify(exactly = 1) {
+            InAppBillingHandler.queryEntitlementFromServer("acc-restore-1", "did-minted-1", any())
+        }
+    }
+
+    @Test
+    fun `processRpnPurchase unresolvable DID skips server query without surfacing error`() = runTest {
+        val purchase = makePurchaseDetail("standard.tier").copy(accountId = "acc-restore-2")
+        val existingSub = SubscriptionStatus().apply {
+            accountExpiry = 0L
+            billingExpiry = System.currentTimeMillis() + 86400000L
+            developerPayload = ""
+        }
+
+        every { mockPersistentState.rpnState } returns RpnProxyManager.RpnState.DISABLED.id
+        every { mockStateMachine.hasValidSubscription() } returns true
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-restore-2", any(), false) } returns null
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns null
+
+        val result = RpnProxyManager.processRpnPurchase(purchase, existingSub)
+
+        assertFalse(result)
+        // purchase flow must not surface sticky errors for an unresolvable DID
+        verify(exactly = 0) { InAppBillingHandler.postDeviceNotRegisteredError(any(), any()) }
+        coVerify(exactly = 0) { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) }
     }
 
     // =========================================================================
@@ -1539,35 +1590,42 @@ class RpnProxyManagerTest : KoinTest {
         lastUpdatedTs = System.currentTimeMillis()
     }
 
-    /**
-     * R11a: when no DID is bound to the purchase cid, Restore Defaults must fail fast
-     * with a device-registration reason and must NOT proceed to the entitlement query
-     * with a missing DID (identity reconciliation happens at purchase time, not here).
-     */
+    /** A missing DID is reconciled (minted) before the reset; failure skips the entitlement query. */
     @Test
-    fun `resetAndRefetchRpn missing bound DID fails fast without entitlement query`() = runTest {
+    fun `resetAndRefetchRpn missing bound DID reconciles then fails fast without entitlement query`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns ""
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), true) } returns null
 
         val result = RpnProxyManager.resetAndRefetchRpn()
 
         assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
         val reason = (result as RpnProxyManager.ResetResult.Failure).reason
         assertTrue("reason should mention device registration: $reason", reason.contains("device registration", ignoreCase = true))
-        // Must not query entitlement without a DID
+        coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), true) }
         coVerify(exactly = 0) { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) }
     }
 
-    /**
-     * R11b: a DID is bound to the purchase cid but the entitlement query still returns
-     * 401 — Restore Defaults must surface an authorization failure instead of
-     * queryEntitlementFromServer's silent "return the original purchase" (which
-     * produced a stale-payload fake success).
-     */
+    /** A reconciled (minted) DID is used for the entitlement query. */
+    @Test
+    fun `resetAndRefetchRpn mints missing DID and queries entitlement with it`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), true) } returns "did-fresh-123"
+        coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
+            QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = ""))
+
+        val result = RpnProxyManager.resetAndRefetchRpn()
+
+        assertTrue("expected failure, got $result", result is RpnProxyManager.ResetResult.Failure)
+        coVerify(exactly = 1) {
+            mockBillingBackendClient.queryEntitlement("acc-reset-1234", "did-fresh-123", any(), any())
+        }
+    }
+
+    /** A 401 from the entitlement query surfaces an authorization failure, not a stale fake success. */
     @Test
     fun `resetAndRefetchRpn entitlement 401 surfaces auth failure not fake success`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), true) } returns "did-fresh-123"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Unauthorized("acc-reset-1234", "did-fresh-123")
 
@@ -1586,14 +1644,11 @@ class RpnProxyManagerTest : KoinTest {
         }
     }
 
-    /**
-     * R11c: DID bound, entitlement Success but an empty payload — the explicit
-     * payload guard still fails the reset (no empty-entitlement WIN registration).
-     */
+    /** A successful entitlement query with an empty payload still fails the reset. */
     @Test
     fun `resetAndRefetchRpn empty payload fails explicitly`() = runTest {
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-fresh-123"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), true) } returns "did-fresh-123"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = ""))
 
@@ -1659,7 +1714,7 @@ class RpnProxyManagerTest : KoinTest {
             purchaseDetail = makePurchaseDetail("standard.tier"),
             lastUpdated = System.currentTimeMillis()
         )
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Success(makePurchaseDetail("standard.tier", payload = freshServerPayload()))
         coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
@@ -1687,7 +1742,7 @@ class RpnProxyManagerTest : KoinTest {
             purchaseDetail = makePurchaseDetail("standard.tier"),
             lastUpdated = System.currentTimeMillis()
         )
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
         coEvery { VpnController.updateWin() } returns WinUpdateResult.Updated("upd".toByteArray())
@@ -1712,7 +1767,7 @@ class RpnProxyManagerTest : KoinTest {
             purchaseDetail = makePurchaseDetail("standard.tier"),
             lastUpdated = System.currentTimeMillis()
         )
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
         coEvery { VpnController.updateWin() } returns WinUpdateResult.NoChange
@@ -1736,7 +1791,7 @@ class RpnProxyManagerTest : KoinTest {
             purchaseDetail = makePurchaseDetail("standard.tier"),
             lastUpdated = System.currentTimeMillis()
         )
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { mockBillingBackendClient.queryEntitlement(any(), any(), any(), any()) } returns
             QueryEntitlementResult.Transient(makePurchaseDetail("standard.tier"))
         coEvery { VpnController.updateWin() } returns WinUpdateResult.Failed("boom")
@@ -1755,7 +1810,7 @@ class RpnProxyManagerTest : KoinTest {
         stubLocalEntitlementFile(wsJson(token = "tok-old", expiryMs = System.currentTimeMillis() - 3_600_000L))
         coEvery { EncryptedFileManager.write(any(), any<ByteArray>(), any()) } returns true
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
             makePurchaseDetail("standard.tier", payload = freshServerPayload())
         coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
@@ -1780,7 +1835,7 @@ class RpnProxyManagerTest : KoinTest {
     fun `registerProxy expired entitlement with no server refresh refuses registration`() = runTest {
         stubLocalEntitlementFile(wsJson(token = "tok-old", expiryMs = System.currentTimeMillis() - 3_600_000L))
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.getDeviceIdForCid(any()) } returns "did-1"
+        coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
             makePurchaseDetail("standard.tier", payload = "")
         coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
@@ -1792,6 +1847,22 @@ class RpnProxyManagerTest : KoinTest {
         assertFalse(ok)
         coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
         coVerify(exactly = 0) { VpnController.unregisterWin() }
+    }
+
+    @Test
+    fun `registerProxy recovery reconciles missing DID and queries server entitlement with it`() = runTest {
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) } returns "did-minted-2"
+        coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
+            makePurchaseDetail("standard.tier", payload = "")
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertFalse(ok)
+        coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) }
+        coVerify(exactly = 1) {
+            InAppBillingHandler.queryEntitlementFromServer("acc-reset-1234", "did-minted-2", any())
+        }
     }
 
     // =========================================================================

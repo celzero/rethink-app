@@ -637,7 +637,11 @@ object RpnProxyManager : KoinComponent {
         val sku = purchase.productId
         Logger.i(LOG_IAB, "$TAG; $mname: delegating to BillingServerRepository for " +
                 "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
-        val deviceId = billingBackendClient.getDeviceIdForCid(purchase.accountId)
+        val deviceId = resolveDeviceIdForServerCalls(purchase.accountId, "callConsumeApi", surfacing = false)
+        if (deviceId == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: did unavailable, consume will retry next cycle")
+            return
+        }
         val success = billingBackendClient.consumePurchase(purchase.accountId, deviceId, sku, purchase.purchaseToken)
         if (success) {
             Logger.i(LOG_IAB, "$TAG; $mname: consume succeeded for token=${purchase.purchaseToken.take(8)}")
@@ -645,6 +649,17 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_IAB, "$TAG; $mname: consume failed for token=${purchase.purchaseToken.take(8)} (will retry next cycle)")
         }
     }
+
+    /**
+     * Resolves the DID bound to [cid] for server calls, minting one if missing; null when
+     * unresolvable. Only [surfacing] flows (user-initiated) post sticky errors; periodic
+     * paths stay silent so a recoverable DID failure cannot strand the user in an alert loop.
+     */
+    private suspend fun resolveDeviceIdForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? = InAppBillingHandler.resolveDidForServerCalls(cid, caller, surfacing)
 
     /**
      * Represents the outcome of a full RPN reset operation.
@@ -693,11 +708,8 @@ object RpnProxyManager : KoinComponent {
             return ResetResult.Failure("Account information is incomplete")
         }
 
-        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-        if (deviceId.isBlank()) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: no did bound to purchase cid")
-            return ResetResult.Failure("Device registration failed; try again later")
-        }
+        val deviceId = resolveDeviceIdForServerCalls(accountId, "resetAndRefetchRpn", surfacing = true)
+            ?: return ResetResult.Failure("Device registration failed; try again later")
 
         val fakePurchase = PurchaseDetail(
             productId = sub.productId,
@@ -1197,9 +1209,11 @@ object RpnProxyManager : KoinComponent {
                     val accountId = sub?.accountId.orEmpty()
                     Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server-entitlement sub=${if (sub != null) "present" else "null"}, accountIdLen=${accountId.length}, purchaseTokenLen=${sub?.purchaseToken?.length ?: 0}")
                     // sub.deviceId holds only the sentinel indicator "pip/identity.json"
-                    val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+                    val deviceId = if (accountId.isNotEmpty()) {
+                        resolveDeviceIdForServerCalls(accountId, "registerProxy", surfacing = false).orEmpty()
+                    } else ""
                     val purchaseToken = sub?.purchaseToken.orEmpty()
-                    if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
+                    if (accountId.isNotEmpty() && purchaseToken.isNotEmpty() && deviceId.isNotEmpty()) {
                         Logger.i(
                             LOG_TAG_PROXY,
                             "$TAG; registerProxy: accountId+purchaseToken present, calling queryEntitlementFromServer"
@@ -1222,7 +1236,7 @@ object RpnProxyManager : KoinComponent {
                                 isAutoRenewing = false,
                                 accountId = accountId,
                                 // Store only the sentinel
-                                // Callers that need the actual ID use billingBackendClient.getDeviceIdForCid(cid).
+                                // Callers that need the actual ID use billingBackendClient.reconcileDidForCid(cid).
                                 deviceId = if (deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
                                 payload = "",
                                 expiryTime = sub?.billingExpiry ?: 0L,
@@ -1274,7 +1288,8 @@ object RpnProxyManager : KoinComponent {
                     } else {
                         Logger.w(
                             LOG_TAG_PROXY,
-                            "$TAG; registerProxy: accountId or purchaseToken empty, skipping server entitlement query (accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchaseToken.isEmpty()})"
+                            "$TAG; registerProxy: accountId, purchaseToken or did empty, skipping server entitlement query " +
+                                "(accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchaseToken.isEmpty()}, didEmpty=${deviceId.isEmpty()})"
                         )
                     }
                 }
@@ -1514,11 +1529,8 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): accountId empty, cannot refresh")
             return WinRefreshOutcome.StillStale
         }
-        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-        if (deviceId.isBlank()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): no did for cid=${accountId.take(8)}, cannot refresh")
-            return WinRefreshOutcome.StillStale
-        }
+        val deviceId = resolveDeviceIdForServerCalls(accountId, "refreshWinEntitlement($label)", surfacing = false)
+            ?: return WinRefreshOutcome.StillStale
 
         var entitlementBytes: ByteArray? = null
         var freshPurchase: PurchaseDetail? = null
@@ -2067,9 +2079,14 @@ object RpnProxyManager : KoinComponent {
                     "accExpiry=$accExpiry, billingExpiry=$billingExpiry)")
 
             val accountId = purchase.accountId.ifEmpty { existingSubs.accountId }
-            val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+            val deviceId = if (accountId.isNotEmpty()) {
+                resolveDeviceIdForServerCalls(accountId, "processRpnPurchase", surfacing = false)
+            } else null
             if (accountId.isEmpty()) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: accountId empty, cannot query server, using best available payload")
+                // Fall through to activateRpn with whatever we have (may also check DB below)
+            } else if (deviceId == null) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: did unavailable for cid=${accountId.take(8)}, cannot query server, using best available payload")
                 // Fall through to activateRpn with whatever we have (may also check DB below)
             } else {
                 try {

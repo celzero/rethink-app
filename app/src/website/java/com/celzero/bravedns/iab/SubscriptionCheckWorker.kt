@@ -78,6 +78,13 @@ class SubscriptionCheckWorker(
         }
     }
 
+    /**
+     * Resolves the DID bound to [accountId] for server calls, minting one if missing;
+     * blank when unresolvable. Background worker: never posts sticky errors.
+     */
+    private suspend fun resolveDeviceId(accountId: String, caller: String): String =
+        InAppBillingHandler.resolveDidForServerCalls(accountId, caller, surfacing = false).orEmpty()
+
     private suspend fun reconcilePurchase() {
         val mname = "reconcilePurchase"
         Logger.i(LOG_IAB, "$TAG; $mname: reconcile purchase")
@@ -327,8 +334,8 @@ class SubscriptionCheckWorker(
         // payload so subsequent calls can use it, and use the returned expiryTime if valid.
         try {
             val accountId = purchase.accountId
-            val deviceId  = billingBackendClient.getDeviceIdForCid(accountId)
-            if (accountId.isNotEmpty() && purchase.purchaseToken.isNotEmpty()) {
+            val deviceId = resolveDeviceId(accountId, mname)
+            if (accountId.isNotEmpty() && purchase.purchaseToken.isNotEmpty() && deviceId.isNotEmpty()) {
                 Logger.d(LOG_IAB, "$TAG; $mname: tunnel entitlement unavailable, querying server entitlement " +
                         "for token=${purchase.purchaseToken.take(8)}")
                 when (val result = billingBackendClient.queryEntitlement(
@@ -410,7 +417,8 @@ class SubscriptionCheckWorker(
                     }
                 }
             } else {
-                Logger.w(LOG_IAB, "$TAG; $mname: accountId or purchaseToken empty, skipping server query")
+                Logger.w(LOG_IAB, "$TAG; $mname: accountId, purchaseToken or did empty, skipping server query " +
+                        "(accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchase.purchaseToken.isEmpty()}, didEmpty=${deviceId.isEmpty()})")
             }
         } catch (e: Exception) {
             Logger.w(LOG_IAB, "$TAG; $mname: server entitlement query failed: ${e.message}")
@@ -435,7 +443,11 @@ class SubscriptionCheckWorker(
         val sku = purchase.productId.ifBlank { InAppBillingHandler.ONE_TIME_PRODUCT_ID }
         Logger.i(LOG_IAB, "$TAG; $mname: delegating to BillingServerRepository for " +
                 "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
-        val deviceId = billingBackendClient.getDeviceIdForCid(purchase.accountId)
+        val deviceId = resolveDeviceId(purchase.accountId, mname)
+        if (deviceId.isEmpty()) {
+            Logger.w(LOG_IAB, "$TAG; $mname: did unavailable, consume will retry next cycle")
+            return
+        }
         val success = billingBackendClient.consumePurchase(purchase.accountId, deviceId, sku, purchase.purchaseToken)
         if (success) {
             Logger.i(LOG_IAB, "$TAG; $mname: consume succeeded for token=${purchase.purchaseToken.take(8)}")

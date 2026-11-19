@@ -1586,6 +1586,38 @@ object InAppBillingHandler : KoinComponent {
         }
     }
 
+    /**
+     * Resolves the DID bound to [cid] for server calls, minting one if missing.
+     * Returns null when unresolvable. [surfacing] flows (user-initiated) post sticky
+     * errors; background paths stay silent, trigger recovery/silent retry, and never post.
+     */
+    internal suspend fun resolveDidForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? {
+        val didResult = billingBackendClient.reconcileDidForCid(cid)
+        if (didResult.isSuccess) return didResult.deviceId
+        if (surfacing) {
+            if (didResult.errorCode == 401) {
+                handleUnauthorized401(ServerApiError.Operation.DEVICE, cid, "")
+            } else {
+                postDeviceNotRegisteredError(cid, didResult.errorCode)
+            }
+        } else if (didResult.errorCode == 401) {
+            // recover the identity without posting the sticky auth error from background paths
+            try {
+                billingBackendClient.recoverIdentityAfterAuthFailure(cid)
+            } catch (e: Exception) {
+                logw(caller, "identity recovery after 401 failed: ${e.message}")
+            }
+        } else if (isDefinitiveDidFailure(didResult.errorCode)) {
+            scheduleAckRetryAndAlert(cid, alert = false)
+        }
+        logw(caller, "did unavailable (code=${didResult.errorCode}, surfacing=$surfacing) for cid=${cid.take(8)}")
+        return null
+    }
+
     /** Queues a one-shot registration re-check for the freshly claimed identity. */
     private fun scheduleRegistrationRecheck(caller: String) {
         val ctx = appContext ?: return

@@ -177,6 +177,14 @@ object InAppBillingHandler {
     @Suppress("UNUSED_PARAMETER")
     fun postDeviceNotRegisteredError(entitlementCid: String, didErrorCode: Int) { /* no-op */ }
 
+    /** Returns null always: F-Droid build has no billing server to resolve DIDs against. */
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun resolveDidForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? = null
+
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
     @Suppress("UNUSED_PARAMETER")
     suspend fun queryEntitlementFromServer(
