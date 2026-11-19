@@ -419,8 +419,15 @@ internal fun resolveTvPlanName(
         InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> ctx.getString(R.string.plan_5yr)
         InAppBillingHandler.SUBS_PRODUCT_YEARLY -> ctx.getString(R.string.billing_yearly)
         InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> ctx.getString(R.string.monthly_plan)
-        else -> fallbackTitle.ifEmpty { productId }
+        else -> resolveUnmappedTvPlanName(productId, planId, fallbackTitle)
     }
+}
+
+// one-time purchase titles are derived durations and can be wrong (e.g. legacy
+// onetime.tier is used for both 2- and 5-year buys); prefer the raw plan id
+private fun resolveUnmappedTvPlanName(productId: String, planId: String, fallbackTitle: String): String {
+    if (isOneTimeProduct(productId, planId)) return planId.ifBlank { productId }
+    return fallbackTitle.ifEmpty { productId }
 }
 
 /** Whether the product ids identify a one-time (INAPP) purchase. */

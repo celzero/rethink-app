@@ -242,6 +242,8 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
     // composition scope) so an in-flight apply survives navigation.
     // dirty clears only on a successful apply; on failure it stays set
     // so the back-press flush and VPN-recovery retry re-attempt it.
+    // rdnsPlusApplyPending persists that pending state so re-entering
+    // the screen (or process) re-attempts an apply the UI missed.
     var applyJob by remember { mutableStateOf<Job?>(null) }
     var dirty by remember { mutableStateOf(false) }
 
@@ -252,7 +254,12 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
             withContext(blocklistSerial) {
                 val tags = withContext(Dispatchers.Main) { selectedTags.value }
                 val ok = RdnsPlusBlocklistStore.apply(tags)
-                withContext(Dispatchers.Main) { if (ok) dirty = false }
+                withContext(Dispatchers.Main) {
+                    if (ok) {
+                        dirty = false
+                        persistentState.rdnsPlusApplyPending = false
+                    }
+                }
             }
         }
     }
@@ -266,8 +273,16 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
             withContext(Dispatchers.Main) {
                 selectedTags.value = tags
                 dirty = true
+                persistentState.rdnsPlusApplyPending = true
             }
             scheduleApply()
+        }
+    }
+
+    // restore an apply left pending by an earlier session or screen exit
+    LaunchedEffect(selectionInitialized) {
+        if (selectionInitialized && persistentState.rdnsPlusApplyPending) {
+            scheduleApply(immediate = true)
         }
     }
 
@@ -278,11 +293,12 @@ fun RdnsPlusBlocklistScreen(navController: NavController? = null) {
     }
 
     // Back press flushes the pending apply immediately instead of
-    // waiting out the debounce window.
+    // waiting out the debounce window; dirty clears only when the
+    // apply succeeds (see scheduleApply), so a failed flush retries
+    // via the persisted pending marker on the next screen entry.
     BackHandler(enabled = dirty) {
         applyJob?.cancel()
         scheduleApply(immediate = true)
-        dirty = false
         navController?.popBackStack()
     }
 
