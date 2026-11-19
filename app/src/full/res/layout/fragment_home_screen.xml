@@ -255,6 +255,7 @@
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="?attr/cardBackgroundColor"
                     app:cardCornerRadius="18dp"
+                    app:layout_constraintHeight_min="80dp"
                     android:layout_marginEnd="2dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/fhs_card_firewall_ll"
