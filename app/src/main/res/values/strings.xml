@@ -554,7 +554,7 @@
     <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
 
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs</string>
-    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, broadcast, link-local routes from Rethink\'s VPN tunnel.</string>
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
     <string name="settings_mobile_metered_desc" translatable="true">Only treat mobile networks as metered, rest as unmetered.</string>
@@ -3016,7 +3016,7 @@
     <string name="rpn_remote_service_hero_stopping" translatable="false">Stopping…</string>
     <string name="rpn_remote_service_hero_listening" translatable="false">Listening</string>
     <string name="rpn_remote_service_hero_listening_hint" translatable="false">Connect from a device on the same Wi-Fi</string>
-    <string name="rpn_remote_service_start" translatable="false">StarIn t service</string>
+    <string name="rpn_remote_service_start" translatable="false">Start service</string>
     <string name="rpn_remote_service_stop" translatable="false">Stop</string>
     <string name="rpn_remote_service_waiting" translatable="false">Waiting for connection…</string>
     <string name="rpn_remote_service_connected" translatable="false">Connected</string>
