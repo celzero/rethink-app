@@ -162,7 +162,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/fhs_firewall_proxy_row"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="100dp"
                 android:layout_marginStart="2dp"
                 app:layout_constraintTop_toBottomOf="@id/fhs_card_dns_ll">
 
@@ -280,7 +280,7 @@
                         <Space
                             android:id="@+id/fhs_proxy_header_space"
                             android:layout_width="match_parent"
-                            android:layout_height="18dp" />
+                            android:layout_height="8dp" />
 
                         <LinearLayout
                             android:id="@+id/fhs_proxy_health_container"
@@ -569,7 +569,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -578,7 +581,7 @@
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/fhs_logs_pager"
                             android:layout_width="match_parent"
-                            android:layout_height="190dp"
+                            android:layout_height="160dp"
                             android:contentDescription="@string/logs_card_pager_desc" />
 
                         <LinearLayout
