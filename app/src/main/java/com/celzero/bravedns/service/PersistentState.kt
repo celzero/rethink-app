@@ -75,6 +75,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NOTIFICATION_PERMISSION = "notification_permission_request"
         const val EXCLUDE_APPS_IN_PROXY = "exclude_apps_in_proxy"
         const val BIOMETRIC_AUTH = "biometric_authentication"
+        private const val MAX_RECONCILED_TOKENS = 8
         const val ANTI_CENSORSHIP_TYPE = "dial_strategy"
         const val RETRY_STRATEGY = "retry_strategy"
         const val ENDPOINT_INDEPENDENCE = "endpoint_independence"
@@ -786,6 +787,25 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var customLanRouterIpv4 by stringPref("custom_lan_router_ipv4").withDefault<String>(DEFAULT_LAN_ROUTER_IPV4)
     var customLanRouterIpv6 by stringPref("custom_lan_router_ipv6").withDefault<String>(DEFAULT_LAN_ROUTER_IPV6)
+
+    // Order-history reconciled one-time purchase tokens; v2 key ignores stale
+    // markers written by the earlier build.
+    private var orderHistoryReconciledTokensString by stringPref("order_history_reconciled_tokens_v2")
+        .withDefault("")
+
+    fun getOrderHistoryReconciledTokens(): Set<String> {
+        return if (orderHistoryReconciledTokensString.isEmpty()) {
+            emptySet()
+        } else {
+            orderHistoryReconciledTokensString.split(",").filter { it.isNotEmpty() }.toSet()
+        }
+    }
+
+    fun markOrderHistoryReconciled(token: String) {
+        if (token.isBlank()) return
+        val tokens = (getOrderHistoryReconciledTokens() + token).toList().takeLast(MAX_RECONCILED_TOKENS).toSet()
+        orderHistoryReconciledTokensString = tokens.joinToString(",")
+    }
 
     var customLanDnsIpv4 by stringPref("custom_lan_dns_ipv4").withDefault<String>(DEFAULT_LAN_DNS_IPV4)
     var customLanDnsIpv6 by stringPref("custom_lan_dns_ipv6").withDefault<String>(DEFAULT_LAN_DNS_IPV6)

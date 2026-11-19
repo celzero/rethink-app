@@ -205,6 +205,34 @@ open class SubscriptionStateMachineV2 : KoinComponent {
                     toState = SubscriptionState.Initial,
                     action = { _, _ -> handleInitialize() }
                 )
+                // billing events can race the async init on cold start
+                addTransition(
+                    fromState = SubscriptionState.Uninitialized,
+                    event = SubscriptionEvent.PaymentSuccessful(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.Active,
+                    guard = { event, _ -> event is SubscriptionEvent.PaymentSuccessful },
+                    action = { event, _ ->
+                        handlePaymentSuccessful((event as SubscriptionEvent.PaymentSuccessful).purchaseDetail)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.Uninitialized,
+                    event = SubscriptionEvent.SubscriptionRestored(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.Active,
+                    guard = { event, _ -> event is SubscriptionEvent.SubscriptionRestored },
+                    action = { event, _ ->
+                        handleSubscriptionRestored((event as SubscriptionEvent.SubscriptionRestored).purchaseDetail)
+                    }
+                )
+                addTransition(
+                    fromState = SubscriptionState.Uninitialized,
+                    event = SubscriptionEvent.PurchaseCompleted(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.PurchasePending,
+                    guard = { event, _ -> event is SubscriptionEvent.PurchaseCompleted },
+                    action = { event, _ ->
+                        handlePurchaseCompleted((event as SubscriptionEvent.PurchaseCompleted).purchaseDetail)
+                    }
+                )
 
                 addTransition(
                     fromState = SubscriptionState.Initial,
@@ -563,6 +591,17 @@ open class SubscriptionStateMachineV2 : KoinComponent {
                     event = SubscriptionEvent.SystemCheck,
                     toState = SubscriptionState.Active,
                     action = { _, _ -> handleSystemCheck() }
+                )
+                // Reconcile re-fires PurchaseCompleted for an already-active purchase
+                // (e.g. an unacknowledged one-time purchase); the handler dedups.
+                addTransition(
+                    fromState = SubscriptionState.Active,
+                    event = SubscriptionEvent.PurchaseCompleted(createDummyPurchaseDetail()),
+                    toState = SubscriptionState.Active,
+                    guard = { event, _ -> event is SubscriptionEvent.PurchaseCompleted },
+                    action = { event, _ ->
+                        handlePurchaseCompleted((event as SubscriptionEvent.PurchaseCompleted).purchaseDetail)
+                    }
                 )
 
                 // These sub-states all share the same transition set.

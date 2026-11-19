@@ -423,8 +423,7 @@ internal fun resolveTvPlanName(
     }
 }
 
-// one-time purchase titles are derived durations and can be wrong (e.g. legacy
-// onetime.tier is used for both 2- and 5-year buys); prefer the raw plan id
+// one-time purchase titles are derived durations and can be wrong; prefer the raw plan id
 private fun resolveUnmappedTvPlanName(productId: String, planId: String, fallbackTitle: String): String {
     if (isOneTimeProduct(productId, planId)) return planId.ifBlank { productId }
     return fallbackTitle.ifEmpty { productId }

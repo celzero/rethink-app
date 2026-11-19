@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -59,6 +60,12 @@ internal class OneTimePurchaseProcessor(
     private val getDeviceId: suspend (accountId: String) -> String = { "" },
     /** Resolves and, if needed, mints the DID for the server-ack path. */
     private val mintDeviceId: suspend (accountId: String) -> String = { "" },
+    /** Returns the most recent active one-time order from server history, or null. */
+    private val fetchRecentOneTimeOrder: suspend (purchaseToken: String) -> ServerOrderEntry? = { null },
+    /** Tokens already reconciled from order history in a previous session. */
+    private val getReconciledTokens: () -> Set<String> = { emptySet() },
+    /** Persists a token as order-history reconciled across app sessions. */
+    private val markReconciledToken: (token: String) -> Unit = {},
     /** Called after a successful server acknowledgement. */
     private val onAckSuccess: (suspend (purchase: Purchase) -> Unit)? = null,
     private val reconcileCidDid: suspend (accountId: String) -> Unit,
@@ -80,7 +87,15 @@ internal class OneTimePurchaseProcessor(
          * so the next fetchPurchases cycle can retry automatically.
          */
         private val ACK_RETRY_DELAYS_MS = longArrayOf(5_000L, 15_000L)
+
+        /** Min interval between order-history retries for a token after a failed fetch. */
+        private const val ORDER_HISTORY_RETRY_MS = 10 * 60_000L
     }
+
+    // tokens whose plan/title/expiry were already reconciled from server order history
+    private val orderHistoryResolved = ConcurrentHashMap.newKeySet<String>()
+    // tokens whose last order-history fetch attempt timestamp; gates retry frequency
+    private val orderHistoryAttempts = ConcurrentHashMap<String, Long>()
 
     private fun logd(m: String, msg: String) = Logger.d(LOG_IAB, "$TAG $m: $msg")
     private fun loge(m: String, msg: String, e: Exception? = null) =
@@ -121,55 +136,6 @@ internal class OneTimePurchaseProcessor(
         return best?.oneTimeOfferDetails
     }
 
-
-    /**
-     * Computes the **access-window expiry** for an INAPP purchase.
-     *
-     * Unlike subscriptions, Google Play has no server-side expiry for one-time products.
-     * The duration is encoded in the **product ID** itself
-     *
-     */
-    fun calculateExpiryTime(
-        purchase: Purchase,
-        @Suppress("UNUSED_PARAMETER") oneTimeOfferDetails: ProductDetails.OneTimePurchaseOfferDetails?
-    ): Long {
-        val mname = "calculateExpiryTime"
-        val productId = purchase.products.firstOrNull() ?: ""
-        val cal = Calendar.getInstance().apply { timeInMillis = purchase.purchaseTime }
-
-        return when (productId) {
-            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS -> {
-                cal.add(Calendar.YEAR, 2)
-                logd(mname, "productId=$productId → 2 years, expiry=${cal.timeInMillis}")
-                cal.timeInMillis
-            }
-            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> {
-                cal.add(Calendar.YEAR, 5)
-                logd(mname, "productId=$productId → 5 years, expiry=${cal.timeInMillis}")
-                cal.timeInMillis
-            }
-            InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID -> {
-                // Test product: 1 day access window for QA
-                cal.add(Calendar.DAY_OF_YEAR, 1)
-                logd(mname, "productId=$productId (test) → 1 day, expiry=${cal.timeInMillis}")
-                cal.timeInMillis
-            }
-            InAppBillingHandler.ONE_TIME_PRODUCT_ID -> {
-                // Legacy one-time product: default to 2 years
-                cal.add(Calendar.YEAR, 2)
-                logd(mname, "productId=$productId (legacy) → 2 years, expiry=${cal.timeInMillis}")
-                cal.timeInMillis
-            }
-            else -> {
-                // Unknown product ID: conservative 2-year safe default.
-                // Log at error level, a new product ID should be added to the when() above.
-                loge(mname, "unknown productId=$productId, using 2-year fallback, update product ID mapping")
-                cal.add(Calendar.YEAR, 2)
-                cal.timeInMillis
-            }
-        }
-    }
-
     /**
      * Builds a [PurchaseDetail] from an INAPP [Purchase].
      *
@@ -205,7 +171,8 @@ internal class OneTimePurchaseProcessor(
             ?: productId
         val productTitle = productDetail?.productTitle ?: QueryUtils.getPlanTitle(getProductBillingPeriod(productId))
         val planTitle    = productTitle  // For INAPP, planTitle == productTitle
-        val expiryTime   = calculateExpiryTime(purchase, oneTimeOfferDetails)
+        // planId is the purchase option; a legacy product ID can host 2yr and 5yr options
+        val expiryTime   = expiryForPeriod(purchase.purchaseTime, getProductBillingPeriod(planId))
         val accountId    = purchase.accountIdentifiers?.obfuscatedAccountId.orEmpty()
 
         if (accountId.isEmpty()) {
@@ -248,8 +215,78 @@ internal class OneTimePurchaseProcessor(
             orderId = purchase.orderId.orEmpty()
         )
 
+        // entitlement response rebuilds the detail; enrich last so the correction survives
         val purchaseDetail = validatePayloadAndFetchIfRequired(purchaseDtl)
-        return purchaseDetail
+        val enriched = enrichFromOrderHistory(purchaseDetail)
+        Logger.i(LOG_IAB, "$TAG $mname: final detail: planId=${enriched.planId}, title=${enriched.productTitle}, " +
+            "expiry=${enriched.expiryTime}, token=${enriched.purchaseToken.take(8)}")
+        return enriched
+    }
+
+    /** Corrects planId/title/expiry from the server order history's purchaseOptionId. */
+    private suspend fun enrichFromOrderHistory(purchaseDtl: PurchaseDetail): PurchaseDetail {
+        val mname = "enrichFromOrderHistory"
+        // retry marked tokens whose planId is still the generic productId
+        val marked = purchaseDtl.purchaseToken in getReconciledTokens()
+        val unresolved = purchaseDtl.planId.isBlank() || purchaseDtl.planId == purchaseDtl.productId
+        if (marked && !unresolved) {
+            logd(mname, "token already reconciled (planId=${purchaseDtl.planId}); skipping")
+            return purchaseDtl
+        }
+        if (orderHistoryResolved.contains(purchaseDtl.purchaseToken)) return purchaseDtl
+        val now = System.currentTimeMillis()
+        val last = orderHistoryAttempts[purchaseDtl.purchaseToken] ?: 0L
+        if (now - last < ORDER_HISTORY_RETRY_MS) return purchaseDtl
+        orderHistoryAttempts[purchaseDtl.purchaseToken] = now
+
+        val entry = try {
+            fetchRecentOneTimeOrder(purchaseDtl.purchaseToken)
+        } catch (e: Exception) {
+            loge(mname, "order history fetch failed (non-fatal): ${e.message}", e)
+            return purchaseDtl
+        } ?: return purchaseDtl
+
+        val optionId = entry.planId
+        if (optionId.isBlank()) {
+            logd(mname, "order history has no purchase option for ${purchaseDtl.purchaseToken.take(8)}")
+            markResolved(purchaseDtl.purchaseToken)
+            return purchaseDtl
+        }
+        if (optionId == purchaseDtl.planId) {
+            markResolved(purchaseDtl.purchaseToken)
+            return purchaseDtl
+        }
+
+        val title = QueryUtils.getPlanTitle(getProductBillingPeriod(optionId))
+        Logger.i(LOG_IAB, "$TAG $mname: correcting planId ${purchaseDtl.planId} → $optionId from order history")
+        markResolved(purchaseDtl.purchaseToken)
+        return purchaseDtl.copy(
+            planId = optionId,
+            productTitle = title.ifBlank { purchaseDtl.productTitle },
+            planTitle = title.ifBlank { purchaseDtl.planTitle },
+            // never shorten a longer server-granted window
+            expiryTime = maxOf(
+                purchaseDtl.expiryTime,
+                expiryForPeriod(purchaseDtl.purchaseTimeMillis, getProductBillingPeriod(optionId))
+            )
+        )
+    }
+
+    /** Marks a token reconciled in-session and durably for future app sessions. */
+    private fun markResolved(token: String) {
+        orderHistoryResolved.add(token)
+        markReconciledToken(token)
+    }
+
+    /** Access-window expiry for a resolved billing period (P1D/P2Y/P5Y/...). */
+    private fun expiryForPeriod(purchaseTimeMillis: Long, billingPeriod: String): Long {
+        val cal = Calendar.getInstance().apply { timeInMillis = purchaseTimeMillis }
+        when (billingPeriod) {
+            "P1D" -> cal.add(Calendar.DAY_OF_YEAR, 1)
+            "P5Y" -> cal.add(Calendar.YEAR, 5)
+            else -> cal.add(Calendar.YEAR, 2)
+        }
+        return cal.timeInMillis
     }
 
 

@@ -141,6 +141,7 @@ object InAppBillingHandler : KoinComponent {
     private val persistentState by inject<PersistentState>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val secureIdentityStore by inject<SecureIdentityStore>()
+    private val serverOrderHistoryRepo by lazy { ServerOrderHistoryRepository(billingBackendClient) }
 
     private val eventLogger by inject<EventLogger>()
 
@@ -1428,6 +1429,11 @@ object InAppBillingHandler : KoinComponent {
             getProductType = getProductTypeFn,
             getDeviceId = getDeviceIdFn,
             mintDeviceId = mintDeviceIdFn,
+            fetchRecentOneTimeOrder = { token ->
+                serverOrderHistoryRepo.fetchRecentOneTimePurchase(token)
+            },
+            getReconciledTokens = { persistentState.getOrderHistoryReconciledTokens() },
+            markReconciledToken = { token -> persistentState.markOrderHistoryReconciled(token) },
             onAckSuccess = onInAppAckSuccessFn,
             reconcileCidDid = ::reconcileCidDidFromPurchase,
             validatePayloadAndFetchIfRequired = ::validatePayloadAndFetchIfRequired

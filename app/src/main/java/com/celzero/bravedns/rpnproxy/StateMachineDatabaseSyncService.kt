@@ -238,6 +238,22 @@ class StateMachineDatabaseSyncService : KoinComponent {
                     existing.orderId = purchaseDetail.orderId
                     needsUpdate = true
                 }
+                // plan identity/expiry corrections from reconciliation must reach the row
+                if (purchaseDetail.planId.isNotBlank() && existing.planId != purchaseDetail.planId) {
+                    existing.planId = purchaseDetail.planId
+                    needsUpdate = true
+                }
+                if (purchaseDetail.productTitle.isNotBlank() && existing.productTitle != purchaseDetail.productTitle) {
+                    existing.productTitle = purchaseDetail.productTitle
+                    needsUpdate = true
+                }
+                if (purchaseDetail.expiryTime > 0L && purchaseDetail.expiryTime != Long.MAX_VALUE &&
+                    existing.billingExpiry != purchaseDetail.expiryTime
+                ) {
+                    existing.billingExpiry = purchaseDetail.expiryTime
+                    existing.accountExpiry = purchaseDetail.expiryTime
+                    needsUpdate = true
+                }
                 if (needsUpdate) {
                     subscriptionRepository.upsert(existing)
                     Logger.i(LOG_IAB, "$TAG: savePurchaseDetail: updated existing row id=${existing.id} with new data")

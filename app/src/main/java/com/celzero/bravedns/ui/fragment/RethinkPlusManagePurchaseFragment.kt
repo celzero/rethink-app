@@ -615,8 +615,14 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
             InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
             InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
-            else -> fallbackTitle.ifEmpty { productId }
+            else -> resolveUnmappedPlanName(productId, planId, fallbackTitle)
         }
+    }
+
+    // one-time purchase titles are derived durations and can be wrong; prefer the raw plan id
+    private fun resolveUnmappedPlanName(productId: String, planId: String, fallbackTitle: String): String {
+        if (isInAppProduct(productId, planId)) return planId.ifBlank { productId }
+        return fallbackTitle.ifEmpty { productId }
     }
 
     private fun isInAppProduct(productId: String, planId: String): Boolean {
