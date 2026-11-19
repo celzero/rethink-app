@@ -1310,4 +1310,44 @@
     <string name="logs_card_apps_count_label_allowed" translatable="true">Verbrauchte Daten</string>
     <string name="logs_card_apps_count_label_blocked" translatable="true">blockiert</string>
     <string name="logs_card_apps_legend_wifi" translatable="true">WLAN</string>
+    <string name="download_update_dialog_message_play" translatable="true">Eine neue Version der App steht auf Google Play zum Download bereit. Möchtest du fortfahren?</string>
+    <string name="pcap_mode_section_title" translatable="true">Erfassungsmodus</string>
+    <string name="pcap_files_section_title" translatable="true">Erfasste Dateien</string>
+    <string name="pcap_empty_state" translatable="true">Noch keine pcap-Dateien. Dateien, die von der Paketerfassung geschrieben wurden, erscheinen hier.</string>
+    <string name="pcap_delete_file_confirmation" translatable="true">%1$s löschen?</string>
+    <string name="pcap_delete_all_confirmation" translatable="true">Alle erfassten pcap-Dateien löschen? Die aktive Erfassung, falls vorhanden, wird gestoppt.</string>
+    <string name="pcap_file_delete_failed_toast" translatable="true">%1$s konnte nicht gelöscht werden</string>
+    <string name="pcap_active_file_label" translatable="true">Aktive Erfassung</string>
+    <string name="pcap_view_file_desc" translatable="true">pcap Datei ansehen</string>
+    <string name="pcap_open_failed_toast" translatable="true">Kann nicht geöffnet werden</string>
+    <string name="pcap_open_folder" translatable="true">Ordner öffnen</string>
+    <string name="pcap_files_desc" translatable="true">Die Paketerfassung bleibt maximal 3 Stunden aktiv, danach wird sie gestoppt und ausgeschaltet.</string>
+    <string name="logs_card_apps_totals" translatable="true">%1$s WLAN · %2$s mobil</string>
+    <string name="logs_card_apps_legend_mobile" translatable="true">Mobil</string>
+    <string name="logs_card_apps_empty" translatable="true">Noch nichts anzuzeigen</string>
+    <string name="logs_card_pager_desc" translatable="true">Wische um zwischen Aktivität und Top Apps zu wechseln</string>
+    <string name="logs_card_disabled_logs_hint" translatable="true">Schalte Logs ein um kürzliche Aktivität zu sehen</string>
+    <string name="dns_btm_resolved_anonymously" translatable="true">anonym aufgelöst %1$s</string>
+    <string name="dns_btm_info_via" translatable="true">%1$s über %2$s</string>
+    <string name="dns_btm_info_on_device" translatable="true">auf dem Gerät</string>
+    <string name="bsdl_meta_resolver" translatable="true">DNS-Resolver</string>
+    <string name="bsdl_meta_query_type" translatable="true">Abfragetyp</string>
+    <string name="ada_insights_uploaded" description="Label for the total upload volume of a single app in the app info insights view." translatable="true">Hochgeladen</string>
+    <string name="ada_insights_downloaded" description="Label for the total download volume of a single app in the app info insights view." translatable="true">Heruntergeladen</string>
+    <string name="bsac_universal_rule_hint" translatable="true">Für diese Domain oder IP existiert eine universelle Regel.</string>
+    <string name="bsdl_open_app_info" translatable="true">App-Info öffnen</string>
+    <string name="bsdl_meta_app" translatable="true">Anwendung</string>
+    <string name="bsdl_meta_response" translatable="true">Antwort</string>
+    <string name="bsdl_meta_alias" translatable="true">Alias</string>
+    <string name="bsdl_meta_region" translatable="true">Region</string>
+    <string name="bsdl_rule_scope_app_title" translatable="true">Für diese App</string>
+    <string name="bsdl_rule_scope_app_title_fmt" translatable="true">Für %1$s</string>
+    <string name="bsdl_rule_scope_global_title" translatable="true">Für alle Apps</string>
+    <string name="bsdl_rule_status_none" translatable="true">Keine Regel</string>
+    <string name="bsdl_rule_status_blocked" translatable="true">Blockiert</string>
+    <string name="bsdl_rule_status_trusted" translatable="true">Vertraut</string>
+    <string name="brbs_no_file_picker_backup" translatable="true">Kein File Picker verfügbar und der App-Ordner ist unbrauchbar. Backup wurde nicht gespeichert.</string>
+    <string name="brbs_backup_saved_app_folder_warning" translatable="true">Backup wird auf %1$s gespeichert. Dateien hier werden gelöscht, wenn die App deinstalliert wird.</string>
+    <string name="brbs_no_file_picker_restore" translatable="true">Kein File Picker auf diesem Gerät verfügbar.</string>
+    <string name="wg_automation_notif_title" translatable="true">WireGuard Automatisierung</string>
 </resources>
