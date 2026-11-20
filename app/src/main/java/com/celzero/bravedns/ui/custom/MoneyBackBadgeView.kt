@@ -42,13 +42,18 @@ class MoneyBackBadgeView @JvmOverloads constructor(
     private val subTextColor: Int = UIUtils.fetchColor(context, R.attr.primaryLightColorText)
 
     init {
-        contentDescription = "$daysText ${context.getString(R.string.days)} " +
-            "${context.getString(R.string.money_back)} ${context.getString(R.string.money_back_guarantee)}"
+        updateContentDescription()
     }
 
     fun setDays(days: Int) {
         this.daysText = days.toString()
+        updateContentDescription()
         invalidate()
+    }
+
+    private fun updateContentDescription() {
+        contentDescription = "$daysText ${context.getString(R.string.days)} " +
+            "${context.getString(R.string.money_back)} ${context.getString(R.string.money_back_guarantee)}"
     }
 
     override fun onDraw(canvas: Canvas) {
