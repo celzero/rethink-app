@@ -1039,12 +1039,18 @@ class RpnProxyManagerTest : KoinTest {
         return fmt.format(java.util.Date(epochMs)) + ".000Z"
     }
 
-    private fun wsJson(token: String = "tok1", expiryMs: Long? = null, status: String? = null): ByteArray {
+    private fun wsJson(
+        token: String = "tok1",
+        expiryMs: Long? = null,
+        status: String? = null,
+        cid: String = "cid1"
+    ): ByteArray {
         val fields = mutableListOf<String>()
+        if (cid.isNotBlank()) fields.add("\"cid\":\"$cid\"")
         if (token.isNotEmpty()) fields.add("\"sessiontoken\":\"$token\"")
         if (expiryMs != null) fields.add("\"expiry\":\"${isoUtc(expiryMs)}\"")
         if (status != null) fields.add("\"status\":\"$status\"")
-        return """{"cid":"cid1",${fields.joinToString(",")}}""".toByteArray()
+        return """{${fields.joinToString(",")}}""".toByteArray()
     }
 
     @Test
@@ -1688,7 +1694,7 @@ class RpnProxyManagerTest : KoinTest {
     @Test
     fun `registerProxy live registration with local-only entitlement never unregisters`() = runTest {
         stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
-        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns "did-1"
         coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
         coEvery { VpnController.isWinRegistered() } returns true
@@ -1813,7 +1819,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
             makePurchaseDetail("standard.tier", payload = freshServerPayload())
-        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns "did-1"
         coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
         coEvery { VpnController.isWinRegistered() } returns false
@@ -1838,7 +1844,7 @@ class RpnProxyManagerTest : KoinTest {
         coEvery { InAppBillingHandler.resolveDidForServerCalls(any(), any(), false) } returns "did-1"
         coEvery { InAppBillingHandler.queryEntitlementFromServer(any(), any(), any()) } returns
             makePurchaseDetail("standard.tier", payload = "")
-        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns "did-1"
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns "did-1"
         coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult("did-1")
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
 
@@ -1865,12 +1871,35 @@ class RpnProxyManagerTest : KoinTest {
         }
     }
 
-    /** Blank stored DID is re-resolved from the purchase-bound cid before the didForCid check. */
+    /** A nonblank entitlement CID takes precedence over a stale subscription-row CID. */
     @Test
-    fun `registerProxy blank stored DID recovers from purchase cid`() = runTest {
-        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
+    fun `registerProxy blank stored DID recovers from entitlement cid first`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L, cid = "cid-entitlement"))
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
-        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns ""
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns ""
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("cid-entitlement", any(), false) } returns "did-recovered-1"
+        coEvery { mockBillingBackendClient.didForCid("cid-entitlement", true) } returns DidResult("did-recovered-1")
+        coEvery { VpnController.getEntitlementDetails(any(), "did-recovered-1") } returns mockk {
+            every { cid() } returns "cid-entitlement"
+        }
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertTrue(ok)
+        coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("cid-entitlement", any(), false) }
+        coVerify(exactly = 0) { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) }
+        coVerify(exactly = 1) { mockBillingBackendClient.didForCid("cid-entitlement", true) }
+    }
+
+    /** The subscription CID is used only when the entitlement does not contain one. */
+    @Test
+    fun `registerProxy blank stored DID falls back to subscription cid when entitlement cid is blank`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L, cid = ""))
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns ""
         coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) } returns "did-recovered-1"
         coEvery { mockBillingBackendClient.didForCid("acc-reset-1234", true) } returns DidResult("did-recovered-1")
         coEvery { VpnController.getEntitlementDetails(any(), "did-recovered-1") } returns mockk {
@@ -1883,8 +1912,6 @@ class RpnProxyManagerTest : KoinTest {
         val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
 
         assertTrue(ok)
-        // recovery resolved the DID from the subscription row's cid, then registration
-        // proceeded through the normal didForCid binding path
         coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) }
         coVerify(exactly = 1) { mockBillingBackendClient.didForCid("acc-reset-1234", true) }
     }
@@ -1892,8 +1919,8 @@ class RpnProxyManagerTest : KoinTest {
     /** Unrecoverable DID (no subscription row): refusal path, no registration attempt. */
     @Test
     fun `registerProxy blank stored DID that cannot be recovered refuses registration`() = runTest {
-        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
-        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns ""
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L, cid = ""))
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns ""
         coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns null
         coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult.error(-1)
         coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null

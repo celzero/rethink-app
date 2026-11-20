@@ -20,7 +20,9 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2
+import io.mockk.coVerify
 import io.mockk.coEvery
+import io.mockk.slot
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -117,12 +119,65 @@ class OneTimePurchaseProcessorTest {
         assertEquals(storedExpiry, detail?.expiryTime)
     }
 
+    @Test
+    fun `server acknowledgement uses stored cid when Play cid differs`() = runBlocking {
+        val now = System.currentTimeMillis()
+        val token = "token-stored-cid"
+        val playAccountId = "cid-play"
+        val storedAccountId = "cid-stored"
+        val storedDetail = PurchaseDetail(
+            productId = "onetime.tier",
+            planId = "onetime.tier",
+            productTitle = "One-time",
+            state = Purchase.PurchaseState.PURCHASED,
+            planTitle = "One-time",
+            purchaseToken = token,
+            productType = BillingClient.ProductType.INAPP,
+            purchaseTime = "",
+            purchaseTimeMillis = now,
+            isAutoRenewing = false,
+            accountId = storedAccountId,
+            payload = "",
+            expiryTime = now + 86_400_000L,
+            status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
+            windowDays = 0
+        )
+        val machine = mockk<SubscriptionStateMachineV2>(relaxed = true)
+        val mintedFor = mutableListOf<String>()
+        val acknowledgements = mutableListOf<Triple<String, String, String>>()
+        val processor = processor(
+            cachedPlanId = "onetime.tier",
+            storedDetail = storedDetail,
+            fetchOrder = { _, _ -> null },
+            machine = machine,
+            acknowledgePurchase = { accountId, deviceId, purchaseToken, _ ->
+                acknowledgements += Triple(accountId, deviceId, purchaseToken)
+                true to "server-payload"
+            },
+            mintDeviceId = { accountId ->
+                mintedFor += accountId
+                "did-stored"
+            }
+        )
+
+        processor.process(mockPurchase(token, playAccountId, now), shouldEscalateToServer = true)
+
+        assertEquals(listOf(storedAccountId), mintedFor)
+        assertEquals(listOf(Triple(storedAccountId, "did-stored", token)), acknowledgements)
+        val savedDetail = slot<PurchaseDetail>()
+        coVerify(exactly = 1) { machine.paymentSuccessful(capture(savedDetail)) }
+        assertEquals(storedAccountId, savedDetail.captured.accountId)
+    }
+
     private fun processor(
         cachedPlanId: String,
         storedDetail: PurchaseDetail? = null,
-        fetchOrder: suspend (String, String) -> ServerOrderEntry?
+        fetchOrder: suspend (String, String) -> ServerOrderEntry?,
+        machine: SubscriptionStateMachineV2 = mockk(relaxed = true),
+        acknowledgePurchase: suspend (String, String, String, String) -> Pair<Boolean, String> =
+            { _, _, _, _ -> false to "" },
+        mintDeviceId: suspend (String) -> String = { "did-purchase" }
     ): OneTimePurchaseProcessor {
-        val machine = mockk<SubscriptionStateMachineV2>(relaxed = true)
         coEvery { machine.getPersistedInAppPurchaseDetail(any()) } returns storedDetail
         val cachedProduct = ProductDetail(
             productId = "onetime.tier",
@@ -141,11 +196,11 @@ class OneTimePurchaseProcessorTest {
         return OneTimePurchaseProcessor(
             storeProductDetails = CopyOnWriteArrayList(listOf(cachedEntry)),
             subscriptionStateMachine = machine,
-            acknowledgePurchase = { _, _, _, _ -> false to "" },
+            acknowledgePurchase = acknowledgePurchase,
             activateRpn = {},
             getProductType = { BillingClient.ProductType.INAPP },
             getDeviceId = { "did-purchase" },
-            mintDeviceId = { "did-purchase" },
+            mintDeviceId = mintDeviceId,
             fetchRecentOneTimeOrder = fetchOrder,
             reconcileCidDid = {},
             validatePayloadAndFetchIfRequired = { it }
@@ -158,6 +213,7 @@ class OneTimePurchaseProcessorTest {
             every { purchase.purchaseTime } returns purchaseTime
             every { purchase.accountIdentifiers?.obfuscatedAccountId } returns accountId
             every { purchase.purchaseState } returns Purchase.PurchaseState.PURCHASED
+            every { purchase.isAcknowledged } returns false
             every { purchase.purchaseToken } returns token
             every { purchase.developerPayload } returns ""
             every { purchase.orderId } returns "order-test"

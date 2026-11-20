@@ -95,6 +95,11 @@ internal class OneTimePurchaseProcessor(
     // Reapplies exact server corrections during this process; cold starts re-fetch by token.
     private val orderHistoryCorrections = ConcurrentHashMap<String, String>()
 
+    private data class PurchaseCidResolution(
+        val storedDetail: PurchaseDetail?,
+        val accountId: String
+    )
+
     private fun logd(m: String, msg: String) = Logger.d(LOG_IAB, "$TAG $m: $msg")
     private fun loge(m: String, msg: String, e: Exception? = null) =
         Logger.e(LOG_IAB, "$TAG $m: $msg", e)
@@ -112,6 +117,13 @@ internal class OneTimePurchaseProcessor(
      * duplicating the clock-check logic.
      */
     suspend fun buildPurchaseDetail(purchase: Purchase): PurchaseDetail? {
+        return buildPurchaseDetail(purchase, null)
+    }
+
+    private suspend fun buildPurchaseDetail(
+        purchase: Purchase,
+        identity: PurchaseCidResolution?
+    ): PurchaseDetail? {
         val mname = "buildPurchaseDetail"
 
         if (getProductType(purchase) != ProductType.INAPP) {
@@ -119,6 +131,8 @@ internal class OneTimePurchaseProcessor(
             return null
         }
 
+        val resolvedIdentity = identity ?: resolvePurchaseCid(purchase)
+        val storedDetail = resolvedIdentity.storedDetail
         val storeEntry = storeProductDetails.find {
             it.productDetail.productId == purchase.products.firstOrNull() &&
                     it.productDetail.productType == ProductType.INAPP
@@ -138,19 +152,7 @@ internal class OneTimePurchaseProcessor(
             purchase.purchaseTime,
             resolveOneTimeBillingPeriod(planId, productId) ?: "P2Y"
         )
-        val playAccountId = purchase.accountIdentifiers?.obfuscatedAccountId.orEmpty()
-        val storedDetail = subscriptionStateMachine.getPersistedInAppPurchaseDetail(purchase.purchaseToken)
-        val storedAccountId = storedDetail?.accountId.orEmpty()
-        if (playAccountId.isNotBlank() && storedAccountId.isNotBlank() &&
-            playAccountId != storedAccountId
-        ) {
-            Logger.w(
-                LOG_IAB,
-                "$TAG $mname: preserving same-token stored cid=${storedAccountId.take(8)} " +
-                    "over differing Play cid=${playAccountId.take(8)}"
-            )
-        }
-        val accountId = storedAccountId.ifBlank { playAccountId }
+        val accountId = resolvedIdentity.accountId
 
         if (accountId.isEmpty()) {
             loge(mname, "accountId empty for purchase token ${purchase.purchaseToken.take(8)}")
@@ -195,6 +197,22 @@ internal class OneTimePurchaseProcessor(
         Logger.i(LOG_IAB, "$TAG $mname: final detail: planId=${enriched.planId}, title=${enriched.productTitle}, " +
             "expiry=${enriched.expiryTime}, token=${enriched.purchaseToken.take(8)}")
         return enriched
+    }
+
+    private suspend fun resolvePurchaseCid(purchase: Purchase): PurchaseCidResolution {
+        val storedDetail = subscriptionStateMachine.getPersistedInAppPurchaseDetail(purchase.purchaseToken)
+        val playAccountId = purchase.accountIdentifiers?.obfuscatedAccountId.orEmpty()
+        val storedAccountId = storedDetail?.accountId.orEmpty()
+        if (playAccountId.isNotBlank() && storedAccountId.isNotBlank() &&
+            playAccountId != storedAccountId
+        ) {
+            Logger.w(
+                LOG_IAB,
+                "$TAG resolvePurchaseCid: preserving same-token stored cid=${storedAccountId.take(8)} " +
+                    "over differing Play cid=${playAccountId.take(8)}"
+            )
+        }
+        return PurchaseCidResolution(storedDetail, storedAccountId.ifBlank { playAccountId })
     }
 
     private fun preserveStoredPlanAndExpiry(
@@ -397,7 +415,8 @@ internal class OneTimePurchaseProcessor(
         // threshold crossed server acknowledgement required.
         logd(mname, "INAPP token=${purchase.purchaseToken.take(8)} unacknowledged after " +
                 "threshold reached, calling server ack")
-        val accountId = purchase.accountIdentifiers?.obfuscatedAccountId.orEmpty()
+        val purchaseCid = resolvePurchaseCid(purchase)
+        val accountId = purchaseCid.accountId
         // resolve the DID only when a server acknowledgement is required.
         val deviceId = if (purchase.developerPayload.isEmpty()) mintDeviceId(accountId) else ""
         if (accountId.isEmpty()) {
@@ -413,7 +432,7 @@ internal class OneTimePurchaseProcessor(
             else -> acknowledgeWithRetry(accountId, deviceId, purchase)
         }
 
-        val pd = buildPurchaseDetail(purchase)
+        val pd = buildPurchaseDetail(purchase, purchaseCid)
         if (pd == null) {
             logd(mname, "INAPP purchase access window expired during ack; marking expired")
             subscriptionStateMachine.subscriptionExpired(purchase.purchaseToken)

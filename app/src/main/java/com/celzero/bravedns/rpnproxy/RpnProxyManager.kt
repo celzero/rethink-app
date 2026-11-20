@@ -1295,44 +1295,62 @@ object RpnProxyManager : KoinComponent {
                 }
                 isEntitlementBytesAvailable = entitlementBytes != null && entitlementBytes.isNotEmpty()
 
-                if (!isEntitlementBytesAvailable) {
+                val registrationBytes = entitlementBytes
+                if (!isEntitlementBytesAvailable || registrationBytes == null || registrationBytes.isEmpty()) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: win entitlement unavailable after all recovery attempts, cannot register")
                     return false
                 }
 
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
                 var ok = true
-                var storedDid = billingBackendClient.storedIdentityDidForCurrentEnv()
+                var storedDid = billingBackendClient.peekStoredDid()
+                var recoveryCid = ""
+                var recoverySource = "none"
                 if (storedDid.isBlank()) {
-                    // identity store empty/lost (keyset invalidation, persist failure, fresh
-                    // migration); re-resolve the DID from the purchase-bound cid so a blank
-                    // payload cid cannot wedge registration into a permanent retry loop
-                    val sub = try {
-                        subscriptionStatusRepository.getCurrentSubscription()
+                    val entitlementCid = try {
+                        JSONObject(String(registrationBytes)).optString("cid").trim()
                     } catch (e: Exception) {
-                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: did-recovery sub read failed: ${e.message}")
-                        null
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement cid parse failed: ${e.message}")
+                        ""
                     }
-                    val accountId = sub?.accountId.orEmpty()
-                    if (accountId.isNotEmpty()) {
-                        storedDid = resolveDeviceIdForServerCalls(accountId, "registerProxy", surfacing = false).orEmpty()
+                    if (entitlementCid.isNotBlank()) {
+                        recoveryCid = entitlementCid
+                        recoverySource = "entitlement"
+                    } else {
+                        val sub = try {
+                            subscriptionStatusRepository.getCurrentSubscription()
+                        } catch (e: Exception) {
+                            Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: did-recovery sub read failed: ${e.message}")
+                            null
+                        }
+                        recoveryCid = sub?.accountId.orEmpty()
+                        if (recoveryCid.isNotBlank()) recoverySource = "subscription"
+                    }
+                    if (recoveryCid.isNotBlank()) {
+                        storedDid = resolveDeviceIdForServerCalls(recoveryCid, "registerProxy", surfacing = false).orEmpty()
                         Logger.i(
                             LOG_TAG_PROXY,
-                            "$TAG; registerProxy: stored did blank, recovery from cid=${accountId.take(8)} " +
+                            "$TAG; registerProxy: stored did blank, recovery source=$recoverySource " +
+                                "cid=${recoveryCid.take(8)} " +
                                 "resolved=${storedDid.isNotEmpty()}"
+                        )
+                    } else {
+                        Logger.w(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: stored did blank, no purchase cid available for recovery"
                         )
                     }
                 }
                 val payloadCid = if (storedDid.isBlank()) {
                     ""
+                } else if (recoveryCid.isNotBlank()) {
+                    recoveryCid
                 } else {
-                    entitlementBytes?.let { bytes ->
-                        try {
-                            VpnController.getEntitlementDetails(bytes, storedDid)?.cid()
-                        } catch (e: Exception) {
-                            Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: payload cid parse failed: ${e.message}")
-                            null
-                        }
+                    try {
+                        VpnController.getEntitlementDetails(registrationBytes, storedDid)?.cid()
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: payload cid parse failed: ${e.message}")
+                        null
                     }.orEmpty()
                 }
 
@@ -1351,13 +1369,9 @@ object RpnProxyManager : KoinComponent {
                 val deviceId = didResult.deviceId
                 Logger.i(
                     LOG_TAG_PROXY,
-                    "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${entitlementBytes?.size})"
+                    "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${registrationBytes.size})"
                 )
-                val finalBytes = entitlementBytes
-                if (finalBytes == null || finalBytes.isEmpty()) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement bytes unavailable before registration, cannot proceed")
-                    return false
-                }
+                val finalBytes = registrationBytes
                 if (!entitlementFromServer) {
                     val expiryMs = try {
                         parseWsExpiryMs(JSONObject(String(finalBytes)))
