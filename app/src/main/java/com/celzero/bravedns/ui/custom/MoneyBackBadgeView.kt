@@ -36,13 +36,14 @@ class MoneyBackBadgeView @JvmOverloads constructor(
     private val topArcPath = Path()
     private val bottomArcPath = Path()
 
-    private var badgeColor: Int = Color.BLUE
-    private var textColor: Int = Color.WHITE
+    // theme-aware: accent border, theme text colors on the card's own background
+    private val borderColor: Int = UIUtils.fetchColor(context, R.attr.accentGood)
+    private val textColor: Int = UIUtils.fetchColor(context, R.attr.colorOnSurface)
+    private val subTextColor: Int = UIUtils.fetchColor(context, R.attr.primaryLightColorText)
 
     init {
-        badgeColor = UIUtils.fetchColor(context, R.attr.accentGood)
-        alpha = 0.85f
-        textColor = Color.WHITE
+        contentDescription = "$daysText ${context.getString(R.string.days)} " +
+            "${context.getString(R.string.money_back)} ${context.getString(R.string.money_back_guarantee)}"
     }
 
     fun setDays(days: Int) {
@@ -60,7 +61,7 @@ class MoneyBackBadgeView @JvmOverloads constructor(
         val cy = h / 2f
         val radius = cx.coerceAtMost(cy) * 0.95f
 
-        // 1. Draw Seal (Sunburst)
+        // 1. Draw Seal outline (Sunburst border, transparent fill)
         drawSeal(canvas, cx, cy, radius)
 
         // 2. Draw Curved Text
@@ -71,9 +72,10 @@ class MoneyBackBadgeView @JvmOverloads constructor(
     }
 
     private fun drawSeal(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        paint.color = badgeColor
-        paint.style = Paint.Style.FILL
-        
+        paint.color = borderColor
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = radius * 0.05f
+
         val points = 24
         val innerRadius = radius * 0.88f
         sealPath.reset()
@@ -86,30 +88,34 @@ class MoneyBackBadgeView @JvmOverloads constructor(
         }
         sealPath.close()
         canvas.drawPath(sealPath, paint)
+        paint.style = Paint.Style.FILL
     }
 
     private fun drawCurvedText(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        paint.color = textColor
-        paint.textAlign = Paint.Align.CENTER
+        paint.color = subTextColor
+        // drawTextOnPath ignores text alignment; offset by measured width instead
+        paint.textAlign = Paint.Align.LEFT
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        //paint.alpha = 220
-        
+
         val textRadius = radius * 0.70f
-        
+        val halfArc = textRadius * Math.toRadians(170.0).toFloat() / 2f
+
         // MONEY-BACK
-        paint.textSize = radius * 0.16f
+        paint.textSize = radius * 0.18f
+        val moneyBackText = context.getString(R.string.money_back)
+        val moneyBackStart = halfArc - paint.measureText(moneyBackText) / 2f
         topArcPath.reset()
         topArcPath.addArc(cx - textRadius, cy - textRadius, cx + textRadius, cy + textRadius, 185f, 170f)
-        canvas.drawTextOnPath(context.getString(R.string.money_back), topArcPath, 0f, 0f, paint)
+        canvas.drawTextOnPath(moneyBackText, topArcPath, moneyBackStart, 0f, paint)
 
         // GUARANTEE
         // To draw bottom text upright, we use a sweep from 175 back to 5
+        val guaranteeText = context.getString(R.string.money_back_guarantee)
+        val guaranteeStart = halfArc - paint.measureText(guaranteeText) / 2f
         bottomArcPath.reset()
         bottomArcPath.addArc(cx - textRadius, cy - textRadius, cx + textRadius, cy + textRadius, 175f, -170f)
-        // hOffset 0, vOffset 0. Text is drawn on the path. 
-        // We use a small vOffset to push it a bit further from the center if needed.
-        canvas.drawTextOnPath(context.getString(R.string.money_back_guarantee), bottomArcPath, 0f, radius * 0.12f, paint)
-        
+        canvas.drawTextOnPath(guaranteeText, bottomArcPath, guaranteeStart, radius * 0.12f, paint)
+
         // Side Dots
         paint.style = Paint.Style.FILL
         canvas.drawCircle(cx - radius * 0.70f, cy, radius * 0.04f, paint)
@@ -117,16 +123,16 @@ class MoneyBackBadgeView @JvmOverloads constructor(
     }
 
     private fun drawCenterText(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        paint.color = textColor
         paint.textAlign = Paint.Align.CENTER
-        //paint.alpha = 220
-        
+
         // Number
+        paint.color = textColor
         paint.textSize = radius * 0.65f
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         canvas.drawText(daysText, cx, cy + radius * 0.12f, paint)
 
         // DAYS
+        paint.color = subTextColor
         paint.textSize = radius * 0.22f
         canvas.drawText(context.getString(R.string.days).uppercase(), cx, cy + radius * 0.40f, paint)
     }
