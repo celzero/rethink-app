@@ -169,16 +169,64 @@ class OneTimePurchaseProcessorTest {
         assertEquals(storedAccountId, savedDetail.captured.accountId)
     }
 
+    @Test
+    fun `server acknowledgement uses refreshed token detail and keeps resolved cid`() = runBlocking {
+        val now = System.currentTimeMillis()
+        val token = "token-refreshed-detail"
+        val storedAccountId = "cid-stored"
+        val updatedStoredAccountId = "cid-updated"
+        val oldDetail = storedDetail(
+            token = token,
+            accountId = storedAccountId,
+            planId = "proxy-yearly-2",
+            expiryTime = now - 1_000L,
+            purchaseTime = now
+        )
+        val currentDetail = storedDetail(
+            token = token,
+            accountId = updatedStoredAccountId,
+            planId = "proxy-yearly-5",
+            expiryTime = now + 5 * 365 * 24 * 60 * 60 * 1000L,
+            purchaseTime = now
+        )
+        val machine = mockk<SubscriptionStateMachineV2>(relaxed = true)
+        val orderHistoryCids = mutableListOf<String>()
+        val processor = processor(
+            cachedPlanId = "proxy-yearly-2",
+            storedDetails = listOf(oldDetail, currentDetail),
+            fetchOrder = { cid, _ ->
+                orderHistoryCids += cid
+                null
+            },
+            machine = machine,
+            acknowledgePurchase = { _, _, _, _ -> true to "" }
+        )
+
+        processor.process(mockPurchase(token, "cid-play", now), shouldEscalateToServer = true)
+
+        val savedDetail = slot<PurchaseDetail>()
+        coVerify(exactly = 1) { machine.paymentSuccessful(capture(savedDetail)) }
+        assertEquals("proxy-yearly-5", savedDetail.captured.planId)
+        assertEquals(currentDetail.expiryTime, savedDetail.captured.expiryTime)
+        assertEquals(storedAccountId, savedDetail.captured.accountId)
+        assertEquals(listOf(storedAccountId), orderHistoryCids)
+    }
+
     private fun processor(
         cachedPlanId: String,
         storedDetail: PurchaseDetail? = null,
+        storedDetails: List<PurchaseDetail?>? = null,
         fetchOrder: suspend (String, String) -> ServerOrderEntry?,
         machine: SubscriptionStateMachineV2 = mockk(relaxed = true),
         acknowledgePurchase: suspend (String, String, String, String) -> Pair<Boolean, String> =
             { _, _, _, _ -> false to "" },
         mintDeviceId: suspend (String) -> String = { "did-purchase" }
     ): OneTimePurchaseProcessor {
-        coEvery { machine.getPersistedInAppPurchaseDetail(any()) } returns storedDetail
+        if (storedDetails == null) {
+            coEvery { machine.getPersistedInAppPurchaseDetail(any()) } returns storedDetail
+        } else {
+            coEvery { machine.getPersistedInAppPurchaseDetail(any()) } returnsMany storedDetails
+        }
         val cachedProduct = ProductDetail(
             productId = "onetime.tier",
             planId = cachedPlanId,
@@ -206,6 +254,30 @@ class OneTimePurchaseProcessorTest {
             validatePayloadAndFetchIfRequired = { it }
         )
     }
+
+    private fun storedDetail(
+        token: String,
+        accountId: String,
+        planId: String,
+        expiryTime: Long,
+        purchaseTime: Long
+    ) = PurchaseDetail(
+        productId = "onetime.tier",
+        planId = planId,
+        productTitle = planId,
+        state = Purchase.PurchaseState.PURCHASED,
+        planTitle = planId,
+        purchaseToken = token,
+        productType = BillingClient.ProductType.INAPP,
+        purchaseTime = "",
+        purchaseTimeMillis = purchaseTime,
+        isAutoRenewing = false,
+        accountId = accountId,
+        payload = "",
+        expiryTime = expiryTime,
+        status = SubscriptionStatus.SubscriptionState.STATE_ACTIVE.id,
+        windowDays = 0
+    )
 
     private fun mockPurchase(token: String, accountId: String, purchaseTime: Long): Purchase =
         mockk<Purchase>().also { purchase ->

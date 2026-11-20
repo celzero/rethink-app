@@ -432,7 +432,15 @@ internal class OneTimePurchaseProcessor(
             else -> acknowledgeWithRetry(accountId, deviceId, purchase)
         }
 
-        val pd = buildPurchaseDetail(purchase, purchaseCid)
+        val currentStoredDetail = subscriptionStateMachine.getPersistedInAppPurchaseDetail(purchase.purchaseToken)
+            ?.let { detail ->
+                if (purchaseCid.accountId.isBlank()) detail
+                else detail.copy(accountId = purchaseCid.accountId)
+            }
+        val pd = buildPurchaseDetail(
+            purchase,
+            purchaseCid.copy(storedDetail = currentStoredDetail)
+        )
         if (pd == null) {
             logd(mname, "INAPP purchase access window expired during ack; marking expired")
             subscriptionStateMachine.subscriptionExpired(purchase.purchaseToken)
