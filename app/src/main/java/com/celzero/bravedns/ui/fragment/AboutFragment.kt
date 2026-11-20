@@ -1473,10 +1473,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     .setView(container)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("db_dump", tv.text.toString())
+                        val copied = copyToClipboard("db_dump", tv.text.toString())
                         showToastUiCentered(
                             ctx,
-                            getString(R.string.copied_clipboard),
+                            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
                             Toast.LENGTH_SHORT
                         )
                     }.create()
