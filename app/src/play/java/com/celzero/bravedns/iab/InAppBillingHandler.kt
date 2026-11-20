@@ -141,6 +141,7 @@ object InAppBillingHandler : KoinComponent {
     private val persistentState by inject<PersistentState>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val secureIdentityStore by inject<SecureIdentityStore>()
+    private val serverOrderHistoryRepo by lazy { ServerOrderHistoryRepository(billingBackendClient) }
 
     private val eventLogger by inject<EventLogger>()
 
@@ -1428,6 +1429,9 @@ object InAppBillingHandler : KoinComponent {
             getProductType = getProductTypeFn,
             getDeviceId = getDeviceIdFn,
             mintDeviceId = mintDeviceIdFn,
+            fetchRecentOneTimeOrder = { accountId, token ->
+                serverOrderHistoryRepo.fetchRecentOneTimePurchase(accountId, token)
+            },
             onAckSuccess = onInAppAckSuccessFn,
             reconcileCidDid = ::reconcileCidDidFromPurchase,
             validatePayloadAndFetchIfRequired = ::validatePayloadAndFetchIfRequired
@@ -1584,6 +1588,38 @@ object InAppBillingHandler : KoinComponent {
             serverApiErrorLiveData.postValue(
                 ServerApiError.DeviceNotRegistered(entitlementCid, storedCid, ""))
         }
+    }
+
+    /**
+     * Resolves the DID bound to [cid] for server calls, minting one if missing.
+     * Returns null when unresolvable. [surfacing] flows (user-initiated) post sticky
+     * errors; background paths stay silent, trigger recovery/silent retry, and never post.
+     */
+    internal suspend fun resolveDidForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? {
+        val didResult = billingBackendClient.reconcileDidForCid(cid)
+        if (didResult.isSuccess) return didResult.deviceId
+        if (surfacing) {
+            if (didResult.errorCode == 401) {
+                handleUnauthorized401(ServerApiError.Operation.DEVICE, cid, "")
+            } else {
+                postDeviceNotRegisteredError(cid, didResult.errorCode)
+            }
+        } else if (didResult.errorCode == 401) {
+            // recover the identity without posting the sticky auth error from background paths
+            try {
+                billingBackendClient.recoverIdentityAfterAuthFailure(cid)
+            } catch (e: Exception) {
+                logw(caller, "identity recovery after 401 failed: ${e.message}")
+            }
+        } else if (isDefinitiveDidFailure(didResult.errorCode)) {
+            scheduleAckRetryAndAlert(cid, alert = false)
+        }
+        logw(caller, "did unavailable (code=${didResult.errorCode}, surfacing=$surfacing) for cid=${cid.take(8)}")
+        return null
     }
 
     /** Queues a one-shot registration re-check for the freshly claimed identity. */
@@ -1812,8 +1848,12 @@ object InAppBillingHandler : KoinComponent {
         }
         return PurchaseDetail(
             productId = productId,
-            planId = storeEntry?.oneTimeOfferDetails?.purchaseOptionId ?: productId,
-            productTitle = storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId)),
+            planId = productId,
+            productTitle = if (productId == ONE_TIME_PRODUCT_ID) {
+                storeEntry?.productDetails?.title ?: productId
+            } else {
+                storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId))
+            },
             planTitle = storeEntry?.productDetail?.productTitle.orEmpty(),
             state = purchase.purchaseState,
             purchaseToken = purchase.purchaseToken,

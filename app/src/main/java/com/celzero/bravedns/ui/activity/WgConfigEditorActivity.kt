@@ -186,19 +186,19 @@ class WgConfigEditorActivity : BaseActivity(R.layout.activity_wg_config_editor) 
         b.dismissBtn.setOnClickListener { finish() }
 
         b.publicKeyLabelLayout.setOnClickListener {
-            clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            val copied = clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
-                getString(R.string.public_key_copy_toast_msg),
+                getString(if (copied) R.string.public_key_copy_toast_msg else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }
 
         b.publicKeyText.setOnClickListener {
-            clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            val copied = clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
-                getString(R.string.public_key_copy_toast_msg),
+                getString(if (copied) R.string.public_key_copy_toast_msg else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }

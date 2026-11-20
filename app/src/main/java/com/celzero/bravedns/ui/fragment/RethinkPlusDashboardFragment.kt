@@ -309,10 +309,12 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun copyWhoToClipboard() {
         val text = b.tvHeroWho.text?.toString().orEmpty()
         if (text.isBlank()) return
-        val clipboard =
-            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
-        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+        val copied = UIUtils.clipboardCopy(requireContext(), text, "who")
+        showToastUiCentered(
+            requireContext(),
+            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     /**
@@ -606,8 +608,24 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
             InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
             InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
-            else -> fallbackTitle.ifEmpty { productId }
+            else -> resolveUnmappedPlanName(productId, planId, fallbackTitle)
         }
+    }
+
+    private fun isInAppProduct(productId: String, planId: String): Boolean {
+        val inAppIds = setOf(
+            InAppBillingHandler.ONE_TIME_PRODUCT_ID,
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS,
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS,
+            InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID
+        )
+        return productId in inAppIds || planId in inAppIds
+    }
+
+    // one-time purchase titles are derived durations and can be wrong; prefer the raw plan id
+    private fun resolveUnmappedPlanName(productId: String, planId: String, fallbackTitle: String): String {
+        if (isInAppProduct(productId, planId)) return planId.ifBlank { productId }
+        return fallbackTitle.ifEmpty { productId }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) =

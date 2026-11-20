@@ -51,6 +51,7 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
@@ -519,7 +520,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             NOTIF_ID_SSID_LOCATION_PERMISSION,
             builder.build()

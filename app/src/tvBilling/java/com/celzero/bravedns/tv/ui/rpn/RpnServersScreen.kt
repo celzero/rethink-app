@@ -335,6 +335,7 @@ private fun InfoBanner(text: String) {
 
 /** Builds the AUTO + country-grouped model from the RPN catalog. */
 private suspend fun loadServersUi(): ServersUi = withContext(Dispatchers.IO) {
+    ensureWinRegisteredForUi()
     val servers = try {
         RpnProxyManager.getWinServers()
     } catch (_: Exception) {

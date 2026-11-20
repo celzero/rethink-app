@@ -52,7 +52,6 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -159,6 +158,7 @@ import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
@@ -335,8 +335,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         private const val HEATMAP_GRID_ROWS = 6
         private const val HEATMAP_GRID_HEIGHT_DP = 60
-
-        private const val HEATMAP_CELL_OVAL_RATIO = 2f
 
         // fraction of the max cell size per intensity level
         private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.30f, 0.78f, 0.78f, 1f, 1f)
@@ -1368,11 +1366,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardBlockedLogsCount.visibility = View.GONE
         logsPage.fhsCardBlockedLogsLabel.visibility = View.GONE
         logsPage.fhsCardLogsDuration.visibility = View.GONE
-        // heatmap (grid + its hour axis and legend) carries no data when
-        // logging is off
+        // heatmap (grid + its hour axis) carries no data when logging is off
         logsPage.fhsLogsHourAxis.visibility = View.GONE
         logsPage.fhsLogsGrid.visibility = View.GONE
-        logsPage.fhsLogsLegend.visibility = View.GONE
         // allowed/blocked chips only make sense on an active card; when the
         // logging preference is off they give way to an inline enable chip
         logsPage.fhsLogsToggleGroup.visibility = View.GONE
@@ -1625,7 +1621,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         topAppsPage.root.setOnClickListener { openNetworkLogs() }
 
         topAppsPage.fhsTopAppsHistogram.setLightTheme(isLightTheme())
-        applyTopAppsLegendColors()
         topAppsPage.fhsTopAppsHistogram.onEntrySelected = { entry ->
             showTopAppsEntry(entry)
         }
@@ -1760,7 +1755,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 topAppsHeaderRevertJob?.cancel()
                 topAppsHeaderRevertJob = null
                 topAppsPage.fhsTopAppsHistogram.submit(entries, blocked)
-                applyTopAppsLegendColors()
                 topAppsPage.fhsTopAppsEmpty.isVisible = entries.isEmpty()
                 topAppsPage.fhsTopAppsHistogram.isVisible = entries.isNotEmpty()
                 renderTopAppsHeader(null)
@@ -1841,7 +1835,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * wall's header: two value-over-label stacks (Wi-Fi, Mobile data) in
      * allowed mode, a single total stack in blocked mode. With no selection
      * the values are the window totals; a tapped slot temporarily swaps in
-     * that app's values and names it in the window caption below.
+     * that app's values and names it in the window caption.
      */
     private fun renderTopAppsHeader(entry: AppHistogramView.Entry?) {
         if (view == null || !isAdded) return
@@ -1892,7 +1886,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (entry == null) return
 
         topAppsHeaderRevertJob = lifecycleScope.launch {
-            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS)
+            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS.milliseconds)
             if (isAdded && view != null) renderTopAppsHeader(null)
         }
     }
@@ -1912,20 +1906,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (unit == "GB" || unit == "TB") String.format(Locale.ROOT, "%.1f", v)
             else String.format(Locale.ROOT, "%.0f", v)
         return getString(R.string.two_argument_no_space, text, unit)
-    }
-
-    /**
-     * Tints the Wi-Fi / mobile-data legend glyphs with the exact segment
-     * colors the histogram draws, so the color key always matches the bars.
-     */
-    private fun applyTopAppsLegendColors() {
-        if (view == null || !isAdded) return
-
-        val histogram = topAppsPage.fhsTopAppsHistogram
-        topAppsPage.fhsTopAppsSwatchWifi.imageTintList =
-            ColorStateList.valueOf(histogram.unmeteredColor())
-        topAppsPage.fhsTopAppsSwatchMobile.imageTintList =
-            ColorStateList.valueOf(histogram.meteredColor())
     }
 
     /**
@@ -2080,8 +2060,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
             else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
         val gap = (2f * resources.displayMetrics.density).toInt()
-        val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
-        val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val designPitch =
+            (HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density -
+                HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val gridWidthPx =
+            if (grid.width > 0) grid.width.toFloat()
+            else resources.displayMetrics.widthPixels - 48f * resources.displayMetrics.density
+        val cellPitch = min(designPitch, gridWidthPx / LogActivityAggregator.HOURS_IN_WINDOW)
 
         // iterate hour-major so each visual column holds one hour: cells are
         // added bucket-by-bucket across the columns (GridLayout auto-places
@@ -2118,8 +2103,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 val lp =
                     GridLayout.LayoutParams().apply {
-                        width = (cellBaseHeight * frac).toInt()
-                        height = (cellBaseHeight * frac).toInt()
+                        width = (cellPitch * frac).toInt()
+                        height = (cellPitch * frac).toInt()
                         columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         setMargins(gap, gap, gap, gap)
@@ -2128,30 +2113,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 cell.layoutParams = lp
                 grid.addView(cell)
             }
-        }
-
-        val swatches =
-            listOf(
-                logsPage.fhsLogsSwatch0,
-                logsPage.fhsLogsSwatch1,
-                logsPage.fhsLogsSwatch2,
-                logsPage.fhsLogsSwatch3
-            )
-        val legendLevels = intArrayOf(0, 2, 3, 4)
-        val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
-        val legendBaseH = 3f * resources.displayMetrics.density
-        swatches.forEachIndexed { i, swatch ->
-            val frac = HEATMAP_CELL_SIZE_FRACTION[legendLevels[i]]
-            swatch.background =
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(ColorUtils.setAlphaComponent(base, legendAlphas[i]))
-                }
-            swatch.layoutParams =
-                LinearLayout.LayoutParams(
-                    (legendBaseH * HEATMAP_CELL_OVAL_RATIO * frac).toInt(),
-                    (legendBaseH * frac).toInt()
-                ).apply { gravity = Gravity.CENTER_VERTICAL }
         }
 
         renderLogsHeaderCount(state)
@@ -2194,8 +2155,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 lastGridTouchX
             }
+        // same pitch the grid uses to size cells: grid width per hour column
         val col =
-            ((x / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+            (x / (grid.width / LogActivityAggregator.HOURS_IN_WINDOW.toFloat())).toInt()
                 .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
         val row =
             ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
@@ -2449,7 +2411,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardLogsDuration.visibility = View.VISIBLE
         logsPage.fhsLogsGrid.visibility = View.VISIBLE
         logsPage.fhsLogsHourAxis.visibility = View.VISIBLE
-        logsPage.fhsLogsLegend.visibility = View.VISIBLE
         logsPage.fhsLogsToggleGroup.visibility = View.VISIBLE
         // expand the pager back; the transition grows the card smoothly so
         animateLogsCardTransition(animateTransition)

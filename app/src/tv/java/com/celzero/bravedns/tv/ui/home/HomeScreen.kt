@@ -37,6 +37,8 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
@@ -72,6 +75,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.database.DnsLogRepository
+import com.celzero.bravedns.service.PauseTimer
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -100,10 +104,14 @@ import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import org.koin.compose.koinInject
 import kotlinx.coroutines.delay
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 private const val HOUR_MILLIS = 60L * 60L * 1000L
 private const val DAY_MILLIS = 24L * HOUR_MILLIS
 private const val REFRESH_INTERVAL_MILLIS = 60_000L
+private const val PAUSE_ROUTE = "settings/pause"
+private const val FOCUS_REQUEST_ATTEMPTS = 20
+private const val FOCUS_REQUEST_RETRY_MS = 50L
 
 /**
  * Selectable look-back window for the network-activity panel.
@@ -156,7 +164,9 @@ private data class HomeEvent(
  *    status modules (DNS / Firewall / Proxy, with WireGuard names
  *    folded into the Proxy detail) fed by the same upstream
  *    observables the rest of the app uses.
- *  * **Quick actions** — four shortcut cards into the control
+ *  * **Quick actions** — action cards that mutate protection state
+ *    (Pause/Resume, extensible to further actions).
+ *  * **Shortcuts** — four navigation cards into the control
  *    surfaces (DNS, Firewall, Proxy, Apps).
  *  * **Network activity** — the visual centerpiece: a focusable
  *    panel with the selected-window stat line over a three-wave
@@ -344,7 +354,15 @@ fun HomeScreen(navController: NavController? = null) {
             },
         )
 
-        QuickActionsSection(onNavigate = { dest -> navController?.navigate(dest.route) })
+        QuickActionsSection(
+            tunnelUp = isOn,
+            onPauseSelected = { navController?.navigate(PAUSE_ROUTE) },
+            onResume = {
+                PauseTimer.stop()
+                VpnController.resumeApp()
+            },
+        )
+        ShortcutsSection(onNavigate = { dest -> navController?.navigate(dest.route) })
 
         NetworkActivitySection(
             usage = usage,
@@ -386,8 +404,12 @@ private fun ProtectionHero(
     onToggle: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(isOn) {
-        runCatching { focusRequester.requestFocus() }
+    // First request throws mid-transition; retry until it lands.
+    LaunchedEffect(Unit) {
+        repeat(FOCUS_REQUEST_ATTEMPTS) {
+            if (runCatching { focusRequester.requestFocus() }.isSuccess) return@LaunchedEffect
+            delay(FOCUS_REQUEST_RETRY_MS)
+        }
     }
     // Proxy endpoint rows can persist in the DB while the tunnel is
     // down — gate on isOn so a selected-but-idle proxy reads Standby.
@@ -456,8 +478,11 @@ private fun ProtectionHero(
                     TvButton(
                         text = if (isOn) "Stop protection" else "Start protection",
                         onClick = onToggle,
-                        containerColor = if (isOn) TvColors.Error else TvColors.Secondary,
-                        contentColor = if (isOn) TvColors.OnError else TvColors.OnSecondary,
+                        // State color lives on the highlight; rest stays muted.
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        focusedContainerColor = if (isOn) TvColors.Error else TvColors.Secondary,
+                        focusedContentColor = if (isOn) TvColors.OnError else TvColors.OnSecondary,
                         textStyle = MaterialTheme.typography.titleMedium
                             .copy(fontWeight = FontWeight.Bold),
                         contentPadding = PaddingValues(horizontal = 28.dp, vertical = 14.dp),
@@ -637,20 +662,61 @@ private fun timeLabels(range: TimeRange): List<String> {
 }
 
 /**
+ * Action cards that mutate protection state; currently Pause/Resume.
+ * Pause routes to the Pause screen so nothing un-filters until a
+ * duration is picked there.
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun QuickActionsSection(
+    tunnelUp: Boolean,
+    onPauseSelected: () -> Unit,
+    onResume: () -> Unit,
+) {
+    val remaining by rememberAsImmutableState(
+        liveData = VpnController.getPauseCountDownObserver() ?: MutableLiveData(0L),
+        initial = 0L,
+    ) { it ?: 0L }
+    val paused = VpnController.isAppPaused() && remaining > 0L
+    Column(verticalArrangement = Arrangement.spacedBy(TvSpacing.HeaderGap)) {
+        TvSectionHeader(text = "Quick actions")
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            TvQuickActionCard(
+                icon = if (paused) Icons.Filled.PlayCircleOutline else Icons.Filled.Pause,
+                title = if (paused) {
+                    "Resume · ${formatPauseCountdown(remaining)}"
+                } else {
+                    "Pause protection"
+                },
+                accent = TvColors.Secondary,
+                accentContainer = TvColors.SecondaryContainer,
+                onClick = if (paused) onResume else onPauseSelected,
+                enabled = tunnelUp,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/** mm:ss countdown for the Resume card, matching PauseVpnScreen. */
+private fun formatPauseCountdown(remainingMs: Long): String {
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingMs)
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingMs) % 60
+    return String.format("%02d:%02d", minutes, seconds)
+}
+
+/**
  * Four shortcut cards into the control surfaces. One coherent neutral
  * card system; only the icon chips carry the module accent.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun QuickActionsSection(onNavigate: (TvDestination) -> Unit) {
+private fun ShortcutsSection(onNavigate: (TvDestination) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(TvSpacing.HeaderGap)) {
-        TvSectionHeader(text = "Quick actions")
-        Text(
-            text = "Shortcuts to manage your protection",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = 4.dp, bottom = TvSpacing.HeaderGap),
-        )
+        TvSectionHeader(text = "Shortcuts")
         Row(
             horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
             modifier = Modifier.fillMaxWidth(),

@@ -72,6 +72,7 @@ import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusDao
 import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.AUTO_SERVER_ID
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.MAX_WIN_SERVERS
@@ -418,7 +419,9 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         setupSwipeToRefresh()
         loadRpnHeatmap()
         // Center the QS pill row once its real (measured) width is known.
-        b.quickSettingsPills.post { if (view != null) alignQuickSettingsPills() }
+        b.quickSettingsPills.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            alignQuickSettingsPills()
+        }
 
         // Show the correct FAB immediately (no animation on first load).
         if (isProxyStopped) {
@@ -1872,23 +1875,43 @@ class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
         if (!DEBUG) return
         b.qsRemoteServiceTile.isVisible = true
         b.qsRemoteServiceTile.setOnClickListener { showRemoteServiceSheet() }
+        revealRemoteServiceTile()
         refreshRemoteServiceTileState()
     }
 
     private fun refreshRemoteServiceTileState() {
         if (!DEBUG) return
         io {
-            val status = try {
-                VpnController.remoteServiceStatus()
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_UI, "$TAG.refreshRemoteServiceTileState: ${e.message}")
-                null
+            val statuses = GoVpnAdapter.RemoteServiceType.entries.map { type ->
+                try {
+                    VpnController.remoteServiceStatus(type)
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_UI, "$TAG.refreshRemoteServiceTileState: ${e.message}")
+                    null
+                }
+            }
+            val anyRunning = statuses.any {
+                it == GoVpnAdapter.SVC_OK || it == GoVpnAdapter.SVC_NOT_OK
             }
             uiCtx {
                 if (!isAdded) return@uiCtx
                 b.qsRemoteServiceState.text =
-                    if (status != null && status != -2) getString(R.string.lbl_on) else getString(R.string.lbl_off)
+                    if (anyRunning) getString(R.string.lbl_on) else getString(R.string.lbl_off)
+                val color = resolveAttrColor(
+                    if (anyRunning) R.attr.chipTextPositive else R.attr.primaryLightColorText
+                )
+                b.qsRemoteServiceIcon.imageTintList = ColorStateList.valueOf(color)
+                b.qsRemoteServiceIcon.alpha = if (anyRunning) 1f else 0.5f
+                b.qsRemoteServiceLabel.setTextColor(color)
+                b.qsRemoteServiceState.setTextColor(color)
             }
+        }
+    }
+
+    private fun revealRemoteServiceTile() {
+        b.quickSettingsRow.post {
+            val overflow = b.quickSettingsPills.measuredWidth - b.quickSettingsRow.width
+            if (overflow > 0) b.quickSettingsRow.smoothScrollTo(overflow, 0)
         }
     }
 

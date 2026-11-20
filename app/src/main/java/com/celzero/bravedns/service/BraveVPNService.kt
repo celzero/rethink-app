@@ -16,10 +16,6 @@
  */
 package com.celzero.bravedns.service
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
-import com.celzero.bravedns.util.Logger.LOG_TAG_CONNECTION
-import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
@@ -70,11 +66,11 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.database.CountryConfig
 import com.celzero.bravedns.database.EventSource
 import com.celzero.bravedns.database.EventType
 import com.celzero.bravedns.database.RefreshDatabase
+import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.net.go.GoVpnAdapter
@@ -83,12 +79,12 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.receiver.UserPresentReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.RpnType
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.scheduler.RpnProxyUpdateWorker
 import com.celzero.bravedns.scheduler.WgProxyPingController
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.tunnel.TunDnsManager
-
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -108,10 +104,15 @@ import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_BATCH_LOGGER
+import com.celzero.bravedns.util.Logger.LOG_TAG_CONNECTION
+import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -495,17 +496,25 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.getPlusTransportById(transportId)
     }
 
-    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
+    suspend fun startRemoteService(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
         if (!DEBUG) return null
-        return vpnAdapter?.startRemoteService()
+        return vpnAdapter?.startRemoteService(type)
     }
 
-    suspend fun stopRemoteService() {
-        vpnAdapter?.stopRemoteService()
+    suspend fun stopRemoteService(type: GoVpnAdapter.RemoteServiceType) {
+        vpnAdapter?.stopRemoteService(type)
     }
 
-    suspend fun remoteServiceStatus(): Int? {
-        return vpnAdapter?.remoteServiceStatus()
+    suspend fun stopAllRemoteServices() {
+        vpnAdapter?.stopAllRemoteServices()
+    }
+
+    suspend fun remoteServiceStatus(type: GoVpnAdapter.RemoteServiceType): Int? {
+        return vpnAdapter?.remoteServiceStatus(type)
+    }
+
+    fun remoteServiceInfo(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return vpnAdapter?.remoteServiceInfo(type)
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor, fid: Long, addrPort: String): Boolean {
@@ -880,6 +889,39 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         val channel = NotificationChannel(MAIN_CHANNEL_ID, name, importance)
         channel.description = resources.getString(R.string.notif_channel_desc_vpn_notification)
         notificationManager.createNotificationChannel(channel)
+        // system_server crashes the app in startForeground if the channel is missing; retry once
+        if (notificationManager.getNotificationChannel(MAIN_CHANNEL_ID) == null) {
+            Logger.w(LOG_TAG_VPN, "main notification channel missing after create, retrying")
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    // fall back to the app or a system icon if the notification icon is unresolvable
+    @Volatile
+    private var resolvedSmallIcon: Int = 0
+
+    private fun smallIconOrFallback(): Int {
+        resolvedSmallIcon.takeIf { it != 0 }?.let { return it }
+        val candidates =
+            intArrayOf(
+                R.drawable.ic_notification_icon,
+                applicationInfo.icon,
+                android.R.drawable.ic_dialog_info
+            )
+        for (res in candidates) {
+            if (res == 0) continue
+            try {
+                if (ContextCompat.getDrawable(this, res) != null) {
+                    resolvedSmallIcon = res
+                    return res
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_VPN, "notif icon $res unresolvable: ${e.message}")
+            }
+        }
+        // system icon is the only resource guaranteed to resolve
+        resolvedSmallIcon = android.R.drawable.ic_dialog_info
+        return resolvedSmallIcon
     }
 
     // bare notification for the initial foreground promotion; must not resolve Koin
@@ -894,7 +936,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 mutable = false
             )
         return NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setSmallIcon(smallIconOrFallback())
             .setContentIntent(pendingIntent)
             .setContentTitle(resources.getString(R.string.app_name))
             .build()
@@ -930,7 +972,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         if (isAppPaused()) {
             contentTitle = resources.getString(R.string.pause_mode_notification_title)
         }
-        builder.setSmallIcon(R.drawable.ic_notification_icon).setContentIntent(pendingIntent)
+        builder.setSmallIcon(smallIconOrFallback()).setContentIntent(pendingIntent)
         builder.setContentTitle(contentTitle)
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
 
@@ -1124,7 +1166,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             NOTIF_ID_ACCESSIBILITY_FAILURE,
             builder.build()
@@ -1224,7 +1266,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         // swap in the rich notification; the foreground contract is already satisfied
         try {
-            notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+            notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err updating fg notification: ${e.message}", e)
         }
@@ -1555,7 +1597,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     setTunMode()
                     updateDnsAlg()
                 }
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.LOCAL_BLOCK_LIST -> {
@@ -1640,7 +1682,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 io("proxy") {
                     handleProxyChange()
                 }
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.NETWORK -> {
@@ -1649,12 +1691,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
 
             PersistentState.NOTIFICATION_ACTION -> {
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.BIOMETRIC_AUTH -> {
                 // update the notification builder to show the action buttons based on the biometric
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.INTERNET_PROTOCOL -> {
@@ -1719,7 +1761,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             PersistentState.NOTIFICATION_PERMISSION -> {
                 if (persistentState.shouldRequestNotificationPermission) {
                     Logger.i(LOG_TAG_VPN, "notification permission allowed, show notification")
-                    notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                    notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
                 } else {
                     // no-op
                 }
@@ -2998,7 +3040,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 .setContentIntent(pendingIntent)
                 // Open the main UI if possible.
                 .setAutoCancel(true)
-            notificationManager.notify(0, builder.build())
+            notificationManager.notifySafely(0, builder.build())
         }
     }
 
@@ -3075,7 +3117,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
             builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
-            notificationManager.notify(IP_MISMATCH_NOTIFICATION_ID, builder.build())
+            notificationManager.notifySafely(IP_MISMATCH_NOTIFICATION_ID, builder.build())
         }
     }
 
@@ -3202,7 +3244,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private fun handleVpnServiceOnAppStateChange() { // paused or resumed
         val reason = if (isAppPaused()) "pause" else "resume"
         vpnRestartTrigger.value = reason
-        ui { notificationManager.notify(SERVICE_ID, updateNotificationBuilder()) }
+        ui { notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder()) }
     }
 
     // The VPN service and tun2socks must agree on the layout of the network.  By convention, we
@@ -3592,12 +3634,53 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             // Broadcast
             ipsToExclude.add(IPUtil.CIDR("224.0.0.0", 3))
 
+            // https://en.wikipedia.org/wiki/Mobile_country_code
+            val config = resources.configuration
+            // for WiFi calling, Verizon, T-Mobile, Germany Telefónica, SFR France
+            if (config.mcc == 310 && (config.mnc == 160 || config.mnc == 200 || config.mnc == 210 ||
+                        config.mnc == 220 || config.mnc == 230 || config.mnc == 240 ||
+                        config.mnc == 250 || config.mnc == 260 || config.mnc == 270 ||
+                        config.mnc == 310 || config.mnc == 490 || config.mnc == 660 ||
+                        config.mnc == 800)) {
+                ipsToExclude.add(IPUtil.CIDR("66.94.2.0", 24))
+                ipsToExclude.add(IPUtil.CIDR("66.94.6.0", 23))
+                ipsToExclude.add(IPUtil.CIDR("66.94.8.0", 22))
+                ipsToExclude.add(IPUtil.CIDR("208.54.0.0", 16))
+            }
+
+            if ((config.mcc == 310 && (config.mnc == 4 || config.mnc == 5 || config.mnc == 6 ||
+                        config.mnc == 10 || config.mnc == 12 || config.mnc == 13 ||
+                        config.mnc == 350 || config.mnc == 590 || config.mnc == 820 ||
+                        config.mnc == 890 || config.mnc == 910)) ||
+                        (config.mcc == 311 && (config.mnc == 12 || config.mnc == 110 ||
+                        (config.mnc in 270..289) || config.mnc == 390 ||
+                        (config.mnc in 480..489) || config.mnc == 590)) ||
+                        (config.mcc == 312 && (config.mnc == 770))) {
+                ipsToExclude.add(IPUtil.CIDR("66.174.0.0", 16)) // 66.174.0.0 - 66.174.255.255
+                ipsToExclude.add(IPUtil.CIDR("66.82.0.0", 15)) // 69.82.0.0 - 69.83.255.255
+                ipsToExclude.add(IPUtil.CIDR("69.96.0.0", 13)) // 69.96.0.0 - 69.103.255.255
+                ipsToExclude.add(IPUtil.CIDR("70.192.0.0", 11)) // 70.192.0.0 - 70.223.255.255
+                ipsToExclude.add(IPUtil.CIDR("97.128.0.0", 9)) // 97.128.0.0 - 97.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("174.192.0.0", 9)) // 174.192.0.0 - 174.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("72.96.0.0", 9)) // 72.96.0.0 - 72.127.255.255
+                ipsToExclude.add(IPUtil.CIDR("75.192.0.0", 9)) // 75.192.0.0 - 75.255.255.255
+                ipsToExclude.add(IPUtil.CIDR("97.0.0.0", 10)) // 97.0.0.0 - 97.63.255.255
+            }
+
+            if (config.mnc == 10 && config.mcc == 208)
+                ipsToExclude.add(IPUtil.CIDR("10.151.0.0", 24))
+
+            if (config.mnc == 3 && config.mcc == 262) {
+                ipsToExclude.add(IPUtil.CIDR("213.20.0.0", 16))
+                ipsToExclude.add(IPUtil.CIDR("62.52.0.0", 14))
+            }
+
             ipsToExclude.sort()
 
             try {
                 var start: InetAddress? = InetAddress.getByName(Constants.UNSPECIFIED_IP_IPV4)
                 ipsToExclude.forEach { exclude ->
-                    val include = IPUtil.toCIDR(start, IPUtil.minus1(exclude.start)!!)
+                    val include = IPUtil.toCIDR(start, IPUtil.minus1(exclude.start))
                     include?.forEach {
                         try {
                             it.address?.let { it1 -> b.addRoute(it1, it.prefix) }
@@ -3605,7 +3688,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                             Logger.e(LOG_TAG_VPN, "exception while adding route: ${ex.message}", ex)
                         }
                     }
-                    start = IPUtil.plus1(exclude.end)
+                    val next = IPUtil.plus1(exclude.end)
+                    if (IPUtil.toLong(next) > IPUtil.toLong(start)) start = next
                 }
             } catch (ex: SocketException) {
                 Logger.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
@@ -4405,7 +4489,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(MEMORY_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(MEMORY_NOTIFICATION_ID, builder.build())
     }
 
     override fun onRevoke() {
@@ -4482,8 +4566,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         return vpnAdapter?.unregisterWin() == true
     }
 
-    suspend fun updateWin(): ByteArray? {
-        return vpnAdapter?.updateWin()
+    suspend fun updateWin(): WinUpdateResult {
+        return vpnAdapter?.updateWin() ?: WinUpdateResult.Failed("no vpn adapter")
     }
 
     suspend fun onRpnOptsChange() {
@@ -4730,10 +4814,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
     suspend fun getAllTraceLogsAsBytes(): ByteArray? {
         return vpnAdapter?.getAllTraceLogsAsBytes()
-    }
-
-    suspend fun getTraceCount(): Long {
-        return vpnAdapter?.getTraceCount() ?: 0L
     }
 
     fun screenLock() {

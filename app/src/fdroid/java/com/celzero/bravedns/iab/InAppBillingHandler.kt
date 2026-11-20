@@ -37,6 +37,7 @@ object InAppBillingHandler {
     const val ONE_TIME_PRODUCT_2YRS = "proxy-yearly-2"
     const val ONE_TIME_PRODUCT_5YRS = "proxy-yearly-5"
     const val ONE_TIME_TEST_PRODUCT_ID = "test_product"
+
     const val SUBS_PRODUCT_MONTHLY = "proxy-monthly"
     const val SUBS_PRODUCT_YEARLY = "proxy-yearly"
 
@@ -177,6 +178,14 @@ object InAppBillingHandler {
     @Suppress("UNUSED_PARAMETER")
     fun postDeviceNotRegisteredError(entitlementCid: String, didErrorCode: Int) { /* no-op */ }
 
+    /** Returns null always: F-Droid build has no billing server to resolve DIDs against. */
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun resolveDidForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? = null
+
     /** Returns the unchanged [purchase]: F-Droid build has no server entitlements. */
     @Suppress("UNUSED_PARAMETER")
     suspend fun queryEntitlementFromServer(
@@ -192,7 +201,6 @@ object InAppBillingHandler {
     /** Returns an empty byte array: F-Droid build has no test purchase payload. */
     fun getTestPurchasePayloadBytes(): ByteArray = ByteArray(0)
 }
-
 
 
 

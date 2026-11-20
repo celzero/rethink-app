@@ -83,6 +83,8 @@ import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
  * [containerColor] / [contentColor] to render a state-colored CTA
  * (e.g. red Stop / teal Start); focused and pressed keep the
  * primaryContainer treatment so focus feedback stays consistent.
+ * [focusedContainerColor] / [focusedContentColor] override the
+ * focused+pressed fill.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -95,6 +97,8 @@ fun TvButton(
     leadingIcon: ImageVector? = null,
     containerColor: Color? = null,
     contentColor: Color? = null,
+    focusedContainerColor: Color? = null,
+    focusedContentColor: Color? = null,
     textStyle: TextStyle = MaterialTheme.typography.labelLarge,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 ) {
@@ -117,10 +121,14 @@ fun TvButton(
             ButtonDefaults.colors(
                 containerColor = containerColor ?: MaterialTheme.colorScheme.primary,
                 contentColor = contentColor ?: MaterialTheme.colorScheme.onPrimary,
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                focusedContainerColor = focusedContainerColor
+                    ?: MaterialTheme.colorScheme.primaryContainer,
+                focusedContentColor = focusedContentColor
+                    ?: MaterialTheme.colorScheme.onPrimaryContainer,
+                pressedContainerColor = focusedContainerColor
+                    ?: MaterialTheme.colorScheme.primaryContainer,
+                pressedContentColor = focusedContentColor
+                    ?: MaterialTheme.colorScheme.onPrimaryContainer,
                 disabledContainerColor = TvColors.DisabledContainer,
                 disabledContentColor = TvColors.DisabledContent,
             )
@@ -506,7 +514,8 @@ fun TvStatusModule(
  * module accent — [accent] tints the icon, [accentContainer] fills
  * the chip at container strength. On focus the whole card lifts to
  * the primary container with bright content: tonal fill + scale +
- * restrained glow, the standard expressive focus language.
+ * restrained glow, the standard expressive focus language. Disabled
+ * cards render grayed and are skipped by D-pad focus traversal.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -517,9 +526,11 @@ fun TvQuickActionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     accentContainer: Color = TvColors.SurfaceContainerHighest,
+    enabled: Boolean = true,
 ) {
     Surface(
         onClick = onClick,
+        enabled = enabled,
         shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Panel),
         colors = TvSurfaceStyles.rowColors(
             container = TvColors.SurfaceContainer,
@@ -534,19 +545,27 @@ fun TvQuickActionCard(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(accentContainer, TvShapes.Medium),
+                    .background(
+                        if (enabled) accentContainer else TvColors.DisabledContainer,
+                        TvShapes.Medium,
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = accent,
+                    tint = if (enabled) accent else TvColors.DisabledContent,
                     modifier = Modifier.size(24.dp),
                 )
             }
             Spacer(Modifier.width(TvSpacing.CardGap))
             Text(
                 text = title,
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    TvColors.DisabledContent
+                },
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

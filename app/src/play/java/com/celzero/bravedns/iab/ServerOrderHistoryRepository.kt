@@ -66,41 +66,84 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
     suspend fun fetchOrders(): Result {
         val mname = "fetchOrders"
         return try {
-            val purchase = RpnProxyManager.getEffectivePurchaseDetail()
-            if (purchase == null) {
-                Logger.w(LOG_TAG_UI, "$TAG $mname: no purchase detail available")
-                return Result.NoCredentials
-            }
-            val accountId = purchase.accountId
-            val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-            val purchaseToken = purchase.purchaseToken
-            if (accountId.isBlank() || purchaseToken.isBlank() || deviceId.isBlank()) {
-                Logger.w(LOG_TAG_UI, "$TAG $mname: accountId, purchaseToken or deviceId blank")
-                return Result.NoCredentials
-            }
-
-            when (val raw = billingBackendClient.fetchPurchaseHistory(
-                accountId = accountId,
-                deviceId = deviceId,
-                purchaseToken = purchaseToken,
-                total = MAX_ORDERS,
-            )) {
-                is FetchOrdersRawResult.Success -> {
-                    val orders = mapTxBody(raw.body)
-                    Logger.i(LOG_TAG_UI, "$TAG $mname: parsed ${orders.size} orders")
-                    Result.Success(orders)
-                }
-                is FetchOrdersRawResult.Error -> {
-                    Logger.w(LOG_TAG_UI, "$TAG $mname: ${raw.message}")
-                    Result.Error(raw.message)
-                }
-                is FetchOrdersRawResult.NoCredentials -> Result.NoCredentials
-            }
+            val orders = fetchOrdersInternal()
+            Logger.i(LOG_TAG_UI, "$TAG $mname: parsed ${orders.size} orders")
+            Result.Success(orders)
+        } catch (e: NoCredentialsException) {
+            Logger.w(LOG_TAG_UI, "$TAG $mname: ${e.message}")
+            Result.NoCredentials
+        } catch (e: FetchException) {
+            Logger.w(LOG_TAG_UI, "$TAG $mname: ${e.message}")
+            Result.Error(e.message ?: "Unknown error")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG $mname: exception: ${e.message}", e)
             Result.Error(e.localizedMessage ?: "Unknown error")
         }
     }
+
+    /**
+     * Returns the active one-time purchase whose [purchaseToken] exactly matches; null
+     * when absent, so reconciliation stays retryable until the requested order appears.
+     * Play's Purchase record omits the purchase option
+     * that was bought; the server's `purchaseOptionId` is the only source of truth.
+     */
+    suspend fun fetchRecentOneTimePurchase(accountId: String, purchaseToken: String): ServerOrderEntry? {
+        val mname = "fetchRecentOneTimePurchase"
+        return try {
+            val orders = fetchOrdersInternal(accountId, purchaseToken)
+            val oneTime = orders.filter {
+                !it.isSubscription && it.purchaseState == ServerOrderEntry.PURCHASE_STATE_PURCHASED
+            }
+            // exact token match only; a different order would poison planId correction
+            val entry = oneTime.firstOrNull { it.purchaseToken == purchaseToken }
+            Logger.i(LOG_TAG_UI, "$TAG $mname: tokenMatch=${entry?.purchaseToken == purchaseToken}, " +
+                "entry=${entry?.productId}, option=${entry?.planId}")
+            entry
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG $mname: exception: ${e.message}", e)
+            null
+        }
+    }
+
+    /** Shared fetch+parse core for [fetchOrders] and [fetchRecentOneTimePurchase]. */
+    private suspend fun fetchOrdersInternal(): List<ServerOrderEntry> {
+        val purchase = RpnProxyManager.getEffectivePurchaseDetail()
+        if (purchase == null) {
+            Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: no purchase detail available")
+            throw NoCredentialsException("no purchase detail available")
+        }
+        return fetchOrdersInternal(purchase.accountId, purchase.purchaseToken)
+    }
+
+    /**
+     * Uses the target purchase credentials. During first-purchase processing the machine
+     * may not yet have any effective purchase to use as an anchor.
+     */
+    private suspend fun fetchOrdersInternal(accountId: String, purchaseToken: String): List<ServerOrderEntry> {
+        if (accountId.isBlank() || purchaseToken.isBlank()) {
+            Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: accountId, purchaseToken or deviceId blank")
+            throw NoCredentialsException("accountId, purchaseToken or deviceId blank")
+        }
+        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+        if (deviceId.isBlank()) {
+            Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: DID unavailable for cid=${accountId.take(8)}")
+            throw NoCredentialsException("device identity unavailable")
+        }
+
+        return when (val raw = billingBackendClient.fetchPurchaseHistory(
+            accountId = accountId,
+            deviceId = deviceId,
+            purchaseToken = purchaseToken,
+            total = MAX_ORDERS,
+        )) {
+            is FetchOrdersRawResult.Success -> mapTxBody(raw.body)
+            is FetchOrdersRawResult.Error -> throw FetchException(raw.message ?: "Unknown error")
+            is FetchOrdersRawResult.NoCredentials -> throw NoCredentialsException("server credentials unavailable")
+        }
+    }
+
+    private class NoCredentialsException(message: String) : Exception(message)
+    private class FetchException(message: String) : Exception(message)
 
     /**
      * Returns the string value of this element, or `null` if it is absent,
@@ -288,7 +331,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         val lineItem = meta.firstArrayObj("productLineItem")
         val productId = lineItem?.get("productId").safeString() ?: ""
         val planId = lineItem.obj("productOfferDetails")
-            ?.get("purchaseOptionId").safeString() ?: productId
+            ?.get("purchaseOptionId").safeString().orEmpty()
 
         val purchaseState: Int? = when (
             meta.obj("purchaseStateContext")?.get("purchaseState").safeString()

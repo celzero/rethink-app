@@ -75,6 +75,8 @@ class BillingBackendClient(
     companion object {
         /** Error code for a refused identity rebind. */
         internal const val DID_REBIND_REFUSED = -2
+        /** Error code when a server-issued DID could not be durably stored. */
+        internal const val DID_PERSIST_FAILED = -3
         internal const val ACK_MARKER_UNAUTHORIZED = "Unauthorized: 401"
         internal const val ACK_MARKER_CONFLICT = "Conflict: 409"
 
@@ -197,6 +199,7 @@ class BillingBackendClient(
                 Logger.i(LOG_IAB, "$TAG mintDid [${env.label}]: did minted under cid=${cid.take(8)} (didLen=${result.deviceId.length})")
             } else {
                 Logger.e(LOG_IAB, "$TAG mintDid [${env.label}]: did minted but PERSIST FAILED for cid=${cid.take(8)}; the DID will be re-minted on next resolve")
+                return DidResult.error(DID_PERSIST_FAILED)
             }
         } else {
             Logger.e(LOG_IAB, "$TAG mintDid [${env.label}]: failed for cid=${cid.take(8)} (code=${result.errorCode})")
@@ -733,11 +736,13 @@ class BillingBackendClient(
         }
 
         var did = if (!cidWasAbsent && !storedDid.isNullOrBlank()) storedDid else ""
+        var didPersistedByMint = false
         if (did.isBlank()) {
             val didResult = mintDidLocked(env, cid)
             when {
                 didResult.isSuccess -> {
                     did = didResult.deviceId
+                    didPersistedByMint = true
                     Logger.i(LOG_IAB, "$TAG $mname [${env.label}]: new did obtained from server (len=${did.length})")
                 }
                 didResult.errorCode == 401 -> {
@@ -757,8 +762,11 @@ class BillingBackendClient(
             Logger.d(LOG_IAB, "$TAG $mname [${env.label}]: did loaded from store (len=${did.length})")
         }
 
-        if (storedCid != cid || storedDid != did) {
-            identityStore.save(env, cid, did)
+        if (!didPersistedByMint && (storedCid != cid || storedDid != did)) {
+            if (!identityStore.save(env, cid, did)) {
+                Logger.e(LOG_IAB, "$TAG $mname [${env.label}]: identity persistence failed; refusing to return an ephemeral DID")
+                return RefreshIdentityResult.Failure
+            }
             Logger.i(LOG_IAB, "$TAG $mname: identity persisted [${env.label}] (cidLen=${cid.length}, didLen=${did.length})")
         }
 

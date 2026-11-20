@@ -30,6 +30,7 @@ import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Client
@@ -245,16 +246,24 @@ object VpnController : KoinComponent {
         return rvpn?.getProxyAddrById(id)
     }
 
-    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
-        return rvpn?.startRemoteService()
+    suspend fun startRemoteService(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.startRemoteService(type)
     }
 
-    suspend fun stopRemoteService() {
-        rvpn?.stopRemoteService()
+    suspend fun stopRemoteService(type: GoVpnAdapter.RemoteServiceType) {
+        rvpn?.stopRemoteService(type)
     }
 
-    suspend fun remoteServiceStatus(): Int? {
-        return rvpn?.remoteServiceStatus()
+    suspend fun stopAllRemoteServices() {
+        rvpn?.stopAllRemoteServices()
+    }
+
+    suspend fun remoteServiceStatus(type: GoVpnAdapter.RemoteServiceType): Int? {
+        return rvpn?.remoteServiceStatus(type)
+    }
+
+    fun remoteServiceInfo(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.remoteServiceInfo(type)
     }
 
     suspend fun getProxyStats(id: String): RouterStats? {
@@ -450,9 +459,8 @@ object VpnController : KoinComponent {
         return rvpn?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
-    /** Ask the tunnel to refresh the WIN proxy state and return the updated bytes. */
-    suspend fun updateWin(): ByteArray? {
-        return rvpn?.updateWin()
+    suspend fun updateWin(): WinUpdateResult {
+        return rvpn?.updateWin() ?: WinUpdateResult.Failed("no vpn service")
     }
 
     suspend fun onRpnOptsChange() {
@@ -621,10 +629,6 @@ object VpnController : KoinComponent {
 
     suspend fun getAllTraceLogsAsBytes(): ByteArray? {
         return rvpn?.getAllTraceLogsAsBytes()
-    }
-
-    suspend fun getTraceCount(): Long {
-        return rvpn?.getTraceCount() ?: 0L
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {

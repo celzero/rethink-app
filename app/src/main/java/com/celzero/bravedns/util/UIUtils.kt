@@ -283,10 +283,17 @@ object UIUtils {
         }
     }
 
-    fun clipboardCopy(context: Context, s: String, label: String) {
-        val clipboard: ClipboardManager? = context.getSystemService()
-        val clip = ClipData.newPlainText(label, s)
-        clipboard?.setPrimaryClip(clip)
+    fun clipboardCopy(context: Context, s: String, label: String): Boolean {
+        return try {
+            val clipboard: ClipboardManager? = context.getSystemService()
+            val clip = ClipData.newPlainText(label, s)
+            clipboard?.setPrimaryClip(clip)
+            true
+        } catch (e: Exception) {
+            // clipboard writes can throw on devices with user restrictions (e.g. work profiles)
+            Logger.w(LOG_TAG_UI, "clipboard copy failed: ${e.message}", e)
+            false
+        }
     }
 
     fun htmlToSpannedText(text: String): Spanned {

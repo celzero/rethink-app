@@ -60,6 +60,7 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.wireguard.WgHopManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -790,7 +791,7 @@ internal constructor(
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             randomNotifId.nextInt(100),
             builder.build()
@@ -903,7 +904,7 @@ internal constructor(
         builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
         builder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
+        notificationManager.notifySafely(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
     }
 
     private suspend fun notifyEmptyFirewallRulesIfNeeded() {
@@ -957,7 +958,7 @@ internal constructor(
         builder = builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
         builder.build()
-        nm.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_LOAD_RULES_FAIL, builder.build())
+        nm.notifySafely(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_LOAD_RULES_FAIL, builder.build())
     }
 
     private fun showDatabaseCorruptionNotification() {
@@ -1009,7 +1010,7 @@ internal constructor(
         builder.addAction(clearAction)
         builder.addAction(dismissAction)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             NOTIF_ID_DB_CORRUPTION,
             builder.build()

@@ -156,7 +156,7 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
         builder.color = ContextCompat.getColor(ctx, getAccentColor(persistentState.theme))
-        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_BUG_REPORT, "nw eng notification: $msg")
     }
 }

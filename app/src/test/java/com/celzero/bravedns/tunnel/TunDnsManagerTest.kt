@@ -1041,6 +1041,16 @@ class TunDnsManagerTest {
         coEvery { FirewallManager.isAppExcludedFromProxy(any()) } returns false
     }
 
+    private fun stubDnsModeDefaults() {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS
+        every { appConfig.isSystemDns() } returns false
+        every { appConfig.isSmartDnsEnabled() } returns false
+        every { VpnController.isAppPaused() } returns false
+        every { persistentState.splitDns } returns false
+        every { persistentState.preventDnsLeaks } returns false
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+    }
+
     @Test
     fun `decideQuery - bypass dns-firewall app with single WG proxy routes DNS via WG with noblock`() = runTest {
         stubDfModeDefaults()
@@ -1086,6 +1096,49 @@ class TunDnsManagerTest {
         assertEquals(TunDnsManager.BRANCH_NO_UID_GLOBAL_BLOCK, decision.branch)
         assertEquals(Backend.BlockAll, decision.tid.first)
         assertFalse(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode app-trusted domain uses default transport with preferred as secondary`() = runTest {
+        stubDnsModeDefaults()
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(10123)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_APP_TRUSTED, decision.branch)
+        assertEquals(Backend.Default, decision.tid.first)
+        assertEquals(Backend.Preferred, decision.tid.second)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode global-trusted domain uses default transport with preferred as secondary`() = runTest {
+        stubDnsModeDefaults()
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(UID_EVERYBODY)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_GLOBAL_TRUSTED, decision.branch)
+        assertEquals(Backend.Default, decision.tid.first)
+        assertEquals(Backend.Preferred, decision.tid.second)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode trusted domain with preventDnsLeaks keeps preferred transport`() = runTest {
+        stubDnsModeDefaults()
+        every { persistentState.preventDnsLeaks } returns true
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(10123)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_APP_TRUSTED, decision.branch)
+        assertEquals(Backend.Preferred, decision.tid.first)
+        assertEquals("", decision.tid.second)
+        assertTrue(decision.noblock)
     }
 
     // endregion

@@ -91,7 +91,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.net.URI
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
@@ -1228,6 +1230,36 @@ object Utilities {
                 buttonContainer.orientation = LinearLayout.HORIZONTAL
                 buttonContainer.gravity = Gravity.END
             }
+        }
+    }
+
+    /**
+     * Best-effort LAN IPv4 address of this device (site-local, non-loopback),
+     * preferring Wi-Fi/Ethernet interfaces. VPN (tun) interfaces are excluded
+     * so the VPN address is never reported. Empty string when none is
+     * available.
+     */
+    fun getLanIpv4(): String {
+        return try {
+            val candidates = NetworkInterface.getNetworkInterfaces().asSequence()
+                .filter { it.isUp && !it.isLoopback && !it.name.startsWith("tun") }
+                .flatMap { nic ->
+                    nic.inetAddresses.asSequence()
+                        .filter { addr -> addr is Inet4Address && !addr.isLoopbackAddress }
+                        .map { it as Inet4Address to nic.name }
+                }
+                .toList()
+            val isWifiOrEth = { name: String ->
+                name.startsWith("wlan") || name.startsWith("eth")
+            }
+            candidates.firstOrNull { (addr, name) ->
+                addr.isSiteLocalAddress && isWifiOrEth(name)
+            }?.first?.hostAddress
+                ?: candidates.firstOrNull { (addr, _) -> addr.isSiteLocalAddress }?.first?.hostAddress
+                ?: candidates.firstOrNull()?.first?.hostAddress.orEmpty()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "err get lan ipv4: ${e.message}")
+            ""
         }
     }
 

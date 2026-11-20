@@ -48,6 +48,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.iab.ServerOrderEntry
 import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.tv.ui.theme.TvSpacing
 import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import androidx.tv.material3.Text
@@ -174,12 +175,11 @@ private fun OrderCard(order: ServerOrderEntry) {
         onClick = {
             val orderId = order.orderId
             if (!orderId.isNullOrBlank()) {
-                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
-                    as? android.content.ClipboardManager
-                clipboard?.setPrimaryClip(
-                    android.content.ClipData.newPlainText("order", orderId)
+                val copied = UIUtils.clipboardCopy(context, orderId, "order")
+                tvToast(
+                    context,
+                    context.getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast)
                 )
-                tvToast(context, context.getString(R.string.copied_clipboard))
             }
         },
         shape = TvSurfaceStyles.interactiveShape(),

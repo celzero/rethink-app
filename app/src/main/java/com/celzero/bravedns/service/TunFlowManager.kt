@@ -56,6 +56,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.intra.FlowSummary
 import com.celzero.firestack.intra.Mark
@@ -1489,7 +1490,7 @@ object TunFlowManager : KoinComponent {
                 .setColor(ContextCompat.getColor(ctx.context, getAccentColor(persistentState.theme)))
                 .addAction(0, ctx.context.getString(R.string.rethink_block_notification_action_dismiss), actionIntent)
 
-            ctx.notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, Constants.NOTIF_ID_RETHINK_BLOCK, builder.build())
+            ctx.notificationManager.notifySafely(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, Constants.NOTIF_ID_RETHINK_BLOCK, builder.build())
         }
     }
 

@@ -319,7 +319,7 @@ class OrbotHelper(
         if (!isInteractive && selectedProxyType != AppConfig.ProxyType.NONE.name) {
             val notificationManager =
                 context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(
+            notificationManager.notifySafely(
                 NOTIF_CHANNEL_ID_PROXY_ALERTS,
                 ORBOT_SERVICE_ID,
                 createNotification().build()

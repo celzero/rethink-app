@@ -71,6 +71,8 @@ class RethinkDnsApplicationPlay : Application(), Configuration.Provider {
             )
         }
 
+        RethinkDnsApplication.maybeForceTvDebugTestMode(this)
+
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         appScope.launch(Dispatchers.IO) {

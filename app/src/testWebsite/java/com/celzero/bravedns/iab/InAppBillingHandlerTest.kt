@@ -389,6 +389,50 @@ class InAppBillingHandlerTest : KoinTest {
         assertEquals("cid-abc", (posted as ServerApiError.DeviceNotRegistered).entitlementCid)
     }
 
+    /** Background DID resolution failure stays silent: no sticky error, no auth funnel. */
+    @Test
+    fun `resolveDidForServerCalls background failure stays silent`() = runTest {
+        InAppBillingHandler.serverApiErrorLiveData.value = null
+        coEvery { mockBillingBackendClient.reconcileDidForCid("cid-silent") } returns DidResult.error(-2)
+
+        val did = InAppBillingHandler.resolveDidForServerCalls("cid-silent", "test", surfacing = false)
+
+        assertNull(did)
+        coVerify(exactly = 0) { mockBillingBackendClient.recoverIdentityAfterAuthFailure(any()) }
+        // silent retry scheduled, but never the sticky error
+        assertFalse(InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.DeviceNotRegistered)
+    }
+
+    /** Background 401 triggers identity recovery without posting the sticky auth error. */
+    @Test
+    fun `resolveDidForServerCalls background 401 recovers identity without posting`() = runTest {
+        InAppBillingHandler.serverApiErrorLiveData.value = null
+        coEvery { mockBillingBackendClient.reconcileDidForCid("cid-401-bg") } returns DidResult.error(401)
+        coEvery { mockBillingBackendClient.recoverIdentityAfterAuthFailure("cid-401-bg") } returns
+            IdentityRecoveryOutcome.SKIPPED
+
+        val did = InAppBillingHandler.resolveDidForServerCalls("cid-401-bg", "test", surfacing = false)
+
+        assertNull(did)
+        coVerify(exactly = 1) { mockBillingBackendClient.recoverIdentityAfterAuthFailure("cid-401-bg") }
+        assertFalse(InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.Unauthorized401)
+    }
+
+    /** Surfacing (user-initiated) flows post the device-not-registered error for definitive failures. */
+    @Test
+    fun `resolveDidForServerCalls surfacing posts device-not-registered for definitive failure`() = runTest {
+        InAppBillingHandler.serverApiErrorLiveData.value = null
+        coEvery { mockBillingBackendClient.reconcileDidForCid("cid-loud") } returns DidResult.error(-2)
+
+        val did = InAppBillingHandler.resolveDidForServerCalls("cid-loud", "test", surfacing = true)
+
+        assertNull(did)
+        awaitUntil { InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.DeviceNotRegistered }
+        val posted = InAppBillingHandler.serverApiErrorLiveData.value
+        assertTrue(posted is ServerApiError.DeviceNotRegistered)
+        assertEquals("cid-loud", (posted as ServerApiError.DeviceNotRegistered).entitlementCid)
+    }
+
     // =========================================================================
     // 2. Linked Purchase Reactivation
     // =========================================================================

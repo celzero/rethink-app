@@ -96,27 +96,31 @@ class TvHomeActivity : ComponentActivity() {
     private fun initAppVersion() {
         val prevVersion = persistentState.appVersion
 
-        // Same one-time firewall exemption HomeScreenActivity applies to
-        // installs at or below v53 (fresh installs included).
-        if (prevVersion <= 53) {
+        // Version-gated server endpoints (e.g. the RPN availability probe)
+        // key off this value; persist it unconditionally so a slow or failed
+        // app scan can never leave it at the 0 default.
+        if (prevVersion != BuildConfig.BASE_VERSION_CODE) {
+            persistentState.appVersion = BuildConfig.BASE_VERSION_CODE
+            Logger.i(
+                Logger.LOG_TAG_VPN,
+                "tv launcher: app version set to ${BuildConfig.BASE_VERSION_CODE} (prev: $prevVersion)"
+            )
+        }
+
+        // Same firewall exemption HomeScreenActivity applies to installs at
+        // or below v53 (fresh installs included); retried on every launch
+        // until it succeeds, since exemptRethinkApp returns false on DB
+        // failure or when the app has not been scanned yet.
+        if (!persistentState.tvSelfExemptionDone) {
             val rethinkUid = android.os.Process.myUid()
             lifecycleScope.launch(Dispatchers.IO) {
-                val exempted = runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }
-                    .onFailure {
-                        Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed: ${it.message}")
-                    }
-                    .getOrDefault(false)
-                if (exempted) {
-                    persistAppVersion(prevVersion)
+                val ok = runCatching { FirewallManager.exemptRethinkApp(rethinkUid) }.getOrDefault(false)
+                if (ok) {
+                    persistentState.tvSelfExemptionDone = true
                 } else {
-                    Logger.w(
-                        Logger.LOG_TAG_VPN,
-                        "tv launcher: exemption incomplete, deferring version persistence"
-                    )
+                    Logger.w(Logger.LOG_TAG_VPN, "tv launcher: self-exemption failed, will retry next launch")
                 }
             }
-        } else {
-            persistAppVersion(prevVersion)
         }
 
         // Parity with HomeScreenActivity: purge pre-v055o WARP/SEC_WARP
@@ -124,10 +128,5 @@ class TvHomeActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             runCatching { WireguardManager.deleteResidueWgs() }
         }
-    }
-
-    private fun persistAppVersion(prevVersion: Int) {
-        persistentState.appVersion = BuildConfig.BASE_VERSION_CODE
-        Logger.i(Logger.LOG_TAG_VPN, "tv launcher: app version set to ${BuildConfig.BASE_VERSION_CODE} (prev: $prevVersion)")
     }
 }

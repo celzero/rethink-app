@@ -16,8 +16,6 @@
 package com.celzero.bravedns.ui.activity
 
 import android.animation.ValueAnimator
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -1115,11 +1113,10 @@ class RpnConfigDetailActivity : BaseActivity(R.layout.activity_rpn_config_detail
         b.tvHeroPub.setOnClickListener {
             val text = b.tvHeroPub.text?.toString().orEmpty()
             if (text.isBlank()) return@setOnClickListener
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("pubPub", text))
+            val copied = UIUtils.clipboardCopy(this, text, "pubPub")
             Utilities.showToastUiCentered(
                 this,
-                getString(R.string.copied_clipboard),
+                getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }
