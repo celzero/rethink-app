@@ -112,6 +112,7 @@ import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -888,6 +889,39 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         val channel = NotificationChannel(MAIN_CHANNEL_ID, name, importance)
         channel.description = resources.getString(R.string.notif_channel_desc_vpn_notification)
         notificationManager.createNotificationChannel(channel)
+        // system_server crashes the app in startForeground if the channel is missing; retry once
+        if (notificationManager.getNotificationChannel(MAIN_CHANNEL_ID) == null) {
+            Logger.w(LOG_TAG_VPN, "main notification channel missing after create, retrying")
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    // fall back to the app or a system icon if the notification icon is unresolvable
+    @Volatile
+    private var resolvedSmallIcon: Int = 0
+
+    private fun smallIconOrFallback(): Int {
+        resolvedSmallIcon.takeIf { it != 0 }?.let { return it }
+        val candidates =
+            intArrayOf(
+                R.drawable.ic_notification_icon,
+                applicationInfo.icon,
+                android.R.drawable.ic_dialog_info
+            )
+        for (res in candidates) {
+            if (res == 0) continue
+            try {
+                if (ContextCompat.getDrawable(this, res) != null) {
+                    resolvedSmallIcon = res
+                    return res
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_VPN, "notif icon $res unresolvable: ${e.message}")
+            }
+        }
+        // system icon is the only resource guaranteed to resolve
+        resolvedSmallIcon = android.R.drawable.ic_dialog_info
+        return resolvedSmallIcon
     }
 
     // bare notification for the initial foreground promotion; must not resolve Koin
@@ -902,7 +936,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 mutable = false
             )
         return NotificationCompat.Builder(this, MAIN_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setSmallIcon(smallIconOrFallback())
             .setContentIntent(pendingIntent)
             .setContentTitle(resources.getString(R.string.app_name))
             .build()
@@ -938,7 +972,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         if (isAppPaused()) {
             contentTitle = resources.getString(R.string.pause_mode_notification_title)
         }
-        builder.setSmallIcon(R.drawable.ic_notification_icon).setContentIntent(pendingIntent)
+        builder.setSmallIcon(smallIconOrFallback()).setContentIntent(pendingIntent)
         builder.setContentTitle(contentTitle)
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
 
@@ -1132,7 +1166,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             NOTIF_ID_ACCESSIBILITY_FAILURE,
             builder.build()
@@ -1232,7 +1266,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
 
         // swap in the rich notification; the foreground contract is already satisfied
         try {
-            notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+            notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err updating fg notification: ${e.message}", e)
         }
@@ -1563,7 +1597,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                     setTunMode()
                     updateDnsAlg()
                 }
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.LOCAL_BLOCK_LIST -> {
@@ -1648,7 +1682,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 io("proxy") {
                     handleProxyChange()
                 }
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.NETWORK -> {
@@ -1657,12 +1691,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             }
 
             PersistentState.NOTIFICATION_ACTION -> {
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.BIOMETRIC_AUTH -> {
                 // update the notification builder to show the action buttons based on the biometric
-                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
             }
 
             PersistentState.INTERNET_PROTOCOL -> {
@@ -1727,7 +1761,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             PersistentState.NOTIFICATION_PERMISSION -> {
                 if (persistentState.shouldRequestNotificationPermission) {
                     Logger.i(LOG_TAG_VPN, "notification permission allowed, show notification")
-                    notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                    notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder())
                 } else {
                     // no-op
                 }
@@ -3006,7 +3040,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 .setContentIntent(pendingIntent)
                 // Open the main UI if possible.
                 .setAutoCancel(true)
-            notificationManager.notify(0, builder.build())
+            notificationManager.notifySafely(0, builder.build())
         }
     }
 
@@ -3083,7 +3117,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
             builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
-            notificationManager.notify(IP_MISMATCH_NOTIFICATION_ID, builder.build())
+            notificationManager.notifySafely(IP_MISMATCH_NOTIFICATION_ID, builder.build())
         }
     }
 
@@ -3210,7 +3244,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
     private fun handleVpnServiceOnAppStateChange() { // paused or resumed
         val reason = if (isAppPaused()) "pause" else "resume"
         vpnRestartTrigger.value = reason
-        ui { notificationManager.notify(SERVICE_ID, updateNotificationBuilder()) }
+        ui { notificationManager.notifySafely(SERVICE_ID, updateNotificationBuilder()) }
     }
 
     // The VPN service and tun2socks must agree on the layout of the network.  By convention, we
@@ -4455,7 +4489,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(MEMORY_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(MEMORY_NOTIFICATION_ID, builder.build())
     }
 
     override fun onRevoke() {

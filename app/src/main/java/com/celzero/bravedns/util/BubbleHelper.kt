@@ -392,7 +392,7 @@ object BubbleHelper {
 
         try {
             nm.notify(BUBBLE_NOTIFICATION_ID, builder.build())
-        } catch (e: SecurityException) {
+        } catch (e: Exception) {
             Logger.e(LOG_TAG_FIREWALL, "err posting bubble notification: ${e.message}", e)
             return false
         }

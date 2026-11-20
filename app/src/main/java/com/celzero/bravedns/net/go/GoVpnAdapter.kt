@@ -77,6 +77,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.firestack.backend.Backend
@@ -601,7 +602,7 @@ class GoVpnAdapter : KoinComponent {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
             builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
-            notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+            notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         }
     }
 
@@ -1130,7 +1131,7 @@ class GoVpnAdapter : KoinComponent {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
             builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
-            notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+            notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         }
     }
 

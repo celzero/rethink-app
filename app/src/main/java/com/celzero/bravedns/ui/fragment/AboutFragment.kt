@@ -104,6 +104,7 @@ import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteDegoogledFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.disableFrostTemporarily
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -868,7 +869,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 as android.app.NotificationManager
 
         if (!isAtleastO()) {
-            manager.notify("MEM_PROFILE", 210, builder.build())
+            manager.notifySafely("MEM_PROFILE", 210, builder.build())
             return
         }
 
@@ -880,7 +881,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             description = "Memory profiling results"
         }
         manager.createNotificationChannel(channel)
-        manager.notify("MEM_PROFILE", 210, builder.build())
+        manager.notifySafely("MEM_PROFILE", 210, builder.build())
     }
 
     private fun formatFileSize(bytes: Long): String {
