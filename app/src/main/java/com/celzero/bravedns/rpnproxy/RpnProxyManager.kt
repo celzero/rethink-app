@@ -1302,7 +1302,27 @@ object RpnProxyManager : KoinComponent {
 
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
                 var ok = true
-                val storedDid = billingBackendClient.storedIdentityDidForCurrentEnv()
+                var storedDid = billingBackendClient.storedIdentityDidForCurrentEnv()
+                if (storedDid.isBlank()) {
+                    // identity store empty/lost (keyset invalidation, persist failure, fresh
+                    // migration); re-resolve the DID from the purchase-bound cid so a blank
+                    // payload cid cannot wedge registration into a permanent retry loop
+                    val sub = try {
+                        subscriptionStatusRepository.getCurrentSubscription()
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: did-recovery sub read failed: ${e.message}")
+                        null
+                    }
+                    val accountId = sub?.accountId.orEmpty()
+                    if (accountId.isNotEmpty()) {
+                        storedDid = resolveDeviceIdForServerCalls(accountId, "registerProxy", surfacing = false).orEmpty()
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: stored did blank, recovery from cid=${accountId.take(8)} " +
+                                "resolved=${storedDid.isNotEmpty()}"
+                        )
+                    }
+                }
                 val payloadCid = if (storedDid.isBlank()) {
                     ""
                 } else {

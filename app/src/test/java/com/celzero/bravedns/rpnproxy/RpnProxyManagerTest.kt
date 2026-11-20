@@ -1865,6 +1865,47 @@ class RpnProxyManagerTest : KoinTest {
         }
     }
 
+    /** Blank stored DID is re-resolved from the purchase-bound cid before the didForCid check. */
+    @Test
+    fun `registerProxy blank stored DID recovers from purchase cid`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns makeResetSubRow()
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns ""
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) } returns "did-recovered-1"
+        coEvery { mockBillingBackendClient.didForCid("acc-reset-1234", true) } returns DidResult("did-recovered-1")
+        coEvery { VpnController.getEntitlementDetails(any(), "did-recovered-1") } returns mockk {
+            every { cid() } returns "acc-reset-1234"
+        }
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertTrue(ok)
+        // recovery resolved the DID from the subscription row's cid, then registration
+        // proceeded through the normal didForCid binding path
+        coVerify(exactly = 1) { InAppBillingHandler.resolveDidForServerCalls("acc-reset-1234", any(), false) }
+        coVerify(exactly = 1) { mockBillingBackendClient.didForCid("acc-reset-1234", true) }
+    }
+
+    /** Unrecoverable DID (no subscription row): refusal path, no registration attempt. */
+    @Test
+    fun `registerProxy blank stored DID that cannot be recovered refuses registration`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L))
+        coEvery { mockBillingBackendClient.storedIdentityDidForCurrentEnv() } returns ""
+        coEvery { mockSubscriptionStatusDb.getCurrentSubscription() } returns null
+        coEvery { mockBillingBackendClient.didForCid(any(), any()) } returns DidResult.error(-1)
+        coEvery { VpnController.getEntitlementDetails(any(), any()) } returns null
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertFalse(ok)
+        coVerify(exactly = 0) { InAppBillingHandler.resolveDidForServerCalls(any(), any(), any()) }
+        coVerify(exactly = 0) { VpnController.registerAndFetchWinConfig(any(), any(), any()) }
+        verify(exactly = 1) { InAppBillingHandler.postDeviceNotRegisteredError(any(), any()) }
+    }
+
     // =========================================================================
     // Helpers
     // =========================================================================

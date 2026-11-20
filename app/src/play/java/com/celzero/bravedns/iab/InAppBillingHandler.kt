@@ -1429,11 +1429,9 @@ object InAppBillingHandler : KoinComponent {
             getProductType = getProductTypeFn,
             getDeviceId = getDeviceIdFn,
             mintDeviceId = mintDeviceIdFn,
-            fetchRecentOneTimeOrder = { token ->
-                serverOrderHistoryRepo.fetchRecentOneTimePurchase(token)
+            fetchRecentOneTimeOrder = { accountId, token ->
+                serverOrderHistoryRepo.fetchRecentOneTimePurchase(accountId, token)
             },
-            getReconciledTokens = { persistentState.getOrderHistoryReconciledTokens() },
-            markReconciledToken = { token -> persistentState.markOrderHistoryReconciled(token) },
             onAckSuccess = onInAppAckSuccessFn,
             reconcileCidDid = ::reconcileCidDidFromPurchase,
             validatePayloadAndFetchIfRequired = ::validatePayloadAndFetchIfRequired
@@ -1850,8 +1848,12 @@ object InAppBillingHandler : KoinComponent {
         }
         return PurchaseDetail(
             productId = productId,
-            planId = storeEntry?.oneTimeOfferDetails?.purchaseOptionId ?: productId,
-            productTitle = storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId)),
+            planId = productId,
+            productTitle = if (productId == ONE_TIME_PRODUCT_ID) {
+                storeEntry?.productDetails?.title ?: productId
+            } else {
+                storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId))
+            },
             planTitle = storeEntry?.productDetail?.productTitle.orEmpty(),
             state = purchase.purchaseState,
             purchaseToken = purchase.purchaseToken,

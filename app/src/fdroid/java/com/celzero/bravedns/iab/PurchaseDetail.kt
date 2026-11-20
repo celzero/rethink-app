@@ -40,6 +40,7 @@ data class PurchaseDetail(
     val expiryTime: Long,
     val status: Int,
     val windowDays: Int,
-    val orderId: String = ""
+    val orderId: String = "",
+    /** True only when the one-time option came from an exact purchase-token `/g/tx` row. */
+    val isPlanIdServerConfirmed: Boolean = false
 )
-

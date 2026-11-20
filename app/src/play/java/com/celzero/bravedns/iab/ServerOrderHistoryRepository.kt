@@ -82,19 +82,20 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
     }
 
     /**
-     * Returns the most recent active one-time purchase, preferring an exact
-     * [purchaseToken] match. Play's Purchase record omits the purchase option
+     * Returns the active one-time purchase whose [purchaseToken] exactly matches; null
+     * when absent, so reconciliation stays retryable until the requested order appears.
+     * Play's Purchase record omits the purchase option
      * that was bought; the server's `purchaseOptionId` is the only source of truth.
      */
-    suspend fun fetchRecentOneTimePurchase(purchaseToken: String): ServerOrderEntry? {
+    suspend fun fetchRecentOneTimePurchase(accountId: String, purchaseToken: String): ServerOrderEntry? {
         val mname = "fetchRecentOneTimePurchase"
         return try {
-            val orders = fetchOrdersInternal()
+            val orders = fetchOrdersInternal(accountId, purchaseToken)
             val oneTime = orders.filter {
                 !it.isSubscription && it.purchaseState == ServerOrderEntry.PURCHASE_STATE_PURCHASED
             }
+            // exact token match only; a different order would poison planId correction
             val entry = oneTime.firstOrNull { it.purchaseToken == purchaseToken }
-                ?: oneTime.maxByOrNull { it.purchaseTimeMs }
             Logger.i(LOG_TAG_UI, "$TAG $mname: tokenMatch=${entry?.purchaseToken == purchaseToken}, " +
                 "entry=${entry?.productId}, option=${entry?.planId}")
             entry
@@ -111,12 +112,22 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
             Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: no purchase detail available")
             throw NoCredentialsException("no purchase detail available")
         }
-        val accountId = purchase.accountId
-        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-        val purchaseToken = purchase.purchaseToken
-        if (accountId.isBlank() || purchaseToken.isBlank() || deviceId.isBlank()) {
+        return fetchOrdersInternal(purchase.accountId, purchase.purchaseToken)
+    }
+
+    /**
+     * Uses the target purchase credentials. During first-purchase processing the machine
+     * may not yet have any effective purchase to use as an anchor.
+     */
+    private suspend fun fetchOrdersInternal(accountId: String, purchaseToken: String): List<ServerOrderEntry> {
+        if (accountId.isBlank() || purchaseToken.isBlank()) {
             Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: accountId, purchaseToken or deviceId blank")
             throw NoCredentialsException("accountId, purchaseToken or deviceId blank")
+        }
+        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+        if (deviceId.isBlank()) {
+            Logger.w(LOG_TAG_UI, "$TAG fetchOrdersInternal: DID unavailable for cid=${accountId.take(8)}")
+            throw NoCredentialsException("device identity unavailable")
         }
 
         return when (val raw = billingBackendClient.fetchPurchaseHistory(
@@ -320,7 +331,7 @@ class ServerOrderHistoryRepository(private val billingBackendClient: BillingBack
         val lineItem = meta.firstArrayObj("productLineItem")
         val productId = lineItem?.get("productId").safeString() ?: ""
         val planId = lineItem.obj("productOfferDetails")
-            ?.get("purchaseOptionId").safeString() ?: productId
+            ?.get("purchaseOptionId").safeString().orEmpty()
 
         val purchaseState: Int? = when (
             meta.obj("purchaseStateContext")?.get("purchaseState").safeString()
