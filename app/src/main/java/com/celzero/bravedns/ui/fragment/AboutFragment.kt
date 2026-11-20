@@ -17,8 +17,6 @@ package com.celzero.bravedns.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -44,7 +42,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -291,13 +288,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                     val text = persistentState.firebaseUserToken
                     val ctx = context ?: return false
-                    val clipboard =
-                        getSystemService(ctx, ClipboardManager::class.java)
-                    val clip = ClipData.newPlainText("token", text)
-                    clipboard?.setPrimaryClip(clip)
-
-                    Toast.makeText(ctx, "Copied to clipboard", Toast.LENGTH_SHORT)
-                        .show()
+                    val copied = UIUtils.clipboardCopy(ctx, text, "token")
+                    Toast.makeText(
+                        ctx,
+                        ctx.getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return true
                 }
 
@@ -1021,8 +1017,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
-                copyToClipboard("stack_trace", clipText)
-                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                val copied = copyToClipboard("stack_trace", clipText)
+                showToastUiCentered(
+                    ctx,
+                    getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
             .setNeutralButton("Refresh", null)
             .create()
@@ -1165,10 +1165,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             } else {
                                 selectedPositions.sorted().joinToString("\n") { lines[it] }
                             }
-                            copyToClipboard("stats_dump", textToCopy)
+                            val copied = copyToClipboard("stats_dump", textToCopy)
                             showToastUiCentered(
                                 ctx,
-                                getString(R.string.copied_clipboard),
+                                getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
                                 Toast.LENGTH_SHORT
                             )
                         }.create()
@@ -1385,8 +1385,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
-                copyToClipboard("proc_analysis", clipText)
-                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                val copied = copyToClipboard("proc_analysis", clipText)
+                showToastUiCentered(
+                    ctx,
+                    getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
             .setNeutralButton("Refresh", null)
             .create()
@@ -1401,11 +1405,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         dialog.show()
     }
 
-    private fun copyToClipboard(label: String, text: String): ClipboardManager? {
-        val cb = getSystemService(requireContext(), ClipboardManager::class.java)
-        cb?.setPrimaryClip(ClipData.newPlainText(label, text))
-        return cb
-    }
+    private fun copyToClipboard(label: String, text: String): Boolean =
+        UIUtils.clipboardCopy(requireContext(), text, label)
 
     private fun openDatabaseDumpDialog() {
         io {

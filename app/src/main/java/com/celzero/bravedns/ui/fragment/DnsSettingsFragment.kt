@@ -780,14 +780,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 di.dismiss()
             }
             .setNeutralButton(requireContext().getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-                UIUtils.clipboardCopy(
-                    requireContext(),
-                    dns,
-                    requireContext().getString(R.string.copy_clipboard_label)
-                )
+                val copied =
+                    UIUtils.clipboardCopy(
+                        requireContext(),
+                        dns,
+                        requireContext().getString(R.string.copy_clipboard_label)
+                    )
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
+                    requireContext().getString(if (copied) R.string.info_dialog_url_copy_toast_msg else R.string.copy_failed_toast),
                     Toast.LENGTH_SHORT
                 )
             }

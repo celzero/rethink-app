@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -36,6 +34,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
@@ -499,11 +498,14 @@ class RpnRemoteServiceBottomSheet : BaseBottomSheetDialogFragment() {
                 displayUrl(type)
             }
             if (!isAdded || url.isEmpty()) return@launch
-            val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            cm.setPrimaryClip(ClipData.newPlainText(url, url))
-            val toastRes = when (type) {
-                GoVpnAdapter.RemoteServiceType.SOCKS5 -> R.string.rpn_remote_service_copied_socks5
-                GoVpnAdapter.RemoteServiceType.HTTP -> R.string.rpn_remote_service_copied_http
+            val copied = UIUtils.clipboardCopy(requireContext(), url, url)
+            val toastRes = if (copied) {
+                when (type) {
+                    GoVpnAdapter.RemoteServiceType.SOCKS5 -> R.string.rpn_remote_service_copied_socks5
+                    GoVpnAdapter.RemoteServiceType.HTTP -> R.string.rpn_remote_service_copied_http
+                }
+            } else {
+                R.string.copy_failed_toast
             }
             Utilities.showToastUiCentered(requireContext(), getString(toastRes), Toast.LENGTH_SHORT)
         }

@@ -309,10 +309,12 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun copyWhoToClipboard() {
         val text = b.tvHeroWho.text?.toString().orEmpty()
         if (text.isBlank()) return
-        val clipboard =
-            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
-        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+        val copied = UIUtils.clipboardCopy(requireContext(), text, "who")
+        showToastUiCentered(
+            requireContext(),
+            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     /**

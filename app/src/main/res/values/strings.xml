@@ -2164,6 +2164,7 @@
 
     <string name="title_database_dump" translatable="true">Database</string>
     <string name="copied_clipboard" translatable="true">Copied</string>
+    <string name="copy_failed_toast" translatable="false">Could not copy to clipboard</string>
 
     <string name="lbl_ssids" translatable="false">SSIDs</string>
     <string name="lbl_ssid" translatable="false">SSID</string>
