@@ -1894,6 +1894,24 @@ class RpnProxyManagerTest : KoinTest {
         coVerify(exactly = 1) { mockBillingBackendClient.didForCid("cid-entitlement", true) }
     }
 
+    @Test
+    fun `registerProxy binds recovery cid when DID resolution returns null`() = runTest {
+        stubLocalEntitlementFile(wsJson(expiryMs = System.currentTimeMillis() + 86_400_000L, cid = "cid-entitlement"))
+        coEvery { mockBillingBackendClient.peekStoredDid() } returns ""
+        coEvery { InAppBillingHandler.resolveDidForServerCalls("cid-entitlement", any(), false) } returns null
+        coEvery { mockBillingBackendClient.didForCid(any(), true) } returns DidResult.error(-1)
+        coEvery { mockBillingBackendClient.didForCid("cid-entitlement", true) } returns DidResult("did-recovered-1")
+        coEvery { VpnController.isWinRegistered() } returns true
+        coEvery { VpnController.getActiveEntitlement() } returns staleTunnelEntitlement()
+        coEvery { VpnController.getRpnLocations(any()) } returns Pair(null, null)
+
+        val ok = RpnProxyManager.registerProxy(RpnProxyManager.RpnType.WIN)
+
+        assertTrue(ok)
+        coVerify(exactly = 1) { mockBillingBackendClient.didForCid("cid-entitlement", true) }
+        coVerify(exactly = 0) { mockBillingBackendClient.didForCid("", true) }
+    }
+
     /** The subscription CID is used only when the entitlement does not contain one. */
     @Test
     fun `registerProxy blank stored DID falls back to subscription cid when entitlement cid is blank`() = runTest {

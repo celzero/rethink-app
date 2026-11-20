@@ -1341,10 +1341,10 @@ object RpnProxyManager : KoinComponent {
                         )
                     }
                 }
-                val payloadCid = if (storedDid.isBlank()) {
-                    ""
-                } else if (recoveryCid.isNotBlank()) {
+                val payloadCid = if (recoveryCid.isNotBlank()) {
                     recoveryCid
+                } else if (storedDid.isBlank()) {
+                    ""
                 } else {
                     try {
                         VpnController.getEntitlementDetails(registrationBytes, storedDid)?.cid()
