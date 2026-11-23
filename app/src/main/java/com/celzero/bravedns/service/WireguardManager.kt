@@ -155,11 +155,11 @@ object WireguardManager : KoinComponent {
         // Recovery path above (and any other non-disableConfig deactivation) can leave the
         // persisted proxy provider stuck at WIREGUARD with no config actually active; clear it
         // so the proxy card and related UI do not report a WireGuard that is not running.
-        if (mappings.none { it.isActive } &&
-            AppConfig.ProxyProvider.WIREGUARD.name == appConfig.getProxyProvider()
-        ) {
-            Logger.w(LOG_TAG_PROXY, "no active wg configs but provider is WIREGUARD; resetting proxy provider")
-            appConfig.removeProxy(AppConfig.ProxyType.WIREGUARD, AppConfig.ProxyProvider.WIREGUARD)
+        // fork: wireguard no longer uses the persisted provider; migrate any legacy WIREGUARD
+        // value (from upstream builds) to NONE so it cannot shadow the custom socks5/http proxy.
+        if (AppConfig.ProxyProvider.WIREGUARD.name == appConfig.getProxyProvider()) {
+            Logger.w(LOG_TAG_PROXY, "legacy provider WIREGUARD found; resetting proxy provider")
+            appConfig.removeAllProxies()
         }
         configs.size
     }
