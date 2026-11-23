@@ -696,6 +696,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                     -1
                 }
             }
+        // fork: wireguard is tracked by WireguardManager, not by the persisted provider
+        if (status == -1 && WireguardManager.getActiveWgCount() > 0) {
+            status = R.string.lbl_wireguard
+        }
         // work around for now to check RPN proxy as well
         if (status == -1) {
             if (RpnProxyManager.isRpnActive()) {

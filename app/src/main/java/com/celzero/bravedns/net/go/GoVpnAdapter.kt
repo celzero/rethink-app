@@ -1014,8 +1014,8 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private suspend fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
-        if (!tunProxyMode.isTunProxyWireguard()) return
-
+        // fork: wireguard is no longer tied to the single persisted proxy provider / tun mode,
+        // so always add the active wg configs; this returns early when none are active.
         val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
             Logger.i(LOG_TAG_VPN, "$TAG no active wg-configs found")

@@ -49,6 +49,7 @@ import com.celzero.bravedns.database.SmartDnsEndpointRepository
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -1046,7 +1047,9 @@ internal constructor(
         }
 
         if (provider == ProxyProvider.WIREGUARD) {
-            setProxy(proxyType, provider)
+            // fork: wireguard state is owned by WireguardManager (active configs), not by the
+            // single persisted provider, so it can coexist with the custom socks5/http proxy.
+            persistentState.updateProxyStatus()
             return
         }
 
@@ -1094,6 +1097,11 @@ internal constructor(
     }
 
     fun removeProxy(removeType: ProxyType, removeProvider: ProxyProvider) {
+        if (removeProvider == ProxyProvider.WIREGUARD) {
+            // fork: removing wireguard must not touch the custom socks5/http/orbot proxy
+            persistentState.updateProxyStatus()
+            return
+        }
         val currentProxyType = ProxyType.of(getProxyType())
 
         if (currentProxyType.isProxyTypeHttpSocks5()) {
@@ -1137,10 +1145,7 @@ internal constructor(
         val provider = persistentState.proxyProvider
         Logger.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
 
-        if (ProxyProvider.WIREGUARD.name == provider) {
-            return TunProxyMode.WIREGUARD
-        }
-
+        // fork: no WIREGUARD short-circuit here; wireguard is added independently of this mode
         if (ProxyProvider.ORBOT.name == provider) {
             return TunProxyMode.ORBOT
         }
@@ -1184,11 +1189,12 @@ internal constructor(
     }
 
     fun isWgEnabled(): Boolean {
-        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return proxyProvider.isProxyProviderWireguard()
+        return WireguardManager.getActiveWgCount() > 0
     }
 
     fun isProxyEnabled(): Boolean {
+        // fork: wireguard counts as a proxy independent of the persisted provider
+        if (isWgEnabled()) return true
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         if (proxyProvider.isProxyProviderNone()) return false
 
@@ -1208,8 +1214,11 @@ internal constructor(
 
     fun canEnableWireguardProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        // fork: wireguard may be enabled alongside custom socks5/http proxies
         return !getBraveMode().isDnsMode() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
+            (proxyProvider.isProxyProviderNone() ||
+                proxyProvider.isProxyProviderCustom() ||
+                proxyProvider.isProxyProviderWireguard())
     }
 
     fun canEnableHttpProxy(): Boolean {
