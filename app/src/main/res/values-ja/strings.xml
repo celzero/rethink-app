@@ -588,15 +588,15 @@
     <string name="lbl_slow" translatable="true">遅い</string>
     <string name="lbl_day" translatable="true">日</string>
     <string name="lbl_fast" translatable="true">高速</string>
-    <string name="lbl_inactive" translatable="true">活動していません</string>
+    <string name="lbl_inactive" translatable="true">非アクティブ</string>
     <string name="lbl_addresses" translatable="true">アドレス</string>
-    <string name="lbl_active" translatable="true">活動中</string>
+    <string name="lbl_active" translatable="true">アクティブ</string>
     <string name="lbl_dns_servers" translatable="true">DNS サーバー</string>
     <string name="lbl_public_key" translatable="true">公開鍵</string>
     <string name="lbl_insecure" translatable="true">(非セキュア)</string>
     <string name="lbl_min" translatable="true">分</string>
     <string name="lbl_private_key" translatable="true">秘密鍵</string>
-    <string name="lbl_preshared_key" translatable="true">鍵データ</string>
+    <string name="lbl_preshared_key" translatable="true">事前共有キー</string>
     <string name="lbl_applications" translatable="true">アプリ</string>
     <string name="lbl_very" translatable="true">とても</string>
     <string name="lbl_select_all" translatable="true">すべて選択</string>

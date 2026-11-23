@@ -507,6 +507,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // RPN encrypted-file storage migration (external -> internal).
     var rpnInternalStorageMigrationVersion by intPref("rpn_internal_storage_migration_version").withDefault<Int>(0)
 
+    // true once the TV launcher self-exemption has been persisted (consumer is TV-only)
+    var tvSelfExemptionDone by booleanPref("tv_self_exemption_done").withDefault<Boolean>(false)
+
     var appTestMode by booleanPref("app_test_mode").withDefault<Boolean>(false)
 
     // -1 = no override; any other value is a ProtoTranslationMode.id to force in DEBUG mode
@@ -807,6 +810,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // RPN use permanent configuration: only effective when rpnConfigHandlingManual=true
     var rpnUsePermanentConfig by booleanPref("rpn_use_permanent_config").withDefault<Boolean>(false)
+
+    // true when a TV RDNS Plus blocklist selection change is pending an endpoint apply
+    var rdnsPlusApplyPending by booleanPref("rdns_plus_apply_pending").withDefault<Boolean>(false)
 
     /** Comma-separated country codes (e.g. "US,DE,FR") excluded from AUTO server selection.
      *  Empty string = no exclusions (default). */

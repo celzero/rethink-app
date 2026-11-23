@@ -637,7 +637,11 @@ object RpnProxyManager : KoinComponent {
         val sku = purchase.productId
         Logger.i(LOG_IAB, "$TAG; $mname: delegating to BillingServerRepository for " +
                 "token=${purchase.purchaseToken.take(8)}, sku=$sku, accLen=${purchase.accountId.length}")
-        val deviceId = billingBackendClient.getDeviceIdForCid(purchase.accountId)
+        val deviceId = resolveDeviceIdForServerCalls(purchase.accountId, "callConsumeApi", surfacing = false)
+        if (deviceId == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; $mname: did unavailable, consume will retry next cycle")
+            return
+        }
         val success = billingBackendClient.consumePurchase(purchase.accountId, deviceId, sku, purchase.purchaseToken)
         if (success) {
             Logger.i(LOG_IAB, "$TAG; $mname: consume succeeded for token=${purchase.purchaseToken.take(8)}")
@@ -645,6 +649,17 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_IAB, "$TAG; $mname: consume failed for token=${purchase.purchaseToken.take(8)} (will retry next cycle)")
         }
     }
+
+    /**
+     * Resolves the DID bound to [cid] for server calls, minting one if missing; null when
+     * unresolvable. Only [surfacing] flows (user-initiated) post sticky errors; periodic
+     * paths stay silent so a recoverable DID failure cannot strand the user in an alert loop.
+     */
+    private suspend fun resolveDeviceIdForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? = InAppBillingHandler.resolveDidForServerCalls(cid, caller, surfacing)
 
     /**
      * Represents the outcome of a full RPN reset operation.
@@ -693,11 +708,8 @@ object RpnProxyManager : KoinComponent {
             return ResetResult.Failure("Account information is incomplete")
         }
 
-        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-        if (deviceId.isBlank()) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; resetAndRefetchRpn: no did bound to purchase cid")
-            return ResetResult.Failure("Device registration failed; try again later")
-        }
+        val deviceId = resolveDeviceIdForServerCalls(accountId, "resetAndRefetchRpn", surfacing = true)
+            ?: return ResetResult.Failure("Device registration failed; try again later")
 
         val fakePurchase = PurchaseDetail(
             productId = sub.productId,
@@ -1047,6 +1059,13 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
+    // win update() outcome: null is success (previous state stands), only errors retry
+    sealed class WinUpdateResult {
+        data class Updated(val bytes: ByteArray) : WinUpdateResult()
+        object NoChange : WinUpdateResult()
+        data class Failed(val reason: String?) : WinUpdateResult()
+    }
+
     private fun getTime(time: Long): String {
         return  Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
     }
@@ -1190,9 +1209,11 @@ object RpnProxyManager : KoinComponent {
                     val accountId = sub?.accountId.orEmpty()
                     Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: server-entitlement sub=${if (sub != null) "present" else "null"}, accountIdLen=${accountId.length}, purchaseTokenLen=${sub?.purchaseToken?.length ?: 0}")
                     // sub.deviceId holds only the sentinel indicator "pip/identity.json"
-                    val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+                    val deviceId = if (accountId.isNotEmpty()) {
+                        resolveDeviceIdForServerCalls(accountId, "registerProxy", surfacing = false).orEmpty()
+                    } else ""
                     val purchaseToken = sub?.purchaseToken.orEmpty()
-                    if (accountId.isNotEmpty() && purchaseToken.isNotEmpty()) {
+                    if (accountId.isNotEmpty() && purchaseToken.isNotEmpty() && deviceId.isNotEmpty()) {
                         Logger.i(
                             LOG_TAG_PROXY,
                             "$TAG; registerProxy: accountId+purchaseToken present, calling queryEntitlementFromServer"
@@ -1215,7 +1236,7 @@ object RpnProxyManager : KoinComponent {
                                 isAutoRenewing = false,
                                 accountId = accountId,
                                 // Store only the sentinel
-                                // Callers that need the actual ID use billingBackendClient.getDeviceIdForCid(cid).
+                                // Callers that need the actual ID use billingBackendClient.reconcileDidForCid(cid).
                                 deviceId = if (deviceId.isNotBlank()) SubscriptionStatus.DEVICE_ID_INDICATOR else "",
                                 payload = "",
                                 expiryTime = sub?.billingExpiry ?: 0L,
@@ -1267,30 +1288,69 @@ object RpnProxyManager : KoinComponent {
                     } else {
                         Logger.w(
                             LOG_TAG_PROXY,
-                            "$TAG; registerProxy: accountId or purchaseToken empty, skipping server entitlement query (accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchaseToken.isEmpty()})"
+                            "$TAG; registerProxy: accountId, purchaseToken or did empty, skipping server entitlement query " +
+                                "(accountIdEmpty=${accountId.isEmpty()}, purchaseTokenEmpty=${purchaseToken.isEmpty()}, didEmpty=${deviceId.isEmpty()})"
                         )
                     }
                 }
                 isEntitlementBytesAvailable = entitlementBytes != null && entitlementBytes.isNotEmpty()
 
-                if (!isEntitlementBytesAvailable) {
+                val registrationBytes = entitlementBytes
+                if (!isEntitlementBytesAvailable || registrationBytes == null || registrationBytes.isEmpty()) {
                     Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: win entitlement unavailable after all recovery attempts, cannot register")
                     return false
                 }
 
                 Logger.i(LOG_TAG_PROXY, "$TAG; registerProxy: calling VpnController.isWinRegistered()")
                 var ok = true
-                val storedDid = billingBackendClient.storedIdentityDidForCurrentEnv()
-                val payloadCid = if (storedDid.isBlank()) {
-                    ""
-                } else {
-                    entitlementBytes?.let { bytes ->
-                        try {
-                            VpnController.getEntitlementDetails(bytes, storedDid)?.cid()
+                var storedDid = billingBackendClient.peekStoredDid()
+                var recoveryCid = ""
+                var recoverySource = "none"
+                if (storedDid.isBlank()) {
+                    val entitlementCid = try {
+                        JSONObject(String(registrationBytes)).optString("cid").trim()
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement cid parse failed: ${e.message}")
+                        ""
+                    }
+                    if (entitlementCid.isNotBlank()) {
+                        recoveryCid = entitlementCid
+                        recoverySource = "entitlement"
+                    } else {
+                        val sub = try {
+                            subscriptionStatusRepository.getCurrentSubscription()
                         } catch (e: Exception) {
-                            Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: payload cid parse failed: ${e.message}")
+                            Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: did-recovery sub read failed: ${e.message}")
                             null
                         }
+                        recoveryCid = sub?.accountId.orEmpty()
+                        if (recoveryCid.isNotBlank()) recoverySource = "subscription"
+                    }
+                    if (recoveryCid.isNotBlank()) {
+                        storedDid = resolveDeviceIdForServerCalls(recoveryCid, "registerProxy", surfacing = false).orEmpty()
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: stored did blank, recovery source=$recoverySource " +
+                                "cid=${recoveryCid.take(8)} " +
+                                "resolved=${storedDid.isNotEmpty()}"
+                        )
+                    } else {
+                        Logger.w(
+                            LOG_TAG_PROXY,
+                            "$TAG; registerProxy: stored did blank, no purchase cid available for recovery"
+                        )
+                    }
+                }
+                val payloadCid = if (recoveryCid.isNotBlank()) {
+                    recoveryCid
+                } else if (storedDid.isBlank()) {
+                    ""
+                } else {
+                    try {
+                        VpnController.getEntitlementDetails(registrationBytes, storedDid)?.cid()
+                    } catch (e: Exception) {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; registerProxy: payload cid parse failed: ${e.message}")
+                        null
                     }.orEmpty()
                 }
 
@@ -1309,13 +1369,9 @@ object RpnProxyManager : KoinComponent {
                 val deviceId = didResult.deviceId
                 Logger.i(
                     LOG_TAG_PROXY,
-                    "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${entitlementBytes?.size})"
+                    "$TAG; registerProxy: did resolved len=${deviceId.length} (payloadCidLen=${payloadCid.length}, ent bytes=${registrationBytes.size})"
                 )
-                val finalBytes = entitlementBytes
-                if (finalBytes == null || finalBytes.isEmpty()) {
-                    Logger.e(LOG_TAG_PROXY, "$TAG; registerProxy: entitlement bytes unavailable before registration, cannot proceed")
-                    return false
-                }
+                val finalBytes = registrationBytes
                 if (!entitlementFromServer) {
                     val expiryMs = try {
                         parseWsExpiryMs(JSONObject(String(finalBytes)))
@@ -1507,11 +1563,8 @@ object RpnProxyManager : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): accountId empty, cannot refresh")
             return WinRefreshOutcome.StillStale
         }
-        val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
-        if (deviceId.isBlank()) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; refreshWinEntitlement($label): no did for cid=${accountId.take(8)}, cannot refresh")
-            return WinRefreshOutcome.StillStale
-        }
+        val deviceId = resolveDeviceIdForServerCalls(accountId, "refreshWinEntitlement($label)", surfacing = false)
+            ?: return WinRefreshOutcome.StillStale
 
         var entitlementBytes: ByteArray? = null
         var freshPurchase: PurchaseDetail? = null
@@ -2060,10 +2113,17 @@ object RpnProxyManager : KoinComponent {
                     "accExpiry=$accExpiry, billingExpiry=$billingExpiry)")
 
             val accountId = purchase.accountId.ifEmpty { existingSubs.accountId }
-            val deviceId = billingBackendClient.getDeviceIdForCid(accountId)
+            val deviceId = if (accountId.isNotEmpty()) {
+                resolveDeviceIdForServerCalls(accountId, "processRpnPurchase", surfacing = false)
+            } else null
             if (accountId.isEmpty()) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: accountId empty, cannot query server, using best available payload")
                 // Fall through to activateRpn with whatever we have (may also check DB below)
+            } else if (deviceId == null) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: did unavailable for cid=${accountId.take(8)}, cannot query server, using best available payload")
+                if (dbPayloadValid && !existingPayloadValid) {
+                    effectivePurchase = purchase.copy(payload = existingSubs.developerPayload)
+                }
             } else {
                 try {
                     val updatedPurchase = InAppBillingHandler.queryEntitlementFromServer(accountId, deviceId, purchase)
@@ -2117,13 +2177,41 @@ object RpnProxyManager : KoinComponent {
             effectivePurchase = purchase.copy(payload = existingSubs.developerPayload)
         }
 
+        // Keep the machine's retained purchase in sync with the effective payload so
+        // later Active-state activations don't re-store a stale payload (machine-only;
+        // DB developerPayload is untouched). No-op when the machine serves another token.
+        if (effectivePurchase !== purchase) {
+            try {
+                subscriptionStateMachine.updatePayloadForToken(
+                    purchase.purchaseToken, effectivePurchase.payload, effectivePurchase)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; processRpnPurchase: machine payload sync failed (non-fatal): ${e.message}")
+            }
+        }
+
         // This is the single point that writes the entitlement file and sets rpnState.
         // Calling it even when already-enabled ensures the file is present after app restart.
         activateRpn(effectivePurchase)
 
+        // Activation alone doesn't touch the tunnel; register WIN now so UI variants
+        // without a registration self-heal (e.g. TV) don't depend on a VPN restart.
+        ensureWinRegisteredInTunnel()
+
         val storedOk = effectivePurchase.payload.isNotEmpty()
         Logger.i(LOG_TAG_PROXY, "$TAG; processRpnPurchase: complete, payloadStored=$storedOk, product=${purchase.productId}")
         return storedOk
+    }
+
+    // best-effort tunnel registration; non-fatal when the VPN service isn't running
+    private suspend fun ensureWinRegisteredInTunnel() {
+        try {
+            if (rpnMode().isNone()) {
+                setRpnMode(RpnMode.ANTI_CENSORSHIP)
+            }
+            VpnController.handleRpnProxies()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; ensureWinRegisteredInTunnel: deferred to VPN restart/GlobalProxyHandler: ${e.message}")
+        }
     }
 
     /**
@@ -2381,33 +2469,13 @@ object RpnProxyManager : KoinComponent {
     }
 
     /**
-     * Returns the set of WIN server keys currently held in the in-memory cache (excluding the
-     * AUTO sentinel), without triggering any DB read or network fetch.
-     *
-     * Used by the ghost-cleanup in [com.celzero.bravedns.database.RefreshDatabase] (via
-     * [com.celzero.bravedns.service.ProxyManager.purgeGhostMappings]) to determine which RPN
-     * proxyIds are still backed by a live server.
-     *
-     * A disabled-but-present server is NOT a ghost — the user may have temporarily toggled it
-     * off while keeping per-app assignments — so this returns every cached server regardless of
-     * its [CountryConfig.isEnabled] state.
-     */
-    suspend fun getCachedWinServerKeys(): Set<String> {
-        return winCacheMutex.withLock {
-            winServersCache
-                .filter { !it.id.equals(AUTO_SERVER_ID, ignoreCase = true) }
-                .map { it.key }
-                .toSet()
-        }
-    }
-
-    /**
      * Full update pipeline:
-     *  1. Ask the tunnel to refresh and return updated WIN state bytes
-     *     ([VpnController.updateWin]).
-     *  2a. If the tunnel returns bytes → persist them with [updateWinConfigState].
-     *  2b. If the tunnel returns null → fall back to [registerProxy] (full re-register).
-     *     If that also fails return null so callers can show an error.
+     *  1. Ask the tunnel to refresh WIN state and report the outcome
+     *     ([VpnController.updateWin], [WinUpdateResult]).
+     *  2a. [WinUpdateResult.Updated]: persist the bytes with [updateWinConfigState].
+     *  2b. [WinUpdateResult.NoChange]: No new bytes; previous state stands,
+     *      skip persistence and continue.
+     *  2c. [WinUpdateResult.Failed]: return null so callers can show an error / retry.
      *  3. Fetch server locations from the tunnel ([fetchAndConstructWinLocations]).
      *     If empty, retry up to 3 times with 1 s back-off.
      *  4. Sync fetched locations to DB + in-memory cache ([syncWinServers]).
@@ -2440,21 +2508,25 @@ object RpnProxyManager : KoinComponent {
         } else {
             // rotate the entitlement first; plain updateWin() never does
             if (!maybeReRegisterStaleEntitlement()) {
-                val bytes: ByteArray? = VpnController.updateWin()
-
-                if (bytes == null) {
-                    Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() returned null")
-                    return null
-                }
-
-                val persisted = updateWinConfigState(bytes)
-                if (!persisted) {
-                    // Log the failure but do NOT return null; the in-memory state is already
-                    // updated by updateWinConfigState before it touches the DB.
-                    Logger.w(
-                        LOG_TAG_PROXY,
-                        "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
-                    )
+                when (val result = VpnController.updateWin()) {
+                    is WinUpdateResult.Updated -> {
+                        val persisted = updateWinConfigState(result.bytes)
+                        if (!persisted) {
+                            // only log the failure
+                            Logger.w(
+                                LOG_TAG_PROXY,
+                                "$TAG; updateWinProxy: failed to persist WIN config state (continuing)"
+                            )
+                        }
+                    }
+                    // null without error: previous state stands, nothing to persist
+                    is WinUpdateResult.NoChange -> {
+                        Logger.i(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() reports no change, keeping previous state")
+                    }
+                    is WinUpdateResult.Failed -> {
+                        Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: updateWin() failed: ${result.reason}")
+                        return null
+                    }
                 }
             }
         }
@@ -2476,7 +2548,7 @@ object RpnProxyManager : KoinComponent {
 
             if (attempt < maxFetchRetries) {
                 Logger.w(LOG_TAG_PROXY, "$TAG; updateWinProxy: no locations on attempt $attempt, retrying in 1s…")
-                delay(2_000L)
+                delay(2_000L.milliseconds) // TODO: magic number
             }
         }
 

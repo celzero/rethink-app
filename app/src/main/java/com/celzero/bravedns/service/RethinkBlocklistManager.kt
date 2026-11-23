@@ -339,6 +339,12 @@ object RethinkBlocklistManager : KoinComponent {
         return remoteFileTagRepository.getSelectedTags()
     }
 
+    // rows exist once the remote blocklist is downloaded; an empty
+    // selection among existing rows is a valid persisted state
+    suspend fun hasRemoteFileTags(): Boolean {
+        return remoteFileTagRepository.fileTags().isNotEmpty()
+    }
+
     suspend fun clearTagsSelectionRemote() {
         remoteFileTagRepository.clearSelectedTags()
     }

@@ -27,6 +27,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.notifySafely
 
 /**
  * Surfaces wireguard automation commands that could not be carried out (see
@@ -99,9 +100,7 @@ object WgAutomationNotifier {
             builder.setContentIntent(contentIntent)
         }
 
-        runCatching { nm.notify(NOTIF_TAG, NOTIF_ID, builder.build()) }.onFailure {
-            Logger.w(LOG_TAG_VPN, "$TAG: failed to post notification: ${it.message}")
-        }
+        nm.notifySafely(NOTIF_TAG, NOTIF_ID, builder.build())
         Logger.i(
             LOG_TAG_VPN,
             "$TAG: posted wg automation failure alert, action: $action, failures: $failures"

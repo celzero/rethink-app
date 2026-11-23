@@ -39,6 +39,7 @@ import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.firestack.backend.LogConsumer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -398,7 +399,7 @@ class GoMemLogConsumer(private val appContext: Context, private val scope: Corou
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
         builder.color = ContextCompat.getColor(appContext, getAccentColor(Themes.SYSTEM_DEFAULT.id))
-        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "$TAG nw eng notification: $msg")
     }
 }

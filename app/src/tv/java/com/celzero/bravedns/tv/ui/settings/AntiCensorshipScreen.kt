@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,11 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.firestack.settings.Settings
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
@@ -85,7 +85,7 @@ fun AntiCensorshipScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         ) {
             SettingSectionHeader("Dial strategy")
             Text(
@@ -202,23 +202,8 @@ private fun StrategyRow(
 ) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-            contentColor = if (selected) {
-                MaterialTheme.colorScheme.onPrimaryContainer
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            focusedContainerColor = MaterialTheme.colorScheme.primary,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimary,
-            pressedContainerColor = MaterialTheme.colorScheme.primary,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.railItemColors(selected = selected),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 3.dp),
@@ -228,7 +213,7 @@ private fun StrategyRow(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 14.dp),
         ) {
-            Box(modifier = Modifier.padding(end = 16.dp, top = 2.dp)) {
+            Box(modifier = Modifier.padding(end = TvSpacing.IconTextGap, top = 2.dp)) {
                 Text(
                     text = if (selected) "●" else "○",
                     style = MaterialTheme.typography.titleLarge,

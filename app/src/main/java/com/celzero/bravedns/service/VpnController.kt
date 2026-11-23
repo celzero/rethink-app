@@ -30,6 +30,7 @@ import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.RpnLog
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WinUpdateResult
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.Client
@@ -160,6 +161,19 @@ object VpnController : KoinComponent {
         b.signalStopService(reason, userInitiated)
     }
 
+    // stop that suspends until the vpn adapter teardown completes
+    suspend fun stopAwait(reason: String, context: Context, userInitiated: Boolean = true) {
+        Logger.i(LOG_TAG_VPN, "VPN Controller stop-await with context: $context")
+        vpnState = null
+        onConnectionStateChanged(null)
+        val b = rvpn
+        if (b == null) {
+            persistentState.setVpnEnabled(false)
+            return
+        }
+        b.signalStopServiceAwait(reason, userInitiated)
+    }
+
     @Suppress("DEPRECATION")
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
@@ -232,16 +246,24 @@ object VpnController : KoinComponent {
         return rvpn?.getProxyAddrById(id)
     }
 
-    suspend fun startRemoteService(): GoVpnAdapter.RemoteServiceInfo? {
-        return rvpn?.startRemoteService()
+    suspend fun startRemoteService(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.startRemoteService(type)
     }
 
-    suspend fun stopRemoteService() {
-        rvpn?.stopRemoteService()
+    suspend fun stopRemoteService(type: GoVpnAdapter.RemoteServiceType) {
+        rvpn?.stopRemoteService(type)
     }
 
-    suspend fun remoteServiceStatus(): Int? {
-        return rvpn?.remoteServiceStatus()
+    suspend fun stopAllRemoteServices() {
+        rvpn?.stopAllRemoteServices()
+    }
+
+    suspend fun remoteServiceStatus(type: GoVpnAdapter.RemoteServiceType): Int? {
+        return rvpn?.remoteServiceStatus(type)
+    }
+
+    fun remoteServiceInfo(type: GoVpnAdapter.RemoteServiceType): GoVpnAdapter.RemoteServiceInfo? {
+        return rvpn?.remoteServiceInfo(type)
     }
 
     suspend fun getProxyStats(id: String): RouterStats? {
@@ -437,9 +459,8 @@ object VpnController : KoinComponent {
         return rvpn?.registerAndFetchWinIfNeeded(entitlementBytes, stateBytes, deviceId)
     }
 
-    /** Ask the tunnel to refresh the WIN proxy state and return the updated bytes. */
-    suspend fun updateWin(): ByteArray? {
-        return rvpn?.updateWin()
+    suspend fun updateWin(): WinUpdateResult {
+        return rvpn?.updateWin() ?: WinUpdateResult.Failed("no vpn service")
     }
 
     suspend fun onRpnOptsChange() {
@@ -600,6 +621,14 @@ object VpnController : KoinComponent {
 
     suspend fun crashTun(type: Long) {
         rvpn?.crashTun(type)
+    }
+
+    suspend fun peekTrace(cid: String): String {
+        return rvpn?.peekTrace(cid) ?: ""
+    }
+
+    suspend fun getAllTraceLogsAsBytes(): ByteArray? {
+        return rvpn?.getAllTraceLogsAsBytes()
     }
 
     suspend fun getEntitlementDetails(prevBytes: ByteArray?, deviceId: String): RpnEntitlement? {

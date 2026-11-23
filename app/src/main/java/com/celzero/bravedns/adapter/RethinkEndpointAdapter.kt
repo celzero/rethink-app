@@ -286,14 +286,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                 }
             }
             builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-                clipboardCopy(
-                    context,
-                    endpoint.url,
-                    context.getString(R.string.copy_clipboard_label)
-                )
+                val copied =
+                    clipboardCopy(
+                        context,
+                        endpoint.url,
+                        context.getString(R.string.copy_clipboard_label)
+                    )
                 Utilities.showToastUiCentered(
                     context,
-                    context.getString(R.string.info_dialog_url_copy_toast_msg),
+                    context.getString(if (copied) R.string.info_dialog_url_copy_toast_msg else R.string.copy_failed_toast),
                     Toast.LENGTH_SHORT
                 )
             }

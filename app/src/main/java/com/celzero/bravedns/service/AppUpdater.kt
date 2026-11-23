@@ -16,12 +16,15 @@
 package com.celzero.bravedns.service
 
 import android.app.Activity
+import android.content.IntentSender
 
 interface AppUpdater {
+
     fun checkForAppUpdate(
         isInteractive: UserPresent,
         activity: Activity,
-        listener: InstallStateListener
+        listener: InstallStateListener,
+        startUpdateFlow: (IntentSender) -> Unit
     )
 
     fun completeUpdate()

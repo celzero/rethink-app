@@ -10,7 +10,6 @@
 package com.celzero.bravedns.tv.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.AltRoute
@@ -46,21 +44,34 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.tv.material3.Button
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.Text
+import com.celzero.bravedns.R
+import com.celzero.bravedns.tv.ui.common.Surface
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.EventSource
+import com.celzero.bravedns.database.EventType
+import com.celzero.bravedns.database.Severity
+import com.celzero.bravedns.net.go.GoVpnAdapter
+import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.SettingToggleRow
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
+import com.celzero.bravedns.tv.ui.theme.TvSizes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
+import com.celzero.bravedns.ui.bottomsheet.BlockFreeDnsModeBottomSheet
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,6 +116,7 @@ import org.koin.compose.koinInject
 fun SettingsScreen(navController: NavController? = null) {
     val persistentState = koinInject<PersistentState>()
     val appConfig = koinInject<AppConfig>()
+    val eventLogger = koinInject<EventLogger>()
     val composeScope = rememberCoroutineScope()
     val ioScope = remember { CoroutineScope(Dispatchers.IO) }
 
@@ -124,7 +136,7 @@ fun SettingsScreen(navController: NavController? = null) {
                 composeScope = composeScope,
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("Tunnel")
             SettingToggleRow(
                 title = "Allow apps to bypass the VPN",
@@ -163,7 +175,15 @@ fun SettingsScreen(navController: NavController? = null) {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
+            DnsSection(
+                navController = navController,
+                persistentState = persistentState,
+                ioScope = ioScope,
+                eventLogger = eventLogger,
+            )
+
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("WireGuard")
             SettingToggleRow(
                 title = "Global lockdown",
@@ -184,7 +204,7 @@ fun SettingsScreen(navController: NavController? = null) {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("Reliability")
             SettingToggleRow(
                 title = "Endpoint-independent mapping",
@@ -223,7 +243,7 @@ fun SettingsScreen(navController: NavController? = null) {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("Boot")
             SettingToggleRow(
                 title = "Auto-start on boot",
@@ -235,7 +255,7 @@ fun SettingsScreen(navController: NavController? = null) {
                 },
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(TvSpacing.GroupGap))
             SettingSectionHeader("Advanced")
             SettingNavRow(
                 title = "Pause protection",
@@ -256,6 +276,12 @@ fun SettingsScreen(navController: NavController? = null) {
                 onClick = { navController?.navigate("settings/console-log") },
             )
 
+            LogLevelSection(
+                persistentState = persistentState,
+                eventLogger = eventLogger,
+                ioScope = ioScope,
+            )
+
             Spacer(Modifier.height(32.dp))
         }
     }
@@ -266,20 +292,14 @@ fun SettingsScreen(navController: NavController? = null) {
 private fun SettingNavRow(
     title: String,
     description: String,
-    leadingIcon: ImageVector,
+    leadingIcon: ImageVector? = null,
+    leadingIconRes: Int? = null,
     onClick: () -> Unit,
 ) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
@@ -287,20 +307,27 @@ private fun SettingNavRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = TvSpacing.ContentHorizontal, vertical = TvSpacing.ContentVertical),
         ) {
-            Icon(
-                imageVector = leadingIcon,
-                contentDescription = null,
-                modifier = Modifier.size(28.dp),
-            )
-            Spacer(Modifier.width(16.dp))
+            if (leadingIcon != null) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(TvSizes.LeadingIcon),
+                )
+                Spacer(Modifier.width(TvSpacing.IconTextGap))
+            } else if (leadingIconRes != null) {
+                Icon(
+                    painter = painterResource(leadingIconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(TvSizes.LeadingIcon),
+                )
+                Spacer(Modifier.width(TvSpacing.IconTextGap))
+            }
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -349,41 +376,200 @@ private fun ProtectionModeSection(
                 AppConfig.BraveMode.FIREWALL -> "Firewall"
                 AppConfig.BraveMode.DNS_FIREWALL -> "DNS + Firewall"
             }
-            val selected = mode == currentMode
-            Surface(
+            TvSelectableChip(
+                label = label,
+                selected = mode == currentMode,
+                style = MaterialTheme.typography.titleMedium,
                 onClick = {
                     currentMode = mode
                     composeScope.launch(Dispatchers.IO) {
                         appConfig.changeBraveMode(mode.mode)
                     }
                 },
-                shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = if (selected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    },
-                    contentColor = if (selected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
+            )
+        }
+    }
+}
+
+/**
+ * DNS toggles ported from the full variant's `DnsSettingsFragment`:
+ * ALG, split DNS, DNS cache, prevent-DNS-leaks, and the block-free
+ * (bypass) DNS mode picker sub-screen. State is hoisted here so the
+ * ALG ↔ split-DNS dependency (below Android R) flips both rows
+ * instantly.
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun DnsSection(
+    navController: NavController?,
+    persistentState: PersistentState,
+    ioScope: CoroutineScope,
+    eventLogger: EventLogger,
+) {
+    var dnsAlg by remember { mutableStateOf(persistentState.enableDnsAlg) }
+    var splitDns by remember { mutableStateOf(persistentState.splitDns) }
+    var dnsCache by remember { mutableStateOf(persistentState.enableDnsCache) }
+    var preventDnsLeaks by remember { mutableStateOf(persistentState.preventDnsLeaks) }
+
+    fun logEvent(msg: String, details: String) {
+        eventLogger.log(EventType.UI_SETTING_CHANGED, Severity.LOW, msg, EventSource.UI, true, details)
+    }
+
+    fun blockFreeDnsLabel(mode: BlockFreeDnsModeBottomSheet.BlockFreeDnsMode): String = when (mode) {
+        BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK -> "Use Bootstrap DNS"
+        BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.GLOBAL -> "Use Global DNS"
+        BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO -> "Automatic"
+    }
+
+    SettingSectionHeader("DNS")
+    SettingToggleRow(
+        title = "Advanced DNS filtering (experimental)",
+        description = "Assign unique IP per DNS request.",
+        leadingIconRes = R.drawable.ic_adv_dns_filter,
+        checked = dnsAlg,
+        onCheckedChange = { next ->
+            dnsAlg = next
+            // below Android R, split DNS depends on ALG; force it off
+            if (!next && !isAtleastR() && splitDns) {
+                splitDns = false
+                ioScope.launch {
+                    persistentState.enableDnsAlg = false
+                    persistentState.splitDns = false
+                }
+            } else {
+                ioScope.launch { persistentState.enableDnsAlg = next }
+            }
+            logEvent("dns alg setting? $next", "User changed dns alg setting to $next")
+        },
+    )
+    SettingToggleRow(
+        title = "Split DNS (experimental)",
+        description = "Forward DNS queries from proxied apps to the proxy's DNS servers.",
+        leadingIconRes = R.drawable.ic_split_dns,
+        checked = splitDns,
+        onCheckedChange = { next ->
+            splitDns = next
+            // below Android R, split DNS requires ALG; auto-enable it
+            if (next && !isAtleastR() && !dnsAlg) {
+                dnsAlg = true
+                ioScope.launch {
+                    persistentState.splitDns = true
+                    persistentState.enableDnsAlg = true
+                }
+            } else {
+                ioScope.launch { persistentState.splitDns = next }
+            }
+            logEvent("split dns? $next", "User changed split dns setting to $next")
+        },
+    )
+    SettingToggleRow(
+        title = "DNS booster",
+        description = "Coalesce requests, cache responses, resilient error handling.",
+        leadingIconRes = R.drawable.ic_auto_start,
+        checked = dnsCache,
+        onCheckedChange = { next ->
+            dnsCache = next
+            ioScope.launch { persistentState.enableDnsCache = next }
+            logEvent("dns cache? $next", "User changed dns cache in tunnel setting to $next")
+        },
+    )
+    SettingToggleRow(
+        title = "Prevent DNS leaks",
+        description = "When enabled, Rethink captures all packets on port 53 and forwards it to a user-set DNS endpoint.",
+        leadingIconRes = R.drawable.ic_prevent_dns_leaks,
+        checked = preventDnsLeaks,
+        onCheckedChange = { next ->
+            preventDnsLeaks = next
+            ioScope.launch { persistentState.preventDnsLeaks = next }
+            logEvent("prevent dns leaks? $next", "User changed prevent dns leaks setting to $next")
+        },
+    )
+    val bypassDesc = if (splitDns) {
+        blockFreeDnsLabel(BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.fromMode(persistentState.blockFreeDnsMode))
+    } else {
+        val defaultMode = if (isAtleastR()) {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.AUTO
+        } else {
+            BlockFreeDnsModeBottomSheet.BlockFreeDnsMode.FALLBACK
+        }
+        "Split DNS is disabled. ${blockFreeDnsLabel(defaultMode)}"
+    }
+    SettingNavRow(
+        title = "DNS for bypass",
+        description = bypassDesc,
+        leadingIconRes = R.drawable.ic_use_fallback_bypass,
+        onClick = { navController?.navigate("settings/dns-bypass") },
+    )
+}
+
+/**
+ * App log level picker, mirroring the full variant's `showGoLoggerDialog`:
+ * persists [PersistentState.goLoggerLevel], updates the in-process Logger
+ * gates, and pushes the level to the Go tunnel. Levels 0-7 map directly to
+ * [Logger.LoggerLevel] ids; id 7 ("None") is translated to Go's `none`
+ * inside [GoVpnAdapter.setLogLevel].
+ */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun LogLevelSection(
+    persistentState: PersistentState,
+    eventLogger: EventLogger,
+    ioScope: CoroutineScope,
+) {
+    var logLevel by remember { mutableStateOf(persistentState.goLoggerLevel.toInt()) }
+    // serializes level changes so rapid clicks apply in click order
+    val logSerial = remember { Dispatchers.IO.limitedParallelism(1) }
+
+    val levelLabels = listOf(
+        R.string.settings_gologger_dialog_option_0,
+        R.string.settings_gologger_dialog_option_1,
+        R.string.settings_gologger_dialog_option_2,
+        R.string.settings_gologger_dialog_option_3,
+        R.string.settings_gologger_dialog_option_4,
+        R.string.settings_gologger_dialog_option_5,
+        R.string.settings_gologger_dialog_option_6,
+        R.string.settings_gologger_dialog_option_7,
+    )
+
+    SettingSectionHeader("Log level")
+    Text(
+        text = "How verbose app and tunnel diagnostics are. Debug or lower is useful for bug reports.",
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(bottom = 12.dp, start = 4.dp),
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        levelLabels.indices.chunked(4).forEach { rowLevels ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 28.dp, vertical = 16.dp),
-                ) {
-                    Text(
-                        text = if (selected) "✓  $label" else label,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        ),
+                rowLevels.forEach { level ->
+                    TvSelectableChip(
+                        label = stringResource(levelLabels[level]),
+                        selected = level == logLevel,
+                        onClick = {
+                            if (level == logLevel) return@TvSelectableChip
+                            logLevel = level
+                            ioScope.launch(logSerial) {
+                                persistentState.goLoggerLevel = level.toLong()
+                                Logger.uiLogLevel = level.toLong()
+                                Logger.updateConfigLevel(level.toLong())
+                                GoVpnAdapter.setLogLevel(
+                                    level,
+                                    Logger.uiLogLevel.toInt(),
+                                    persistentState.includeFileTrace
+                                )
+                                eventLogger.log(
+                                    EventType.UI_SETTING_CHANGED,
+                                    Severity.LOW,
+                                    "app log level set to $level",
+                                    EventSource.UI,
+                                    true,
+                                    "User changed app log level to $level"
+                                )
+                            }
+                        },
                     )
                 }
             }

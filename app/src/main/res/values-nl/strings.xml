@@ -92,8 +92,8 @@
     <string name="app_name" translatable="false">RethinkDNS</string>
     <string name="app_name_small_case" translatable="false">rethink</string>
     <string name="title_settings">Instellingen</string>
-    <string name="pause_title_desc">In slaapstand…</string>
-    <string name="about_title_desc">Detecteer en blokkeer netwerkbeveiligingsbedreigingen</string>
+    <string name="pause_title_desc">een dutje doen…</string>
+    <string name="about_title_desc">Netwerkbeveiligingsbedreigingen opsporen en blokkeren</string>
     <string name="next">Volgende</string>
     <string name="skip">Overslaan</string>
     <string name="slide_1_title">Gratis en open source</string>
@@ -489,7 +489,7 @@
     <string name="lbl_maybe_blocked" translatable="true">Misschien geblokkeerd</string>
     <string name="lbl_rules" translatable="true">regels</string>
     <string name="lbl_configure" translatable="true">Configureren</string>
-    <string name="lbl_network" translatable="true">netwerk</string>
+    <string name="lbl_network" translatable="true">Netwerk</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
     <string name="lbl_import" translatable="true">Importeren</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
@@ -503,7 +503,7 @@
     <string name="settings_app_notification_persistent_heading" translatable="true">Aanhoudende melding</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Maak de melding aanhoudend</string>
     <string name="lbl_action_required" translatable="true">Actie vereist</string>
-    <string name="lbl_logs" translatable="true">Logboeken</string>
+    <string name="lbl_logs" translatable="true">Logs</string>
     <string name="lbl_create" translatable="true">Nieuw</string>
     <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
     <string name="lbl_delete" translatable="true">Verwijderen</string>
@@ -1093,4 +1093,11 @@
     <string name="ac_title" translatable="true">anticensuur</string>
     <string name="ac_desc" translatable="true">Anticensuurtools kunnen vrije internettoegang bieden, maar werken mogelijk niet overal. Ze worden alleen geprobeerd bij verbindingen zonder proxy.</string>
     <string name="ac_never_split_desc" translatable="true">Pakketten niet wijzigen.</string>
+    <string name="lbl_unknown" translatable="true">Onbekend</string>
+    <string name="lbl_on" translatable="true">Aan</string>
+    <string name="lbl_off" translatable="true">Uit</string>
+    <string name="log_activity_conn_count" translatable="true">%1$d verbindingen</string>
+    <string name="log_activity_interval_empty" translatable="true">Geen activiteit opgenomen in deze periode</string>
+    <string name="logs_card_grid_desc" translatable="true">Activiteitsraster, tik om details te zien</string>
+    <string name="lbl_enable" translatable="true">Inschakelen</string>
 </resources>

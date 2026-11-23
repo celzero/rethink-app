@@ -119,7 +119,7 @@ class HomeScreenActivityDialogTest {
     fun `test update available dialog is modal and has correct buttons for Play Store`() {
         // Given
         val title = "New Update!"
-        val customMessage = "A new version is available. Please update from Play Store."
+        val customMessage = "A new version of the app is available on Google Play. Do you want to update?"
 
         // When
         val builder = AlertDialog.Builder(context)
@@ -128,7 +128,7 @@ class HomeScreenActivityDialogTest {
         builder.setCancelable(false) // Modal
 
         // Play Store version buttons
-        builder.setPositiveButton("ok") { dialogInterface, _ ->
+        builder.setPositiveButton("Open Play Store") { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
         builder.setNegativeButton("Remind me later") { dialogInterface, _ ->

@@ -45,6 +45,7 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
@@ -379,34 +380,34 @@ class AppWiseDomainsAdapter(
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
+        private fun resolveDomainStatus(domain: String): DomainRulesManager.Status {
+            val status = DomainRulesManager.status(domain, uid)
+            if (status != DomainRulesManager.Status.NONE) return status
+            return DomainRulesManager.status(domain, UID_EVERYBODY)
+        }
+
         private fun updateStatusUi(conn: AppConnection) {
             if (conn.appOrDnsName.isNullOrEmpty()) {
                 b.progress.visibility = View.GONE
                 return
             }
-            if (conn.blocked) {
-                b.progress.setIndicatorColor(
-                    UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                )
-            } else {
-                val status = DomainRulesManager.status(conn.appOrDnsName, uid)
-                Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
-                when (status) {
-                    DomainRulesManager.Status.NONE -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                        )
-                    }
-                    DomainRulesManager.Status.BLOCK -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                        )
-                    }
-                    DomainRulesManager.Status.TRUST -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                        )
-                    }
+            val status = resolveDomainStatus(conn.appOrDnsName)
+            Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
+            when (status) {
+                DomainRulesManager.Status.NONE -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchColor(context, R.attr.colorOnSurfaceVariant)
+                    )
+                }
+                DomainRulesManager.Status.BLOCK -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                    )
+                }
+                DomainRulesManager.Status.TRUST -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
                 }
             }
 
@@ -427,7 +428,7 @@ class AppWiseDomainsAdapter(
         // PagingDataAdapter does not support manual notifyItem* calls.
         // Calling notifyItemChanged on a PagingDataAdapter can cause
         // RecyclerView inconsistency crashes (IndexOutOfBoundsException).
-        // Always use refresh() to reload the current data from the PagingSource.
+        notifyDataSetChanged()
         refresh()
     }
 }

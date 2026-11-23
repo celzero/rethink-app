@@ -32,6 +32,7 @@ import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -168,7 +169,7 @@ class GoLogFileDescriptorReader(
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
         builder.color = ContextCompat.getColor(ctx, getAccentColor(Themes.SYSTEM_DEFAULT.id))
-        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_VPN, "nw eng notification: $msg")
     }
 }

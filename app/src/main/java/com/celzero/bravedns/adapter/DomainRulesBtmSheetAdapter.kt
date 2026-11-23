@@ -27,8 +27,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DomainItemBottomSheetBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DomainRulesBtmSheetAdapter(
     val context: Context,
@@ -51,46 +53,42 @@ class DomainRulesBtmSheetAdapter(
         holder.update(domain)
     }
 
+    private fun resolveDomainStatus(domain: String): DomainRulesManager.Status {
+        val status = DomainRulesManager.status(domain, uid)
+        if (status != DomainRulesManager.Status.NONE) return status
+        return DomainRulesManager.status(domain, UID_EVERYBODY)
+    }
+
     inner class ViewHolder(private val b: DomainItemBottomSheetBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(item: String) {
             val domain = item.trim()
             b.domainText.text = domain.trim()
-            when (DomainRulesManager.getDomainRule(domain, uid)) {
-                DomainRulesManager.Status.TRUST -> {
-                    enableTrustUi()
-                }
-                DomainRulesManager.Status.BLOCK -> {
-                    enableBlockUi()
-                }
-                DomainRulesManager.Status.NONE -> {
-                    noRuleUi()
-                }
-            }
+            renderStatus(resolveDomainStatus(domain))
 
             b.blockIcon.setOnClickListener {
-                if (
-                    DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.BLOCK
-                ) {
-                    applyDomainRule(domain, DomainRulesManager.Status.NONE)
-                    noRuleUi()
-                } else {
-                    applyDomainRule(domain, DomainRulesManager.Status.BLOCK)
-                    enableBlockUi()
-                }
+                val newStatus =
+                    if (
+                        DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.BLOCK
+                    ) {
+                        DomainRulesManager.Status.NONE
+                    } else {
+                        DomainRulesManager.Status.BLOCK
+                    }
+                applyDomainRule(domain, newStatus)
             }
 
             b.trustIcon.setOnClickListener {
-                if (
-                    DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.TRUST
-                ) {
-                    applyDomainRule(domain, DomainRulesManager.Status.NONE)
-                    noRuleUi()
-                } else {
-                    applyDomainRule(domain, DomainRulesManager.Status.TRUST)
-                    enableTrustUi()
-                }
+                val newStatus =
+                    if (
+                        DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.TRUST
+                    ) {
+                        DomainRulesManager.Status.NONE
+                    } else {
+                        DomainRulesManager.Status.TRUST
+                    }
+                applyDomainRule(domain, newStatus)
             }
         }
 
@@ -103,6 +101,21 @@ class DomainRulesBtmSheetAdapter(
                     DomainRulesManager.DomainType.DOMAIN,
                     uid,
                 )
+                // re-resolve after the write lands; a cleared app rule may fall
+                // back to an inherited universal rule
+                val resolved = resolveDomainStatus(domain.trim())
+                uiCtx {
+                    // holder may have been rebound to another domain meanwhile
+                    if (b.domainText.text.toString() == domain.trim()) renderStatus(resolved)
+                }
+            }
+        }
+
+        private fun renderStatus(status: DomainRulesManager.Status) {
+            when (status) {
+                DomainRulesManager.Status.TRUST -> enableTrustUi()
+                DomainRulesManager.Status.BLOCK -> enableBlockUi()
+                DomainRulesManager.Status.NONE -> noRuleUi()
             }
         }
 
@@ -128,5 +141,9 @@ class DomainRulesBtmSheetAdapter(
 
     private fun io(f: suspend () -> Unit) {
         (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

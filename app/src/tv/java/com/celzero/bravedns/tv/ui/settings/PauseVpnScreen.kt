@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.tv.material3.ClickableSurfaceDefaults
@@ -35,6 +33,9 @@ import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import com.celzero.bravedns.service.PauseTimer
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
@@ -87,7 +88,7 @@ fun PauseVpnScreen() {
                 PausePicker()
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(TvSpacing.RowGap))
             Text(
                 text = "While paused, traffic flows directly without any blocking. " +
                     "Use this for short-term debugging of an app that needs an unfiltered network.",
@@ -108,16 +109,16 @@ private fun PausePicker() {
     }
     Text(
         text = "How long?",
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+        style = MaterialTheme.typography.titleMedium,
     )
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap)) {
         presets.forEach { p ->
             Surface(
                 onClick = {
                     VpnController.pauseApp()
                     PauseTimer.start(p.durationMs)
                 },
-                shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+                shape = TvSurfaceStyles.interactiveShape(),
                 colors = ClickableSurfaceDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -130,9 +131,7 @@ private fun PausePicker() {
                 Box(modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp)) {
                     Text(
                         text = p.label,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                        ),
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
             }
@@ -147,7 +146,7 @@ private fun PausedCountdown(remainingMs: Long) {
     val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingMs) % 60
 
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = TvShapes.Medium,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -160,16 +159,16 @@ private fun PausedCountdown(remainingMs: Long) {
         ) {
             Text(
                 text = "Protection paused",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleMedium,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(TvSpacing.RowGap))
             Text(
                 text = String.format("%02d:%02d", minutes, seconds),
-                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.displayLarge,
             )
             Spacer(Modifier.height(16.dp))
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(TvSpacing.GroupGap),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AdjustButton(label = "−1 min") {
@@ -178,13 +177,13 @@ private fun PausedCountdown(remainingMs: Long) {
                 AdjustButton(label = "+1 min") {
                     PauseTimer.addDuration(PauseTimer.PAUSE_VPN_EXTRA_MILLIS)
                 }
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(TvSpacing.RowGap))
                 Surface(
                     onClick = {
                         PauseTimer.stop()
                         VpnController.resumeApp()
                     },
-                    shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+                    shape = TvSurfaceStyles.interactiveShape(),
                     colors = ClickableSurfaceDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError,
@@ -197,9 +196,7 @@ private fun PausedCountdown(remainingMs: Long) {
                     Box(modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp)) {
                         Text(
                             text = "Resume now",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                            ),
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
                 }
@@ -213,7 +210,7 @@ private fun PausedCountdown(remainingMs: Long) {
 private fun AdjustButton(label: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(10.dp)),
+        shape = TvSurfaceStyles.interactiveShape(shape = TvShapes.Small),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,

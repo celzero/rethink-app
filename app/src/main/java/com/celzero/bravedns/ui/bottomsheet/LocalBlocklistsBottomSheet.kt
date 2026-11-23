@@ -587,14 +587,15 @@ class LocalBlocklistsBottomSheet : BaseBottomSheetDialogFragment() {
 
         b.lbbsCopy.setOnClickListener {
             val url = Constants.RETHINK_BASE_URL_MAX + persistentState.localBlocklistStamp
-            clipboardCopy(
-                requireContext(),
-                url,
-                requireContext().getString(R.string.copy_clipboard_label)
-            )
+            val copied =
+                clipboardCopy(
+                    requireContext(),
+                    url,
+                    requireContext().getString(R.string.copy_clipboard_label)
+                )
             Utilities.showToastUiCentered(
                 requireContext(),
-                requireContext().getString(R.string.info_dialog_rethink_toast_msg),
+                requireContext().getString(if (copied) R.string.info_dialog_rethink_toast_msg else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,11 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.celzero.bravedns.tv.ui.common.Surface
@@ -51,6 +47,10 @@ import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.SettingToggleRow
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.theme.TvColors
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -214,7 +214,7 @@ fun WgDetailScreen(configId: Int, navController: NavController? = null) {
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(TvSpacing.SectionGap))
             Text(
                 text = "Tap a peer for raw allowed-IPs. Editing peers requires a paste-friendly text-entry flow that will land alongside the WG import screen.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -234,25 +234,21 @@ fun WgDetailScreen(configId: Int, navController: NavController? = null) {
 private fun IncludedAppsRow(onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            modifier = Modifier.padding(
+                horizontal = TvSpacing.ContentHorizontal,
+                vertical = TvSpacing.ContentVertical,
+            ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Included apps",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -261,10 +257,10 @@ private fun IncludedAppsRow(onClick: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(TvSpacing.IconTextGap))
             Text(
                 text = "Open ›",
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -274,7 +270,7 @@ private fun IncludedAppsRow(onClick: () -> Unit) {
 @Composable
 private fun InterfaceCard(config: Config?, mapping: WgConfigFilesImmutable) {
     Surface(
-        shape = RoundedCornerShape(12.dp),
+        shape = TvShapes.Small,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
@@ -289,7 +285,7 @@ private fun InterfaceCard(config: Config?, mapping: WgConfigFilesImmutable) {
                 Spacer(Modifier.width(12.dp))
                 Text(
                     text = "Interface",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
             val iface = config?.getInterface()
@@ -317,19 +313,19 @@ private fun InterfaceCard(config: Config?, mapping: WgConfigFilesImmutable) {
 @Composable
 private fun PeerCard(index: Int, peer: Peer) {
     Surface(
-        shape = RoundedCornerShape(10.dp),
+        shape = TvShapes.Small,
         colors = SurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+            modifier = Modifier.padding(horizontal = TvSpacing.ContentHorizontal, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = "Peer #$index",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleSmall,
             )
             Spacer(Modifier.height(2.dp))
             InfoLine("Public key", peer.getPublicKey().base64(), monospace = true)
@@ -372,16 +368,18 @@ private fun InfoLine(label: String, value: String, monospace: Boolean = false) {
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun ActiveTile(active: Boolean) {
-    val container = if (active) Color(0xFF2E7D32) else MaterialTheme.colorScheme.surface
+    // Tertiary carries the positive/"good" status accent in this theme.
+    val container = if (active) TvColors.Success else MaterialTheme.colorScheme.surface
+    val content = if (active) TvColors.OnSuccess else MaterialTheme.colorScheme.onSurfaceVariant
     Box(
         modifier = Modifier
-            .background(container, RoundedCornerShape(50))
+            .background(container, TvShapes.Pill)
             .padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Text(
             text = if (active) "ON" else "OFF",
-            color = Color.White,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = content,
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }

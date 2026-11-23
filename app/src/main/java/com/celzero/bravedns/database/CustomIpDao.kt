@@ -27,6 +27,7 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Update
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CustomIpDao {
@@ -76,6 +77,11 @@ interface CustomIpDao {
     @Query("delete from CustomIp where uid = $UID_EVERYBODY") fun deleteAllIPRulesUniversal()
 
     @Query("select * from CustomIp where uid = :uid") fun getRulesByUid(uid: Int): List<CustomIp>
+
+    @Query(
+        "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc"
+    )
+    fun observeRulesByUid(uid: Int): Flow<List<CustomIp>>
 
     @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY and isActive = 1")
     fun getBlockedConnectionsCount(): Int

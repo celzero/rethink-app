@@ -214,11 +214,11 @@ class StateMachineDatabaseSyncService : KoinComponent {
     }
 
     /**
-     * Save a new purchase to the DB (insert only if not already present by token).
+     * Save or reconcile a purchase row by token. Confirmed one-time options can
+     * recalculate the fixed access expiry; generic purchase snapshots cannot.
      * Returns the row id on success, -1 on failure.
      *
-     * NOTE: This method only creates the initial row. All subsequent updates are
-     * handled exclusively by [SubscriptionStateMachineV2.handlePaymentSuccessful].
+     * Successful status transitions remain owned by [SubscriptionStateMachineV2.handlePaymentSuccessful].
      */
     suspend fun savePurchaseDetail(purchaseDetail: PurchaseDetail): Long {
         return try {
@@ -238,14 +238,57 @@ class StateMachineDatabaseSyncService : KoinComponent {
                     existing.orderId = purchaseDetail.orderId
                     needsUpdate = true
                 }
+                val isInApp = SubscriptionStateMachineV2.isInAppProduct(purchaseDetail.productId)
+                // For INAPP, only an exact-token server response confirms a multi-option plan.
+                val planResolved = if (isInApp) {
+                    purchaseDetail.isPlanIdServerConfirmed
+                } else {
+                    purchaseDetail.planId.isNotBlank() &&
+                            purchaseDetail.planId != purchaseDetail.productId
+                }
+                if (planResolved && existing.planId != purchaseDetail.planId) {
+                    existing.planId = purchaseDetail.planId
+                    needsUpdate = true
+                } else if (!planResolved && existing.planId.isBlank()) {
+                    existing.planId = if (isInApp) purchaseDetail.productId
+                    else purchaseDetail.planId.ifBlank { purchaseDetail.productId }
+                    needsUpdate = true
+                }
+                if (planResolved && existing.windowDays != purchaseDetail.windowDays) {
+                    existing.windowDays = purchaseDetail.windowDays
+                    needsUpdate = true
+                }
+                val titleApplies = (planResolved ||
+                        existing.planId.isBlank() || existing.planId == existing.productId) &&
+                        purchaseDetail.productTitle.isNotBlank()
+                if (titleApplies && existing.productTitle != purchaseDetail.productTitle) {
+                    existing.productTitle = purchaseDetail.productTitle
+                    needsUpdate = true
+                }
+                val hasIncomingExpiry = purchaseDetail.expiryTime > 0L &&
+                        purchaseDetail.expiryTime != Long.MAX_VALUE
+                val authoritativeInAppExpiry = isInApp && purchaseDetail.isPlanIdServerConfirmed
+                if (hasIncomingExpiry &&
+                    (authoritativeInAppExpiry || existing.billingExpiry < purchaseDetail.expiryTime)
+                ) {
+                    existing.billingExpiry = purchaseDetail.expiryTime
+                    existing.accountExpiry = purchaseDetail.expiryTime
+                    needsUpdate = true
+                }
                 if (needsUpdate) {
-                    subscriptionRepository.upsert(existing)
+                    val updatedId = subscriptionRepository.upsert(existing)
+                    if (updatedId <= 0L) {
+                        throw IllegalStateException("Unable to update purchase ${purchaseDetail.purchaseToken.take(8)}")
+                    }
                     Logger.i(LOG_IAB, "$TAG: savePurchaseDetail: updated existing row id=${existing.id} with new data")
                 }
                 existing.id.toLong()
             } else {
                 val sub = convertPurchaseDetailToSubscriptionStatus(purchaseDetail)
                 val id  = subscriptionRepository.insert(sub)
+                if (id <= 0L) {
+                    throw IllegalStateException("Unable to insert purchase ${purchaseDetail.purchaseToken.take(8)}")
+                }
                 Logger.d(LOG_IAB, "$TAG: savePurchaseDetail: new row id=$id")
                 id
             }
@@ -451,6 +494,7 @@ class StateMachineDatabaseSyncService : KoinComponent {
             accountExpiry    = playExpiry    // same Play value; ws payload is not used for expiry
             developerPayload = purchaseDetail.payload
             status           = purchaseDetail.status
+            windowDays       = purchaseDetail.windowDays
             lastUpdatedTs    = System.currentTimeMillis()
         }
     }

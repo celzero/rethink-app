@@ -33,6 +33,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVI
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_DEVICE_AUTH_ERROR_VALUE
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 
 /**
  * Posts a high-priority system notification whenever an API call returns HTTP 401
@@ -114,7 +115,7 @@ object DeviceAuthErrorNotifier {
                 .setAutoCancel(true)
 
             // Fixed ID → repeated 401s update the same notification, not stack new ones
-            notificationManager.notify(
+            notificationManager.notifySafely(
                 NOTIF_CHANNEL_ID_RPN_ALERTS,
                 NOTIF_ID_IAB_DEVICE_AUTH_ERROR,
                 builder.build()

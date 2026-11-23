@@ -100,10 +100,12 @@ class ConsoleLogAdapter(private val context: Context) :
                         )
                 }
                 b.logDetail.text = log.message
+                val time =
+                    if (log.timestamp == 0L) "" else Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
                 if (DEBUG) {
-                    b.logTimestamp.text = "${abs(log.id)}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
+                    b.logTimestamp.text = "${abs(log.id)}\n$time"
                 } else {
-                    b.logTimestamp.text = Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
+                    b.logTimestamp.text = time
                 }
             } catch (e: Exception) {
                 Logger.w("ConsoleLogAdapter", "Error updating view holder: ${e.message}")
