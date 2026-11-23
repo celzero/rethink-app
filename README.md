@@ -1,5 +1,7 @@
 ## Rethink DNS + Firewall + VPN for Android
 
+The goal of this fork is to re-enable the option to use both Wireguard and SOCKS/HTTP Proxies, all other app functionality is identical.
+
 A multi-hop [WireGuard](https://github.com/wireguard/wireguard-go) client, an [OpenSnitch](https://github.com/evilsocket/opensnitch)-inspired firewall and network monitor + a [pi-hole](https://github.com/pi-hole/pi-hole)-inspired DNS over HTTPS (DoH), Oblivious DoH, DNS over TLS (DoT), DNSCrypt client with blocklists.
 
 <div align="center">
