@@ -150,6 +150,73 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         handleProxyUi()
         displayWireguardUi()
         displayRpnUi()
+        refreshCustomProxyExtras()
+    }
+
+    // the endpoint is saved asynchronously, so give it a moment before re-reading app config
+    private fun refreshCustomProxyExtrasDelayed() {
+        io {
+            kotlinx.coroutines.delay(600)
+            uiCtx { refreshCustomProxyExtras() }
+        }
+    }
+
+    // fork: live status + per-app selection rows for the custom socks5 / http proxies
+    private fun refreshCustomProxyExtras() {
+        updateCustomProxyRow(
+            appConfig.isCustomSocks5Enabled(),
+            ProxyManager.ID_S5_BASE,
+            ProxyManager.S5_PROXY_NAME,
+            b.settingsActivitySocks5Status,
+            b.settingsActivitySocks5Apps,
+        )
+        updateCustomProxyRow(
+            appConfig.isCustomHttpProxyEnabled(),
+            ProxyManager.ID_HTTP_BASE,
+            ProxyManager.HTTP_PROXY_NAME,
+            b.settingsActivityHttpStatus,
+            b.settingsActivityHttpApps,
+        )
+    }
+
+    private fun updateCustomProxyRow(
+        enabled: Boolean,
+        proxyId: String,
+        proxyName: String,
+        statusView: TextView,
+        appsView: TextView,
+    ) {
+        if (!enabled) {
+            statusView.visibility = View.GONE
+            appsView.visibility = View.GONE
+            return
+        }
+        val count = ProxyManager.getAppCountForProxy(proxyId)
+        appsView.visibility = View.VISIBLE
+        appsView.text =
+            if (count == 0) {
+                getString(R.string.settings_proxy_apps_all)
+            } else {
+                getString(R.string.add_remove_apps, count.toString())
+            }
+        appsView.setOnClickListener {
+            startActivity(WgIncludeAppsActivity.newIntent(this, proxyId, proxyName))
+        }
+        io {
+            val statusId = VpnController.getProxyStatusById(proxyId).first
+            val status = UIUtils.ProxyStatus.entries.find { it.id == statusId }
+            val label =
+                if (status == null) {
+                    getString(R.string.status_waiting)
+                } else {
+                    getString(UIUtils.getProxyStatusStringRes(status.id))
+                }
+            uiCtx {
+                statusView.text =
+                    getString(R.string.settings_proxy_status, label.replaceFirstChar(Char::titlecase))
+                statusView.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun initView() {
@@ -183,6 +250,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 b.settingsActivitySocks5Desc.text =
                     getString(R.string.settings_socks_forwarding_default_desc)
                 logEvent("Custom SOCKS5 Proxy disabled", "disabled custom SOCKS5 proxy")
+                refreshCustomProxyExtras()
                 return@setOnCheckedChangeListener
             }
 
@@ -260,6 +328,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
+                refreshCustomProxyExtras()
                 return@setOnCheckedChangeListener
             }
 
@@ -966,6 +1035,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 }
                 logEvent("Custom SOCKS5 Proxy set", "custom SOCKS5 proxy to $ip:$port, app: $app")
                 dialog.dismiss()
+                refreshCustomProxyExtrasDelayed()
             } else {
                 // no-op
             }
@@ -1156,6 +1226,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                     "Custom HTTP Proxy set",
                     "custom HTTP proxy to $host, app: ${appNameSpinner.selectedItem}",
                 )
+                refreshCustomProxyExtrasDelayed()
             }
         }
         cancelURLBtn.setOnClickListener {

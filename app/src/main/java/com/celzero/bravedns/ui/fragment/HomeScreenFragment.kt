@@ -1112,7 +1112,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // get proxy type from app config
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
 
-        if (proxyType.isProxyTypeWireguard() || RpnProxyManager.isRpnActive()) {
+        // fork: wireguard is tracked by WireguardManager (not the persisted proxy type), so it
+        // can be active together with the custom socks5 / http proxy
+        if (proxyType.isProxyTypeWireguard() || appConfig.isWireGuardEnabled() || RpnProxyManager.isRpnActive()) {
             withContext(Dispatchers.IO) {
                 if (view == null || !isAdded) return@withContext
 
@@ -1184,11 +1186,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                     if (isBoth) {
                         b.fhsCardOtherProxyCount.isSelected = true
-                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.two_argument, getString(R.string.rpn_title), getString(R.string.lbl_wireguard)))
+                        b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(getString(R.string.two_argument, getString(R.string.rpn_title), getString(R.string.lbl_wireguard))))
                     } else if (rpnProxies.isNotEmpty()) {
-                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.rpn_title))
+                        b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(getString(R.string.rpn_title)))
                     } else if (proxies.isNotEmpty()) {
-                        b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_wireguard))
+                        b.fhsCardOtherProxyCount.setTextAnimated(withCustomProxyLabels(getString(R.string.lbl_wireguard)))
                     } else {
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(resId))
                     }
@@ -1218,6 +1220,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             b.fhsCardOtherProxyCount.setTextAnimated(headline)
         }
+    }
+
+    /**
+     * fork: appends the custom proxies that are enabled alongside the given base label,
+     * e.g. "WireGuard + SOCKS5 + HTTP".
+     */
+    private fun withCustomProxyLabels(base: String): String {
+        val extras = buildList {
+            if (appConfig.isCustomSocks5Enabled()) add(getString(R.string.lbl_socks5))
+            if (appConfig.isCustomHttpProxyEnabled()) add(getString(R.string.lbl_http))
+            if (appConfig.isOrbotProxyEnabled()) add(getString(R.string.orbot))
+        }
+        return (listOf(base) + extras).joinToString(" + ")
     }
 
     /**

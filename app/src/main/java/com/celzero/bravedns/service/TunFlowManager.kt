@@ -1260,7 +1260,13 @@ object TunFlowManager : KoinComponent {
         }
 
         // chose socks5 proxy over http proxy
-        if (appConfig.isCustomSocks5Enabled()) {
+        // fork: socks5 is scoped to the selected apps (all apps when none are selected); the
+        // proxy forwarder app is always handled here so that it is never blocked / looped
+        val s5ForwarderPkg = if (appConfig.isCustomSocks5Enabled()) appConfig.getSocks5ProxyDetails()?.proxyAppName else null
+        if (appConfig.isCustomSocks5Enabled() &&
+            (ProxyManager.appliesToApp(uid, ProxyManager.ID_S5_BASE) ||
+                s5ForwarderPkg?.let { it == FirewallManager.getPackageNameByUid(uid) } == true)
+        ) {
             val endpoint = appConfig.getSocks5ProxyDetails()
             if (endpoint == null) {
                 Logger.e(LOG_TAG_VPN, "flow/upstream: socks5 proxy enabled but endpoint is null $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
@@ -1296,7 +1302,12 @@ object TunFlowManager : KoinComponent {
             )
         }
 
-        if (appConfig.isCustomHttpProxyEnabled()) {
+        // fork: http proxy is scoped to the selected apps (all apps when none are selected)
+        val httpForwarderPkg = if (appConfig.isCustomHttpProxyEnabled()) appConfig.getHttpProxyDetails()?.proxyAppName else null
+        if (appConfig.isCustomHttpProxyEnabled() &&
+            (ProxyManager.appliesToApp(uid, ProxyManager.ID_HTTP_BASE) ||
+                httpForwarderPkg?.let { it == FirewallManager.getPackageNameByUid(uid) } == true)
+        ) {
             val endpoint = appConfig.getHttpProxyDetails()
             if (endpoint == null) {
                 Logger.e(LOG_TAG_VPN, "flow/upstream: http proxy enabled but endpoint is null for $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
