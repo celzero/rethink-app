@@ -709,9 +709,11 @@ object TunDnsManager: KoinComponent {
 
         val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
         // custom socks5 routes the apps mapped to it, or in simple mode every app no wireguard
-        // config routes; other apps fall through
+        // config routes; other apps fall through. the forwarder app is never routed into socks5,
+        // even when mapped to it, as flows already skip it and its queries would loop back
         val viaSocks5 =
             appConfig.isCustomSocks5Enabled() &&
+                appConfig.getSocks5ProxyDetails()?.proxyAppName != pkgName &&
                 (ProxyManager.isAppRoutedViaSocks5(uid) ||
                     isSocks5AllAppsFor(pkgName, uid, domain, usesCellularNw, ssid))
         return if (viaSocks5) {
