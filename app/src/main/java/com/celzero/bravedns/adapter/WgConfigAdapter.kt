@@ -618,7 +618,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             return DateUtils.getRelativeTimeSpanString(
                 stats.lastOK,
                 now,
-                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.SECOND_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
         }

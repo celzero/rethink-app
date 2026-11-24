@@ -28,6 +28,7 @@ import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
 import com.celzero.bravedns.util.Utilities
 import androidx.work.Configuration
+import com.celzero.bravedns.service.ProxyManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -80,6 +81,8 @@ class RethinkDnsApplication : Application(), Configuration.Provider {
         appScope.launch {
             scheduleJobs()
         }
+        // app-to-proxy assignments are read by many screens; don't wait for the vpn to load them
+        appScope.launch { ProxyManager.ensureLoaded() }
     }
 
     private suspend fun scheduleJobs() {

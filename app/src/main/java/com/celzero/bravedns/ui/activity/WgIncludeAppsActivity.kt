@@ -285,6 +285,7 @@ class WgIncludeAppsActivity : BaseActivity(R.layout.dialog_wg_apps),
      */
     private fun syncBulkToggleState() {
         io {
+            ProxyManager.ensureLoaded()
             val selected = ProxyManager.getAppCountForProxy(proxyId)
             val total = ProxyManager.trackedApps().size
             withContext(Dispatchers.Main) {
