@@ -520,6 +520,7 @@
 
     <string name="download_update_dialog_title" translatable="true">New Update!</string>
     <string name="download_update_dialog_message" translatable="true">A new version of the app is available for download from the website. Do you want to proceed?</string>
+    <string name="download_update_dialog_message_play" translatable="true">A new version of the app is available on Google Play. Do you want to update?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Up-to-date!</string>
     <string name="download_update_dialog_message_ok" translatable="true">You are already on the latest version.</string>
     <string name="download_update_dialog_message_success" translatable="true">Blocklist download successful.</string>
@@ -585,7 +586,7 @@
     <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
 
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs</string>
-    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, broadcast, link-local routes from Rethink\'s VPN tunnel.</string>
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
     <string name="settings_mobile_metered_desc" translatable="true">Only treat mobile networks as metered, rest as unmetered.</string>
@@ -884,7 +885,7 @@
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
 
-    <string name="logs_card_heatmap_window" translatable="true">last 24 hours</string>
+    <string name="logs_card_heatmap_window" translatable="true">Last 24 hours</string>
 
     <!-- top-apps histogram page of the home-screen logs card -->
     <string name="logs_card_apps_hint_allowed" translatable="true">Data used by your most active apps · last 24 hours</string>
@@ -1232,7 +1233,7 @@
 
     <!-- Home Screen activity -->
     <string name="hs_download_positive_default" translatable="true">ok</string>
-    <string name="hs_download_positive_play_store" translatable="true">Complete Update</string>
+    <string name="hs_download_positive_play_store" translatable="true">Open Play Store</string>
     <string name="hs_download_positive_website" translatable="true">Visit website</string>
 
     <string name="hs_download_negative_default" translatable="true">Remind me later</string>
@@ -1632,10 +1633,12 @@
 
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
+    <string name="bsac_universal_rule_hint" translatable="true">A universal rule exists for this domain or IP.</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_blocked_desc" translatable="true">blocked %1$s by %2$s</string>
     <string name="bsdl_open_domain_connections" translatable="true">Open domain connections</string>
+    <string name="bsdl_open_app_info" translatable="true">Open app info</string>
     <string name="bsdl_meta_app" translatable="true">App</string>
     <string name="bsdl_meta_response" translatable="true">Response</string>
     <string name="bsdl_meta_alias" translatable="true">Alias</string>
@@ -1756,6 +1759,16 @@
     <string name="brbs_backup_complete_toast" translatable="true">Backup completed</string>
     <string name="brbs_restore_invalid_file" translatable="false">Invalid backup file. Please select a %1$s backup file for this build.</string>
     <string name="brbs_restore_no_uri_toast" translatable="true">Restore failed; try again</string>
+    <string name="brbs_no_file_picker_backup" translatable="true">No file picker available and the app folder is unusable. Backup was not saved.</string>
+    <string name="brbs_backup_saved_app_folder_warning" translatable="true">Backup will be saved to %1$s. Files here are deleted if the app is uninstalled.</string>
+    <string name="brbs_backup_saved_to" translatable="false">Saving backup to %1$s</string>
+    <string name="brbs_no_file_picker_restore" translatable="true">No file picker available on this device.</string>
+    <string name="brbs_restore_folder_empty" translatable="true">No %1$s backup found in %2$s. Copy your backup file there and try again.</string>
+    <string name="brbs_restore_pick_file_title" translatable="true">Select backup file</string>
+    <string name="brbs_restore_pick_source_title" translatable="true">Restore backup</string>
+    <string name="brbs_restore_pick_source_browse" translatable="true">Browse files</string>
+    <string name="brbs_restore_pick_source_app_folder" translatable="true">From app folder</string>
+    <string name="brbs_backup_restore_in_progress" translatable="true">Backup or restore already in progress</string>
 
     <!-- Rethink simple view -->
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blocklists</string>
@@ -1922,6 +1935,8 @@
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Logs</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information. Logging remains active for a maximum of 3 hours, after which the log level reverts to error only if it was set to a more verbose level.</string>
+
+    <string name="conn_id_logs_empty" translatable="true">No logs found for this connection</string>
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
@@ -2181,6 +2196,7 @@
 
     <string name="title_database_dump" translatable="true">Database</string>
     <string name="copied_clipboard" translatable="true">Copied</string>
+    <string name="copy_failed_toast" translatable="false">Could not copy to clipboard</string>
 
     <string name="lbl_ssids" translatable="false">SSIDs</string>
     <string name="lbl_ssid" translatable="false">SSID</string>
@@ -2593,6 +2609,8 @@
     <string name="support_attach_vpn_stats_desc" translatable="false">RPN proxy statistics</string>
     <string name="support_attach_proc_info" translatable="false">System State</string>
     <string name="support_attach_proc_info_desc" translatable="false">Snapshot of this app\'s process, memory, and thread state</string>
+    <string name="support_attach_trace_log" translatable="false">Trace Logs</string>
+    <string name="support_attach_trace_log_desc" translatable="false">Go-engine connection trace for this session</string>
     <string name="support_privacy_note" translatable="false">Your email will be sent to hello@celzero.com. We only use this data to investigate your issue and never share it with third parties.</string>
     <string name="support_btn_sending" translatable="false">Collecting data…</string>
     <string name="support_loading_data" translatable="false">Collecting diagnostic data…</string>
@@ -3013,6 +3031,40 @@
     <string name="qs_relay_automation_dialog_title" translatable="true">Automation warning</string>
     <string name="qs_relay_automation_dialog_message" translatable="true">Since all other active locations will be relayed through Auto, its automation will be applied to all other locations. Do you want to proceed?</string>
 
+    <!-- DEBUG-only: connect a laptop to the on-device proxy (Server Selection) -->
+    <string name="qs_remote_service_label" translatable="false">Laptop</string>
+    <string name="rpn_remote_service_title" translatable="false">Connect any device</string>
+    <string name="rpn_remote_service_subtitle" translatable="false">Proxy through the Rethink tunnel on this phone</string>
+    <string name="rpn_remote_service_section_proxy_type" translatable="false">Proxy type</string>
+    <string name="rpn_remote_service_section_endpoints" translatable="false">Endpoints</string>
+    <string name="rpn_remote_service_mode_socks5" translatable="false">SOCKS5</string>
+    <string name="rpn_remote_service_mode_http" translatable="false">HTTP</string>
+    <string name="rpn_remote_service_mode_both" translatable="false">Both</string>
+    <string name="rpn_remote_service_caption_socks5" translatable="false">Works with most apps, browsers and curl</string>
+    <string name="rpn_remote_service_caption_http" translatable="false">Plain HTTP proxy for browsers and curl</string>
+    <string name="rpn_remote_service_caption_both" translatable="false">Run the SOCKS5 and HTTP proxies together</string>
+    <string name="rpn_remote_service_hero_stopped" translatable="false">Service stopped</string>
+    <string name="rpn_remote_service_hero_stopped_hint" translatable="false">Pick a proxy type, then start</string>
+    <string name="rpn_remote_service_hero_starting" translatable="false">Starting…</string>
+    <string name="rpn_remote_service_hero_stopping" translatable="false">Stopping…</string>
+    <string name="rpn_remote_service_hero_listening" translatable="false">Listening</string>
+    <string name="rpn_remote_service_hero_listening_hint" translatable="false">Connect from a device on the same Wi-Fi</string>
+    <string name="rpn_remote_service_start" translatable="false">Start service</string>
+    <string name="rpn_remote_service_stop" translatable="false">Stop</string>
+    <string name="rpn_remote_service_waiting" translatable="false">Waiting for connection…</string>
+    <string name="rpn_remote_service_connected" translatable="false">Connected</string>
+    <string name="rpn_remote_service_not_ok" translatable="false">Not reachable</string>
+    <string name="rpn_remote_service_failed" translatable="false">Failed to start</string>
+    <string name="rpn_remote_service_no_tunnel" translatable="false">Start Rethink first</string>
+    <string name="rpn_remote_service_start_failure" translatable="false">Failed to start service</string>
+    <string name="rpn_remote_service_copied_socks5" translatable="false">SOCKS5 proxy copied</string>
+    <string name="rpn_remote_service_copied_http" translatable="false">HTTP proxy copied</string>
+    <string name="rpn_remote_service_copy_desc" translatable="false">Copy proxy address</string>
+    <string name="rpn_remote_service_no_addr" translatable="false">Could not determine address</string>
+    <string name="rpn_remote_service_hint_socks5" translatable="false">curl --proxy %1$s https://example.com</string>
+    <string name="rpn_remote_service_hint_http" translatable="false">curl -x %1$s https://example.com</string>
+
+
     <!-- RPN bypass apps -->
     <string name="rpn_bypass_apps_count" translatable="true">%1$d apps bypassed</string>
     <string name="rpn_bypass_apps_none" translatable="true">No apps bypassed</string>
@@ -3089,4 +3141,25 @@
     <string name="dolphin_quote_lost_we_meant_it" translatable="false">Lost? We meant to do that.</string>
     <string name="dolphin_quote_nothing_suspicious" translatable="false">Nothing suspicious. Just swimming.</string>
 
+    <string name="connection_check_title" translatable="false">Connection check</string>
+    <string name="connection_check_subtitle" translatable="false">Simulate how a domain or app is treated by the current DNS \u0026amp; firewall settings, and find out why it is blocked or allowed.</string>
+    <string name="connection_check_domain_hint" translatable="false">Domain (e.g. example.com)</string>
+    <string name="connection_check_ip_hint" translatable="false">IP address (optional; enables firewall rules)</string>
+    <string name="connection_check_app_hint" translatable="false">App</string>
+    <string name="connection_check_simulate" translatable="false">Simulate</string>
+    <string name="connection_check_running" translatable="false">Checking…</string>
+    <string name="connection_check_verdict_blocked" translatable="false">Blocked</string>
+    <string name="connection_check_verdict_allowed" translatable="false">Allowed</string>
+    <string name="connection_check_config_heading" translatable="false">Effective configuration</string>
+    <string name="connection_check_steps_heading" translatable="false">Reason chain</string>
+    <string name="connection_check_err_domain" translatable="false">Enter a domain to check</string>
+    <string name="connection_check_err_ip" translatable="false">Enter a valid IP address</string>
+
+    <string name="tv_open_action" translatable="true">Open ›</string>
+    <string name="tv_rpn_stats_title" translatable="true">RPN stats</string>
+    <string name="tv_rpn_stats_subtitle_fmt" translatable="true">Last %1$dh of RPN-routed traffic.</string>
+    <string name="tv_rpn_stats_top_apps_fmt" translatable="true">Top apps · last %1$dh</string>
+    <string name="tv_rpn_stats_empty_fmt" translatable="true">No connections have gone through selected servers in the last %1$dh.</string>
+    <string name="tv_rpn_stats_logs_subtitle" translatable="true">Inspect individual RPN-routed connections.</string>
+    <string name="tv_rpn_stats_window_fmt" translatable="true">%1$dh</string>
 </resources>

@@ -15,12 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -42,19 +38,17 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.net.toUri
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppDatabase
@@ -74,21 +68,23 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.sponsor.provider.SponsorProvider
+import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.activity.ConsoleLogActivity
 import com.celzero.bravedns.ui.activity.EventsActivity
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.bottomsheet.BugReportFilesBottomSheet
-import com.celzero.bravedns.sponsor.provider.SponsorProvider
-import com.celzero.bravedns.sponsor.repository.SponsorRepository
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
-import com.celzero.bravedns.util.KernelProc
-import com.celzero.bravedns.util.MemoryUtils
-import com.celzero.bravedns.util.MemoryProfiler
 import com.celzero.bravedns.util.GoMemoryProfiler
+import com.celzero.bravedns.util.KernelProc
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
+import com.celzero.bravedns.util.MemoryProfiler
+import com.celzero.bravedns.util.MemoryUtils
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -105,18 +101,19 @@ import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteDegoogledFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.disableFrostTemporarily
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.NonCancellable
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -125,6 +122,7 @@ import org.koin.core.component.KoinComponent
 import java.io.File
 import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -290,13 +288,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                     val text = persistentState.firebaseUserToken
                     val ctx = context ?: return false
-                    val clipboard =
-                        getSystemService(ctx, ClipboardManager::class.java)
-                    val clip = ClipData.newPlainText("token", text)
-                    clipboard?.setPrimaryClip(clip)
-
-                    Toast.makeText(ctx, "Copied to clipboard", Toast.LENGTH_SHORT)
-                        .show()
+                    val copied = UIUtils.clipboardCopy(ctx, text, "token")
+                    Toast.makeText(
+                        ctx,
+                        ctx.getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return true
                 }
 
@@ -868,7 +865,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 as android.app.NotificationManager
 
         if (!isAtleastO()) {
-            manager.notify("MEM_PROFILE", 210, builder.build())
+            manager.notifySafely("MEM_PROFILE", 210, builder.build())
             return
         }
 
@@ -880,7 +877,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             description = "Memory profiling results"
         }
         manager.createNotificationChannel(channel)
-        manager.notify("MEM_PROFILE", 210, builder.build())
+        manager.notifySafely("MEM_PROFILE", 210, builder.build())
     }
 
     private fun formatFileSize(bytes: Long): String {
@@ -1020,8 +1017,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
-                copyToClipboard("stack_trace", clipText)
-                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                val copied = copyToClipboard("stack_trace", clipText)
+                showToastUiCentered(
+                    ctx,
+                    getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
             .setNeutralButton("Refresh", null)
             .create()
@@ -1164,10 +1165,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             } else {
                                 selectedPositions.sorted().joinToString("\n") { lines[it] }
                             }
-                            copyToClipboard("stats_dump", textToCopy)
+                            val copied = copyToClipboard("stats_dump", textToCopy)
                             showToastUiCentered(
                                 ctx,
-                                getString(R.string.copied_clipboard),
+                                getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
                                 Toast.LENGTH_SHORT
                             )
                         }.create()
@@ -1340,14 +1341,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         val procScrollView    = makeScrollableSpannable(otherSpan)
         val metricsContent = buildString {
-            appendLine("Memory Metrics")
             appendLine(memMetrics)
             appendLine()
             appendLine(formatedMetrics.orEmpty())
         }
         val metricsScrollView = makeScrollableText(metricsContent)
 
-        val tabProc    = makeTabButton("Threads / Proc / Mem")
+        val tabProc    = makeTabButton("Threads / Proc")
         val tabMetrics = makeTabButton("Metrics")
 
         fun selectTab(showProc: Boolean) {
@@ -1385,8 +1385,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             .setView(container)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
             .setNegativeButton(R.string.dns_info_neutral) { _, _ ->
-                copyToClipboard("proc_analysis", clipText)
-                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                val copied = copyToClipboard("proc_analysis", clipText)
+                showToastUiCentered(
+                    ctx,
+                    getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
             .setNeutralButton("Refresh", null)
             .create()
@@ -1401,11 +1405,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         dialog.show()
     }
 
-    private fun copyToClipboard(label: String, text: String): ClipboardManager? {
-        val cb = getSystemService(requireContext(), ClipboardManager::class.java)
-        cb?.setPrimaryClip(ClipData.newPlainText(label, text))
-        return cb
-    }
+    private fun copyToClipboard(label: String, text: String): Boolean =
+        UIUtils.clipboardCopy(requireContext(), text, label)
 
     private fun openDatabaseDumpDialog() {
         io {
@@ -1472,10 +1473,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     .setView(container)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("db_dump", tv.text.toString())
+                        val copied = copyToClipboard("db_dump", tv.text.toString())
                         showToastUiCentered(
                             ctx,
-                            getString(R.string.copied_clipboard),
+                            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
                             Toast.LENGTH_SHORT
                         )
                     }.create()

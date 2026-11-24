@@ -74,7 +74,10 @@ object TunFirewallManager : KoinComponent {
         val accessibilityServiceFunctional: Boolean = false,
         val onAccessibilityFailure: (() -> Unit)? = null,
         val keyguardManager: KeyguardManager? = null,
-        val connectivityManager: ConnectivityManager
+        val connectivityManager: ConnectivityManager,
+        // dry-run (connection simulator): evaluate rules without side effects
+        // (no add-new-app db write, no onDeviceLocked/onAccessibilityFailure callbacks)
+        val dryRun: Boolean = false
     )
 
     fun setSettingUpOrbot(value: Boolean) {
@@ -120,7 +123,9 @@ object TunFirewallManager : KoinComponent {
 
             // if the app is new (ie not tracked by FirewallManager), refresh the db
             if (!FirewallManager.hasUid(uid) && uid != INVALID_UID) {
-                io(params.scope, "addNewApp") { rdb.addNewApp(uid) }
+                if (!params.dryRun) {
+                    io(params.scope, "addNewApp") { rdb.addNewApp(uid) }
+                }
                 if (newAppBlocked(uid)) {
                     logd("firewall($connId): new app blocked, $uid")
                     return FirewallRuleset.RULE1B
@@ -338,7 +343,9 @@ object TunFirewallManager : KoinComponent {
             }
 
             if (params.isDeviceLocked) {
-                params.onDeviceLocked?.invoke()
+                if (!params.dryRun) {
+                    params.onDeviceLocked?.invoke()
+                }
                 logd("firewall($connId): device locked, $uid")
                 return FirewallRuleset.RULE3
             }
@@ -349,7 +356,7 @@ object TunFirewallManager : KoinComponent {
                 return FirewallRuleset.RULE6
             }
 
-            if (blockBackgroundData(uid, params.accessibilityServiceFunctional, params.onAccessibilityFailure, params.keyguardManager)) {
+            if (blockBackgroundData(uid, params.accessibilityServiceFunctional, params.onAccessibilityFailure, params.keyguardManager, params.dryRun)) {
                 logd("firewall($connId): background data blocked, $uid")
                 return FirewallRuleset.RULE4
             }
@@ -679,13 +686,16 @@ object TunFirewallManager : KoinComponent {
         uid: Int,
         accessibilityServiceFunctional: Boolean,
         onAccessibilityFailure: (() -> Unit)?,
-        keyguardManager: KeyguardManager?
+        keyguardManager: KeyguardManager?,
+        dryRun: Boolean = false
     ): Boolean {
         if (!persistentState.getBlockAppWhenBackground()) return false
 
         if (!accessibilityServiceFunctional) {
             Logger.w(LOG_TAG_VPN, "accessibility service not functional, disable bg-block")
-            onAccessibilityFailure?.invoke()
+            if (!dryRun) {
+                onAccessibilityFailure?.invoke()
+            }
             return false
         }
 

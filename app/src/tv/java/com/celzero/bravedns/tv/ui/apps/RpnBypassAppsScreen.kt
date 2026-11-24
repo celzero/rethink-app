@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +45,10 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.tv.ui.common.SettingSectionHeader
 import com.celzero.bravedns.tv.ui.common.TvScreenScaffold
+import com.celzero.bravedns.tv.ui.common.TvSelectableChip
+import com.celzero.bravedns.tv.ui.theme.TvShapes
+import com.celzero.bravedns.tv.ui.theme.TvSpacing
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -186,14 +188,14 @@ fun RpnBypassAppsScreen() {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FilterChip(label = "All", selected = filter == Filter.ALL,
+                TvSelectableChip(label = "All", selected = filter == Filter.ALL,
                     onClick = { filter = Filter.ALL })
-                FilterChip(label = "Bypassed", selected = filter == Filter.BYPASSED,
+                TvSelectableChip(label = "Bypassed", selected = filter == Filter.BYPASSED,
                     onClick = { filter = Filter.BYPASSED })
-                FilterChip(label = "Not bypassed", selected = filter == Filter.NOT_BYPASSED,
+                TvSelectableChip(label = "Not bypassed", selected = filter == Filter.NOT_BYPASSED,
                     onClick = { filter = Filter.NOT_BYPASSED })
                 Spacer(Modifier.weight(1f))
                 BulkChip(
@@ -224,7 +226,7 @@ fun RpnBypassAppsScreen() {
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(TvSpacing.RowGap))
             SettingSectionHeader("Apps (${visible.size})")
 
             if (visible.isEmpty()) {
@@ -243,7 +245,7 @@ fun RpnBypassAppsScreen() {
             }
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
                 contentPadding = PaddingValues(bottom = 32.dp, end = 24.dp),
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -260,39 +262,11 @@ fun RpnBypassAppsScreen() {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun FilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-    ) {
-        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                ),
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
 private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         enabled = enabled,
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(50)),
+        shape = TvSurfaceStyles.interactiveShape(TvShapes.Pill),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = if (armed) MaterialTheme.colorScheme.error
             else MaterialTheme.colorScheme.surfaceVariant,
@@ -313,7 +287,7 @@ private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: (
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -329,15 +303,8 @@ private fun BulkChip(label: String, enabled: Boolean, armed: Boolean, onClick: (
 private fun AppToggleRow(row: RpnBypassRow, onToggle: (Boolean) -> Unit) {
     Surface(
         onClick = { onToggle(!row.isBypassed) },
-        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            pressedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+        shape = TvSurfaceStyles.interactiveShape(),
+        colors = TvSurfaceStyles.rowColors(),
         modifier = Modifier
             .fillMaxWidth()
             .height(96.dp),
@@ -349,13 +316,11 @@ private fun AppToggleRow(row: RpnBypassRow, onToggle: (Boolean) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppIcon(packageName = row.packageName, size = 48)
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(TvSpacing.GroupGap))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.appName.ifBlank { row.packageName },
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
+                    style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -368,7 +333,7 @@ private fun AppToggleRow(row: RpnBypassRow, onToggle: (Boolean) -> Unit) {
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(TvSpacing.IconTextGap))
             BypassTile(bypassed = row.isBypassed)
         }
     }
@@ -381,7 +346,7 @@ private fun BypassTile(bypassed: Boolean) {
     val container = if (bypassed) MaterialTheme.colorScheme.primary
     else MaterialTheme.colorScheme.surface
     androidx.tv.material3.Surface(
-        shape = RoundedCornerShape(50),
+        shape = TvShapes.Pill,
         colors = SurfaceDefaults.colors(containerColor = container),
     ) {
         Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) {
@@ -389,7 +354,7 @@ private fun BypassTile(bypassed: Boolean) {
                 text = if (bypassed) "Bypassed" else "Proxied",
                 color = if (bypassed) MaterialTheme.colorScheme.onPrimary
                 else MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelMedium,
             )
         }
     }

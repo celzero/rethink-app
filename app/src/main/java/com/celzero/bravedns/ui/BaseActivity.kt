@@ -27,10 +27,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.TextSelectionGuard
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastS
 import org.koin.android.ext.android.inject
 
 /**
@@ -97,6 +100,7 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
         // behind the status bar, so the app must declare whether icons should be dark or
         // light; without this the icons default to white and are invisible on light surfaces.
         applyStatusBarAppearance()
+        applyOverlayWindowGuard()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -153,6 +157,19 @@ abstract class BaseActivity(@LayoutRes contentLayoutId: Int = 0) :
         lp.width = target
         lp.gravity = Gravity.CENTER_HORIZONTAL
         child.layoutParams = lp
+    }
+
+    /**
+     * Blocks other apps' overlay windows (API 31+) while any app screen is visible,
+     * preventing tapjacking of firewall/VPN controls.
+     */
+    private fun applyOverlayWindowGuard() {
+        if (!isAtleastS()) return
+        try {
+            window.setHideOverlayWindows(true)
+        } catch (e: SecurityException) {
+            Logger.e(LOG_TAG_UI, "err hiding overlay windows: ${e.message}", e)
+        }
     }
 
     /**

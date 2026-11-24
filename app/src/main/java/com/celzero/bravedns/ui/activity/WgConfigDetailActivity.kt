@@ -15,9 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -38,7 +35,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.customdownloader.IpInfoDownloader
@@ -64,6 +60,9 @@ import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgSsidDialog
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper
 import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
@@ -73,6 +72,7 @@ import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -81,6 +81,7 @@ import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.firestack.backend.IPMetadata
 import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import inet.ipaddr.HostName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -174,6 +175,7 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -805,19 +807,19 @@ class WgConfigDetailActivity : BaseActivity(R.layout.activity_wg_detail) {
         }*/
 
         b.publicKeyLabel.setOnClickListener {
-            UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            val copied = UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
-                getString(R.string.public_key_copy_toast_msg),
+                getString(if (copied) R.string.public_key_copy_toast_msg else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }
 
         b.publicKeyText.setOnClickListener {
-            UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            val copied = UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
-                getString(R.string.public_key_copy_toast_msg),
+                getString(if (copied) R.string.public_key_copy_toast_msg else R.string.copy_failed_toast),
                 Toast.LENGTH_SHORT
             )
         }

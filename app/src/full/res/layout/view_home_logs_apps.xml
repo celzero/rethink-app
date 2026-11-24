@@ -96,7 +96,7 @@
             android:id="@+id/fhs_top_apps_allowed_chip"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
             android:checkable="true"
             android:checked="true"
             android:text="@string/lbl_allowed"
@@ -104,7 +104,6 @@
             android:textSize="@dimen/small_font_text_view"
             app:chipBackgroundColor="?attr/homeScreenBtnBackground"
             app:chipEndPadding="4dp"
-            app:chipMinHeight="24dp"
             app:chipStartPadding="4dp"
             app:chipStrokeColor="@color/chip_toggle_stroke"
             app:chipStrokeWidth="1dp" />
@@ -113,29 +112,53 @@
             android:id="@+id/fhs_top_apps_blocked_chip"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
             android:checkable="true"
             android:text="@string/lbl_blocked"
             android:textColor="@color/chip_toggle_text"
             android:textSize="@dimen/small_font_text_view"
             app:chipBackgroundColor="?attr/homeScreenBtnBackground"
             app:chipEndPadding="4dp"
-            app:chipMinHeight="24dp"
             app:chipStartPadding="4dp"
             app:chipStrokeColor="@color/chip_toggle_stroke"
             app:chipStrokeWidth="1dp" />
     </com.google.android.material.chip.ChipGroup>
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fhs_top_apps_window"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
+        android:alpha="0.8"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="@string/logs_card_heatmap_window"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/extra_small_font_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="@id/fhs_top_apps_toggle_group"
+        app:layout_constraintTop_toBottomOf="@id/fhs_top_apps_toggle_group"
+        tools:text="Last 24 hours" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/fhs_top_apps_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="fhs_top_apps_header,fhs_top_apps_window" />
+
     <com.celzero.bravedns.ui.custom.AppHistogramView
         android:id="@+id/fhs_top_apps_histogram"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@id/fhs_top_apps_caption_row"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_min="72dp"
-        app:layout_constraintTop_toBottomOf="@id/fhs_top_apps_header"
-        app:layout_constraintVertical_bias="0"
+        app:layout_constraintTop_toBottomOf="@id/fhs_top_apps_barrier"
         tools:background="#11000000" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -152,60 +175,5 @@
         app:layout_constraintStart_toStartOf="@id/fhs_top_apps_histogram"
         app:layout_constraintTop_toTopOf="@id/fhs_top_apps_histogram"
         tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fhs_top_apps_caption_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fhs_top_apps_window"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:alpha="0.8"
-            android:ellipsize="end"
-            android:letterSpacing="0.08"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text="@string/logs_card_heatmap_window"
-            android:textAllCaps="true"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fhs_top_apps_legend"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="last 24 hours" />
-
-        <LinearLayout
-            android:id="@+id/fhs_top_apps_legend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingVertical="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fhs_top_apps_swatch_wifi"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:contentDescription="@string/logs_card_apps_legend_wifi"
-                android:src="@drawable/ic_firewall_wifi_on" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fhs_top_apps_swatch_mobile"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@string/logs_card_apps_legend_mobile"
-                android:src="@drawable/ic_firewall_data_on" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

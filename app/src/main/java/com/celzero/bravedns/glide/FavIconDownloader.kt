@@ -20,12 +20,18 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_DNS
 import android.content.Context
 import android.os.Process
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.HttpException
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
+import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.io.File
+import java.io.IOException
+import java.util.concurrent.ExecutionException
+import javax.net.ssl.SSLException
 
 /**
  * FavIconDownloader - Downloads the favicon of the DNS requests and store in the Glide cache. The
@@ -40,6 +46,9 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
     companion object {
         // base-url for fav icon download
         private const val FAV_ICON_DUCK_URL = "https://icons.duckduckgo.com/ip2/"
+        // DuckDuckGo onion mirror for favicon requests when Orbot is active.
+        private const val FAV_ICON_DUCK_ONION_URL =
+            "https://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion/ip3/"
         private const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
         private const val FAV_ICON_SIZE = "@2x.png"
         private const val CACHE_BUILDER_MAX_SIZE = 10000L
@@ -57,6 +66,9 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         // Add duckduckgo format to download the favicon.
         // eg., https://icons.duckduckgo.com/ip2/google.com.ico
         fun constructFavUrlDuckDuckGo(url: String): String {
+            if (OrbotHelper.isOrbotProxyActive()) {
+                return "${FAV_ICON_DUCK_ONION_URL}${url}.ico"
+            }
             return "${FAV_ICON_DUCK_URL}${url}.ico"
         }
 
@@ -81,14 +93,48 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         // Returns the value associated with key in this cache, or null if there is no cached
         // value for key.
         if (failedFavIconUrls.getIfPresent(fdqnUrl) == null) {
-            fetchFromNextDns(fdqnUrl)
+            if (OrbotHelper.isOrbotProxyActive()) {
+                // when Orbot is selected, use only onion servers for favicons.
+                // skip (do not cache) until Orbot exposes a usable endpoint.
+                if (OrbotHelper.getOrbotProxy() == null) return
+                fetchFromDuckDuckGoOnion(fdqnUrl)
+            } else {
+                fetchFromNextDns(fdqnUrl)
+            }
         } else {
             // no-op
         }
     }
 
-    private fun fetchFromNextDns(url: String) {
-        val subUrl = constructFavIcoUrlNextDns(url)
+    // no fallback; definitive failures are added to the failed cache.
+    private fun fetchFromDuckDuckGoOnion(url: String) {
+        val subUrl = constructFavUrlDuckDuckGo(url)
+        var failure = downloadToCache(subUrl)
+        if (failure == null) {
+            Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo onion $subUrl")
+            return
+        }
+        // .onion sites don't use normal CA certificates; Tor encrypts the connection.
+        if (failure is SSLException && subUrl.startsWith("https://")) {
+            val httpUrl = subUrl.replaceFirst("https://", "http://")
+            failure = downloadToCache(httpUrl)
+            if (failure == null) {
+                Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo onion over http $httpUrl")
+                return
+            }
+        }
+        // transient io failures (tor/network not ready) are not cached so the favicon can be
+        // retried once connectivity is usable; definitive failures still go to the failed cache.
+        if (isTransientIoFailure(failure)) {
+            Logger.i(LOG_TAG_DNS, "Glide, transient onion failure for $subUrl, ${failure.message}")
+            return
+        }
+        // retry with the eTLD+1 domain; failed requests go to the failed cache.
+        updateImage(url, getDomainUrlFromFdqnDuckduckgo(url), "", false)
+    }
+
+    // returns null on success, or the failure (exception or empty body)
+    private fun downloadToCache(subUrl: String): Exception? {
         val futureTarget: FutureTarget<File> =
             Glide.with(context.applicationContext)
                 .downloadOnly()
@@ -97,10 +143,33 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         try {
             val file = futureTarget.get()
             if (file == null || file.length() <= 0) {
-                throw Exception("Empty file, likely 404")
+                return Exception("Empty file, likely 404")
             }
-            Logger.d(LOG_TAG_DNS, "Glide, load success from nextdns for url: $url")
+            return null
         } catch (e: Exception) {
+            return e
+        } finally {
+            Glide.with(context.applicationContext).clear(futureTarget)
+        }
+    }
+
+    // glide wraps fetch failures as execution-exception -> glide-exception; inspect the roots
+    private fun isTransientIoFailure(failure: Throwable): Boolean {
+        val roots =
+            (failure as? ExecutionException)
+                ?.let { (it.cause as? GlideException)?.rootCauses ?: listOfNotNull(it.cause) }
+                ?: listOf(failure)
+        // http status errors (eg 404) are http-exception, an io-exception subclass; not transient
+        if (roots.any { it is HttpException }) return false
+        return roots.any { it is IOException }
+    }
+
+    private fun fetchFromNextDns(url: String) {
+        val subUrl = constructFavIcoUrlNextDns(url)
+        val failure = downloadToCache(subUrl)
+        if (failure == null) {
+            Logger.d(LOG_TAG_DNS, "Glide, load success from nextdns for url: $url")
+        } else {
             // on exception, initiate the download of fav icon from duckduckgo
             Logger.i(LOG_TAG_DNS, "Glide, load failure from nextdns $subUrl")
             updateImage(
@@ -109,40 +178,26 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 getDomainUrlFromFdqnDuckduckgo(url),
                 true
             )
-        } finally {
-            Glide.with(context.applicationContext).clear(futureTarget)
         }
     }
 
     // ref: https://github.com/bumptech/glide/issues/2972
     // https://github.com/bumptech/glide/issues/509
     private fun updateImage(fdqnUrl: String, subUrl: String, url: String, retry: Boolean) {
-        val futureTarget: FutureTarget<File> =
-            Glide.with(context.applicationContext)
-                .downloadOnly()
-                .load(subUrl)
-                .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
-        try {
-            val file = futureTarget.get()
-            if (file == null || file.length() <= 0) {
-                throw Exception("Empty file, likely 404")
-            }
+        if (downloadToCache(subUrl) == null) {
             Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo $subUrl, $url")
-        } catch (e: Exception) {
-            // In case of failure the FutureTarget will throw an exception.
-            // Will initiate the download of fav icon for the top level domain.
-            if (retry) {
-                Logger.d(LOG_TAG_DNS, "Glide, download failed from duckduckgo $subUrl")
-                updateImage(fdqnUrl, url, "", false)
-            } else {
-                // add failed urls to a local cache, no need to attempt again and again
-                // add the value as false by default
-                // FIXME: add metadata instead of boolean
-                failedFavIconUrls.put(fdqnUrl, true)
-            }
-            Logger.i(LOG_TAG_DNS, "Glide, no fav icon available for the url: $subUrl")
-        } finally {
-            Glide.with(context.applicationContext).clear(futureTarget)
+            return
+        }
+        // retry the favicon download for the main domain otherwise cache the url to avoid
+        // repeated attempts.
+        Logger.i(LOG_TAG_DNS, "Glide, no fav icon available for the url: $subUrl")
+        if (retry) {
+            Logger.d(LOG_TAG_DNS, "Glide, download failed from duckduckgo $subUrl")
+            updateImage(fdqnUrl, url, "", false)
+        } else {
+            // add the value as false by default
+            // FIXME: add metadata instead of boolean
+            failedFavIconUrls.put(fdqnUrl, true)
         }
     }
 }

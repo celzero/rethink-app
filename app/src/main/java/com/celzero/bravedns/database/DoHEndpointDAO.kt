@@ -30,7 +30,7 @@ interface DoHEndpointDAO {
 
     @Update fun update(doHEndpoint: DoHEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(doHEndpoint: DoHEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(doHEndpoint: DoHEndpoint): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertReplace(doHEndpoint: DoHEndpoint)
 
@@ -66,4 +66,6 @@ interface DoHEndpointDAO {
     fun getAll(): List<DoHEndpoint>
 
     @Query("select count(*) from DoHEndpoint") fun getCount(): Int
+
+    @Query("select * from DoHEndpoint where id = :id") fun getById(id: Int): DoHEndpoint?
 }

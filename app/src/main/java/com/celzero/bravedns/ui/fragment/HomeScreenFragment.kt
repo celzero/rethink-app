@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
@@ -49,9 +50,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
-import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -65,10 +65,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
@@ -146,6 +144,7 @@ import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -154,12 +153,12 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import android.graphics.drawable.Drawable
 import java.util.Calendar
 import java.util.Locale
 import java.util.Locale.getDefault
 import java.util.concurrent.TimeUnit
 import kotlin.math.log10
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
@@ -337,8 +336,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         private const val HEATMAP_GRID_ROWS = 6
         private const val HEATMAP_GRID_HEIGHT_DP = 60
 
-        private const val HEATMAP_CELL_OVAL_RATIO = 2f
-
         // fraction of the max cell size per intensity level
         private val HEATMAP_CELL_SIZE_FRACTION = floatArrayOf(0.30f, 0.78f, 0.78f, 1f, 1f)
 
@@ -501,7 +498,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.v(LOG_TAG_UI, "$TAG: click event on bottom sheet icon")
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
-            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
                 b.homeFragmentBottomSheetIcon.isEnabled = true
             }
             logEvent(
@@ -524,7 +521,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsDnsOnOffBtn.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on main button")
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+            delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
                 if (isAdded) {
                     b.homeFragmentBottomSheetIcon.isEnabled = true
                 }
@@ -1140,7 +1137,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         (if (isRpnStoppedEarly()) RpnProxyManager.getEnabledConfigs().size else 0) +
                             getStoppedWgCount()
                     uiCtx {
-                        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                        showProxyCardHeader()
                         b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.lbl_checking))
                         updateStoppedSlot(isStoppedSlotVisible())
                         b.fhsProxyStoppedCount.text = stoppedCount.toString()
@@ -1185,7 +1182,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val stoppedCount = getStoppedWgCount() + rpnStoppedCount
 
                 uiCtx {
-                    b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                    showProxyCardHeader()
                     // Colored scheme is reserved for RPN (also when RPN and
                     // WireGuard are both active); WireGuard-only or any other
                     // proxy renders monochrome.
@@ -1235,7 +1232,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 showProxyInactive()
                 return
             }
-            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            showProxyCardHeader()
             val headline =
                 if (RpnProxyManager.isRpnActive() && !appConfig.isProxyEnabled()) {
                     getString(R.string.rpn_title)
@@ -1261,7 +1258,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         uiCtx {
             if (view == null || !isAdded) return@uiCtx
 
-            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            showProxyCardHeader()
             b.fhsCardOtherProxyCount.alpha = 1f
             b.fhsCardOtherProxyCount.isSelected = true
             b.fhsCardOtherProxyCount.setTextAnimated(getString(R.string.rpn_title))
@@ -1394,11 +1391,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardBlockedLogsCount.visibility = View.GONE
         logsPage.fhsCardBlockedLogsLabel.visibility = View.GONE
         logsPage.fhsCardLogsDuration.visibility = View.GONE
-        // heatmap (grid + its hour axis and legend) carries no data when
-        // logging is off
+        // heatmap (grid + its hour axis) carries no data when logging is off
         logsPage.fhsLogsHourAxis.visibility = View.GONE
         logsPage.fhsLogsGrid.visibility = View.GONE
-        logsPage.fhsLogsLegend.visibility = View.GONE
         // allowed/blocked chips only make sense on an active card; when the
         // logging preference is off they give way to an inline enable chip
         logsPage.fhsLogsToggleGroup.visibility = View.GONE
@@ -1423,15 +1418,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (view == null || !isAdded) return
 
         Logger.w(LOG_TAG_UI, "$TAG proxy inactive, showing compact indicator")
-        b.fhsCardOtherProxyCount.text = getString(R.string.hsf_proxy_off_indicator)
-        b.fhsCardOtherProxyCount.alpha = 0.65f
+        b.fhsCardOtherProxyCount.visibility = View.GONE
+        b.fhsProxyHeaderSpace.visibility = View.GONE
+        b.fhsProxyInactiveTxt.visibility = View.VISIBLE
         b.fhsProxyHealthContainer.isVisible = false
+    }
+
+    private fun showProxyCardHeader() {
+        b.fhsProxyInactiveTxt.visibility = View.GONE
+        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+        b.fhsProxyHeaderSpace.visibility = View.VISIBLE
     }
 
     /** Restores the proxy card to full emphasis for a running proxy. */
     private fun showProxyActiveIndicator() {
         if (view == null || !isAdded) return
 
+        showProxyCardHeader()
         b.fhsProxyHealthContainer.isVisible = true
         b.fhsCardOtherProxyCount.alpha = 1f
         // Provisional scheme until the proxy poll computes the exact one:
@@ -1643,7 +1646,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         topAppsPage.root.setOnClickListener { openNetworkLogs() }
 
         topAppsPage.fhsTopAppsHistogram.setLightTheme(isLightTheme())
-        applyTopAppsLegendColors()
         topAppsPage.fhsTopAppsHistogram.onEntrySelected = { entry ->
             showTopAppsEntry(entry)
         }
@@ -1778,7 +1780,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 topAppsHeaderRevertJob?.cancel()
                 topAppsHeaderRevertJob = null
                 topAppsPage.fhsTopAppsHistogram.submit(entries, blocked)
-                applyTopAppsLegendColors()
                 topAppsPage.fhsTopAppsEmpty.isVisible = entries.isEmpty()
                 topAppsPage.fhsTopAppsHistogram.isVisible = entries.isNotEmpty()
                 renderTopAppsHeader(null)
@@ -1859,7 +1860,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * wall's header: two value-over-label stacks (Wi-Fi, Mobile data) in
      * allowed mode, a single total stack in blocked mode. With no selection
      * the values are the window totals; a tapped slot temporarily swaps in
-     * that app's values and names it in the window caption below.
+     * that app's values and names it in the window caption.
      */
     private fun renderTopAppsHeader(entry: AppHistogramView.Entry?) {
         if (view == null || !isAdded) return
@@ -1910,7 +1911,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (entry == null) return
 
         topAppsHeaderRevertJob = lifecycleScope.launch {
-            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS)
+            kotlinx.coroutines.delay(TOP_APPS_HEADER_REVERT_MS.milliseconds)
             if (isAdded && view != null) renderTopAppsHeader(null)
         }
     }
@@ -1930,20 +1931,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (unit == "GB" || unit == "TB") String.format(Locale.ROOT, "%.1f", v)
             else String.format(Locale.ROOT, "%.0f", v)
         return getString(R.string.two_argument_no_space, text, unit)
-    }
-
-    /**
-     * Tints the Wi-Fi / mobile-data legend glyphs with the exact segment
-     * colors the histogram draws, so the color key always matches the bars.
-     */
-    private fun applyTopAppsLegendColors() {
-        if (view == null || !isAdded) return
-
-        val histogram = topAppsPage.fhsTopAppsHistogram
-        topAppsPage.fhsTopAppsSwatchWifi.imageTintList =
-            ColorStateList.valueOf(histogram.unmeteredColor())
-        topAppsPage.fhsTopAppsSwatchMobile.imageTintList =
-            ColorStateList.valueOf(histogram.meteredColor())
     }
 
     /**
@@ -2098,8 +2085,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (isLightTheme()) intArrayOf(0x40, 0x80, 0x80, 0xB3, 0xE6)
             else intArrayOf(0x24, 0x52, 0x52, 0x85, 0xCC)
         val gap = (2f * resources.displayMetrics.density).toInt()
-        val gridHeightPx = HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density
-        val cellBaseHeight = (gridHeightPx - HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val designPitch =
+            (HEATMAP_GRID_HEIGHT_DP * resources.displayMetrics.density -
+                HEATMAP_GRID_ROWS * gap * 2f) / HEATMAP_GRID_ROWS
+        val gridWidthPx =
+            if (grid.width > 0) grid.width.toFloat()
+            else resources.displayMetrics.widthPixels - 48f * resources.displayMetrics.density
+        val cellPitch = min(designPitch, gridWidthPx / LogActivityAggregator.HOURS_IN_WINDOW)
 
         // iterate hour-major so each visual column holds one hour: cells are
         // added bucket-by-bucket across the columns (GridLayout auto-places
@@ -2136,8 +2128,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 val lp =
                     GridLayout.LayoutParams().apply {
-                        width = (cellBaseHeight * frac).toInt()
-                        height = (cellBaseHeight * frac).toInt()
+                        width = (cellPitch * frac).toInt()
+                        height = (cellPitch * frac).toInt()
                         columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                         setMargins(gap, gap, gap, gap)
@@ -2146,30 +2138,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 cell.layoutParams = lp
                 grid.addView(cell)
             }
-        }
-
-        val swatches =
-            listOf(
-                logsPage.fhsLogsSwatch0,
-                logsPage.fhsLogsSwatch1,
-                logsPage.fhsLogsSwatch2,
-                logsPage.fhsLogsSwatch3
-            )
-        val legendLevels = intArrayOf(0, 2, 3, 4)
-        val legendAlphas = intArrayOf(alphas[0], alphas[2], alphas[3], alphas[4])
-        val legendBaseH = 3f * resources.displayMetrics.density
-        swatches.forEachIndexed { i, swatch ->
-            val frac = HEATMAP_CELL_SIZE_FRACTION[legendLevels[i]]
-            swatch.background =
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setColor(ColorUtils.setAlphaComponent(base, legendAlphas[i]))
-                }
-            swatch.layoutParams =
-                LinearLayout.LayoutParams(
-                    (legendBaseH * HEATMAP_CELL_OVAL_RATIO * frac).toInt(),
-                    (legendBaseH * frac).toInt()
-                ).apply { gravity = Gravity.CENTER_VERTICAL }
         }
 
         renderLogsHeaderCount(state)
@@ -2212,8 +2180,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 lastGridTouchX
             }
+        // same pitch the grid uses to size cells: grid width per hour column
         val col =
-            ((x / grid.width) * LogActivityAggregator.HOURS_IN_WINDOW).toInt()
+            (x / (grid.width / LogActivityAggregator.HOURS_IN_WINDOW.toFloat())).toInt()
                 .coerceIn(0, LogActivityAggregator.HOURS_IN_WINDOW - 1)
         val row =
             ((lastGridTouchY / grid.height) * LogActivityAggregator.BUCKETS_PER_HOUR).toInt()
@@ -2467,7 +2436,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         logsPage.fhsCardLogsDuration.visibility = View.VISIBLE
         logsPage.fhsLogsGrid.visibility = View.VISIBLE
         logsPage.fhsLogsHourAxis.visibility = View.VISIBLE
-        logsPage.fhsLogsLegend.visibility = View.VISIBLE
         logsPage.fhsLogsToggleGroup.visibility = View.VISIBLE
         // expand the pager back; the transition grows the card smoothly so
         animateLogsCardTransition(animateTransition)
@@ -2708,7 +2676,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun handleMainScreenBtnClickEvent() {
         b.fhsDnsOnOffBtn.isEnabled = false
-        delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), lifecycleScope) {
+        delay(TimeUnit.MILLISECONDS.toMillis(UI_DELAY_MS), viewLifecycleOwner.lifecycleScope) {
             if (isAdded) {
                 b.fhsDnsOnOffBtn.isEnabled = true
             }
@@ -3568,31 +3536,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         if (canRethinkBlockItself) {
-            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.attr.accentWarning))
             b.fhsProtectionLevelTxt.text = getString(R.string.rethink_home_screen_warning).capitalizeWords()
             return
         }
         val vpnState = VpnController.state()
         // Change status and explanation text
         var statusId: Int
-        var colorId: Int
         val privateDnsMode: Utilities.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (vpnState.on) {
-            colorId = fetchTextColor(R.color.accentGood)
             statusId = if (appConfig.getBraveMode().isFirewallMode()) {
                 UIUtils.getDnsStatusStringRes(Transaction.Status.COMPLETE.id)
             } else {
                 R.string.status_protected
             }
         } else if (isVpnActivated) {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_waiting
         } else if (isAnotherVpnActive()) {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId = R.string.status_exposed
         } else {
-            colorId = fetchTextColor(R.color.accentBad)
             statusId =
                 when (privateDnsMode) {
                     Utilities.PrivateDnsMode.STRICT -> R.string.status_strict
@@ -3605,12 +3567,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 statusId = R.string.status_protected_with_rpn
             } else if (appConfig.getBraveMode().isDnsMode() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.getBraveMode().isDnsMode()) {
                 statusId = R.string.status_protected
             } else if (appConfig.isOrbotProxyEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_tor_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
             } else if (
@@ -3619,7 +3579,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 isPrivateDnsActive(requireContext())
             ) { // SOCKS5 + (Http or WireGuard) + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (
                 appConfig.isCustomSocks5Enabled() &&
                 (appConfig.isCustomHttpProxyEnabled() || appConfig.isWireGuardEnabled())
@@ -3627,22 +3586,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 statusId = R.string.status_protected_with_proxy
             } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_socks5_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (
                 appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(requireContext())
             ) {
                 statusId = R.string.status_protected_with_http_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_http
             } else if (appConfig.isCustomSocks5Enabled()) {
                 statusId = R.string.status_protected_with_socks5
             } else if (isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isWireGuardEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_wg_private_dns
-                colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isWireGuardEnabled()) {
                 statusId = R.string.status_protected_with_wg
             }
@@ -3651,16 +3606,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (persistentState.wgGlobalLockdown) {
             val stat = getString(statusId).lowercase()
             val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.firewall_rule_global_lockdown), true).capitalizeWords()
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = s
         } else {
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
             val s = getString(statusId).capitalizeWords()
             b.fhsProtectionLevelTxt.text = s
         }
         val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
         if (isUnderlyingVpnNwEmpty) {
-            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentBad))
             b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network).capitalizeWords()
         }
         updateActiveSinceUi()
@@ -3687,25 +3639,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Logger.e(LOG_TAG_VPN, "err checking VPN status: ${e.message}", e)
             false
         }
-    }
-
-    private fun fetchTextColor(attr: Int): Int {
-        val attributeFetch =
-            when (attr) {
-                R.color.accentGood -> {
-                    R.attr.accentGood
-                }
-                R.color.accentBad -> {
-                    R.attr.accentBad
-                }
-                R.color.accentWarning -> {
-                    R.attr.accentWarning
-                }
-                else -> {
-                    R.attr.colorOnSurfaceVariant
-                }
-            }
-        return UIUtils.fetchColor(requireContext(), attributeFetch)
     }
 
     /**

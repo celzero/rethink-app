@@ -29,6 +29,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.NetLogTracker
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.TunFirewallManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -1024,6 +1025,120 @@ class TunDnsManagerTest {
 
         assertTrue(opts.tidcsv.contains(Backend.BlockAll))
         assertFalse(opts.noblock)
+    }
+
+    // endregion
+
+    // region decideQuery - simulator dry-run tests (shared by handleOnQuery and ConnectionSimulator)
+
+    private fun stubDfModeDefaults() {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS_FIREWALL
+        every { appConfig.isSystemDns() } returns false
+        every { appConfig.isSmartDnsEnabled() } returns false
+        every { VpnController.isAppPaused() } returns false
+        every { persistentState.splitDns } returns false
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+        coEvery { FirewallManager.isAppExcludedFromProxy(any()) } returns false
+    }
+
+    private fun stubDnsModeDefaults() {
+        every { appConfig.getBraveMode() } returns AppConfig.BraveMode.DNS
+        every { appConfig.isSystemDns() } returns false
+        every { appConfig.isSmartDnsEnabled() } returns false
+        every { VpnController.isAppPaused() } returns false
+        every { persistentState.splitDns } returns false
+        every { persistentState.preventDnsLeaks } returns false
+        every { persistentState.getAllowedDnsRecordTypesAsEnum() } returns setOf(ResourceRecordTypes.A)
+    }
+
+    @Test
+    fun `decideQuery - bypass dns-firewall app with single WG proxy routes DNS via WG with noblock`() = runTest {
+        stubDfModeDefaults()
+        every { WireguardManager.getOneWireGuardProxyId() } returns 1
+        val status = mockk<FirewallManager.FirewallStatus>(relaxed = true)
+        every { status.bypassDnsFirewall() } returns true
+        coEvery { FirewallManager.appStatus(any()) } returns status
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_BYPASS_DNS, decision.branch)
+        assertEquals(ID_WG_BASE + 1, decision.tid.first)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - proxy-excluded bypass app resolves via rethink transport`() = runTest {
+        stubDfModeDefaults()
+        every { WireguardManager.getOneWireGuardProxyId() } returns 1
+        coEvery { FirewallManager.isAppExcludedFromProxy(any()) } returns true
+        val status = mockk<FirewallManager.FirewallStatus>(relaxed = true)
+        every { status.bypassDnsFirewall() } returns true
+        coEvery { FirewallManager.appStatus(any()) } returns status
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_BYPASS_DNS, decision.branch)
+        assertEquals(Backend.Preferred, decision.tid.first)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - unknown uid with global domain block returns BlockAll`() = runTest {
+        stubDfModeDefaults()
+        coEvery { FirewallManager.isAnyAppBypassesDns() } returns false
+        every { DomainRulesManager.getAggregatedDomainRule(any(), any()) } returns
+            Pair(DomainRulesManager.Status.BLOCK, "")
+
+        val decision = TunDnsManager.decideQuery(
+            createQueryParams(isCaptivePortal = false, uidStr = INVALID_UID.toString())
+        )
+
+        assertEquals(TunDnsManager.BRANCH_NO_UID_GLOBAL_BLOCK, decision.branch)
+        assertEquals(Backend.BlockAll, decision.tid.first)
+        assertFalse(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode app-trusted domain uses default transport with preferred as secondary`() = runTest {
+        stubDnsModeDefaults()
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(10123)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_APP_TRUSTED, decision.branch)
+        assertEquals(Backend.Default, decision.tid.first)
+        assertEquals(Backend.Preferred, decision.tid.second)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode global-trusted domain uses default transport with preferred as secondary`() = runTest {
+        stubDnsModeDefaults()
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(UID_EVERYBODY)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_GLOBAL_TRUSTED, decision.branch)
+        assertEquals(Backend.Default, decision.tid.first)
+        assertEquals(Backend.Preferred, decision.tid.second)
+        assertTrue(decision.noblock)
+    }
+
+    @Test
+    fun `decideQuery - dns mode trusted domain with preventDnsLeaks keeps preferred transport`() = runTest {
+        stubDnsModeDefaults()
+        every { persistentState.preventDnsLeaks } returns true
+        every { DomainRulesManager.getAggregatedDomainRule(any(), eq(10123)) } returns
+            Pair(DomainRulesManager.Status.TRUST, "")
+
+        val decision = TunDnsManager.decideQuery(createQueryParams(isCaptivePortal = false))
+
+        assertEquals(TunDnsManager.BRANCH_APP_TRUSTED, decision.branch)
+        assertEquals(Backend.Preferred, decision.tid.first)
+        assertEquals("", decision.tid.second)
+        assertTrue(decision.noblock)
     }
 
     // endregion

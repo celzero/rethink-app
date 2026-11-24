@@ -345,7 +345,9 @@ object FirewallManager : KoinComponent {
                 if (notification.cause == RemovalCause.EXPIRED) {
                     tempAllowDbExecutor.execute {
                         runCatching {
-                            db.clearTempAllowByUidIfExpiryBlocking(uid, expiry)
+                            if (db.clearTempAllowByUidIfExpiryBlocking(uid, expiry) > 0) {
+                                closeConnectionsForExpiredTempAllows(listOf(uid))
+                            }
                         }.onFailure { t ->
                             Logger.e(LOG_TAG_FIREWALL, "err clearing expired temp allow: ${t.message}", t as? Exception)
                         }
@@ -412,7 +414,9 @@ object FirewallManager : KoinComponent {
             val expiry = ai.tempAllowExpiryTime
             if (expiry <= now) {
                 try {
-                    db.clearTempAllowByUidIfExpiry(ai.uid, expiry)
+                    if (db.clearTempAllowByUidIfExpiry(ai.uid, expiry) > 0) {
+                        closeConnectionsForExpiredTempAllows(listOf(ai.uid))
+                    }
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_FIREWALL, "err clearing stale temp allow: ${e.message}", e)
                 }
@@ -934,6 +938,7 @@ object FirewallManager : KoinComponent {
             return
         }
         tempAllowCache.invalidate(uid)
+        closeConnectionsForExpiredTempAllows(listOf(uid))
 
         // schedule/cancel based on remaining entries (DB is source of truth)
         scheduleTempAllowExpiryIfPossible()
@@ -941,12 +946,20 @@ object FirewallManager : KoinComponent {
         Logger.i(LOG_TAG_FIREWALL, "Temporary allow reverted for uid: $uid")
     }
 
-    suspend fun isTempAllowed(uid: Int): Boolean {
+    fun closeConnectionsForExpiredTempAllows(uids: List<Int>) {
+        uids.forEach { uid ->
+            tempAllowCache.invalidate(uid) // explicit removal, does not re-trigger the EXPIRED listener
+            VpnController.closeConnectionsIfNeeded(uid, "temp-allow-expired-close")
+        }
+    }
+
+    // cached expiry for an active temp-allow rule; 0 when none is active
+    suspend fun getTempAllowExpiry(uid: Int): Long {
         val now = System.currentTimeMillis()
 
         val cachedExpiry = tempAllowCache.getIfPresent(uid)
         if (cachedExpiry != null) {
-            return now < cachedExpiry
+            return if (now < cachedExpiry) cachedExpiry else 0L
         }
 
         // Cache miss: consult DB (source of truth) and warm cache if still valid.
@@ -958,13 +971,15 @@ object FirewallManager : KoinComponent {
 
         if (ai?.tempAllowEnabled == true && ai.tempAllowExpiryTime > now) {
             tempAllowCache.put(uid, ai.tempAllowExpiryTime)
-            return true
+            return ai.tempAllowExpiryTime
         }
 
         // If DB says expired/disabled, ensure cache doesn't keep it.
         tempAllowCache.invalidate(uid)
-        return false
+        return 0L
     }
+
+    suspend fun isTempAllowed(uid: Int): Boolean = getTempAllowExpiry(uid) > 0L
 
     suspend fun updateTempAllow(uid: Int, enabled: Boolean) {
         if (enabled) {
@@ -1168,12 +1183,16 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    suspend fun exemptRethinkApp(rethinkUid: Int) {
-        try {
+    suspend fun exemptRethinkApp(rethinkUid: Int): Boolean {
+        val rows = try {
             db.exemptRethinkApp()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_FIREWALL, "exemptRethinkApp db failed for uid $rethinkUid", e)
-            return
+            return false
+        }
+        if (rows == 0) {
+            Logger.w(LOG_TAG_FIREWALL, "exemptRethinkApp matched no rows (app not scanned yet?)")
+            return false
         }
         mutex.withLock {
             val appInfo = appInfos[rethinkUid].firstOrNull()
@@ -1188,6 +1207,7 @@ object FirewallManager : KoinComponent {
             appInfo.modifiedTs = System.currentTimeMillis()
         }
         informObservers()
+        return true
     }
 
     suspend fun isAppExcludedFromProxy(uid: Int): Boolean {

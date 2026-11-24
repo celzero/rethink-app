@@ -32,6 +32,7 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppIpDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
@@ -173,34 +174,34 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
+        private fun resolveIpStatus(ip: String): IpRulesManager.IpRuleStatus {
+            val status = IpRulesManager.getMostSpecificRuleMatch(uid, ip)
+            if (status != IpRulesManager.IpRuleStatus.NONE) return status
+            return IpRulesManager.getMostSpecificRuleMatch(UID_EVERYBODY, ip)
+        }
+
         private fun updateStatusUi(conn: AppConnection) {
-            if (conn.blocked) {
-                b.progress.setIndicatorColor(
-                    UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                )
-            } else {
-                val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
-                when (status) {
-                    IpRulesManager.IpRuleStatus.NONE -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                        )
-                    }
-                    IpRulesManager.IpRuleStatus.BLOCK -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
-                        )
-                    }
-                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                        )
-                    }
-                    IpRulesManager.IpRuleStatus.TRUST -> {
-                        b.progress.setIndicatorColor(
-                            UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
-                        )
-                    }
+            val status = resolveIpStatus(conn.ipAddress)
+            when (status) {
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchColor(context, R.attr.colorOnSurfaceVariant)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
                 }
             }
 
@@ -221,7 +222,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         // PagingDataAdapter does not support manual notifyItem* calls.
         // Calling notifyItemChanged on a PagingDataAdapter can cause
         // RecyclerView inconsistency crashes (IndexOutOfBoundsException).
-        // Always use refresh() to reload the current data from the PagingSource.
+        notifyDataSetChanged()
         refresh()
     }
 }

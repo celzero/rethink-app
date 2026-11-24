@@ -364,7 +364,13 @@ object BubbleHelper {
         if (eligible) {
             // Actual bubble: content opens BubbleActivity, swipe/delete disables feature.
             builder.setContentIntent(bubblePendingIntent)
-            builder.addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
+            builder.addAction(
+                Utilities.getNotificationAction(
+                    context.getString(R.string.firewall_bubble_action_disable),
+                    disableIntent,
+                    authRequired = true
+                )
+            )
         } else {
             // Fallback prompt: content + "Enable bubbles" action open settings.
             val enableBubblesPendingIntent = buildEnableBubblesPendingIntent(context)
@@ -376,15 +382,17 @@ object BubbleHelper {
             )
             // Also add a explicit dismiss action that turns off the toggle
             builder.addAction(
-                0,
-                context.getString(R.string.firewall_bubble_action_dismiss),
-                disableIntent
+                Utilities.getNotificationAction(
+                    context.getString(R.string.firewall_bubble_action_dismiss),
+                    disableIntent,
+                    authRequired = true
+                )
             )
         }
 
         try {
             nm.notify(BUBBLE_NOTIFICATION_ID, builder.build())
-        } catch (e: SecurityException) {
+        } catch (e: Exception) {
             Logger.e(LOG_TAG_FIREWALL, "err posting bubble notification: ${e.message}", e)
             return false
         }
@@ -505,7 +513,13 @@ object BubbleHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setOnlyAlertOnce(true)
                 .setDeleteIntent(buildBubbleDeletePendingIntent(context))
-                .addAction(0, context.getString(R.string.firewall_bubble_action_disable), disableIntent)
+                .addAction(
+                    Utilities.getNotificationAction(
+                        context.getString(R.string.firewall_bubble_action_disable),
+                        disableIntent,
+                        authRequired = true
+                    )
+                )
                 .build()
 
             nm.notify(BUBBLE_NOTIFICATION_ID, notification)

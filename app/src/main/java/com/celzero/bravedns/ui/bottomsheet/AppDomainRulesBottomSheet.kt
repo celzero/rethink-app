@@ -40,6 +40,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getBottomSheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
@@ -185,8 +186,15 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
     private fun setRulesUi() {
         io {
             // no need to send port number for the app info screen
+            val universalRule = DomainRulesManager.status(domain, UID_EVERYBODY)
             domainRule = DomainRulesManager.status(domain, uid)
-            Logger.d(LOG_TAG_FIREWALL, "$TAG set selection of ip: $domain, ${domainRule.id}")
+            val isUniversalOnly =
+                domainRule == DomainRulesManager.Status.NONE &&
+                    universalRule != DomainRulesManager.Status.NONE
+            Logger.d(
+                LOG_TAG_FIREWALL,
+                "$TAG set selection of domain: $domain, ${domainRule.id}, universal: $universalRule"
+            )
             uiCtx {
                 when (domainRule) {
                     DomainRulesManager.Status.TRUST -> {
@@ -196,9 +204,15 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
                         enableBlockUi()
                     }
                     DomainRulesManager.Status.NONE -> {
-                        noRuleUi()
+                        when (universalRule) {
+                            DomainRulesManager.Status.BLOCK -> enableBlockUi()
+                            DomainRulesManager.Status.TRUST -> enableTrustUi()
+                            DomainRulesManager.Status.NONE -> noRuleUi()
+                        }
                     }
                 }
+                b.bsacUniversalRuleHint.visibility =
+                    if (isUniversalOnly) View.VISIBLE else View.GONE
             }
         }
     }
@@ -214,23 +228,23 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
     private fun initializeClickListeners() {
 
         b.blockIcon.setOnClickListener {
-            if (domainRule == DomainRulesManager.Status.BLOCK) {
-                applyDomainRule(DomainRulesManager.Status.NONE)
-                noRuleUi()
-            } else {
-                applyDomainRule(DomainRulesManager.Status.BLOCK)
-                enableBlockUi()
-            }
+            applyDomainRule(
+                if (domainRule == DomainRulesManager.Status.BLOCK) {
+                    DomainRulesManager.Status.NONE
+                } else {
+                    DomainRulesManager.Status.BLOCK
+                }
+            )
         }
 
         b.trustIcon.setOnClickListener {
-            if (domainRule == DomainRulesManager.Status.TRUST) {
-                applyDomainRule(DomainRulesManager.Status.NONE)
-                noRuleUi()
-            } else {
-                applyDomainRule(DomainRulesManager.Status.TRUST)
-                enableTrustUi()
-            }
+            applyDomainRule(
+                if (domainRule == DomainRulesManager.Status.TRUST) {
+                    DomainRulesManager.Status.NONE
+                } else {
+                    DomainRulesManager.Status.TRUST
+                }
+            )
         }
 
         b.chooseProxyRl.setOnClickListener {
@@ -282,6 +296,8 @@ class AppDomainRulesBottomSheet : BaseBottomSheetDialogFragment(), WireguardList
                 DomainRulesManager.DomainType.DOMAIN,
                 status
             )
+            // refresh after the write lands so inherited universal rules and the hint reflect
+            setRulesUi()
         }
         logEvent("Domain rule applied: $domain, $uid, ${status.name}")
     }

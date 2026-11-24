@@ -51,6 +51,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.database.DnsLog
@@ -65,6 +66,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.snackbar.Snackbar
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -168,6 +170,27 @@ object UIUtils {
         }
     }
 
+    // relative phrase + absolute timestamp, e.g. "in 29 days (Nov 21, 2026, 00:00)"
+    fun formatEntitlementExpiry(context: Context, timestamp: Long): String {
+        if (timestamp <= 0L) return "N/A"
+        val absolute = SimpleDateFormat("MMM d, yyyy, HH:mm", Locale.getDefault()).format(Date(timestamp))
+        val now = System.currentTimeMillis()
+        val future = timestamp > now
+        val days = if (future) {
+            val d = (timestamp - now + DateUtils.DAY_IN_MILLIS - 1) / DateUtils.DAY_IN_MILLIS
+            maxOf(d, 1L).toInt()
+        } else {
+            maxOf((now - timestamp) / DateUtils.DAY_IN_MILLIS, 1L).toInt()
+        }
+        val relative = when {
+            DateUtils.isToday(timestamp) -> context.getString(R.string.relative_time_today)
+            isYesterday(Date(timestamp)) -> context.getString(R.string.relative_time_yesterday)
+            future -> if (days == 1) "in 1 day" else "in $days days"
+            else -> if (days == 1) "1 day ago" else "$days days ago"
+        }
+        return "$relative ($absolute)"
+    }
+
     fun getRelativeTimeSpan(t: Long?): CharSequence? {
         if (t == null || t <= 0L) return "0"
         return relativeTimeSpanString(t)
@@ -260,10 +283,17 @@ object UIUtils {
         }
     }
 
-    fun clipboardCopy(context: Context, s: String, label: String) {
-        val clipboard: ClipboardManager? = context.getSystemService()
-        val clip = ClipData.newPlainText(label, s)
-        clipboard?.setPrimaryClip(clip)
+    fun clipboardCopy(context: Context, s: String, label: String): Boolean {
+        return try {
+            val clipboard: ClipboardManager? = context.getSystemService()
+            val clip = ClipData.newPlainText(label, s)
+            clipboard?.setPrimaryClip(clip)
+            true
+        } catch (e: Exception) {
+            // clipboard writes can throw on devices with user restrictions (e.g. work profiles)
+            Logger.w(LOG_TAG_UI, "clipboard copy failed: ${e.message}", e)
+            false
+        }
     }
 
     fun htmlToSpannedText(text: String): Spanned {
@@ -1138,5 +1168,40 @@ object SnackbarHelper {
             Color.WHITE
         }
     }
+
+    /** Pads the view on all four sides with the system-bar and display-cutout insets. */
+    fun View.applySystemBarEdgeInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
+    /** Pads only the view's top with the system-bar/cutout inset. */
+    fun View.applyTopInsetOnly() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            v.updatePadding(top = bars.top)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
+    /** Pads only the view's bottom with the system-bar inset. */
+    fun View.applyBottomInsetOnly() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(this)
+    }
+
 }
 

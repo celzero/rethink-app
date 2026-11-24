@@ -35,8 +35,14 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
+import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.Logger
 import okhttp3.OkHttpClient
 import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
+import java.io.IOException
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
@@ -62,7 +68,7 @@ class RethinkGlideModule : AppGlideModule() {
         // default disk cache executors thread count is 1, which is not enough for disk cache
         // operations. Increasing the thread count to available processors.
         val diskCacheBuilder = GlideExecutor.newDiskCacheBuilder()
-        val threadCount = Math.max(Runtime.getRuntime().availableProcessors(), 1)
+        val threadCount = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
         diskCacheBuilder.setThreadCount(threadCount)
         diskCacheBuilder.setName("g-disk-cache")
         builder.setDiskCacheExecutor(diskCacheBuilder.build())
@@ -79,12 +85,11 @@ class RethinkGlideModule : AppGlideModule() {
         super.registerComponents(context, glide, registry)
 
         val client: OkHttpClient = OkHttpClient.Builder()
-            .readTimeout(5, TimeUnit.SECONDS)
-            .connectTimeout(3, TimeUnit.SECONDS)
-            // Pin NO_PROXY: with no explicit proxy, OkHttp consults ProxySelector.getDefault(),
-            // which crashes (IllegalArgumentException: port out of range:-1) on devices where
-            // the platform set http(s).proxyPort=-1 for a global proxy without a port.
-            .proxy(Proxy.NO_PROXY)
+            // generous timeouts for Tor circuit setup
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            // .onion requests use Orbot; other requests use NO_PROXY
+            .proxySelector(OrbotOnionProxySelector)
             .build()
         registry.replace(GlideUrl::class.java, InputStream::class.java, OkHttpUrlLoader.Factory(client))
 
@@ -102,6 +107,21 @@ class RethinkGlideModule : AppGlideModule() {
         //   falls through to the placeholder / error drawable without crashing.
         registry.prepend(Unit.javaClass, InputStream::class.java, NoOpUnitInputStreamLoaderFactory())
         registry.prepend(Unit.javaClass, ByteBuffer::class.java, NoOpUnitByteBufferLoaderFactory())
+    }
+
+    // .onion requests use Orbot; other requests use NO_PROXY.
+    private object OrbotOnionProxySelector : ProxySelector() {
+        private val noProxy = listOf(Proxy.NO_PROXY)
+
+        override fun select(uri: URI?): List<Proxy> {
+            if (uri?.host == null) return noProxy
+            if (!uri.host.endsWith(".onion")) return noProxy
+            return OrbotHelper.getOrbotProxy()?.let { listOf(it) } ?: noProxy
+        }
+
+        override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
+            Logger.w(Logger.LOG_TAG_DNS, "onion proxy connect failed: ${ioe?.message}")
+        }
     }
 
     inner class NoOpUnitInputStreamLoaderFactory : ModelLoaderFactory<Unit, InputStream> {

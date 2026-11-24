@@ -20,6 +20,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.rpnproxy.SubscriptionStateMachineV2Test.Companion.MACHINE_INIT_WAIT_MS
 import com.celzero.bravedns.service.PersistentState
@@ -32,6 +33,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.slot
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -1795,6 +1797,253 @@ class SubscriptionStateMachineV2Test : KoinTest {
         assertFalse(refreshed)
         coVerify(exactly = 0) { mockRepository.upsert(any()) }
         assertEquals("tok-current", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+    }
+
+    // =========================================================================
+    // 9. PurchaseCompleted token scoping + PurchasePending restore
+    // =========================================================================
+
+    @Test
+    fun `completePurchase for a different token persists but keeps active machine data`() = runBlocking {
+        val machine  = createMachine()
+        val activeSub = makeActiveSub(purchaseToken = "tok-active", productId = STD_PRODUCT)
+        transitionToActiveWithData(machine, activeSub)
+
+        machine.completePurchase(makePurchaseDetail(STD_PRODUCT, purchaseToken = "tok-pending-b"))
+        delay(100)
+
+        assertEquals("tok-active", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        coVerify { mockDbSyncService.savePurchaseDetail(any()) }
+    }
+
+    @Test
+    fun `completePurchase same-token reconciliation still updates machine data`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-reconcile"
+
+        machine.completePurchase(makePurchaseDetail(STD_PRODUCT, purchaseToken = token))
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
+
+        machine.completePurchase(makePurchaseDetail(STD_PRODUCT, purchaseToken = token))
+
+        assertEquals(token, machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+    }
+
+    @Test
+    fun `completePurchase merges the stored longer expiry into machine data`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-expiry-merge"
+        val longer  = System.currentTimeMillis() + 5 * 365 * 24 * 60 * 60 * 1000L
+        val shorter = System.currentTimeMillis() + 2 * 365 * 24 * 60 * 60 * 1000L
+        val storedRow = makeActiveSub(purchaseToken = token, productId = INAPP_ONETIME).also {
+            it.billingExpiry = longer
+            it.accountExpiry = longer
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns storedRow
+
+        machine.completePurchase(
+            makePurchaseDetail(INAPP_ONETIME, purchaseToken = token, expiryTime = shorter)
+        )
+        delay(100)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
+        assertEquals(longer, machine.getSubscriptionData()?.subscriptionStatus?.billingExpiry)
+        assertEquals(longer, machine.getSubscriptionData()?.subscriptionStatus?.accountExpiry)
+        assertEquals(longer, machine.getSubscriptionData()?.purchaseDetail?.expiryTime)
+    }
+
+    @Test
+    fun `completePurchase preserves same-token cid when incoming identity is blank`() = runBlocking {
+        val machine = createMachine()
+        val token = "tok-cid-restore"
+        val storedRow = makeActiveSub(purchaseToken = token, productId = INAPP_ONETIME).also {
+            it.accountId = "cid-persisted"
+            it.deviceId = SubscriptionStatus.DEVICE_ID_INDICATOR
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns storedRow
+
+        machine.completePurchase(
+            makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(accountId = "", deviceId = "")
+        )
+        delay(100)
+
+        val restored = machine.getSubscriptionData()
+        assertEquals("cid-persisted", restored?.subscriptionStatus?.accountId)
+        assertEquals("cid-persisted", restored?.purchaseDetail?.accountId)
+        assertEquals(SubscriptionStatus.DEVICE_ID_INDICATOR, restored?.purchaseDetail?.deviceId)
+    }
+
+    @Test
+    fun `completePurchase does not rebind same token to a different cid`() = runBlocking {
+        val machine = createMachine()
+        val token = "tok-cid-rebind"
+        val storedRow = makeActiveSub(purchaseToken = token, productId = INAPP_ONETIME).also {
+            it.accountId = "cid-persisted"
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns storedRow
+
+        machine.completePurchase(
+            makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(accountId = "cid-other")
+        )
+        delay(100)
+
+        assertEquals(
+            "cid-persisted",
+            machine.getSubscriptionData()?.subscriptionStatus?.accountId
+        )
+        assertEquals("cid-persisted", machine.getSubscriptionData()?.purchaseDetail?.accountId)
+    }
+
+    @Test
+    fun `PurchasePending accepts restore of an active subscription`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-pend-restore"
+        machine.completePurchase(makePurchaseDetail(INAPP_2YRS, purchaseToken = token))
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
+
+        val activeRow = makeActiveSub(purchaseToken = token, productId = INAPP_2YRS)
+        coEvery { mockRepository.getByPurchaseToken(token) } returns activeRow
+
+        machine.restoreSubscription(makePurchaseDetail(INAPP_2YRS, purchaseToken = token))
+        delay(100)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.Active, machine.currentMachineState())
+    }
+
+    @Test
+    fun `legacy PURCHASED DB state stays pending until Play confirms it`() = runBlocking {
+        val sub = makeActiveSub(purchaseToken = "tok-purchased", productId = INAPP_2YRS).also {
+            it.status = SubscriptionStatus.SubscriptionState.STATE_PURCHASED.id
+        }
+        coEvery { mockDbSyncService.loadStateFromDatabase() } returns
+            makeDatabaseStateInfo(sub, SubscriptionStateMachineV2.SubscriptionState.PurchasePending)
+
+        val machine = createMachine()
+        delay(100)
+
+        assertEquals(SubscriptionStateMachineV2.SubscriptionState.PurchasePending, machine.currentMachineState())
+        assertEquals("tok-purchased", machine.getSubscriptionData()?.subscriptionStatus?.purchaseToken)
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+    }
+
+    // =========================================================================
+    // 10. Confirmed one-time identity and expiry reconciliation
+    // =========================================================================
+
+    @Test
+    fun `paymentSuccessful generic plan keeps resolved identity and expiry`() = runBlocking {
+        val machine  = createMachine()
+        val token    = "tok-identity"
+        val now      = System.currentTimeMillis()
+        val fiveYear = now + 5 * 365 * 24 * 60 * 60 * 1000L
+        val resolved = makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(
+            planId = "proxy-yearly-5", productTitle = "5 years", expiryTime = fiveYear,
+            isPlanIdServerConfirmed = true
+        )
+
+        coEvery { mockRepository.getByPurchaseToken(token) } returns null
+        coEvery { mockRepository.getCurrentSubscription() } returns null
+        machine.paymentSuccessful(resolved)
+        delay(100)
+
+        val saved = slot<SubscriptionStatus>()
+        coVerify { mockRepository.upsert(capture(saved)) }
+        assertEquals("proxy-yearly-5", saved.captured.planId)
+        assertEquals("5 years", saved.captured.productTitle)
+        assertEquals(fiveYear, saved.captured.billingExpiry)
+
+        // A non-authoritative cached option with a shorter estimate must not downgrade.
+        clearMocks(mockRepository, answers = false)
+        coEvery { mockRepository.getByPurchaseToken(token) } returns saved.captured
+        coEvery { mockRepository.getCurrentSubscription() } returns saved.captured
+        coEvery { mockRepository.upsert(any()) } returns 1L
+
+        val generic = makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(
+            planId = "proxy-yearly-2",
+            productTitle = "2 years",
+            expiryTime = now + 2 * 365 * 24 * 60 * 60 * 1000L
+        )
+        machine.paymentSuccessful(generic)
+        delay(100)
+
+        assertEquals("proxy-yearly-5", machine.getSubscriptionData()?.subscriptionStatus?.planId)
+        assertEquals("proxy-yearly-5", machine.getSubscriptionData()?.purchaseDetail?.planId)
+        assertEquals("5 years", machine.getSubscriptionData()?.subscriptionStatus?.productTitle)
+        assertTrue((machine.getSubscriptionData()?.subscriptionStatus?.billingExpiry ?: 0L) >
+            now + 3 * 365 * 24 * 60 * 60 * 1000L)
+        // dedup: nothing changed vs the persisted row, so no rewrite
+        coVerify(exactly = 0) { mockRepository.upsert(any()) }
+    }
+
+    @Test
+    fun `paymentSuccessful takes the latest resolved plan over a stored resolved one`() = runBlocking {
+        val machine = createMachine()
+        val token   = "tok-latest"
+        val now     = System.currentTimeMillis()
+        val row = makeActiveSub(purchaseToken = token, productId = INAPP_ONETIME).also {
+            it.planId = "proxy-yearly-2"
+            it.productTitle = "2 years"
+            it.billingExpiry = now + 2 * 365 * 24 * 60 * 60 * 1000L
+            it.accountExpiry = it.billingExpiry
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns row
+        coEvery { mockRepository.getCurrentSubscription() } returns row
+
+        val upgraded = makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(
+            planId = "proxy-yearly-5", productTitle = "5 years",
+            expiryTime = now + 5 * 365 * 24 * 60 * 60 * 1000L,
+            isPlanIdServerConfirmed = true
+        )
+        machine.paymentSuccessful(upgraded)
+        delay(100)
+
+        assertEquals("proxy-yearly-5", machine.getSubscriptionData()?.subscriptionStatus?.planId)
+        assertEquals("5 years", machine.getSubscriptionData()?.subscriptionStatus?.productTitle)
+        assertEquals(
+            InAppBillingHandler.REVOKE_WINDOW_ONE_TIME_5YRS_DAYS,
+            machine.getSubscriptionData()?.subscriptionStatus?.windowDays
+        )
+        coVerify { mockRepository.upsert(match {
+            it.planId == "proxy-yearly-5" && it.productTitle == "5 years" &&
+                it.billingExpiry > row.billingExpiry
+        }) }
+    }
+
+    @Test
+    fun `paymentSuccessful applies confirmed shorter one-time expiry`() = runBlocking {
+        val machine = createMachine()
+        val token = "tok-shorter-confirmed"
+        val now = System.currentTimeMillis()
+        val oldExpiry = now + 5 * 365 * 24 * 60 * 60 * 1000L
+        val correctedExpiry = now + 2 * 365 * 24 * 60 * 60 * 1000L
+        val row = makeActiveSub(purchaseToken = token, productId = INAPP_ONETIME).also {
+            it.planId = "proxy-yearly-5"
+            it.productTitle = "5 years"
+            it.billingExpiry = oldExpiry
+            it.accountExpiry = oldExpiry
+        }
+        coEvery { mockRepository.getByPurchaseToken(token) } returns row
+        coEvery { mockRepository.getCurrentSubscription() } returns row
+
+        val corrected = makePurchaseDetail(INAPP_ONETIME, purchaseToken = token).copy(
+            planId = "proxy-yearly-2",
+            productTitle = "2 years",
+            expiryTime = correctedExpiry,
+            isPlanIdServerConfirmed = true
+        )
+        machine.paymentSuccessful(corrected)
+        delay(100)
+
+        val current = machine.getSubscriptionData()
+        assertEquals("proxy-yearly-2", current?.subscriptionStatus?.planId)
+        assertEquals(correctedExpiry, current?.subscriptionStatus?.billingExpiry)
+        assertEquals("proxy-yearly-2", current?.purchaseDetail?.planId)
+        assertEquals(correctedExpiry, current?.purchaseDetail?.expiryTime)
+        coVerify { mockRepository.upsert(match {
+            it.planId == "proxy-yearly-2" &&
+                it.billingExpiry == correctedExpiry &&
+                it.accountExpiry == correctedExpiry
+        }) }
     }
 
     // =========================================================================

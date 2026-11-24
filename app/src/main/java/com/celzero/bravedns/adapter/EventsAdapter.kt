@@ -16,8 +16,6 @@
 package com.celzero.bravedns.adapter
 
 import android.animation.ObjectAnimator
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +29,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.Event
 import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ItemEventBinding
+import com.celzero.bravedns.util.UIUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -178,10 +177,9 @@ class EventsAdapter(private val context: Context) :
         }
 
         private fun copyToClipboard(text: String) {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Event Message", text)
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            val copied = UIUtils.clipboardCopy(context, text, "Event Message")
+            val msg = context.getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast)
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 

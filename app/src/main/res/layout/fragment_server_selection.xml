@@ -531,6 +531,49 @@
 
                         </LinearLayout>
 
+                        <LinearLayout
+                            android:id="@+id/qs_remote_service_tile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_qs_action_pill"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="11dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="11dp"
+                            android:paddingBottom="8dp"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/qs_remote_service_icon"
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/ic_laptop"
+                                android:tint="?attr/primaryLightColorText" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/qs_remote_service_label"
+                                style="@style/RethinkPlus.TileLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="@string/qs_remote_service_label" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/qs_remote_service_state"
+                                style="@style/RethinkPlus.TileValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                tools:text="Off" />
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
                     </HorizontalScrollView>

@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
@@ -57,6 +56,7 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ServerSelectionViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -64,10 +64,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import kotlin.time.Duration.Companion.milliseconds
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_dashboard) {
     private val b by viewBinding(FragmentRethinkPlusDashboardBinding::bind)
@@ -309,10 +309,12 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
     private fun copyWhoToClipboard() {
         val text = b.tvHeroWho.text?.toString().orEmpty()
         if (text.isBlank()) return
-        val clipboard =
-            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
-        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+        val copied = UIUtils.clipboardCopy(requireContext(), text, "who")
+        showToastUiCentered(
+            requireContext(),
+            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     /**
@@ -606,8 +608,24 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.fragment_rethink_plus_das
             InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
             InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
             InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
-            else -> fallbackTitle.ifEmpty { productId }
+            else -> resolveUnmappedPlanName(productId, planId, fallbackTitle)
         }
+    }
+
+    private fun isInAppProduct(productId: String, planId: String): Boolean {
+        val inAppIds = setOf(
+            InAppBillingHandler.ONE_TIME_PRODUCT_ID,
+            InAppBillingHandler.ONE_TIME_PRODUCT_2YRS,
+            InAppBillingHandler.ONE_TIME_PRODUCT_5YRS,
+            InAppBillingHandler.ONE_TIME_TEST_PRODUCT_ID
+        )
+        return productId in inAppIds || planId in inAppIds
+    }
+
+    // one-time purchase titles are derived durations and can be wrong; prefer the raw plan id
+    private fun resolveUnmappedPlanName(productId: String, planId: String, fallbackTitle: String): String {
+        if (isInAppProduct(productId, planId)) return planId.ifBlank { productId }
+        return fallbackTitle.ifEmpty { productId }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) =

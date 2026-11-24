@@ -228,10 +228,10 @@ class DnsProxyEndpointAdapter(
             _: DialogInterface,
             _: Int ->
             if (ip != null) {
-                clipboardCopy(context, ip, context.getString(R.string.copy_clipboard_label))
+                val copied = clipboardCopy(context, ip, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,
-                    context.getString(R.string.info_dialog_copy_toast_msg),
+                    context.getString(if (copied) R.string.info_dialog_copy_toast_msg else R.string.copy_failed_toast),
                     Toast.LENGTH_SHORT
                 )
             } else {

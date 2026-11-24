@@ -32,7 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
+import dev.androidbroadcast.vbpd.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusPremiumBinding
@@ -150,7 +150,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
         setupRecyclerView()
         setupTermsAndPolicy()
         setupProductTypeToggle()
-        adjustCtaBottomMargin()
         startHeaderAnimations()
 
         if (viewModel.extendMode) {
@@ -201,14 +200,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus_premium),
             movementMethod = LinkMovementMethod.getInstance()
             highlightColor = Color.TRANSPARENT
             setLinkTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryLightColorText))
-        }
-    }
-
-    private fun adjustCtaBottomMargin() {
-        if (activity is FragmentHostActivity) {
-            val lp = b.ctaInnerContainer.layoutParams as? android.view.ViewGroup.MarginLayoutParams
-            lp?.bottomMargin = 0
-            b.ctaInnerContainer.layoutParams = lp
         }
     }
 

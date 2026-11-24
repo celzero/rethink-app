@@ -60,6 +60,7 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import com.celzero.bravedns.util.notifySafely
 import com.celzero.bravedns.wireguard.WgHopManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -93,6 +94,7 @@ internal constructor(
         const val ACTION_INSERT_NEW_APP = ACTION_BASE + 5
         const val PENDING_INTENT_REQUEST_CODE_ALLOW = 0x10000000
         const val PENDING_INTENT_REQUEST_CODE_DENY = 0x20000000
+        private const val PENDING_INTENT_REQUEST_CODE_BULK_NEW_APP = 0x30000000
     }
 
     private val randomNotifId: Random = Random
@@ -512,6 +514,12 @@ internal constructor(
             insertUnknownApp(uid)
             logEvent(Severity.MEDIUM, "new unknown app installed", "inserted unknown app, uid: $uid")
         }
+        // self-insert is exempted (see insertApp); no need to prompt about the app itself
+        if (pkg == ctx.packageName) return
+
+        // non-app uids and system components are exempted from block-on-insert; do not notify
+        if (ai == null || isSystemComponent(ai)) return
+
         showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
     }
 
@@ -697,6 +705,13 @@ internal constructor(
 
         entry.appCategory = determineAppCategory(ai)
 
+        // self-exempt on insert; startup migration is a no-op until the app scan populates AppInfo
+        if (ai.packageName == ctx.packageName) {
+            entry.firewallStatus = FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id
+            entry.isProxyExcluded = true
+        }
+
         Logger.i(LOG_TAG_APP_DB, "insert app: $ai")
         FirewallManager.persistAppInfo(entry)
         ProxyManager.addNewApp(entry)
@@ -706,7 +721,11 @@ internal constructor(
         // need not notify if "block newly installed apps" is off: insertApp() & insertUnkownApp()
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
-        val appCount = apps.count()
+        // exclude self-insert; the app is exempted (see insertApp) and must not notify about itself
+        val others = apps.filter { it.packageName != ctx.packageName }
+        if (others.isEmpty()) return
+
+        val appCount = others.count()
         // Show bulk notification when the app size is greater than NEW_APP_BULK_CHECK_COUNT(5)
         if (appCount > NOTIF_BATCH_NEW_APPS_THRESHOLD) {
             showNewAppsBulkNotificationIfNeeded(appCount)
@@ -714,7 +733,7 @@ internal constructor(
         }
 
         // show notification for particular app (less than NEW_APP_BULK_CHECK_COUNT)
-        apps.forEach { showNewAppNotificationIfNeeded(it) }
+        others.forEach { showNewAppNotificationIfNeeded(it) }
     }
 
     private fun showNewAppsBulkNotificationIfNeeded(appSize: Int) {
@@ -732,7 +751,13 @@ internal constructor(
         )
 
         val pendingIntent =
-            getActivityPendingIntent(ctx, intent, PendingIntent.FLAG_ONE_SHOT, mutable = false)
+            getActivityPendingIntent(
+                ctx,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT,
+                mutable = false,
+                requestCode = PENDING_INTENT_REQUEST_CODE_BULK_NEW_APP
+            )
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
@@ -768,7 +793,7 @@ internal constructor(
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             randomNotifId.nextInt(100),
             builder.build()
@@ -817,7 +842,8 @@ internal constructor(
                 ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = app.uid
             )
 
         val builder: NotificationCompat.Builder
@@ -862,16 +888,16 @@ internal constructor(
                 PENDING_INTENT_REQUEST_CODE_DENY
             )
         val notificationAction: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.allow).uppercase(),
-                openIntent1
+                openIntent1,
+                authRequired = true
             )
         val notificationAction2: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
-                openIntent2
+                openIntent2,
+                authRequired = true
             )
         builder.addAction(notificationAction)
         builder.addAction(notificationAction2)
@@ -880,7 +906,7 @@ internal constructor(
         builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
         builder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
+        notificationManager.notifySafely(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
     }
 
     private suspend fun notifyEmptyFirewallRulesIfNeeded() {
@@ -934,7 +960,7 @@ internal constructor(
         builder = builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
         builder.build()
-        nm.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_LOAD_RULES_FAIL, builder.build())
+        nm.notifySafely(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, NOTIF_ID_LOAD_RULES_FAIL, builder.build())
     }
 
     private fun showDatabaseCorruptionNotification() {
@@ -972,10 +998,10 @@ internal constructor(
             .setAutoCancel(true)
 
         val clearAction: NotificationCompat.Action =
-            NotificationCompat.Action(
-                0,
+            Utilities.getNotificationAction(
                 ctx.resources.getString(R.string.db_corruption_action_clear),
-                clearIntent
+                clearIntent,
+                authRequired = true
             )
         val dismissAction: NotificationCompat.Action =
             NotificationCompat.Action(
@@ -986,7 +1012,7 @@ internal constructor(
         builder.addAction(clearAction)
         builder.addAction(dismissAction)
 
-        notificationManager.notify(
+        notificationManager.notifySafely(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
             NOTIF_ID_DB_CORRUPTION,
             builder.build()

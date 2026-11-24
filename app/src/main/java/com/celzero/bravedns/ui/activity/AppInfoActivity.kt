@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -52,7 +50,6 @@ import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseCountriesAdapter
@@ -68,24 +65,30 @@ import com.celzero.bravedns.database.Severity
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.databinding.ViewInsightsRankRowBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EventLogger
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
+import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.TOP_SLICES
 import com.celzero.bravedns.ui.custom.DonutChartView
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.ui.stats.CountryInsightsMapper
 import com.celzero.bravedns.ui.stats.StatsInsightsMath
 import com.celzero.bravedns.ui.stats.StatsViewMode
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
@@ -95,16 +98,21 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -135,6 +143,11 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var notesDialog: AlertDialog? = null
     private var notesEditText: EditText? = null
 
+    // ticks the temp-allow countdown label until expiry
+    private var tempAllowTickerJob: Job? = null
+    private var tempAllowExpiryMs: Long = 0L
+    private var suppressTempAllowListener: Boolean = false
+
     // current presentation mode of the network-log sections; mirrors the stats
     // screen's persisted preference so both surfaces stay in sync
     private var statsViewMode: StatsViewMode = StatsViewMode.LIST
@@ -153,6 +166,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     private var blockedColor: Int = 0
     private var trackColor: Int = 0
     private var centerTextColor: Int = 0
+    private var subtleColor: Int = 0
 
     // true when the ASN section was actually wired up (setting enabled and
     // app is not Rethink itself); gates the insights ASN section
@@ -193,6 +207,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         private const val TEMP_ALLOW_DURATION_MINUTES = 15
         private const val MILLIS_PER_MINUTE = 60
         private const val MILLIS_PER_SECOND = 1000L
+        private const val TEMP_ALLOW_TICK_INTERVAL_MS = 30_000L
         private const val ALPHA_DISABLED = 0.5f
         private const val IS_WARNING_ACKNOWLEDGED = "IS_WARNING_ACKNOWLEDGED"
         private const val MAX_NOTE_LENGTH = 500
@@ -210,6 +225,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -352,9 +368,13 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 
                 // Set temporary allow toggle state
-                val isTempAllowed = FirewallManager.isTempAllowed(appInfo.uid)
-                b.tempAllowSwitch.isChecked = isTempAllowed
-                updateTempAllowDescription(isTempAllowed, appInfo.tempAllowExpiryTime)
+                val tempAllowExpiry = FirewallManager.getTempAllowExpiry(appInfo.uid)
+                val isTempAllowed = tempAllowExpiry > 0L
+                if (b.tempAllowSwitch.isChecked != isTempAllowed) {
+                    suppressTempAllowListener = true
+                    b.tempAllowSwitch.isChecked = isTempAllowed
+                }
+                updateTempAllowDescription(isTempAllowed, tempAllowExpiry)
                 
                 displayDataUsage()
                 displayProxyStatus()
@@ -698,11 +718,44 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         applyInsightsSectionGating()
     }
 
-    private fun isBlockedSection(section: AppInsightsSection): Boolean {
-        return section == AppInsightsSection.BLOCKED_ASN ||
+    private fun isRuleAddressableSection(section: AppInsightsSection): Boolean {
+        return section == AppInsightsSection.ACTIVE_CONNS ||
+            section == AppInsightsSection.DOMAINS ||
             section == AppInsightsSection.BLOCKED_DOMAINS ||
-            section == AppInsightsSection.BLOCKED_IPS ||
-            section == AppInsightsSection.BLOCKLISTS
+            section == AppInsightsSection.IPS ||
+            section == AppInsightsSection.BLOCKED_IPS
+    }
+
+    private fun resolveDomainRuleStatus(domain: String?): DomainRulesManager.Status {
+        if (domain.isNullOrEmpty()) return DomainRulesManager.Status.NONE
+        val status = DomainRulesManager.status(domain, uid)
+        if (status != DomainRulesManager.Status.NONE) return status
+        return DomainRulesManager.status(domain, UID_EVERYBODY)
+    }
+
+    private fun resolveIpRuleStatus(ip: String, connUid: Int): IpRulesManager.IpRuleStatus {
+        val status = IpRulesManager.getMostSpecificRuleMatch(connUid, ip)
+        if (status != IpRulesManager.IpRuleStatus.NONE) return status
+        return IpRulesManager.getMostSpecificRuleMatch(UID_EVERYBODY, ip)
+    }
+
+    private fun resolveRuleColor(section: AppInsightsSection, item: AppConnection): Int {
+        return if (section == AppInsightsSection.DOMAINS ||
+            section == AppInsightsSection.BLOCKED_DOMAINS
+        ) {
+            when (resolveDomainRuleStatus(item.appOrDnsName)) {
+                DomainRulesManager.Status.BLOCK -> blockedColor
+                DomainRulesManager.Status.TRUST -> allowedColor
+                DomainRulesManager.Status.NONE -> subtleColor
+            }
+        } else {
+            when (resolveIpRuleStatus(item.ipAddress, item.uid)) {
+                IpRulesManager.IpRuleStatus.BLOCK -> blockedColor
+                IpRulesManager.IpRuleStatus.TRUST,
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> allowedColor
+                IpRulesManager.IpRuleStatus.NONE -> subtleColor
+            }
+        }
     }
 
     /** Hides insights sections whose list-view counterparts are unavailable. */
@@ -722,8 +775,8 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         blockedColor = UIUtils.fetchColor(this, R.attr.accentBad)
         trackColor = UIUtils.fetchColor(this, R.attr.colorSurfaceContainerHighest)
         centerTextColor = UIUtils.fetchColor(this, R.attr.primaryTextColor)
-        val subtle = UIUtils.fetchColor(this, R.attr.secondaryTextColor)
-        b.aadIaCountriesMap.setColors(trackColor, allowedColor, subtle)
+        subtleColor = UIUtils.fetchColor(this, R.attr.colorOnSurfaceVariant)
+        b.aadIaCountriesMap.setColors(trackColor, allowedColor, subtleColor)
         allInsightsDonuts().forEach { donut ->
             donut.setTrackColor(trackColor)
             donut.setCenterTextColor(centerTextColor)
@@ -803,14 +856,7 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
     }
 
-    /**
-     * Renders a section as a donut chart (top slices, single hue stepped by
-     * intensity) plus normalized ranking rows (bar length = value / maxValue,
-     * the longest item at ~100%). The whole section — heading, action chip
-     * and chart — is hidden when there is nothing to show; no separate
-     * empty-state message is displayed. Blocked sections use the negative
-     * accent hue throughout.
-     */
+
     private fun renderRanking(
         section: AppInsightsSection,
         containerView: View,
@@ -818,7 +864,6 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         donut: DonutChartView?,
         items: List<AppConnection>
     ) {
-        val blocked = isBlockedSection(section)
         containerView.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
         if (items.isEmpty()) {
             rowsContainer.removeAllViews()
@@ -827,9 +872,9 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
         donut?.visibility = View.VISIBLE
         val fractions = StatsInsightsMath.normalizeFractions(items.map { it.count.toLong() })
-        renderDonut(donut, fractions, items, blocked)
+        renderDonut(donut, fractions, items, section)
         val inflater = LayoutInflater.from(this)
-        val barColor = if (blocked) blockedColor else allowedColor
+        val ruleAware = isRuleAddressableSection(section)
         rowsContainer.removeAllViews()
         // rows are capped to the donut's top-slice count: the full ranked list
         // stays one tap away on the "see more" screen
@@ -843,30 +888,25 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             rowBinding.irBar.max = PERCENTAGE_MULTIPLIER
             rowBinding.irBar.progress = (fractions[index] * PERCENTAGE_MULTIPLIER).toInt()
             rowBinding.irBar.setIndicatorColor(
-                if (!blocked && item.blocked) blockedColor else barColor
+                if (ruleAware) resolveRuleColor(section, item) else subtleColor
             )
             rowBinding.root.contentDescription = getString(R.string.ci_desc, label, metric)
             rowsContainer.addView(rowBinding.root)
         }
     }
 
-    /**
-     * Donut slices: the top [TOP_SLICES] items, one hue (green for
-     * allowed/contacted sections, red for blocked sections) at stepped
-     * intensities; the remainder stays visible as the neutral track ring.
-     * The center carries the section total.
-     */
     private fun renderDonut(
         donut: DonutChartView?,
         fractions: List<Float>,
         items: List<AppConnection>,
-        blocked: Boolean
+        section: AppInsightsSection
     ) {
         donut ?: return
-        val base = if (blocked) blockedColor else allowedColor
+        val ruleAware = isRuleAddressableSection(section)
         val top = minOf(TOP_SLICES, fractions.size)
         val slices = (0 until top).map { i ->
-            DonutChartView.Slice(fractions[i], ColorUtils.setAlphaComponent(base, SLICE_ALPHAS[i]))
+            val color = if (ruleAware) resolveRuleColor(section, items[i]) else subtleColor
+            DonutChartView.Slice(fractions[i], ColorUtils.setAlphaComponent(color, SLICE_ALPHAS[i]))
         }
         donut.setData(slices)
         donut.setCenterText(items.sumOf { it.count.toLong() }.toString())
@@ -918,6 +958,28 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
             } else {
                 getString(R.string.two_argument_colon, getString(R.string.cd_stats_country_map), summary)
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // re-render so rule-colors changed on other screens are re-resolved
+        if (statsViewMode == StatsViewMode.INSIGHTS && !isFinishing && !isDestroyed) {
+            renderInsights()
+        }
+        // ticker is cancelled in onPause; re-render (or lapse) and restart it here
+        if (tempAllowExpiryMs > 0L) {
+            if (System.currentTimeMillis() >= tempAllowExpiryMs) {
+                onTempAllowExpiredOrDisabled()
+            } else {
+                renderTempAllowLabel()
+                startTempAllowTicker()
+            }
+        }
+    }
+
+    override fun onPause() {
+        stopTempAllowTicker()
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -1181,6 +1243,10 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
         }
 
         b.tempAllowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressTempAllowListener) {
+                suppressTempAllowListener = false
+                return@setOnCheckedChangeListener
+            }
             updateTempAllowStatus(isChecked)
         }
 
@@ -1255,22 +1321,55 @@ class AppInfoActivity : BaseActivity(R.layout.activity_app_details) {
     }
 
     private fun updateTempAllowDescription(isAllowed: Boolean, expiryTime: Long) {
-        if (isAllowed && expiryTime > 0) {
-            val now = System.currentTimeMillis()
-            if (expiryTime > now) {
-                val relativeTime = DateUtils.getRelativeTimeSpanString(
-                    expiryTime,
-                    now,
-                    DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
-                b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
-            } else {
-                b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
-            }
+        if (isAllowed && expiryTime > System.currentTimeMillis()) {
+            tempAllowExpiryMs = expiryTime
+            renderTempAllowLabel()
+            startTempAllowTicker()
         } else {
-            b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+            onTempAllowExpiredOrDisabled()
         }
+    }
+
+    private fun renderTempAllowLabel() {
+        val relativeTime = DateUtils.getRelativeTimeSpanString(
+            tempAllowExpiryMs,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+        b.tempAllowDesc.text = getString(R.string.temp_allow_active, relativeTime)
+    }
+
+    private fun onTempAllowExpiredOrDisabled() {
+        stopTempAllowTicker()
+        tempAllowExpiryMs = 0L
+        if (b.tempAllowSwitch.isChecked) {
+            suppressTempAllowListener = true
+            b.tempAllowSwitch.isChecked = false
+        }
+        b.tempAllowDesc.text = getString(R.string.temp_allow_desc)
+    }
+
+    // ticks only while resumed (cancelled in onPause); refreshes the countdown label
+    // and resets the toggle ui when the window lapses
+    private fun startTempAllowTicker() {
+        if (tempAllowTickerJob?.isActive == true) return
+        tempAllowTickerJob = lifecycleScope.launch(Dispatchers.Main) {
+            while (isActive) {
+                delay(TEMP_ALLOW_TICK_INTERVAL_MS)
+                if (tempAllowExpiryMs <= 0L) break
+                if (System.currentTimeMillis() >= tempAllowExpiryMs) {
+                    onTempAllowExpiredOrDisabled()
+                    break
+                }
+                renderTempAllowLabel()
+            }
+        }
+    }
+
+    private fun stopTempAllowTicker() {
+        tempAllowTickerJob?.cancel()
+        tempAllowTickerJob = null
     }
 
     private fun openAppWiseDomainLogsActivity(

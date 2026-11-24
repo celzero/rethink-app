@@ -128,6 +128,11 @@ class AppInfo : Serializable {
         if (packageName.startsWith(NO_PACKAGE_PREFIX)) return true
 
         // INTERNET permission if defined, can not be denied so this is safe to use
-        return packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
+        // fix: not the case for stale package names (uninstalled apps) can throw exception
+        return try {
+            packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
+        } catch (_: Exception) {
+            false
+        }
     }
 }

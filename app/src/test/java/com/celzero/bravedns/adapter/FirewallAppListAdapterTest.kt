@@ -399,11 +399,12 @@ class FirewallAppListAdapterTest {
         val interfaces = adapterClass.interfaces
 
         assertNotNull("Adapter should have a superclass", superClass)
-
-        val implementsSectionedAdapter = interfaces.any {
-            it.name.contains("SectionedAdapter")
-        }
-        assert(implementsSectionedAdapter)
+        assert(superClass!!.name.contains("PagingDataAdapter"))
+        assert(
+            interfaces.none {
+                it.name.contains("SectionedAdapter")
+            }
+        )
     }
 
     @Test

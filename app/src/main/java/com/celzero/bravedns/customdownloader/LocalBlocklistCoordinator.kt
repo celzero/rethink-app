@@ -46,6 +46,7 @@ import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.calculateMd5
 import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
+import com.celzero.bravedns.util.notifySafely
 import okhttp3.ResponseBody
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -545,7 +546,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun showNotification(context: Context) {
         getNotificationManager(context)
-            .notify(
+            .notifySafely(
                 DOWNLOAD_NOTIFICATION_TAG,
                 DOWNLOAD_NOTIFICATION_ID,
                 getBuilder(context).build()
@@ -567,7 +568,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.setProgress(max, cur, forever)
         getNotificationManager(context)
-            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+            .notifySafely(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyProcessing(context: Context) {
@@ -579,7 +580,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         // indeterminate spinner while files are being verified/validated
         builder.setProgress(0, 0, true)
         getNotificationManager(context)
-            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+            .notifySafely(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadFailure(context: Context) {
@@ -595,7 +596,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         getNotificationManager(context)
-            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+            .notifySafely(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadSuccess(context: Context) {
@@ -611,7 +612,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         getNotificationManager(context)
-            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+            .notifySafely(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadCancelled(context: Context) {
@@ -627,7 +628,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         getNotificationManager(context)
-            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
+            .notifySafely(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun clear(timestamp: Long) {

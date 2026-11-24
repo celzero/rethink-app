@@ -35,6 +35,8 @@ import java.io.File
 class GoReportingHandler private constructor(private val scope: CoroutineScope, private val ctx: Context): Console, KoinComponent {
     private val persistentState by inject<PersistentState>()
 
+    @Volatile private var crashOutputReady = false
+
     companion object {
         // Safe: holds applicationContext only, not Activity/Service context
         @SuppressLint("StaticFieldLeak")
@@ -58,14 +60,16 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
 
     init {
         scope.launch {
-            Intra.setupConsole(this@GoReportingHandler)
             val crashFile = getCrashFile()
             if (crashFile == null) {
                 Logger.e(LOG_TAG_BUG_REPORT, "$TAG init: failed to create crash file")
             } else {
                 Logger.i(LOG_TAG_BUG_REPORT, "$TAG init: path: ${crashFile.absolutePath}")
-                Intra.setCrashOutput(crashFile.absolutePath, crashFile.absolutePath)
+                crashOutputReady =
+                    Intra.setCrashOutput(crashFile.absolutePath, crashFile.absolutePath)
             }
+            // setupConsole probes logFD/logMemFD; crash output must be decided first
+            Intra.setupConsole(this@GoReportingHandler)
         }
     }
 
@@ -86,11 +90,17 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
             if (l.stacktrace()) {
                 // disable crash logging for now
                 if (false) Logger.crash(LOG_GO_LOGGER_V1, msg) // write to in-mem db
-                if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
                 val token = if (isWebsiteDegoogledFlavour()) "website-degoogled"
                             else if (isFdroidFlavour()) "fdroid"
                             else persistentState.firebaseUserToken
-                EnhancedBugReport.writeLogsToFile(ctx, token, msg)
+                val file = EnhancedBugReport.writeGoCrashToFile(ctx, token, msg)
+                // report immediately; mark the tombstone as reported so the startup pass
+                // does not send the same crash a second time
+                if (!isFdroidFlavour() && persistentState.firebaseErrorReportingEnabled &&
+                    file != null && CrashReporter.recordGoCrash(msg)
+                ) {
+                    persistentState.lastReportedTombstoneFile = file.name
+                }
             } else if (l.user()) {
                 showNwEngineNotification(msg)
                 // consider all the notifications from go as failure and stop the service
@@ -102,6 +112,7 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
     }
 
     override fun logFD(p0: Long): Boolean {
+        if (!crashOutputReady) return false
         Logger.i(LOG_TAG_BUG_REPORT, "$TAG logFD: fd=$p0")
         val goLogFdReader = GoLogFileDescriptorReader(scope)
         val started = goLogFdReader.start(ctx, p0)
@@ -115,6 +126,7 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
         bufferSize: Long,
         size: Long
     ): LogConsumer? {
+        if (!crashOutputReady) return null
         Logger.i(LOG_TAG_BUG_REPORT, "$TAG logMemFD: fd/a=$fda, fd/b=$fdb, buffer-sz=$bufferSize, sz: $size")
         // Return a GoMemLogConsumer that will drain the shared-memory buffer Go points us at.
         // Go will call drain(fd, start, end) on the returned consumer each time new data
@@ -144,7 +156,7 @@ class GoReportingHandler private constructor(private val scope: CoroutineScope, 
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
         builder.color = ContextCompat.getColor(ctx, getAccentColor(persistentState.theme))
-        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        notificationManager.notifySafely(NW_ENGINE_NOTIFICATION_ID, builder.build())
         Logger.w(LOG_TAG_BUG_REPORT, "nw eng notification: $msg")
     }
 }

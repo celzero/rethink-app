@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="80dp">
+    android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/fhs_scroll_view"
@@ -17,7 +16,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxWidth="720dp"
             android:layout_gravity="center_horizontal"
             android:paddingBottom="32dp">
 
@@ -42,7 +40,7 @@
                     android:maxLines="1"
                     tools:text="Lockdown with RPN"
                     android:textAllCaps="true"
-                    android:textColor="?attr/accentGood"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fhs_active_since_txt"
@@ -164,7 +162,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/fhs_firewall_proxy_row"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 app:layout_constraintTop_toBottomOf="@id/fhs_card_dns_ll">
 
@@ -176,6 +174,7 @@
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fhs_card_proxy_ll"
+                    app:layout_constraintHeight_min="80dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.50">
@@ -253,18 +252,18 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/fhs_card_proxy_ll"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     app:cardBackgroundColor="?attr/cardBackgroundColor"
                     app:cardCornerRadius="18dp"
+                    app:layout_constraintHeight_min="80dp"
                     android:layout_marginEnd="2dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/fhs_card_firewall_ll"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="12dp">
 
@@ -280,8 +279,9 @@
                             android:textSize="@dimen/large_font_text_view" />
 
                         <Space
+                            android:id="@+id/fhs_proxy_header_space"
                             android:layout_width="match_parent"
-                            android:layout_height="18dp" />
+                            android:layout_height="8dp" />
 
                         <LinearLayout
                             android:id="@+id/fhs_proxy_health_container"
@@ -534,6 +534,24 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fhs_proxy_inactive_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:alpha="0.5"
+                        android:letterSpacing="0.02"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/hsf_proxy_off_indicator"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view"
+                        app:autoSizeMaxTextSize="12sp"
+                        app:autoSizeMinTextSize="8sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform"
+                        android:visibility="gone" />
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -552,7 +570,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -561,7 +582,7 @@
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/fhs_logs_pager"
                             android:layout_width="match_parent"
-                            android:layout_height="190dp"
+                            android:layout_height="160dp"
                             android:contentDescription="@string/logs_card_pager_desc" />
 
                         <LinearLayout

@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppCountryDetailsBinding
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import kotlin.math.log2
@@ -105,7 +105,7 @@ class AppWiseCountriesAdapter(
          * bar length never depends on stale state from a previous data load.
          */
         private fun setProgress(count: Int) {
-            b.accProgress.setIndicatorColor(fetchToggleBtnColors(context, R.color.accentGood))
+            b.accProgress.setIndicatorColor(fetchColor(context, R.attr.colorOnSurfaceVariant))
             val percentage = calculatePercentage(count)
             if (isAtleastN()) {
                 b.accProgress.setProgress(percentage, true)

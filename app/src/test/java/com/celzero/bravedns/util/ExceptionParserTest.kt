@@ -71,8 +71,8 @@ class ExceptionParserTest {
 
         assertEquals(ExceptionParser.TraceType.GO, parsed.type)
         assertEquals("runtime error: invalid memory address or nil pointer dereference", parsed.message)
-        // function frame pairs from both goroutine blocks; `created by` (no trailing parens)
-        // and `[signal ...]` lines must not become frames.
+        // frames from the first two goroutines, nothing filtered; `created by` (no trailing
+        // parens) and `[signal ...]` lines must not become frames.
         assertEquals(2, parsed.frames.size)
         assertEquals(
             "github.com/celzero/firestack.(*Tunnel).Serve",
@@ -83,6 +83,9 @@ class ExceptionParserTest {
         assertEquals("main.waitForExit", parsed.frames[1].function)
         assertEquals("/app/main.go", parsed.frames[1].file)
         assertEquals(88, parsed.frames[1].line)
+        // created-by origin kept separately: only the source location after the
+        // `created by` line (no `github.com/celzero` prefix to shorten in this fixture)
+        assertEquals("/go/src/firestack/intra.go:64", parsed.createdBy)
     }
 
     @Test
@@ -104,6 +107,225 @@ class ExceptionParserTest {
         assertEquals(2, parsed.frames.size)
         assertEquals("main.good", parsed.frames[0].function)
         assertEquals("main.alsoGood", parsed.frames[1].function)
+    }
+
+    // -- Firestack crash envelope ---------------------------------------------------
+
+    @Test
+    fun `parses firestack crash envelope with title and first two goroutines`() {
+        val raw = """
+            Token: fdroid
+            icmpecho.reply4 [11] runtime error: index out of range [0] with length 0 [gobind@v20260112110838-e5bc08c]
+             (#0)
+            <===>
+            goroutine 520 [running]:
+            github.com/celzero/firestack/intra/log.(*simpleLogger).Stack(0x4000194008, 0x0?)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/logger.go:483 +0x15c
+            github.com/celzero/firestack/intra/core.Recover(0xb, {0x7d1ff7e760, 0x40003144f0})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/dontpanic.go:130 +0x128
+            panic({0x7d2006b3a0?, 0x40007023c0?})
+            	runtime/panic.go:783 +0x120
+            gvisor.dev/gvisor/pkg/tcpip/header.ICMPv4.Type(...)
+            	gvisor.dev/gvisor@v0.0.0-20250816201027-ba3b9ca85f20/pkg/tcpip/header/icmpv4.go:131
+            github.com/celzero/firestack/intra/netstack.(*icmpForwarder).reply4(0x40000e9380, {0x0})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/netstack/icmp.go:75 +0x994
+            created by github.com/celzero/firestack/intra/core.Gx in goroutine 98
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60 +0x78
+
+            goroutine 17 [syscall, locked to thread]:
+            runtime.goexit({})
+            	runtime/asm_arm64.s:1268 +0x4
+
+            goroutine 34 [syscall, locked to thread]:
+            runtime.goexit({})
+            	runtime/asm_arm64.s:1268 +0x4
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        // headline: last non-blank line before the separator, ` (#0)` skipped, headers ignored
+        assertEquals(
+            "icmpecho.reply4 [11] runtime error: index out of range [0] with length 0 [gobind@v20260112110838-e5bc08c]",
+            parsed.message
+        )
+        // frames from the first two goroutines, nothing filtered
+        assertEquals("github.com/celzero/firestack/intra/log.(*simpleLogger).Stack", parsed.frames[0].function)
+        assertEquals("github.com/celzero/firestack/intra/core.Recover", parsed.frames[1].function)
+        assertEquals("panic", parsed.frames[2].function)
+        assertEquals("gvisor.dev/gvisor/pkg/tcpip/header.ICMPv4.Type", parsed.frames[3].function)
+        assertEquals(
+            "github.com/celzero/firestack/intra/netstack.(*icmpForwarder).reply4",
+            parsed.frames[4].function
+        )
+        assertEquals(75, parsed.frames[4].line)
+        // second goroutine's frames are included
+        assertEquals("runtime.goexit", parsed.frames[5].function)
+        assertEquals(6, parsed.frames.size)
+        // third goroutine block excluded
+        assertTrue(parsed.frames.count { it.function == "runtime.goexit" } == 1)
+        // created-by subtitle: only the shortened location line after `created by`
+        assertEquals(
+            "celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60",
+            parsed.createdBy
+        )
+    }
+
+    @Test
+    fun `envelope without index line still yields title`() {
+        val raw = """
+            dns53.(*dot).Query [3] context deadline exceeded [gobind@v20260112110838-e5bc08c]
+            <===>
+            goroutine 9 [running]:
+            main.f()
+            	/app/f.go:1 +0x1
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        assertEquals(
+            "dns53.(*dot).Query [3] context deadline exceeded [gobind@v20260112110838-e5bc08c]",
+            parsed.message
+        )
+        assertEquals(1, parsed.frames.size)
+        assertNull(parsed.createdBy)
+    }
+
+    @Test
+    fun `parses go-direct crash dump without separator and without panic line`() {
+        // Intra.crash(0/2) output written via setCrashOutput: headline + `(#0)` directly
+        // followed by the goroutine header on the same line; no `<===>`, no `panic:`.
+        val raw = """
+            tun: debugging... not a crash [0] runtime error: index out of range [10] with length 0 [gobind@v20261005214959-d3d530e] (#0)goroutine 1360 [running]:
+            github.com/celzero/firestack/intra/log.(*simpleLogger).Stack(0x6db2492008, 0x0?)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/logger.go:554 +0x148
+            panic({0x6dfc057940?, 0x6db26d0630?})
+            	runtime/panic.go:859 +0x120
+            github.com/celzero/firestack/intra.Crash.func1()
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:423 +0x110
+            created by github.com/celzero/firestack/intra.Crash in goroutine 328
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:412 +0x50
+
+            goroutine 509 [GC scavenge wait]:
+            gvisor.dev/gvisor/pkg/sync.Gopark(...)
+            	gvisor.dev/gvisor@v0.0.0-20260508212337-96dad6a2da94/pkg/sync/runtime_unsafe.go:34
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        assertEquals(
+            "tun: debugging... not a crash [0] runtime error: index out of range [10] with length 0 [gobind@v20261005214959-d3d530e]",
+            parsed.message
+        )
+        // frames from the first two goroutines, nothing filtered; log plumbing stays
+        assertEquals(4, parsed.frames.size)
+        assertEquals("github.com/celzero/firestack/intra/log.(*simpleLogger).Stack", parsed.frames[0].function)
+        assertEquals("panic", parsed.frames[1].function)
+        assertEquals("github.com/celzero/firestack/intra.Crash.func1", parsed.frames[2].function)
+        assertEquals(423, parsed.frames[2].line)
+        // second goroutine's frames are included
+        assertEquals("gvisor.dev/gvisor/pkg/sync.Gopark", parsed.frames[3].function)
+        // subtitle = shortened location line after `created by`
+        assertEquals(
+            "celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:412",
+            parsed.createdBy
+        )
+    }
+
+    @Test
+    fun `parses level-prefixed crash lines from old golog files`() {
+        val raw = """
+            F tun: debug trace (not a crash) (#0)goroutine 53 [running]:
+            F github.com/celzero/firestack/intra/log.(*simpleLogger).Stack(0x1)
+            F 	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/logger.go:554 +0x148
+            F github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify(0x0)
+            F 	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/ipn/wgproxy.go:1197 +0x1
+            F created by github.com/celzero/firestack/intra/core.Gx in goroutine 9
+            F 	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60 +0x78
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        assertEquals("tun: debug trace (not a crash)", parsed.message)
+        assertEquals(
+            "github.com/celzero/firestack/intra/log.(*simpleLogger).Stack",
+            parsed.frames[0].function
+        )
+        assertEquals(
+            "github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify",
+            parsed.frames[1].function
+        )
+        assertEquals(2, parsed.frames.size)
+        assertEquals(
+            "celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60",
+            parsed.createdBy
+        )
+    }
+
+    @Test
+    fun `all frames of the first two goroutines are kept, nothing filtered`() {
+        val raw = """
+            panic: send on closed channel
+
+            goroutine 520 [running]:
+            github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify(0x0)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/ipn/wgproxy.go:1197 +0x1
+            github.com/celzero/firestack/intra/log.C({0x1})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/log.go:216 +0x8c
+            github.com/celzero/firestack/intra/core.applog(0x2, {0x3})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/dontpanic.go:204 +0x164
+            github.com/celzero/firestack/intra/core.Recover(0x0, {0x4})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/dontpanic.go:177 +0x118
+            github.com/celzero/firestack/intra/log.(*ring).process(0x0)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/ring.go:68 +0x84
+
+            goroutine 17 [syscall, locked to thread]:
+            runtime.goexit({})
+            	runtime/asm_arm64.s:1039 +0x4
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        // nothing is filtered: log-plumbing frames stay wherever they appear...
+        assertEquals(6, parsed.frames.size)
+        assertEquals(
+            "github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify",
+            parsed.frames[0].function
+        )
+        assertEquals("github.com/celzero/firestack/intra/log.C", parsed.frames[1].function)
+        assertEquals("github.com/celzero/firestack/intra/core.applog", parsed.frames[2].function)
+        assertEquals("github.com/celzero/firestack/intra/core.Recover", parsed.frames[3].function)
+        assertEquals(
+            "github.com/celzero/firestack/intra/log.(*ring).process",
+            parsed.frames[4].function
+        )
+        // ...and the second goroutine's frames are included
+        assertEquals("runtime.goexit", parsed.frames[5].function)
+        assertEquals(1039, parsed.frames[5].line)
+    }
+
+    @Test
+    fun `plain panic dump without envelope keeps panic message and no synthetic frame`() {
+        val raw = """
+            panic: send on closed channel
+
+            goroutine 520 [running]:
+            github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify(0x0)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/ipn/wgproxy.go:1197 +0x1
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        assertEquals("send on closed channel", parsed.message)
+        assertEquals(
+            "github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify",
+            parsed.frames[0].function
+        )
+        assertNull(parsed.createdBy)
     }
 
     // -- Java/Kotlin traces --------------------------------------------------------
@@ -321,7 +543,7 @@ class ExceptionParserTest {
         val t = parsed.toThrowable(context = "GoCrash gocrash_1.txt")
         val st = t.stackTrace
 
-        assertEquals("[GoCrash gocrash_1.txt] runtime error: index out of range", t.message)
+        assertEquals("go-panic: runtime error: index out of range", t.message)
         assertEquals(2, st.size)
 
         // className/methodName split on the last dot
@@ -350,5 +572,110 @@ class ExceptionParserTest {
         assertEquals("java.lang.Exception: x", t.message)
         assertEquals(1, t.stackTrace.size)
         assertEquals("a.B.c", t.stackTrace[0].className + "." + t.stackTrace[0].methodName)
+    }
+
+    @Test
+    fun `toThrowable with createdBy prepends synthetic title frame and rewrites message`() {
+        val raw = """
+            Token: fdroid
+            icmpecho.reply4 [11] runtime error: index out of range [0] with length 0 [gobind@v20260112110838-e5bc08c]
+             (#0)
+            <===>
+            goroutine 520 [running]:
+            github.com/celzero/firestack/intra/log.(*simpleLogger).Stack(0x0?)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/log/logger.go:483 +0x15c
+            gvisor.dev/gvisor/pkg/tcpip/header.ICMPv4.Type(...)
+            	gvisor.dev/gvisor@v0.0.0-20250816201027-ba3b9ca85f20/pkg/tcpip/header/icmpv4.go:131
+            github.com/celzero/firestack/intra/netstack.(*icmpForwarder).reply4(0x40000e9380, {0x0})
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/netstack/icmp.go:75 +0x994
+            created by github.com/celzero/firestack/intra/core.Gx in goroutine 98
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60 +0x78
+        """.trimIndent()
+
+        val parsed = ExceptionParser.parse(raw)
+        val t = parsed.toThrowable(context = "GoCrash gocrash_1.txt")
+        val st = t.stackTrace
+
+        // message = the location line after `created by` (Crashlytics subtitle); no
+        // context prefix on Go traces
+        assertEquals(
+            "celzero/firestack@v0.0.0-00010101000000-000000000000/intra/core/async.go:60",
+            t.message
+        )
+
+        // synthetic top frame carries the go-panic headline (Crashlytics issue title);
+        // empty methodName avoids the className.methodName concatenation doubling the text
+        assertEquals(
+            "go-panic: icmpecho.reply4 [11] runtime error: index out of range [0] with length 0 [gobind@v20260112110838-e5bc08c]",
+            st[0].className
+        )
+        assertEquals("", st[0].methodName)
+        assertNull(st[0].fileName)
+        assertEquals(-1, st[0].lineNumber)
+
+        // real frames follow; only the log.C / applog / Recover plumbing is filtered
+        assertEquals(
+            "github.com/celzero/firestack/intra/log.(*simpleLogger).Stack",
+            st[1].className + "." + st[1].methodName
+        )
+        assertEquals("gvisor.dev/gvisor/pkg/tcpip/header.ICMPv4.Type", st[2].className + "." + st[2].methodName)
+        assertEquals(
+            "github.com/celzero/firestack/intra/netstack.(*icmpForwarder).reply4",
+            st[3].className + "." + st[3].methodName
+        )
+        assertEquals(4, st.size)
+    }
+
+    @Test
+    fun `toThrowable without createdBy keeps message and plain frames`() {
+        val raw = """
+            panic: send on closed channel
+
+            goroutine 520 [running]:
+            github.com/celzero/firestack/intra/ipn.(*wgtun).WriteNotify(0x0)
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/ipn/wgproxy.go:1197 +0x1
+        """.trimIndent()
+
+        val parsed = ExceptionParser.parse(raw)
+        val t = parsed.toThrowable(context = "GoCrash gocrash_2.txt")
+        val st = t.stackTrace
+
+        assertEquals("go-panic: send on closed channel", t.message)
+        assertEquals(1, st.size)
+        assertEquals("github.com/celzero/firestack/intra/ipn.(*wgtun)", st[0].className)
+        assertEquals("WriteNotify", st[0].methodName)
+    }
+
+    @Test
+    fun `parses newer runtime goroutine headers with gp m mp fields`() {
+        val raw = """
+            panic: runtime error: index out of range [10] with length 0
+
+            goroutine 298 gp=0x6f4a33da40 m=27 mp=0x6f4a314008 [running]:
+            panic({0x6f56c55940?, 0x6f4a1caed0?})
+            	runtime/panic.go:878 +0x150 fp=0x6f4a3f0e30 sp=0x6f4a3f0d80 pc=0x6f56406c60
+            github.com/celzero/firestack/intra.Crash.func1()
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:423 +0x110 fp=0x6f4a3f0fd0 sp=0x6f4a3f0f30 pc=0x6f569c6e30
+            created by github.com/celzero/firestack/intra.Crash in goroutine 102
+            	github.com/celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:412 +0x50
+
+            goroutine 17 gp=0x6f4a072780 m=1 mp=0x6f4a0c6008 [syscall, locked to thread]:
+            runtime.goexit({})
+            	runtime/asm_arm64.s:1039 +0x4 fp=0x6f4a26bfe0 sp=0x6f4a26bfe0 pc=0x6f5640e6a4
+        """.trimIndent() + "\n"
+
+        val parsed = ExceptionParser.parse(raw)
+
+        assertEquals(ExceptionParser.TraceType.GO, parsed.type)
+        assertEquals("runtime error: index out of range [10] with length 0", parsed.message)
+        assertEquals(3, parsed.frames.size)
+        assertEquals("panic", parsed.frames[0].function)
+        assertEquals("github.com/celzero/firestack/intra.Crash.func1", parsed.frames[1].function)
+        // second goroutine's frames are included
+        assertEquals("runtime.goexit", parsed.frames[2].function)
+        assertEquals(
+            "celzero/firestack@v0.0.0-00010101000000-000000000000/intra/tun2socks.go:412",
+            parsed.createdBy
+        )
     }
 }

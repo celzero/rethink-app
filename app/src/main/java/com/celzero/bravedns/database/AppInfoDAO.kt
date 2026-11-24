@@ -253,7 +253,7 @@ interface AppInfoDAO {
     fun getAppInfoUidForPackageName(packageName: String): Int
 
     @Query("update AppInfo set firewallStatus = 7, connectionStatus = 3, isProxyExcluded = 1 where packageName = 'com.celzero.bravedns'")
-    fun exemptRethinkApp()
+    fun exemptRethinkApp(): Int
 
     @Query("select * from AppInfo where tempAllowEnabled = 1 and tempAllowExpiryTime > 0")
     suspend fun getTempAllowedApps(): List<AppInfo>
@@ -278,4 +278,12 @@ interface AppInfoDAO {
             "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
     )
     fun clearAllExpiredTempAllows(now: Long, modifiedTs: Long): Int
+
+    @Query(
+        "select uid, tempAllowExpiryTime from AppInfo " +
+            "where tempAllowEnabled = 1 and tempAllowExpiryTime > 0 and tempAllowExpiryTime <= :now"
+    )
+    fun getExpiredTempAllows(now: Long): List<ExpiredTempAllow>
 }
+
+data class ExpiredTempAllow(val uid: Int, val tempAllowExpiryTime: Long)

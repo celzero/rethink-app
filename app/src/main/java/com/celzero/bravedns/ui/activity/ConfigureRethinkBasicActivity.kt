@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import android.view.View
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -32,6 +33,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import org.koin.android.ext.android.inject
 
 class ConfigureRethinkBasicActivity : BaseActivity(R.layout.fragment_rethink_basic) {
@@ -54,6 +56,7 @@ class ConfigureRethinkBasicActivity : BaseActivity(R.layout.fragment_rethink_bas
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        findViewById<View>(android.R.id.content).applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

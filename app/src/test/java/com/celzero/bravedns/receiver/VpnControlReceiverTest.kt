@@ -6,6 +6,7 @@ import com.celzero.bravedns.service.PersistentState
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
@@ -200,28 +201,72 @@ class VpnControlReceiverTest {
     // ── caller identity resolution ───────────────────────────────────────────
 
     @Test
-    fun `default resolver ignores spoofed sender extra and rejects when os identity is absent`() {
+    @Config(sdk = [34])
+    fun `default resolver uses allowlisted sender extra when os identity is absent`() {
         every { persistentState.appTriggerPackages } returns "com.trusted.app"
         every { persistentState.wgTaskerAutomationEnabled } returns true
         receiver.callerResolver = { c, i -> receiver.defaultCallerResolver(c, i) }
         val intent = Intent(VpnControlReceiver.ACTION_WG_PAUSE).apply {
-            // spoofed extra naming an allowlisted package must not grant trust
             putExtra(VpnControlReceiver.EXTRA_SENDER, "com.trusted.app")
             putExtra(VpnControlReceiver.EXTRA_WG_IDS, "1")
         }
         receiver.onReceive(context, intent)
+        coVerify(exactly = 1) { wgCommands.pause(listOf(1)) }
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun `default resolver rejects missing malformed and untrusted sender extras`() {
+        every { persistentState.appTriggerPackages } returns "com.trusted.app"
+        every { persistentState.wgTaskerAutomationEnabled } returns true
+        receiver.callerResolver = { c, i -> receiver.defaultCallerResolver(c, i) }
+
+        listOf<String?>(null, "", "com.untrusted.app").forEach { sender ->
+            val intent = Intent(VpnControlReceiver.ACTION_WG_PAUSE).apply {
+                if (sender != null) {
+                    putExtra(VpnControlReceiver.EXTRA_SENDER, sender)
+                }
+                putExtra(VpnControlReceiver.EXTRA_WG_IDS, "1")
+            }
+            receiver.onReceive(context, intent)
+        }
+
         coVerify(exactly = 0) { wgCommands.pause(any()) }
     }
 
     @Test
-    fun `default resolver returns null on spoofed extra when no os identity is stamped`() {
+    @Config(sdk = [34])
+    fun `default resolver gives os package identity precedence over sender extra`() {
+        val osIdentityReceiver = spyk(receiver)
+        osIdentityReceiver.wgCommands = wgCommands
+        osIdentityReceiver.callerResolver = { c, i ->
+            osIdentityReceiver.defaultCallerResolver(c, i)
+        }
+        every { osIdentityReceiver.sentFromPackage } returns "com.os.app"
+        every { persistentState.appTriggerPackages } returns "com.trusted.app"
+        every { persistentState.wgTaskerAutomationEnabled } returns true
+        val intent = Intent(VpnControlReceiver.ACTION_WG_PAUSE).apply {
+            putExtra(VpnControlReceiver.EXTRA_SENDER, "com.trusted.app")
+            putExtra(VpnControlReceiver.EXTRA_WG_IDS, "1")
+        }
+
+        osIdentityReceiver.onReceive(context, intent)
+
+        coVerify(exactly = 0) { wgCommands.pause(any()) }
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun `default resolver uses package resolved from os uid before sender extra`() {
+        val osIdentityReceiver = spyk(receiver)
+        every { osIdentityReceiver.sentFromPackage } returns null
+        every { osIdentityReceiver.sentFromUid } returns 1234
+        every { context.packageManager.getPackagesForUid(1234) } returns arrayOf("com.os.app")
         val intent = Intent(VpnControlReceiver.ACTION_STOP).apply {
             putExtra(VpnControlReceiver.EXTRA_SENDER, "com.trusted.app")
         }
-        // on the Robolectric SDK no OS sender identity is stamped; the spoofed extra must not
-        // be honored even though it names an allowlisted package
-        val resolved = receiver.defaultCallerResolver(context, intent)
-        assertEquals(null, resolved)
+
+        assertEquals("com.os.app", osIdentityReceiver.defaultCallerResolver(context, intent))
     }
 
     @Test

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.util
 
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.Logger.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Logger.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
@@ -23,6 +24,7 @@ import com.celzero.bravedns.util.Logger.LOG_TAG_VPN
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -37,6 +39,7 @@ import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
+import android.net.Uri
 import android.os.Build
 import android.os.Process
 import androidx.annotation.ChecksSdkIntAtLeast
@@ -52,6 +55,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
@@ -64,6 +68,7 @@ import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.util.Constants.Companion.BUILD_TYPE_ALPHA
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_TV
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -86,7 +91,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.net.URI
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
@@ -446,6 +453,25 @@ object Utilities {
         }
     }
 
+    // 0 when the update time cannot be read
+    fun getSelfLastUpdateTime(ctx: Context): Long {
+        return try {
+            val info =
+                if (isAtleastT()) {
+                    ctx.packageManager.getPackageInfo(
+                        ctx.packageName,
+                        PackageManager.PackageInfoFlags.of(0)
+                    )
+                } else {
+                    ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+                }
+            info.lastUpdateTime
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_APP_DB, "err reading lastUpdateTime: ${e.message}")
+            0L
+        }
+    }
+
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     fun copy(from: String, to: String): Boolean {
         try {
@@ -723,6 +749,10 @@ object Utilities {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_FDROID
     }
 
+    fun isTvFlavour(): Boolean {
+        return BuildConfig.FLAVOR_releaseType == FLAVOR_TV
+    }
+
     fun isWebsiteFlavour(): Boolean {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_WEBSITE
     }
@@ -755,6 +785,30 @@ object Utilities {
     /** Returns true when the app is built with the "alpha" build type. */
     fun isAlphaBuild(): Boolean {
         return BuildConfig.BUILD_TYPE == BUILD_TYPE_ALPHA
+    }
+
+    /**
+     * Takes the user to this app's Play Store listing; last-resort path when the
+     * in-app update API fails. Falls back to the web listing, then a toast.
+     */
+    fun openPlayStorePage(activity: android.app.Activity) {
+        if (activity.isFinishing || activity.isDestroyed) return
+        val listing = "market://details?id=${activity.packageName}"
+        try {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(listing)))
+        } catch (e: ActivityNotFoundException) {
+            Logger.w(LOG_TAG_APP_UPDATE, "no handler for $listing, trying web listing")
+            try {
+                activity.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=${activity.packageName}")
+                    )
+                )
+            } catch (e: ActivityNotFoundException) {
+                showToastUiCentered(activity, activity.getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
+            }
+        }
     }
 
     /**
@@ -910,19 +964,20 @@ object Utilities {
         }
     }
 
-    // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
+    // medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
     fun getActivityPendingIntent(
         context: Context,
         intent: Intent,
         flag: Int,
-        mutable: Boolean
+        mutable: Boolean,
+        requestCode: Int = 0
     ): PendingIntent {
         return if (isAtleastS()) {
             val sFlag = flag or if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
-            PendingIntent.getActivity(context, 0, intent, sFlag)
+            PendingIntent.getActivity(context, requestCode, intent, sFlag)
         } else {
             val sFlag = flag or PendingIntent.FLAG_IMMUTABLE
-            PendingIntent.getActivity(context, 0, intent, sFlag)
+            PendingIntent.getActivity(context, requestCode, intent, sFlag)
         }
     }
 
@@ -940,6 +995,17 @@ object Utilities {
             val sFlag = flag or PendingIntent.FLAG_IMMUTABLE
             PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
         }
+    }
+
+    // no-op below API 31; on S+ the action fires only after the device is unlocked
+    fun getNotificationAction(
+        title: String,
+        intent: PendingIntent,
+        authRequired: Boolean = false
+    ): NotificationCompat.Action {
+        return NotificationCompat.Action.Builder(R.drawable.ic_notification_icon, title, intent)
+            .setAuthenticationRequired(authRequired)
+            .build()
     }
 
     fun getRemoteBlocklistStamp(url: String): String {
@@ -1164,6 +1230,36 @@ object Utilities {
                 buttonContainer.orientation = LinearLayout.HORIZONTAL
                 buttonContainer.gravity = Gravity.END
             }
+        }
+    }
+
+    /**
+     * Best-effort LAN IPv4 address of this device (site-local, non-loopback),
+     * preferring Wi-Fi/Ethernet interfaces. VPN (tun) interfaces are excluded
+     * so the VPN address is never reported. Empty string when none is
+     * available.
+     */
+    fun getLanIpv4(): String {
+        return try {
+            val candidates = NetworkInterface.getNetworkInterfaces().asSequence()
+                .filter { it.isUp && !it.isLoopback && !it.name.startsWith("tun") }
+                .flatMap { nic ->
+                    nic.inetAddresses.asSequence()
+                        .filter { addr -> addr is Inet4Address && !addr.isLoopbackAddress }
+                        .map { it as Inet4Address to nic.name }
+                }
+                .toList()
+            val isWifiOrEth = { name: String ->
+                name.startsWith("wlan") || name.startsWith("eth")
+            }
+            candidates.firstOrNull { (addr, name) ->
+                addr.isSiteLocalAddress && isWifiOrEth(name)
+            }?.first?.hostAddress
+                ?: candidates.firstOrNull { (addr, _) -> addr.isSiteLocalAddress }?.first?.hostAddress
+                ?: candidates.firstOrNull()?.first?.hostAddress.orEmpty()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "err get lan ipv4: ${e.message}")
+            ""
         }
     }
 

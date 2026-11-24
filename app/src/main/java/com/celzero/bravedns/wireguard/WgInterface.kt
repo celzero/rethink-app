@@ -321,6 +321,8 @@ class WgInterface private constructor(builder: Builder) {
                 .mapNotNull { it.hostAddress }
                 .toMutableList()
         dnsServerStrings.addAll(dnsSearchDomains)
+        // requires at least one dns entry; default when the config has none
+        if (dnsServerStrings.isEmpty()) dnsServerStrings.add(DEFAULT_DNS)
 
         val sb = StringBuilder()
         sb.append("private_key=").append(keyPair.getPrivateKey().hex()).append('\n')
@@ -752,6 +754,7 @@ class WgInterface private constructor(builder: Builder) {
         private const val MAX_UDP_PORT = 65535
         private const val MIN_UDP_PORT = 0
         private const val DEFAULT_MTU = -1 // -1 means not set
+        const val DEFAULT_DNS = "1.1.1.1"
 
         /**
          * Parses an series of "KEY = VALUE" lines into an `Interface`. Throws [ParseException] if

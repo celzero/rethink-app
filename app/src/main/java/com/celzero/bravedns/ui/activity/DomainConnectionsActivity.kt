@@ -24,12 +24,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.BlocklistAppsAdapter
 import com.celzero.bravedns.adapter.DomainConnectionsAdapter
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
-import kotlinx.coroutines.launch
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -38,13 +36,15 @@ import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.chip.Chip
+import dev.androidbroadcast.vbpd.viewBinding
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -88,6 +88,7 @@ class DomainConnectionsActivity : BaseActivity(R.layout.activity_domain_connecti
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

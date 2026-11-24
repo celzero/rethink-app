@@ -83,6 +83,7 @@ class BillingBackendClientTest : KoinTest {
     private var testStoredCid: String? = null
     private var testStoredDid: String? = null
     private var testMode = false
+    private var identitySaveSucceeds = true
 
     private lateinit var client: BillingBackendClient
 
@@ -96,6 +97,7 @@ class BillingBackendClientTest : KoinTest {
         testStoredCid = null
         testStoredDid = null
         testMode = false
+        identitySaveSucceeds = true
 
         every { mockPersistentState.appTestMode } answers { testMode }
         every { mockPersistentState.routeRethinkInRethink } returns false
@@ -108,6 +110,7 @@ class BillingBackendClientTest : KoinTest {
             }
         }
         coEvery { mockIdentityStore.save(any(), any(), any()) } coAnswers {
+            if (!identitySaveSucceeds) return@coAnswers false
             val env: SecureIdentityStore.Env = firstArg()
             val cid: String = secondArg()
             val did: String = thirdArg()
@@ -221,6 +224,28 @@ class BillingBackendClientTest : KoinTest {
         check(storedCid == "cid-old-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") { "store must be untouched" }
         check(storedDid == null) { "store must be untouched" }
         check(capturedRequests.size == 1) { "mint must be attempted once, got ${capturedRequests.size}" }
+    }
+
+    @Test
+    fun `DID mint is not returned when secure identity persistence fails`() = runTest {
+        identitySaveSucceeds = false
+        script = { request ->
+            when (request.url.encodedPath) {
+                "/d/acc" -> okResponse(request, """{"cid":"cid-created-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}""")
+                "/d/reg" -> okResponse(request, """{"did":"did-ephemeral-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}""")
+                else -> error("unexpected request ${request.url.encodedPath}")
+            }
+        }
+
+        val result = client.resolveIdentity()
+
+        check(result == RefreshIdentityResult.Failure) {
+            "an unpersisted DID must not be reported as a usable identity: $result"
+        }
+        check(storedDid == null) { "failed persistence must not populate the local DID" }
+        check(capturedRequests.map { it.path } == listOf("/d/acc", "/d/reg")) {
+            "expected one CID and one DID request, got ${capturedRequests.map { it.path }}"
+        }
     }
 
     /** R3: reconcileDidForCid under a mismatched cid is refused in BOTH environments. */

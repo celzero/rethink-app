@@ -2,6 +2,5 @@
 <resources>
     <style name="AppThemeInitial" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowDisablePreview">true</item>
-        <item name="android:fitsSystemWindows">true</item>
     </style>
 </resources>

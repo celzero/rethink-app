@@ -24,11 +24,11 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.InAppMessageProvider
 import com.celzero.bravedns.service.PlayInAppMessageProvider
 import com.celzero.bravedns.util.FirebaseErrorReporting
-import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_APP
 import com.google.firebase.FirebaseApp
+import androidx.work.Configuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -39,7 +39,12 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
-class RethinkDnsApplicationPlay : Application() {
+class RethinkDnsApplicationPlay : Application(), Configuration.Provider {
+
+    // on-demand init: WorkManager self-initializes even if the
+    // androidx.startup initializer never ran on this device
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 
     override fun onCreate() {
         super.onCreate()
@@ -58,7 +63,7 @@ class RethinkDnsApplicationPlay : Application() {
                     module {
                         // New Koin override strategy allow to override any definition by default.
                         // don't need to specify override = true anymore in module.
-                        single<AppUpdater> { StoreAppUpdater(androidContext()) }
+                        single<AppUpdater> { StoreAppUpdater(androidContext(), get()) }
                         // Play Billing in-app messaging
                         single<InAppMessageProvider> { PlayInAppMessageProvider() }
                     }
@@ -66,10 +71,10 @@ class RethinkDnsApplicationPlay : Application() {
             )
         }
 
+        RethinkDnsApplication.maybeForceTvDebugTestMode(this)
+
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-        // Initialize exception handlers
-        GlobalExceptionHandler.initialize(this)
         appScope.launch(Dispatchers.IO) {
             try {
                 FirebaseApp.initializeApp(this@RethinkDnsApplicationPlay)

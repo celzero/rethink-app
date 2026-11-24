@@ -41,8 +41,8 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.EventSource
@@ -59,6 +59,7 @@ import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
+import com.celzero.bravedns.ui.activity.ConnectionCheckActivity
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.PcapFilesBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.TaskerAutomationBottomSheet
@@ -88,8 +89,10 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -156,6 +159,7 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
         if (savedInstanceState != null) {
             isThemeChanged = savedInstanceState.getBoolean(KEY_THEME_CHANGE, false)
         }
@@ -193,6 +197,15 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
     }
 
     private fun initView() {
+
+        // connection check is a debug-only diagnostic; hide it in production builds
+        if (DEBUG) {
+            b.settingsConnectionCheckRl.visibility = View.VISIBLE
+            b.dividerConnectionCheck.visibility = View.VISIBLE
+        } else {
+            b.settingsConnectionCheckRl.visibility = View.GONE
+            b.dividerConnectionCheck.visibility = View.GONE
+        }
 
         // Firebase error reporting is available in the play flavour only.
         if (isPlayStoreFlavour()) {
@@ -640,6 +653,10 @@ class MiscSettingsActivity : BaseActivity(R.layout.activity_misc_settings),
         }
 
         b.settingsConsoleLogRl.setOnClickListener { openConsoleLogActivity() }
+
+        b.settingsConnectionCheckRl.setOnClickListener {
+            startActivity(Intent(this, ConnectionCheckActivity::class.java))
+        }
 
         b.settingsActivityAutoStartRl.setOnClickListener {
             b.settingsActivityAutoStartSwitch.isChecked =

@@ -129,9 +129,19 @@ object InAppBillingHandler : KoinComponent {
 
     const val TAG = "IABHandler"
 
+    /** Server-entitlement refresh is due when the stored entitlement file is older than this, even if still unexpired (the local copy cannot reveal server-side rotation). */
+    private const val LOCAL_ENTITLEMENT_MAX_AGE_MS = 3L * 24 * 60 * 60 * 1000
+
+    /** Minimum gap between age-based entitlement refresh attempts (per process). */
+    private const val AGE_REFRESH_MIN_GAP_MS = 60L * 60 * 1000
+
+    @Volatile
+    private var lastAgeBasedRefreshAtMs = 0L
+
     private val persistentState by inject<PersistentState>()
     private val billingBackendClient by inject<BillingBackendClient>()
     private val secureIdentityStore by inject<SecureIdentityStore>()
+    private val serverOrderHistoryRepo by lazy { ServerOrderHistoryRepository(billingBackendClient) }
 
     private val eventLogger by inject<EventLogger>()
 
@@ -1419,6 +1429,9 @@ object InAppBillingHandler : KoinComponent {
             getProductType = getProductTypeFn,
             getDeviceId = getDeviceIdFn,
             mintDeviceId = mintDeviceIdFn,
+            fetchRecentOneTimeOrder = { accountId, token ->
+                serverOrderHistoryRepo.fetchRecentOneTimePurchase(accountId, token)
+            },
             onAckSuccess = onInAppAckSuccessFn,
             reconcileCidDid = ::reconcileCidDidFromPurchase,
             validatePayloadAndFetchIfRequired = ::validatePayloadAndFetchIfRequired
@@ -1454,12 +1467,36 @@ object InAppBillingHandler : KoinComponent {
 
     private suspend fun validatePayloadAndFetchIfRequired(purchaseDtl: PurchaseDetail): PurchaseDetail {
         val mname = this::validatePayloadAndFetchIfRequired.name
-        val now = System.currentTimeMillis()
-        val tunnelExpiry: Long? = getExpiryFromPayload(purchaseDtl.payload)
-        if (tunnelExpiry != null && tunnelExpiry > now) {
+        // Play no longer returns developerPayload; gate the fetch on the stored entitlement
+        val localEntitlementValid = try {
+            RpnProxyManager.isLocalEntitlementValid()
+        } catch (e: Exception) {
+            Logger.i(mname, "local entitlement check failed: ${e.message}; fetching from server")
+            false
+        }
+        if (localEntitlementValid) {
+            // detect server-side rotation behind a still-valid local copy; throttled, success-only
+            val refreshDue = try {
+                RpnProxyManager.isLocalEntitlementFileOlderThan(LOCAL_ENTITLEMENT_MAX_AGE_MS)
+            } catch (e: Exception) {
+                Logger.i(mname, "entitlement file age check failed: ${e.message}")
+                false
+            }
+            if (refreshDue) {
+                val now = System.currentTimeMillis()
+                if (now - lastAgeBasedRefreshAtMs > AGE_REFRESH_MIN_GAP_MS) {
+                    Logger.i(mname, "Local entitlement older than ${LOCAL_ENTITLEMENT_MAX_AGE_MS / (60 * 60 * 1000)}d; refreshing from server")
+                    val (cid, did) = identityForPurchase(purchaseDtl)
+                    val refreshed = queryEntitlementFromServer(cid, did, purchaseDtl)
+                    if (refreshed.payload.isNotEmpty() && RpnProxyManager.isPayloadEntitlementCurrent(refreshed.payload)) {
+                        lastAgeBasedRefreshAtMs = now
+                    }
+                    return refreshed
+                }
+            }
             return purchaseDtl
         }
-        Logger.i(mname, "Payload validation failed or expired for token=${purchaseDtl.purchaseToken.take(8)}; fetching updated entitlement from server")
+        Logger.i(mname, "Local entitlement missing or expired for token=${purchaseDtl.purchaseToken.take(8)}; fetching updated entitlement from server")
         val (cid, did) = identityForPurchase(purchaseDtl)
         return queryEntitlementFromServer(cid, did, purchaseDtl)
     }
@@ -1551,6 +1588,38 @@ object InAppBillingHandler : KoinComponent {
             serverApiErrorLiveData.postValue(
                 ServerApiError.DeviceNotRegistered(entitlementCid, storedCid, ""))
         }
+    }
+
+    /**
+     * Resolves the DID bound to [cid] for server calls, minting one if missing.
+     * Returns null when unresolvable. [surfacing] flows (user-initiated) post sticky
+     * errors; background paths stay silent, trigger recovery/silent retry, and never post.
+     */
+    internal suspend fun resolveDidForServerCalls(
+        cid: String,
+        caller: String,
+        surfacing: Boolean
+    ): String? {
+        val didResult = billingBackendClient.reconcileDidForCid(cid)
+        if (didResult.isSuccess) return didResult.deviceId
+        if (surfacing) {
+            if (didResult.errorCode == 401) {
+                handleUnauthorized401(ServerApiError.Operation.DEVICE, cid, "")
+            } else {
+                postDeviceNotRegisteredError(cid, didResult.errorCode)
+            }
+        } else if (didResult.errorCode == 401) {
+            // recover the identity without posting the sticky auth error from background paths
+            try {
+                billingBackendClient.recoverIdentityAfterAuthFailure(cid)
+            } catch (e: Exception) {
+                logw(caller, "identity recovery after 401 failed: ${e.message}")
+            }
+        } else if (isDefinitiveDidFailure(didResult.errorCode)) {
+            scheduleAckRetryAndAlert(cid, alert = false)
+        }
+        logw(caller, "did unavailable (code=${didResult.errorCode}, surfacing=$surfacing) for cid=${cid.take(8)}")
+        return null
     }
 
     /** Queues a one-shot registration re-check for the freshly claimed identity. */
@@ -1779,8 +1848,12 @@ object InAppBillingHandler : KoinComponent {
         }
         return PurchaseDetail(
             productId = productId,
-            planId = storeEntry?.oneTimeOfferDetails?.purchaseOptionId ?: productId,
-            productTitle = storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId)),
+            planId = productId,
+            productTitle = if (productId == ONE_TIME_PRODUCT_ID) {
+                storeEntry?.productDetails?.title ?: productId
+            } else {
+                storeEntry?.productDetail?.productTitle ?: QueryUtils.getPlanTitle(getOneTimeBillingPeriod(productId))
+            },
             planTitle = storeEntry?.productDetail?.productTitle.orEmpty(),
             state = purchase.purchaseState,
             purchaseToken = purchase.purchaseToken,

@@ -18,9 +18,9 @@ package com.celzero.bravedns.sponsor.ui
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentSponsorSuccessBinding
+import dev.androidbroadcast.vbpd.viewBinding
 
 class SponsorSuccessFragment : Fragment(R.layout.fragment_sponsor_success) {
 

@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -43,6 +41,7 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -205,18 +204,12 @@ class PcapFilesBottomSheet : BaseBottomSheetDialogFragment() {
 
     private fun copyPcapFolderPath() {
         val dir = pcapDir() ?: return
-        try {
-            val clipboard =
-                requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("pcap_folder", dir.absolutePath))
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "err copying pcap folder path: ${e.message}", e)
-        }
+        val copied = UIUtils.clipboardCopy(requireContext(), dir.absolutePath, "pcap_folder")
+        showToastUiCentered(
+            requireContext(),
+            getString(if (copied) R.string.config_add_success_toast else R.string.copy_failed_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun openPcapFolder() {

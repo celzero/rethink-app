@@ -17,8 +17,13 @@
 package com.celzero.bravedns.database
 
 import androidx.room.Transaction
+import com.celzero.bravedns.util.Constants
 
 class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) {
+
+    suspend fun getGlobalRethinkEndpoints(): List<RethinkDnsEndpoint> {
+        return rethinkDnsEndpointDao.getRethinkEndpointsList(Constants.MISSING_UID)
+    }
 
     @Transaction
     suspend fun update(rethinkDnsEndpoint: RethinkDnsEndpoint) {

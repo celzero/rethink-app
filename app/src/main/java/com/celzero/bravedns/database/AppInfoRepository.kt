@@ -165,8 +165,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
 
-    suspend fun exemptRethinkApp() {
-        appInfoDAO.exemptRethinkApp()
+    suspend fun exemptRethinkApp(): Int {
+        return appInfoDAO.exemptRethinkApp()
     }
 
     /**
@@ -192,5 +192,9 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         // Clear any temp allow rows whose expiry has passed.
         // (Requires a DAO query; if not present, keep this as best-effort per-uid in worker.)
         return appInfoDAO.clearAllExpiredTempAllows(now, System.currentTimeMillis())
+    }
+
+    fun getExpiredTempAllowsBlocking(now: Long): List<ExpiredTempAllow> {
+        return appInfoDAO.getExpiredTempAllows(now)
     }
 }

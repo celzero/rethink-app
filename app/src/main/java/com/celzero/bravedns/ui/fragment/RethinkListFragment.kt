@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
@@ -33,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
@@ -49,11 +47,13 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

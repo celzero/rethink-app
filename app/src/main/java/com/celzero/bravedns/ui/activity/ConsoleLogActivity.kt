@@ -15,9 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -41,7 +38,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
@@ -56,8 +52,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_BUG_REPORT
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.TraceLogExporter
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -67,6 +68,7 @@ import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -130,6 +132,7 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 
@@ -576,27 +579,52 @@ class ConsoleLogActivity : BaseActivity(R.layout.activity_console_log), SearchVi
             return
         }
 
-        // Create the intent
-        val intent =
-            Intent(Intent.ACTION_SEND).apply {
-                type = "application/zip"
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
-                putExtra(Intent.EXTRA_TEXT, "Crash/Issue Report (Logs Attached)")
-                putExtra(Intent.EXTRA_STREAM, uri)
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        // Create the intent; attach firestack trace logs alongside the zip when available
+        lifecycleScope.launch {
+            val traceFile = TraceLogExporter.dumpTraceLogsFile(this@ConsoleLogActivity)
+            val traceUri: Uri? = traceFile?.let {
+                try {
+                    FileProvider.getUriForFile(this@ConsoleLogActivity, BugReportZipper.FILE_PROVIDER_NAME, it)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_BUG_REPORT, "err(shareZip) getting trace uri: ${e.message}", e)
+                    null
+                }
             }
 
-        // start the email app
-        try {
-            startActivity(Intent.createChooser(intent, "Send email..."))
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err(shareZip) starting share intent: ${e.message}", e)
-            showToastUiCentered(
-                this,
-                getString(R.string.error_loading_log_file),
-                Toast.LENGTH_SHORT
-            )
+            val intent = if (traceUri == null) {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "application/zip"
+                    putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+                    putExtra(Intent.EXTRA_TEXT, "Crash/Issue Report (Logs Attached)")
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            } else {
+                Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "message/rfc822"
+                    putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+                    putExtra(Intent.EXTRA_TEXT, "Crash/Issue Report (Logs Attached)")
+                    putParcelableArrayListExtra(
+                        Intent.EXTRA_STREAM,
+                        arrayListOf<Uri>(uri, traceUri)
+                    )
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            }
+
+            // start the email app
+            try {
+                startActivity(Intent.createChooser(intent, "Send email..."))
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_BUG_REPORT, "err(shareZip) starting share intent: ${e.message}", e)
+                showToastUiCentered(
+                    this@ConsoleLogActivity,
+                    getString(R.string.error_loading_log_file),
+                    Toast.LENGTH_SHORT
+                )
+            }
         }
     }
 

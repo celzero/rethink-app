@@ -15,8 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
@@ -26,16 +24,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkLogAdapter
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.RethinkLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -108,7 +108,7 @@ class RethinkLogFragment :
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = RethinkLogAdapter(requireContext())
         viewModel.rlogList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(lifecycle, it)
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerConnection.adapter = recyclerAdapter
         b.recyclerConnection.layoutAnimation = null
@@ -127,6 +127,7 @@ class RethinkLogFragment :
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
+                    if (view == null) return
 
                     val firstChild = recyclerView.getChildAt(0)
                     if (firstChild == null) {
@@ -140,12 +141,13 @@ class RethinkLogFragment :
                         return
                     }
 
-                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
+                    b.connectionListScrollHeader.text = formatToRelativeTime(recyclerView.context, tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
+                    if (view == null) return
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         b.connectionListScrollHeader.visibility = View.GONE
                     }

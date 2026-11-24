@@ -30,9 +30,13 @@ class TempAllowExpiryWorker(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()
         try {
-            val cleared = db.clearAllExpiredTempAllowsBlocking(now)
-            if (cleared > 0) {
-                Logger.i(LOG_TAG_FIREWALL, "TempAllowExpiryWorker cleared $cleared expired temp-allow entries")
+            val expired = db.getExpiredTempAllowsBlocking(now)
+            val clearedUids = expired.filter { e ->
+                db.clearTempAllowByUidIfExpiryBlocking(e.uid, e.tempAllowExpiryTime) > 0
+            }.map { it.uid }
+            if (clearedUids.isNotEmpty()) {
+                Logger.i(LOG_TAG_FIREWALL, "TempAllowExpiryWorker cleared ${clearedUids.size} expired temp-allow entries")
+                FirewallManager.closeConnectionsForExpiredTempAllows(clearedUids)
             }
 
             // schedule the next nearest expiry

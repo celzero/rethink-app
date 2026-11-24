@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DoTEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
@@ -38,6 +37,7 @@ import com.celzero.bravedns.util.RecyclerViewSpacingDecoration
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -108,16 +108,20 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
     }
 
     private fun applyEdgeToEdge() {
+        // absolute padding from a captured base so repeated inset dispatches stay idempotent
+        val basePaddingBottom = b.recyclerDot.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(b.recyclerDot) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(
                 v.paddingLeft,
                 v.paddingTop,
                 v.paddingRight,
-                v.paddingBottom + systemBars.bottom
+                basePaddingBottom + systemBars.bottom
             )
             insets
         }
+        // some OEMs skip the initial inset dispatch on attach
+        ViewCompat.requestApplyInsets(b.recyclerDot)
     }
 
     private fun showAddDialog() {

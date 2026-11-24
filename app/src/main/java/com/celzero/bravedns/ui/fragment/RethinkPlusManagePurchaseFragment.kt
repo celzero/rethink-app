@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.SubscriptionStatus
 import com.celzero.bravedns.database.SubscriptionStatusRepository
@@ -57,6 +56,7 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ManagePurchaseViewModel
 import com.celzero.bravedns.viewmodel.ManagePurchaseViewModel.OperationState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.androidbroadcast.vbpd.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -289,10 +289,12 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
     private fun copyWhoToClipboard() {
         val text = b.tvHeroWho.text?.toString().orEmpty()
         if (text.isBlank()) return
-        val clipboard =
-            requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("who", text))
-        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+        val copied = UIUtils.clipboardCopy(requireContext(), text, "who")
+        showToastUiCentered(
+            requireContext(),
+            getString(if (copied) R.string.copied_clipboard else R.string.copy_failed_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun showCancelOrRevokeButton(
@@ -615,8 +617,14 @@ class RethinkPlusManagePurchaseFragment : Fragment(R.layout.fragment_rethink_plu
             InAppBillingHandler.ONE_TIME_PRODUCT_5YRS -> getString(R.string.plan_5yr)
             InAppBillingHandler.SUBS_PRODUCT_YEARLY -> getString(R.string.billing_yearly)
             InAppBillingHandler.SUBS_PRODUCT_MONTHLY -> getString(R.string.monthly_plan)
-            else -> fallbackTitle.ifEmpty { productId }
+            else -> resolveUnmappedPlanName(productId, planId, fallbackTitle)
         }
+    }
+
+    // one-time purchase titles are derived durations and can be wrong; prefer the raw plan id
+    private fun resolveUnmappedPlanName(productId: String, planId: String, fallbackTitle: String): String {
+        if (isInAppProduct(productId, planId)) return planId.ifBlank { productId }
+        return fallbackTitle.ifEmpty { productId }
     }
 
     private fun isInAppProduct(productId: String, planId: String): Boolean {

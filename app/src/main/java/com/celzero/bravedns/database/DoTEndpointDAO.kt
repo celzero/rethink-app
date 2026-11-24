@@ -30,7 +30,7 @@ interface DoTEndpointDAO {
 
     @Update fun update(endpoint: DoTEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(endpoint: DoTEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(endpoint: DoTEndpoint): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertReplace(endpoint: DoTEndpoint)
 
@@ -66,4 +66,6 @@ interface DoTEndpointDAO {
 
     @Query("select * from DoTEndpoint order by name asc")
     fun getAll(): List<DoTEndpoint>
+
+    @Query("select * from DoTEndpoint where id = :id") fun getById(id: Int): DoTEndpoint?
 }

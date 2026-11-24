@@ -33,6 +33,7 @@
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
                 <data android:pathPattern=".*\\.rbk" />
+                <data android:pathPattern=".*\\.rbka" />
                 <data android:host="*" />
             </intent-filter>
         </activity>
@@ -156,6 +157,8 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.ConsoleLogActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConnIdLogsActivity"
+            android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.EventsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
@@ -185,6 +188,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.PingTestActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ConnectionCheckActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.FragmentHostActivity"
             android:finishOnTaskLaunch="true" />

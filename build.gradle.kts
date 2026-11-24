@@ -8,11 +8,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath(libs.androidToolsBuildGradle)
-        classpath(libs.jetbrainsKotlinKotlinGradlePlugin)
-        // Required by the TV flavor's Compose UI.
-        classpath(libs.jetbrainsKotlinComposeCompilerGradlePlugin)
-        
         // add firebase plugins - will be conditionally applied in app/build.gradle
         val taskNames = gradle.startParameter.taskNames.joinToString(",").lowercase()
         val playBuild = taskNames.contains("play")
@@ -34,6 +29,9 @@ buildscript {
 }
 
 plugins {
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidTest) apply false
+    alias(libs.plugins.kotlinCompose) apply false
     alias(libs.plugins.ksp) apply false
 }
 

@@ -23,8 +23,11 @@ import android.os.StrictMode
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.GoReportingHandler
+import com.celzero.bravedns.util.Utilities
+import androidx.work.Configuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,10 +37,21 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class RethinkDnsApplication : Application() {
+class RethinkDnsApplication : Application(), Configuration.Provider {
     companion object {
         var DEBUG: Boolean = false
+
+        // tv debug builds always run against test billing/rpn endpoints;
+        // called from every Application subclass (play overrides this class)
+        fun maybeForceTvDebugTestMode(app: Application) {
+            if (Utilities.isTvFlavour() && DEBUG) app.get<PersistentState>().appTestMode = true
+        }
     }
+
+    // on-demand init: WorkManager self-initializes even if the
+    // androidx.startup initializer never ran on this device
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 
     override fun onCreate() {
         super.onCreate()
@@ -50,6 +64,8 @@ class RethinkDnsApplication : Application() {
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+
+        maybeForceTvDebugTestMode(this)
 
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

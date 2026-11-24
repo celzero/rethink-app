@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
@@ -30,6 +31,7 @@ import androidx.tv.material3.Glow
 import androidx.tv.material3.SurfaceColors
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Surface as TvMaterialSurface
+import com.celzero.bravedns.tv.ui.theme.TvSurfaceStyles
 
 /**
  * Drop-in replacement for [androidx.tv.material3.Surface] that also responds to
@@ -50,20 +52,22 @@ fun Surface(
     tonalElevation: Dp = 0.dp,
     shape: ClickableSurfaceShape = ClickableSurfaceDefaults.shape(),
     colors: ClickableSurfaceColors = ClickableSurfaceDefaults.colors(),
-    scale: ClickableSurfaceScale = ClickableSurfaceDefaults.scale(),
+    scale: ClickableSurfaceScale = TvSurfaceStyles.expressiveScale(),
     border: ClickableSurfaceBorder = ClickableSurfaceDefaults.border(),
-    glow: ClickableSurfaceGlow = ClickableSurfaceDefaults.glow(),
+    glow: ClickableSurfaceGlow = TvSurfaceStyles.expressiveGlow(),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     TvMaterialSurface(
         onClick = onClick,
-        modifier = modifier.pointerInput(onClick, onLongClick, enabled) {
-            detectTapGestures(
-                onTap = { if (enabled) onClick() },
-                onLongPress = { if (enabled) onLongClick?.invoke() },
-            )
-        },
+        modifier = modifier
+            .focusProperties { canFocus = enabled }
+            .pointerInput(onClick, onLongClick, enabled) {
+                detectTapGestures(
+                    onTap = { if (enabled) onClick() },
+                    onLongPress = { if (enabled) onLongClick?.invoke() },
+                )
+            },
         onLongClick = onLongClick,
         enabled = enabled,
         tonalElevation = tonalElevation,

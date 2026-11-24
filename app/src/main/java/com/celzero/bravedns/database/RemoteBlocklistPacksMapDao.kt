@@ -39,4 +39,9 @@ interface RemoteBlocklistPacksMapDao {
         "select * from RemoteBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM RemoteBlocklistPacksMap where pack not in ('dead','ignore') GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` DESC"
     )
     fun getTags(): PagingSource<Int, RemoteBlocklistPacksMap>
+
+    @Query(
+        "select * from RemoteBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM RemoteBlocklistPacksMap where pack not in ('dead','ignore') GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` DESC"
+    )
+    suspend fun getTagsList(): List<RemoteBlocklistPacksMap>
 }

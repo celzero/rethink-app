@@ -33,6 +33,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_CONF
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_IAB_CONFLICT_VALUE
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.notifySafely
 
 /**
  * Posts a high-priority system notification whenever an [ITcpProxy] call returns HTTP 409
@@ -100,7 +101,8 @@ object PurchaseConflictNotifier {
                 context,
                 tapIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
-                mutable = false
+                mutable = false,
+                requestCode = NOTIF_ID_IAB_CONFLICT
             )
 
             // Ensure the channel exists (idempotent: safe to call on every notification)
@@ -130,7 +132,7 @@ object PurchaseConflictNotifier {
                 .setAutoCancel(true)
 
             // Fixed ID → repeated 409s update the same notification, not stack new ones
-            notificationManager.notify(NOTIF_CHANNEL_ID_RPN_ALERTS, NOTIF_ID_IAB_CONFLICT, builder.build())
+            notificationManager.notifySafely(NOTIF_CHANNEL_ID_RPN_ALERTS, NOTIF_ID_IAB_CONFLICT, builder.build())
 
             Logger.i(LOG_IAB, "$TAG: conflict notification posted for op=${error.operation}, endpoint=${error.endpoint}")
         } catch (e: Exception) {

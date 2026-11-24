@@ -32,11 +32,13 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import android.view.View
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.BaseActivity
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.util.SnackbarHelper.applySystemBarEdgeInsets
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -68,6 +70,7 @@ class AppLockActivity : BaseActivity(R.layout.activity_app_lock) {
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        findViewById<View>(android.R.id.content).applySystemBarEdgeInsets()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityConfigureOtherDnsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -32,6 +31,8 @@ import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.SnackbarHelper.applyTopInsetOnly
+import dev.androidbroadcast.vbpd.viewBinding
 import org.koin.android.ext.android.inject
 
 class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other_dns) {
@@ -79,6 +80,7 @@ class ConfigureOtherDnsActivity : BaseActivity(R.layout.activity_configure_other
     override fun onCreate(savedInstanceState: Bundle?) {
         theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+        b.root.applyTopInsetOnly()
 
         handleFrostEffectIfNeeded(persistentState.theme)
 

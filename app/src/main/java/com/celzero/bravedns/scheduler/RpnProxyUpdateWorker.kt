@@ -104,11 +104,11 @@ class RpnProxyUpdateWorker(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 request
             )
 
-            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (UPDATE; keeps the periodic timer stable across reschedules)")
+            Logger.i(LOG_TAG_PROXY, "$TAG; scheduled: first run in ${INTERVAL_MINUTES}m, then every ${INTERVAL_MINUTES}m (CANCEL_AND_REENQUEUE; fresh timer from registration)")
         }
 
         /** Cancel the periodic worker (e.g. when RPN is disabled). */
@@ -155,10 +155,6 @@ class RpnProxyUpdateWorker(
                 val updated = RpnProxyManager.updateWinProxy()
                 when {
                     updated == null -> {
-                        // null → tunnel failure (VpnController.updateWin returned null).
-                        // If a 409 conflict is currently active the failure is waiting for
-                        // user action, not a transient network error – stop retrying so we
-                        // don't spam further notifications.
                         if (InAppBillingHandler.serverApiErrorLiveData.value is ServerApiError.Conflict409) {
                             Logger.e(
                                 LOG_TAG_PROXY,
@@ -175,7 +171,7 @@ class RpnProxyUpdateWorker(
                         Result.retry()
                     }
                     updated.isEmpty() -> {
-                        // empty list → bytes persisted but tunnel has no locations yet.
+                        // empty list: bytes persisted but tunnel has no locations yet.
                         Logger.i(
                             LOG_TAG_PROXY,
                             "$TAG; doWork: WIN proxy update succeeded (no locations yet) on attempt $attempt; SUCCESS"

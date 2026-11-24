@@ -41,5 +41,7 @@ data class PurchaseDetail(
     val expiryTime: Long,
     val status: Int,
     val windowDays: Int,
-    val orderId: String = ""  // Google Play order ID for refund/chargeback correlation
+    val orderId: String = "",  // Google Play order ID for refund/chargeback correlation
+    /** True only when the one-time option came from an exact purchase-token `/g/tx` row. */
+    val isPlanIdServerConfirmed: Boolean = false
 )
