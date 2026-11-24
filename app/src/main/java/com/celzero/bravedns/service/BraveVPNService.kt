@@ -2042,7 +2042,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Network
             Logger.i(LOG_TAG_VPN, "handle custom socks5 change, enabled? $enabled")
             // the socks5 forwarder app is excluded from the vpn while socks5 is on, so restart vpn
             val ep = appConfig.getSocks5ProxyDetails()
-            vpnRestartTrigger.value = "customSocks5: $enabled, ${ep?.proxyIP}:${ep?.proxyPort}"
+            // vpnRestartTrigger is a StateFlow and drops a value equal to the current one, so
+            // the reason must name everything the tunnel builder reads: the forwarder app is
+            // excluded at build time, and a forwarder-only change must still restart the vpn
+            vpnRestartTrigger.value =
+                "customSocks5: $enabled, ${ep?.proxyIP}:${ep?.proxyPort}, fwdr: ${ep?.proxyAppName}"
             if (enabled) {
                 vpnAdapter?.readdSocks5Proxy()
             } else {
