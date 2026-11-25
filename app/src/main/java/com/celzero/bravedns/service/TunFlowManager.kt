@@ -1182,6 +1182,24 @@ object TunFlowManager : KoinComponent {
             return persistAndConstructFlowResponse(ctx, connTracker, baseOrAutoOrExit, connId, uid, forUpstreamAnswer)
         }
 
+        // fork: the app that forwards for a custom socks5 / http proxy (ex: tailsocks) must reach
+        // its own network directly. if a catch-all wireguard claimed it, tailscale would be
+        // tunnelled inside wireguard (upload, but nothing comes back). same as orbot's forwarder.
+        if (uid != rethinkUid) {
+            val fwdPkg = FirewallManager.getPackageNameByUid(uid)
+            val isFwd = !fwdPkg.isNullOrEmpty() && (
+                (appConfig.isCustomSocks5Enabled() && appConfig.getSocks5ProxyDetails()?.proxyAppName == fwdPkg) ||
+                (appConfig.isCustomHttpProxyEnabled() && appConfig.getHttpProxyDetails()?.proxyAppName == fwdPkg))
+            if (isFwd) {
+                if (splAppProxy == Backend.Block) {
+                    connTracker.isBlocked = true
+                    connTracker.blockedByRule = FirewallRuleset.RULE17.id
+                }
+                logd("flow/upstream: proxy forwarder $fwdPkg goes $splAppProxy, $connId, $uid, ${connTracker.destIP}")
+                return persistAndConstructFlowResponse(ctx, connTracker, splAppProxy, connId, uid, forUpstreamAnswer)
+            }
+        }
+
         // fork: a custom socks5 / http proxy claims the flow ahead of wireguard (including any
         // catch-all config) when the app was explicitly selected for it or the destination matches
         // its rules. fail closed: no fallback to wireguard / exit, so ex: a tor-bound app never
