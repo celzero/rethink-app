@@ -297,7 +297,7 @@
     <string name="settings_connectivity_checks" translatable="true">Execută verificări de conectivitate</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Sunt trimise verificări de conectivitate pentru a determina disponibilitatea.</string>
     <string name="settings_allow_lan_heading" translatable="true">Nu direcționa IP-urile private</string>
-    <string name="settings_allow_lan_desc" translatable="true">Exclude direcționările LAN, loopback, multicast și link-local din tunelul VPN al Rethink.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclude direcționările LAN, loopback, broadcast și link-local din tunelul VPN al Rethink.</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Când este dezactivat, exclude aplicațiile proxy (SOCKS5, HTTP, DNS) din tunelul VPN al Rethink.</string>
     <string name="settings_allow_bypass_heading" translatable="true">Activează vizibilitatea rețelei</string>
     <string name="settings_allow_bypass_desc" translatable="true">Permite aplicațiilor să acceseze toate rețelele disponibile. La nevoie, aceste aplicații pot ocoli tunelul VPN Rethink. Unele aplicații de audio/video conferință precum Zoom și Meet au nevoie de asta pentru a funcționa corespunzător.</string>
@@ -354,7 +354,7 @@
     <string name="settings_network_all_networks_desc" translatable="true">Când este activat, Rethink folosește toate rețelele disponibile pentru conectarea la internet. Dacă nu, folosește orice rețea indicată ca <i>activă</i> de Android.</string>
     <string name="settings_check_update_desc" translatable="true">Verifică automat pentru actualizări săptămânal.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Folosește downloader-ul aplicației</string>
-    <string name="settings_custom_downloader_desc" translatable="true">Dacă e dezactivat, se folosește <i>Download Manager</i> al Android</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Dacă e dezactivat, se folosește <i>Download Manager</i> al Android.</string>
     <string name="settings_import_export_desc" translatable="true">Efectuează manual copie de rezervă sau restaurare a setărilor și datelor din aplicații.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Notificare aplicație</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Activează notificările pentru aplicație</string>
@@ -458,8 +458,8 @@
     <string name="hsf_pause_vpn_failure" translatable="true">Rethink nu poate fi pus în pauză deoarece e inactiv</string>
     <string name="dc_custom_block_heading" translatable="true">Reguli domeniu</string>
     <string name="dc_dns_website_heading" translatable="true">Arată icon-urile website-urilor în jurnalul DNS</string>
-    <string name="dc_dns_website_desc" translatable="true">Colectează icon-uri de website de la <i>nextdns.io</i> și <i>duckduckgo.com</i>. Consumă până la 350Mb spațiu memorie</string>
-    <string name="dc_check_update_desc" translatable="true">Verifică actualizarea listelor de blocat o dată la <i>trei</i> zile</string>
+    <string name="dc_dns_website_desc" translatable="true">Colectează icon-uri de website de la <i>nextdns.io</i> și <i>duckduckgo.com</i>. Consumă până la 350Mb spațiu memorie.</string>
+    <string name="dc_check_update_desc" translatable="true">Verifică actualizarea listelor de blocat o dată la <i>trei</i> zile.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Niciodată Proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Nu utiliza DNS peste proxy-uri permanente WireGuard, SOCKS5, HTTP.</string>
     <string name="about_bravedns_whoarewe" translatable="true">Rethink este un proiect open-source gratuit, condus de ingineri software care au lucrat la Amazon, IBM și Scientific Games.</string>
@@ -511,7 +511,7 @@
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eliminat</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> poate duce la pierderea conexiunii. Modifică setarea pentru a permite Rethink să folosească datele și alte resurse când rulează în background.</string>
     <string name="dc_local_block_desc_1" translatable="true">Alege din peste 195 liste de blocat. Click aici pentru descărcarea sau configurarea lor.</string>
-    <string name="dc_dns_leaks_desc" translatable="true">Când este activat, Rethink capturează toate pachetele la portul 53 și le înaintează la un endpoint setat de utilizator</string>
+    <string name="dc_dns_leaks_desc" translatable="true">Când este activat, Rethink capturează toate pachetele la portul 53 și le înaintează la un endpoint setat de utilizator.</string>
     <string name="about_bravedns_explantion" translatable="true">Rethink este cea mai ușoară cale pentru monitorizarea activității aplicațiilor, ocolirea cenzurii pe internet și protejarea aplicațiilor pe dispozitivul tău Android.</string>
     <string name="about_bug_report" translatable="true">Raportare bug</string>
     <string name="about_bravedns_toreport_text" translatable="true">ajutor și feedback</string>
@@ -565,7 +565,7 @@
     <string name="dns_btm_latency_ms" translatable="true">%1$ss</string>
     <string name="dns_btm_record_type" translatable="true">Tip cerere: %1$s</string>
     <string name="hs_download_positive_default" translatable="true">ok</string>
-    <string name="hs_download_positive_play_store" translatable="true">Actualizare completă</string>
+    <string name="hs_download_positive_play_store" translatable="true">Deschide Play Store</string>
     <string name="hs_download_positive_website" translatable="true">Vizitează website</string>
     <string name="hs_download_negative_default" translatable="true">Amintește-mi mai târziu</string>
     <string name="cd_dns_crypt_dialog_name" translatable="true">Nume</string>
@@ -822,7 +822,7 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">va ocoli regulile universale de dns și firewall</string>
     <string name="ada_app_status_unknown" translatable="true">este necunoscută</string>
     <string name="ada_firewall_title" translatable="true">Reguli de firewall pentru această aplicație</string>
-    <string name="ada_network_log_title" translatable="true">Jurnal de rețea pentru această aplicație</string>
+    <string name="ada_network_log_title" translatable="true">Statistici de rețea pentru această aplicație</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Contorizat</string>
     <string name="ada_app_unmetered" translatable="true">Necontorizat</string>
@@ -886,7 +886,7 @@
     <string name="rethink_sky_desc" translatable="true">280+ locații; uptime ridicat; resolver stub rulând pe cloudflare.com</string>
     <string name="rethink_max_desc" translatable="true">50+ locații; mai multă intimitate; resolver recursiv rulând pe fly.io</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Booster DNS</string>
-    <string name="dc_setting_dns_cache_desc" translatable="true">Grupează cererile, memorează răspunsurile, rezolvă cu promptitudine erorile</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Grupează cererile, memorează răspunsurile, rezolvă cu promptitudine erorile.</string>
     <string name="dc_refresh_toast" translatable="true">Reîmprospătare completă</string>
     <string name="brbs_restore_dialog_failure_title" translatable="true">Restaurare nereușită</string>
     <string name="brbs_restore_dialog_failure_message" translatable="true">Nu s-a putut efectua restaurarea. Mai încerci o dată?</string>
@@ -1002,7 +1002,7 @@
     <string name="wireguard_disable_failure_relay" translatable="true">\"Releul WireGuard\" nu poate fi închis</string>
     <string name="config_invalid_desc" translatable="true">Configurare WireGuard incorectă</string>
     <string name="console_log_title" translatable="true">Jurnale aplicații</string>
-    <string name="console_log_desc" translatable="true">Jurnalele pot conține informații sensibile.</string>
+    <string name="console_log_desc" translatable="true">Jurnalele pot conține informații sensibile. Jurnalizarea rămâne activă maxim 3 ore, după care nivelul jurnalului revine la Erori numai dacă înainte era setat la un nivel mai amănunțit.</string>
     <string name="do_not_randomize_listen_port_title" translatable="true">Nu lăsa la întâmplare porturile de ascultare WireGuard</string>
     <string name="do_not_randomize_listen_port_desc" translatable="true">În modul Avansat, păstrează porturile de ascultare WireGuard fixe (nu la întâmplare).</string>
     <string name="endpoint_independent_mapping_title" translatable="true">Mapare Endpoint-Independent</string>
@@ -1047,7 +1047,7 @@
     <string name="most_contacted_asn" translatable="true">Cei mai contactați ISP</string>
     <string name="most_blocked_asn" translatable="true">Cei mai blocați ISP</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Introdu numele pachetelor (separate prin virgulă) admise să pornească sau să oprească Rethink.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP\n\n WireGuard actions (require the WireGuard automation toggle above;\n extra key: wg_ids – comma separated WireGuard config ids, e.g. 1,3):\n • Start WireGuard – com.celzero.bravedns.intent.action.WG_START\n • Stop WireGuard – com.celzero.bravedns.intent.action.WG_STOP\n • Pauză WireGuard – com.celzero.bravedns.intent.action.WG_PAUSE\n • Continuă WireGuard – com.celzero.bravedns.intent.action.WG_RESUME</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Introdu numele de pachet (example: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Arată informații despre ISP</string>
     <string name="download_ip_info_desc" translatable="true">Oferă detalii ISP-ului pentru website-uri de la <i>rethinkdns.com</i>, cu sprijinul <i>%1$s</i></string>
@@ -1217,7 +1217,7 @@
     <string name="restore_defaults_success_toast" translatable="true">Setări readuse la valorile implicite</string>
     <string name="lbl_unselect_all" translatable="true">deselectează tot</string>
     <string name="hsf_proxy_off_indicator" translatable="true">Proxy inactiv</string>
-    <string name="logs_card_heatmap_window" translatable="true">ultimele 24 ore</string>
+    <string name="logs_card_heatmap_window" translatable="true">Ultimele 24 ore</string>
     <string name="hsf_vpn_lockdown_prepare_failure" translatable="true">Rethink nu poate porni dacă o altă aplicație a setat o VPN Permanentă cu \"Blocarea tuturor conexiunilor fără VPN\" . Modifică setările VPN pentru a continua.</string>
     <string name="cd_doh_dialog_resolver_ip" translatable="true">Rezolvator adresă IP (opțional)</string>
     <string name="ci_dialog_error_invalid_cidr" translatable="true">CIDR nevalid. Intervalele IP (de ex. 1.1.1.1-55) și wildcard-urile nealiniate nu sunt permise. Folosește notația CIDR precum 1.1.1.0/24.</string>
@@ -1242,8 +1242,8 @@
     <string name="qs_relay_disabled_toast" translatable="true">Releu dezactivat pentru toate locațiile</string>
     <string name="qs_relay_no_locations_toast" translatable="true">Selectează o locație pentru activarea releului</string>
     <string name="qs_relay_failure_toast" translatable="true">Nu s-a reușit actualizarea releului pentru %1$d locații</string>
-    <string name="qs_relay_automation_dialog_title" translatable="true">Automatizarea activată</string>
-    <string name="qs_relay_automation_dialog_message" translatable="true">Automatizarea e activată pentru Auto locație, ceea ce va afecta inclusiv această locație. Vrei să continui?</string>
+    <string name="qs_relay_automation_dialog_title" translatable="true">Alertă automatizare</string>
+    <string name="qs_relay_automation_dialog_message" translatable="true">Din moment ce toate locațiile active vor fi transmise prin Auto, automatizarea va fi aplicată pentru toate locațiile. Vrei să continui?</string>
     <string name="rpn_bypass_apps_count" translatable="true">%1$d aplicații ocolite</string>
     <string name="rpn_bypass_apps_none" translatable="true">Nu sunt aplicații ocolite</string>
     <string name="rpn_bypass_all_dialog_title" translatable="true">Ocolesc toate aplicațiile?</string>
@@ -1302,4 +1302,76 @@
     <string name="bsdl_rule_status_none" translatable="true">Nu există reguli</string>
     <string name="bsdl_rule_status_blocked" translatable="true">Blocată</string>
     <string name="bsdl_rule_status_trusted" translatable="true">De încredere</string>
+    <string name="download_update_dialog_message_play" translatable="true">O nouă versiune a aplicației e disponibilă în Google Play. Vrei să o actualizezii?</string>
+    <string name="pcap_mode_section_title" translatable="true">Mod Captură</string>
+    <string name="pcap_files_section_title" translatable="true">Fișiere capturate</string>
+    <string name="pcap_empty_state" translatable="true">Încă nu există fișiere pcap. Fișierele obținute din capturarea pachetelor apar aici.</string>
+    <string name="pcap_delete_file_confirmation" translatable="true">Șterg %1$s?</string>
+    <string name="pcap_delete_all_confirmation" translatable="true">Șterg toate fișierele pcap? Capturarea activă, în caz ca există, va fi oprită.</string>
+    <string name="pcap_file_delete_failed_toast" translatable="true">Nu se poate șterge %1$s</string>
+    <string name="pcap_active_file_label" translatable="true">Captura activă</string>
+    <string name="pcap_view_file_desc" translatable="true">Arată fișierul pcap</string>
+    <string name="pcap_open_failed_toast" translatable="true">Nu poate fi deschis</string>
+    <string name="pcap_open_folder" translatable="true">Deschide folderul</string>
+    <string name="pcap_files_desc" translatable="true">Capturarea pachetelor va fi activă maxim 3 ore, după care va fi oprită și dezactivată.</string>
+    <string name="dc_use_sys_dns_captive_heading" translatable="true">Folosește DNS-ul sistemului în portalurile captive</string>
+    <string name="dc_use_sys_dns_captive_desc" translatable="true">Folosește DNS-ul sistemului pentru rezolvarea domeniilor până când portalurile active de autentificare sunt completate.</string>
+    <string name="ada_insights_uploaded" description="Label for the total upload volume of a single app in the app info insights view." translatable="true">Uploadat</string>
+    <string name="ada_insights_downloaded" description="Label for the total download volume of a single app in the app info insights view." translatable="true">Descărcat</string>
+    <string name="bsac_universal_rule_hint" translatable="true">Pentru acest domeniu sau IP există o regulă universală.</string>
+    <string name="bsdl_open_app_info" translatable="true">Informații despre aplicație</string>
+    <string name="brbs_backup_saved_app_folder_warning" translatable="true">Copia de rezervă va fi salvată ca %1$s. Fișierele de aici vor fi șterse dacă se dezinstalează aplicația.</string>
+    <string name="brbs_no_file_picker_restore" translatable="true">Nu există un selector de fișiere disponibil pe acest dispozitiv.</string>
+    <string name="brbs_no_file_picker_backup" translatable="true">Selector de fișiere indisponibil iar folderul aplicației este inutilizabil. Nu a fost salvată nici o copie de rezervă.</string>
+    <string name="brbs_restore_folder_empty" translatable="true">Nu s-a găsit copia de rezervă %1$s în %2$s. Copiază aici una și încearcă din nou.</string>
+    <string name="brbs_restore_pick_file_title" translatable="true">Alege copia de rezervă</string>
+    <string name="brbs_restore_pick_source_title" translatable="true">Restaurează din copia de rezervă</string>
+    <string name="brbs_restore_pick_source_browse" translatable="true">Răsfoiește fișiere</string>
+    <string name="brbs_restore_pick_source_app_folder" translatable="true">Din folderul aplicației</string>
+    <string name="brbs_backup_restore_in_progress" translatable="true">Copie de rezervă sau restaurare în curs</string>
+    <string name="ssv_blocklists_heading" description="This label will appear on the stats screen as a header for the domains blocked per blocklist." translatable="true">Cele mai blocate cu listele de blocat</string>
+    <string name="ssv_blocklist_summary" description="Shows a blocklist name with the number of its tag sets that blocked domains, e.g. 'ads.example · 3 lists'." translatable="true">%1$s · %2$d liste</string>
+    <string name="ssv_filter_heading" description="Accessibility label for the stats filter chip row that toggles which sections are shown." translatable="true">Secțiuni filtre</string>
+    <string name="ssv_filter_providers" description="Filter chip label on the stats screen to show or hide the ASN/provider sections." translatable="true">Furnizori</string>
+    <string name="ssv_filter_countries" description="Filter chip label on the stats screen to show or hide the country sections." translatable="true">Țări</string>
+    <string name="ssv_filter_domains" description="Filter chip label on the stats screen to show or hide the domain sections." translatable="true">Domenii</string>
+    <string name="ssv_filter_blocklist" description="Filter chip label on the stats screen to show or hide the blocklist section." translatable="true">Liste de blocat</string>
+    <string name="ssv_filter_ips" description="Filter chip label on the stats screen to show or hide the IP sections." translatable="true">IP-uri</string>
+    <string name="wireguard_duplicate_keys_warning_title" translatable="true">Chei WireGuard duplicate</string>
+    <string name="wireguard_duplicate_keys_warning" translatable="true">Această cheie este deja folosită de o altă configurație WireGuard activă. Dacă se continuă, poate fi afectată conectivitatea ambelor configurații.</string>
+    <string name="conn_id_logs_empty" translatable="true">Nu există jurnale pentru această conexiune</string>
+    <string name="tasker_allowed_apps_title" translatable="true">Aplicații permise</string>
+    <string name="tasker_intent_reference_title" translatable="true">Intent reference</string>
+    <string name="tasker_wg_automation_title" translatable="true">Automatizare WireGuard</string>
+    <string name="tasker_wg_automation_desc" translatable="true">Permite aplicațiilor de încredere să pornească, să oprească, să întrerupă și să continue configurațiile WireGuard după id. Odată activat, automatizarea WireGuard (numai date mobile/ SSID) e controlată de o aplicație externă.</string>
+    <string name="wg_automation_tasker_managed" translatable="true">Automatizarea e dezactivată pentru această configurație, fiind controlată de o aplicație externă (de ex. Tasker).</string>
+    <string name="notif_channel_wg_automation" translatable="true">Automatizare WireGuard</string>
+    <string name="notif_channel_desc_wg_automation" translatable="true">Alertează dacă o aplicație externă de automatizare nu poate porni, opri, întrerupe sau continua WireGuard</string>
+    <string name="wg_automation_notif_title" translatable="true">Automatizare Wireguard</string>
+    <plurals name="wg_automation_notif_summary">
+        <item quantity="one">Nu se poate %1$s %2$d din %3$d configurația WireGuard</item>
+        <item quantity="few">Nu se poate %1$s %2$d din %3$d configurații WireGuard</item>
+        <item quantity="other">Nu se poate %1$s %2$d din %3$d configurații WireGuard</item>
+    </plurals>
+    <string name="wg_automation_notif_item" translatable="true">Configurația #%1$d: %2$s</string>
+    <string name="wg_automation_notif_more" translatable="true">…și încă %1$d</string>
+    <string name="wg_automation_action_start" translatable="true">start</string>
+    <string name="wg_automation_action_stop" translatable="true">stop</string>
+    <string name="wg_automation_action_pause" translatable="true">pauză</string>
+    <string name="wg_automation_action_resume" translatable="true">continuă</string>
+    <string name="wg_automation_action_failed" translatable="true">Acțiune nereușită, încearcă din nou</string>
+    <string name="recent_routed_apps_title" translatable="true">Aplicații direcționate recent</string>
+    <string name="recent_routed_apps_empty" translatable="true">Prin acest server încă nu au fost direcționate aplicații.</string>
+    <string name="recent_routed_conn_count" translatable="true">%1$s conexiuni</string>
+    <string name="recent_routed_apps_hint" translatable="true">Aplicațiile excluse ocolesc toate proxy-urile</string>
+    <string name="recent_routed_app_excluded" translatable="true">%1$s excluse din toate proxy-urile</string>
+    <string name="recent_routed_app_included" translatable="true">%1$s direcționate iarăși prin proxy</string>
+    <string name="recent_routed_view_logs" translatable="true">Arată toate jurnalele</string>
+    <string name="tv_open_action" translatable="true">Deschide ›</string>
+    <string name="tv_rpn_stats_title" translatable="true">Statistici RPN</string>
+    <string name="tv_rpn_stats_subtitle_fmt" translatable="true">Ultimele %1$dh de trafic RPN.</string>
+    <string name="tv_rpn_stats_top_apps_fmt" translatable="true">Top aplicații · ultimele %1$dh</string>
+    <string name="tv_rpn_stats_empty_fmt" translatable="true">Nici o conexiune prin serverele selectate în utimele %1$dh.</string>
+    <string name="tv_rpn_stats_logs_subtitle" translatable="true">Inspectează conexiunile individuale direcționate prin RPN.</string>
+    <string name="tv_rpn_stats_window_fmt" translatable="true">%1$dh</string>
 </resources>

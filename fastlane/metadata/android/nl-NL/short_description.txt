@@ -1,1 +1,1 @@
-Firewall-apps, WireGuard VPN gebruiken, netwerk monitoren, malware blokkeren, DNS wijzigen.
+Firewall apps, gebruik WireGuard VPN, monitor netwerk, stop malware, wijzig DNS.

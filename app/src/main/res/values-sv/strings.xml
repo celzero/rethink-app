@@ -178,7 +178,7 @@
     <string name="configure_dns_connection_name" translatable="true">Ansluten till %1$s</string>
     <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolvrar</string>
     <string name="http_proxy_dialog_heading" translatable="true">Ställ in HTTP(S)-CONNECT-proxy</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Ange en URL i formen &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exempel: http://proxy.example.com:8080/</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Ange en URL i formen &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exempel: http://proxy.exempel.se:8080/</string>
     <string name="download_update_dialog_title" translatable="true">Ny uppdatering!</string>
     <string name="download_update_dialog_message" translatable="true">En ny version av appen kan hämtas från webbplatsen. Vill du fortsätta?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Uppdaterad!</string>

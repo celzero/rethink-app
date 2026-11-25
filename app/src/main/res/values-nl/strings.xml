@@ -30,7 +30,7 @@
     <string name="search_custom_domains"><font size="12">Domeinnamen zoeken</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Bloklijsten zoeken</font></string>
     <string name="settings_socks5_vpn_disabled_error">Start Rethink om verder te gaan.</string>
-    <string name="settings_network_all_networks_desc">Indien ingeschakeld, gebruikt RethinkDNS alle beschikbare netwerken om verbinding te maken met het internet. Indien niet, gebruikt het netwerk dat door Android als <i>actief wordt beschouwd</i>.</string>
+    <string name="settings_network_all_networks_desc">Indien ingeschakeld, gebruikt Rethink alle beschikbare netwerken om verbinding te maken met het internet. Indien niet, gebruikt het netwerk dat door Android als <i>actief wordt beschouwd</i>.</string>
     <string name="settings_ip_network_heading">Kies IP-versie</string>
     <string name="settings_https_heading">HTTP(S)-proxy instellen</string>
     <string name="orbot_http_desc">Beveelt aan dat apps de HTTP-proxy van Orbot gebruiken.</string>
@@ -38,9 +38,9 @@
     <string name="settings_socks5_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_import_export_heading">Back-up &amp; Herstel</string>
     <string name="settings_https_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
-    <string name="settings_autostart_bootup_desc">Start RethinkDNS bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
+    <string name="settings_autostart_bootup_desc">Start Rethink bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
     <string name="settings_autostart_bootup_heading">Auto-start bij opstarten (experimenteel)</string>
-    <string name="settings_custom_downloader_desc">Indien uitgeschakeld wordt Android\'s ingebouwde <i>Download Manager</i> gebruikt</string>
+    <string name="settings_custom_downloader_desc">Indien uitgeschakeld, wordt Android\'s ingebouwde <i>Download Manager</i> gebruikt.</string>
     <string name="settings_app_notification_a13_desc">Meldingsrechten voor de app inschakelen</string>
     <string name="settings_http_proxy_error_text3">Hostname is leeg</string>
     <string name="settings_http_proxy_desc">Doorsturen naar %1$s</string>
@@ -56,10 +56,10 @@
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimenteel)</string>
     <string name="settings_notification_desc1">Pauze / Stop (standaard)</string>
-    <string name="settings_notification_dialog_option_2">\n\nDNS / DNS + Firewall:\n\nToont twee knoppen om snel te schakelen tussen de batterijbesparende DNS-modus en de gewone DNS + Firewall-modus.</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nToont twee knoppen om snel te schakelen tussen de batterijbesparende DNS-modus en de gewone DNS + Firewall-modus.</string>
     <string name="apps_icon_content_desc">Toepassingspictogram</string>
     <string name="firewall_status_excluded">uitgesloten van dns en firewall</string>
-    <string name="firewall_status_block_unmetered">geblokkeerd op niet-gemeten (wifi) netwerken</string>
+    <string name="firewall_status_block_unmetered">geblokkeerd op (wifi-) netwerken zonder datalimiet</string>
     <string name="orbot_both">TCP + HTTP-proxy</string>
     <string name="orbot_stop_dialog_message">Rethink is gestopt met het doorsturen van verbindingen naar Orbot, maar Orbot draait misschien op de achtergrond.</string>
     <string name="settings_http_proxy_error_text2">Ongeldige poort</string>
@@ -164,10 +164,10 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_selected_ip_desc" translatable="false">%1$s</string>
     <string name="settings_notification_heading">Notificatieactie kiezen</string>
-    <string name="settings_notification_desc">Actieknoppen om te tonen bij de RethinkDNS melding: %1$s</string>
+    <string name="settings_notification_desc">Actieknoppen om te tonen bij de Rethink melding: %1$s</string>
     <string name="settings_notification_desc3">Geen</string>
-    <string name="settings_notification_dialog_option_1">\n\nPauze / Stop (standaard):\n\nToont twee knoppen, om RethinkDNS snel te pauzeren en te stoppen.</string>
-    <string name="settings_notification_dialog_option_3">\n\nGeen:\n\nToont geen knop.\n\n</string>
+    <string name="settings_notification_dialog_option_1">\nPauze / Stop (standaard):\nToont twee knoppen om Rethink snel te pauzeren en te stoppen.</string>
+    <string name="settings_notification_dialog_option_3">\nGeen:\nToont geen knop.\n</string>
     <string name="settings_selected_theme">Huidig thema: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Schakel over naar DNS/DNS+Firewall modus om deze instelling in te schakelen</string>
     <string name="firewall_status_allow">toegestaan</string>
@@ -189,7 +189,7 @@
     <string name="settings_socks5_heading">SOCKS5-proxy instellen</string>
     <string name="settings_socks5_desc">Verbindingen doorsturen naar SOCKS5 eindpunt.</string>
     <string name="settings_https_desc">Deze instelling is slechts een aanbeveling en het is mogelijk dat apps deze zullen negeren. Apps die HTTP(S)-proxy gebruiken, omzeilen zowel de firewall als de DNS-regels.</string>
-    <string name="orbot_socks5">TCP-only Proxy</string>
+    <string name="orbot_socks5">Alleen-TCP Proxy</string>
     <string name="orbot_socks5_desc">Stuurt alle TCP-verbindingen door naar Orbot.</string>
     <string name="orbot_http">HTTP Proxy</string>
     <string name="orbot_both_desc">Al het bovenstaande.</string>
@@ -230,26 +230,26 @@
     <string name="firewall_rule_foreground">App Niet in gebruik</string>
     <string name="univ_firewall_rule_1">Alle apps blokkeren wanneer het apparaat is vergrendeld</string>
     <string name="dc_local_block_desc_1">Kies uit 185+ blocklists. Klik hier om bloklijsten te downloaden of te configureren.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Rethink toegankelijkheidsdienst is gestopt of gecrasht. <i><b>Ga naar Instellingen en Forceer Stop</b></i> RethinkDNS en start het opnieuw om de <i>Blokkeer elke app die niet in gebruik is</i> functie te gebruiken.\n\nRethink gebruikt de toegankelijkheidsdienst om bij te houden welke apps in gebruik zijn (voorgrond) versus welke niet in gebruik zijn (achtergrond).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink toegankelijkheidsdienst is gestopt of gecrasht. <i><b>Ga naar Instellingen en Forceer Stop</b></i> van Rethink en start het opnieuw om de <i>Blokkeer elke app die niet in gebruik is</i> functie te gebruiken.\n\nRethink gebruikt de toegankelijkheidsdienst om bij te houden welke apps in gebruik zijn (voorgrond) versus welke niet in gebruik zijn (achtergrond).</string>
     <string name="show_logs_disabled_dns_message">Het loggen van DNS-verzoeken is uitgeschakeld. Om dit opnieuw in te schakelen, gaat u naar <i>Instellingen</i> en schakelt u <i>Inschakelen van on-device logging in.</i></string>
     <string name="firewall_status_unknown">onbekend</string>
     <string name="ct_bs_app_info_error">App Info niet gevonden</string>
     <string name="apps_card_ips_count">%1$s IP- en poortregels</string>
     <string name="firewall_card_status_active">%1$s apps</string>
-    <string name="hsf_vpn_dialog_message">RethinkDNS heeft toestemming nodig om een lokaal VPN op te zetten om de DNS-verzoeken van het apparaat te versleutelen, een netwerkmonitor te implementeren en firewallregels af te dwingen. \n \nRethinkDNS verzamelt geen informatie en bespioneert u op geen enkele manier.</string>
+    <string name="hsf_vpn_dialog_message">RethinkDNS heeft toestemming nodig om een lokale VPN op te zetten om de DNS-verzoeken van het apparaat te versleutelen, een netwerkmonitor te implementeren en firewallregels af te dwingen. \n \nOp Wi-Fi gebaseerde proxy-automatisering vereist Locatie rechten om het verbonden Wi-Fi-netwerk te identificeren (SSID). Deze toestemming wordt alleen gevraagd als u de functie inschakelt.\n\nRethink verzamelt geen informatie en bespioneert u op geen enkele manier.</string>
     <string name="dc_entries">%1$s inzendingen 🔗</string>
     <string name="dc_dns_leaks_heading">DNS-lekken voorkomen</string>
     <string name="hsf_start_dialog_positive">Begin</string>
-    <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
+    <string name="hsf_pause_vpn_failure">Kan niet pauzeren: Rethink niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
     <string name="dc_block_heading">regels</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_local_block_heading">Blokkeringslijsten op het apparaat</string>
-    <string name="dc_dns_website_desc">Haalt websitepictogrammen op van <i>nextdns.io</i> en <i>duckduckgo.com</i>. Verbruikt tot 350 mb aan schijfruimte</string>
+    <string name="dc_dns_website_desc">Haalt websitepictogrammen op van <i>nextdns.io</i> en <i>duckduckgo.com</i>. Verbruikt tot 350 mb aan schijfruimte.</string>
     <string name="univ_firewall_rule_5">Blokkeren wanneer DNS wordt omzeild</string>
-    <string name="dc_check_update_desc">Controleer eenmaal per <i>drie</i> dagen of de blocklist is bijgewerkt</string>
-    <string name="about_bravedns_explantion">RethinkDNS is de eenvoudigste manier om de activiteit van apps te controleren, internetcensuur te omzeilen en apps op uw Android-toestel te firewarden.</string>
+    <string name="dc_check_update_desc">Controleer eenmaal per <i>drie</i> dagen of de blocklist is bijgewerkt.</string>
+    <string name="about_bravedns_explantion">Rethink is de eenvoudigste manier om de activiteit van apps te controleren, internetcensuur te omzeilen en apps op uw Android-toestel te firewallen.</string>
     <string name="about_app">app</string>
     <string name="about_settings">systeem</string>
     <string name="about_bravedns_whoarewe">RethinkDNS is een gratis en open-source project, geleid door ex-ingenieurs van Amazon, IBM en Scientific Games.</string>
@@ -326,10 +326,10 @@
     <string name="firewall_rule_block_ip">IP / Poort (App)</string>
     <string name="firewall_rule_no_rule_desc">Geen firewall regels kwamen overeen met deze verbinding.</string>
     <string name="firewall_rule_block_http">Onveilige HTTP</string>
-    <string name="firewall_rule_new_app_desc"><![CDATA[Deze app maakte verbinding voor de <i>eerste keer</i>.<br/><br/> Om te veranderen ga naar <i>Universele</i> tab.]]></string>
-    <string name="dc_dns_leaks_desc">Indien ingeschakeld, vangt RethinkDNS alle pakketten op poort 53 op en stuurt deze door naar een door de gebruiker ingesteld DNS eindpunt</string>
-    <string name="firewall_rule_isolate_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.]]></string>
-    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Deze verbinding is geblokkeerd omdat universele lockdown is ingesteld.<br/><br/> Om dit te veranderen ga naar <i>tabblad Universal</i>.]]></string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Deze app maakte verbinding voor de <i>eerste keer</i>.<br><br> Om te veranderen ga naar <i>Universeel</i> tabblad.]]></string>
+    <string name="dc_dns_leaks_desc">Indien ingeschakeld, vangt Rethink alle pakketten op poort 53 op en stuurt deze door naar een door de gebruiker ingesteld DNS eindpunt.</string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br><br> Om te wijzigen ga naar het <i>Alle Apps</i> tabblad.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[Deze verbinding is geblokkeerd omdat universele lockdown is ingesteld.<br><br> Om dit te veranderen ga naar <i>Universeel</i> tabblad.]]></string>
     <string name="ada_app_status_isolate">staat in lockdown modus</string>
     <string name="ada_app_isolate">Lockdown</string>
     <string name="settings_orbot_notification_content">Fout bij het starten van Tor-as-a-Proxy. Open de Orbot-app om deze handmatig te starten.</string>
@@ -360,7 +360,7 @@
     <string name="settings_theme_dialog_themes_2">Licht</string>
     <string name="settings_notification_dialog_title">Notificatieactie kiezen</string>
     <string name="firewall_status_isolate">lockdown</string>
-    <string name="firewall_status_block_metered">geblokkeerd op gedoseerde (mobiele) netwerken</string>
+    <string name="firewall_status_block_metered">geblokkeerd op (mobiele) netwerken met een datalimiet</string>
     <string name="firewall_status_blocked">geblokkeerd</string>
     <string name="firewall_card_text_inactive">Firewall-modus inschakelen.</string>
     <string name="dns_card_latency_inactive">DNS-modus inschakelen.</string>
@@ -370,7 +370,7 @@
     <string name="hsf_downtime">(inactief sinds %1$s)</string>
     <string name="hsf_vpn_dialog_header">Attentie!</string>
     <string name="firewall_card_text_active">%1$s geblokkeerd \n%2$s omzeild \n%3$s uitgesloten \n%4$s lockdown</string>
-    <string name="lbl_proceed">Doorgaan</string>
+    <string name="lbl_proceed">Verdergaan</string>
     <string name="hsf_vpn_prepare_failure">Of de VPN toestemming ontbreekt, of een andere app staat in Always-on VPN mode.</string>
     <string name="hsf_notification_permission_failure">Meldingstoestemming inschakelen vanuit het instellingenscherm</string>
     <string name="hsf_start_dialog_header">Start %1$s</string>
@@ -386,7 +386,7 @@
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report_dialog_positive_btn">Verzend e-mail</string>
-    <string name="about_bug_no_log_dialog_message">Kon geen crash logs ophalen. Wilt u uw bug handmatig rapporteren?</string>
+    <string name="about_bug_no_log_dialog_message">Kon geen crashlogbestanden ophalen. Wilt u deze fout handmatig rapporteren?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Verzend e-mail</string>
     <string name="about_web">links</string>
     <string name="about_website">Bezoek rethinkdns.com</string>
@@ -452,7 +452,7 @@
     <string name="firewall_rule_unknown">Bron Onbekend</string>
     <string name="firewall_rule_block_dns_bypass">DNS omzeild</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Omzeilde app</string>
-    <string name="firewall_rule_block_app_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.]]></string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i>.<br><br> Om te wijzigen ga naar <i>Alle Apps</i> tabblad.]]></string>
     <string name="firewall_rule_global_lockdown">Lockdown</string>
     <string name="settings_ptrans_desc">Vertaal uitgaand IPv6-verkeer naar IPv4 op het apparaat. Inschakelen als u verbonden bent met een netwerk dat alleen uit IPv4 bestaat.</string>
     <string name="settings_allow_bypass_desc">Sta toe dat aanvragende apps de RethinkDNS firewall on-demand omzeilen. Sommige audio/video conferentie apps zoals Zoom en WhatsApp kunnen een on-demand bypass nodig hebben om goed te functioneren.</string>
@@ -478,7 +478,7 @@
     <string name="ctbs_block_other_apps">De regels voor %1$s gelden ook voor %2$s andere apps</string>
     <string name="ctbs_dialog_negative_btn">Ga Terug</string>
     <string name="dns_log_dialog_positive">Logboeken verwijderen</string>
-    <string name="cd_dnscrypt_relay_heading">Relays</string>
+    <string name="cd_dnscrypt_relay_heading">Relais</string>
     <string name="txt_home" translatable="true">Beginscherm</string>
     <string name="title_statistics" translatable="true">Statistieken</string>
     <string name="lbl_cancel" translatable="true">Annuleren</string>
@@ -558,7 +558,7 @@
     <string name="cd_toast_added" translatable="true">Domein succesvol toegevoegd</string>
     <string name="cd_no_rule_initial" translatable="true">N</string>
     <string name="status_protected_with_wg" translatable="true">beschermd met wireguard</string>
-    <string name="notification_action_resume_vpn" translatable="true">DOORGAAN</string>
+    <string name="notification_action_resume_vpn" translatable="true">HERVATTEN</string>
     <string name="notification_action_pause_vpn" translatable="true">PAUZE</string>
     <string name="private_dns_dialog_heading" translatable="true">Privé DNS uitzetten</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Netwerk</string>
@@ -712,7 +712,7 @@
     <string name="settings_rinr_desc_disabled" translatable="true">Stuur Rethinks eigen verkeer, zoals downloads van blokkeerlijsten, connectiviteitscontroles en DNS-verbindingen, terug door de tunnel.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethinks eigen verkeer door de tunnel sturen. Schakel dit uit, tenzij je weet wat je doet.</string>
     <string name="settings_rinr_btmsht_title" translatable="true">Loopback (experimenteel)</string>
-    <string name="settings_rinr_btmsht_desc" translatable="true">In de Loopback-modus kan Rethink zijn eigen netwerkverkeer omleiden. Dit betekent dat Rethink IP- en domeinregels, algemene firewallregels en proxyregels kan toepassen op zijn eigen verkeer alsof het een gewone app is. Hoewel Loopback meer controle biedt, is het gedrag dat hieruit voortkomt niet altijd wenselijk.\n\nHet wordt aanbevolen om Rethink uit te sluiten van firewall-, DNS- en proxyregels. Dit heeft geen invloed op netwerkmonitoring of logboeken, maar alleen op de regels.\n\nIn de Loopback-modus wordt Proxy Lockdown voorlopig niet afgedwongen.</string>
+    <string name="settings_rinr_btmsht_desc" translatable="true">In de Loopback-modus kan Rethink zijn eigen netwerkverkeer omleiden. Dit betekent dat Rethink IP- en domeinregels, algemene firewallregels en proxyregels kan toepassen op zijn eigen verkeer alsof het een gewone app is. Hoewel Loopback meer controle biedt, is het gedrag dat hieruit voortkomt niet altijd wenselijk.\n\n\nHet wordt aanbevolen om Rethink uit te sluiten van firewall-, DNS- en proxyregels. Dit heeft geen invloed op netwerkmonitoring of logboeken, maar alleen op de regels.\n\n\nIn de Loopback-modus wordt Proxy Lockdown voorlopig niet afgedwongen.</string>
     <string name="settings_rinr_exempt_btn" translatable="true">Rethink uitsluiten</string>
     <string name="app_info_rethink_warning_title" translatable="true">Let op</string>
     <string name="app_info_rethink_warning_desc" translatable="true">Je staat op het punt de firewallregels voor Rethink te wijzigen. Omdat Rethink de VPN-tunnel beheert, kan het toestaan, blokkeren of isoleren van het eigen verkeer van Rethink de netwerktoegang volledig verbreken.</string>
@@ -751,9 +751,9 @@
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Systeem-DNS gebruiken voor niet-gedelegeerde domeinen</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Systeem-DNS gebruiken voor niet-gedelegeerde domeinen zoals <i>.lan</i>, <i>.internal</i>, enz.</string>
     <string name="dc_filtering_heading" translatable="true">Filteren</string>
-    <string name="about_bug_report" translatable="true">Bugrapport</string>
-    <string name="about_bug_no_log_dialog_title" translatable="true">Bug report</string>
-    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Bug report</string>
+    <string name="about_bug_report" translatable="true">Foutrapport</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Foutrapport</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Foutrapport</string>
     <string name="intent_launch_error" translatable="true">Kan %1$s niet starten</string>
     <string name="contributors_list" translatable="true"><![CDATA[Het <i>Rethink Open Source Project</i> bestaat dankzij deze vrijwilligers, die talloze uren besteden aan de ontwikkeling ervan.<br/>\n<br/>🛡️ Android-app <br/>\n<a href="https://github.com/anthonyryan1">Anthony Ryan</a> /\n<a href="https://github.com/BayLee4">BayLee4</a> /\n<a href="https://github.com/Coding-Young">Coding-Young</a> /\n<a href="https://github.com/Ch4t4r">Ch4t4r</a> /\n<a href="https://github.com/samthesamman">CodingAttack</a> /\n<a href="https://github.com/dsremo">dsremo</a> /\n<a href="https://github.com/HrBDev">HrBDev</a> /\n<a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /\n<a href="https://github.com/ignoramous">ignoramous</a> /\n<a href="https://github.com/ironveil">ironveil</a> /\n<a href="https://github.com/markwmuller">markwmuller</a> /\n<a href="https://github.com/mohammaduvez">Mohammaduvez</a> /\n<a href="https://github.com/Mygod">Mygod</a> /\n<a href="https://github.com/Poussinou">Poussinou</a> /\n<a href="https://github.com/pjosingh">pjosingh</a> /\n<a href="https://github.com/RohitSurwase">RohitSurwase</a> /\n<a href="https://github.com/rootshel">rootshel</a> /\n<a href="https://github.com/ShantanuVichare">Shantanu</a> /\n<a href="https://github.com/Uldiniad">Uldiniad</a> /\n<a href="https://github.com/VASHvic">VASHvic</a> /\n<a href="https://github.com/yurtpage">yurtpage</a> /\n<a href="https://github.com/WhoIsDevelop">WhoIsDevelop</a><br/>\n<br/>🚂 Netwerkmotor <br/>\n<a href="https://github.com/alalamav">alalamav</a> /\n<a href="https://github.com/bemasc">bemasc</a> /\n<a href="https://github.com/dmcardle">dmcardle</a> /\n<a href="https://github.com/fortuna">fortuna</a> /\n<a href="https://github.com/ignoramous">ignoramous</a> /\n<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n<a href="https://github.com/SeanBurford">SeanBurford</a><br/>\n<br/>📚 Resolver <br/>\n<a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /\n<a href="https://github.com/amithm7">amithm7</a> /\n<a href="https://github.com/arfshl">arfshl</a> /\n<a href="https://github.com/arfshl">arfshl</a> /\n<a href="https://github.com/badmojr">badmojr</a> /\n<a href="https://github.com/bongochong">bongochong</a> /\n<a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /\n<a href="https://github.com/georgyo">georgyo</a> /\n<a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /\n<a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /\n<a href="https://github.com/ignoramous">ignoramous</a> /\n<a href="https://github.com/JakeChampion">JakeChampion</a> /\n<a href="https://github.com/MasterKia">MasterKia</a> /\n<a href="https://github.com/mtxadmin">mtxadmin</a> /\n<a href="https://github.com/neneeen">neneeen</a> /\n<a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /\n<a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /\n<a href="https://github.com/shruuub">shruuub</a> /\n<a href="https://github.com/shuvashish76">shuvashish76</a><br/>\n<br/>⚜ Communitymoderators <br/>\n<a href="https://t.me/amithm7">amithm7</a> /\n<a href="https://t.me/TronSlayer">Andersen</a> /\n<a href="https://t.me/ppatra">ppatra</a> /\n<a href="https://t.me/InFamous23">InFamous23</a> /\n<a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /\n<a href="https://t.me/Ch4t4r">Ch4t4r</a> /\n<a href="https://t.me/Billi_ance">Billi_ance</a> /\n<a href="https://t.me/kaliangel">kaliangel</a> /\n<a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>\n<br/>📌 Geo-IP <br/>\n<a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>\n<br/>❇ Vertalingen <br/>\n<a href="https://weblate.org/en/">Weblate</a><br/>\n<br/>🦆 Pictogrammen <br/>\n<a href="https://github.com/celzero/rethink-app/issues/346">Pictogrammen</a><br/>\n<br/>📦 Buildservers <br/>\n<a href="https://jitpack.io/">JitPack</a> /\n<a href="https://github.com/">GitHub</a> /\n<a href="https://central.sonatype.com/">Sonatype</a><br/>\n \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020 \u0020]]></string>
     <string name="cd_split_dns_heading" translatable="true">Gesplitste DNS (experimenteel)</string>
@@ -761,9 +761,9 @@
     <string name="dns_record_types_auto_mode_status" translatable="true">Automatisch (alle types)</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blokkeerlijst(en)</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="dns_btm_resolved_doh" translatable="true">resolved %1$s door %2$s</string>
-    <string name="dns_btm_resolved_doh_no_server" translatable="true">resolved %1$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">%1$s opgelost</string>
     <string name="dns_btm_record_type" translatable="true">Type query: %1$s</string>
-    <string name="univ_firewall_rule_9" translatable="true">Blokkeren op mobiel netwerk met datalimiet</string>
+    <string name="univ_firewall_rule_9" translatable="true">Blokkeren op (mobiele) netwerken met een datalimiet</string>
     <string name="univ_firewall_rule_11" translatable="true">Alle lokale hostverbindingen blokkeren</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Alle domeinregels verwijderen?</string>
     <string name="univ_delete_domain_dialog_message" translatable="true">Door deze regels te verwijderen, kunnen alle apps verbinding maken met de momenteel geblokkeerde domeinen.</string>
@@ -776,20 +776,20 @@
     <string name="dns_proxy_name" translatable="true">Naam van proxy</string>
     <string name="fapps_filter_filter_heading" translatable="true">Type</string>
     <string name="fapps_info_dialog_message" translatable="true">Apps blokkeren om verbinding te maken met internet. Door internettoegang te beperken, voorkom je onnodig dataverbruik en bespaar je batterij.</string>
-    <string name="fapps_info_unmetered_msg" translatable="true">Toestaan / blokkeren op een netwerk zonder datalimiet (wifi).</string>
-    <string name="fapps_info_metered_msg" translatable="true">Toestaan / blokkeren op een netwerk met datalimiet (mobiel) netwerk.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Toestaan / Blokkeren op een (WiFi-) netwerk zonder datalimiet.</string>
+    <string name="fapps_info_metered_msg" translatable="true">Toestaan / Blokkeren op een (Mobiel) netwerk met datalimiet.</string>
     <string name="fapps_info_bypass_msg" translatable="true">Universele firewallregels omzeilen.</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">DNS- en firewallregels omzeilen.</string>
     <string name="fapps_info_exclude_msg" translatable="true">Uitsluiten van zowel DNS als firewall.</string>
     <string name="fapps_info_isolate_msg" translatable="true">Alles blokkeren behalve vertrouwde IP-adressen.</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Toestaan op netwerk zonder datalimiet</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blokkeren op netwerk zonder datalimiet</string>
-    <string name="fapps_unmetered_block_dialog_message" translatable="true">Verbindingen op een netwerk zonder datalimiet (wifi) blokkeren voor <i>vermelde</i> apps?</string>
-    <string name="fapps_unmetered_unblock_dialog_message">Verbindingen op een netwerk zonder datalimiet (wifi) toestaan voor <i>vermelde</i> apps?</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Verbindingen op een (WiFi) netwerk zonder datalimiet blokkeren voor <i>vermelde</i> apps?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Verbindingen op een (WiFi-) netwerk zonder datalimiet toestaan voor <i>vermelde</i> apps?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Blokkeren op netwerk met datalimiet</string>
-    <string name="fapps_metered_block_dialog_message" translatable="true">Verbindingen op een netwerk met datalimiet (mobiel netwerk) blokkeren voor <i>vermelde</i> apps?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Verbindingen op een (mobiel) netwerk met datalimiet blokkeren voor <i>vermelde</i> apps?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Toestaan op netwerk met datalimiet</string>
-    <string name="fapps_metered_unblock_dialog_message" translatable="true">Verbindingen op een netwerk met datalimiet (mobiel netwerk) toestaan voor <i>vermelde</i> apps?</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Verbindingen op een (mobiel) netwerk met datalimiet toestaan voor <i>vermelde</i> apps?</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">Apps omzeilen</string>
     <string name="fapps_bypass_block_dialog_message" translatable="true">Universele firewallregels omzeilen voor <i>vermelde</i> apps?</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Apps omzeilen</string>
@@ -804,8 +804,8 @@
     <string name="settings_local_blocklist_in_use" translatable="true">%1$s blokkeerlijsten in gebruik</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s is uitgeschakeld omdat er proxy\'s actief zijn</string>
     <string name="firewall_rule_block_unmetered" translatable="true">Netwerk zonder datalimiet (wifi)</string>
-    <string name="firewall_rule_block_metered" translatable="true">Netwerk met datalimiet (mobiel)</string>
-    <string name="firewall_rule_univ_block_metered" translatable="true">Netwerk met datalimiet (universeel)</string>
+    <string name="firewall_rule_block_metered" translatable="true">Netwerk met datalimiet (Mobiel)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Netwerk met datalimiet (Universeel)</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Omzeilde app</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS via proxy</string>
     <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot instellen</string>
@@ -820,9 +820,9 @@
     <string name="firewall_rule_paused_app" translatable="true">App gepauzeerd</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy-vergrendeling</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxyfout</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> wanneer hij probeerde verbinding te maken op <i>Ongemeten</i> netwerk.<br><br> Om te wijzigen ga naar <i>All Apps</i> tab.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel heeft deze <i>app</i> geblokkeerd bij het verbinden via een <i>Netwerk zonder datalimiet</i>.<br><br> Om te wijzigen ga naar <i>Alle Apps</i> tabblad.]]></string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel heeft deze <i>app</i> geblokkeerd bij het verbinden via een <i>netwerk met datalimiet</i>.<br><br>Ga naar het tabblad <i>Alle apps</i> om dit te wijzigen.]]></string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde universele firewallregel heeft deze <i>app</i> geblokkeerd bij het verbinden via een <i>netwerk met datalimiet</i> (mobiel).<br><br>Ga naar het tabblad <i>Universeel</i> om dit te wijzigen.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde universele firewallregel heeft deze <i>app</i> geblokkeerd bij het verbinden via een (mobiel) <i>netwerk met datalimiet</i>.<br><br> Ga naar het tabblad <i>Universeel</i> om dit te wijzigen.]]></string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Deze verbinding is toegestaan omdat de <i>bron-app</i> is ingesteld om de DNS- en firewallregels te <i>omzeilen</i>.<br><br>Ga naar het scherm <i>App-specifieke firewall</i> om dit te wijzigen.]]></string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel heeft het <i>doel-IP-adres / de poort</i> geblokkeerd.<br><br>Ga naar het tabblad <i>Universeel</i> om dit te wijzigen.]]></string>
     <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel heeft het <i>doel-IP-adres</i> geblokkeerd.<br><br>Ga naar het scherm <i>App-specifieke firewall</i> om dit te wijzigen.]]></string>
@@ -836,7 +836,7 @@
     <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[Deze verbinding werd toegestaan omdat de <i>bron app</i> is ingesteld op <i>omzeilen universele</i> firewall regels.<br><br> Ga om te wijzigen naar <i>App-specifieke firewall</i> scherm.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[Deze DNS-verbinding werd geproxied en doorgestuurd naar het door de gebruiker gewenste DNS-eindpunt.<br><br> Om uit te schakelen <i>Voorkom DNS-lekken</i> van het scherm DNS <i>Configuratie</i>.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[Deze verbinding werd toegestaan omdat <i>one-click Tor-as-a-proxy</i> setup via Orbot aan de gang was.]]></string>
-    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[Deze verbinding werd geblokkeerd omdat deze waarschijnlijk <i>onveilige HTTP</i> gebruikte.<br><br> Om te veranderen ga naar <i>Universele</i> tab.]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[Deze verbinding werd geblokkeerd omdat deze waarschijnlijk <i>onveilige HTTP</i> gebruikte.<br><br> Om te veranderen ga naar <i>Universeel</i> tabblad.]]></string>
     <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Een door de gebruiker ingestelde firewallregel blokkeerde het <i>domein</i>.<br><br> Ga om te wijzigen naar <i>App-specifieke firewall</i> scherm.]]></string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Deze verbinding werd toegestaan omdat het <i>domein</i> is ingesteld als Vertrouwd domein.<br><br> Ga om te wijzigen naar <i>App-specifieke firewall</i> scherm.]]></string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Deze verbinding is geblokkeerd omdat het <i>domein</i> wordt geblokkeerd door user-preferred DNS.<br><br> Om dit gedrag te veranderen gaat u naar het tabblad <i>DNS configureren</i>.]]></string>
@@ -865,8 +865,8 @@
     <string name="ada_ip_no_connection" translatable="true">Geen netwerklogboeken voor deze categorie.</string>
     <string name="ada_app_status_allow" translatable="true">Is toegestaan</string>
     <string name="ada_app_status_block" translatable="true">Is geblokkeerd</string>
-    <string name="ada_app_status_block_wifi" translatable="true">is geblokkeerd op netwerken zonder datalimiet (wifi)</string>
-    <string name="ada_app_status_block_md" translatable="true">is geblokkeerd op netwerken met datalimiet (mobiel)</string>
+    <string name="ada_app_status_block_wifi" translatable="true">is geblokkeerd op (wifi-) netwerken zonder datalimiet</string>
+    <string name="ada_app_status_block_md" translatable="true">is geblokkeerd op (mobiele) netwerken met datalimiet</string>
     <string name="ada_app_status_whitelist" translatable="true">zal universele firewallregels omzeilen</string>
     <string name="ada_app_status_exclude" translatable="true">is uitgesloten van DNS en firewall</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">zal universele DNS- en firewallregels omzeilen</string>
@@ -1100,4 +1100,16 @@
     <string name="log_activity_interval_empty" translatable="true">Geen activiteit opgenomen in deze periode</string>
     <string name="logs_card_grid_desc" translatable="true">Activiteitsraster, tik om details te zien</string>
     <string name="lbl_enable" translatable="true">Inschakelen</string>
+    <string name="restore_defaults_dialog_title" translatable="true">Standaardinstellingen herstellen?</string>
+    <string name="restore_defaults_dialog_message" translatable="true">Alle instellingen op dit scherm zullen worden teruggezet naar hun standaardwaardne. Deze actie kan niet ongedaan worden.</string>
+    <string name="restore_defaults_success_toast" translatable="true">Instellingen hersteld naar standaardwaarden</string>
+    <string name="lbl_app_rules" translatable="true">Appregels</string>
+    <string name="lbl_notes" translatable="true">Notities</string>
+    <string name="hint_notes" translatable="true">Voeg notities toe over deze app</string>
+    <string name="ctbs_note_char_counter" translatable="true">%1$d/%2$d</string>
+    <string name="ctbs_app_notes_too_long" translatable="true">Notities kunnen maximaal 500 tekens bevatten</string>
+    <string name="ctbs_app_notes_save_failed" translatable="true">Notities opslaan mislukt</string>
+    <string name="wg_automation_action_resume" translatable="true">hervatten</string>
+    <string name="settings_tunnel_metered" translatable="true">Altijd met een datalimiet</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Markeer Rethink\'s VPN-tunnel als een netwerk met een datalimiet om apps te beïnvloeden om minder data te gebruiken. Waarschuwing: Dit zorgt er mogelijk voor dat app grote up- &amp; downloads, zoals back-ups, pauzeren.</string>
 </resources>
