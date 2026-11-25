@@ -45,6 +45,8 @@ object ProxyManager : KoinComponent {
 
     const val TCP_PROXY_NAME = "Rethink-Proxy"
     const val ORBOT_PROXY_NAME = "Orbot"
+    const val S5_PROXY_NAME = "SOCKS5"
+    const val HTTP_PROXY_NAME = "HTTP"
 
     // we are using ProxyAppMapTuple instead of ProxyApplicationMapping for the pamSet as the equals
     // and hash method implementation is overridden and cannot be used for the pamSet
@@ -402,6 +404,15 @@ object ProxyManager : KoinComponent {
 
     fun isAnyAppSelected(proxyId: String): Boolean {
         return pamSet.any { it.proxyId == proxyId }
+    }
+
+    /**
+     * fork: per-app scoping for the custom socks5 / http proxies.
+     * When no app has been selected for [proxyId], the proxy applies to every app (stock
+     * behaviour). Once at least one app is selected, only the selected apps use it.
+     */
+    fun appliesToApp(uid: Int, proxyId: String): Boolean {
+        return !isAnyAppSelected(proxyId) || getProxyIdsForApp(uid).contains(proxyId)
     }
 
     private fun isValidProxyPrefix(pid: String): Boolean {

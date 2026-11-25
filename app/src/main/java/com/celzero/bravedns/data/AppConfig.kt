@@ -544,8 +544,8 @@ internal constructor(
     }
 
     fun isWireGuardEnabled(): Boolean {
-        val proxyType = ProxyType.of(persistentState.proxyType)
-        return proxyType.isProxyTypeWireguard()
+        // fork: wireguard is tracked by WireguardManager, not by the persisted proxy type
+        return WireguardManager.getActiveWgCount() > 0
     }
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {

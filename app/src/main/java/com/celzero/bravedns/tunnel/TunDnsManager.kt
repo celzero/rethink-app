@@ -708,11 +708,31 @@ object TunDnsManager: KoinComponent {
         val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, "", 0, domain, usesCellularNw, ssid) else emptyList()
 
         val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
-        return if (appConfig.isCustomSocks5Enabled()) {
+        // fork: wireguard takes precedence over socks5 / http / orbot, mirroring the flow
+        // routing in TunFlowManager.determineProxyDetails. without this, dns for apps routed
+        // via wireguard would be sent over socks5 when both are enabled.
+        val wgIds = WireguardManager.getAllPossibleConfigIdsForApp(
+            uid,
+            ip = "",
+            port = 0,
+            domain,
+            usesCellularNw,
+            ssid,
+            if (rpnIds.isNotEmpty()) "" else emptyOrDefault // no need add default proxy in case if rpn id's available
+        )
+        if (wgIds.any { it == Backend.Block || it == Backend.BlockAll }) {
+            return Backend.Block
+        }
+        if (wgIds.any { it.startsWith(ID_WG_BASE, ignoreCase = true) }) {
+            val ids = (rpnIds + wgIds).joinToString(":")
+            logd("(onQuery-pid) fid: $fid, wg ids($ids) take precedence over custom proxies for uid: $uid")
+            return ids
+        }
+        return if (appConfig.isCustomSocks5Enabled() && ProxyManager.appliesToApp(uid, ProxyManager.ID_S5_BASE)) {
             val id = proxyIdBuilder(ProxyManager.ID_S5_BASE, emptyOrDefault)
             logd("(onQuery-pid) fid: $fid, customSocks5 enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
             rpnIds.plus(id).joinToString(":")
-        } else if (appConfig.isCustomHttpProxyEnabled()) {
+        } else if (appConfig.isCustomHttpProxyEnabled() && ProxyManager.appliesToApp(uid, ProxyManager.ID_HTTP_BASE)) {
             val id = proxyIdBuilder(ProxyManager.ID_HTTP_BASE, emptyOrDefault)
             logd("(onQuery-pid) fid: $fid, customHttp enabled, return $rpnIds,$id, global-proxy-lockdown? $isGlobalProxyLockdown")
             rpnIds.plus(id).joinToString(":")
@@ -722,16 +742,7 @@ object TunDnsManager: KoinComponent {
             rpnIds.plus(id).joinToString(":")
         } else {
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
-            val ids = WireguardManager.getAllPossibleConfigIdsForApp(
-                uid,
-                ip = "",
-                port = 0,
-                domain,
-                usesCellularNw,
-                ssid,
-                if (rpnIds.isNotEmpty()) "" else emptyOrDefault // no need add default proxy in case if rpn id's available
-            )
-            val proxyIds = rpnIds + ids
+            val proxyIds = rpnIds + wgIds
             if (proxyIds.any { it == Backend.Block || it == Backend.BlockAll }) {
                 return Backend.Block
             }

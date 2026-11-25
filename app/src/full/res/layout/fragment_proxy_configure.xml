@@ -405,6 +405,24 @@
                             android:paddingTop="5dp"
                             android:text="@string/settings_socks5_desc"
                             android:textSize="@dimen/default_font_text_view" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_socks5_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="2dp"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_socks5_apps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
@@ -473,6 +491,24 @@
                             android:paddingBottom="5dp"
                             android:text="@string/settings_https_desc"
                             android:textSize="@dimen/default_font_text_view" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_http_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="2dp"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_http_apps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch
