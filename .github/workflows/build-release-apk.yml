@@ -1,0 +1,50 @@
+name: Build Release APK (universal)
+
+on:
+  workflow_dispatch:   # run manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0   # the build derives versionName from git history
+    - name: JDK 17
+      uses: actions/setup-java@v5
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+    - name: Recreate signing key from secrets
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: |
+        if [ -z "$KEYSTORE_BASE64" ]; then
+          echo "::error::Secret KEYSTORE_BASE64 is missing. See setup steps."
+          exit 1
+        fi
+        echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+        {
+          echo "storeFile=$RUNNER_TEMP/release.jks"
+          echo "storePassword=$KEYSTORE_PASSWORD"
+          echo "keyAlias=$KEY_ALIAS"
+          echo "keyPassword=$KEY_PASSWORD"
+        } > keystore.properties
+    - name: Build signed release APK (F-Droid flavor, no Google services needed)
+      run: ./gradlew assembleFdroidFullRelease --warning-mode all
+    - name: Remove key material
+      if: always()
+      run: rm -f keystore.properties "$RUNNER_TEMP/release.jks"
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: rethink-wg-socks5-release-apk
+        path: app/build/outputs/apk/**/*universal*.apk
+        if-no-files-found: error

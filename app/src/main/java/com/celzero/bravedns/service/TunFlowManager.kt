@@ -1182,6 +1182,19 @@ object TunFlowManager : KoinComponent {
             return persistAndConstructFlowResponse(ctx, connTracker, baseOrAutoOrExit, connId, uid, forUpstreamAnswer)
         }
 
+        // fork: a custom socks5 / http proxy claims the flow ahead of wireguard (including any
+        // catch-all config) when the app was explicitly selected for it or the destination matches
+        // its rules. fail closed: no fallback to wireguard / exit, so ex: a tor-bound app never
+        // leaks over wireguard. rethink's own traffic (it dials these proxies) is never claimed.
+        if (uid != rethinkUid) {
+            val custom = ProxyManager.customProxyIdsFor(uid, connTracker.destIP, connTracker.query)
+            if (custom.isNotEmpty()) {
+                val ids = (rpnIds + custom).joinToString(",")
+                logd("flow/upstream: custom proxy $ids claims $connId, $uid, ${connTracker.query}, ${connTracker.destIP}")
+                return persistAndConstructFlowResponse(ctx, connTracker, ids, connId, uid, forUpstreamAnswer)
+            }
+        }
+
         val defProxy = if (rpnIds.isNotEmpty() || isGlobalLockdown) "" else baseOrAutoOrExit
         val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query.orEmpty(), usesMobileNw, ssid, defProxy)
         if (wgs.isNotEmpty() && wgs.first() != baseOrAutoOrExit) {

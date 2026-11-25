@@ -543,6 +543,19 @@ internal constructor(
         return TcpProxyHelper.getActiveTcpProxy() != null
     }
 
+    // fork: destination rules for the custom socks5 / http proxies, see ProxyRouteRules
+    fun getS5RouteRules(): String = persistentState.s5RouteRules
+
+    fun getHttpRouteRules(): String = persistentState.httpRouteRules
+
+    fun setS5RouteRules(rules: String) {
+        persistentState.s5RouteRules = rules
+    }
+
+    fun setHttpRouteRules(rules: String) {
+        persistentState.httpRouteRules = rules
+    }
+
     fun isWireGuardEnabled(): Boolean {
         // fork: wireguard is tracked by WireguardManager, not by the persisted proxy type
         return WireguardManager.getActiveWgCount() > 0

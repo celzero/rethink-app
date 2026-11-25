@@ -708,9 +708,19 @@ object TunDnsManager: KoinComponent {
         val rpnIds = if (RpnProxyManager.isRpnActive()) RpnProxyManager.getAllPossibleConfigIdsForApp(uid, "", 0, domain, usesCellularNw, ssid) else emptyList()
 
         val emptyOrDefault = if (isGlobalProxyLockdown) "" else defaultProxy
-        // fork: wireguard takes precedence over socks5 / http / orbot, mirroring the flow
-        // routing in TunFlowManager.determineProxyDetails. without this, dns for apps routed
-        // via wireguard would be sent over socks5 when both are enabled.
+        // fork: a custom proxy that claims the app (or the domain) also carries its dns, otherwise
+        // names would resolve outside the proxy (ex: a tor-bound app leaking lookups to wireguard)
+        if (uid != rethinkUid) {
+            val custom = ProxyManager.customProxyIdsFor(uid, null, domain)
+            if (custom.isNotEmpty()) {
+                val ids = (rpnIds + custom).joinToString(":")
+                logd("(onQuery-pid) fid: $fid, custom proxy ids($ids) claim dns for uid: $uid, $domain")
+                return ids
+            }
+        }
+        // fork: wireguard takes precedence over the global socks5 / http / orbot fallback,
+        // mirroring the flow routing in TunFlowManager.determineProxyDetails. without this, dns
+        // for apps routed via wireguard would be sent over socks5 when both are enabled.
         val wgIds = WireguardManager.getAllPossibleConfigIdsForApp(
             uid,
             ip = "",

@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.LOG_TAG_PROXY
+import com.celzero.bravedns.util.ProxyRouteRules
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
@@ -413,6 +414,38 @@ object ProxyManager : KoinComponent {
      */
     fun appliesToApp(uid: Int, proxyId: String): Boolean {
         return !isAnyAppSelected(proxyId) || getProxyIdsForApp(uid).contains(proxyId)
+    }
+
+    /**
+     * fork: ids of the custom socks5 / http proxies that must take a flow ahead of wireguard.
+     * A proxy takes the flow when the app was explicitly selected for it, or when the
+     * destination ([destIp] / [domain]) matches the proxy's destination rules. This mirrors how a
+     * wireguard config claims traffic through its apps and allowed-ips, and is what lets a
+     * catch-all wireguard coexist with, ex: a tor or tailscale socks5 proxy. The proxy's own
+     * forwarder app is never routed back into the proxy.
+     */
+    suspend fun customProxyIdsFor(uid: Int, destIp: String?, domain: String?): List<String> {
+        val ids = mutableListOf<String>()
+        val pkg = FirewallManager.getPackageNameByUid(uid)
+
+        if (appConfig.isCustomSocks5Enabled() &&
+            claimsFlow(uid, ID_S5_BASE, appConfig.getS5RouteRules(), destIp, domain) &&
+            appConfig.getSocks5ProxyDetails()?.proxyAppName.let { it.isNullOrEmpty() || it != pkg }
+        ) {
+            ids.add(ID_S5_BASE)
+        }
+        if (appConfig.isCustomHttpProxyEnabled() &&
+            claimsFlow(uid, ID_HTTP_BASE, appConfig.getHttpRouteRules(), destIp, domain) &&
+            appConfig.getHttpProxyDetails()?.proxyAppName.let { it.isNullOrEmpty() || it != pkg }
+        ) {
+            ids.add(ID_HTTP_BASE)
+        }
+        return ids
+    }
+
+    private fun claimsFlow(uid: Int, proxyId: String, rules: String, destIp: String?, domain: String?): Boolean {
+        return getProxyIdsForApp(uid).contains(proxyId) ||
+            ProxyRouteRules.matches(rules, destIp, domain)
     }
 
     private fun isValidProxyPrefix(pid: String): Boolean {

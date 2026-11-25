@@ -249,6 +249,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var proxyType by
         stringPref("proxy_proxytype").withDefault<String>(AppConfig.ProxyType.NONE.name)
 
+    // fork: destination rules (ip / cidr / domain, one per line) that send matching traffic from
+    // any app to the custom socks5 / http proxy ahead of wireguard, see ProxyRouteRules
+    var s5RouteRules by stringPref("proxy_s5_route_rules").withDefault<String>("")
+
+    var httpRouteRules by stringPref("proxy_http_route_rules").withDefault<String>("")
+
     // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by
         stringPref("proxy_proxyprovider").withDefault<String>(AppConfig.ProxyProvider.NONE.name)

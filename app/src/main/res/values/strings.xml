@@ -1828,6 +1828,12 @@
     <string name="one_wg_error_toast" translatable="true">To switch to Advanced, stop WireGuard in Simple mode</string>
 
     <string name="settings_proxy_apps_all" translatable="false">All apps (tap to choose specific apps)</string>
+    <string name="settings_proxy_rules_none" translatable="false">Destination rules: none (tap to add)</string>
+    <string name="settings_proxy_rules_count" translatable="false">Destination rules: %1$d (tap to edit)</string>
+    <string name="settings_proxy_rules_title" translatable="false">%1$s destination rules</string>
+    <string name="settings_proxy_rules_help" translatable="false">One per line: an IP, a CIDR (100.64.0.0/10) or a domain (*.ts.net). Matching traffic from any app goes through this proxy, ahead of WireGuard.</string>
+    <string name="settings_proxy_rules_save" translatable="false">Save</string>
+    <string name="settings_proxy_rules_cancel" translatable="false">Cancel</string>
     <string name="settings_proxy_status" translatable="false">Status: %1$s</string>
     <string name="add_remove_apps" translatable="true">Add / Remove (%1$s apps)</string>
     <string name="routing_remaining_apps" translatable="true">Routing remaining apps</string>

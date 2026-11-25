@@ -25,5 +25,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: rethink-wg-socks5-debug-apk
-        path: app/build/outputs/apk/**/*.apk
+        path: app/build/outputs/apk/**/*universal*.apk
         if-no-files-found: error

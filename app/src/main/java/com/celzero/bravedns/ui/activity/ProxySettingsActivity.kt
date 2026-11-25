@@ -23,7 +23,9 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.text.format.DateUtils
+import android.text.InputType
 import android.view.MotionEvent
+import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
@@ -32,6 +34,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -70,6 +73,7 @@ import com.celzero.bravedns.util.SnackbarHelper.capitalizeWords
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.ProxyRouteRules
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
@@ -153,6 +157,36 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         refreshCustomProxyExtras()
     }
 
+    // fork: editor for a custom proxy's destination rules (see ProxyRouteRules)
+    private fun showRouteRulesDialog(proxyName: String, current: String, onSave: (String) -> Unit) {
+        val input =
+            EditText(this).apply {
+                setText(current)
+                hint = "100.64.0.0/10\n*.ts.net"
+                minLines = 4
+                gravity = Gravity.TOP or Gravity.START
+                inputType =
+                    InputType.TYPE_CLASS_TEXT or
+                        InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            }
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val container =
+            FrameLayout(this).apply {
+                setPadding(pad, pad / 2, pad, 0)
+                addView(input)
+            }
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
+            .setTitle(getString(R.string.settings_proxy_rules_title, proxyName))
+            .setMessage(getString(R.string.settings_proxy_rules_help))
+            .setView(container)
+            .setPositiveButton(getString(R.string.settings_proxy_rules_save)) { _, _ ->
+                onSave(input.text.toString().trim())
+            }
+            .setNegativeButton(getString(R.string.settings_proxy_rules_cancel)) { d, _ -> d.dismiss() }
+            .show()
+    }
+
     // the endpoint is saved asynchronously, so give it a moment before re-reading app config
     private fun refreshCustomProxyExtrasDelayed() {
         io {
@@ -169,6 +203,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             ProxyManager.S5_PROXY_NAME,
             b.settingsActivitySocks5Status,
             b.settingsActivitySocks5Apps,
+            b.settingsActivitySocks5Rules,
+            { appConfig.getS5RouteRules() },
+            { appConfig.setS5RouteRules(it) },
         )
         updateCustomProxyRow(
             appConfig.isCustomHttpProxyEnabled(),
@@ -176,6 +213,9 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             ProxyManager.HTTP_PROXY_NAME,
             b.settingsActivityHttpStatus,
             b.settingsActivityHttpApps,
+            b.settingsActivityHttpRules,
+            { appConfig.getHttpRouteRules() },
+            { appConfig.setHttpRouteRules(it) },
         )
     }
 
@@ -185,11 +225,29 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
         proxyName: String,
         statusView: TextView,
         appsView: TextView,
+        rulesView: TextView,
+        getRules: () -> String,
+        setRules: (String) -> Unit,
     ) {
         if (!enabled) {
             statusView.visibility = View.GONE
             appsView.visibility = View.GONE
+            rulesView.visibility = View.GONE
             return
+        }
+        rulesView.visibility = View.VISIBLE
+        val ruleCount = ProxyRouteRules.count(getRules())
+        rulesView.text =
+            if (ruleCount == 0) {
+                getString(R.string.settings_proxy_rules_none)
+            } else {
+                getString(R.string.settings_proxy_rules_count, ruleCount)
+            }
+        rulesView.setOnClickListener {
+            showRouteRulesDialog(proxyName, getRules()) { updated ->
+                setRules(updated)
+                refreshCustomProxyExtras()
+            }
         }
         val count = ProxyManager.getAppCountForProxy(proxyId)
         appsView.visibility = View.VISIBLE
