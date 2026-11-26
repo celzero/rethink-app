@@ -556,6 +556,14 @@ internal constructor(
         persistentState.httpRouteRules = rules
     }
 
+    fun getDnsRouteRules(): String = persistentState.dnsRouteRules
+
+    fun setDnsRouteRules(rules: String) {
+        persistentState.dnsRouteRules = rules
+    }
+
+    fun getDnsRouteResolver(): String = persistentState.dnsRouteResolver
+
     fun isWireGuardEnabled(): Boolean {
         // fork: wireguard is tracked by WireguardManager, not by the persisted proxy type
         return WireguardManager.getActiveWgCount() > 0

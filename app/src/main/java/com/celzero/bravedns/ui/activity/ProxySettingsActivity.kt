@@ -158,7 +158,13 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
     }
 
     // fork: editor for a custom proxy's destination rules (see ProxyRouteRules)
-    private fun showRouteRulesDialog(proxyName: String, current: String, onSave: (String) -> Unit) {
+    private fun showRouteRulesDialog(
+        proxyName: String,
+        current: String,
+        onSave: (String) -> Unit,
+        title: String = getString(R.string.settings_proxy_rules_title, proxyName),
+        help: String = getString(R.string.settings_proxy_rules_help),
+    ) {
         val input =
             EditText(this).apply {
                 setText(current)
@@ -177,8 +183,8 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
                 addView(input)
             }
         MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
-            .setTitle(getString(R.string.settings_proxy_rules_title, proxyName))
-            .setMessage(getString(R.string.settings_proxy_rules_help))
+            .setTitle(title)
+            .setMessage(help)
             .setView(container)
             .setPositiveButton(getString(R.string.settings_proxy_rules_save)) { _, _ ->
                 onSave(input.text.toString().trim())
@@ -197,6 +203,7 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
 
     // fork: live status + per-app selection rows for the custom socks5 / http proxies
     private fun refreshCustomProxyExtras() {
+        updateProxyDnsRulesRow()
         updateCustomProxyRow(
             appConfig.isCustomSocks5Enabled(),
             ProxyManager.ID_S5_BASE,
@@ -217,6 +224,31 @@ class ProxySettingsActivity : BaseActivity(R.layout.fragment_proxy_configure) {
             { appConfig.getHttpRouteRules() },
             { appConfig.setHttpRouteRules(it) },
         )
+    }
+
+    private fun updateProxyDnsRulesRow() {
+        val v = b.settingsActivityProxyDnsRules
+        if (!appConfig.isCustomSocks5Enabled() && !appConfig.isCustomHttpProxyEnabled()) {
+            v.visibility = View.GONE
+            return
+        }
+        v.visibility = View.VISIBLE
+        val n = ProxyRouteRules.count(appConfig.getDnsRouteRules())
+        v.text =
+            if (n == 0) getString(R.string.settings_proxy_dns_rules_none)
+            else getString(R.string.settings_proxy_dns_rules_count, n)
+        v.setOnClickListener {
+            showRouteRulesDialog(
+                "",
+                appConfig.getDnsRouteRules(),
+                { updated ->
+                    appConfig.setDnsRouteRules(updated)
+                    refreshCustomProxyExtras()
+                },
+                getString(R.string.settings_proxy_dns_rules_title),
+                getString(R.string.settings_proxy_dns_rules_help),
+            )
+        }
     }
 
     private fun updateCustomProxyRow(

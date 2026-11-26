@@ -255,6 +255,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var httpRouteRules by stringPref("proxy_http_route_rules").withDefault<String>("")
 
+    // fork: domains (ex: *.ts.net) resolved by a dedicated resolver reached through the custom
+    // socks5 / http proxy, so tailnet names resolve to tailnet ips and not public ones
+    var dnsRouteRules by stringPref("proxy_dns_route_rules").withDefault<String>("*.ts.net")
+
+    var dnsRouteResolver by stringPref("proxy_dns_route_resolver").withDefault<String>("100.100.100.100")
+
     // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by
         stringPref("proxy_proxyprovider").withDefault<String>(AppConfig.ProxyProvider.NONE.name)

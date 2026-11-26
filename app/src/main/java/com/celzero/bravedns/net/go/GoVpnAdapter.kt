@@ -322,7 +322,22 @@ class GoVpnAdapter : KoinComponent {
         // stale block free transport when user switches from rethink remote to other dns type.
         // for other dns types, the block free transport is not added at all, so no need to remove.
         removeBlockFreeTransportIfNeeded()
+        addProxyDomainDnsTransport()
         Logger.v(LOG_TAG_VPN, "$TAG addTransport done")
+    }
+
+    // fork: resolver (default 100.100.100.100, tailscale magicdns) used only for the proxied-domain
+    // dns rules; the queries to it are carried by the custom socks5 / http proxy
+    private fun addProxyDomainDnsTransport() {
+        try {
+            val resolver = appConfig.getDnsRouteResolver().trim()
+            if (resolver.isEmpty()) return
+            val ipPort = if (resolver.contains(":")) resolver else "$resolver:53"
+            Intra.addDNSProxy(tunnel, ProxyManager.DNS_DOMAIN_TID, ipPort)
+            Logger.i(LOG_TAG_VPN, "$TAG proxied-domain dns transport added: $ipPort")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err adding proxied-domain dns transport: ${e.message}", e)
+        }
     }
 
     private suspend fun fallbackToRethinkDefault() {

@@ -78,6 +78,7 @@ object TunDnsManager: KoinComponent {
     internal const val BRANCH_UA_PORT_RULE = "upstream-port-rule"
     internal const val BRANCH_UA_EMPTY_IPCSV = "upstream-empty-ipcsv"
     internal const val BRANCH_UA_DNS_MODE = "upstream-dns-mode"
+    internal const val BRANCH_PROXY_DOMAIN_DNS = "proxy-domain-dns"
     internal const val BRANCH_UA_FIXED_TRANSPORT = "upstream-fixed-transport"
     internal const val BRANCH_UA_UNKNOWN_APP = "upstream-unknown-app"
     internal const val BRANCH_UA_FIREWALL_BLOCKED = "upstream-firewall-blocked"
@@ -231,6 +232,13 @@ object TunDnsManager: KoinComponent {
         if (d.isCaptivePortal) {
             logw("onQuery: fid: ${d.fid}, captive portal active, routing ${d.fqdn} to system dns")
             val r = makeDecision(uid, Pair(Backend.System, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_CAPTIVE_PORTAL)
+            return checkUserAllowedDnsQtypes(r, d.qtype, d.fid)
+        }
+
+        // fork: names matching the proxied-domain dns rules (ex: *.ts.net) are resolved by a
+        // dedicated resolver reached through the custom proxy (see GoVpnAdapter)
+        if (uid != rethinkUid && ProxyManager.proxyForDomainDns(d.fqdn) != null) {
+            val r = makeDecision(uid, Pair(ProxyManager.DNS_DOMAIN_TID, ""), d.fqdn, true, d.isIfaceCellular, d.ssid, BRANCH_PROXY_DOMAIN_DNS)
             return checkUserAllowedDnsQtypes(r, d.qtype, d.fid)
         }
 
@@ -602,7 +610,9 @@ object TunDnsManager: KoinComponent {
         // firestack is already expected to bypass proxies for rethink uid when rinr is false
         // for rethink over origin internal case, no matter what the proxyId is set, if the
         // transport is set to default in that case, the proxyId will be ignored in firestack
-        val pidcsv = if (appConfig.getBraveMode().isDnsMode()) {
+        val pidcsv = if (tid.first == ProxyManager.DNS_DOMAIN_TID) {
+            ProxyManager.proxyForDomainDns(domain) ?: Backend.Base
+        } else if (appConfig.getBraveMode().isDnsMode()) {
             Backend.Base
         } else {
             proxyIdForOnQuery(uid, domain, isIfaceCellular, ssid, fid)

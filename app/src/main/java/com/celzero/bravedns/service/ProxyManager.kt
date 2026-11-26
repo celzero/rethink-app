@@ -46,6 +46,8 @@ object ProxyManager : KoinComponent {
 
     const val TCP_PROXY_NAME = "Rethink-Proxy"
     const val ORBOT_PROXY_NAME = "Orbot"
+    // transport id of the resolver used for proxied-domain dns (see TunDnsManager)
+    const val DNS_DOMAIN_TID = "ProxyDomainDns"
     const val S5_PROXY_NAME = "SOCKS5"
     const val HTTP_PROXY_NAME = "HTTP"
 
@@ -565,6 +567,16 @@ object ProxyManager : KoinComponent {
             if (toRemove.isEmpty()) return@withLock
             pamSet.removeAll(toRemove.toSet())
             db.deleteMapping(uid, packageName, proxyId)
+        }
+    }
+
+    // fork: the proxy that carries dns for the proxied-domain rules, or null if none is enabled
+    fun proxyForDomainDns(domain: String): String? {
+        if (!ProxyRouteRules.matches(appConfig.getDnsRouteRules(), null, domain)) return null
+        return when {
+            appConfig.isCustomSocks5Enabled() -> ID_S5_BASE
+            appConfig.isCustomHttpProxyEnabled() -> ID_HTTP_BASE
+            else -> null
         }
     }
 }

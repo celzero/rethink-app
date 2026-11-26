@@ -531,6 +531,17 @@
                             android:textColor="?attr/accentGood"
                             android:textSize="@dimen/default_font_text_view"
                             android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_activity_proxy_dns_rules"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <com.google.android.material.materialswitch.MaterialSwitch

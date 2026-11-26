@@ -1832,6 +1832,10 @@
     <string name="settings_proxy_rules_count" translatable="false">Destination rules: %1$d (tap to edit)</string>
     <string name="settings_proxy_rules_title" translatable="false">%1$s destination rules</string>
     <string name="settings_proxy_rules_help" translatable="false">One per line: an IP, a CIDR (100.64.0.0/10) or a domain (*.ts.net). Matching traffic from any app goes through this proxy, ahead of WireGuard.</string>
+    <string name="settings_proxy_dns_rules_count" translatable="false">DNS via proxy domains: %1$d (tap to edit)</string>
+    <string name="settings_proxy_dns_rules_none" translatable="false">DNS via proxy domains: none (tap to add)</string>
+    <string name="settings_proxy_dns_rules_title" translatable="false">DNS via proxy domains</string>
+    <string name="settings_proxy_dns_rules_help" translatable="false">One domain per line, ex: *.ts.net. These names are resolved by a separate resolver (default 100.100.100.100, Tailscale) reached through the SOCKS5 / HTTP proxy, so they resolve to private addresses.</string>
     <string name="settings_proxy_rules_save" translatable="false">Save</string>
     <string name="settings_proxy_rules_cancel" translatable="false">Cancel</string>
     <string name="settings_proxy_status" translatable="false">Status: %1$s</string>
